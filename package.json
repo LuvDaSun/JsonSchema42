@@ -3,6 +3,9 @@
   "workspaces": [
     "packages/ts/jns42-generator"
   ],
+  "scripts": {
+    "lint": "cspell"
+  },
   "devDependencies": {
     "cspell": "^8.0.0"
   }
