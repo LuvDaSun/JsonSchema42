@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+      "path": "jns42-generator"
+    }
+  ],
+  "settings": {
+    "window.title": "JsonSchema42 (TypeScript)",
+    "typescript.tsdk": "../../node_modules/typescript/lib"
+  }
+}
