@@ -1,9 +1,8 @@
-on: 
+on:
   - push
   - pull_request
 
 jobs:
-
   test-unit:
     runs-on: ubuntu-latest
     container: rust:1.64-alpine3.15

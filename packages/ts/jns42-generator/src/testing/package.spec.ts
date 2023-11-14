@@ -29,12 +29,7 @@ for (const packageName of packageNames) {
 }
 
 async function runTest(packageName: string) {
-  const testPath = path.join(
-    projectRoot,
-    "fixtures",
-    "testing",
-    `${packageName}.yaml`,
-  );
+  const testPath = path.join(projectRoot, "fixtures", "testing", `${packageName}.yaml`);
 
   if (!fs.existsSync(testPath)) {
     return;
@@ -67,12 +62,7 @@ async function runTest(packageName: string) {
       context.registerFactory(
         schemaDraft04.metaSchemaId,
         ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft04.Document(
-            givenUrl,
-            antecedentUrl,
-            rootNode,
-            context,
-          ),
+          new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaIntermediateB.metaSchemaId,
@@ -80,13 +70,7 @@ async function runTest(packageName: string) {
           new schemaIntermediateB.Document(givenUrl, rootNode),
       );
 
-      await context.loadFromDocument(
-        testUrl,
-        testUrl,
-        null,
-        schema,
-        schema202012.metaSchemaId,
-      );
+      await context.loadFromDocument(testUrl, testUrl, null, schema, schema202012.metaSchemaId);
 
       const intermediateData = context.getIntermediateData();
 
@@ -125,9 +109,7 @@ async function runTest(packageName: string) {
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
         await test(testName, async () => {
-          const packageMain = await import(
-            path.join(packageDirectoryPath, "main.js")
-          );
+          const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
           assert.equal(packageMain[`is${rootTypeName}`](data), true);
         });
       }
@@ -137,9 +119,7 @@ async function runTest(packageName: string) {
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];
         await test(testName, async () => {
-          const packageMain = await import(
-            path.join(packageDirectoryPath, "main.js")
-          );
+          const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
           assert.equal(packageMain[`is${rootTypeName}`](data), false);
         });
       }

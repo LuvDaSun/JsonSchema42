@@ -95,14 +95,10 @@ export class Document extends SchemaDocumentBase<N> {
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
-      const resolvedPointer =
-        resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
-      const anchorResolvedPointer =
-        resolvedDocument.nodeNameMap.get(resolvedPointer);
+      const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
+      const anchorResolvedPointer = resolvedDocument.nodeNameMap.get(resolvedPointer);
       if (anchorResolvedPointer != null) {
-        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(
-          anchorResolvedPointer,
-        );
+        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
         return anchorResolvedUrl;
       }
     }
@@ -137,11 +133,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectNodeRef(node: N) {
-    if (
-      typeof node === "object" &&
-      "$ref" in node &&
-      typeof node.$ref === "string"
-    ) {
+    if (typeof node === "object" && "$ref" in node && typeof node.$ref === "string") {
       return node.$ref;
     }
   }
@@ -189,15 +181,10 @@ export class Document extends SchemaDocumentBase<N> {
     yield* [];
   }
 
-  protected *selectNodePatternPropertyPointerEntries(
-    nodePointer: string,
-    node: N,
-  ) {
+  protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const key of Object.keys(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join(
-          "/",
-        );
+        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
         yield [key, subNodePointer] as const;
       }
     }
@@ -237,11 +224,7 @@ export class Document extends SchemaDocumentBase<N> {
     nodePointer: string,
     node: N,
   ): Iterable<readonly [string, N]> {
-    if (
-      typeof node === "object" &&
-      node.items != null &&
-      Array.isArray(node.items)
-    ) {
+    if (typeof node === "object" && node.items != null && Array.isArray(node.items)) {
       for (const [key, subNode] of Object.entries(node.items)) {
         const subNodePointer = [nodePointer, "items", key].join("/");
         yield [subNodePointer, subNode] as [string, N];
@@ -252,11 +235,7 @@ export class Document extends SchemaDocumentBase<N> {
     nodePointer: string,
     node: N,
   ): Iterable<readonly [string, N]> {
-    if (
-      typeof node === "object" &&
-      node.items != null &&
-      !Array.isArray(node.items)
-    ) {
+    if (typeof node === "object" && node.items != null && !Array.isArray(node.items)) {
       const subNode = node.items;
       const subNodePointer = [nodePointer, "items"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -274,15 +253,10 @@ export class Document extends SchemaDocumentBase<N> {
     yield* [];
   }
 
-  protected *selectSubNodePatternPropertiesEntries(
-    nodePointer: string,
-    node: N,
-  ) {
+  protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join(
-          "/",
-        );
+        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
         yield [subNodePointer, subNode] as const;
       }
     }
@@ -330,17 +304,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  protected selectSubNodeIfEntries(
-    nodePointer: string,
-    node: N,
-  ): Iterable<readonly [string, N]> {
+  protected selectSubNodeIfEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
     return [];
   }
 
-  protected selectSubNodeThenEntries(
-    nodePointer: string,
-    node: N,
-  ): Iterable<readonly [string, N]> {
+  protected selectSubNodeThenEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
     return [];
   }
 

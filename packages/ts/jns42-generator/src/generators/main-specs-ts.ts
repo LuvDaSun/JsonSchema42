@@ -20,11 +20,7 @@ export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
 
     yield f.createImportDeclaration(
       undefined,
-      f.createImportClause(
-        false,
-        undefined,
-        f.createNamespaceImport(f.createIdentifier("main")),
-      ),
+      f.createImportClause(false, undefined, f.createNamespaceImport(f.createIdentifier("main"))),
       f.createStringLiteral("./main.js"),
     );
 

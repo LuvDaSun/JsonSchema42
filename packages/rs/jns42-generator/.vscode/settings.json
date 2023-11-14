@@ -4,8 +4,6 @@
     "source.fixAll": true,
     "source.organizeImports": true
   },
-  "editor.rulers": [
-    100
-  ],
+  "editor.rulers": [100],
   "rust-analyzer.check.command": "clippy"
 }

@@ -2,12 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://jns42-generator.org/simple-object",
   "description": "A very simple object",
-  "type": [
-    "object"
-  ],
-  "required": [
-    "id"
-  ],
+  "type": ["object"],
+  "required": ["id"],
   "properties": {
     "id": {
       "description": "An identity",

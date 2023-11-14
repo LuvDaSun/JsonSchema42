@@ -106,10 +106,7 @@ Interfaces can be created with an index signature example:
 
 ```typescript
 interface ExampleWithIndex {
-  [key: ExampleKey]:
-    | ExampleMapProperty
-    | ExamplePatternProperty
-    | ExampleOtherPatternProperty;
+  [key: ExampleKey]: ExampleMapProperty | ExamplePatternProperty | ExampleOtherPatternProperty;
 }
 ```
 

@@ -47,11 +47,7 @@ export function generatePackage(
   }
 
   {
-    const codeGenerator = new MainTsCodeGenerator(
-      factory,
-      namesData,
-      intermediateData.schemas,
-    );
+    const codeGenerator = new MainTsCodeGenerator(factory, namesData, intermediateData.schemas);
     const statements = codeGenerator.getStatements();
     const filePath = path.join(options.directoryPath, "main.ts");
     fs.writeFileSync(filePath, formatStatements(factory, statements));

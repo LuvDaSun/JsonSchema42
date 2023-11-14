@@ -101,10 +101,7 @@ export class Namer {
     De-duping process
     */
     while (shouldContinueCounter > 0) {
-      const newNameMap = new Map<
-        string,
-        Array<[NameNode | undefined, NameNode]>
-      >();
+      const newNameMap = new Map<string, Array<[NameNode | undefined, NameNode]>>();
 
       shouldContinueCounter = 0;
 
@@ -113,11 +110,7 @@ export class Namer {
         if nodes.length is one then there are no duplicates. If then
         name starts with a letter, we can move on to the next name.
         */
-        if (
-          nodes.length === 1 &&
-          startsWithLetterRe.test(name) &&
-          !newNameMap.has(name)
-        ) {
+        if (nodes.length === 1 && startsWithLetterRe.test(name) && !newNameMap.has(name)) {
           const [[currentNode, targetNode]] = nodes;
           newNameMap.set(name, [[currentNode, targetNode]]);
           continue;
@@ -147,10 +140,7 @@ export class Namer {
             if uniqueParentNameParts size == 1 then there are no unique parents.
             If the size is > 1 then lest prepend the unique name to the newName
             */
-            if (
-              uniqueParentNameParts.size > 1 ||
-              !startsWithLetterRe.test(newName)
-            ) {
+            if (uniqueParentNameParts.size > 1 || !startsWithLetterRe.test(newName)) {
               newName = newCurrentNode.part + newName;
             }
           }

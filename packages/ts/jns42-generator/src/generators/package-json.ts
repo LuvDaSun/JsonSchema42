@@ -27,9 +27,7 @@ function withDependencies(names: string[]) {
   return names.reduce(
     (o, name) =>
       Object.assign(o, {
-        [name]:
-          packageInfo.dependencies?.[name] ??
-          packageInfo.devDependencies?.[name],
+        [name]: packageInfo.dependencies?.[name] ?? packageInfo.devDependencies?.[name],
       }),
     {},
   );

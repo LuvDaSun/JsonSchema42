@@ -11,14 +11,9 @@
     "src/*"
   ],
   "scripts": {
-    "prepare": "npm run compile && chmod +x out/program.js",
-    "compile": "tsc",
-    "watch": "tsc --watch",
+    "build": "tsc && chmod +x out/program.js",
     "clean": "rm -rf out",
-    "lock": "npm install --no-workspaces --package-lock-only --ignore-scripts",
-    "test": "npm run spec-all",
-    "lint": "prettier --check *",
-    "spec-all": "node --test ./out/**/*.spec.js",
+    "test": "node --test ./out/**/*.spec.js",
     "coverage": "c8 --reporter lcov npm test"
   },
   "repository": {
@@ -39,7 +34,6 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "c8": "^8.0.1",
-    "prettier": "^3.0.3",
     "yaml": "^2.3.3"
   },
   "dependencies": {

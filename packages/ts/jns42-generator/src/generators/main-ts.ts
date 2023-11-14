@@ -12,11 +12,7 @@ export class MainTsCodeGenerator extends CodeGeneratorBase {
     }
 
     {
-      const codeGenerator = new ValidatorsTsCodeGenerator(
-        f,
-        this.names,
-        this.nodes,
-      );
+      const codeGenerator = new ValidatorsTsCodeGenerator(f, this.names, this.nodes);
       yield* codeGenerator.getStatements();
     }
   }

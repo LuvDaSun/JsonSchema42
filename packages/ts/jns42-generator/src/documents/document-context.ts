@@ -1,10 +1,5 @@
 import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
-import {
-  discoverSchemaId,
-  loadJSON,
-  normalizeUrl,
-  readJson,
-} from "../utils/index.js";
+import { discoverSchemaId, loadJSON, normalizeUrl, readJson } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
@@ -15,9 +10,7 @@ export interface DocumentInitializer<N = unknown> {
   documentNode: N;
 }
 
-export type DocumentFactory<N = unknown> = (
-  initializer: DocumentInitializer<N>,
-) => DocumentBase<N>;
+export type DocumentFactory<N = unknown> = (initializer: DocumentInitializer<N>) => DocumentBase<N>;
 
 export class DocumentContext {
   /**
@@ -51,15 +44,12 @@ export class DocumentContext {
 
   public getIntermediateData(): schemaIntermediateB.SchemaJson {
     return {
-      $schema:
-        "https://schema.JsonSchema42.org/jns42-intermediate-b/schema.json",
+      $schema: "https://schema.JsonSchema42.org/jns42-intermediate-b/schema.json",
       schemas: Object.fromEntries(this.getIntermediateSchemaEntries()),
     };
   }
 
-  public *getIntermediateSchemaEntries(): Iterable<
-    readonly [string, schemaIntermediateB.Node]
-  > {
+  public *getIntermediateSchemaEntries(): Iterable<readonly [string, schemaIntermediateB.Node]> {
     for (const document of this.documents.values()) {
       yield* document.getIntermediateNodeEntries();
     }
@@ -95,12 +85,7 @@ export class DocumentContext {
       this.fillNodeCache(retrievalUrl, documentNode);
     }
 
-    await this.loadFromCache(
-      retrievalUrl,
-      givenUrl,
-      antecedentUrl,
-      defaultSchemaId,
-    );
+    await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
   }
 
   public async loadFromDocument(
@@ -115,12 +100,7 @@ export class DocumentContext {
       this.fillNodeCache(retrievalUrl, documentNode);
     }
 
-    await this.loadFromCache(
-      retrievalUrl,
-      givenUrl,
-      antecedentUrl,
-      defaultSchemaId,
-    );
+    await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
   }
 
   private fillNodeCache(retrievalUrl: URL, documentNode: unknown) {

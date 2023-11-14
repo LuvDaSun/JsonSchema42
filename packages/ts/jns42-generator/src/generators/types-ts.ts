@@ -48,46 +48,32 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     const { factory: f } = this;
 
     const typeElements = [...this.generateTypeDefinitionElements(nodeId)];
-    const compoundElements = [
-      ...this.generateCompoundDefinitionElements(nodeId),
-    ];
+    const compoundElements = [...this.generateCompoundDefinitionElements(nodeId)];
 
     let typeDefinitionNode: ts.TypeNode | undefined;
     if (compoundElements.length > 0) {
-      const typeNode = f.createParenthesizedType(
-        f.createIntersectionTypeNode(compoundElements),
-      );
+      const typeNode = f.createParenthesizedType(f.createIntersectionTypeNode(compoundElements));
       typeDefinitionNode =
         typeDefinitionNode == null
           ? typeNode
-          : f.createParenthesizedType(
-              f.createIntersectionTypeNode([typeDefinitionNode, typeNode]),
-            );
+          : f.createParenthesizedType(f.createIntersectionTypeNode([typeDefinitionNode, typeNode]));
     }
     if (typeElements.length > 0) {
-      const typeNode = f.createParenthesizedType(
-        f.createUnionTypeNode(typeElements),
-      );
+      const typeNode = f.createParenthesizedType(f.createUnionTypeNode(typeElements));
       typeDefinitionNode =
         typeDefinitionNode == null
           ? typeNode
-          : f.createParenthesizedType(
-              f.createIntersectionTypeNode([typeDefinitionNode, typeNode]),
-            );
+          : f.createParenthesizedType(f.createIntersectionTypeNode([typeDefinitionNode, typeNode]));
     }
 
     if (typeDefinitionNode == null) {
-      typeDefinitionNode = f.createKeywordTypeNode(
-        ts.SyntaxKind.UnknownKeyword,
-      );
+      typeDefinitionNode = f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
     }
 
     return typeDefinitionNode;
   }
 
-  protected *generateTypeDefinitionElements(
-    nodeId: string,
-  ): Iterable<ts.TypeNode> {
+  protected *generateTypeDefinitionElements(nodeId: string): Iterable<ts.TypeNode> {
     const node = this.nodes[nodeId];
     for (const type of node.types) {
       switch (type) {
@@ -133,15 +119,11 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
   }
 
-  protected *generateCompoundDefinitionElements(
-    nodeId: string,
-  ): Iterable<ts.TypeNode> {
+  protected *generateCompoundDefinitionElements(nodeId: string): Iterable<ts.TypeNode> {
     const node = this.nodes[nodeId];
 
     if (node.applicators.reference != null) {
-      yield this.generateReferenceCompoundDefinition(
-        node.applicators.reference,
-      );
+      yield this.generateReferenceCompoundDefinition(node.applicators.reference);
     }
     if (node.applicators.oneOf != null) {
       yield this.generateOneOfCompoundDefinition(node.applicators.oneOf);
@@ -199,9 +181,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     return this.factory.createUnionTypeNode(
       options.map((option) =>
-        this.factory.createLiteralTypeNode(
-          this.factory.createNumericLiteral(option),
-        ),
+        this.factory.createLiteralTypeNode(this.factory.createNumericLiteral(option)),
       ),
     );
   }
@@ -215,9 +195,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     return this.factory.createUnionTypeNode(
       options.map((option) =>
-        this.factory.createLiteralTypeNode(
-          this.factory.createNumericLiteral(option),
-        ),
+        this.factory.createLiteralTypeNode(this.factory.createNumericLiteral(option)),
       ),
     );
   }
@@ -231,9 +209,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
 
     return this.factory.createUnionTypeNode(
       options.map((option) =>
-        this.factory.createLiteralTypeNode(
-          this.factory.createStringLiteral(option),
-        ),
+        this.factory.createLiteralTypeNode(this.factory.createStringLiteral(option)),
       ),
     );
   }
@@ -248,22 +224,16 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
         .map((nodeId) => nodeId as string)
         .map((nodeId) => this.generateTypeReference(nodeId));
 
-      return this.factory.createArrayTypeNode(
-        this.factory.createUnionTypeNode(elements),
-      );
+      return this.factory.createArrayTypeNode(this.factory.createUnionTypeNode(elements));
     }
 
     if (tupleItems != null) {
-      const elements = tupleItems.map((nodeId) =>
-        this.generateTypeReference(nodeId),
-      );
+      const elements = tupleItems.map((nodeId) => this.generateTypeReference(nodeId));
       return this.factory.createTupleTypeNode(elements);
     }
 
     {
-      const element = this.factory.createKeywordTypeNode(
-        ts.SyntaxKind.UnknownKeyword,
-      );
+      const element = this.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword);
       return this.factory.createArrayTypeNode(element);
     }
   }
@@ -312,9 +282,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
           f.createPropertySignature(
             undefined,
             f.createIdentifier(name),
-            memberRequired
-              ? undefined
-              : f.createToken(ts.SyntaxKind.QuestionToken),
+            memberRequired ? undefined : f.createToken(ts.SyntaxKind.QuestionToken),
             typeElement,
           ),
         );
@@ -330,9 +298,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
     }
 
     if (indexMaybeUndefined) {
-      indexTypeUnionElements.push(
-        f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
-      );
+      indexTypeUnionElements.push(f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword));
     }
 
     if (hasIndexSignature) {
@@ -367,9 +333,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
       for (const intersectionTypes of choose(anyOf, count + 1)) {
         unionTypes.push(
           this.factory.createIntersectionTypeNode(
-            intersectionTypes.map((nodeId) =>
-              this.generateTypeReference(nodeId),
-            ),
+            intersectionTypes.map((nodeId) => this.generateTypeReference(nodeId)),
           ),
         );
       }
@@ -383,11 +347,7 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
   protected generateReferenceCompoundDefinition(reference: string) {
     return this.generateTypeReference(reference);
   }
-  protected generateIfCompoundDefinition(
-    $if: string,
-    then?: string,
-    $else?: string,
-  ) {
+  protected generateIfCompoundDefinition($if: string, then?: string, $else?: string) {
     const elements = new Array<ts.TypeNode>();
     if (then != null) {
       elements.push(this.generateTypeReference(then));

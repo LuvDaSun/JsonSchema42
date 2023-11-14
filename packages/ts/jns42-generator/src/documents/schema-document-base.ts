@@ -57,9 +57,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
    */
   public *getEmbeddedDocuments(retrievalUrl: URL): Iterable<EmbeddedDocument> {
     const queue = new Array<readonly [string, N]>();
-    queue.push(
-      ...this.selectSubNodes(this.documentNodePointer, this.documentNode),
-    );
+    queue.push(...this.selectSubNodes(this.documentNodePointer, this.documentNode));
 
     let pair: readonly [string, N] | undefined;
     while ((pair = queue.shift()) != null) {
@@ -81,9 +79,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   /**
    * get all references to other documents
    */
-  public *getReferencedDocuments(
-    retrievalUrl: URL,
-  ): Iterable<ReferencedDocument> {
+  public *getReferencedDocuments(retrievalUrl: URL): Iterable<ReferencedDocument> {
     for (const [, node] of this.nodes) {
       const nodeRef = this.selectNodeRef(node);
       if (nodeRef == null) {
@@ -104,9 +100,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   protected *getNodePairs(): Iterable<readonly [string, N]> {
     const queue = new Array<readonly [string, N]>();
-    queue.push(
-      ...this.selectSubNodes(this.documentNodePointer, this.documentNode),
-    );
+    queue.push(...this.selectSubNodes(this.documentNodePointer, this.documentNode));
 
     yield [this.documentNodePointer, this.documentNode];
 
@@ -129,9 +123,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       return null;
     }
     const nodeUrl =
-      this.antecedentUrl == null
-        ? new URL(nodeId)
-        : new URL(nodeId, this.antecedentUrl);
+      this.antecedentUrl == null ? new URL(nodeId) : new URL(nodeId, this.antecedentUrl);
     return nodeUrl;
   }
 
@@ -167,9 +159,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   protected *getAntecedentDocuments(): Iterable<SchemaDocumentBase> {
     let currentDocument: SchemaDocumentBase = this;
     while (currentDocument.antecedentUrl != null) {
-      const maybeNextDocument = this.context.getDocument(
-        currentDocument.antecedentUrl,
-      );
+      const maybeNextDocument = this.context.getDocument(currentDocument.antecedentUrl);
       if (!(maybeNextDocument instanceof SchemaDocumentBase)) {
         break;
       }
@@ -178,23 +168,15 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  public *getIntermediateNodeEntries(): Iterable<
-    readonly [string, schemaIntermediateB.Node]
-  > {
+  public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediateB.Node]> {
     for (const [nodePointer, node] of this.nodes) {
       const nodeUrl = this.pointerToNodeUrl(nodePointer);
       const nodeId = nodeUrl.toString();
 
       const metadata = this.getIntermediateMetadataSection(nodePointer, node);
       const types = this.getIntermediateTypesSection(nodePointer, node);
-      const assertions = this.getIntermediateAssertionsSection(
-        nodePointer,
-        node,
-      );
-      const applicators = this.getIntermediateApplicatorsSection(
-        nodePointer,
-        node,
-      );
+      const assertions = this.getIntermediateAssertionsSection(nodePointer, node);
+      const applicators = this.getIntermediateApplicatorsSection(nodePointer, node);
 
       yield [
         nodeId,
@@ -250,26 +232,11 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     nodePointer: string,
     node: N,
   ): schemaIntermediateB.AssertionsSection {
-    const booleanAssertions = this.getIntermediateBooleanAssertion(
-      nodePointer,
-      node,
-    );
-    const integerAssertions = this.getIntermediateIntegerAssertion(
-      nodePointer,
-      node,
-    );
-    const numberAssertions = this.getIntermediateNumberAssertion(
-      nodePointer,
-      node,
-    );
-    const stringAssertions = this.getIntermediateStringAssertion(
-      nodePointer,
-      node,
-    );
-    const arrayAssertions = this.getIntermediateArrayAssertion(
-      nodePointer,
-      node,
-    );
+    const booleanAssertions = this.getIntermediateBooleanAssertion(nodePointer, node);
+    const integerAssertions = this.getIntermediateIntegerAssertion(nodePointer, node);
+    const numberAssertions = this.getIntermediateNumberAssertion(nodePointer, node);
+    const stringAssertions = this.getIntermediateStringAssertion(nodePointer, node);
+    const arrayAssertions = this.getIntermediateArrayAssertion(nodePointer, node);
     const mapAssertions = this.getIntermediateMapAssertion(nodePointer, node);
 
     return {
@@ -295,24 +262,15 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     const then = this.getIntermediateThen(nodePointer, node);
     const $else = this.getIntermediateElse(nodePointer, node);
 
-    const dependentSchemas = this.getIntermediateDependentSchemas(
-      nodePointer,
-      node,
-    );
+    const dependentSchemas = this.getIntermediateDependentSchemas(nodePointer, node);
 
     const tupleItems = this.getIntermediateTupleItems(nodePointer, node);
     const arrayItems = this.getIntermediateArrayItems(nodePointer, node);
     const contains = this.getIntermediateContains(nodePointer, node);
 
-    const objectProperties = this.getIntermediateObjectProperties(
-      nodePointer,
-      node,
-    );
+    const objectProperties = this.getIntermediateObjectProperties(nodePointer, node);
     const mapProperties = this.getIntermediateMapProperties(nodePointer, node);
-    const patternProperties = this.getIntermediatePatternProperties(
-      nodePointer,
-      node,
-    );
+    const patternProperties = this.getIntermediatePatternProperties(nodePointer, node);
     const propertyNames = this.getIntermediatePropertyNames(nodePointer, node);
 
     return {
@@ -503,19 +461,13 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     ]);
   }
 
-  protected getIntermediateNot(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.Not | undefined {
+  protected getIntermediateNot(nodePointer: string, node: N): schemaIntermediateB.Not | undefined {
     return this.mapEntriesToSingleNodeId(nodePointer, node, [
       ...this.selectSubNodeNotEntries(nodePointer, node),
     ]);
   }
 
-  protected getIntermediateIf(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.If | undefined {
+  protected getIntermediateIf(nodePointer: string, node: N): schemaIntermediateB.If | undefined {
     return this.mapEntriesToSingleNodeId(nodePointer, node, [
       ...this.selectSubNodeIfEntries(nodePointer, node),
     ]);
@@ -618,10 +570,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   //#region selectors
 
-  protected *selectSubNodes(
-    nodePointer: string,
-    node: N,
-  ): Iterable<readonly [string, N]> {
+  protected *selectSubNodes(nodePointer: string, node: N): Iterable<readonly [string, N]> {
     yield* this.selectSubNodeDefinitionsEntries(nodePointer, node);
     yield* this.selectSubNodeObjectPropertyEntries(nodePointer, node);
     yield* this.selectSubNodeMapPropertiesEntries(nodePointer, node);
@@ -650,12 +599,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   protected abstract selectNodeTypes(node: N): string[] | undefined;
 
-  protected abstract selectValidationMaximumProperties(
-    node: N,
-  ): number | undefined;
-  protected abstract selectValidationMinimumProperties(
-    node: N,
-  ): number | undefined;
+  protected abstract selectValidationMaximumProperties(node: N): number | undefined;
+  protected abstract selectValidationMinimumProperties(node: N): number | undefined;
   protected abstract selectValidationRequired(node: N): string[] | undefined;
   protected abstract selectValidationMinimumItems(node: N): number | undefined;
   protected abstract selectValidationMaximumItems(node: N): number | undefined;
@@ -664,18 +609,10 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   protected abstract selectValidationMaximumLength(node: N): number | undefined;
   protected abstract selectValidationValuePattern(node: N): string | undefined;
   protected abstract selectValidationValueFormat(node: N): string | undefined;
-  protected abstract selectValidationMinimumInclusive(
-    node: N,
-  ): number | undefined;
-  protected abstract selectValidationMinimumExclusive(
-    node: N,
-  ): number | undefined;
-  protected abstract selectValidationMaximumInclusive(
-    node: N,
-  ): number | undefined;
-  protected abstract selectValidationMaximumExclusive(
-    node: N,
-  ): number | undefined;
+  protected abstract selectValidationMinimumInclusive(node: N): number | undefined;
+  protected abstract selectValidationMinimumExclusive(node: N): number | undefined;
+  protected abstract selectValidationMaximumInclusive(node: N): number | undefined;
+  protected abstract selectValidationMaximumExclusive(node: N): number | undefined;
   protected abstract selectValidationMultipleOf(node: N): number | undefined;
   protected abstract selectValidationConst(node: N): any | undefined;
   protected abstract selectValidationEnum(node: N): any[] | undefined;

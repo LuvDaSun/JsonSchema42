@@ -39,9 +39,7 @@ async function main(options: MainOptions) {
   if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
     instanceSchemaUrl = new URL(options.instanceSchemaUrl);
   } else {
-    instanceSchemaUrl = new URL(
-      "file://" + path.resolve(process.cwd(), options.instanceSchemaUrl),
-    );
+    instanceSchemaUrl = new URL("file://" + path.resolve(process.cwd(), options.instanceSchemaUrl));
   }
 
   const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
@@ -59,16 +57,10 @@ async function main(options: MainOptions) {
   );
   context.registerFactory(
     schemaIntermediateB.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) =>
-      new schemaIntermediateB.Document(givenUrl, rootNode),
+    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediateB.Document(givenUrl, rootNode),
   );
 
-  await context.loadFromUrl(
-    instanceSchemaUrl,
-    instanceSchemaUrl,
-    null,
-    defaultMetaSchemaId,
-  );
+  await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
 
   const intermediateData = context.getIntermediateData();
 

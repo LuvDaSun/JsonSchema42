@@ -3,8 +3,5 @@
   "$id": "https://jns42-generator.org/string-or-boolean",
   "description": "Please don't use this",
   "deprecated": true,
-  "type": [
-    "string",
-    "boolean"
-  ]
+  "type": ["string", "boolean"]
 }

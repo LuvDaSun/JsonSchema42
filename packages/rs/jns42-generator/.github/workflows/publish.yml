@@ -1,10 +1,9 @@
 on:
   push:
-    tags:        
+    tags:
       - v*
 
 jobs:
-
   publish-crates:
     runs-on: ubuntu-latest
     container: rust:1.64-alpine3.15
