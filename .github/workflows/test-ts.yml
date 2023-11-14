@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - "*"
+    paths:
+      - "*"
+      - .github/**
+      - packages/ts/**
+
+env:
+  NPM_CONFIG_WORKSPACE: jns42-generator
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm --workspaces test
+
+  audit:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm --workspaces audit --audit-level high
