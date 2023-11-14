@@ -37,6 +37,7 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
     "c8": "^8.0.1",
     "prettier": "^3.0.3",
     "yaml": "^2.3.3"

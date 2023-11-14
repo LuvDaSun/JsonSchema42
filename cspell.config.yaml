@@ -4,5 +4,7 @@ dictionaryDefinitions: []
 dictionaries: []
 words:
   - clippy
+  - npmjs
+  - rustup
 ignoreWords: []
 import: []
