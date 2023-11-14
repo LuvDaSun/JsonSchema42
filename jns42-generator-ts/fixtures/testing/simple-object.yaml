@@ -1,0 +1,42 @@
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    description: "A very simple object"
+    $dynamicAnchor: "child"
+    type: object
+    required:
+      - id
+    properties:
+      id: { $ref: "./models.json#/$defs/id" }
+      name: { $ref: "./models.json#/$defs/name" }
+      child: { $ref: "./models.json#/$defs/child" }
+    examples:
+      - id: 1
+      - id: 2
+        name: "hi"
+valid:
+  with-child:
+    id: 1
+    name: "hi"
+    child:
+      id: 2
+      name: "hi too"
+  excessive-field:
+    id: 1
+    name: "Good name"
+    excessive-field: true
+  tiny:
+    id: 1
+    name: "hi"
+
+invalid:
+  invalid-child-id:
+    id: 1
+    child:
+      id: 0
+  invalid-id:
+    id: 0
+    name: "hi"
+  invalid-name:
+    id: 1
+    name: "h"

@@ -1,0 +1,20 @@
+schemas:
+  draft_2020-12:
+    $schema: "http://json-schema.org/draft-04/schema#"
+    type:
+      - "string"
+      - "boolean"
+  draft-04:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    type:
+      - "string"
+      - "boolean"
+    examples:
+      - "hi!"
+      - false
+valid:
+  hi: "hi!"
+  "false": false
+invalid:
+  one: 1
+  object: {}

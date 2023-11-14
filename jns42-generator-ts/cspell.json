@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "enableGlobDot": true,
+  "words": [
+    "apikey",
+    "camelcase",
+    "cobertura",
+    "dbaeumer",
+    "deduping",
+    "endregion",
+    "esbenp",
+    "goodschema",
+    "lcov",
+    "NOTPARALLEL",
+    "npmjs",
+    "npmrc",
+    "oidc",
+    "openapi",
+    "patsubst",
+    "ryanluker",
+    "unflattened"
+  ],
+  "enableFiletypes": ["makefile"]
+}

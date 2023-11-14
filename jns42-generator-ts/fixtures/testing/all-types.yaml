@@ -1,0 +1,60 @@
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    description: "all types"
+    anyOf:
+      # - { $ref: "#/$defs/never-model" }
+      # - { $ref: "#/$defs/any-model" }
+      - { $ref: "#/$defs/null-model" }
+      - { $ref: "#/$defs/boolean-model" }
+      - { $ref: "#/$defs/integer-model" }
+      - { $ref: "#/$defs/number-model" }
+      - { $ref: "#/$defs/string-model" }
+      - { $ref: "#/$defs/tuple-model" }
+      - { $ref: "#/$defs/array-model" }
+      - { $ref: "#/$defs/object-model" }
+      - { $ref: "#/$defs/record-model" }
+    $defs:
+      never-model: false
+      any-model: true
+      null-model: { type: "null" }
+      boolean-model: { type: "boolean" }
+      integer-model: { type: "integer" }
+      number-model: { type: "number" }
+      string-model: { type: "string" }
+      tuple-model:
+        type: "array"
+        prefixItems:
+          - { type: "integer" }
+          - { type: "string" }
+        # items: false
+      array-model:
+        type: "array"
+        items: { type: "string" }
+      object-model:
+        type: "object"
+        required: ["a"]
+        properties:
+          a: { type: "integer" }
+          b: { type: "string" }
+        # additionalProperties: false
+      record-model:
+        type: "object"
+        additionalProperties: { type: "string" }
+
+valid:
+  "null": null
+  boolean: true
+  integer: 1
+  number: 0.5
+  string: "hi"
+  tuple: [1, "hi"]
+  array: ["hi"]
+  object: { "a": 1 }
+  record: { "z": "z" }
+
+invalid:
+  tuple: [1, 2]
+  array: [1]
+  object: { "b": 1 }
+  record: { "0": 0 }

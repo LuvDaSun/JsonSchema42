@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Collection of models",
+  "$defs": {
+    "id": {
+      "$anchor": "id",
+      "description": "An identity",
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "examples": [1, 2, 3]
+    },
+    "name": {
+      "description": "A name",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 20,
+      "examples": ["Jack", "John", "Elmer"]
+    },
+    "child": {
+      "$dynamicRef": "#child"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    description: "An object"
+    oneOf:
+      - type: "object"
+        required: ["a", "b"]
+        properties:
+          a: { type: "string" }
+          b: { type: "string" }
+      - type: "object"
+        required: ["c", "d"]
+        properties:
+          c: { type: "string" }
+          d: { type: "string" }
+  draft-04:
+    $schema: "http://json-schema.org/draft-04/schema#"
+    description: "An object"
+    oneOf:
+      - type: "object"
+        required: ["a", "b"]
+        properties:
+          a: { type: "string" }
+          b: { type: "string" }
+      - type: "object"
+        required: ["c", "d"]
+        properties:
+          c: { type: "string" }
+          d: { type: "string" }
+
+valid:
+  ab:
+    a: "a"
+    b: "b"
+  abc:
+    a: "a"
+    b: "b"
+    c: "c"
+  cd:
+    c: "c"
+    d: "d"
+
+invalid:
+  abcd:
+    a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+  abcde:
+    a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+    e: "e"

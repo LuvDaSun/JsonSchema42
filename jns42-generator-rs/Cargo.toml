@@ -1,0 +1,27 @@
+[package]
+name = "jns42_generator"
+version = "0.0.0"
+edition = "2021"
+description = "Generate structs and validators from json schema"
+license = "ISC"
+authors = ["Elmer Bulthuis"]
+homepage = "https://www.JsonSchema42.org"
+keywords = ["json", "schema", "generator"]
+repository = "git@github.com:JsonSchema42/jns42-generator-ts"
+
+[badges]
+maintenance = { status = "actively-developed" }
+
+[dependencies]
+clap = { version = "4.1.14", features = ["derive"] }
+serde = "1.0.158"
+serde_json = "1.0.94"
+url = "2.3.1"
+urlencoding = "2.1.2"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "jns42_generator"
+path = "src/main.rs"

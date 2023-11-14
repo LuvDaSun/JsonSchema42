@@ -1,0 +1,10 @@
+.*
+
+!.gitignore
+!.editorconfig
+
+/target/
+/coverage/
+
+!/.vscode/
+!/.github/

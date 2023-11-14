@@ -1,0 +1,35 @@
+on:
+  - push
+  - pull_request
+
+jobs:
+  test-unit:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm test
+
+  test-lint:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm run lint
+
+  test-spelling:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npx --yes cspell .
+
+  test-audit:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm audit --audit-level high
