@@ -2,5 +2,8 @@
   "private": true,
   "workspaces": [
     "packages/ts/jns42-generator"
-  ]
+  ],
+  "devDependencies": {
+    "cspell": "^8.0.0"
+  }
 }
