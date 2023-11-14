@@ -1,0 +1,16 @@
+.*
+
+*.tsbuildinfo
+
+!.gitignore
+!.gitattributes
+!.editorconfig
+!.npmrc
+
+node_modules/
+target/
+coverage/
+out/
+
+!.vscode/
+!.github/
