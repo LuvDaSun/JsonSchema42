@@ -1,50 +1,112 @@
-import ts from "typescript";
 import * as models from "../models/index.js";
 import { itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
 
-export function* generateValidators(specifitation: models.Specification) {
-  const { names, nodes } = specifitation;
-  const { factory } = ts;
+export function* generateValidators(specification: models.Specification) {
+  const { names, nodes } = specification;
 
   for (const nodeId in nodes) {
     const node = nodes[nodeId];
-    yield* generateValidationFunction(specifitation, nodeId);
+
+    {
+      const typeName = toPascal(names[nodeId]);
+      const functionName = toCamel("is", names[nodeId]);
+      const functionBody = generateValidationBody(specification, nodeId);
+
+      yield itt`
+        export function ${functionName}(value: unknown): value is ${typeName} {
+          ${functionBody}
+        }
+      `;
+    }
+
     for (const type of node.types) {
-      yield* generateTypeValidationFunction(specifitation, nodeId, type);
+      const functionName = "_" + toCamel("is", type, names[nodeId]);
+      const functionBody = generateTypeValidationBody(specification, nodeId, type);
+
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
+    }
+
+    if (node.applicators.reference != null) {
+      const functionName = "_" + toCamel("is", "reference", names[nodeId]);
+      const functionBody = generateReferenceCompoundValidationStatements(specification, nodeId);
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
+    }
+
+    if (node.applicators.oneOf != null) {
+      const functionName = "_" + toCamel("is", "oneOf", names[nodeId]);
+      const functionBody = generateOneOfCompoundValidationStatements(
+        specification,
+        node.applicators.oneOf,
+      );
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
+    }
+
+    if (node.applicators.anyOf != null) {
+      const functionName = "_" + toCamel("is", "anyOf", names[nodeId]);
+      const functionBody = generateAnyOfCompoundValidationStatements(
+        specification,
+        node.applicators.anyOf,
+      );
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
+    }
+
+    if (node.applicators.allOf != null) {
+      const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
+      const functionBody = generateAllOfCompoundValidationStatements(
+        specification,
+        node.applicators.allOf,
+      );
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
+    }
+
+    if (node.applicators.if != null) {
+      const functionName = "_" + toCamel("is", "if", names[nodeId]);
+      const functionBody = generateIfCompoundValidationStatements(
+        specification,
+        node.applicators.if,
+        node.applicators.then,
+        node.applicators.else,
+      );
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
+    }
+
+    if (node.applicators.not != null) {
+      const functionName = "_" + toCamel("is", "not", names[nodeId]);
+      const functionBody = generateNotCompoundValidationStatements(
+        specification,
+        node.applicators.not,
+      );
+      yield itt`
+        function ${functionName}(value: unknown): value is unknown {
+          ${functionBody}
+        }
+      `;
     }
   }
-}
-
-function* generateValidationFunction(specification: models.Specification, nodeId: string) {
-  const { names, nodes } = specification;
-  const node = nodes[nodeId];
-
-  const typeName = toPascal(names[nodeId]);
-  const functionName = toCamel("is", names[nodeId]);
-  const functionBody = generateValidationBody(specification, nodeId);
-
-  yield itt`
-    export function ${functionName}(value: unknown): value is ${typeName} {
-      ${functionBody}
-    }
-  `;
-}
-
-function* generateTypeValidationFunction(
-  specification: models.Specification,
-  nodeId: string,
-  type: string,
-) {
-  const { names } = specification;
-
-  const functionName = "_" + toCamel("is", type, names[nodeId]);
-  const functionBody = generateTypeValidationBody(specification, nodeId, type);
-
-  yield itt`
-    export function ${functionName}(value: unknown): value is unknown {
-      ${functionBody}
-    }
-  `;
 }
 
 function* generateValidationBody(specification: models.Specification, nodeId: string) {
@@ -75,12 +137,12 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.anyOf != null) {
+  if (node.applicators.if != null) {
     const functionName = "_" + toCamel("is", "if", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.anyOf != null) {
+  if (node.applicators.not != null) {
     const functionName = "_" + toCamel("is", "not", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
@@ -110,31 +172,40 @@ function* generateTypeValidationBody(
 ) {
   switch (type) {
     case "never":
-      return generateNeverTypeValidationStatements(specification, nodeId);
+      yield* generateNeverTypeValidationStatements(specification, nodeId);
+      break;
 
     case "any":
-      return generateAnyTypeValidationStatements(specification, nodeId);
+      yield* generateAnyTypeValidationStatements(specification, nodeId);
+      break;
 
     case "null":
-      return generateNullTypeValidationStatements(specification, nodeId);
+      yield* generateNullTypeValidationStatements(specification, nodeId);
+      break;
 
     case "boolean":
-      return generateBooleanTypeValidationStatements(specification, nodeId);
+      yield* generateBooleanTypeValidationStatements(specification, nodeId);
+      break;
 
     case "integer":
-      return generateIntegerTypeValidationStatements(specification, nodeId);
+      yield* generateIntegerTypeValidationStatements(specification, nodeId);
+      break;
 
     case "number":
-      return generateNumberTypeValidationStatements(specification, nodeId);
+      yield* generateNumberTypeValidationStatements(specification, nodeId);
+      break;
 
     case "string":
-      return generateStringTypeValidationStatements(specification, nodeId);
+      yield* generateStringTypeValidationStatements(specification, nodeId);
+      break;
 
     case "array":
-      return generateArrayTypeValidationStatements(specification, nodeId);
+      yield* generateArrayTypeValidationStatements(specification, nodeId);
+      break;
 
     case "map":
-      return generateMapTypeValidationStatements(specification, nodeId);
+      yield* generateMapTypeValidationStatements(specification, nodeId);
+      break;
 
     default:
       throw new Error("type not supported");
@@ -151,7 +222,7 @@ function* generateNeverTypeValidationStatements(
 }
 function* generateAnyTypeValidationStatements(specification: models.Specification, nodeId: string) {
   yield itt`
-    retuirn true;
+    return true;
   `;
 }
 function* generateNullTypeValidationStatements(
@@ -186,7 +257,7 @@ function* generateBooleanTypeValidationStatements(
     yield itt`
       if(${joinIterable(
         assertions.options.map((option) => {
-          return itt`value === ${JSON.stringify(option)}`;
+          return itt`value !== ${JSON.stringify(option)}`;
         }),
         " && ",
       )}) {
@@ -257,7 +328,7 @@ function* generateIntegerTypeValidationStatements(
     yield itt`
       if(${joinIterable(
         assertions.options.map((option) => {
-          return itt`value === ${JSON.stringify(option)}`;
+          return itt`value !== ${JSON.stringify(option)}`;
         }),
         " && ",
       )}) {
@@ -328,7 +399,7 @@ function* generateNumberTypeValidationStatements(
     yield itt`
       if(${joinIterable(
         assertions.options.map((option) => {
-          return itt`value === ${JSON.stringify(option)}`;
+          return itt`value !== ${JSON.stringify(option)}`;
         }),
         " && ",
       )}) {
@@ -373,7 +444,7 @@ function* generateStringTypeValidationStatements(
 
   if (assertions.valuePattern != null) {
     yield itt`
-      if(new RexExp(${JSON.stringify(assertions.valuePattern)}).test(value)) {
+      if(new RegExp(${JSON.stringify(assertions.valuePattern)}).test(value)) {
         return false;
       }
     `;
@@ -384,7 +455,7 @@ function* generateStringTypeValidationStatements(
       yield itt`
         if(${joinIterable(
           assertions.options.map((option) => {
-            return itt`value === ${JSON.stringify(option)}`;
+            return itt`value !== ${JSON.stringify(option)}`;
           }),
           " && ",
         )}) {
@@ -463,7 +534,7 @@ function* generateArrayTypeValidationStatements(
    * Loop through the elements to validate them!
    */
   yield itt`
-    for(let elementIndex = 0; elementIndes < value.length; elementIndex ++) {
+    for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
       ${generateArrayTypeItemValidationStatements(specification, nodeId)}
     }
   `;
@@ -499,7 +570,7 @@ function* generateArrayTypeItemValidationStatements(
   }
 
   if (node.applicators.tupleItems != null && node.applicators.arrayItems != null) {
-    const itemValidatorFunctionName = toPascal(names[node.applicators.arrayItems]);
+    const itemValidatorFunctionName = toCamel("is", names[node.applicators.arrayItems]);
 
     yield itt`
       if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
@@ -526,7 +597,7 @@ function* generateArrayTypeItemValidationStatements(
   }
 
   if (node.applicators.tupleItems == null && node.applicators.arrayItems != null) {
-    const itemValidatorFunctionName = toPascal(names[node.applicators.arrayItems]);
+    const itemValidatorFunctionName = toCamel("is", names[node.applicators.arrayItems]);
     yield itt`
       if(!${itemValidatorFunctionName}(elementValue)) {
         return false;
@@ -591,7 +662,7 @@ function* generateMapTypeValidationStatements(specification: models.Specificatio
    */
   for (const propertyName of assertions.required ?? []) {
     yield itt`
-      if(!(${JSON.stringify(propertyName)}) in value) {
+      if(!(${JSON.stringify(propertyName)} in value)) {
         return false;
       }
     `;
@@ -649,7 +720,7 @@ function* generateMapTypeItemValidationStatements(
   }
 
   yield itt`
-    const propertyValue = value[propertyName as keyof value];
+    const propertyValue = value[propertyName as keyof typeof value];
   `;
 
   if (node.applicators.objectProperties != null) {
