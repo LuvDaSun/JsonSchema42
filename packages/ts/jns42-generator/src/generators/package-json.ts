@@ -10,6 +10,17 @@ export function getPackageJsonData(name: string, version: string) {
     main: "main.js",
     types: "main.d.ts",
     files: ["*"],
+    exports: {
+      ".": {
+        default: "./main.js",
+      },
+      "./types": {
+        default: "./types.js",
+      },
+      "./validators": {
+        default: "./validators.js",
+      },
+    },
     scripts: {
       build: "tsc",
       test: "node --test ./*.test.js",

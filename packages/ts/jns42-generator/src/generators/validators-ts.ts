@@ -1,8 +1,14 @@
 import * as models from "../models/index.js";
-import { itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
+import { banner, itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
 
-export function* generateValidators(specification: models.Specification) {
+export function* generateValidatorsTsCode(specification: models.Specification) {
+  yield banner;
+
   const { names, nodes } = specification;
+
+  yield itt`
+    import * as types from "./types.js";
+  `;
 
   for (const nodeId in nodes) {
     const node = nodes[nodeId];
@@ -13,7 +19,7 @@ export function* generateValidators(specification: models.Specification) {
       const functionBody = generateValidationBody(specification, nodeId);
 
       yield itt`
-        export function ${functionName}(value: unknown): value is ${typeName} {
+        export function ${functionName}(value: unknown): value is types.${typeName} {
           ${functionBody}
         }
       `;

@@ -1,8 +1,11 @@
 import * as models from "../models/index.js";
-import { generateTypes } from "./types.js";
-import { generateValidators } from "./validators.js";
+import { banner, itt } from "../utils/index.js";
 
 export function* generateMainTsCode(specification: models.Specification) {
-  yield* generateTypes(specification);
-  yield* generateValidators(specification);
+  yield banner;
+
+  yield itt`
+    export * from "./types.js";
+    export * from "./validators.js";
+  `;
 }
