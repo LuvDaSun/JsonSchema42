@@ -11,9 +11,9 @@
     "src/*"
   ],
   "scripts": {
-    "build": "tsc && chmod +x out/program.js",
+    "build": "tsc --build && chmod +x out/program.js",
     "clean": "rm -rf out",
-    "test": "node --test ./out/**/*.spec.js",
+    "test": "node --test ./out/**/*.test.js",
     "coverage": "c8 --reporter lcov npm test"
   },
   "repository": {
@@ -34,14 +34,14 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "c8": "^8.0.1",
-    "yaml": "^2.3.3"
+    "yaml": "^2.3.4"
   },
   "dependencies": {
     "@jns42/jns42-schema-draft-04": "^0.2.5",
     "@jns42/jns42-schema-draft-2020-12": "^0.2.4",
     "@jns42/jns42-schema-intermediate-b": "^0.4.0",
-    "@types/node": "^20.8.10",
-    "@types/yargs": "^17.0.29",
+    "@types/node": "^20.9.2",
+    "@types/yargs": "^17.0.31",
     "camelcase": "^8.0.0",
     "tslib": "^2.6.2",
     "type-fest": "^4.6.0",

@@ -11,8 +11,8 @@ export function getPackageJsonData(name: string, version: string) {
     types: "main.d.ts",
     files: ["*"],
     scripts: {
-      prepare: "tsc",
-      test: "node --test ./*.spec.js",
+      build: "tsc",
+      test: "node --test ./*.test.js",
     },
     author: "",
     license: "ISC",

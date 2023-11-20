@@ -5,6 +5,7 @@ on:
     paths:
       - "*"
       - .github/**
+      - fixtures/**
       - packages/rs/**
 
 jobs:

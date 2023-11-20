@@ -1,10 +1,9 @@
 import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";
-import { formatData, formatStatements } from "../utils/index.js";
-import { MainSpecsTsCodeGenerator } from "./main-specs-ts.js";
-import { MainTsCodeGenerator } from "./main-ts.js";
+import { formatCode, formatData } from "../utils/index.js";
+import { generateMainSpecTsCode } from "./main-test-ts.js";
+import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
 
@@ -14,12 +13,16 @@ export interface PackageOptions {
   directoryPath: string;
 }
 
-export function generatePackage(
-  factory: ts.NodeFactory,
+export async function generatePackage(
   intermediateData: schemaIntermediateB.SchemaJson,
   namesData: Record<string, string>,
   options: PackageOptions,
 ) {
+  const specification = {
+    names: namesData,
+    nodes: intermediateData.schemas,
+  };
+
   fs.mkdirSync(options.directoryPath, { recursive: true });
 
   {
@@ -47,20 +50,14 @@ export function generatePackage(
   }
 
   {
-    const codeGenerator = new MainTsCodeGenerator(factory, namesData, intermediateData.schemas);
-    const statements = codeGenerator.getStatements();
+    const code = generateMainTsCode(specification);
     const filePath = path.join(options.directoryPath, "main.ts");
-    fs.writeFileSync(filePath, formatStatements(factory, statements));
+    fs.writeFileSync(filePath, formatCode(code));
   }
 
   {
-    const codeGenerator = new MainSpecsTsCodeGenerator(
-      factory,
-      namesData,
-      intermediateData.schemas,
-    );
-    const statements = codeGenerator.getStatements();
-    const filePath = path.join(options.directoryPath, "main.spec.ts");
-    fs.writeFileSync(filePath, formatStatements(factory, statements));
+    const code = generateMainSpecTsCode(specification);
+    const filePath = path.join(options.directoryPath, "main.test.ts");
+    fs.writeFileSync(filePath, formatCode(code));
   }
 }
