@@ -1,27 +1,20 @@
 import ts from "typescript";
-import { choose, nestedTextFromTs } from "../utils/index.js";
+import { choose, itt, nestedTextFromTs } from "../utils/index.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
   public *getCode() {
     for (const nodeId in this.nodes) {
-      const statements = this.generateTypeDeclarationStatement(nodeId);
-      yield* nestedTextFromTs(this.factory, [statements]);
+      yield* this.generateTypeDeclaration(nodeId);
     }
   }
 
-  protected generateTypeDeclarationStatement(nodeId: string) {
+  protected *generateTypeDeclaration(nodeId: string) {
     const node = this.nodes[nodeId];
 
     const typeDefinition = this.generateTypeDefinition(nodeId);
 
     const typeName = this.getTypeName(nodeId);
-    const declaration = this.factory.createTypeAliasDeclaration(
-      [this.factory.createToken(ts.SyntaxKind.ExportKeyword)],
-      typeName,
-      undefined,
-      typeDefinition,
-    );
 
     const comments = [
       node.metadata.title ?? "",
@@ -29,20 +22,23 @@ export class TypesTsCodeGenerator extends CodeGeneratorBase {
       node.metadata.deprecated ? "@deprecated" : "",
     ]
       .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .map((line) => line + "\n")
-      .join("");
+      .filter((line) => line.length > 0);
 
     if (comments.length > 0) {
-      ts.addSyntheticLeadingComment(
-        declaration,
-        ts.SyntaxKind.MultiLineCommentTrivia,
-        "*\n" + comments,
-        true,
-      );
+      yield itt`
+        /**
+        ${comments}
+        */
+      `;
     }
 
-    return declaration;
+    const declaration = this.factory.createTypeAliasDeclaration(
+      [this.factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      typeName,
+      undefined,
+      typeDefinition,
+    );
+    yield nestedTextFromTs(this.factory, [declaration]);
   }
 
   protected generateTypeDefinition(nodeId: string): ts.TypeNode {
