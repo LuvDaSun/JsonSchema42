@@ -11,7 +11,7 @@
     "src/*"
   ],
   "scripts": {
-    "build": "tsc && chmod +x out/program.js",
+    "build": "tsc --build && chmod +x out/program.js",
     "clean": "rm -rf out",
     "test": "node --test ./out/**/*.spec.js",
     "coverage": "c8 --reporter lcov npm test"
