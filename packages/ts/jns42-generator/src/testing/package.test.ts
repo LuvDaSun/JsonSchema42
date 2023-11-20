@@ -28,7 +28,15 @@ for (const packageName of packageNames) {
 }
 
 async function runTest(packageName: string) {
-  const testPath = path.join(projectRoot, "fixtures", "testing", `${packageName}.yaml`);
+  const testPath = path.join(
+    projectRoot,
+    "..",
+    "..",
+    "..",
+    "fixtures",
+    "testing",
+    `${packageName}.yaml`,
+  );
 
   if (!fs.existsSync(testPath)) {
     return;
