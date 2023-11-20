@@ -1,5 +1,6 @@
 export * from "./choose.js";
 export * from "./file.js";
+export * from "./iterable-text-template.js";
 export * from "./literal.js";
 export * from "./load.js";
 export * from "./namer.js";
