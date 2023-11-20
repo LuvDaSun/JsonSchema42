@@ -7,5 +7,6 @@ export function* generateMainTsCode(specification: models.Specification) {
   yield itt`
     export * from "./types.js";
     export * from "./validators.js";
+    export * from "./parsers.js";
   `;
 }

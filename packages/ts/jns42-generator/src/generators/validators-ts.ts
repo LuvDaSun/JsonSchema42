@@ -12,9 +12,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   for (const nodeId in nodes) {
     const node = nodes[nodeId];
+    const typeName = toPascal(names[nodeId]);
 
     {
-      const typeName = toPascal(names[nodeId]);
       const functionName = toCamel("is", names[nodeId]);
       const functionBody = generateValidationBody(specification, nodeId);
 

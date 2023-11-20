@@ -20,6 +20,9 @@ export function getPackageJsonData(name: string, version: string) {
       "./validators": {
         default: "./validators.js",
       },
+      "./parsers": {
+        default: "./parsers.js",
+      },
     },
     scripts: {
       build: "tsc",
