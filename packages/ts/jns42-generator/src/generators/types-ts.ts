@@ -1,47 +1,40 @@
 import ts from "typescript";
-import { choose, itt, nestedTextFromTs } from "../utils/index.js";
+import * as models from "../models/index.js";
+import { choose, itt, toPascal } from "../utils/index.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export class TypesTsCodeGenerator extends CodeGeneratorBase {
-  public *getCode() {
-    for (const nodeId in this.nodes) {
-      yield* this.generateTypeDeclaration(nodeId);
-    }
+export function* generateTypes(specification: models.Specification) {
+  for (const nodeId in specification.nodes) {
+    yield* generateTypeDeclarationCode(specification, nodeId);
   }
+}
 
-  protected *generateTypeDeclaration(nodeId: string) {
-    const node = this.nodes[nodeId];
+function* generateTypeDeclarationCode(specification: models.Specification, nodeId: string) {
+  const node = specification.nodes[nodeId];
+  const typeName = toPascal(specification.names[nodeId]);
 
-    const typeDefinition = this.generateTypeDefinition(nodeId);
+  const comments = [
+    node.metadata.title ?? "",
+    node.metadata.description ?? "",
+    node.metadata.deprecated ? "@deprecated" : "",
+  ]
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 
-    const typeName = this.getTypeName(nodeId);
-
-    const comments = [
-      node.metadata.title ?? "",
-      node.metadata.description ?? "",
-      node.metadata.deprecated ? "@deprecated" : "",
-    ]
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-
-    if (comments.length > 0) {
-      yield itt`
-        /**
-        ${comments}
-        */
-      `;
-    }
-
-    const declaration = this.factory.createTypeAliasDeclaration(
-      [this.factory.createToken(ts.SyntaxKind.ExportKeyword)],
-      typeName,
-      undefined,
-      typeDefinition,
-    );
-    yield nestedTextFromTs(this.factory, [declaration]);
+  if (comments.length > 0) {
+    yield itt`
+      /**
+      ${comments}
+      */
+    `;
   }
+  yield itt`
+    export type ${typeName} = unknown;
+  `;
+}
 
-  protected generateTypeDefinition(nodeId: string): ts.TypeNode {
+class TypesTsCodeGenerator extends CodeGeneratorBase {
+  public generateTypeDefinition(nodeId: string): ts.TypeNode {
     const { factory: f } = this;
 
     const typeElements = [...this.generateTypeDefinitionElements(nodeId)];
