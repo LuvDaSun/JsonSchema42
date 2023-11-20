@@ -30,19 +30,19 @@ export function generatePackage(
   {
     const data = getPackageJsonData(options.name, options.version);
     const filePath = path.join(options.directoryPath, "package.json");
-    fs.writeFileSync(filePath, JSON.stringify(data));
+    fs.writeFileSync(filePath, JSON.stringify(data, undefined, 2));
   }
 
   {
     const data = namesData;
     const filePath = path.join(options.directoryPath, "names.json");
-    fs.writeFileSync(filePath, JSON.stringify(data));
+    fs.writeFileSync(filePath, JSON.stringify(data, undefined, 2));
   }
 
   {
     const data = intermediateData;
     const filePath = path.join(options.directoryPath, "intermediate.json");
-    fs.writeFileSync(filePath, JSON.stringify(data));
+    fs.writeFileSync(filePath, JSON.stringify(data, undefined, 2));
   }
 
   {
