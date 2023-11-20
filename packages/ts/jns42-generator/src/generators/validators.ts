@@ -32,7 +32,10 @@ export function* generateValidators(specification: models.Specification) {
 
     if (node.applicators.reference != null) {
       const functionName = "_" + toCamel("is", "reference", names[nodeId]);
-      const functionBody = generateReferenceCompoundValidationStatements(specification, nodeId);
+      const functionBody = generateReferenceCompoundValidationStatements(
+        specification,
+        node.applicators.reference,
+      );
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
           ${functionBody}
@@ -153,7 +156,7 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
         mapIterable(validatorFunctionNames, (functionName) => {
           return itt`!${functionName}(value)`;
         }),
-        " || ",
+        " && ",
       )}) {
         return false;
       }

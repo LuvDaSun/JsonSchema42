@@ -57,7 +57,7 @@ export async function generatePackage(
 
   {
     const code = generateMainSpecTsCode(specification);
-    const filePath = path.join(options.directoryPath, "main.spec.ts");
+    const filePath = path.join(options.directoryPath, "main.test.ts");
     fs.writeFileSync(filePath, formatCode(code));
   }
 }
