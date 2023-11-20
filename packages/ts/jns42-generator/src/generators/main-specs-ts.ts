@@ -1,6 +1,6 @@
 import ts from "typescript";
 import * as models from "../models/index.js";
-import { nestedTextFromTs } from "../utils/index.js";
+import { itt, nestedTextFromTs } from "../utils/index.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
@@ -16,32 +16,15 @@ export function* generateMainSpecTsCode(specification: models.Specification) {
 
 class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
   public *getCode() {
-    yield nestedTextFromTs(this.factory, this.getStatements());
-  }
-
-  public *getStatements() {
-    const { factory: f } = this;
-
-    yield f.createImportDeclaration(
-      undefined,
-      f.createImportClause(false, f.createIdentifier("assert"), undefined),
-      f.createStringLiteral("node:assert/strict"),
-    );
-
-    yield f.createImportDeclaration(
-      undefined,
-      f.createImportClause(false, f.createIdentifier("test"), undefined),
-      f.createStringLiteral("node:test"),
-    );
-
-    yield f.createImportDeclaration(
-      undefined,
-      f.createImportClause(false, undefined, f.createNamespaceImport(f.createIdentifier("main"))),
-      f.createStringLiteral("./main.js"),
-    );
+    yield itt`
+      import assert from "node:assert/strict";
+      import test from "node:test";
+      import * as main from "./main.js";
+    `;
 
     for (const nodeId in this.nodes) {
-      yield* this.generateTestStatement(nodeId);
+      const statements = this.generateTestStatement(nodeId);
+      yield* nestedTextFromTs(this.factory, statements);
     }
   }
 

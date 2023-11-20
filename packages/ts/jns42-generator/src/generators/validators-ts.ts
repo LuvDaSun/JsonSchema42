@@ -8,7 +8,7 @@ export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
   public *getCode() {
     for (const nodeId in this.nodes) {
       const statements = this.generateValidatorFunctionDeclarationStatements(nodeId);
-      nestedTextFromTs(this.factory, statements);
+      yield* nestedTextFromTs(this.factory, statements);
     }
   }
 
