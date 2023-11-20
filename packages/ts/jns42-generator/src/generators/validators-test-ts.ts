@@ -1,13 +1,13 @@
 import * as models from "../models/index.js";
 import { itt, toCamel } from "../utils/index.js";
 
-export function* generateMainSpecTsCode(specification: models.Specification) {
+export function* generateValidatorsTestTsCode(specification: models.Specification) {
   const { names, nodes } = specification;
 
   yield itt`
     import assert from "node:assert/strict";
     import test from "node:test";
-    import * as main from "./main.js";
+    import * as validators from "./validators.js";
   `;
 
   for (const nodeId in nodes) {
@@ -33,7 +33,7 @@ function* generateTestBody(specification: models.Specification, nodeId: string) 
   for (const example of node.metadata.examples ?? []) {
     yield itt`
       assert.equal(
-        main.${validatorFunctionName}(${JSON.stringify(example)}),
+        validators.${validatorFunctionName}(${JSON.stringify(example)}),
         true,
       )
     `;

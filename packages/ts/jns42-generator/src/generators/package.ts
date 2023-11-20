@@ -2,10 +2,12 @@ import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
 import fs from "node:fs";
 import path from "node:path";
 import { NestedText, banner, flattenNestedText } from "../utils/index.js";
-import { generateMainSpecTsCode } from "./main-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
+import { generateTypesTsCode } from "./types-ts.js";
+import { generateValidatorsTestTsCode } from "./validators-test-ts.js";
+import { generateValidatorsTsCode } from "./validators-ts.js";
 
 export interface PackageOptions {
   name: string;
@@ -56,8 +58,20 @@ export function generatePackage(
   }
 
   {
-    const code = generateMainSpecTsCode(specification);
-    const filePath = path.join(options.directoryPath, "main.test.ts");
+    const code = generateValidatorsTsCode(specification);
+    const filePath = path.join(options.directoryPath, "validators.ts");
+    writeCodeToFile(filePath, code);
+  }
+
+  {
+    const code = generateTypesTsCode(specification);
+    const filePath = path.join(options.directoryPath, "types.ts");
+    writeCodeToFile(filePath, code);
+  }
+
+  {
+    const code = generateValidatorsTestTsCode(specification);
+    const filePath = path.join(options.directoryPath, "validators.test.ts");
     writeCodeToFile(filePath, code);
   }
 }

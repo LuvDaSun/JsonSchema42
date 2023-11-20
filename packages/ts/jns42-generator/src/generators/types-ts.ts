@@ -1,7 +1,7 @@
 import * as models from "../models/index.js";
 import { NestedText, choose, itt, joinIterable, mapIterable, toPascal } from "../utils/index.js";
 
-export function* generateTypes(specification: models.Specification) {
+export function* generateTypesTsCode(specification: models.Specification) {
   for (const nodeId in specification.nodes) {
     const node = specification.nodes[nodeId];
     const typeName = toPascal(specification.names[nodeId]);
