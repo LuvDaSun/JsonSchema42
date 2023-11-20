@@ -1,9 +1,20 @@
 import ts from "typescript";
+import * as models from "../models/index.js";
 import { nestedTextFromTs } from "../utils/index.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
-export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
+export function* generateMainSpecTsCode(specification: models.Specification) {
+  const { names, nodes } = specification;
+  const { factory } = ts;
+
+  const codeGenerator = new MainSpecsTsCodeGenerator(factory, names, nodes);
+  const code = codeGenerator.getCode();
+
+  return code;
+}
+
+class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
   public *getCode() {
     yield nestedTextFromTs(this.factory, this.getStatements());
   }

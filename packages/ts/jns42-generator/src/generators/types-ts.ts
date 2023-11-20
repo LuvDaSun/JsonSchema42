@@ -1,11 +1,12 @@
 import ts from "typescript";
-import { choose } from "../main.js";
+import { choose, nestedTextFromTs } from "../utils/index.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class TypesTsCodeGenerator extends CodeGeneratorBase {
-  public *getStatements() {
+  public *getCode() {
     for (const nodeId in this.nodes) {
-      yield this.generateTypeDeclarationStatement(nodeId);
+      const statements = this.generateTypeDeclarationStatement(nodeId);
+      yield* nestedTextFromTs(this.factory, [statements]);
     }
   }
 

@@ -1,12 +1,14 @@
 import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
 import camelcase from "camelcase";
 import ts from "typescript";
+import { nestedTextFromTs } from "../utils/index.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
-  public *getStatements() {
+  public *getCode() {
     for (const nodeId in this.nodes) {
-      yield* this.generateValidatorFunctionDeclarationStatements(nodeId);
+      const statements = this.generateValidatorFunctionDeclarationStatements(nodeId);
+      nestedTextFromTs(this.factory, statements);
     }
   }
 

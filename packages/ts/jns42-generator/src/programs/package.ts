@@ -1,5 +1,4 @@
 import * as path from "node:path";
-import ts from "typescript";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/draft-04/index.js";
@@ -99,8 +98,7 @@ async function main(options: MainOptions) {
 
   const namesData = namer.getNames();
 
-  const factory = ts.factory;
-  generatePackage(factory, intermediateData, namesData, {
+  generatePackage(intermediateData, namesData, {
     directoryPath: packageDirectoryPath,
     name: packageName,
     version: packageVersion,

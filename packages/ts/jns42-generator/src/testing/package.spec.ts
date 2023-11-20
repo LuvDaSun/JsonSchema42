@@ -4,7 +4,6 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import ts from "typescript";
 import YAML from "yaml";
 import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
@@ -83,8 +82,7 @@ async function runTest(packageName: string) {
 
       const names = namer.getNames();
 
-      const factory = ts.factory;
-      generatePackage(factory, intermediateData, names, {
+      generatePackage(intermediateData, names, {
         directoryPath: packageDirectoryPath,
         name: packageName,
         version: "v0.0.0",

@@ -1,10 +1,9 @@
 import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
 import fs from "node:fs";
 import path from "node:path";
-import ts from "typescript";
 import { formatData, formatStatements } from "../utils/index.js";
-import { MainSpecsTsCodeGenerator } from "./main-specs-ts.js";
-import { MainTsCodeGenerator } from "./main-ts.js";
+import { generateMainSpecTsCode } from "./main-specs-ts.js";
+import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
 
@@ -15,11 +14,15 @@ export interface PackageOptions {
 }
 
 export async function generatePackage(
-  factory: ts.NodeFactory,
   intermediateData: schemaIntermediateB.SchemaJson,
   namesData: Record<string, string>,
   options: PackageOptions,
 ) {
+  const specification = {
+    names: namesData,
+    nodes: intermediateData.schemas,
+  };
+
   fs.mkdirSync(options.directoryPath, { recursive: true });
 
   {
@@ -47,19 +50,13 @@ export async function generatePackage(
   }
 
   {
-    const codeGenerator = new MainTsCodeGenerator(factory, namesData, intermediateData.schemas);
-    const code = codeGenerator.getCode();
+    const code = generateMainTsCode(specification);
     const filePath = path.join(options.directoryPath, "main.ts");
     fs.writeFileSync(filePath, formatStatements(code));
   }
 
   {
-    const codeGenerator = new MainSpecsTsCodeGenerator(
-      factory,
-      namesData,
-      intermediateData.schemas,
-    );
-    const code = codeGenerator.getCode();
+    const code = generateMainSpecTsCode(specification);
     const filePath = path.join(options.directoryPath, "main.spec.ts");
     fs.writeFileSync(filePath, formatStatements(code));
   }
