@@ -14,7 +14,7 @@ export interface PackageOptions {
   directoryPath: string;
 }
 
-export function generatePackage(
+export async function generatePackage(
   factory: ts.NodeFactory,
   intermediateData: schemaIntermediateB.SchemaJson,
   namesData: Record<string, string>,
@@ -48,9 +48,9 @@ export function generatePackage(
 
   {
     const codeGenerator = new MainTsCodeGenerator(factory, namesData, intermediateData.schemas);
-    const statements = codeGenerator.getStatements();
+    const code = codeGenerator.getCode();
     const filePath = path.join(options.directoryPath, "main.ts");
-    fs.writeFileSync(filePath, formatStatements(factory, statements));
+    fs.writeFileSync(filePath, formatStatements(code));
   }
 
   {
@@ -59,8 +59,8 @@ export function generatePackage(
       namesData,
       intermediateData.schemas,
     );
-    const statements = codeGenerator.getStatements();
+    const code = codeGenerator.getCode();
     const filePath = path.join(options.directoryPath, "main.spec.ts");
-    fs.writeFileSync(filePath, formatStatements(factory, statements));
+    fs.writeFileSync(filePath, formatStatements(code));
   }
 }

@@ -1,8 +1,13 @@
 import ts from "typescript";
+import { nestedTextFromTs } from "../utils/index.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
+  public *getCode() {
+    yield nestedTextFromTs(this.factory, this.getStatements());
+  }
+
   public *getStatements() {
     const { factory: f } = this;
 
