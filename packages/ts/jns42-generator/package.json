@@ -15,8 +15,7 @@
   "scripts": {
     "build": "tsc --build && chmod +x out/program.js",
     "clean": "rm -rf out",
-    "test": "node --test ./out/**/*.test.js",
-    "coverage": "c8 --reporter lcov npm test"
+    "test": "node --test ./out/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -34,8 +33,6 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.2",
-    "c8": "^8.0.1",
     "yaml": "^2.3.4"
   },
   "dependencies": {
