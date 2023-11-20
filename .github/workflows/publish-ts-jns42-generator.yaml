@@ -1,0 +1,12 @@
+on:
+  push:
+    tags:
+      - ts/jns42-generator@*.*.*
+
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-ts.yaml
+    with:
+      NPM_CONFIG_WORKSPACE: jns42-generator
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
