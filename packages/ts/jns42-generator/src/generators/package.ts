@@ -1,7 +1,7 @@
 import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
 import fs from "node:fs";
 import path from "node:path";
-import { formatData, formatStatements } from "../utils/index.js";
+import { formatCode, formatData } from "../utils/index.js";
 import { generateMainSpecTsCode } from "./main-specs-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
@@ -52,12 +52,12 @@ export async function generatePackage(
   {
     const code = generateMainTsCode(specification);
     const filePath = path.join(options.directoryPath, "main.ts");
-    fs.writeFileSync(filePath, formatStatements(code));
+    fs.writeFileSync(filePath, formatCode(code));
   }
 
   {
     const code = generateMainSpecTsCode(specification);
     const filePath = path.join(options.directoryPath, "main.spec.ts");
-    fs.writeFileSync(filePath, formatStatements(code));
+    fs.writeFileSync(filePath, formatCode(code));
   }
 }
