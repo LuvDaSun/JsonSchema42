@@ -33,6 +33,8 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "typescript": "^5.2.2",
     "yaml": "^2.3.4"
   },
   "dependencies": {
