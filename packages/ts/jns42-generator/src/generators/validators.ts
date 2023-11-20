@@ -1,7 +1,6 @@
 import ts from "typescript";
 import * as models from "../models/index.js";
 import { itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
-import { CodeGeneratorBase } from "./code-generator-base.js";
 
 export function* generateValidators(specifitation: models.Specification) {
   const { names, nodes } = specifitation;
@@ -720,241 +719,166 @@ function* generateMapTypeItemCaseClausesValidationStatements(
   }
 }
 
-class ValidatorsTsCodeGenerator extends CodeGeneratorBase {
-  protected *generateReferenceCompoundValidationStatements(reference: string) {
-    const { factory: f } = this;
-    const typeName = this.getTypeName(reference);
+function* generateReferenceCompoundValidationStatements(
+  specification: models.Specification,
+  reference: string,
+) {
+  const { nodes, names } = specification;
+  const validatorFunctionName = toCamel("is", names[reference]);
 
-    yield f.createIfStatement(
-      f.createPrefixUnaryExpression(
-        ts.SyntaxKind.ExclamationToken,
-        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-          f.createIdentifier("value"),
-        ]),
-      ),
-      f.createBlock([f.createReturnStatement(f.createFalse())], true),
-    );
+  yield itt`
+    if(!${validatorFunctionName}(value)) {
+      return false;
+    }
+  `;
 
-    yield itt`
+  yield itt`
     return true;
   `;
-  }
-  protected *generateOneOfCompoundValidationStatements(oneOf: string[]) {
-    const { factory: f } = this;
+}
+function* generateOneOfCompoundValidationStatements(
+  specification: models.Specification,
+  oneOf: string[],
+) {
+  const { nodes, names } = specification;
 
-    yield f.createVariableStatement(
-      undefined,
-      f.createVariableDeclarationList(
-        [
-          f.createVariableDeclaration(
-            f.createIdentifier("validCounter"),
-            undefined,
-            undefined,
-            f.createNumericLiteral(0),
-          ),
-        ],
-        ts.NodeFlags.Let,
-      ),
-    );
+  yield itt`
+    let validCounter = 0;
+  `;
 
-    for (const typeNodeId of oneOf) {
-      const typeName = this.getTypeName(typeNodeId);
-
-      yield f.createIfStatement(
-        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-          f.createIdentifier("value"),
-        ]),
-        f.createBlock(
-          [
-            f.createExpressionStatement(
-              f.createPostfixUnaryExpression(
-                f.createIdentifier("validCounter"),
-                ts.SyntaxKind.PlusPlusToken,
-              ),
-            ),
-          ],
-          true,
-        ),
-      );
-
-      yield f.createIfStatement(
-        f.createBinaryExpression(
-          f.createIdentifier("validCounter"),
-          f.createToken(ts.SyntaxKind.GreaterThanToken),
-          f.createNumericLiteral(1),
-        ),
-        f.createBlock([f.createReturnStatement(f.createFalse())], true),
-      );
-    }
-
-    yield f.createIfStatement(
-      f.createBinaryExpression(
-        f.createIdentifier("validCounter"),
-        f.createToken(ts.SyntaxKind.LessThanToken),
-        f.createNumericLiteral(1),
-      ),
-      f.createBlock([f.createReturnStatement(f.createFalse())], true),
-    );
+  for (const typeNodeId of oneOf) {
+    const validatorFunctionName = toCamel("is", names[typeNodeId]);
 
     yield itt`
+      if(${validatorFunctionName}(value)) {
+        validCounter++;
+      }
+
+      if(validCounter > 1) {
+        return false
+      }
+    `;
+  }
+
+  yield itt`
+    if(validCounter < 1) {
+      return false
+    }
+  `;
+
+  yield itt`
     return true;
   `;
-  }
-  protected *generateAnyOfCompoundValidationStatements(anyOf: string[]) {
-    const { factory: f } = this;
+}
+function* generateAnyOfCompoundValidationStatements(
+  specification: models.Specification,
+  anyOf: string[],
+) {
+  const { nodes, names } = specification;
 
-    for (const typeNodeId of anyOf) {
-      const typeName = this.getTypeName(typeNodeId);
-
-      yield f.createIfStatement(
-        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-          f.createIdentifier("value"),
-        ]),
-        f.createBlock([f.createReturnStatement(f.createTrue())], true),
-      );
-    }
-
-    yield f.createReturnStatement(f.createFalse());
-  }
-  protected *generateAllOfCompoundValidationStatements(allOf: string[]) {
-    const { factory: f } = this;
-
-    for (const typeNodeId of allOf) {
-      const typeName = this.getTypeName(typeNodeId);
-
-      yield f.createIfStatement(
-        f.createPrefixUnaryExpression(
-          ts.SyntaxKind.ExclamationToken,
-          f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-            f.createIdentifier("value"),
-          ]),
-        ),
-        f.createBlock([f.createReturnStatement(f.createFalse())], true),
-      );
-    }
+  for (const typeNodeId of anyOf) {
+    const validatorFunctionName = toCamel("is", names[typeNodeId]);
 
     yield itt`
-    return true;
-  `;
+      if(${validatorFunctionName}(value)) {
+        return true;
+      }
+    `;
   }
-  protected *generateIfCompoundValidationStatements($if: string, then?: string, $else?: string) {
-    const { factory: f } = this;
-    const typeName = this.getTypeName($if);
 
-    if (then != null && $else != null) {
-      const thenTypeName = this.getTypeName(then);
-      const elseTypeName = this.getTypeName($else);
+  yield itt`
+    return false;
+  `;
+}
+function* generateAllOfCompoundValidationStatements(
+  specification: models.Specification,
+  allOf: string[],
+) {
+  const { nodes, names } = specification;
 
-      yield f.createIfStatement(
-        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-          f.createIdentifier("value"),
-        ]),
-        f.createBlock(
-          [
-            f.createIfStatement(
-              f.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                f.createCallExpression(f.createIdentifier(`is${thenTypeName}`), undefined, [
-                  f.createIdentifier("value"),
-                ]),
-              ),
-              f.createBlock([f.createReturnStatement(f.createFalse())], true),
-            ),
-          ],
-          true,
-        ),
-        f.createBlock(
-          [
-            f.createIfStatement(
-              f.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                f.createCallExpression(f.createIdentifier(`is${elseTypeName}`), undefined, [
-                  f.createIdentifier("value"),
-                ]),
-              ),
-              f.createBlock([f.createReturnStatement(f.createFalse())], true),
-            ),
-          ],
-          true,
-        ),
-      );
-    }
-
-    if (then != null && $else == null) {
-      const thenTypeName = this.getTypeName(then);
-
-      yield f.createIfStatement(
-        f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-          f.createIdentifier("value"),
-        ]),
-        f.createBlock(
-          [
-            f.createIfStatement(
-              f.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                f.createCallExpression(f.createIdentifier(`is${thenTypeName}`), undefined, [
-                  f.createIdentifier("value"),
-                ]),
-              ),
-              f.createBlock([f.createReturnStatement(f.createFalse())], true),
-            ),
-          ],
-          true,
-        ),
-      );
-    }
-
-    if (then == null && $else != null) {
-      const elseTypeName = this.getTypeName($else);
-
-      yield f.createIfStatement(
-        f.createPrefixUnaryExpression(
-          ts.SyntaxKind.ExclamationToken,
-          f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-            f.createIdentifier("value"),
-          ]),
-        ),
-        f.createBlock(
-          [
-            f.createIfStatement(
-              f.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                f.createCallExpression(f.createIdentifier(`is${elseTypeName}`), undefined, [
-                  f.createIdentifier("value"),
-                ]),
-              ),
-              f.createBlock([f.createReturnStatement(f.createFalse())], true),
-            ),
-          ],
-          true,
-        ),
-      );
-    }
+  for (const typeNodeId of allOf) {
+    const validatorFunctionName = toCamel("is", names[typeNodeId]);
 
     yield itt`
+      if(!${validatorFunctionName}(value)) {
+        return false;
+      }
+    `;
+  }
+
+  yield itt`
     return true;
   `;
+}
+function* generateIfCompoundValidationStatements(
+  specification: models.Specification,
+  $if: string,
+  then?: string,
+  $else?: string,
+) {
+  const { nodes, names } = specification;
+  const ifValidatorFunctionName = toCamel("is", names[$if]);
+
+  if (then != null && $else != null) {
+    const thenValidatorFunctionName = toCamel("is", names[then]);
+    const elseValidatorFunctionName = toCamel("is", names[$else]);
+
+    itt`
+      if(${ifValidatorFunctionName}(value)) {
+        if(!${thenValidatorFunctionName}(value)) {
+          return false;
+        }
+      }
+      else {
+        if(!${elseValidatorFunctionName}(value)) {
+          return false;
+        }
+      }
+    `;
   }
-  protected *generateNotCompoundValidationStatements(not: string) {
-    const { factory: f } = this;
-    const typeName = this.getTypeName(not);
 
-    yield f.createIfStatement(
-      f.createCallExpression(f.createIdentifier(`is${typeName}`), undefined, [
-        f.createIdentifier("value"),
-      ]),
-      f.createBlock([f.createReturnStatement(f.createFalse())], true),
-    );
+  if (then != null && $else == null) {
+    const thenValidatorFunctionName = toCamel("is", names[then]);
 
-    yield itt`
+    itt`
+      if(${ifValidatorFunctionName}(value)) {
+        if(!${thenValidatorFunctionName}(value)) {
+          return false;
+        }
+      }
+    `;
+  }
+
+  if (then == null && $else != null) {
+    const elseValidatorFunctionName = toCamel("is", names[$else]);
+
+    itt`
+      if(!${ifValidatorFunctionName}(value)) {
+        if(!${elseValidatorFunctionName}(value)) {
+          return false;
+        }
+      }
+    `;
+  }
+
+  yield itt`
     return true;
   `;
-  }
+}
+function* generateNotCompoundValidationStatements(
+  specification: models.Specification,
+  not: string,
+) {
+  const { nodes, names } = specification;
+  const validatorFunctionName = toCamel("is", names[not]);
 
-  private createRegExpExpression(pattern: string) {
-    const { factory } = this;
-    return factory.createNewExpression(factory.createIdentifier("RegExp"), undefined, [
-      factory.createStringLiteral(pattern),
-    ]);
-  }
+  yield itt`
+    if(${validatorFunctionName}(value)) {
+      return false;
+    }
+  `;
+
+  yield itt`
+    return true;
+  `;
 }
