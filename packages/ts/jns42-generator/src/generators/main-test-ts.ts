@@ -8,13 +8,13 @@ export function* generateMainSpecTsCode(specification: models.Specification) {
   const { names, nodes } = specification;
   const { factory } = ts;
 
-  const codeGenerator = new MainSpecsTsCodeGenerator(factory, names, nodes);
+  const codeGenerator = new MainTestTsCodeGenerator(factory, names, nodes);
   const code = codeGenerator.getCode();
 
   return code;
 }
 
-class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
+class MainTestTsCodeGenerator extends CodeGeneratorBase {
   public *getCode() {
     yield itt`
       import assert from "node:assert/strict";

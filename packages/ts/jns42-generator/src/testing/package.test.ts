@@ -96,6 +96,13 @@ async function runTest(packageName: string) {
       });
     });
 
+    await test("build package", () => {
+      cp.execSync("npm run build", {
+        cwd: packageDirectoryPath,
+        env: process.env,
+      });
+    });
+
     await test("test package", () => {
       cp.execSync("test package", {
         cwd: packageDirectoryPath,

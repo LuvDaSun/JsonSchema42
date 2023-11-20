@@ -2,7 +2,7 @@ import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
 import fs from "node:fs";
 import path from "node:path";
 import { formatCode, formatData } from "../utils/index.js";
-import { generateMainSpecTsCode } from "./main-specs-ts.js";
+import { generateMainSpecTsCode } from "./main-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
