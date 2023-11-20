@@ -1,6 +1,11 @@
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - "*"
+    paths:
+      - "*"
+      - .github/**
+      - packages/**
 
 jobs:
   formatting:
