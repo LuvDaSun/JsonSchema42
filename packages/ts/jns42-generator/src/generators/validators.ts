@@ -140,6 +140,11 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
     validatorFunctionNames.push(functionName);
   }
 
+  if (node.applicators.allOf != null) {
+    const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
+    validatorFunctionNames.push(functionName);
+  }
+
   if (node.applicators.if != null) {
     const functionName = "_" + toCamel("is", "if", names[nodeId]);
     validatorFunctionNames.push(functionName);
@@ -621,10 +626,10 @@ function* generateArrayTypeItemCaseClausesValidationStatements(
 
   for (const elementIndex in node.applicators.tupleItems) {
     const itemTypeNodeId = node.applicators.tupleItems[elementIndex];
-    const itemValidatorFunctionName = toPascal(names[itemTypeNodeId]);
+    const itemValidatorFunctionName = toCamel("is", names[itemTypeNodeId]);
 
     yield itt`
-      case ${JSON.stringify(elementIndex)}:
+      case ${JSON.stringify(Number(elementIndex))}:
         if(!${itemValidatorFunctionName}(elementValue)) {
           return false;
         }
