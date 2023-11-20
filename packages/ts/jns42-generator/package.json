@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
-  "bin": "out/program.js",
+  "bin": {
+    "jns42-generator": "out/program.js"
+  },
   "main": "out/main.js",
   "types": "out/main.d.ts",
   "files": [
@@ -18,12 +20,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:JsonSchema42/jns42-generator-ts"
+    "url": "git+ssh://git@github.com/LuvDaSun/JsonSchema42.gi"
   },
   "author": "LuvDaSun Software B.V.",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/JsonSchema42/jns42-generator-ts/issues"
+    "url": "https://github.com/LuvDaSun/JsonSchema42/issues"
   },
   "keywords": [
     "json",
