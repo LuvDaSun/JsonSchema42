@@ -79,8 +79,11 @@ export function generatePackage(
 function writeCodeToFile(filePath: string, code: NestedText) {
   const fd = fs.openSync(filePath, "w");
 
-  for (const text of flattenNestedText(code)) {
-    fs.writeFileSync(fd, text);
+  try {
+    for (const text of flattenNestedText(code)) {
+      fs.writeFileSync(fd, text);
+    }
+  } finally {
+    fs.closeSync(fd);
   }
-  fs.closeSync(fd);
 }
