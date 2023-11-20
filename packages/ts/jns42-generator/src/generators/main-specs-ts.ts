@@ -1,6 +1,6 @@
 import ts from "typescript";
 import * as models from "../models/index.js";
-import { itt, nestedTextFromTs } from "../utils/index.js";
+import { itt } from "../utils/index.js";
 import { generateLiteral } from "../utils/literal.js";
 import { CodeGeneratorBase } from "./code-generator-base.js";
 
@@ -24,7 +24,7 @@ class MainSpecsTsCodeGenerator extends CodeGeneratorBase {
 
     for (const nodeId in this.nodes) {
       const statements = this.generateTestStatement(nodeId);
-      yield* nestedTextFromTs(this.factory, statements);
+      yield* this.nestedTextFromTs(statements);
     }
   }
 

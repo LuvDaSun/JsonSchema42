@@ -15,7 +15,6 @@ export function formatStatements(nestedCode: NestedText) {
 `.trim();
 
   const code = [...flattenNestedText(nestedCode)].join("");
-  const formattedCode = code.toString();
 
-  return `${banner}\n\n${formattedCode}`;
+  return `${banner}\n\n${code}`;
 }

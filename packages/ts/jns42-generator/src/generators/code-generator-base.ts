@@ -32,4 +32,18 @@ export abstract class CodeGeneratorBase {
 
     return expressions.reduce((a, b) => f.createBinaryExpression(a, glue, b));
   }
+
+  protected nestedTextFromTs(statements: Iterable<ts.Statement>) {
+    const printer = ts.createPrinter({
+      newLine: ts.NewLineKind.LineFeed,
+    });
+
+    const sourceFile = this.factory.createSourceFile(
+      [...statements],
+      this.factory.createToken(ts.SyntaxKind.EndOfFileToken),
+      ts.NodeFlags.None,
+    );
+
+    return printer.printFile(sourceFile);
+  }
 }

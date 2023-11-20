@@ -1,5 +1,3 @@
-import ts from "typescript";
-
 export type NestedText = Iterable<NestedText> | string;
 
 export function* iterableTextTemplate(
@@ -28,19 +26,9 @@ export function* flattenNestedText(nestedText: NestedText): Iterable<string> {
   }
 }
 
-/**
- * temporary helper function, should be factored out
- */
-export function nestedTextFromTs(factory: ts.NodeFactory, statements: Iterable<ts.Statement>) {
-  const printer = ts.createPrinter({
-    newLine: ts.NewLineKind.LineFeed,
-  });
-
-  const sourceFile = factory.createSourceFile(
-    [...statements],
-    factory.createToken(ts.SyntaxKind.EndOfFileToken),
-    ts.NodeFlags.None,
-  );
-
-  return printer.printFile(sourceFile);
+function unindent(text: string) {
+  return text
+    .split("\n")
+    .map((line) => line.trimStart())
+    .join("\n");
 }
