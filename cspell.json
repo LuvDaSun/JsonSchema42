@@ -1,0 +1,6 @@
+{
+  "version": "0.2",
+  "words": ["camelcase", "endregion", "urlencoding"],
+  "useGitignore": true,
+  "files": ["packages/rs/jns42-generator/src/**", "packages/ts/jns42-generator/src/**"]
+}

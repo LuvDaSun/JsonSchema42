@@ -1,0 +1,51 @@
+{
+  "name": "jns42-generator",
+  "version": "0.0.0",
+  "description": "generate interfaces and validators from a json schema",
+  "type": "module",
+  "bin": "out/program.js",
+  "main": "out/main.js",
+  "types": "out/main.d.ts",
+  "files": [
+    "out/*",
+    "src/*"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x out/program.js",
+    "clean": "rm -rf out",
+    "test": "node --test ./out/**/*.spec.js",
+    "coverage": "c8 --reporter lcov npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:JsonSchema42/jns42-generator-ts"
+  },
+  "author": "LuvDaSun Software B.V.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JsonSchema42/jns42-generator-ts/issues"
+  },
+  "keywords": [
+    "json",
+    "schema",
+    "generator"
+  ],
+  "homepage": "https://www.JsonSchema42.org",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "c8": "^8.0.1",
+    "yaml": "^2.3.3"
+  },
+  "dependencies": {
+    "@jns42/jns42-schema-draft-04": "^0.2.5",
+    "@jns42/jns42-schema-draft-2020-12": "^0.2.4",
+    "@jns42/jns42-schema-intermediate-b": "^0.4.0",
+    "@types/node": "^20.8.10",
+    "@types/yargs": "^17.0.29",
+    "camelcase": "^8.0.0",
+    "tslib": "^2.6.2",
+    "type-fest": "^4.6.0",
+    "typescript": "^5.2.2",
+    "yargs": "^17.7.2"
+  }
+}
