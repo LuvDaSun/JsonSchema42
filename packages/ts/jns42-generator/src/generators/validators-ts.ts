@@ -1,7 +1,9 @@
 import * as models from "../models/index.js";
-import { itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
+import { banner, itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
+  yield banner;
+
   const { names, nodes } = specification;
 
   yield itt`
