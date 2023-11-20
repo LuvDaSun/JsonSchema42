@@ -8,3 +8,9 @@ export function* joinIterable<T, G>(iterable: Iterable<T>, glue: G): Iterable<T 
     count++;
   }
 }
+
+export function* mapIterable<T, R>(iterable: Iterable<T>, mapper: (item: T) => R): Iterable<R> {
+  for (const item of iterable) {
+    yield mapper(item);
+  }
+}
