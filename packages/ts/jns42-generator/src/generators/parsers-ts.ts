@@ -307,28 +307,83 @@ function* generateArrayTypeParserStatements(specification: models.Specification,
     if(Array.isArray(value)) {
       const result = new Array<unknown>(value.length);
       for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-        const elementValue = undefined;
-        result[elementIndex] = elementValue;
+        ${generateArrayTypeItemParserStatements(specification, nodeId)}
       }
       return result;
     }
-    return false
+    return undefined;
   `;
 }
 function* generateArrayTypeItemParserStatements(
   specification: models.Specification,
   nodeId: string,
 ) {
-  yield itt`
-    throw "TODO";
-  `;
+  const { nodes, names } = specification;
+  const node = nodes[nodeId];
+
+  if (node.applicators.tupleItems != null && node.applicators.arrayItems != null) {
+    const itemParserFunctionName = toCamel("parse", names[node.applicators.arrayItems]);
+
+    yield itt`
+      if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+        switch(elementIndex) {
+          ${generateArrayTypeItemCaseClausesParserStatements(specification, nodeId)}
+        }
+      }
+      else {
+        result[elementIndex] = ${itemParserFunctionName}(value[elementIndex]);
+      }
+    `;
+  }
+
+  if (node.applicators.tupleItems != null && node.applicators.arrayItems == null) {
+    yield itt`
+      if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+        switch(elementIndex) {
+          ${generateArrayTypeItemCaseClausesParserStatements(specification, nodeId)}
+        }
+      }
+    `;
+  }
+
+  if (node.applicators.tupleItems == null && node.applicators.arrayItems != null) {
+    const itemParserFunctionName = toCamel("parse", names[node.applicators.arrayItems]);
+    yield itt`
+      result[elementIndex] = ${itemParserFunctionName}(value[elementIndex]);
+    `;
+  }
+
+  if (node.applicators.tupleItems == null && node.applicators.arrayItems == null) {
+    yield itt`
+      result[elementIndex] = value[elementIndex];
+    `;
+  }
 }
 function* generateArrayTypeItemCaseClausesParserStatements(
   specification: models.Specification,
   nodeId: string,
 ) {
+  const { nodes, names } = specification;
+  const node = nodes[nodeId];
+
+  if (node.applicators.tupleItems == null) {
+    return;
+  }
+
+  for (const elementIndex in node.applicators.tupleItems) {
+    const itemTypeNodeId = node.applicators.tupleItems[elementIndex];
+    const itemParserFunctionName = toCamel("parse", names[itemTypeNodeId]);
+
+    yield itt`
+      case ${JSON.stringify(Number(elementIndex))}:
+        result[elementIndex] = ${itemParserFunctionName}(value[elementIndex]);
+        break;
+    `;
+  }
+
   yield itt`
-    throw "TODO";
+    default:
+      return undefined;
   `;
 }
 function* generateMapTypeParserStatements(specification: models.Specification, nodeId: string) {
@@ -336,26 +391,64 @@ function* generateMapTypeParserStatements(specification: models.Specification, n
     if(typeof value === "object" && value !== null && !Array.isArray(value)) {
       const result = {} as Record<string, unknown>;
       for(const propertyName in value) {
-        const propertyValue = undefined;
-        result[propertyName] = propertyValue;
+        ${generateMapTypeItemParserStatements(specification, nodeId)}
       }
       return result;
     }
-    return false
+    return undefined;
   `;
 }
 function* generateMapTypeItemParserStatements(specification: models.Specification, nodeId: string) {
-  yield itt`
-    throw "TODO";
-  `;
+  const { nodes, names } = specification;
+  const node = nodes[nodeId];
+
+  if (node.applicators.objectProperties != null) {
+    yield itt`
+      switch(propertyName) {
+        ${generateMapTypeItemCaseClausesParserStatements(specification, nodeId)}
+      }
+    `;
+  }
+
+  if (node.applicators.propertyNames != null) {
+    const parserFunctionName = toCamel("parse", names[node.applicators.propertyNames]);
+
+    yield itt`
+      result[propertyName] ??= ${parserFunctionName}(value[propertyName as keyof typeof value]);
+    `;
+  }
+
+  if (node.applicators.mapProperties != null) {
+    const parserFunctionName = toCamel("parse", names[node.applicators.mapProperties]);
+
+    yield itt`
+      result[propertyName] ??= ${parserFunctionName}(value[propertyName as keyof typeof value]);
+    `;
+  }
 }
 function* generateMapTypeItemCaseClausesParserStatements(
   specification: models.Specification,
   nodeId: string,
 ) {
-  yield itt`
-    throw "TODO";
-  `;
+  const { nodes, names } = specification;
+  const node = nodes[nodeId];
+
+  if (node.applicators.objectProperties == null) {
+    return;
+  }
+
+  for (const propertyName in node.applicators.objectProperties) {
+    const propertyTypeNodeId = node.applicators.objectProperties[propertyName];
+    const parserFunctionName = toCamel("parse", names[propertyTypeNodeId]);
+
+    yield itt`
+      case ${JSON.stringify(propertyName)}: {
+        const propertyValue = ${parserFunctionName}(value[propertyName as keyof typeof value]);
+        result[propertyName] = propertyValue;
+        break;
+      }
+    `;
+  }
 }
 
 function* generateReferenceCompoundParserStatements(
