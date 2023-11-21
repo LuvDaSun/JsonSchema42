@@ -53,7 +53,7 @@ function* generateDeclaration(specification: models.Specification, nodeId: strin
     return;
   }
 
-  yield `unknown`;
+  yield "unknown";
 }
 
 function* generateTypeDefinitionElements(specification: models.Specification, nodeId: string) {
@@ -311,7 +311,7 @@ function* generateReferenceCompoundDefinition(
   reference: string,
 ) {
   const type = toPascal(specification.names[reference]);
-  return type;
+  yield type;
 }
 function* generateIfCompoundDefinition(
   specification: models.Specification,
@@ -339,5 +339,5 @@ function* generateIfCompoundDefinition(
 }
 function* generateNotCompoundDefinition(specification: models.Specification, not: string) {
   const type = toPascal(specification.names[not]);
-  return type;
+  yield type;
 }
