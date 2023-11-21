@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/LuvDaSun/JsonSchema42.gi"
+    "url": "git+ssh://git@github.com/LuvDaSun/JsonSchema42.git"
   },
   "author": "LuvDaSun Software B.V.",
   "license": "ISC",
