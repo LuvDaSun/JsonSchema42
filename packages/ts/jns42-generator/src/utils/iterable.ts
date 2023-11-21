@@ -15,7 +15,7 @@ export function* mapIterable<T, R>(iterable: Iterable<T>, mapper: (item: T) => R
   }
 }
 
-export function* splitIterable(texts: Iterable<string>, separator = /\r?\n/): Iterable<string> {
+export function* splitIterableText(texts: Iterable<string>, separator = /\r?\n/): Iterable<string> {
   let buffer = "";
 
   for (const text of texts) {
