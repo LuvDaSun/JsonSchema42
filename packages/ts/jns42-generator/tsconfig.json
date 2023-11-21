@@ -4,7 +4,9 @@
     "outDir": "./out",
     "rootDir": "./src",
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "composite": true,
+    "lib": ["es2023", "DOM"]
   },
   "include": ["src/**/*"]
 }
