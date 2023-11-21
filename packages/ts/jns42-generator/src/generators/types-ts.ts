@@ -48,12 +48,12 @@ function* generateDeclaration(specification: models.Specification, nodeId: strin
   if (typeElements.length > 0) {
     yield joinIterable(
       mapIterable(typeElements, (element) => itt`(${element})`),
-      " | ",
+      " |\n",
     );
     return;
   }
 
-  yield `unknown`;
+  yield "unknown";
 }
 
 function* generateTypeDefinitionElements(specification: models.Specification, nodeId: string) {
@@ -145,7 +145,7 @@ function* generateBooleanTypeDefinition(specification: models.Specification, nod
   if (options != null) {
     yield joinIterable(
       options.map((option) => JSON.stringify(option)),
-      " | ",
+      " |\n",
     );
     return;
   }
@@ -159,7 +159,7 @@ function* generateIntegerTypeDefinition(specification: models.Specification, nod
   if (options != null) {
     yield joinIterable(
       options.map((option) => JSON.stringify(option)),
-      " | ",
+      " |\n",
     );
     return;
   }
@@ -174,7 +174,7 @@ function* generateNumberTypeDefinition(specification: models.Specification, node
   if (options != null) {
     yield joinIterable(
       options.map((option) => JSON.stringify(option)),
-      " | ",
+      " |\n",
     );
     return;
   }
@@ -188,7 +188,7 @@ function* generateStringTypeDefinition(specification: models.Specification, node
   if (options != null) {
     yield joinIterable(
       options.map((option) => JSON.stringify(option)),
-      " | ",
+      " |\n",
     );
     return;
   }
@@ -206,7 +206,7 @@ function* generateArrayTypeDefinition(specification: models.Specification, nodeI
       .map((nodeId) => nodeId as string)
       .map((nodeId) => toPascal(specification.names[nodeId]));
 
-    yield itt`Array<${joinIterable(elements, " | ")}>`;
+    yield itt`Array<${joinIterable(elements, " |\n")}>`;
     return;
   }
 
@@ -275,7 +275,7 @@ function* generateMapTypeDefinition(specification: models.Specification, nodeId:
   }
 
   if (hasIndexSignature) {
-    members.push(itt`[key: ${nameTypeElement}]: ${joinIterable(indexTypeUnionElements, " | ")},`);
+    members.push(itt`[key: ${nameTypeElement}]: ${joinIterable(indexTypeUnionElements, " |\n")},`);
   }
 
   yield itt`
@@ -287,7 +287,7 @@ function* generateMapTypeDefinition(specification: models.Specification, nodeId:
 
 function* generateOneOfCompoundDefinition(specification: models.Specification, oneOf: string[]) {
   const types = oneOf.map((nodeId) => toPascal(specification.names[nodeId]));
-  yield joinIterable(types, " | ");
+  yield joinIterable(types, " |\n");
 }
 function* generateAnyOfCompoundDefinition(specification: models.Specification, anyOf: string[]) {
   const unionTypes = new Array<NestedText>();
@@ -297,18 +297,21 @@ function* generateAnyOfCompoundDefinition(specification: models.Specification, a
       unionTypes.push(joinIterable(types, " & "));
     }
   }
-  yield joinIterable(unionTypes, " | ");
+  yield joinIterable(
+    mapIterable(unionTypes, (type) => itt`(${type})`),
+    " |\n",
+  );
 }
 function* generateAllOfCompoundDefinition(specification: models.Specification, allOf: string[]) {
   const types = allOf.map((nodeId) => toPascal(specification.names[nodeId]));
-  yield joinIterable(types, " & ");
+  yield joinIterable(types, " &\n");
 }
 function* generateReferenceCompoundDefinition(
   specification: models.Specification,
   reference: string,
 ) {
   const type = toPascal(specification.names[reference]);
-  return type;
+  yield type;
 }
 function* generateIfCompoundDefinition(
   specification: models.Specification,
@@ -328,7 +331,7 @@ function* generateIfCompoundDefinition(
   }
 
   if (elements.length > 0) {
-    yield joinIterable(elements, " | ");
+    yield joinIterable(elements, " |\n");
     return;
   }
 
@@ -336,5 +339,5 @@ function* generateIfCompoundDefinition(
 }
 function* generateNotCompoundDefinition(specification: models.Specification, not: string) {
   const type = toPascal(specification.names[not]);
-  return type;
+  yield type;
 }
