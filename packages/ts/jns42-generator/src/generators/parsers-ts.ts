@@ -1,14 +1,10 @@
 import * as models from "../models/index.js";
-import { banner, itt, toCamel, toPascal } from "../utils/index.js";
+import { banner, itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
 
 export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, nodes } = specification;
-
-  yield itt`
-    import * as types from "./types.js";
-  `;
 
   for (const nodeId in nodes) {
     const node = nodes[nodeId];
@@ -19,7 +15,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
       const functionBody = generateParserBody(specification, nodeId);
 
       yield itt`
-        export function ${functionName}(value: unknown): types.${typeName} {
+        export function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -30,7 +26,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
       const functionBody = generateTypeParserBody(specification, nodeId, type);
 
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName} {
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -43,7 +39,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
         node.applicators.reference,
       );
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName} {
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -56,7 +52,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
         node.applicators.oneOf,
       );
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName}{
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -69,7 +65,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
         node.applicators.anyOf,
       );
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName}{
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -82,7 +78,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
         node.applicators.allOf,
       );
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName} {
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -97,7 +93,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
         node.applicators.else,
       );
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName} {
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -107,7 +103,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
       const functionName = "_" + toCamel("parse", "not", names[nodeId]);
       const functionBody = generateNotCompoundParserStatements(specification, node.applicators.not);
       yield itt`
-        function ${functionName}(value: unknown): types.${typeName}{
+        function ${functionName}(value: unknown): unknown {
           ${functionBody}
         }
       `;
@@ -119,47 +115,50 @@ function* generateParserBody(specification: models.Specification, nodeId: string
   const { names, nodes } = specification;
   const node = nodes[nodeId];
 
-  const validatorFunctionNames = new Array<string>();
+  const parserFunctionNames = new Array<string>();
 
   if (node.types.length > 0) {
     for (const type of node.types) {
       const functionName = "_" + toCamel("parse", type, names[nodeId]);
-      validatorFunctionNames.push(functionName);
+      parserFunctionNames.push(functionName);
     }
   }
 
   if (node.applicators.reference != null) {
     const functionName = "_" + toCamel("parse", "reference", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    parserFunctionNames.push(functionName);
   }
 
   if (node.applicators.oneOf != null) {
     const functionName = "_" + toCamel("parse", "oneOf", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    parserFunctionNames.push(functionName);
   }
 
   if (node.applicators.anyOf != null) {
     const functionName = "_" + toCamel("parse", "anyOf", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    parserFunctionNames.push(functionName);
   }
 
   if (node.applicators.allOf != null) {
     const functionName = "_" + toCamel("parse", "allOf", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    parserFunctionNames.push(functionName);
   }
 
   if (node.applicators.if != null) {
     const functionName = "_" + toCamel("parse", "if", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    parserFunctionNames.push(functionName);
   }
 
   if (node.applicators.not != null) {
     const functionName = "_" + toCamel("parse", "not", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    parserFunctionNames.push(functionName);
   }
 
   yield itt`
-    throw "TODO";
+    return ${joinIterable(
+      mapIterable(parserFunctionNames, (functionName) => `${functionName}(value)`),
+      " ?? ",
+    )};
   `;
 }
 
@@ -212,60 +211,108 @@ function* generateTypeParserBody(
 
 function* generateNeverTypeParserStatements(specification: models.Specification, nodeId: string) {
   yield itt`
-    return value;
+    return undefined;
   `;
 }
 function* generateAnyTypeParserStatements(specification: models.Specification, nodeId: string) {
   yield itt`
-    throw "TODO";
+    return value;
   `;
 }
 function* generateNullTypeParserStatements(specification: models.Specification, nodeId: string) {
   yield itt`
-    throw "TODO";
+    if(value == null) {
+      return null;
+    }
+    switch(typeof value) {
+      case "string":
+        if(value.trim() === "") {
+          return null;
+        }
+        break;
+      case "number":
+        return Boolean(value);
+      case "boolean":
+        return value;
+    }
+    return undefined;
   `;
 }
 function* generateBooleanTypeParserStatements(specification: models.Specification, nodeId: string) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-  const assertions = node.assertions.boolean ?? {};
-
   yield itt`
-    throw "TODO";
+    if(value == null) {
+      return false;
+    }
+    switch(typeof value) {
+      case "string":
+        switch(value.trim()) {
+          case "":
+          case "no":
+          case "off":
+          case "false":
+          case "0":
+             return false;
+          default:
+              return true;            
+        }
+      case "number":
+        return Boolean(value);
+      case "boolean":
+        return value;
+    }
+    return undefined;
   `;
 }
 function* generateIntegerTypeParserStatements(specification: models.Specification, nodeId: string) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-  const assertions = node.assertions.integer ?? {};
-
   yield itt`
-    throw "TODO";
+    switch(typeof value) {
+      case "string":
+        return Number(value);
+      case "number":
+        return value;
+      case "boolean":
+        return value ? 1 : 0;
+    }
+    return undefined;
   `;
 }
 function* generateNumberTypeParserStatements(specification: models.Specification, nodeId: string) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-  const assertions = node.assertions.integer ?? {};
-
   yield itt`
-    throw "TODO";
+    switch(typeof value) {
+      case "string":
+        return Number(value);
+      case "number":
+        return value;
+      case "boolean":
+        return value ? 1 : 0;
+    }
+    return undefined;
   `;
 }
 function* generateStringTypeParserStatements(specification: models.Specification, nodeId: string) {
   yield itt`
-    throw "TODO";
+    switch(typeof value) {
+      case "string":
+        return value;
+      case "number":
+      case "boolean":
+        return String(value);
+      default:
+        return undefined;
+    }
   `;
 }
 function* generateArrayTypeParserStatements(specification: models.Specification, nodeId: string) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-  const assertions = node.assertions.array ?? {};
-
-  const hasSeenSet = assertions.uniqueItems ?? false;
-
   yield itt`
-    throw "TODO";
+    if(Array.isArray(value)) {
+      const result = new Array<unknown>(value.length);
+      for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
+        const elementValue = undefined;
+        result[elementIndex] = elementValue;
+      }
+      return result;
+    }
+    return false
   `;
 }
 function* generateArrayTypeItemParserStatements(
@@ -286,7 +333,15 @@ function* generateArrayTypeItemCaseClausesParserStatements(
 }
 function* generateMapTypeParserStatements(specification: models.Specification, nodeId: string) {
   yield itt`
-    throw "TODO";
+    if(typeof value === "object" && value !== null && !Array.isArray(value)) {
+      const result = {} as Record<string, unknown>;
+      for(const propertyName in value) {
+        const propertyValue = undefined;
+        result[propertyName] = propertyValue;
+      }
+      return result;
+    }
+    return false
   `;
 }
 function* generateMapTypeItemParserStatements(specification: models.Specification, nodeId: string) {
@@ -307,32 +362,57 @@ function* generateReferenceCompoundParserStatements(
   specification: models.Specification,
   reference: string,
 ) {
+  const { names, nodes } = specification;
+
+  const functionName = toCamel("parse", names[reference]);
+
   yield itt`
-    throw "TODO";
+    return ${functionName}(value);
   `;
 }
 function* generateOneOfCompoundParserStatements(
   specification: models.Specification,
   oneOf: string[],
 ) {
+  const { names, nodes } = specification;
+
+  const parserFunctionNames = oneOf.map((nodeId) => toCamel("parse", names[nodeId]));
+
   yield itt`
-    throw "TODO";
+    return ${joinIterable(
+      mapIterable(parserFunctionNames, (functionName) => `${functionName}(value)`),
+      " ?? ",
+    )};
   `;
 }
 function* generateAnyOfCompoundParserStatements(
   specification: models.Specification,
   anyOf: string[],
 ) {
+  const { names, nodes } = specification;
+
+  const parserFunctionNames = anyOf.map((nodeId) => toCamel("parse", names[nodeId]));
+
   yield itt`
-    throw "TODO";
+    return ${joinIterable(
+      mapIterable(parserFunctionNames, (functionName) => `${functionName}(value)`),
+      " ?? ",
+    )};
   `;
 }
 function* generateAllOfCompoundParserStatements(
   specification: models.Specification,
   allOf: string[],
 ) {
+  const { names, nodes } = specification;
+
+  const parserFunctionNames = allOf.map((nodeId) => toCamel("parse", names[nodeId]));
+
   yield itt`
-    throw "TODO";
+    return ${joinIterable(
+      mapIterable(parserFunctionNames, (functionName) => `${functionName}(value)`),
+      " ?? ",
+    )};
   `;
 }
 function* generateIfCompoundParserStatements(
@@ -341,12 +421,30 @@ function* generateIfCompoundParserStatements(
   then?: string,
   $else?: string,
 ) {
+  const { names, nodes } = specification;
+
+  const parserFunctionNames = new Array<string>();
+  parserFunctionNames.push(toCamel("parse", names[$if]));
+  if (then != null) {
+    parserFunctionNames.push(toCamel("parse", names[then]));
+  }
+  if ($else != null) {
+    parserFunctionNames.push(toCamel("parse", names[$else]));
+  }
+
   yield itt`
-    throw "TODO";
+    return ${joinIterable(
+      mapIterable(parserFunctionNames, (functionName) => `${functionName}(value)`),
+      " ?? ",
+    )};
   `;
 }
 function* generateNotCompoundParserStatements(specification: models.Specification, not: string) {
+  const { names, nodes } = specification;
+
+  const functionName = toCamel("parse", names[not]);
+
   yield itt`
-    throw "TODO";
+    return ${functionName}(value);
   `;
 }

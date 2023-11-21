@@ -1,0 +1,16 @@
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    description: "An object"
+    type: "number"
+parse: true
+valid:
+  one: "1"
+  two: "2"
+  "true": true
+  "false": false
+
+invalid:
+  a: "a"
+  b: "b"
+  c: "c"
