@@ -13,6 +13,7 @@ import { generatePackage } from "../generators/index.js";
 import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
+  "parse",
   "string-or-boolean",
   "simple-object",
   "all-of-object",
@@ -48,6 +49,7 @@ async function runTest(packageName: string) {
   const testContent = fs.readFileSync(testPath, "utf8");
   const testData = YAML.parse(testContent);
 
+  const parseData = testData.parse ?? false;
   const schemas = testData.schemas as Record<string, unknown>;
   for (const schemaName in schemas) {
     const schema = schemas[schemaName];
@@ -123,6 +125,9 @@ async function runTest(packageName: string) {
         let data = testData.valid[testName];
         await test(testName, async () => {
           const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
+          if (parseData) {
+            data = packageMain[`parse${rootTypeName}`](data);
+          }
           assert.equal(packageMain[`is${rootTypeName}`](data), true);
         });
       }
@@ -133,6 +138,9 @@ async function runTest(packageName: string) {
         let data = testData.invalid[testName];
         await test(testName, async () => {
           const packageMain = await import(path.join(packageDirectoryPath, "main.js"));
+          if (parseData) {
+            data = packageMain[`parse${rootTypeName}`](data);
+          }
           assert.equal(packageMain[`is${rootTypeName}`](data), false);
         });
       }

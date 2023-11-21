@@ -4,6 +4,7 @@ import path from "node:path";
 import { NestedText, flattenNestedText } from "../utils/index.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
+import { generateParsersTsCode } from "./parsers-ts.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTestTsCode } from "./validators-test-ts.js";
@@ -66,6 +67,12 @@ export function generatePackage(
   {
     const code = generateTypesTsCode(specification);
     const filePath = path.join(options.directoryPath, "types.ts");
+    writeCodeToFile(filePath, code);
+  }
+
+  {
+    const code = generateParsersTsCode(specification);
+    const filePath = path.join(options.directoryPath, "parsers.ts");
     writeCodeToFile(filePath, code);
   }
 
