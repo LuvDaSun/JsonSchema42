@@ -11,6 +11,7 @@
   ],
   "settings": {
     "window.title": "JsonSchema42 (TypeScript)",
-    "typescript.tsdk": "../../node_modules/typescript/lib"
+    "typescript.tsdk": "../../node_modules/typescript/lib",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
