@@ -1,7 +1,7 @@
 {
   "extends": "@tsconfig/node20",
   "compilerOptions": {
-    "outDir": "./out",
+    "outDir": "../../../out/ts/jns42-generator",
     "rootDir": "./src",
     "sourceMap": true,
     "declaration": true,
