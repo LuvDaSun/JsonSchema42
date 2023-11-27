@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
+import * as schemaIntermediateB from "jns42-schema-intermediate";
 import { DocumentBase } from "./document-base.js";
 import { DocumentContext } from "./document-context.js";
 

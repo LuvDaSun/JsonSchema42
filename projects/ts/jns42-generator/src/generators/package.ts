@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
+import * as schemaIntermediateB from "jns42-schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
 import { NestedText, flattenNestedText, splitIterableText } from "../utils/index.js";

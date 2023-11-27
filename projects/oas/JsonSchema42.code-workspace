@@ -1,8 +1,8 @@
 {
   "folders": [
     {
-      "name": "jns42-schema-intermediate-b",
-      "path": "jns42-schema-intermediate-b"
+      "name": "jns42-schema-intermediate",
+      "path": "./jns42-schema-intermediate"
     }
   ],
   "settings": {

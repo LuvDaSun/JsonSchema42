@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://schema.JsonSchema42.org/jns42-intermediate-b/schema.json"
+$id: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
 title: "JsonSchema42 intermediate schema"
 type: object
 required:
@@ -8,7 +8,7 @@ required:
 properties:
   $schema:
     "type": "string"
-    "const": "https://schema.JsonSchema42.org/jns42-intermediate-b/schema.json"
+    "const": "https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
   schemas:
     type: object
     additionalProperties: { $ref: "#/$defs/node" }

@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
+import * as schemaIntermediateB from "jns42-schema-intermediate";
 
 export abstract class DocumentBase<N = unknown> {
   public abstract readonly documentNodeUrl: URL;

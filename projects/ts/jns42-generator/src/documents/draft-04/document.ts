@@ -1,5 +1,5 @@
-import { Draft04Schema, isDraft04Schema } from "@jns42/jns42-schema-draft-04";
-import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
+import { Draft04Schema, isDraft04Schema } from "jns42-schema-draft-04";
+import * as schemaIntermediateB from "jns42-schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 

@@ -39,9 +39,9 @@
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "@jns42/jns42-schema-draft-04": "^0.2.5",
-    "@jns42/jns42-schema-draft-2020-12": "^0.2.4",
-    "@jns42/jns42-schema-intermediate-b": "^0.4.0",
+    "jns42-schema-draft-04": "^0.2.5",
+    "jns42-schema-draft-2020-12": "^0.2.4",
+    "jns42-schema-intermediate": "^0.4.0",
     "@types/node": "^20.10.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",

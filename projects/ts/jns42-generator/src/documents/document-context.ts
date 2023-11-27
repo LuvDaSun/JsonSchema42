@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "@jns42/jns42-schema-intermediate-b";
+import * as schemaIntermediateB from "jns42-schema-intermediate";
 import { discoverSchemaId, loadJSON, normalizeUrl, readJson } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
@@ -44,7 +44,7 @@ export class DocumentContext {
 
   public getIntermediateData(): schemaIntermediateB.SchemaJson {
     return {
-      $schema: "https://schema.JsonSchema42.org/jns42-intermediate-b/schema.json",
+      $schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json",
       schemas: Object.fromEntries(this.getIntermediateSchemaEntries()),
     };
   }

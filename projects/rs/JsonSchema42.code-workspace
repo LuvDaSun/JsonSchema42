@@ -1,7 +1,8 @@
 {
   "folders": [
     {
-      "path": "jns42-generator"
+      "name": "jns42-generator",
+      "path": "./jns42-generator"
     }
   ],
   "settings": {

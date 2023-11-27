@@ -2,7 +2,7 @@
   "private": true,
   "workspaces": [
     "projects/ts/jns42-generator",
-    "projects/oas/jns42-schema-intermediate-b"
+    "projects/oas/jns42-schema-intermediate"
   ],
   "scripts": {
     "spelling": "cspell",

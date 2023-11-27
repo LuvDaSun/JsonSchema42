@@ -3,7 +3,7 @@ import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
-import * as schemaIntermediateB from "../documents/intermediate-b/index.js";
+import * as schemaIntermediateB from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
 import { Namer } from "../utils/index.js";
 
