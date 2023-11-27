@@ -2,5 +2,5 @@
   "version": "0.2",
   "words": ["camelcase", "endregion", "urlencoding"],
   "useGitignore": true,
-  "files": ["projects/rs/jns42-generator/src/**", "projects/ts/jns42-generator/src/**"]
+  "files": ["projects/rs/*/src/**", "projects/ts/*/src/**", "projects/oas/*/src/**"]
 }

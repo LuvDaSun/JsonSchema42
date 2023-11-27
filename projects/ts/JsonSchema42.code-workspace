@@ -5,6 +5,10 @@
       "path": "../../fixtures"
     },
     {
+      "name": "jns42-schema-intermediate-b",
+      "path": "../oas/jns42-schema-intermediate-b"
+    },
+    {
       "name": "jns42-generator",
       "path": "jns42-generator"
     }
