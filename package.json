@@ -1,7 +1,7 @@
 {
   "private": true,
   "workspaces": [
-    "packages/ts/jns42-generator"
+    "projects/ts/jns42-generator"
   ],
   "scripts": {
     "spelling": "cspell",
