@@ -1,8 +1,13 @@
 {
-	"private": true,
-	"devDependencies": {
-		"@jns42/jns42-generator": "^0.6.2",
-		"semver": "^7.5.4",
-		"yamljs": "^0.3.0"
-	}
+  "private": true,
+  "devDependencies": {
+    "jns42-generator": "0.8.6",
+    "semver": "^7.5.4",
+    "yamljs": "^0.3.0"
+  },
+  "scripts": {
+    "build": "make rebuild",
+    "clean": "make clean",
+    "test": "node --test ./out/**/*.test.js"
+  }
 }
