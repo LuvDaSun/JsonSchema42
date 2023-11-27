@@ -1,0 +1,17 @@
+env:
+  PACKAGE_NAME: "@jns42/jns42-schema-intermediate-b"
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  test-unit:
+    runs-on: ubuntu-latest
+    container: node:18
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: make
+      - run: ( cd out/schema ; npm test )

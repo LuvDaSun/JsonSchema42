@@ -1,0 +1,21 @@
+env:
+  PACKAGE_NAME: "@jns42/jns42-schema-intermediate-b"
+  TAG: ${{ github.ref_name }}
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    container: node:18
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ~/.npmrc
+      - run: npm ci
+      - run: make
+      - run: ( cd out/schema ; npm publish --access public )
