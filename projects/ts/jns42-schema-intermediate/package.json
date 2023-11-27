@@ -1,0 +1,23 @@
+{
+  "name": "jns42-schema-intermediate",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "type": "module",
+  "main": "main.js",
+  "types": "main.d.ts",
+  "files": [
+    "*"
+  ],
+  "scripts": {
+    "prepare": "tsc",
+    "test": "node --test ./*.spec.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^20.8.10"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
