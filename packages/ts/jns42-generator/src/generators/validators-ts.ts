@@ -740,6 +740,7 @@ function* generateMapTypeItemValidationStatements(
           if(!${validatorFunctionName}(propertyValue)) {
             return false;
           }
+          continue;
         }
       `;
     }
@@ -751,8 +752,9 @@ function* generateMapTypeItemValidationStatements(
     yield itt`
       if(!${validatorFunctionName}(propertyValue)) {
         return false;
-    }
-  `;
+      }
+      continue;
+    `;
   }
 
   if (node.mapProperties != null) {
@@ -762,6 +764,7 @@ function* generateMapTypeItemValidationStatements(
       if(!${validatorFunctionName}(propertyValue)) {
         return false;
       }
+      continue;
     `;
   }
 }
@@ -785,7 +788,7 @@ function* generateMapTypeItemCaseClausesValidationStatements(
         if(!${validatorFunctionName}(propertyValue)) {
           return false;
         }
-        break;
+        continue;
     `;
   }
 }
