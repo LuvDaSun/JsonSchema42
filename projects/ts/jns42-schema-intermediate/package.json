@@ -9,7 +9,7 @@
     "*"
   ],
   "scripts": {
-    "prepare": "tsc",
+    "build": "tsc --build",
     "test": "node --test ./*.spec.js"
   },
   "author": "",
