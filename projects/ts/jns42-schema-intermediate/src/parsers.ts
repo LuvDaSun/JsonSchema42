@@ -36,45 +36,6 @@ if(typeof value === "object" && value !== null && !Array.isArray(value)) {
 const result = {} as Record<string, unknown>;
 for(const propertyName in value) {
 switch(propertyName) {
-case "context": {
-const propertyValue = parseContext(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "metadata": {
-const propertyValue = parseMetadata(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "types": {
-const propertyValue = parseTypes(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "assertions": {
-const propertyValue = parseAssertions(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "applicators": {
-const propertyValue = parseApplicators(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseMetadataSection(value: unknown): unknown {
-return _parseMapMetadataSection(value);
-}
-function _parseMapMetadataSection(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
 case "title": {
 const propertyValue = parseTitle(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
@@ -95,77 +56,11 @@ const propertyValue = parseDeprecated(value[propertyName as keyof typeof value])
 result[propertyName] = propertyValue;
 break;
 }
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseTypesSection(value: unknown): unknown {
-return _parseArrayTypesSection(value);
-}
-function _parseArrayTypesSection(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseTypesSectionItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
-export function parseAssertionsSection(value: unknown): unknown {
-return _parseMapAssertionsSection(value);
-}
-function _parseMapAssertionsSection(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "boolean": {
-const propertyValue = parseBoolean(value[propertyName as keyof typeof value]);
+case "types": {
+const propertyValue = parseTypes(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
-case "integer": {
-const propertyValue = parseInteger(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "number": {
-const propertyValue = parseNumber(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "string": {
-const propertyValue = parseString(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "array": {
-const propertyValue = parseArray(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "map": {
-const propertyValue = parseMap(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseApplicatorsSection(value: unknown): unknown {
-return _parseMapApplicatorsSection(value);
-}
-function _parseMapApplicatorsSection(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
 case "reference": {
 const propertyValue = parseReference(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
@@ -246,129 +141,33 @@ const propertyValue = parseContains(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseBooleanAssertion(value: unknown): unknown {
-return _parseMapBooleanAssertion(value);
-}
-function _parseMapBooleanAssertion(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
 case "options": {
-const propertyValue = parseBooleanAssertionOptions(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseIntegerAssertion(value: unknown): unknown {
-return _parseMapIntegerAssertion(value);
-}
-function _parseMapIntegerAssertion(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "options": {
-const propertyValue = parseIntegerAssertionOptions(value[propertyName as keyof typeof value]);
+const propertyValue = parseOptions(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
 case "minimumInclusive": {
-const propertyValue = parseIntegerAssertionMinimumInclusive(value[propertyName as keyof typeof value]);
+const propertyValue = parseMinimumInclusive(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
 case "minimumExclusive": {
-const propertyValue = parseIntegerAssertionMinimumExclusive(value[propertyName as keyof typeof value]);
+const propertyValue = parseMinimumExclusive(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
 case "maximumInclusive": {
-const propertyValue = parseIntegerAssertionMaximumInclusive(value[propertyName as keyof typeof value]);
+const propertyValue = parseMaximumInclusive(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
 case "maximumExclusive": {
-const propertyValue = parseIntegerAssertionMaximumExclusive(value[propertyName as keyof typeof value]);
+const propertyValue = parseMaximumExclusive(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
 case "multipleOf": {
-const propertyValue = parseIntegerAssertionMultipleOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseNumberAssertion(value: unknown): unknown {
-return _parseMapNumberAssertion(value);
-}
-function _parseMapNumberAssertion(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "options": {
-const propertyValue = parseNumberAssertionOptions(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumInclusive": {
-const propertyValue = parseNumberAssertionMinimumInclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumExclusive": {
-const propertyValue = parseNumberAssertionMinimumExclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumInclusive": {
-const propertyValue = parseNumberAssertionMaximumInclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumExclusive": {
-const propertyValue = parseNumberAssertionMaximumExclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "multipleOf": {
-const propertyValue = parseNumberAssertionMultipleOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseStringAssertion(value: unknown): unknown {
-return _parseMapStringAssertion(value);
-}
-function _parseMapStringAssertion(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "options": {
-const propertyValue = parseStringAssertionOptions(value[propertyName as keyof typeof value]);
+const propertyValue = parseMultipleOf(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
@@ -392,20 +191,6 @@ const propertyValue = parseValueFormat(value[propertyName as keyof typeof value]
 result[propertyName] = propertyValue;
 break;
 }
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseArrayAssertion(value: unknown): unknown {
-return _parseMapArrayAssertion(value);
-}
-function _parseMapArrayAssertion(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
 case "minimumItems": {
 const propertyValue = parseMinimumItems(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
@@ -421,20 +206,6 @@ const propertyValue = parseUniqueItems(value[propertyName as keyof typeof value]
 result[propertyName] = propertyValue;
 break;
 }
-}
-}
-return result;
-}
-return undefined;
-}
-export function parseMapAssertion(value: unknown): unknown {
-return _parseMapMapAssertion(value);
-}
-function _parseMapMapAssertion(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
 case "required": {
 const propertyValue = parseRequired(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
@@ -593,36 +364,6 @@ return result;
 }
 return undefined;
 }
-export function parseContext(value: unknown): unknown {
-return _parseReferenceContext(value);
-}
-function _parseReferenceContext(value: unknown): unknown {
-return parseNodeReference(value);
-}
-export function parseMetadata(value: unknown): unknown {
-return _parseReferenceMetadata(value);
-}
-function _parseReferenceMetadata(value: unknown): unknown {
-return parseMetadataSection(value);
-}
-export function parseTypes(value: unknown): unknown {
-return _parseReferenceTypes(value);
-}
-function _parseReferenceTypes(value: unknown): unknown {
-return parseTypesSection(value);
-}
-export function parseAssertions(value: unknown): unknown {
-return _parseReferenceAssertions(value);
-}
-function _parseReferenceAssertions(value: unknown): unknown {
-return parseAssertionsSection(value);
-}
-export function parseApplicators(value: unknown): unknown {
-return _parseReferenceApplicators(value);
-}
-function _parseReferenceApplicators(value: unknown): unknown {
-return parseApplicatorsSection(value);
-}
 export function parseTitle(value: unknown): unknown {
 return _parseReferenceTitle(value);
 }
@@ -654,55 +395,18 @@ return _parseReferenceDeprecated(value);
 function _parseReferenceDeprecated(value: unknown): unknown {
 return parseBooleanValue(value);
 }
-export function parseTypesSectionItems(value: unknown): unknown {
-return _parseStringTypesSectionItems(value);
+export function parseTypes(value: unknown): unknown {
+return _parseArrayTypes(value);
 }
-function _parseStringTypesSectionItems(value: unknown): unknown {
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
+function _parseArrayTypes(value: unknown): unknown {
+if(Array.isArray(value)) {
+const result = new Array<unknown>(value.length);
+for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
+result[elementIndex] = parseTypesItems(value[elementIndex]);
+}
+return result;
+}
 return undefined;
-}
-}
-export function parseBoolean(value: unknown): unknown {
-return _parseReferenceBoolean(value);
-}
-function _parseReferenceBoolean(value: unknown): unknown {
-return parseBooleanAssertion(value);
-}
-export function parseInteger(value: unknown): unknown {
-return _parseReferenceInteger(value);
-}
-function _parseReferenceInteger(value: unknown): unknown {
-return parseIntegerAssertion(value);
-}
-export function parseNumber(value: unknown): unknown {
-return _parseReferenceNumber(value);
-}
-function _parseReferenceNumber(value: unknown): unknown {
-return parseNumberAssertion(value);
-}
-export function parseString(value: unknown): unknown {
-return _parseReferenceString(value);
-}
-function _parseReferenceString(value: unknown): unknown {
-return parseStringAssertion(value);
-}
-export function parseArray(value: unknown): unknown {
-return _parseReferenceArray(value);
-}
-function _parseReferenceArray(value: unknown): unknown {
-return parseArrayAssertion(value);
-}
-export function parseMap(value: unknown): unknown {
-return _parseReferenceMap(value);
-}
-function _parseReferenceMap(value: unknown): unknown {
-return parseMapAssertion(value);
 }
 export function parseReference(value: unknown): unknown {
 return _parseReferenceReference(value);
@@ -849,117 +553,48 @@ return _parseReferenceContains(value);
 function _parseReferenceContains(value: unknown): unknown {
 return parseNodeReference(value);
 }
-export function parseBooleanAssertionOptions(value: unknown): unknown {
-return _parseArrayBooleanAssertionOptions(value);
+export function parseOptions(value: unknown): unknown {
+return _parseArrayOptions(value);
 }
-function _parseArrayBooleanAssertionOptions(value: unknown): unknown {
+function _parseArrayOptions(value: unknown): unknown {
 if(Array.isArray(value)) {
 const result = new Array<unknown>(value.length);
 for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseBooleanAssertionOptionsItems(value[elementIndex]);
+result[elementIndex] = parseOptionsItems(value[elementIndex]);
 }
 return result;
 }
 return undefined;
 }
-export function parseIntegerAssertionOptions(value: unknown): unknown {
-return _parseArrayIntegerAssertionOptions(value);
+export function parseMinimumInclusive(value: unknown): unknown {
+return _parseReferenceMinimumInclusive(value);
 }
-function _parseArrayIntegerAssertionOptions(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseIntegerAssertionOptionsItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
-export function parseIntegerAssertionMinimumInclusive(value: unknown): unknown {
-return _parseReferenceIntegerAssertionMinimumInclusive(value);
-}
-function _parseReferenceIntegerAssertionMinimumInclusive(value: unknown): unknown {
-return parseIntegerValue(value);
-}
-export function parseIntegerAssertionMinimumExclusive(value: unknown): unknown {
-return _parseReferenceIntegerAssertionMinimumExclusive(value);
-}
-function _parseReferenceIntegerAssertionMinimumExclusive(value: unknown): unknown {
-return parseIntegerValue(value);
-}
-export function parseIntegerAssertionMaximumInclusive(value: unknown): unknown {
-return _parseReferenceIntegerAssertionMaximumInclusive(value);
-}
-function _parseReferenceIntegerAssertionMaximumInclusive(value: unknown): unknown {
-return parseIntegerValue(value);
-}
-export function parseIntegerAssertionMaximumExclusive(value: unknown): unknown {
-return _parseReferenceIntegerAssertionMaximumExclusive(value);
-}
-function _parseReferenceIntegerAssertionMaximumExclusive(value: unknown): unknown {
-return parseIntegerValue(value);
-}
-export function parseIntegerAssertionMultipleOf(value: unknown): unknown {
-return _parseReferenceIntegerAssertionMultipleOf(value);
-}
-function _parseReferenceIntegerAssertionMultipleOf(value: unknown): unknown {
-return parseIntegerValue(value);
-}
-export function parseNumberAssertionOptions(value: unknown): unknown {
-return _parseArrayNumberAssertionOptions(value);
-}
-function _parseArrayNumberAssertionOptions(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseNumberAssertionOptionsItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
-export function parseNumberAssertionMinimumInclusive(value: unknown): unknown {
-return _parseReferenceNumberAssertionMinimumInclusive(value);
-}
-function _parseReferenceNumberAssertionMinimumInclusive(value: unknown): unknown {
+function _parseReferenceMinimumInclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-export function parseNumberAssertionMinimumExclusive(value: unknown): unknown {
-return _parseReferenceNumberAssertionMinimumExclusive(value);
+export function parseMinimumExclusive(value: unknown): unknown {
+return _parseReferenceMinimumExclusive(value);
 }
-function _parseReferenceNumberAssertionMinimumExclusive(value: unknown): unknown {
+function _parseReferenceMinimumExclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-export function parseNumberAssertionMaximumInclusive(value: unknown): unknown {
-return _parseReferenceNumberAssertionMaximumInclusive(value);
+export function parseMaximumInclusive(value: unknown): unknown {
+return _parseReferenceMaximumInclusive(value);
 }
-function _parseReferenceNumberAssertionMaximumInclusive(value: unknown): unknown {
+function _parseReferenceMaximumInclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-export function parseNumberAssertionMaximumExclusive(value: unknown): unknown {
-return _parseReferenceNumberAssertionMaximumExclusive(value);
+export function parseMaximumExclusive(value: unknown): unknown {
+return _parseReferenceMaximumExclusive(value);
 }
-function _parseReferenceNumberAssertionMaximumExclusive(value: unknown): unknown {
+function _parseReferenceMaximumExclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-export function parseNumberAssertionMultipleOf(value: unknown): unknown {
-return _parseReferenceNumberAssertionMultipleOf(value);
+export function parseMultipleOf(value: unknown): unknown {
+return _parseReferenceMultipleOf(value);
 }
-function _parseReferenceNumberAssertionMultipleOf(value: unknown): unknown {
+function _parseReferenceMultipleOf(value: unknown): unknown {
 return parseNumberValue(value);
-}
-export function parseStringAssertionOptions(value: unknown): unknown {
-return _parseArrayStringAssertionOptions(value);
-}
-function _parseArrayStringAssertionOptions(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseStringAssertionOptionsItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
 }
 export function parseMinimumLength(value: unknown): unknown {
 return _parseReferenceMinimumLength(value);
@@ -1060,6 +695,20 @@ return _parseAnyExamplesItems(value);
 function _parseAnyExamplesItems(value: unknown): unknown {
 return value;
 }
+export function parseTypesItems(value: unknown): unknown {
+return _parseStringTypesItems(value);
+}
+function _parseStringTypesItems(value: unknown): unknown {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
+return undefined;
+}
+}
 export function parseOneOfItems(value: unknown): unknown {
 return _parseReferenceOneOfItems(value);
 }
@@ -1102,29 +751,11 @@ return _parseReferenceTupleItemsItems(value);
 function _parseReferenceTupleItemsItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
-export function parseBooleanAssertionOptionsItems(value: unknown): unknown {
-return _parseReferenceBooleanAssertionOptionsItems(value);
+export function parseOptionsItems(value: unknown): unknown {
+return _parseAnyOptionsItems(value);
 }
-function _parseReferenceBooleanAssertionOptionsItems(value: unknown): unknown {
-return parseBooleanValue(value);
-}
-export function parseIntegerAssertionOptionsItems(value: unknown): unknown {
-return _parseReferenceIntegerAssertionOptionsItems(value);
-}
-function _parseReferenceIntegerAssertionOptionsItems(value: unknown): unknown {
-return parseIntegerValue(value);
-}
-export function parseNumberAssertionOptionsItems(value: unknown): unknown {
-return _parseReferenceNumberAssertionOptionsItems(value);
-}
-function _parseReferenceNumberAssertionOptionsItems(value: unknown): unknown {
-return parseNumberValue(value);
-}
-export function parseStringAssertionOptionsItems(value: unknown): unknown {
-return _parseReferenceStringAssertionOptionsItems(value);
-}
-function _parseReferenceStringAssertionOptionsItems(value: unknown): unknown {
-return parseStringValue(value);
+function _parseAnyOptionsItems(value: unknown): unknown {
+return value;
 }
 export function parseRequiredItems(value: unknown): unknown {
 return _parseReferenceRequiredItems(value);

@@ -15,46 +15,11 @@ export type SchemaJson = ((
 ));
 export type Node = ((
 {
-"context"?: Context,
-"metadata": Metadata,
-"types": Types,
-"assertions": Assertions,
-"applicators": Applicators,
-}
-));
-/**
-some meta information about this schema
-*/
-export type MetadataSection = ((
-{
 "title"?: Title,
 "description"?: Description,
 "examples"?: Examples,
 "deprecated": Deprecated,
-}
-));
-/**
-What types does this schema describe
-*/
-export type TypesSection = (((TypesSectionItems)[]));
-/**
-Assertions, per type it is possible that an assertion for a different type is present here, that validator may be used when this schema is used as an applicator
-*/
-export type AssertionsSection = ((
-{
-"boolean"?: Boolean,
-"integer"?: Integer,
-"number"?: Number,
-"string"?: String,
-"array"?: Array,
-"map"?: Map,
-}
-));
-/**
-Applicators apply other schemas to this one
-*/
-export type ApplicatorsSection = ((
-{
+"types": Types,
 "reference"?: Reference,
 "oneOf"?: OneOf,
 "anyOf"?: AnyOf,
@@ -71,51 +36,19 @@ export type ApplicatorsSection = ((
 "tupleItems"?: TupleItems,
 "arrayItems"?: ArrayItems,
 "contains"?: Contains,
-}
-));
-export type BooleanAssertion = ((
-{
-"options"?: BooleanAssertionOptions,
-}
-));
-export type IntegerAssertion = ((
-{
-"options"?: IntegerAssertionOptions,
-"minimumInclusive"?: IntegerAssertionMinimumInclusive,
-"minimumExclusive"?: IntegerAssertionMinimumExclusive,
-"maximumInclusive"?: IntegerAssertionMaximumInclusive,
-"maximumExclusive"?: IntegerAssertionMaximumExclusive,
-"multipleOf"?: IntegerAssertionMultipleOf,
-}
-));
-export type NumberAssertion = ((
-{
-"options"?: NumberAssertionOptions,
-"minimumInclusive"?: NumberAssertionMinimumInclusive,
-"minimumExclusive"?: NumberAssertionMinimumExclusive,
-"maximumInclusive"?: NumberAssertionMaximumInclusive,
-"maximumExclusive"?: NumberAssertionMaximumExclusive,
-"multipleOf"?: NumberAssertionMultipleOf,
-}
-));
-export type StringAssertion = ((
-{
-"options"?: StringAssertionOptions,
+"options"?: Options,
+"minimumInclusive"?: MinimumInclusive,
+"minimumExclusive"?: MinimumExclusive,
+"maximumInclusive"?: MaximumInclusive,
+"maximumExclusive"?: MaximumExclusive,
+"multipleOf"?: MultipleOf,
 "minimumLength"?: MinimumLength,
 "maximumLength"?: MaximumLength,
 "valuePattern"?: ValuePattern,
 "valueFormat"?: ValueFormat,
-}
-));
-export type ArrayAssertion = ((
-{
 "minimumItems"?: MinimumItems,
 "maximumItems"?: MaximumItems,
 "uniqueItems"?: UniqueItems,
-}
-));
-export type MapAssertion = ((
-{
 "required"?: Required,
 "minimumProperties"?: MinimumProperties,
 "maximumProperties"?: MaximumProperties,
@@ -134,30 +67,14 @@ export type Schemas = ((
 [key: string]: SchemasAdditionalProperties,
 }
 ));
-export type Context = (NodeReference);
-export type Metadata = (MetadataSection);
-export type Types = (TypesSection);
-export type Assertions = (AssertionsSection);
-export type Applicators = (ApplicatorsSection);
 export type Title = (NonEmptyStringValue);
 export type Description = (NonEmptyStringValue);
 export type Examples = (((ExamplesItems)[]));
 export type Deprecated = (BooleanValue);
-export type TypesSectionItems = (("never" |
-"any" |
-"null" |
-"boolean" |
-"integer" |
-"number" |
-"string" |
-"array" |
-"map"));
-export type Boolean = (BooleanAssertion);
-export type Integer = (IntegerAssertion);
-export type Number = (NumberAssertion);
-export type String = (StringAssertion);
-export type Array = (ArrayAssertion);
-export type Map = (MapAssertion);
+/**
+What types does this schema describe
+*/
+export type Types = (((TypesItems)[]));
 export type Reference = (NodeReference);
 export type OneOf = (((OneOfItems)[]));
 export type AnyOf = (((AnyOfItems)[]));
@@ -186,20 +103,12 @@ export type PropertyNames = (NodeReference);
 export type TupleItems = (((TupleItemsItems)[]));
 export type ArrayItems = (NodeReference);
 export type Contains = (NodeReference);
-export type BooleanAssertionOptions = (((BooleanAssertionOptionsItems)[]));
-export type IntegerAssertionOptions = (((IntegerAssertionOptionsItems)[]));
-export type IntegerAssertionMinimumInclusive = (IntegerValue);
-export type IntegerAssertionMinimumExclusive = (IntegerValue);
-export type IntegerAssertionMaximumInclusive = (IntegerValue);
-export type IntegerAssertionMaximumExclusive = (IntegerValue);
-export type IntegerAssertionMultipleOf = (IntegerValue);
-export type NumberAssertionOptions = (((NumberAssertionOptionsItems)[]));
-export type NumberAssertionMinimumInclusive = (NumberValue);
-export type NumberAssertionMinimumExclusive = (NumberValue);
-export type NumberAssertionMaximumInclusive = (NumberValue);
-export type NumberAssertionMaximumExclusive = (NumberValue);
-export type NumberAssertionMultipleOf = (NumberValue);
-export type StringAssertionOptions = (((StringAssertionOptionsItems)[]));
+export type Options = (((OptionsItems)[]));
+export type MinimumInclusive = (NumberValue);
+export type MinimumExclusive = (NumberValue);
+export type MaximumInclusive = (NumberValue);
+export type MaximumExclusive = (NumberValue);
+export type MultipleOf = (NumberValue);
 export type MinimumLength = (Amount);
 export type MaximumLength = (Amount);
 export type ValuePattern = (NonEmptyStringValue);
@@ -212,6 +121,15 @@ export type MinimumProperties = (Amount);
 export type MaximumProperties = (Amount);
 export type SchemasAdditionalProperties = (Node);
 export type ExamplesItems = ((any));
+export type TypesItems = (("never" |
+"any" |
+"null" |
+"boolean" |
+"integer" |
+"number" |
+"string" |
+"array" |
+"map"));
 export type OneOfItems = (NodeReference);
 export type AnyOfItems = (NodeReference);
 export type AllOfItems = (NodeReference);
@@ -219,8 +137,5 @@ export type DependentSchemasAdditionalProperties = (NodeReference);
 export type ObjectPropertiesAdditionalProperties = (NodeReference);
 export type PatternPropertiesAdditionalProperties = (NodeReference);
 export type TupleItemsItems = (NodeReference);
-export type BooleanAssertionOptionsItems = (BooleanValue);
-export type IntegerAssertionOptionsItems = (IntegerValue);
-export type NumberAssertionOptionsItems = (NumberValue);
-export type StringAssertionOptionsItems = (StringValue);
+export type OptionsItems = ((any));
 export type RequiredItems = (StringValue);

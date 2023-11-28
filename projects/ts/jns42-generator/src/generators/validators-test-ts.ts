@@ -14,7 +14,7 @@ export function* generateValidatorsTestTsCode(specification: models.Specificatio
 
   for (const nodeId in nodes) {
     const node = nodes[nodeId];
-    if ((node.metadata.examples ?? []).length === 0) {
+    if ((node.examples ?? []).length === 0) {
       continue;
     }
     const typeName = names[nodeId];
@@ -32,7 +32,7 @@ function* generateTestBody(specification: models.Specification, nodeId: string) 
   const validatorFunctionName = toCamel("is", names[nodeId]);
 
   const node = nodes[nodeId];
-  for (const example of node.metadata.examples ?? []) {
+  for (const example of node.examples ?? []) {
     yield itt`
       assert.equal(
         validators.${validatorFunctionName}(${JSON.stringify(example)}),

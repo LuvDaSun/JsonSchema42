@@ -19,9 +19,9 @@ export function* generateTypesTsCode(specification: models.Specification) {
     const typeDefinition = generateDeclaration(specification, nodeId);
 
     const comments = [
-      node.metadata.title ?? "",
-      node.metadata.description ?? "",
-      node.metadata.deprecated ? "@deprecated" : "",
+      node.title ?? "",
+      node.description ?? "",
+      node.deprecated ? "@deprecated" : "",
     ]
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
@@ -111,28 +111,23 @@ function* generateTypeDefinitionElements(specification: models.Specification, no
 function* generateCompoundDefinitionElements(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
 
-  if (node.applicators.reference != null) {
-    yield* generateReferenceCompoundDefinition(specification, node.applicators.reference);
+  if (node.reference != null) {
+    yield* generateReferenceCompoundDefinition(specification, node.reference);
   }
-  if (node.applicators.oneOf != null) {
-    yield* generateOneOfCompoundDefinition(specification, node.applicators.oneOf);
+  if (node.oneOf != null) {
+    yield* generateOneOfCompoundDefinition(specification, node.oneOf);
   }
-  if (node.applicators.anyOf != null) {
-    yield* generateAnyOfCompoundDefinition(specification, node.applicators.anyOf);
+  if (node.anyOf != null) {
+    yield* generateAnyOfCompoundDefinition(specification, node.anyOf);
   }
-  if (node.applicators.allOf != null) {
-    yield* generateAllOfCompoundDefinition(specification, node.applicators.allOf);
+  if (node.allOf != null) {
+    yield* generateAllOfCompoundDefinition(specification, node.allOf);
   }
-  if (node.applicators.if != null) {
-    yield* generateIfCompoundDefinition(
-      specification,
-      node.applicators.if,
-      node.applicators.then,
-      node.applicators.else,
-    );
+  if (node.if != null) {
+    yield* generateIfCompoundDefinition(specification, node.if, node.then, node.else);
   }
-  if (node.applicators.not != null) {
-    yield* generateNotCompoundDefinition(specification, node.applicators.not);
+  if (node.not != null) {
+    yield* generateNotCompoundDefinition(specification, node.not);
   }
 }
 
@@ -147,7 +142,7 @@ function* generateNullTypeDefinition(specification: models.Specification, nodeId
 }
 function* generateBooleanTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
-  const options = node.assertions.boolean?.options;
+  const options = node.options?.filter((option) => typeof option === "boolean");
 
   if (options != null) {
     yield joinIterable(
@@ -161,7 +156,7 @@ function* generateBooleanTypeDefinition(specification: models.Specification, nod
 }
 function* generateIntegerTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
-  const options = node.assertions.integer?.options;
+  const options = node.options?.filter((option) => typeof option === "number");
 
   if (options != null) {
     yield joinIterable(
@@ -176,7 +171,7 @@ function* generateIntegerTypeDefinition(specification: models.Specification, nod
 
 function* generateNumberTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
-  const options = node.assertions.integer?.options;
+  const options = node.options?.filter((option) => typeof option === "number");
 
   if (options != null) {
     yield joinIterable(
@@ -190,7 +185,7 @@ function* generateNumberTypeDefinition(specification: models.Specification, node
 }
 function* generateStringTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
-  const options = node.assertions.string?.options;
+  const options = node.options?.filter((option) => typeof option === "string");
 
   if (options != null) {
     yield joinIterable(
@@ -204,8 +199,8 @@ function* generateStringTypeDefinition(specification: models.Specification, node
 }
 function* generateArrayTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
-  const tupleItems = node.applicators.tupleItems;
-  const arrayItems = node.applicators.arrayItems;
+  const tupleItems = node.tupleItems;
+  const arrayItems = node.arrayItems;
 
   if (arrayItems != null) {
     const elements = [...(tupleItems || []), arrayItems]
@@ -227,11 +222,11 @@ function* generateArrayTypeDefinition(specification: models.Specification, nodeI
 }
 function* generateMapTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
-  const objectProperties = node.applicators.objectProperties;
-  const patternProperties = node.applicators.patternProperties;
-  const mapProperties = node.applicators.mapProperties;
-  const propertyNames = node.applicators.propertyNames;
-  const required = new Set(node.assertions.map?.required);
+  const objectProperties = node.objectProperties;
+  const patternProperties = node.patternProperties;
+  const mapProperties = node.mapProperties;
+  const propertyNames = node.propertyNames;
+  const required = new Set(node.required);
 
   const members = Array<NestedText>();
   const indexTypeUnionElements = new Array<NestedText>();

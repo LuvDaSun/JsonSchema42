@@ -32,12 +32,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.reference != null) {
+    if (node.reference != null) {
       const functionName = "_" + toCamel("parse", "reference", names[nodeId]);
-      const functionBody = generateReferenceCompoundParserStatements(
-        specification,
-        node.applicators.reference,
-      );
+      const functionBody = generateReferenceCompoundParserStatements(specification, node.reference);
       yield itt`
         function ${functionName}(value: unknown): unknown {
           ${functionBody}
@@ -45,12 +42,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.oneOf != null) {
+    if (node.oneOf != null) {
       const functionName = "_" + toCamel("parse", "oneOf", names[nodeId]);
-      const functionBody = generateOneOfCompoundParserStatements(
-        specification,
-        node.applicators.oneOf,
-      );
+      const functionBody = generateOneOfCompoundParserStatements(specification, node.oneOf);
       yield itt`
         function ${functionName}(value: unknown): unknown {
           ${functionBody}
@@ -58,12 +52,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.anyOf != null) {
+    if (node.anyOf != null) {
       const functionName = "_" + toCamel("parse", "anyOf", names[nodeId]);
-      const functionBody = generateAnyOfCompoundParserStatements(
-        specification,
-        node.applicators.anyOf,
-      );
+      const functionBody = generateAnyOfCompoundParserStatements(specification, node.anyOf);
       yield itt`
         function ${functionName}(value: unknown): unknown {
           ${functionBody}
@@ -71,12 +62,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.allOf != null) {
+    if (node.allOf != null) {
       const functionName = "_" + toCamel("parse", "allOf", names[nodeId]);
-      const functionBody = generateAllOfCompoundParserStatements(
-        specification,
-        node.applicators.allOf,
-      );
+      const functionBody = generateAllOfCompoundParserStatements(specification, node.allOf);
       yield itt`
         function ${functionName}(value: unknown): unknown {
           ${functionBody}
@@ -84,13 +72,13 @@ export function* generateParsersTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.if != null) {
+    if (node.if != null) {
       const functionName = "_" + toCamel("parse", "if", names[nodeId]);
       const functionBody = generateIfCompoundParserStatements(
         specification,
-        node.applicators.if,
-        node.applicators.then,
-        node.applicators.else,
+        node.if,
+        node.then,
+        node.else,
       );
       yield itt`
         function ${functionName}(value: unknown): unknown {
@@ -99,9 +87,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.not != null) {
+    if (node.not != null) {
       const functionName = "_" + toCamel("parse", "not", names[nodeId]);
-      const functionBody = generateNotCompoundParserStatements(specification, node.applicators.not);
+      const functionBody = generateNotCompoundParserStatements(specification, node.not);
       yield itt`
         function ${functionName}(value: unknown): unknown {
           ${functionBody}
@@ -124,32 +112,32 @@ function* generateParserBody(specification: models.Specification, nodeId: string
     }
   }
 
-  if (node.applicators.reference != null) {
+  if (node.reference != null) {
     const functionName = "_" + toCamel("parse", "reference", names[nodeId]);
     parserFunctionNames.push(functionName);
   }
 
-  if (node.applicators.oneOf != null) {
+  if (node.oneOf != null) {
     const functionName = "_" + toCamel("parse", "oneOf", names[nodeId]);
     parserFunctionNames.push(functionName);
   }
 
-  if (node.applicators.anyOf != null) {
+  if (node.anyOf != null) {
     const functionName = "_" + toCamel("parse", "anyOf", names[nodeId]);
     parserFunctionNames.push(functionName);
   }
 
-  if (node.applicators.allOf != null) {
+  if (node.allOf != null) {
     const functionName = "_" + toCamel("parse", "allOf", names[nodeId]);
     parserFunctionNames.push(functionName);
   }
 
-  if (node.applicators.if != null) {
+  if (node.if != null) {
     const functionName = "_" + toCamel("parse", "if", names[nodeId]);
     parserFunctionNames.push(functionName);
   }
 
-  if (node.applicators.not != null) {
+  if (node.not != null) {
     const functionName = "_" + toCamel("parse", "not", names[nodeId]);
     parserFunctionNames.push(functionName);
   }
@@ -321,11 +309,11 @@ function* generateArrayTypeItemParserStatements(
   const { nodes, names } = specification;
   const node = nodes[nodeId];
 
-  if (node.applicators.tupleItems != null && node.applicators.arrayItems != null) {
-    const itemParserFunctionName = toCamel("parse", names[node.applicators.arrayItems]);
+  if (node.tupleItems != null && node.arrayItems != null) {
+    const itemParserFunctionName = toCamel("parse", names[node.arrayItems]);
 
     yield itt`
-      if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+      if(elementIndex < ${JSON.stringify(node.tupleItems.length)}) {
         switch(elementIndex) {
           ${generateArrayTypeItemCaseClausesParserStatements(specification, nodeId)}
         }
@@ -336,9 +324,9 @@ function* generateArrayTypeItemParserStatements(
     `;
   }
 
-  if (node.applicators.tupleItems != null && node.applicators.arrayItems == null) {
+  if (node.tupleItems != null && node.arrayItems == null) {
     yield itt`
-      if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+      if(elementIndex < ${JSON.stringify(node.tupleItems.length)}) {
         switch(elementIndex) {
           ${generateArrayTypeItemCaseClausesParserStatements(specification, nodeId)}
         }
@@ -346,14 +334,14 @@ function* generateArrayTypeItemParserStatements(
     `;
   }
 
-  if (node.applicators.tupleItems == null && node.applicators.arrayItems != null) {
-    const itemParserFunctionName = toCamel("parse", names[node.applicators.arrayItems]);
+  if (node.tupleItems == null && node.arrayItems != null) {
+    const itemParserFunctionName = toCamel("parse", names[node.arrayItems]);
     yield itt`
       result[elementIndex] = ${itemParserFunctionName}(value[elementIndex]);
     `;
   }
 
-  if (node.applicators.tupleItems == null && node.applicators.arrayItems == null) {
+  if (node.tupleItems == null && node.arrayItems == null) {
     yield itt`
       result[elementIndex] = value[elementIndex];
     `;
@@ -366,12 +354,12 @@ function* generateArrayTypeItemCaseClausesParserStatements(
   const { nodes, names } = specification;
   const node = nodes[nodeId];
 
-  if (node.applicators.tupleItems == null) {
+  if (node.tupleItems == null) {
     return;
   }
 
-  for (const elementIndex in node.applicators.tupleItems) {
-    const itemTypeNodeId = node.applicators.tupleItems[elementIndex];
+  for (const elementIndex in node.tupleItems) {
+    const itemTypeNodeId = node.tupleItems[elementIndex];
     const itemParserFunctionName = toCamel("parse", names[itemTypeNodeId]);
 
     yield itt`
@@ -402,7 +390,7 @@ function* generateMapTypeItemParserStatements(specification: models.Specificatio
   const { nodes, names } = specification;
   const node = nodes[nodeId];
 
-  if (node.applicators.objectProperties != null) {
+  if (node.objectProperties != null) {
     yield itt`
       switch(propertyName) {
         ${generateMapTypeItemCaseClausesParserStatements(specification, nodeId)}
@@ -410,16 +398,16 @@ function* generateMapTypeItemParserStatements(specification: models.Specificatio
     `;
   }
 
-  if (node.applicators.propertyNames != null) {
-    const parserFunctionName = toCamel("parse", names[node.applicators.propertyNames]);
+  if (node.propertyNames != null) {
+    const parserFunctionName = toCamel("parse", names[node.propertyNames]);
 
     yield itt`
       result[propertyName] ??= ${parserFunctionName}(value[propertyName as keyof typeof value]);
     `;
   }
 
-  if (node.applicators.mapProperties != null) {
-    const parserFunctionName = toCamel("parse", names[node.applicators.mapProperties]);
+  if (node.mapProperties != null) {
+    const parserFunctionName = toCamel("parse", names[node.mapProperties]);
 
     yield itt`
       result[propertyName] ??= ${parserFunctionName}(value[propertyName as keyof typeof value]);
@@ -433,12 +421,12 @@ function* generateMapTypeItemCaseClausesParserStatements(
   const { nodes, names } = specification;
   const node = nodes[nodeId];
 
-  if (node.applicators.objectProperties == null) {
+  if (node.objectProperties == null) {
     return;
   }
 
-  for (const propertyName in node.applicators.objectProperties) {
-    const propertyTypeNodeId = node.applicators.objectProperties[propertyName];
+  for (const propertyName in node.objectProperties) {
+    const propertyTypeNodeId = node.objectProperties[propertyName];
     const parserFunctionName = toCamel("parse", names[propertyTypeNodeId]);
 
     yield itt`

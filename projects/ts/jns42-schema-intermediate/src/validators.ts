@@ -48,61 +48,10 @@ function _isMapNode(value: unknown): value is unknown {
 if(typeof value !== "object" || value === null || Array.isArray(value)) {
 return false;
 }
-if(!("metadata" in value)) {
+if(!("deprecated" in value)) {
 return false;
 }
 if(!("types" in value)) {
-return false;
-}
-if(!("assertions" in value)) {
-return false;
-}
-if(!("applicators" in value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
-case "context":
-if(!isContext(propertyValue)) {
-return false;
-}
-break;
-case "metadata":
-if(!isMetadata(propertyValue)) {
-return false;
-}
-break;
-case "types":
-if(!isTypes(propertyValue)) {
-return false;
-}
-break;
-case "assertions":
-if(!isAssertions(propertyValue)) {
-return false;
-}
-break;
-case "applicators":
-if(!isApplicators(propertyValue)) {
-return false;
-}
-break;
-}
-}
-return true;
-}
-export function isMetadataSection(value: unknown): value is types.MetadataSection {
-if(!_isMapMetadataSection(value)) {
-return false;
-}
-return true;
-}
-function _isMapMetadataSection(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-if(!("deprecated" in value)) {
 return false;
 }
 for(const propertyName in value) {
@@ -128,88 +77,11 @@ if(!isDeprecated(propertyValue)) {
 return false;
 }
 break;
-}
-}
-return true;
-}
-export function isTypesSection(value: unknown): value is types.TypesSection {
-if(!_isArrayTypesSection(value)) {
-return false;
-}
-return true;
-}
-function _isArrayTypesSection(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
-const elementValue = value[elementIndex];
-if(!isTypesSectionItems(elementValue)) {
-return false;
-}
-}
-return true;
-}
-export function isAssertionsSection(value: unknown): value is types.AssertionsSection {
-if(!_isMapAssertionsSection(value)) {
-return false;
-}
-return true;
-}
-function _isMapAssertionsSection(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
-case "boolean":
-if(!isBoolean(propertyValue)) {
+case "types":
+if(!isTypes(propertyValue)) {
 return false;
 }
 break;
-case "integer":
-if(!isInteger(propertyValue)) {
-return false;
-}
-break;
-case "number":
-if(!isNumber(propertyValue)) {
-return false;
-}
-break;
-case "string":
-if(!isString(propertyValue)) {
-return false;
-}
-break;
-case "array":
-if(!isArray(propertyValue)) {
-return false;
-}
-break;
-case "map":
-if(!isMap(propertyValue)) {
-return false;
-}
-break;
-}
-}
-return true;
-}
-export function isApplicatorsSection(value: unknown): value is types.ApplicatorsSection {
-if(!_isMapApplicatorsSection(value)) {
-return false;
-}
-return true;
-}
-function _isMapApplicatorsSection(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
 case "reference":
 if(!isReference(propertyValue)) {
 return false;
@@ -290,141 +162,33 @@ if(!isContains(propertyValue)) {
 return false;
 }
 break;
-}
-}
-return true;
-}
-export function isBooleanAssertion(value: unknown): value is types.BooleanAssertion {
-if(!_isMapBooleanAssertion(value)) {
-return false;
-}
-return true;
-}
-function _isMapBooleanAssertion(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
 case "options":
-if(!isBooleanAssertionOptions(propertyValue)) {
-return false;
-}
-break;
-}
-}
-return true;
-}
-export function isIntegerAssertion(value: unknown): value is types.IntegerAssertion {
-if(!_isMapIntegerAssertion(value)) {
-return false;
-}
-return true;
-}
-function _isMapIntegerAssertion(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
-case "options":
-if(!isIntegerAssertionOptions(propertyValue)) {
+if(!isOptions(propertyValue)) {
 return false;
 }
 break;
 case "minimumInclusive":
-if(!isIntegerAssertionMinimumInclusive(propertyValue)) {
+if(!isMinimumInclusive(propertyValue)) {
 return false;
 }
 break;
 case "minimumExclusive":
-if(!isIntegerAssertionMinimumExclusive(propertyValue)) {
+if(!isMinimumExclusive(propertyValue)) {
 return false;
 }
 break;
 case "maximumInclusive":
-if(!isIntegerAssertionMaximumInclusive(propertyValue)) {
+if(!isMaximumInclusive(propertyValue)) {
 return false;
 }
 break;
 case "maximumExclusive":
-if(!isIntegerAssertionMaximumExclusive(propertyValue)) {
+if(!isMaximumExclusive(propertyValue)) {
 return false;
 }
 break;
 case "multipleOf":
-if(!isIntegerAssertionMultipleOf(propertyValue)) {
-return false;
-}
-break;
-}
-}
-return true;
-}
-export function isNumberAssertion(value: unknown): value is types.NumberAssertion {
-if(!_isMapNumberAssertion(value)) {
-return false;
-}
-return true;
-}
-function _isMapNumberAssertion(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
-case "options":
-if(!isNumberAssertionOptions(propertyValue)) {
-return false;
-}
-break;
-case "minimumInclusive":
-if(!isNumberAssertionMinimumInclusive(propertyValue)) {
-return false;
-}
-break;
-case "minimumExclusive":
-if(!isNumberAssertionMinimumExclusive(propertyValue)) {
-return false;
-}
-break;
-case "maximumInclusive":
-if(!isNumberAssertionMaximumInclusive(propertyValue)) {
-return false;
-}
-break;
-case "maximumExclusive":
-if(!isNumberAssertionMaximumExclusive(propertyValue)) {
-return false;
-}
-break;
-case "multipleOf":
-if(!isNumberAssertionMultipleOf(propertyValue)) {
-return false;
-}
-break;
-}
-}
-return true;
-}
-export function isStringAssertion(value: unknown): value is types.StringAssertion {
-if(!_isMapStringAssertion(value)) {
-return false;
-}
-return true;
-}
-function _isMapStringAssertion(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
-case "options":
-if(!isStringAssertionOptions(propertyValue)) {
+if(!isMultipleOf(propertyValue)) {
 return false;
 }
 break;
@@ -448,23 +212,6 @@ if(!isValueFormat(propertyValue)) {
 return false;
 }
 break;
-}
-}
-return true;
-}
-export function isArrayAssertion(value: unknown): value is types.ArrayAssertion {
-if(!_isMapArrayAssertion(value)) {
-return false;
-}
-return true;
-}
-function _isMapArrayAssertion(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
 case "minimumItems":
 if(!isMinimumItems(propertyValue)) {
 return false;
@@ -480,23 +227,6 @@ if(!isUniqueItems(propertyValue)) {
 return false;
 }
 break;
-}
-}
-return true;
-}
-export function isMapAssertion(value: unknown): value is types.MapAssertion {
-if(!_isMapMapAssertion(value)) {
-return false;
-}
-return true;
-}
-function _isMapMapAssertion(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-switch(propertyName) {
 case "required":
 if(!isRequired(propertyValue)) {
 return false;
@@ -633,66 +363,6 @@ return false;
 }
 return true;
 }
-export function isContext(value: unknown): value is types.Context {
-if(!_isReferenceContext(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceContext(value: unknown): value is unknown {
-if(!isNodeReference(value)) {
-return false;
-}
-return true;
-}
-export function isMetadata(value: unknown): value is types.Metadata {
-if(!_isReferenceMetadata(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceMetadata(value: unknown): value is unknown {
-if(!isMetadataSection(value)) {
-return false;
-}
-return true;
-}
-export function isTypes(value: unknown): value is types.Types {
-if(!_isReferenceTypes(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceTypes(value: unknown): value is unknown {
-if(!isTypesSection(value)) {
-return false;
-}
-return true;
-}
-export function isAssertions(value: unknown): value is types.Assertions {
-if(!_isReferenceAssertions(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAssertions(value: unknown): value is unknown {
-if(!isAssertionsSection(value)) {
-return false;
-}
-return true;
-}
-export function isApplicators(value: unknown): value is types.Applicators {
-if(!_isReferenceApplicators(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceApplicators(value: unknown): value is unknown {
-if(!isApplicatorsSection(value)) {
-return false;
-}
-return true;
-}
 export function isTitle(value: unknown): value is types.Title {
 if(!_isReferenceTitle(value)) {
 return false;
@@ -747,90 +417,21 @@ return false;
 }
 return true;
 }
-export function isTypesSectionItems(value: unknown): value is types.TypesSectionItems {
-if(!_isStringTypesSectionItems(value)) {
+export function isTypes(value: unknown): value is types.Types {
+if(!_isArrayTypes(value)) {
 return false;
 }
 return true;
 }
-function _isStringTypesSectionItems(value: unknown): value is unknown {
-if(typeof value !== "string") {
+function _isArrayTypes(value: unknown): value is unknown {
+if(!Array.isArray(value)) {
 return false;
 }
-if(value !== "never" && value !== "any" && value !== "null" && value !== "boolean" && value !== "integer" && value !== "number" && value !== "string" && value !== "array" && value !== "map") {
+for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
+const elementValue = value[elementIndex];
+if(!isTypesItems(elementValue)) {
 return false;
 }
-return true;
-}
-export function isBoolean(value: unknown): value is types.Boolean {
-if(!_isReferenceBoolean(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceBoolean(value: unknown): value is unknown {
-if(!isBooleanAssertion(value)) {
-return false;
-}
-return true;
-}
-export function isInteger(value: unknown): value is types.Integer {
-if(!_isReferenceInteger(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceInteger(value: unknown): value is unknown {
-if(!isIntegerAssertion(value)) {
-return false;
-}
-return true;
-}
-export function isNumber(value: unknown): value is types.Number {
-if(!_isReferenceNumber(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceNumber(value: unknown): value is unknown {
-if(!isNumberAssertion(value)) {
-return false;
-}
-return true;
-}
-export function isString(value: unknown): value is types.String {
-if(!_isReferenceString(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceString(value: unknown): value is unknown {
-if(!isStringAssertion(value)) {
-return false;
-}
-return true;
-}
-export function isArray(value: unknown): value is types.Array {
-if(!_isReferenceArray(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceArray(value: unknown): value is unknown {
-if(!isArrayAssertion(value)) {
-return false;
-}
-return true;
-}
-export function isMap(value: unknown): value is types.Map {
-if(!_isReferenceMap(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceMap(value: unknown): value is unknown {
-if(!isMapAssertion(value)) {
-return false;
 }
 return true;
 }
@@ -1068,195 +669,81 @@ return false;
 }
 return true;
 }
-export function isBooleanAssertionOptions(value: unknown): value is types.BooleanAssertionOptions {
-if(!_isArrayBooleanAssertionOptions(value)) {
+export function isOptions(value: unknown): value is types.Options {
+if(!_isArrayOptions(value)) {
 return false;
 }
 return true;
 }
-function _isArrayBooleanAssertionOptions(value: unknown): value is unknown {
+function _isArrayOptions(value: unknown): value is unknown {
 if(!Array.isArray(value)) {
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!isBooleanAssertionOptionsItems(elementValue)) {
+if(!isOptionsItems(elementValue)) {
 return false;
 }
 }
 return true;
 }
-export function isIntegerAssertionOptions(value: unknown): value is types.IntegerAssertionOptions {
-if(!_isArrayIntegerAssertionOptions(value)) {
+export function isMinimumInclusive(value: unknown): value is types.MinimumInclusive {
+if(!_isReferenceMinimumInclusive(value)) {
 return false;
 }
 return true;
 }
-function _isArrayIntegerAssertionOptions(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
-const elementValue = value[elementIndex];
-if(!isIntegerAssertionOptionsItems(elementValue)) {
-return false;
-}
-}
-return true;
-}
-export function isIntegerAssertionMinimumInclusive(value: unknown): value is types.IntegerAssertionMinimumInclusive {
-if(!_isReferenceIntegerAssertionMinimumInclusive(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceIntegerAssertionMinimumInclusive(value: unknown): value is unknown {
-if(!isIntegerValue(value)) {
-return false;
-}
-return true;
-}
-export function isIntegerAssertionMinimumExclusive(value: unknown): value is types.IntegerAssertionMinimumExclusive {
-if(!_isReferenceIntegerAssertionMinimumExclusive(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceIntegerAssertionMinimumExclusive(value: unknown): value is unknown {
-if(!isIntegerValue(value)) {
-return false;
-}
-return true;
-}
-export function isIntegerAssertionMaximumInclusive(value: unknown): value is types.IntegerAssertionMaximumInclusive {
-if(!_isReferenceIntegerAssertionMaximumInclusive(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceIntegerAssertionMaximumInclusive(value: unknown): value is unknown {
-if(!isIntegerValue(value)) {
-return false;
-}
-return true;
-}
-export function isIntegerAssertionMaximumExclusive(value: unknown): value is types.IntegerAssertionMaximumExclusive {
-if(!_isReferenceIntegerAssertionMaximumExclusive(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceIntegerAssertionMaximumExclusive(value: unknown): value is unknown {
-if(!isIntegerValue(value)) {
-return false;
-}
-return true;
-}
-export function isIntegerAssertionMultipleOf(value: unknown): value is types.IntegerAssertionMultipleOf {
-if(!_isReferenceIntegerAssertionMultipleOf(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceIntegerAssertionMultipleOf(value: unknown): value is unknown {
-if(!isIntegerValue(value)) {
-return false;
-}
-return true;
-}
-export function isNumberAssertionOptions(value: unknown): value is types.NumberAssertionOptions {
-if(!_isArrayNumberAssertionOptions(value)) {
-return false;
-}
-return true;
-}
-function _isArrayNumberAssertionOptions(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
-const elementValue = value[elementIndex];
-if(!isNumberAssertionOptionsItems(elementValue)) {
-return false;
-}
-}
-return true;
-}
-export function isNumberAssertionMinimumInclusive(value: unknown): value is types.NumberAssertionMinimumInclusive {
-if(!_isReferenceNumberAssertionMinimumInclusive(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceNumberAssertionMinimumInclusive(value: unknown): value is unknown {
+function _isReferenceMinimumInclusive(value: unknown): value is unknown {
 if(!isNumberValue(value)) {
 return false;
 }
 return true;
 }
-export function isNumberAssertionMinimumExclusive(value: unknown): value is types.NumberAssertionMinimumExclusive {
-if(!_isReferenceNumberAssertionMinimumExclusive(value)) {
+export function isMinimumExclusive(value: unknown): value is types.MinimumExclusive {
+if(!_isReferenceMinimumExclusive(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceNumberAssertionMinimumExclusive(value: unknown): value is unknown {
+function _isReferenceMinimumExclusive(value: unknown): value is unknown {
 if(!isNumberValue(value)) {
 return false;
 }
 return true;
 }
-export function isNumberAssertionMaximumInclusive(value: unknown): value is types.NumberAssertionMaximumInclusive {
-if(!_isReferenceNumberAssertionMaximumInclusive(value)) {
+export function isMaximumInclusive(value: unknown): value is types.MaximumInclusive {
+if(!_isReferenceMaximumInclusive(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceNumberAssertionMaximumInclusive(value: unknown): value is unknown {
+function _isReferenceMaximumInclusive(value: unknown): value is unknown {
 if(!isNumberValue(value)) {
 return false;
 }
 return true;
 }
-export function isNumberAssertionMaximumExclusive(value: unknown): value is types.NumberAssertionMaximumExclusive {
-if(!_isReferenceNumberAssertionMaximumExclusive(value)) {
+export function isMaximumExclusive(value: unknown): value is types.MaximumExclusive {
+if(!_isReferenceMaximumExclusive(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceNumberAssertionMaximumExclusive(value: unknown): value is unknown {
+function _isReferenceMaximumExclusive(value: unknown): value is unknown {
 if(!isNumberValue(value)) {
 return false;
 }
 return true;
 }
-export function isNumberAssertionMultipleOf(value: unknown): value is types.NumberAssertionMultipleOf {
-if(!_isReferenceNumberAssertionMultipleOf(value)) {
+export function isMultipleOf(value: unknown): value is types.MultipleOf {
+if(!_isReferenceMultipleOf(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceNumberAssertionMultipleOf(value: unknown): value is unknown {
+function _isReferenceMultipleOf(value: unknown): value is unknown {
 if(!isNumberValue(value)) {
 return false;
-}
-return true;
-}
-export function isStringAssertionOptions(value: unknown): value is types.StringAssertionOptions {
-if(!_isArrayStringAssertionOptions(value)) {
-return false;
-}
-return true;
-}
-function _isArrayStringAssertionOptions(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
-const elementValue = value[elementIndex];
-if(!isStringAssertionOptionsItems(elementValue)) {
-return false;
-}
 }
 return true;
 }
@@ -1412,6 +899,21 @@ return true;
 function _isAnyExamplesItems(value: unknown): value is unknown {
 return true;
 }
+export function isTypesItems(value: unknown): value is types.TypesItems {
+if(!_isStringTypesItems(value)) {
+return false;
+}
+return true;
+}
+function _isStringTypesItems(value: unknown): value is unknown {
+if(typeof value !== "string") {
+return false;
+}
+if(value !== "never" && value !== "any" && value !== "null" && value !== "boolean" && value !== "integer" && value !== "number" && value !== "string" && value !== "array" && value !== "map") {
+return false;
+}
+return true;
+}
 export function isOneOfItems(value: unknown): value is types.OneOfItems {
 if(!_isReferenceOneOfItems(value)) {
 return false;
@@ -1496,52 +998,13 @@ return false;
 }
 return true;
 }
-export function isBooleanAssertionOptionsItems(value: unknown): value is types.BooleanAssertionOptionsItems {
-if(!_isReferenceBooleanAssertionOptionsItems(value)) {
+export function isOptionsItems(value: unknown): value is types.OptionsItems {
+if(!_isAnyOptionsItems(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceBooleanAssertionOptionsItems(value: unknown): value is unknown {
-if(!isBooleanValue(value)) {
-return false;
-}
-return true;
-}
-export function isIntegerAssertionOptionsItems(value: unknown): value is types.IntegerAssertionOptionsItems {
-if(!_isReferenceIntegerAssertionOptionsItems(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceIntegerAssertionOptionsItems(value: unknown): value is unknown {
-if(!isIntegerValue(value)) {
-return false;
-}
-return true;
-}
-export function isNumberAssertionOptionsItems(value: unknown): value is types.NumberAssertionOptionsItems {
-if(!_isReferenceNumberAssertionOptionsItems(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceNumberAssertionOptionsItems(value: unknown): value is unknown {
-if(!isNumberValue(value)) {
-return false;
-}
-return true;
-}
-export function isStringAssertionOptionsItems(value: unknown): value is types.StringAssertionOptionsItems {
-if(!_isReferenceStringAssertionOptionsItems(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceStringAssertionOptionsItems(value: unknown): value is unknown {
-if(!isStringValue(value)) {
-return false;
-}
+function _isAnyOptionsItems(value: unknown): value is unknown {
 return true;
 }
 export function isRequiredItems(value: unknown): value is types.RequiredItems {

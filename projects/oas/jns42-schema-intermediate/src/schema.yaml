@@ -16,23 +16,8 @@ $defs:
   node:
     type: object
     required:
-      - metadata
-      - types
-      - assertions
-      - applicators
-    properties:
-      context: { $ref: "#/$defs/node-reference" }
-      metadata: { $ref: "#/$defs/metadata-section" }
-      types: { $ref: "#/$defs/types-section" }
-      assertions: { $ref: "#/$defs/assertions-section" }
-      applicators: { $ref: "#/$defs/applicators-section" }
-
-  metadata-section:
-    description: >
-      some meta information about this schema
-    type: object
-    required:
       - deprecated
+      - types
     properties:
       title: { $ref: "#/$defs/non-empty-string-value" }
       description: { $ref: "#/$defs/non-empty-string-value" }
@@ -40,40 +25,24 @@ $defs:
         type: array
         items: true
       deprecated: { $ref: "#/$defs/boolean-value" }
-  types-section:
-    description: >
-      What types does this schema describe
-    type: array
-    items:
-      type: string
-      enum:
-        - never
-        - any
-        - "null"
-        - boolean
-        - integer
-        - number
-        - string
-        - array
-        - map
-  assertions-section:
-    description: >
-      Assertions, per type it is possible that an assertion for a different
-      type is present here, that validator may be used when this schema is
-      used as an applicator
-    type: object
-    properties:
-      boolean: { $ref: "#/$defs/boolean-assertion" }
-      integer: { $ref: "#/$defs/integer-assertion" }
-      number: { $ref: "#/$defs/number-assertion" }
-      string: { $ref: "#/$defs/string-assertion" }
-      array: { $ref: "#/$defs/array-assertion" }
-      map: { $ref: "#/$defs/map-assertion" }
-  applicators-section:
-    description: >
-      Applicators apply other schemas to this one
-    type: object
-    properties:
+
+      types:
+        description: >
+          What types does this schema describe
+        type: array
+        items:
+          type: string
+          enum:
+            - never
+            - any
+            - "null"
+            - boolean
+            - integer
+            - number
+            - string
+            - array
+            - map
+
       reference: { $ref: "#/$defs/node-reference" }
       oneOf:
         type: array
@@ -105,54 +74,22 @@ $defs:
       arrayItems: { $ref: "#/$defs/node-reference" }
       contains: { $ref: "#/$defs/node-reference" }
 
-  boolean-assertion:
-    type: object
-    properties:
       options:
         type: array
-        items: { $ref: "#/$defs/boolean-value" }
-  integer-assertion:
-    type: object
-    properties:
-      options:
-        type: array
-        items: { $ref: "#/$defs/integer-value" }
-      minimumInclusive: { $ref: "#/$defs/integer-value" }
-      minimumExclusive: { $ref: "#/$defs/integer-value" }
-      maximumInclusive: { $ref: "#/$defs/integer-value" }
-      maximumExclusive: { $ref: "#/$defs/integer-value" }
-      multipleOf: { $ref: "#/$defs/integer-value" }
-  number-assertion:
-    type: object
-    properties:
-      options:
-        type: array
-        items: { $ref: "#/$defs/number-value" }
+        items: true
       minimumInclusive: { $ref: "#/$defs/number-value" }
       minimumExclusive: { $ref: "#/$defs/number-value" }
       maximumInclusive: { $ref: "#/$defs/number-value" }
       maximumExclusive: { $ref: "#/$defs/number-value" }
       multipleOf: { $ref: "#/$defs/number-value" }
-  string-assertion:
-    type: object
-    properties:
-      options:
-        type: array
-        items: { $ref: "#/$defs/string-value" }
       minimumLength: { $ref: "#/$defs/amount" }
       maximumLength: { $ref: "#/$defs/amount" }
       valuePattern: { $ref: "#/$defs/non-empty-string-value" }
       valueFormat: { $ref: "#/$defs/non-empty-string-value" }
-  array-assertion:
-    type: object
-    properties:
       minimumItems: { $ref: "#/$defs/amount" }
       maximumItems: { $ref: "#/$defs/amount" }
       uniqueItems:
         type: boolean
-  map-assertion:
-    type: object
-    properties:
       required:
         type: array
         items: { $ref: "#/$defs/string-value" }

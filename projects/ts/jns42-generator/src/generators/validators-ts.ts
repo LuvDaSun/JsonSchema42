@@ -36,11 +36,11 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.reference != null) {
+    if (node.reference != null) {
       const functionName = "_" + toCamel("is", "reference", names[nodeId]);
       const functionBody = generateReferenceCompoundValidationStatements(
         specification,
-        node.applicators.reference,
+        node.reference,
       );
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
@@ -49,12 +49,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.oneOf != null) {
+    if (node.oneOf != null) {
       const functionName = "_" + toCamel("is", "oneOf", names[nodeId]);
-      const functionBody = generateOneOfCompoundValidationStatements(
-        specification,
-        node.applicators.oneOf,
-      );
+      const functionBody = generateOneOfCompoundValidationStatements(specification, node.oneOf);
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
           ${functionBody}
@@ -62,12 +59,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.anyOf != null) {
+    if (node.anyOf != null) {
       const functionName = "_" + toCamel("is", "anyOf", names[nodeId]);
-      const functionBody = generateAnyOfCompoundValidationStatements(
-        specification,
-        node.applicators.anyOf,
-      );
+      const functionBody = generateAnyOfCompoundValidationStatements(specification, node.anyOf);
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
           ${functionBody}
@@ -75,12 +69,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.allOf != null) {
+    if (node.allOf != null) {
       const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
-      const functionBody = generateAllOfCompoundValidationStatements(
-        specification,
-        node.applicators.allOf,
-      );
+      const functionBody = generateAllOfCompoundValidationStatements(specification, node.allOf);
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
           ${functionBody}
@@ -88,13 +79,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.if != null) {
+    if (node.if != null) {
       const functionName = "_" + toCamel("is", "if", names[nodeId]);
       const functionBody = generateIfCompoundValidationStatements(
         specification,
-        node.applicators.if,
-        node.applicators.then,
-        node.applicators.else,
+        node.if,
+        node.then,
+        node.else,
       );
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
@@ -103,12 +94,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (node.applicators.not != null) {
+    if (node.not != null) {
       const functionName = "_" + toCamel("is", "not", names[nodeId]);
-      const functionBody = generateNotCompoundValidationStatements(
-        specification,
-        node.applicators.not,
-      );
+      const functionBody = generateNotCompoundValidationStatements(specification, node.not);
       yield itt`
         function ${functionName}(value: unknown): value is unknown {
           ${functionBody}
@@ -131,32 +119,32 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
     }
   }
 
-  if (node.applicators.reference != null) {
+  if (node.reference != null) {
     const functionName = "_" + toCamel("is", "reference", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.oneOf != null) {
+  if (node.oneOf != null) {
     const functionName = "_" + toCamel("is", "oneOf", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.anyOf != null) {
+  if (node.anyOf != null) {
     const functionName = "_" + toCamel("is", "anyOf", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.allOf != null) {
+  if (node.allOf != null) {
     const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.if != null) {
+  if (node.if != null) {
     const functionName = "_" + toCamel("is", "if", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
 
-  if (node.applicators.not != null) {
+  if (node.not != null) {
     const functionName = "_" + toCamel("is", "not", names[nodeId]);
     validatorFunctionNames.push(functionName);
   }
@@ -259,7 +247,6 @@ function* generateBooleanTypeValidationStatements(
 ) {
   const { nodes } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.boolean ?? {};
 
   yield itt`
     if(typeof value !== "boolean") {
@@ -267,10 +254,12 @@ function* generateBooleanTypeValidationStatements(
     }
   `;
 
-  if (assertions.options != null && assertions.options.length > 0) {
+  const options = node.options?.filter((option) => typeof option === "boolean");
+
+  if (options != null && options.length > 0) {
     yield itt`
       if(${joinIterable(
-        assertions.options.map((option) => {
+        options.map((option) => {
           return itt`value !== ${JSON.stringify(option)}`;
         }),
         " && ",
@@ -290,7 +279,6 @@ function* generateIntegerTypeValidationStatements(
 ) {
   const { nodes } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.integer ?? {};
 
   yield itt`
     if(typeof value !== "number" || isNaN(value)) {
@@ -298,50 +286,52 @@ function* generateIntegerTypeValidationStatements(
     }
   `;
 
-  if (assertions.minimumInclusive != null) {
+  if (node.minimumInclusive != null) {
     yield itt`
-      if(value < ${JSON.stringify(assertions.minimumInclusive)}) {
+      if(value < ${JSON.stringify(node.minimumInclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.minimumExclusive != null) {
+  if (node.minimumExclusive != null) {
     yield itt`
-      if(value <= ${JSON.stringify(assertions.minimumExclusive)}) {
+      if(value <= ${JSON.stringify(node.minimumExclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.maximumInclusive != null) {
+  if (node.maximumInclusive != null) {
     yield itt`
-      if(value > ${JSON.stringify(assertions.minimumInclusive)}) {
+      if(value > ${JSON.stringify(node.minimumInclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.maximumExclusive != null) {
+  if (node.maximumExclusive != null) {
     yield itt`
-      if(value >= ${JSON.stringify(assertions.minimumExclusive)}) {
+      if(value >= ${JSON.stringify(node.minimumExclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.multipleOf != null) {
+  if (node.multipleOf != null) {
     yield itt`
-      if(value % ${JSON.stringify(assertions.multipleOf)} !== 0) {
+      if(value % ${JSON.stringify(node.multipleOf)} !== 0) {
         return false;
       }
     `;
   }
 
-  if (assertions.options != null && assertions.options.length > 0) {
+  const options = node.options?.filter((option) => typeof option === "number");
+
+  if (options != null && options.length > 0) {
     yield itt`
       if(${joinIterable(
-        assertions.options.map((option) => {
+        options.map((option) => {
           return itt`value !== ${JSON.stringify(option)}`;
         }),
         " && ",
@@ -361,7 +351,6 @@ function* generateNumberTypeValidationStatements(
 ) {
   const { nodes } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.integer ?? {};
 
   yield itt`
     if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
@@ -369,50 +358,52 @@ function* generateNumberTypeValidationStatements(
     }
   `;
 
-  if (assertions.minimumInclusive != null) {
+  if (node.minimumInclusive != null) {
     yield itt`
-      if(value < ${JSON.stringify(assertions.minimumInclusive)}) {
+      if(value < ${JSON.stringify(node.minimumInclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.minimumExclusive != null) {
+  if (node.minimumExclusive != null) {
     yield itt`
-      if(value <= ${JSON.stringify(assertions.minimumExclusive)}) {
+      if(value <= ${JSON.stringify(node.minimumExclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.maximumInclusive != null) {
+  if (node.maximumInclusive != null) {
     yield itt`
-      if(value > ${JSON.stringify(assertions.minimumInclusive)}) {
+      if(value > ${JSON.stringify(node.minimumInclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.maximumExclusive != null) {
+  if (node.maximumExclusive != null) {
     yield itt`
-      if(value >= ${JSON.stringify(assertions.minimumExclusive)}) {
+      if(value >= ${JSON.stringify(node.minimumExclusive)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.multipleOf != null) {
+  if (node.multipleOf != null) {
     yield itt`
-      if(value % ${JSON.stringify(assertions.multipleOf)} !== 0) {
+      if(value % ${JSON.stringify(node.multipleOf)} !== 0) {
         return false;
       }
     `;
   }
 
-  if (assertions.options != null && assertions.options.length > 0) {
+  const options = node.options?.filter((option) => typeof option === "number");
+
+  if (options != null && options.length > 0) {
     yield itt`
       if(${joinIterable(
-        assertions.options.map((option) => {
+        options.map((option) => {
           return itt`value !== ${JSON.stringify(option)}`;
         }),
         " && ",
@@ -432,7 +423,6 @@ function* generateStringTypeValidationStatements(
 ) {
   const { nodes } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.string ?? {};
 
   yield itt`
     if(typeof value !== "string") {
@@ -440,35 +430,37 @@ function* generateStringTypeValidationStatements(
     }
   `;
 
-  if (assertions.minimumLength != null) {
+  if (node.minimumLength != null) {
     yield itt`
-      if(value.length < ${JSON.stringify(assertions.minimumLength)}) {
+      if(value.length < ${JSON.stringify(node.minimumLength)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.maximumLength != null) {
+  if (node.maximumLength != null) {
     yield itt`
-      if(value.length > ${JSON.stringify(assertions.maximumLength)}) {
+      if(value.length > ${JSON.stringify(node.maximumLength)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.valuePattern != null) {
+  if (node.valuePattern != null) {
     yield itt`
-      if(new RegExp(${JSON.stringify(assertions.valuePattern)}).test(value)) {
+      if(new RegExp(${JSON.stringify(node.valuePattern)}).test(value)) {
         return false;
       }
     `;
   }
 
-  if (assertions.options != null && assertions.options.length > 0) {
-    if (assertions.options != null && assertions.options.length > 0) {
+  const options = node.options?.filter((option) => typeof option === "string");
+
+  if (options != null && options.length > 0) {
+    if (options != null && options.length > 0) {
       yield itt`
         if(${joinIterable(
-          assertions.options.map((option) => {
+          options.map((option) => {
             return itt`value !== ${JSON.stringify(option)}`;
           }),
           " && ",
@@ -489,9 +481,8 @@ function* generateArrayTypeValidationStatements(
 ) {
   const { nodes } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.array ?? {};
 
-  const hasSeenSet = assertions.uniqueItems ?? false;
+  const hasSeenSet = node.uniqueItems ?? false;
 
   yield itt`
     if(!Array.isArray(value)) {
@@ -499,17 +490,17 @@ function* generateArrayTypeValidationStatements(
     }
   `;
 
-  if (assertions.minimumItems != null) {
+  if (node.minimumItems != null) {
     yield itt`
-      if(value.length < ${JSON.stringify(assertions.minimumItems)}) {
+      if(value.length < ${JSON.stringify(node.minimumItems)}) {
         return false;
       }
     `;
   }
 
-  if (assertions.maximumItems != null) {
+  if (node.maximumItems != null) {
     yield itt`
-      if(value.length > ${JSON.stringify(assertions.maximumItems)}) {
+      if(value.length > ${JSON.stringify(node.maximumItems)}) {
         return false;
       }
     `;
@@ -528,16 +519,16 @@ function* generateArrayTypeValidationStatements(
    * if we have tuple items the length should be the length of the tuple
    * or at least the length of the tuple if there are array items
    */
-  if (node.applicators.tupleItems != null) {
-    if (node.applicators.arrayItems == null) {
+  if (node.tupleItems != null) {
+    if (node.arrayItems == null) {
       yield itt`
-        if(value.length !== ${JSON.stringify(node.applicators.tupleItems.length)}) {
+        if(value.length !== ${JSON.stringify(node.tupleItems.length)}) {
           return false;
         }
       `;
     } else {
       yield itt`
-        if(value.length < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+        if(value.length < ${JSON.stringify(node.tupleItems.length)}) {
           return false;
         }
       `;
@@ -563,9 +554,8 @@ function* generateArrayTypeItemValidationStatements(
 ) {
   const { nodes, names } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.array ?? {};
 
-  const hasSeenSet = assertions.uniqueItems ?? false;
+  const hasSeenSet = node.uniqueItems ?? false;
 
   yield itt`
     const elementValue = value[elementIndex];
@@ -583,11 +573,11 @@ function* generateArrayTypeItemValidationStatements(
     `;
   }
 
-  if (node.applicators.tupleItems != null && node.applicators.arrayItems != null) {
-    const itemValidatorFunctionName = toCamel("is", names[node.applicators.arrayItems]);
+  if (node.tupleItems != null && node.arrayItems != null) {
+    const itemValidatorFunctionName = toCamel("is", names[node.arrayItems]);
 
     yield itt`
-      if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+      if(elementIndex < ${JSON.stringify(node.tupleItems.length)}) {
         switch(elementIndex) {
           ${generateArrayTypeItemCaseClausesValidationStatements(specification, nodeId)}
         }
@@ -600,9 +590,9 @@ function* generateArrayTypeItemValidationStatements(
     `;
   }
 
-  if (node.applicators.tupleItems != null && node.applicators.arrayItems == null) {
+  if (node.tupleItems != null && node.arrayItems == null) {
     yield itt`
-      if(elementIndex < ${JSON.stringify(node.applicators.tupleItems.length)}) {
+      if(elementIndex < ${JSON.stringify(node.tupleItems.length)}) {
         switch(elementIndex) {
           ${generateArrayTypeItemCaseClausesValidationStatements(specification, nodeId)}
         }
@@ -610,8 +600,8 @@ function* generateArrayTypeItemValidationStatements(
     `;
   }
 
-  if (node.applicators.tupleItems == null && node.applicators.arrayItems != null) {
-    const itemValidatorFunctionName = toCamel("is", names[node.applicators.arrayItems]);
+  if (node.tupleItems == null && node.arrayItems != null) {
+    const itemValidatorFunctionName = toCamel("is", names[node.arrayItems]);
     yield itt`
       if(!${itemValidatorFunctionName}(elementValue)) {
         return false;
@@ -626,12 +616,12 @@ function* generateArrayTypeItemCaseClausesValidationStatements(
   const { nodes, names } = specification;
   const node = nodes[nodeId];
 
-  if (node.applicators.tupleItems == null) {
+  if (node.tupleItems == null) {
     return;
   }
 
-  for (const elementIndex in node.applicators.tupleItems) {
-    const itemTypeNodeId = node.applicators.tupleItems[elementIndex];
+  for (const elementIndex in node.tupleItems) {
+    const itemTypeNodeId = node.tupleItems[elementIndex];
     const itemValidatorFunctionName = toCamel("is", names[itemTypeNodeId]);
 
     yield itt`
@@ -651,10 +641,8 @@ function* generateArrayTypeItemCaseClausesValidationStatements(
 function* generateMapTypeValidationStatements(specification: models.Specification, nodeId: string) {
   const { nodes } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.map ?? {};
 
-  const hasPropertyCounter =
-    assertions.minimumProperties != null || assertions.maximumProperties != null;
+  const hasPropertyCounter = node.minimumProperties != null || node.maximumProperties != null;
 
   yield itt`
     if(typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -674,7 +662,7 @@ function* generateMapTypeValidationStatements(specification: models.Specificatio
   /**
    * check if all the required properties are present
    */
-  for (const propertyName of assertions.required ?? []) {
+  for (const propertyName of node.required ?? []) {
     yield itt`
       if(!(${JSON.stringify(propertyName)} in value)) {
         return false;
@@ -695,17 +683,17 @@ function* generateMapTypeValidationStatements(specification: models.Specificatio
    * property count validation
    */
   if (hasPropertyCounter) {
-    if (assertions.minimumProperties != null) {
+    if (node.minimumProperties != null) {
       yield itt`
-        if(propertyCount < ${JSON.stringify(assertions.minimumProperties)}) {
+        if(propertyCount < ${JSON.stringify(node.minimumProperties)}) {
           return false;
         }
       `;
     }
 
-    if (assertions.maximumProperties != null) {
+    if (node.maximumProperties != null) {
       yield itt`
-        if(propertyCount > ${JSON.stringify(assertions.maximumProperties)}) {
+        if(propertyCount > ${JSON.stringify(node.maximumProperties)}) {
           return false;
         }
       `;
@@ -722,10 +710,8 @@ function* generateMapTypeItemValidationStatements(
 ) {
   const { nodes, names } = specification;
   const node = nodes[nodeId];
-  const assertions = node.assertions.map ?? {};
 
-  const hasPropertyCounter =
-    assertions.minimumProperties != null || assertions.maximumProperties != null;
+  const hasPropertyCounter = node.minimumProperties != null || node.maximumProperties != null;
 
   if (hasPropertyCounter) {
     yield itt`
@@ -737,7 +723,7 @@ function* generateMapTypeItemValidationStatements(
     const propertyValue = value[propertyName as keyof typeof value];
   `;
 
-  if (node.applicators.objectProperties != null) {
+  if (node.objectProperties != null) {
     yield itt`
       switch(propertyName) {
         ${generateMapTypeItemCaseClausesValidationStatements(specification, nodeId)}
@@ -745,8 +731,8 @@ function* generateMapTypeItemValidationStatements(
     `;
   }
 
-  if (node.applicators.patternProperties != null) {
-    for (const [pattern, typeNodeId] of Object.entries(node.applicators.patternProperties)) {
+  if (node.patternProperties != null) {
+    for (const [pattern, typeNodeId] of Object.entries(node.patternProperties)) {
       const validatorFunctionName = toCamel("is", names[typeNodeId]);
 
       yield itt`
@@ -759,8 +745,8 @@ function* generateMapTypeItemValidationStatements(
     }
   }
 
-  if (node.applicators.propertyNames != null) {
-    const validatorFunctionName = toCamel("is", names[node.applicators.propertyNames]);
+  if (node.propertyNames != null) {
+    const validatorFunctionName = toCamel("is", names[node.propertyNames]);
 
     yield itt`
       if(!${validatorFunctionName}(propertyValue)) {
@@ -769,8 +755,8 @@ function* generateMapTypeItemValidationStatements(
   `;
   }
 
-  if (node.applicators.mapProperties != null) {
-    const validatorFunctionName = toCamel("is", names[node.applicators.mapProperties]);
+  if (node.mapProperties != null) {
+    const validatorFunctionName = toCamel("is", names[node.mapProperties]);
 
     yield itt`
       if(!${validatorFunctionName}(propertyValue)) {
@@ -786,12 +772,12 @@ function* generateMapTypeItemCaseClausesValidationStatements(
   const { nodes, names } = specification;
   const node = nodes[nodeId];
 
-  if (node.applicators.objectProperties == null) {
+  if (node.objectProperties == null) {
     return;
   }
 
-  for (const propertyName in node.applicators.objectProperties) {
-    const propertyTypeNodeId = node.applicators.objectProperties[propertyName];
+  for (const propertyName in node.objectProperties) {
+    const propertyTypeNodeId = node.objectProperties[propertyName];
     const validatorFunctionName = toCamel("is", names[propertyTypeNodeId]);
 
     yield itt`

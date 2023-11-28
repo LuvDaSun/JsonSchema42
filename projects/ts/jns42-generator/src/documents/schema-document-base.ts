@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "jns42-schema-intermediate";
+import * as schemaIntermediate from "jns42-schema-intermediate";
 import { DocumentBase } from "./document-base.js";
 import { DocumentContext } from "./document-context.js";
 
@@ -168,31 +168,28 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediateB.Node]> {
+  public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediate.Node]> {
     for (const [nodePointer, node] of this.nodes) {
       const nodeUrl = this.pointerToNodeUrl(nodePointer);
       const nodeId = nodeUrl.toString();
 
-      const metadata = this.getIntermediateMetadataSection(nodePointer, node);
-      const types = this.getIntermediateTypesSection(nodePointer, node);
-      const assertions = this.getIntermediateAssertionsSection(nodePointer, node);
-      const applicators = this.getIntermediateApplicatorsSection(nodePointer, node);
+      const metadata = this.getIntermediateMetadataPart(nodePointer, node);
+      const types = this.getIntermediateTypesPart(nodePointer, node);
+      const assertions = this.getIntermediateAssertionsPart(nodePointer, node);
+      const applicators = this.getIntermediateApplicatorsPart(nodePointer, node);
 
       yield [
         nodeId,
         {
-          metadata,
-          types,
-          assertions,
-          applicators,
+          ...metadata,
+          ...types,
+          ...assertions,
+          ...applicators,
         },
       ];
     }
   }
-  protected getIntermediateMetadataSection(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.MetadataSection {
+  protected getIntermediateMetadataPart(nodePointer: string, node: N) {
     const title = this.selectNodeTitle(node) ?? "";
     const description = this.selectNodeDescription(node) ?? "";
     const deprecated = this.selectNodeDeprecated(node) ?? false;
@@ -205,73 +202,131 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       examples,
     };
   }
-  protected getIntermediateTypesSection(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.TypesSection {
+  protected getIntermediateTypesPart(nodePointer: string, node: N) {
+    let types = new Array<schemaIntermediate.TypesItems>();
+
     if (node === true) {
-      return ["any"];
-    }
-
-    if (node === false) {
-      return ["never"];
-    }
-
-    const types = this.selectNodeTypes(node);
-    if (types != null) {
-      return types
+      types = ["any"];
+    } else if (node === false) {
+      types = ["never"];
+    } else {
+      types = (this.selectNodeTypes(node) ?? [])
         .filter((type) => type != null)
         .map((type) => type!)
         .map((type) => this.mapType(type));
     }
 
-    return this.guessTypes(node);
+    if (types.length === 0) {
+      types = this.guessTypes(node);
+    }
+
+    return { types };
   }
 
-  protected getIntermediateAssertionsSection(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.AssertionsSection {
-    const booleanAssertions = this.getIntermediateBooleanAssertion(nodePointer, node);
-    const integerAssertions = this.getIntermediateIntegerAssertion(nodePointer, node);
-    const numberAssertions = this.getIntermediateNumberAssertion(nodePointer, node);
-    const stringAssertions = this.getIntermediateStringAssertion(nodePointer, node);
-    const arrayAssertions = this.getIntermediateArrayAssertion(nodePointer, node);
-    const mapAssertions = this.getIntermediateMapAssertion(nodePointer, node);
+  protected getIntermediateAssertionsPart(nodePointer: string, node: N) {
+    const enumValues = this.selectValidationEnum(node);
+    const constValue = this.selectValidationConst(node);
+
+    let options: Array<any> | undefined;
+
+    if (constValue != null) {
+      options = [constValue];
+    } else if (enumValues != null) {
+      options = enumValues;
+    }
+    const minimumInclusive = this.selectValidationMinimumInclusive(node);
+    const minimumExclusive = this.selectValidationMinimumExclusive(node);
+    const maximumInclusive = this.selectValidationMaximumInclusive(node);
+    const maximumExclusive = this.selectValidationMaximumExclusive(node);
+    const multipleOf = this.selectValidationMultipleOf(node);
+
+    const minimumLength = this.selectValidationMinimumLength(node);
+    const maximumLength = this.selectValidationMaximumLength(node);
+    const valuePattern = this.selectValidationValuePattern(node);
+    const valueFormat = this.selectValidationValueFormat(node);
+
+    const minimumItems = this.selectValidationMinimumItems(node);
+    const maximumItems = this.selectValidationMaximumItems(node);
+    const uniqueItems = this.selectValidationUniqueItems(node) ?? false;
+
+    const minimumProperties = this.selectValidationMinimumProperties(node);
+    const maximumProperties = this.selectValidationMaximumProperties(node);
+    const required = this.selectValidationRequired(node) ?? [];
 
     return {
-      boolean: booleanAssertions,
-      integer: integerAssertions,
-      number: numberAssertions,
-      string: stringAssertions,
-      array: arrayAssertions,
-      map: mapAssertions,
+      options,
+
+      minimumInclusive,
+      minimumExclusive,
+      maximumInclusive,
+      maximumExclusive,
+      multipleOf,
+
+      minimumLength,
+      maximumLength,
+      valuePattern,
+      valueFormat,
+
+      maximumItems,
+      minimumItems,
+      uniqueItems,
+
+      minimumProperties,
+      maximumProperties,
+      required,
     };
   }
-  protected getIntermediateApplicatorsSection(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.ApplicatorsSection {
+  protected getIntermediateApplicatorsPart(nodePointer: string, node: N) {
     const reference = this.getIntermediateReference(nodePointer, node);
-    const allOf = this.getIntermediateAllOf(nodePointer, node);
-    const anyOf = this.getIntermediateAnyOf(nodePointer, node);
-    const oneOf = this.getIntermediateOneOf(nodePointer, node);
+    const allOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeAllOfEntries(nodePointer, node),
+    ]);
+    const anyOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeAnyOfEntries(nodePointer, node),
+    ]);
+    const oneOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeOneOfEntries(nodePointer, node),
+    ]);
 
-    const not = this.getIntermediateNot(nodePointer, node);
-    const $if = this.getIntermediateIf(nodePointer, node);
-    const then = this.getIntermediateThen(nodePointer, node);
-    const $else = this.getIntermediateElse(nodePointer, node);
+    const not = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeNotEntries(nodePointer, node),
+    ]);
+    const $if = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeIfEntries(nodePointer, node),
+    ]);
+    const then = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeThenEntries(nodePointer, node),
+    ]);
+    const $else = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeElseEntries(nodePointer, node),
+    ]);
 
-    const dependentSchemas = this.getIntermediateDependentSchemas(nodePointer, node);
+    const dependentSchemas = this.mapPointerEntriesRecord(nodePointer, node, [
+      ...this.selectNodeDependentSchemasPointerEntries(nodePointer, node),
+    ]);
 
-    const tupleItems = this.getIntermediateTupleItems(nodePointer, node);
-    const arrayItems = this.getIntermediateArrayItems(nodePointer, node);
-    const contains = this.getIntermediateContains(nodePointer, node);
+    const tupleItems = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeTupleItemsEntries(nodePointer, node),
+    ]);
+    const arrayItems = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeArrayItemsEntries(nodePointer, node),
+    ]);
+    const contains = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeContainsEntries(nodePointer, node),
+    ]);
 
-    const objectProperties = this.getIntermediateObjectProperties(nodePointer, node);
-    const mapProperties = this.getIntermediateMapProperties(nodePointer, node);
-    const patternProperties = this.getIntermediatePatternProperties(nodePointer, node);
-    const propertyNames = this.getIntermediatePropertyNames(nodePointer, node);
+    const objectProperties = this.mapPointerEntriesRecord(nodePointer, node, [
+      ...this.selectNodePropertiesPointerEntries(nodePointer, node),
+    ]);
+    const mapProperties = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeMapPropertiesEntries(nodePointer, node),
+    ]);
+    const patternProperties = this.mapPointerEntriesRecord(nodePointer, node, [
+      ...this.selectNodePatternPropertyPointerEntries(nodePointer, node),
+    ]);
+    const propertyNames = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodePropertyNamesEntries(nodePointer, node),
+    ]);
 
     return {
       reference,
@@ -293,278 +348,12 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     };
   }
 
-  //#region intermediate assertions
-
-  protected getIntermediateBooleanAssertion(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.BooleanAssertion | undefined {
-    const enumValues = this.selectValidationEnum(node);
-    const constValue = this.selectValidationConst(node);
-
-    let options: Array<boolean> | undefined;
-
-    if (constValue != null && typeof constValue === "boolean") {
-      options = [constValue];
-    } else if (enumValues != null) {
-      options = [...enumValues].filter((value) => typeof value === "boolean");
-    }
-
-    return {
-      options,
-    };
-  }
-  protected getIntermediateIntegerAssertion(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.IntegerAssertion | undefined {
-    const enumValues = this.selectValidationEnum(node);
-    const constValue = this.selectValidationConst(node);
-
-    let options: Array<number> | undefined;
-
-    if (constValue != null && typeof constValue === "number") {
-      options = [constValue];
-    } else if (enumValues != null) {
-      options = [...enumValues].filter((value) => typeof value === "number");
-    }
-
-    const minimumInclusive = this.selectValidationMinimumInclusive(node);
-    const minimumExclusive = this.selectValidationMinimumExclusive(node);
-    const maximumInclusive = this.selectValidationMaximumInclusive(node);
-    const maximumExclusive = this.selectValidationMaximumExclusive(node);
-    const multipleOf = this.selectValidationMultipleOf(node);
-
-    return {
-      options,
-      minimumInclusive,
-      minimumExclusive,
-      maximumInclusive,
-      maximumExclusive,
-      multipleOf,
-    };
-  }
-  protected getIntermediateNumberAssertion(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.NumberAssertion | undefined {
-    const enumValues = this.selectValidationEnum(node);
-    const constValue = this.selectValidationConst(node);
-
-    let options: Array<number> | undefined;
-
-    if (constValue != null && typeof constValue === "number") {
-      options = [constValue];
-    } else if (enumValues != null) {
-      options = [...enumValues].filter((value) => typeof value === "number");
-    }
-
-    const minimumInclusive = this.selectValidationMinimumInclusive(node);
-    const minimumExclusive = this.selectValidationMinimumExclusive(node);
-    const maximumInclusive = this.selectValidationMaximumInclusive(node);
-    const maximumExclusive = this.selectValidationMaximumExclusive(node);
-    const multipleOf = this.selectValidationMultipleOf(node);
-
-    return {
-      options,
-      minimumInclusive,
-      minimumExclusive,
-      maximumInclusive,
-      maximumExclusive,
-      multipleOf,
-    };
-  }
-  protected getIntermediateStringAssertion(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.StringAssertion | undefined {
-    const enumValues = this.selectValidationEnum(node);
-    const constValue = this.selectValidationConst(node);
-
-    let options: Array<string> | undefined;
-
-    if (constValue != null && typeof constValue === "string") {
-      options = [constValue];
-    } else if (enumValues != null) {
-      options = [...enumValues].filter((value) => typeof value === "string");
-    }
-
-    const minimumLength = this.selectValidationMinimumLength(node);
-    const maximumLength = this.selectValidationMaximumLength(node);
-    const valuePattern = this.selectValidationValuePattern(node);
-    const valueFormat = this.selectValidationValueFormat(node);
-
-    return {
-      options,
-      minimumLength,
-      maximumLength,
-      valuePattern,
-      valueFormat,
-    };
-  }
-  protected getIntermediateArrayAssertion(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.ArrayAssertion | undefined {
-    const minimumItems = this.selectValidationMinimumItems(node);
-    const maximumItems = this.selectValidationMaximumItems(node);
-    const uniqueItems = this.selectValidationUniqueItems(node) ?? false;
-
-    return {
-      maximumItems,
-      minimumItems,
-      uniqueItems,
-    };
-  }
-  protected getIntermediateMapAssertion(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.MapAssertion | undefined {
-    const minimumProperties = this.selectValidationMinimumProperties(node);
-    const maximumProperties = this.selectValidationMaximumProperties(node);
-
-    const required = this.selectValidationRequired(node) ?? [];
-
-    return {
-      minimumProperties,
-      maximumProperties,
-      required,
-    };
-  }
-
-  //#endregion
-
   //#region intermediate applicators
-
-  protected getIntermediateAllOf(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.AllOf | undefined {
-    return this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeAllOfEntries(nodePointer, node),
-    ]);
-  }
-  protected getIntermediateAnyOf(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.AnyOf | undefined {
-    return this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeAnyOfEntries(nodePointer, node),
-    ]);
-  }
-  protected getIntermediateOneOf(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.OneOf | undefined {
-    return this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeOneOfEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateNot(nodePointer: string, node: N): schemaIntermediateB.Not | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeNotEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateIf(nodePointer: string, node: N): schemaIntermediateB.If | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeIfEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateThen(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.Then | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeThenEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateElse(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.Else | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeElseEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateDependentSchemas(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.DependentSchemas | undefined {
-    return this.mapPointerEntriesRecord(nodePointer, node, [
-      ...this.selectNodeDependentSchemasPointerEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateTupleItems(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.TupleItems | undefined {
-    return this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeTupleItemsEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateArrayItems(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.ArrayItems | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeArrayItemsEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateContains(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.Contains | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeContainsEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateObjectProperties(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.ObjectProperties | undefined {
-    return this.mapPointerEntriesRecord(nodePointer, node, [
-      ...this.selectNodePropertiesPointerEntries(nodePointer, node),
-    ]);
-  }
-
-  protected getIntermediateMapProperties(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.MapProperties | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeMapPropertiesEntries(nodePointer, node),
-    ]);
-  }
-  protected getIntermediatePatternProperties(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.PatternProperties | undefined {
-    return this.mapPointerEntriesRecord(nodePointer, node, [
-      ...this.selectNodePatternPropertyPointerEntries(nodePointer, node),
-    ]);
-  }
-  protected getIntermediatePropertyNames(
-    nodePointer: string,
-    node: N,
-  ): schemaIntermediateB.PropertyNames | undefined {
-    return this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodePropertyNamesEntries(nodePointer, node),
-    ]);
-  }
 
   protected abstract getIntermediateReference(
     nodePointer: string,
     node: N,
-  ): schemaIntermediateB.Reference | undefined;
+  ): schemaIntermediate.Reference | undefined;
 
   //#endregion
 
@@ -767,7 +556,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   protected guessTypes(node: N) {
     const nodeConst = this.selectValidationConst(node);
     const nodeEnums = this.selectValidationEnum(node);
-    const types = new Set<schemaIntermediateB.TypesSectionItems>();
+    const types = new Set<schemaIntermediate.TypesItems>();
 
     if (nodeConst != null) {
       switch (typeof nodeConst) {

@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "jns42-schema-intermediate";
+import * as schemaIntermediate from "jns42-schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
@@ -17,7 +17,7 @@ export interface PackageOptions {
 }
 
 export function generatePackage(
-  intermediateData: schemaIntermediateB.SchemaJson,
+  intermediateData: schemaIntermediate.SchemaJson,
   namesData: Record<string, string>,
   options: PackageOptions,
 ) {
