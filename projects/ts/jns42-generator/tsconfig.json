@@ -1,12 +1,13 @@
 {
   "extends": "@tsconfig/node20",
   "compilerOptions": {
-    "outDir": "../../../out/ts/jns42-generator",
+    "outDir": "./out",
     "rootDir": "./src",
     "sourceMap": true,
     "declaration": true,
     "composite": true,
     "lib": ["es2023", "DOM"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "references": [{ "path": "../jns42-schema-intermediate" }]
 }

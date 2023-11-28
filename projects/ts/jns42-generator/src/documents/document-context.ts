@@ -1,5 +1,5 @@
-import * as schemaIntermediateB from "jns42-schema-intermediate";
-import { discoverSchemaId, loadJSON, normalizeUrl, readJson } from "../utils/index.js";
+import * as schemaIntermediate from "jns42-schema-intermediate";
+import { discoverSchemaId, loadYAML, normalizeUrl, readJson } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
@@ -42,14 +42,14 @@ export class DocumentContext {
     this.factories.set(schema, factory);
   }
 
-  public getIntermediateData(): schemaIntermediateB.SchemaJson {
+  public getIntermediateData(): schemaIntermediate.SchemaJson {
     return {
       $schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json",
       schemas: Object.fromEntries(this.getIntermediateSchemaEntries()),
     };
   }
 
-  public *getIntermediateSchemaEntries(): Iterable<readonly [string, schemaIntermediateB.Node]> {
+  public *getIntermediateSchemaEntries(): Iterable<readonly [string, schemaIntermediate.Node]> {
     for (const document of this.documents.values()) {
       yield* document.getIntermediateNodeEntries();
     }
@@ -81,7 +81,7 @@ export class DocumentContext {
   ) {
     const retrievalId = normalizeUrl(retrievalUrl).toString();
     if (!this.nodeCache.has(retrievalId)) {
-      const documentNode = await loadJSON(retrievalUrl);
+      const documentNode = await loadYAML(retrievalUrl);
       this.fillNodeCache(retrievalUrl, documentNode);
     }
 

@@ -6,11 +6,11 @@
     },
     {
       "name": "jns42-schema-intermediate",
-      "path": "../oas/jns42-schema-intermediate"
+      "path": "jns42-schema-intermediate"
     },
     {
       "name": "jns42-generator",
-      "path": "./jns42-generator"
+      "path": "jns42-generator"
     }
   ],
   "settings": {
