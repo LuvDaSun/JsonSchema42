@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.8.6",
+  "version": "0.8.9",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "tsc --build && chmod +x out/program.js",
-    "clean": "rm -rf out",
+    "clean": "rm -rf out *.tsbuildinfo",
     "test": "node --test ./out/**/*.test.js"
   },
   "repository": {
@@ -39,9 +39,9 @@
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "jns42-schema-draft-04": "0.0.0",
-    "jns42-schema-draft-2020-12": "0.0.0",
-    "jns42-schema-intermediate": "0.0.0",
+    "jns42-schema-draft-04": "file://../jns42-schema-draft-04",
+    "jns42-schema-draft-2020-12": "file://../jns42-schema-draft-2020-12",
+    "jns42-schema-intermediate": "file://../jns42-schema-intermediate",
     "@types/node": "^20.10.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
