@@ -1,4 +1,4 @@
 out/
-projects/ts/jns42-schema-intermediate
-projects/ts/jns42-schema-draft-04
-projects/ts/jns42-schema-draft-2020-12
+packages/ts/schema-intermediate
+packages/ts/schema-draft-04
+packages/ts/schema-draft-2020-12

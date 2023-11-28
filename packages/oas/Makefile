@@ -1,25 +1,25 @@
 SHELL:=$(PREFIX)/bin/sh
 
 build: \
-	../ts/jns42-schema-intermediate \
-	../ts/jns42-schema-draft-04 \
-	../ts/jns42-schema-draft-2020-12 \
+	../ts/schema-intermediate \
+	../ts/schema-draft-04 \
+	../ts/schema-draft-2020-12 \
 
 	npm install
 
-out/jns42-schema-intermediate: jns42-schema-intermediate/src/schema.yaml
+out/schema-intermediate: schema-intermediate/src/schema.yaml
 	../ts/jns42-generator/out/program.js package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
 
-out/jns42-schema-draft-04:
+out/schema-draft-04:
 	../ts/jns42-generator/out/program.js package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
 
-out/jns42-schema-draft-2020-12:
+out/schema-draft-2020-12:
 	../ts/jns42-generator/out/program.js package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \

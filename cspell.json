@@ -2,5 +2,5 @@
   "version": "0.2",
   "words": ["camelcase", "endregion", "urlencoding"],
   "useGitignore": true,
-  "files": ["projects/rs/*/src/**", "projects/ts/*/src/**", "projects/oas/*/src/**"]
+  "files": ["packages/rs/*/src/**", "packages/ts/*/src/**", "packages/oas/*/src/**"]
 }

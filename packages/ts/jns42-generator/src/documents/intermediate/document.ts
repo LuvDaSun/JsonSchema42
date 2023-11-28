@@ -1,4 +1,4 @@
-import { Node, SchemaJson, isSchemaJson } from "jns42-schema-intermediate";
+import { Node, SchemaJson, isSchemaJson } from "schema-intermediate";
 import { DocumentBase } from "../document-base.js";
 
 export class Document extends DocumentBase<SchemaJson> {

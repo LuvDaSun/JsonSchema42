@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "jns42-schema-intermediate";
+import * as schemaIntermediateB from "schema-intermediate";
 
 export interface Specification {
   names: Record<string, string>;

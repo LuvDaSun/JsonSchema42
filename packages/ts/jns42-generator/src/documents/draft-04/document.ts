@@ -1,11 +1,16 @@
-import { Draft202012Schema as N, isDraft202012Schema as isNode } from "jns42-schema-draft-2020-12";
-import * as schemaIntermediate from "jns42-schema-intermediate";
+import { Draft04Schema, isDraft04Schema } from "schema-draft-04";
+import * as schemaIntermediateB from "schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
+type N = Draft04Schema | boolean;
+
+function isNode(value: unknown): value is N {
+  return isDraft04Schema(value) || typeof value === "boolean";
+}
+
 export class Document extends SchemaDocumentBase<N> {
-  private readonly anchorMap = new Map<string, string>();
-  private readonly dynamicAnchorMap = new Map<string, string>();
+  private readonly nodeNameMap = new Map<string, string>();
 
   constructor(
     givenUrl: URL,
@@ -16,20 +21,13 @@ export class Document extends SchemaDocumentBase<N> {
     super(givenUrl, antecedentUrl, documentNode, context);
 
     for (const [nodePointer, node] of this.nodes) {
-      const nodeAnchor = this.selectNodeAnchor(node);
-      if (nodeAnchor != null) {
-        if (this.anchorMap.has(nodeAnchor)) {
-          throw new TypeError(`duplicate anchor ${nodeAnchor}`);
+      const nodeId = this.selectNodeId(node);
+      if (nodeId != null && nodeId.startsWith("#")) {
+        const nodeName = this.nodeHashToPointer(nodeId);
+        if (this.nodeNameMap.has(nodeName)) {
+          throw new TypeError(`duplicate node name ${nodeName}`);
         }
-        this.anchorMap.set(nodeAnchor, nodePointer);
-      }
-
-      const nodeDynamicAnchor = this.selectNodeDynamicAnchor(node);
-      if (nodeDynamicAnchor != null) {
-        if (this.dynamicAnchorMap.has(nodeDynamicAnchor)) {
-          throw new TypeError(`duplicate dynamic anchor ${nodeDynamicAnchor}`);
-        }
-        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodePointer);
+        this.nodeNameMap.set(nodeName, nodePointer);
       }
     }
   }
@@ -43,13 +41,9 @@ export class Document extends SchemaDocumentBase<N> {
   public *getNodeUrls(): Iterable<URL> {
     yield* super.getNodeUrls();
 
-    for (const [anchor] of this.anchorMap) {
-      yield this.pointerToNodeUrl(anchor);
+    for (const [nodeName] of this.nodeNameMap) {
+      yield this.pointerToNodeUrl(nodeName);
     }
-
-    /*
-		don't emit dynamic anchors here, they are treated differently
-		*/
   }
 
   //#endregion
@@ -58,14 +52,13 @@ export class Document extends SchemaDocumentBase<N> {
 
   protected isNodeEmbeddedSchema(node: N): boolean {
     const nodeId = this.selectNodeId(node);
-    if (nodeId == null) {
+    if (nodeId == null || nodeId.startsWith("#")) {
       return false;
     }
     return true;
   }
-
   public pointerToNodeHash(nodePointer: string): string {
-    return nodePointer === "" ? "" : `#${nodePointer}`;
+    return `#${nodePointer}`;
   }
   public nodeHashToPointer(nodeHash: string): string {
     if (nodeHash === "") {
@@ -84,17 +77,10 @@ export class Document extends SchemaDocumentBase<N> {
   protected getIntermediateReference(
     nodePointer: string,
     node: N,
-  ): schemaIntermediate.Reference | undefined {
+  ): schemaIntermediateB.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
     if (nodeRef != null) {
       const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeRef);
-      const resolvedNodeId = resolvedNodeUrl.toString();
-      return resolvedNodeId;
-    }
-
-    const nodeDynamicRef = this.selectNodeDynamicRef(node);
-    if (nodeDynamicRef != null) {
-      const resolvedNodeUrl = this.resolveDynamicReferenceNodeUrl(nodeDynamicRef);
       const resolvedNodeId = resolvedNodeUrl.toString();
       return resolvedNodeId;
     }
@@ -110,7 +96,7 @@ export class Document extends SchemaDocumentBase<N> {
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
       const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
-      const anchorResolvedPointer = resolvedDocument.anchorMap.get(resolvedPointer);
+      const anchorResolvedPointer = resolvedDocument.nodeNameMap.get(resolvedPointer);
       if (anchorResolvedPointer != null) {
         const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
         return anchorResolvedUrl;
@@ -118,26 +104,6 @@ export class Document extends SchemaDocumentBase<N> {
     }
 
     return resolvedNodeUrl;
-  }
-  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): URL {
-    const documents = [this, ...this.getAntecedentDocuments()];
-    documents.reverse();
-
-    for (const document of documents) {
-      if (!(document instanceof Document)) {
-        continue;
-      }
-
-      const resolvedPointer = this.nodeHashToPointer(nodeDynamicRef);
-      const dynamicAnchorResolvedPointer = document.dynamicAnchorMap.get(resolvedPointer);
-
-      if (dynamicAnchorResolvedPointer != null) {
-        const dynamicAnchorResolvedUrl = document.pointerToNodeUrl(dynamicAnchorResolvedPointer);
-        return dynamicAnchorResolvedUrl;
-      }
-    }
-
-    throw new TypeError("dynamic anchor not found");
   }
 
   //#endregion
@@ -162,31 +128,13 @@ export class Document extends SchemaDocumentBase<N> {
 
   protected selectNodeId(node: N) {
     if (typeof node === "object") {
-      return node.$id;
-    }
-  }
-
-  protected selectNodeAnchor(node: N) {
-    if (typeof node === "object") {
-      return node.$anchor;
-    }
-  }
-
-  protected selectNodeDynamicAnchor(node: N) {
-    if (typeof node === "object") {
-      return node.$dynamicAnchor;
+      return node.id;
     }
   }
 
   protected selectNodeRef(node: N) {
-    if (typeof node === "object") {
+    if (typeof node === "object" && "$ref" in node && typeof node.$ref === "string") {
       return node.$ref;
-    }
-  }
-
-  protected selectNodeDynamicRef(node: N) {
-    if (typeof node === "object") {
-      return node.$dynamicRef;
     }
   }
 
@@ -206,16 +154,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  protected selectNodeDeprecated(node: N) {
-    if (typeof node === "object") {
-      return node.deprecated;
-    }
+  protected selectNodeDeprecated(node: N): boolean | undefined {
+    return undefined;
   }
-
-  protected selectNodeExamples(node: N) {
-    if (typeof node === "object") {
-      return node.examples;
-    }
+  protected selectNodeExamples(node: N): any[] | undefined {
+    return undefined;
   }
 
   //#endregion
@@ -231,13 +174,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  protected *selectNodeDependentSchemasPointerEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.dependentSchemas != null) {
-      for (const key of Object.keys(node.dependentSchemas)) {
-        const subNodePointer = [nodePointer, "dependentSchemas", key].join("/");
-        yield [key, subNodePointer] as const;
-      }
-    }
+  protected *selectNodeDependentSchemasPointerEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, string]> {
+    yield* [];
   }
 
   protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
@@ -254,9 +195,9 @@ export class Document extends SchemaDocumentBase<N> {
   //#region schema selectors
 
   protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.$defs != null) {
-      for (const [key, subNode] of Object.entries(node.$defs)) {
-        const subNodePointer = [nodePointer, "$defs", key].join("/");
+    if (typeof node === "object" && node.definitions != null) {
+      for (const [key, subNode] of Object.entries(node.definitions)) {
+        const subNodePointer = [nodePointer, "definitions", key].join("/");
         yield [subNodePointer, subNode] as const;
       }
     }
@@ -279,6 +220,39 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
+  protected *selectSubNodeTupleItemsEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    if (typeof node === "object" && node.items != null && Array.isArray(node.items)) {
+      for (const [key, subNode] of Object.entries(node.items)) {
+        const subNodePointer = [nodePointer, "items", key].join("/");
+        yield [subNodePointer, subNode] as [string, N];
+      }
+    }
+  }
+  protected *selectSubNodeArrayItemsEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    if (typeof node === "object" && node.items != null && !Array.isArray(node.items)) {
+      const subNode = node.items;
+      const subNodePointer = [nodePointer, "items"].join("/");
+      yield [subNodePointer, subNode] as const;
+    }
+    if (typeof node === "object" && node.additionalItems != null) {
+      const subNode = node.additionalItems;
+      const subNodePointer = [nodePointer, "additionalItems"].join("/");
+      yield [subNodePointer, subNode] as const;
+    }
+  }
+  protected *selectSubNodeContainsEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    yield* [];
+  }
+
   protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
@@ -288,53 +262,18 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  protected *selectSubNodePropertyNamesEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.propertyNames != null) {
-      const subNode = node.propertyNames;
-      const subNodePointer = [nodePointer, "propertyNames"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
-  }
-
-  protected *selectSubNodeTupleItemsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.prefixItems != null) {
-      for (const [key, subNode] of Object.entries(node.prefixItems)) {
-        const subNodePointer = [nodePointer, "prefixItems", key].join("/");
-        yield [subNodePointer, subNode] as const;
-      }
-    }
-  }
-
-  protected *selectSubNodeArrayItemsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.items != null) {
-      const subNode = node.items;
-      const subNodePointer = [nodePointer, "items"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
-  }
-
-  protected *selectSubNodeContainsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.contains != null) {
-      const subNode = node.contains;
-      const subNodePointer = [nodePointer, "contains"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
-  }
-
-  protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.allOf != null) {
-      for (const [key, subNode] of Object.entries(node.allOf)) {
-        const subNodePointer = [nodePointer, "allOf", key].join("/");
-        yield [subNodePointer, subNode] as const;
-      }
-    }
+  protected *selectSubNodePropertyNamesEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    yield* [];
   }
 
   protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
     if (typeof node === "object" && node.anyOf != null) {
       for (const [key, subNode] of Object.entries(node.anyOf)) {
         const subNodePointer = [nodePointer, "anyOf", key].join("/");
-        yield [subNodePointer, subNode] as const;
+        yield [subNodePointer, subNode] as [string, N];
       }
     }
   }
@@ -343,7 +282,16 @@ export class Document extends SchemaDocumentBase<N> {
     if (typeof node === "object" && node.oneOf != null) {
       for (const [key, subNode] of Object.entries(node.oneOf)) {
         const subNodePointer = [nodePointer, "oneOf", key].join("/");
-        yield [subNodePointer, subNode] as const;
+        yield [subNodePointer, subNode] as [string, N];
+      }
+    }
+  }
+
+  protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
+    if (typeof node === "object" && node.allOf != null) {
+      for (const [key, subNode] of Object.entries(node.allOf)) {
+        const subNodePointer = [nodePointer, "allOf", key].join("/");
+        yield [subNodePointer, subNode] as [string, N];
       }
     }
   }
@@ -356,28 +304,19 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  protected *selectSubNodeIfEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.if != null) {
-      const subNode = node.if;
-      const subNodePointer = [nodePointer, "if"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
+  protected selectSubNodeIfEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+    return [];
   }
 
-  protected *selectSubNodeThenEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.then != null) {
-      const subNode = node.then;
-      const subNodePointer = [nodePointer, "then"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
+  protected selectSubNodeThenEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+    return [];
   }
 
-  protected *selectSubNodeElseEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.else != null) {
-      const subNode = node.else;
-      const subNodePointer = [nodePointer, "else"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
+  protected *selectSubNodeElseEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    yield* [];
   }
 
   //#endregion
@@ -398,7 +337,7 @@ export class Document extends SchemaDocumentBase<N> {
 
   protected selectValidationRequired(node: N) {
     if (typeof node === "object") {
-      return node.required;
+      return node.required as string[];
     }
   }
 
@@ -446,25 +385,41 @@ export class Document extends SchemaDocumentBase<N> {
 
   protected selectValidationMinimumInclusive(node: N) {
     if (typeof node === "object") {
-      return node.minimum;
+      if (node.exclusiveMinimum ?? false) {
+        return undefined;
+      } else {
+        return node.minimum;
+      }
     }
   }
 
   protected selectValidationMinimumExclusive(node: N) {
     if (typeof node === "object") {
-      return node.exclusiveMinimum;
+      if (node.exclusiveMinimum ?? false) {
+        return node.minimum;
+      } else {
+        return undefined;
+      }
     }
   }
 
   protected selectValidationMaximumInclusive(node: N) {
     if (typeof node === "object") {
-      return node.maximum;
+      if (node.exclusiveMaximum ?? false) {
+        return undefined;
+      } else {
+        return node.maximum;
+      }
     }
   }
 
   protected selectValidationMaximumExclusive(node: N) {
     if (typeof node === "object") {
-      return node.exclusiveMaximum;
+      if (node.exclusiveMaximum ?? false) {
+        return node.maximum;
+      } else {
+        return undefined;
+      }
     }
   }
 
@@ -481,9 +436,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectValidationConst(node: N) {
-    if (typeof node === "object") {
-      return node.const;
-    }
+    return undefined;
   }
 
   //#endregion

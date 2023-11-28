@@ -39,9 +39,9 @@
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "jns42-schema-draft-04": "file://../jns42-schema-draft-04",
-    "jns42-schema-draft-2020-12": "file://../jns42-schema-draft-2020-12",
-    "jns42-schema-intermediate": "file://../jns42-schema-intermediate",
+    "schema-draft-04": "file://../schema-draft-04",
+    "schema-draft-2020-12": "file://../schema-draft-2020-12",
+    "schema-intermediate": "file://../schema-intermediate",
     "@types/node": "^20.10.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
@@ -51,8 +51,8 @@
     "yargs": "^17.7.2"
   },
   "bundledDependencies": [
-    "jns42-schema-draft-04",
-    "jns42-schema-draft-2020-12",
-    "jns42-schema-intermediate"
+    "schema-draft-04",
+    "schema-draft-2020-12",
+    "schema-intermediate"
   ]
 }

@@ -5,7 +5,7 @@ on:
     paths:
       - "*"
       - .github/**
-      - projects/**
+      - packages/**
 
 jobs:
   formatting:

@@ -6,7 +6,7 @@ on:
       - "*"
       - .github/**
       - fixtures/**
-      - projects/rs/**
+      - packages/rs/**
 
 jobs:
   unit:
