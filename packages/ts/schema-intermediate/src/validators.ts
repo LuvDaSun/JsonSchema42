@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.9                          -- www.JsonSchema42.org
+// v0.8.12                         -- www.JsonSchema42.org
 import * as types from "./types.js";
 export function isSchemaJson(value: unknown): value is types.SchemaJson {
 if(!_isMapSchemaJson(value)) {
@@ -28,12 +28,12 @@ case "$schema":
 if(!isSchema(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "schemas":
 if(!isSchemas(propertyValue)) {
 return false;
 }
-break;
+continue;
 }
 }
 return true;
@@ -61,187 +61,187 @@ case "title":
 if(!isTitle(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "description":
 if(!isDescription(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "examples":
 if(!isExamples(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "deprecated":
 if(!isDeprecated(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "types":
 if(!isTypes(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "reference":
 if(!isReference(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "oneOf":
 if(!isOneOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "anyOf":
 if(!isAnyOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "allOf":
 if(!isAllOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "if":
 if(!isIf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "then":
 if(!isThen(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "else":
 if(!isElse(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "not":
 if(!isNot(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "dependentSchemas":
 if(!isDependentSchemas(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "objectProperties":
 if(!isObjectProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "mapProperties":
 if(!isMapProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "patternProperties":
 if(!isPatternProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "propertyNames":
 if(!isPropertyNames(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "tupleItems":
 if(!isTupleItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "arrayItems":
 if(!isArrayItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "contains":
 if(!isContains(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "options":
 if(!isOptions(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minimumInclusive":
 if(!isMinimumInclusive(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minimumExclusive":
 if(!isMinimumExclusive(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maximumInclusive":
 if(!isMaximumInclusive(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maximumExclusive":
 if(!isMaximumExclusive(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "multipleOf":
 if(!isMultipleOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minimumLength":
 if(!isMinimumLength(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maximumLength":
 if(!isMaximumLength(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "valuePattern":
 if(!isValuePattern(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "valueFormat":
 if(!isValueFormat(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minimumItems":
 if(!isMinimumItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maximumItems":
 if(!isMaximumItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "uniqueItems":
 if(!isUniqueItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "required":
 if(!isRequired(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minimumProperties":
 if(!isMinimumProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maximumProperties":
 if(!isMaximumProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 }
 }
 return true;
@@ -360,6 +360,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
@@ -564,6 +565,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
@@ -582,6 +584,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isObjectPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
@@ -612,6 +615,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }

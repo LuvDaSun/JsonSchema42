@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.9                          -- www.JsonSchema42.org
+// v0.8.12                         -- www.JsonSchema42.org
 import * as types from "./types.js";
 export function isDraft04Schema(value: unknown): value is types.Draft04Schema {
 if(!_isMapDraft04Schema(value)) {
@@ -22,167 +22,167 @@ case "id":
 if(!isId(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "$schema":
 if(!isPropertiesSchema(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "title":
 if(!isTitle(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "description":
 if(!isDescription(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "default":
 if(!isDefault(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "multipleOf":
 if(!isMultipleOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maximum":
 if(!isMaximum(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "exclusiveMaximum":
 if(!isExclusiveMaximum(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minimum":
 if(!isMinimum(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "exclusiveMinimum":
 if(!isExclusiveMinimum(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maxLength":
 if(!isMaxLength(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minLength":
 if(!isMinLength(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "pattern":
 if(!isPattern(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "additionalItems":
 if(!isAdditionalItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "items":
 if(!isPropertiesItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maxItems":
 if(!isMaxItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minItems":
 if(!isMinItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "uniqueItems":
 if(!isUniqueItems(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "maxProperties":
 if(!isMaxProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "minProperties":
 if(!isMinProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "required":
 if(!isRequired(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "additionalProperties":
 if(!isSchemaPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "definitions":
 if(!isDefinitions(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "properties":
 if(!isProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "patternProperties":
 if(!isPatternProperties(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "dependencies":
 if(!isDependencies(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "enum":
 if(!isEnum(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "type":
 if(!isType(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "format":
 if(!isFormat(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "allOf":
 if(!isAllOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "anyOf":
 if(!isAnyOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "oneOf":
 if(!isOneOf(propertyValue)) {
 return false;
 }
-break;
+continue;
 case "not":
 if(!isNot(propertyValue)) {
 return false;
 }
-break;
+continue;
 }
 }
 return true;
@@ -561,6 +561,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isDefinitionsAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
@@ -579,6 +580,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isPropertiesPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
@@ -597,6 +599,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
@@ -615,6 +618,7 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(!isDependenciesAdditionalProperties(propertyValue)) {
 return false;
 }
+continue;
 }
 return true;
 }
