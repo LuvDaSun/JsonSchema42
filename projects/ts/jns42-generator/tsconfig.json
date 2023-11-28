@@ -6,7 +6,7 @@
     "sourceMap": true,
     "declaration": true,
     "composite": true,
-    "lib": ["es2023", "DOM"]
+    "lib": ["ES2023", "DOM"]
   },
   "include": ["src/**/*"],
   "references": [{ "path": "../jns42-schema-intermediate" }]

@@ -1,5 +1,2 @@
-!.gitignore
-*.js
-*.js.map
-*.d.ts
-*.buildinfo
+*.tsbuildinfo
+out/

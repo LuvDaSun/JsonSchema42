@@ -1,16 +1,16 @@
 {
+  "extends": "@tsconfig/node20",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "Node16",
-    "moduleResolution": "node16",
-    "declaration": true,
+    "outDir": "./out",
+    "rootDir": "./src",
     "sourceMap": true,
-    "importHelpers": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
+    "declaration": true,
     "composite": true,
-    "lib": ["ES2023"]
-  }
+    "lib": [
+      "ES2023"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ]
 }

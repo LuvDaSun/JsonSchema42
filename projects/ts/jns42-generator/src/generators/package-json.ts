@@ -7,26 +7,26 @@ export function getPackageJsonData(name: string, version: string) {
     version: version,
     sideEffects: false,
     type: "module",
-    main: "main.js",
-    types: "main.d.ts",
-    files: ["*"],
+    main: "./out/main.js",
+    types: "./out/main.d.ts",
+    files: ["./src/*", "./out/*"],
     exports: {
       ".": {
-        default: "./main.js",
+        default: "./out/main.js",
       },
       "./types": {
-        default: "./types.js",
+        default: "./out/types.js",
       },
       "./validators": {
-        default: "./validators.js",
+        default: "./out/validators.js",
       },
       "./parsers": {
-        default: "./parsers.js",
+        default: "./out/parsers.js",
       },
     },
     scripts: {
       build: "tsc",
-      test: "node --test ./*.test.js",
+      test: "node --test ./out/*.test.js",
     },
     author: "",
     license: "ISC",
