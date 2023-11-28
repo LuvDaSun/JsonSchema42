@@ -1,5 +1,5 @@
 import { Draft202012Schema as N, isDraft202012Schema as isNode } from "jns42-schema-draft-2020-12";
-import * as schemaIntermediateB from "jns42-schema-intermediate";
+import * as schemaIntermediate from "jns42-schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
@@ -84,7 +84,7 @@ export class Document extends SchemaDocumentBase<N> {
   protected getIntermediateReference(
     nodePointer: string,
     node: N,
-  ): schemaIntermediateB.Reference | undefined {
+  ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
     if (nodeRef != null) {
       const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeRef);

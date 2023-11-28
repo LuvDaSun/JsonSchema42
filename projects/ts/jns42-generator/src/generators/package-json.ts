@@ -31,7 +31,7 @@ export function getPackageJsonData(name: string, version: string) {
     author: "",
     license: "ISC",
     dependencies: withDependencies(["@types/node"]),
-    devDependencies: withDependencies(["typescript"]),
+    devDependencies: withDependencies(["typescript", "@tsconfig/node20"]),
   };
 
   return content;

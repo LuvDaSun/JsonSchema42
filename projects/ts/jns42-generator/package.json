@@ -39,8 +39,8 @@
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "jns42-schema-draft-04": "^0.2.5",
-    "jns42-schema-draft-2020-12": "^0.2.4",
+    "jns42-schema-draft-04": "0.0.0",
+    "jns42-schema-draft-2020-12": "0.0.0",
     "jns42-schema-intermediate": "0.0.0",
     "@types/node": "^20.10.0",
     "@types/yargs": "^17.0.32",
@@ -49,5 +49,10 @@
     "type-fest": "^4.6.0",
     "typescript": "^5.3.2",
     "yargs": "^17.7.2"
-  }
+  },
+  "bundledDependencies": [
+    "jns42-schema-draft-04",
+    "jns42-schema-draft-2020-12",
+    "jns42-schema-intermediate"
+  ]
 }

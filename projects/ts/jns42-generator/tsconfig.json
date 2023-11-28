@@ -9,5 +9,9 @@
     "lib": ["ES2023", "DOM"]
   },
   "include": ["src/**/*"],
-  "references": [{ "path": "../jns42-schema-intermediate" }]
+  "references": [
+    { "path": "../jns42-schema-intermediate" },
+    { "path": "../jns42-schema-draft-04" },
+    { "path": "../jns42-schema-draft-2020-12" }
+  ]
 }
