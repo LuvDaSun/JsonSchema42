@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.6                          -- www.JsonSchema42.org
+// v0.8.9                          -- www.JsonSchema42.org
 import * as types from "./types.js";
 export function isDraft04Schema(value: unknown): value is types.Draft04Schema {
 if(!_isMapDraft04Schema(value)) {
