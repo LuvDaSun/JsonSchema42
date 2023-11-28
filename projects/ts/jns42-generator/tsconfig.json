@@ -1,0 +1,17 @@
+{
+  "extends": "@tsconfig/node20",
+  "compilerOptions": {
+    "outDir": "./out",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "declaration": true,
+    "composite": true,
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "../jns42-schema-intermediate" },
+    { "path": "../jns42-schema-draft-04" },
+    { "path": "../jns42-schema-draft-2020-12" }
+  ]
+}

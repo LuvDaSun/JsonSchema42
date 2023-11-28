@@ -3,6 +3,7 @@
 *.tsbuildinfo
 
 !.gitignore
+!.prettierignore
 !.gitattributes
 !.editorconfig
 !.npmrc

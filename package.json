@@ -1,7 +1,10 @@
 {
   "private": true,
   "workspaces": [
-    "packages/ts/jns42-generator"
+    "projects/ts/jns42-generator",
+    "projects/ts/jns42-schema-intermediate",
+    "projects/ts/jns42-schema-draft-04",
+    "projects/ts/jns42-schema-draft-2020-12"
   ],
   "scripts": {
     "spelling": "cspell",

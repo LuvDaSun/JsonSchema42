@@ -1,0 +1,116 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
+title: "JsonSchema42 intermediate schema"
+type: object
+required:
+  - $schema
+  - schemas
+properties:
+  $schema:
+    "type": "string"
+    "const": "https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
+  schemas:
+    type: object
+    additionalProperties: { $ref: "#/$defs/node" }
+$defs:
+  node:
+    type: object
+    required:
+      - deprecated
+      - types
+    properties:
+      title: { $ref: "#/$defs/non-empty-string-value" }
+      description: { $ref: "#/$defs/non-empty-string-value" }
+      examples:
+        type: array
+        items: true
+      deprecated: { $ref: "#/$defs/boolean-value" }
+
+      types:
+        description: >
+          What types does this schema describe
+        type: array
+        items:
+          type: string
+          enum:
+            - never
+            - any
+            - "null"
+            - boolean
+            - integer
+            - number
+            - string
+            - array
+            - map
+
+      reference: { $ref: "#/$defs/node-reference" }
+      oneOf:
+        type: array
+        items: { $ref: "#/$defs/node-reference" }
+      anyOf:
+        type: array
+        items: { $ref: "#/$defs/node-reference" }
+      allOf:
+        type: array
+        items: { $ref: "#/$defs/node-reference" }
+      if: { $ref: "#/$defs/node-reference" }
+      then: { $ref: "#/$defs/node-reference" }
+      else: { $ref: "#/$defs/node-reference" }
+      not: { $ref: "#/$defs/node-reference" }
+      dependentSchemas:
+        type: object
+        additionalProperties: { $ref: "#/$defs/node-reference" }
+      objectProperties:
+        type: object
+        additionalProperties: { $ref: "#/$defs/node-reference" }
+      mapProperties: { $ref: "#/$defs/node-reference" }
+      patternProperties:
+        type: object
+        additionalProperties: { $ref: "#/$defs/node-reference" }
+      propertyNames: { $ref: "#/$defs/node-reference" }
+      tupleItems:
+        type: array
+        items: { $ref: "#/$defs/node-reference" }
+      arrayItems: { $ref: "#/$defs/node-reference" }
+      contains: { $ref: "#/$defs/node-reference" }
+
+      options:
+        type: array
+        items: true
+      minimumInclusive: { $ref: "#/$defs/number-value" }
+      minimumExclusive: { $ref: "#/$defs/number-value" }
+      maximumInclusive: { $ref: "#/$defs/number-value" }
+      maximumExclusive: { $ref: "#/$defs/number-value" }
+      multipleOf: { $ref: "#/$defs/number-value" }
+      minimumLength: { $ref: "#/$defs/amount" }
+      maximumLength: { $ref: "#/$defs/amount" }
+      valuePattern: { $ref: "#/$defs/non-empty-string-value" }
+      valueFormat: { $ref: "#/$defs/non-empty-string-value" }
+      minimumItems: { $ref: "#/$defs/amount" }
+      maximumItems: { $ref: "#/$defs/amount" }
+      uniqueItems:
+        type: boolean
+      required:
+        type: array
+        items: { $ref: "#/$defs/string-value" }
+        uniqueItems: true
+      minimumProperties: { $ref: "#/$defs/amount" }
+      maximumProperties: { $ref: "#/$defs/amount" }
+
+  node-reference:
+    type: string
+    minimumLength: 1
+  integer-value:
+    type: integer
+  number-value:
+    type: number
+  boolean-value:
+    type: boolean
+  string-value:
+    type: string
+  non-empty-string-value:
+    type: string
+    minimumLength: 1
+  amount:
+    type: integer
+    minimumInclusive: 0

@@ -1,0 +1,685 @@
+{
+  "$schema": "https://schema.JsonSchema42.org/jns42-intermediate/schema.json",
+  "schemas": {
+    "http://json-schema.org/draft-04/schema#": {
+      "deprecated": false,
+      "title": "",
+      "description": "Core schema meta-schema",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "objectProperties": {
+        "id": "http://json-schema.org/draft-04/schema#/properties/id",
+        "$schema": "http://json-schema.org/draft-04/schema#/properties/$schema",
+        "title": "http://json-schema.org/draft-04/schema#/properties/title",
+        "description": "http://json-schema.org/draft-04/schema#/properties/description",
+        "default": "http://json-schema.org/draft-04/schema#/properties/default",
+        "multipleOf": "http://json-schema.org/draft-04/schema#/properties/multipleOf",
+        "maximum": "http://json-schema.org/draft-04/schema#/properties/maximum",
+        "exclusiveMaximum": "http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum",
+        "minimum": "http://json-schema.org/draft-04/schema#/properties/minimum",
+        "exclusiveMinimum": "http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum",
+        "maxLength": "http://json-schema.org/draft-04/schema#/properties/maxLength",
+        "minLength": "http://json-schema.org/draft-04/schema#/properties/minLength",
+        "pattern": "http://json-schema.org/draft-04/schema#/properties/pattern",
+        "additionalItems": "http://json-schema.org/draft-04/schema#/properties/additionalItems",
+        "items": "http://json-schema.org/draft-04/schema#/properties/items",
+        "maxItems": "http://json-schema.org/draft-04/schema#/properties/maxItems",
+        "minItems": "http://json-schema.org/draft-04/schema#/properties/minItems",
+        "uniqueItems": "http://json-schema.org/draft-04/schema#/properties/uniqueItems",
+        "maxProperties": "http://json-schema.org/draft-04/schema#/properties/maxProperties",
+        "minProperties": "http://json-schema.org/draft-04/schema#/properties/minProperties",
+        "required": "http://json-schema.org/draft-04/schema#/properties/required",
+        "additionalProperties": "http://json-schema.org/draft-04/schema#/properties/additionalProperties",
+        "definitions": "http://json-schema.org/draft-04/schema#/properties/definitions",
+        "properties": "http://json-schema.org/draft-04/schema#/properties/properties",
+        "patternProperties": "http://json-schema.org/draft-04/schema#/properties/patternProperties",
+        "dependencies": "http://json-schema.org/draft-04/schema#/properties/dependencies",
+        "enum": "http://json-schema.org/draft-04/schema#/properties/enum",
+        "type": "http://json-schema.org/draft-04/schema#/properties/type",
+        "format": "http://json-schema.org/draft-04/schema#/properties/format",
+        "allOf": "http://json-schema.org/draft-04/schema#/properties/allOf",
+        "anyOf": "http://json-schema.org/draft-04/schema#/properties/anyOf",
+        "oneOf": "http://json-schema.org/draft-04/schema#/properties/oneOf",
+        "not": "http://json-schema.org/draft-04/schema#/properties/not"
+      }
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/schemaArray": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "minimumItems": 1,
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "http://json-schema.org/draft-04/schema#/definitions/schemaArray/items"
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/positiveInteger": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "integer"
+      ],
+      "minimumInclusive": 0,
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "allOf": [
+        "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0",
+        "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1"
+      ]
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/simpleTypes": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "options": [
+        "array",
+        "boolean",
+        "integer",
+        "null",
+        "number",
+        "object",
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/stringArray": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "minimumItems": 1,
+      "uniqueItems": true,
+      "required": [],
+      "arrayItems": "http://json-schema.org/draft-04/schema#/definitions/stringArray/items"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/id": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/$schema": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/title": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/description": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/default": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/multipleOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "number"
+      ],
+      "minimumExclusive": 0,
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/maximum": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "number"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/minimum": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "number"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/maxLength": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/minLength": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/pattern": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "valueFormat": "regex",
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/additionalItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "anyOf": [
+        "http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0",
+        "http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1"
+      ]
+    },
+    "http://json-schema.org/draft-04/schema#/properties/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "anyOf": [
+        "http://json-schema.org/draft-04/schema#/properties/items/anyOf/0",
+        "http://json-schema.org/draft-04/schema#/properties/items/anyOf/1"
+      ]
+    },
+    "http://json-schema.org/draft-04/schema#/properties/maxItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/minItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/uniqueItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/maxProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/minProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/required": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/stringArray"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "anyOf": [
+        "http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0",
+        "http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1"
+      ]
+    },
+    "http://json-schema.org/draft-04/schema#/properties/definitions": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/properties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/patternProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/dependencies": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/enum": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "minimumItems": 1,
+      "uniqueItems": true,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/type": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "anyOf": [
+        "http://json-schema.org/draft-04/schema#/properties/type/anyOf/0",
+        "http://json-schema.org/draft-04/schema#/properties/type/anyOf/1"
+      ]
+    },
+    "http://json-schema.org/draft-04/schema#/properties/format": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/allOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/schemaArray"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/anyOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/schemaArray"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/oneOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/schemaArray"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/not": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/schemaArray/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/positiveInteger"
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/definitions/stringArray/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/items/anyOf/0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/items/anyOf/1": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/schemaArray"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "anyOf": [
+        "http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0",
+        "http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1"
+      ]
+    },
+    "http://json-schema.org/draft-04/schema#/properties/type/anyOf/0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/simpleTypes"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/type/anyOf/1": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "minimumItems": 1,
+      "uniqueItems": true,
+      "required": [],
+      "arrayItems": "http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/stringArray"
+    },
+    "http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "http://json-schema.org/draft-04/schema#/definitions/simpleTypes"
+    }
+  }
+}
