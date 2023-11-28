@@ -40,15 +40,22 @@ export function* generateTypesTsCode(specification: models.Specification) {
 }
 
 function* generateDeclaration(specification: models.Specification, nodeId: string) {
-  const typeElements = [
-    ...generateTypeDefinitionElements(specification, nodeId),
-    ...generateCompoundDefinitionElements(specification, nodeId),
-  ];
+  const typeElements = [...generateTypeDefinitionElements(specification, nodeId)];
+  const compoundElements = [...generateCompoundDefinitionElements(specification, nodeId)];
 
   if (typeElements.length > 0) {
+    compoundElements.push(
+      joinIterable(
+        mapIterable(typeElements, (element) => itt`(${element})`),
+        " |\n",
+      ),
+    );
+  }
+
+  if (compoundElements.length > 0) {
     yield joinIterable(
-      mapIterable(typeElements, (element) => itt`(${element})`),
-      " |\n",
+      mapIterable(compoundElements, (element) => itt`(${element})`),
+      " &\n",
     );
     return;
   }

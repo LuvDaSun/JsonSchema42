@@ -7,7 +7,14 @@
 /**
 Core and Validation specifications meta-schema
 */
-export type Draft202012Schema = (
+export type Draft202012Schema = (AllOf0 &
+AllOf1 &
+AllOf2 &
+AllOf3 &
+AllOf4 &
+AllOf5 &
+AllOf6) &
+((
 {
 "definitions"?: Definitions,
 "dependencies"?: Dependencies,
@@ -15,30 +22,23 @@ export type Draft202012Schema = (
 "$recursiveRef"?: RecursiveRef,
 }
 ) |
-(boolean) |
-(AllOf0 &
-AllOf1 &
-AllOf2 &
-AllOf3 &
-AllOf4 &
-AllOf5 &
-AllOf6);
+(boolean));
 /**
 @deprecated
 */
-export type Definitions = (
+export type Definitions = ((
 {
 [key: string]: DefinitionsAdditionalProperties,
 }
-);
+));
 /**
 @deprecated
 */
-export type Dependencies = (
+export type Dependencies = ((
 {
 [key: string]: DependenciesAdditionalProperties,
 }
-);
+));
 /**
 @deprecated
 */
@@ -60,12 +60,12 @@ export type DependenciesAdditionalProperties = ((AdditionalPropertiesAnyOf0) |
 (AdditionalPropertiesAnyOf0 & AdditionalPropertiesAnyOf1));
 export type AdditionalPropertiesAnyOf0 = (Draft202012Schema);
 export type AdditionalPropertiesAnyOf1 = (StringArray);
-export type AnchorString = (string);
-export type UriReferenceString = (string);
+export type AnchorString = ((string));
+export type UriReferenceString = ((string));
 /**
 Core vocabulary meta-schema
 */
-export type Core = (
+export type Core = ((
 {
 "$id"?: Id,
 "$schema"?: PropertiesSchema,
@@ -78,33 +78,33 @@ export type Core = (
 "$defs"?: Defs,
 }
 ) |
-(boolean);
-export type UriString = (string);
-export type Id = (string) |
-(UriReferenceString);
+(boolean));
+export type UriString = ((string));
+export type Id = (UriReferenceString) &
+((string));
 export type PropertiesSchema = (UriString);
 export type Ref = (UriReferenceString);
 export type Anchor = (AnchorString);
 export type DynamicRef = (UriReferenceString);
 export type DynamicAnchor = (AnchorString);
-export type Vocabulary = (
+export type Vocabulary = ((
 {
 [key: VocabularyPropertyNames]: VocabularyAdditionalProperties,
 }
-);
-export type Comment = (string);
-export type Defs = (
+));
+export type Comment = ((string));
+export type Defs = ((
 {
 [key: string]: DefsAdditionalProperties,
 }
-);
-export type VocabularyAdditionalProperties = (boolean);
+));
+export type VocabularyAdditionalProperties = ((boolean));
 export type VocabularyPropertyNames = (UriString);
 export type DefsAdditionalProperties = (Draft202012Schema);
 /**
 Applicator vocabulary meta-schema
 */
-export type Applicator = (
+export type Applicator = ((
 {
 "prefixItems"?: PrefixItems,
 "items"?: PropertiesItems,
@@ -123,27 +123,27 @@ export type Applicator = (
 "not"?: Not,
 }
 ) |
-(boolean);
-export type SchemaArray = ((SchemaArrayItems)[]);
+(boolean));
+export type SchemaArray = (((SchemaArrayItems)[]));
 export type PrefixItems = (SchemaArray);
 export type PropertiesItems = (Draft202012Schema);
 export type Contains = (Draft202012Schema);
 export type ApplicatorPropertiesAdditionalProperties = (Draft202012Schema);
-export type Properties = (
+export type Properties = ((
 {
 [key: string]: PropertiesPropertiesAdditionalProperties,
 }
-);
-export type PatternProperties = (
+));
+export type PatternProperties = ((
 {
 [key: PatternPropertiesPropertyNames]: PatternPropertiesAdditionalProperties,
 }
-);
-export type DependentSchemas = (
+));
+export type DependentSchemas = ((
 {
 [key: string]: DependentSchemasAdditionalProperties,
 }
-);
+));
 export type PropertiesPropertyNames = (Draft202012Schema);
 export type If = (Draft202012Schema);
 export type Then = (Draft202012Schema);
@@ -155,24 +155,24 @@ export type Not = (Draft202012Schema);
 export type SchemaArrayItems = (Draft202012Schema);
 export type PropertiesPropertiesAdditionalProperties = (Draft202012Schema);
 export type PatternPropertiesAdditionalProperties = (Draft202012Schema);
-export type PatternPropertiesPropertyNames = (string);
+export type PatternPropertiesPropertyNames = ((string));
 export type DependentSchemasAdditionalProperties = (Draft202012Schema);
 /**
 Unevaluated applicator vocabulary meta-schema
 */
-export type Unevaluated = (
+export type Unevaluated = ((
 {
 "unevaluatedItems"?: UnevaluatedItems,
 "unevaluatedProperties"?: UnevaluatedProperties,
 }
 ) |
-(boolean);
+(boolean));
 export type UnevaluatedItems = (Draft202012Schema);
 export type UnevaluatedProperties = (Draft202012Schema);
 /**
 Validation vocabulary meta-schema
 */
-export type Validation = (
+export type Validation = ((
 {
 "type"?: Type,
 "const"?: Const,
@@ -196,53 +196,53 @@ export type Validation = (
 "dependentRequired"?: DependentRequired,
 }
 ) |
-(boolean);
-export type NonNegativeInteger = (number);
+(boolean));
+export type NonNegativeInteger = ((number));
 export type NonNegativeIntegerDefault0 = (NonNegativeInteger);
-export type SimpleTypes = ("array" |
+export type SimpleTypes = (("array" |
 "boolean" |
 "integer" |
 "null" |
 "number" |
 "object" |
-"string");
-export type StringArray = ((StringArrayItems)[]);
+"string"));
+export type StringArray = (((StringArrayItems)[]));
 export type Type = ((TypeAnyOf0) |
 (TypeAnyOf1) |
 (TypeAnyOf0 & TypeAnyOf1));
-export type Const = (any);
-export type Enum = ((EnumItems)[]);
-export type MultipleOf = (number);
-export type Maximum = (number);
-export type ExclusiveMaximum = (number);
-export type Minimum = (number);
-export type ExclusiveMinimum = (number);
+export type Const = ((any));
+export type Enum = (((EnumItems)[]));
+export type MultipleOf = ((number));
+export type Maximum = ((number));
+export type ExclusiveMaximum = ((number));
+export type Minimum = ((number));
+export type ExclusiveMinimum = ((number));
 export type MaxLength = (NonNegativeInteger);
 export type MinLength = (NonNegativeIntegerDefault0);
-export type Pattern = (string);
+export type Pattern = ((string));
 export type MaxItems = (NonNegativeInteger);
 export type MinItems = (NonNegativeIntegerDefault0);
-export type UniqueItems = (boolean);
+export type UniqueItems = ((boolean));
 export type MaxContains = (NonNegativeInteger);
 export type MinContains = (NonNegativeInteger);
 export type MaxProperties = (NonNegativeInteger);
 export type MinProperties = (NonNegativeIntegerDefault0);
 export type Required = (StringArray);
-export type DependentRequired = (
+export type DependentRequired = ((
 {
 [key: string]: DependentRequiredAdditionalProperties,
 }
-);
-export type StringArrayItems = (string);
+));
+export type StringArrayItems = ((string));
 export type TypeAnyOf0 = (SimpleTypes);
-export type TypeAnyOf1 = ((AnyOf1Items)[]);
-export type EnumItems = (any);
+export type TypeAnyOf1 = (((AnyOf1Items)[]));
+export type EnumItems = ((any));
 export type DependentRequiredAdditionalProperties = (StringArray);
 export type AnyOf1Items = (SimpleTypes);
 /**
 Meta-data vocabulary meta-schema
 */
-export type MetaData = (
+export type MetaData = ((
 {
 "title"?: Title,
 "description"?: Description,
@@ -253,36 +253,36 @@ export type MetaData = (
 "examples"?: Examples,
 }
 ) |
-(boolean);
-export type Title = (string);
-export type Description = (string);
-export type Default = (any);
-export type Deprecated = (boolean);
-export type ReadOnly = (boolean);
-export type WriteOnly = (boolean);
-export type Examples = ((ExamplesItems)[]);
-export type ExamplesItems = (any);
+(boolean));
+export type Title = ((string));
+export type Description = ((string));
+export type Default = ((any));
+export type Deprecated = ((boolean));
+export type ReadOnly = ((boolean));
+export type WriteOnly = ((boolean));
+export type Examples = (((ExamplesItems)[]));
+export type ExamplesItems = ((any));
 /**
 Format vocabulary meta-schema for annotation results
 */
-export type FormatAnnotation = (
+export type FormatAnnotation = ((
 {
 "format"?: Format,
 }
 ) |
-(boolean);
-export type Format = (string);
+(boolean));
+export type Format = ((string));
 /**
 Content vocabulary meta-schema
 */
-export type Content = (
+export type Content = ((
 {
 "contentEncoding"?: ContentEncoding,
 "contentMediaType"?: ContentMediaType,
 "contentSchema"?: ContentSchema,
 }
 ) |
-(boolean);
-export type ContentEncoding = (string);
-export type ContentMediaType = (string);
+(boolean));
+export type ContentEncoding = ((string));
+export type ContentMediaType = ((string));
 export type ContentSchema = (Draft202012Schema);
