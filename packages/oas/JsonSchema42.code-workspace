@@ -1,0 +1,12 @@
+{
+  "folders": [
+    {
+      "name": "schema-intermediate",
+      "path": "./schema-intermediate"
+    }
+  ],
+  "settings": {
+    "window.title": "JsonSchema42 (OpenApis Specification)",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
