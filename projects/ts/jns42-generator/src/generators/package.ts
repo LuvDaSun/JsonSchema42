@@ -35,17 +35,17 @@ export function generatePackage(
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
-  // {
-  //   const content = namesData;
-  //   const filePath = path.join(options.directoryPath, "names.json");
-  //   fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
-  // }
+  {
+    const content = namesData;
+    const filePath = path.join(options.directoryPath, "names.json");
+    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
+  }
 
-  // {
-  //   const content = intermediateData;
-  //   const filePath = path.join(options.directoryPath, "intermediate.json");
-  //   fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
-  // }
+  {
+    const content = intermediateData;
+    const filePath = path.join(options.directoryPath, "intermediate.json");
+    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
+  }
 
   {
     const content = getTsconfigJsonData();

@@ -1,0 +1,706 @@
+{
+  "$schema": "https://schema.JsonSchema42.org/jns42-intermediate/schema.json",
+  "schemas": {
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json": {
+      "deprecated": false,
+      "title": "JsonSchema42 intermediate schema",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [
+        "$schema",
+        "schemas"
+      ],
+      "objectProperties": {
+        "$schema": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema",
+        "schemas": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas"
+      }
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [
+        "deprecated",
+        "types"
+      ],
+      "objectProperties": {
+        "title": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title",
+        "description": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description",
+        "examples": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples",
+        "deprecated": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated",
+        "types": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types",
+        "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference",
+        "oneOf": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf",
+        "anyOf": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf",
+        "allOf": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf",
+        "if": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if",
+        "then": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then",
+        "else": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else",
+        "not": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not",
+        "dependentSchemas": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas",
+        "objectProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties",
+        "mapProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties",
+        "patternProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties",
+        "propertyNames": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames",
+        "tupleItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems",
+        "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems",
+        "contains": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains",
+        "options": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options",
+        "minimumInclusive": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive",
+        "minimumExclusive": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive",
+        "maximumInclusive": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive",
+        "maximumExclusive": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive",
+        "multipleOf": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf",
+        "minimumLength": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength",
+        "maximumLength": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength",
+        "valuePattern": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern",
+        "valueFormat": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat",
+        "minimumItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems",
+        "maximumItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems",
+        "uniqueItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems",
+        "required": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required",
+        "minimumProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties",
+        "maximumProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties"
+      }
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/integer-value": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "integer"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "number"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "integer"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "options": [
+        "https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types": {
+      "deprecated": false,
+      "title": "",
+      "description": "What types does this schema describe\n",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "mapProperties": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": false,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "boolean"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "array"
+      ],
+      "uniqueItems": true,
+      "required": [],
+      "arrayItems": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "any"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "string"
+      ],
+      "options": [
+        "never",
+        "any",
+        "null",
+        "boolean",
+        "integer",
+        "number",
+        "string",
+        "array",
+        "map"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference"
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [
+        "any"
+      ],
+      "uniqueItems": false,
+      "required": []
+    },
+    "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items": {
+      "deprecated": false,
+      "title": "",
+      "description": "",
+      "examples": [],
+      "types": [],
+      "uniqueItems": false,
+      "required": [],
+      "reference": "https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value"
+    }
+  }
+}
