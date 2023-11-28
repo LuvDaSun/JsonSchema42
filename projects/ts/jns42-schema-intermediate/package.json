@@ -8,16 +8,30 @@
   "files": [
     "*"
   ],
+  "exports": {
+    ".": {
+      "default": "./main.js"
+    },
+    "./types": {
+      "default": "./types.js"
+    },
+    "./validators": {
+      "default": "./validators.js"
+    },
+    "./parsers": {
+      "default": "./parsers.js"
+    }
+  },
   "scripts": {
-    "build": "tsc --build",
-    "test": "node --test ./*.spec.js"
+    "build": "tsc",
+    "test": "node --test ./*.test.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^20.8.10"
+    "@types/node": "^20.10.0"
   },
   "devDependencies": {
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.2"
   }
 }

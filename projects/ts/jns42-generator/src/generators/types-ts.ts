@@ -206,7 +206,7 @@ function* generateArrayTypeDefinition(specification: models.Specification, nodeI
       .map((nodeId) => nodeId as string)
       .map((nodeId) => toPascal(specification.names[nodeId]));
 
-    yield itt`Array<${joinIterable(elements, " |\n")}>`;
+    yield itt`(${joinIterable(elements, " |\n")})[]`;
     return;
   }
 

@@ -1,7 +1,7 @@
 import * as schemaIntermediateB from "jns42-schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
-import { NestedText, flattenNestedText, splitIterableText } from "../utils/index.js";
+import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
@@ -29,61 +29,73 @@ export function generatePackage(
   fs.mkdirSync(options.directoryPath, { recursive: true });
 
   {
-    const data = getPackageJsonData(options.name, options.version);
+    const content = getPackageJsonData(options.name, options.version);
     const filePath = path.join(options.directoryPath, "package.json");
-    fs.writeFileSync(filePath, JSON.stringify(data, undefined, 2));
+    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
-    const data = namesData;
+    const content = namesData;
     const filePath = path.join(options.directoryPath, "names.json");
-    fs.writeFileSync(filePath, JSON.stringify(data, undefined, 2));
+    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
-    const data = intermediateData;
+    const content = intermediateData;
     const filePath = path.join(options.directoryPath, "intermediate.json");
-    fs.writeFileSync(filePath, JSON.stringify(data, undefined, 2));
+    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
-    const data = getTsconfigJsonData();
+    const content = getTsconfigJsonData();
     const filePath = path.join(options.directoryPath, "tsconfig.json");
-    fs.writeFileSync(filePath, JSON.stringify(data));
+    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
-    const code = generateMainTsCode(specification);
+    const content = generateMainTsCode(specification);
     const filePath = path.join(options.directoryPath, "main.ts");
-    writeCodeToFile(filePath, code);
+    writeContentToFile(filePath, content);
   }
 
   {
-    const code = generateValidatorsTsCode(specification);
+    const content = generateValidatorsTsCode(specification);
     const filePath = path.join(options.directoryPath, "validators.ts");
-    writeCodeToFile(filePath, code);
+    writeContentToFile(filePath, content);
   }
 
   {
-    const code = generateTypesTsCode(specification);
+    const content = generateTypesTsCode(specification);
     const filePath = path.join(options.directoryPath, "types.ts");
-    writeCodeToFile(filePath, code);
+    writeContentToFile(filePath, content);
   }
 
   {
-    const code = generateParsersTsCode(specification);
+    const content = generateParsersTsCode(specification);
     const filePath = path.join(options.directoryPath, "parsers.ts");
-    writeCodeToFile(filePath, code);
+    writeContentToFile(filePath, content);
   }
 
   {
-    const code = generateValidatorsTestTsCode(specification);
+    const content = generateValidatorsTestTsCode(specification);
     const filePath = path.join(options.directoryPath, "validators.test.ts");
-    writeCodeToFile(filePath, code);
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = itt`
+      !.gitignore
+      *.js
+      *.js.map
+      *.d.ts
+      *.buildinfo
+    `;
+    const filePath = path.join(options.directoryPath, ".gitignore");
+    writeContentToFile(filePath, content);
   }
 }
 
-function writeCodeToFile(filePath: string, code: NestedText) {
+function writeContentToFile(filePath: string, code: NestedText) {
   const fd = fs.openSync(filePath, "w");
 
   try {
