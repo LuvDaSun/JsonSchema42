@@ -448,7 +448,7 @@ function* generateStringTypeValidationStatements(
 
   if (node.valuePattern != null) {
     yield itt`
-      if(new RegExp(${JSON.stringify(node.valuePattern)}).test(value)) {
+      if(!new RegExp(${JSON.stringify(node.valuePattern)}).test(value)) {
         return false;
       }
     `;
