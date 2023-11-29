@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.13                         -- www.JsonSchema42.org
+// v0.8.14                         -- www.JsonSchema42.org
 export function parseDraft202012Schema(value: unknown): unknown {
 return _parseMapDraft202012Schema(value) ?? _parseBooleanDraft202012Schema(value) ?? _parseAllOfDraft202012Schema(value);
 }

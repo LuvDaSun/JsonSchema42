@@ -164,18 +164,18 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
     `;
   }
 
-  if (compoundValidatorFunctionNames.length > 0) {
-    yield itt`
-      if(${joinIterable(
-        mapIterable(compoundValidatorFunctionNames, (functionName) => {
-          return itt`!${functionName}(value)`;
-        }),
-        " || ",
-      )}) {
-        return false;
-      }
-    `;
-  }
+  // if (compoundValidatorFunctionNames.length > 0) {
+  //   yield itt`
+  //     if(${joinIterable(
+  //       mapIterable(compoundValidatorFunctionNames, (functionName) => {
+  //         return itt`!${functionName}(value)`;
+  //       }),
+  //       " || ",
+  //     )}) {
+  //       return false;
+  //     }
+  //   `;
+  // }
 
   yield itt`
     return true;
