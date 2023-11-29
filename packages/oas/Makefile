@@ -8,19 +8,19 @@ build: \
 	npm install
 
 out/schema-intermediate: schema-intermediate/src/schema.yaml
-	../ts/jns42-generator/out/program.js package file://${PWD}/$< \
+	../ts/jns42-generator/bin/jns42-generator package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
 
 out/schema-draft-04:
-	../ts/jns42-generator/out/program.js package http://json-schema.org/draft-04/schema\# \
+	../ts/jns42-generator/bin/jns42-generator package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
 
 out/schema-draft-2020-12:
-	../ts/jns42-generator/out/program.js package https://json-schema.org/draft/2020-12/schema \
+	../ts/jns42-generator/bin/jns42-generator package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \

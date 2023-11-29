@@ -26,6 +26,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
 
+    yield itt`
+        // ${nodeId}
+      `;
+
     if (comments.length > 0) {
       yield itt`
         /**

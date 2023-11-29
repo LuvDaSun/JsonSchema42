@@ -3,8 +3,9 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.13                         -- www.JsonSchema42.org
+// v0.8.14                         -- www.JsonSchema42.org
 import * as types from "./types.js";
+// https://json-schema.org/draft/2020-12/schema
 export function isDraft202012Schema(value: unknown): value is types.Draft202012Schema {
 if(!_isMapDraft202012Schema(value) && !_isBooleanDraft202012Schema(value)) {
 return false;
@@ -75,6 +76,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/definitions
 export function isDefinitions(value: unknown): value is types.Definitions {
 if(!_isMapDefinitions(value)) {
 return false;
@@ -94,6 +96,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies
 export function isDependencies(value: unknown): value is types.Dependencies {
 if(!_isMapDependencies(value)) {
 return false;
@@ -113,6 +116,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor
 export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
 if(!_isReferenceRecursiveAnchor(value)) {
 return false;
@@ -125,6 +129,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef
 export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
 if(!_isReferenceRecursiveRef(value)) {
 return false;
@@ -137,6 +142,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/0
 export function isAllOf0(value: unknown): value is types.AllOf0 {
 if(!_isReferenceAllOf0(value)) {
 return false;
@@ -149,6 +155,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/1
 export function isAllOf1(value: unknown): value is types.AllOf1 {
 if(!_isReferenceAllOf1(value)) {
 return false;
@@ -161,6 +168,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/2
 export function isAllOf2(value: unknown): value is types.AllOf2 {
 if(!_isReferenceAllOf2(value)) {
 return false;
@@ -173,6 +181,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/3
 export function isAllOf3(value: unknown): value is types.AllOf3 {
 if(!_isReferenceAllOf3(value)) {
 return false;
@@ -185,6 +194,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/4
 export function isAllOf4(value: unknown): value is types.AllOf4 {
 if(!_isReferenceAllOf4(value)) {
 return false;
@@ -197,6 +207,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/5
 export function isAllOf5(value: unknown): value is types.AllOf5 {
 if(!_isReferenceAllOf5(value)) {
 return false;
@@ -209,6 +220,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/6
 export function isAllOf6(value: unknown): value is types.AllOf6 {
 if(!_isReferenceAllOf6(value)) {
 return false;
@@ -221,6 +233,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
 export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
 if(!_isReferenceDefinitionsAdditionalProperties(value)) {
 return false;
@@ -233,6 +246,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
 export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
 if(!_isAnyOfDependenciesAdditionalProperties(value)) {
 return false;
@@ -248,6 +262,7 @@ return true;
 }
 return false;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
 export function isAdditionalPropertiesAnyOf0(value: unknown): value is types.AdditionalPropertiesAnyOf0 {
 if(!_isReferenceAdditionalPropertiesAnyOf0(value)) {
 return false;
@@ -260,6 +275,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
 export function isAdditionalPropertiesAnyOf1(value: unknown): value is types.AdditionalPropertiesAnyOf1 {
 if(!_isReferenceAdditionalPropertiesAnyOf1(value)) {
 return false;
@@ -272,6 +288,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString
 export function isAnchorString(value: unknown): value is types.AnchorString {
 if(!_isStringAnchorString(value)) {
 return false;
@@ -287,6 +304,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString
 export function isUriReferenceString(value: unknown): value is types.UriReferenceString {
 if(!_isStringUriReferenceString(value)) {
 return false;
@@ -299,6 +317,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core
 export function isCore(value: unknown): value is types.Core {
 if(!_isMapCore(value) && !_isBooleanCore(value)) {
 return false;
@@ -367,6 +386,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString
 export function isUriString(value: unknown): value is types.UriString {
 if(!_isStringUriString(value)) {
 return false;
@@ -379,6 +399,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$id
 export function isId(value: unknown): value is types.Id {
 if(!_isStringId(value)) {
 return false;
@@ -403,6 +424,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
 export function isPropertiesSchema(value: unknown): value is types.PropertiesSchema {
 if(!_isReferencePropertiesSchema(value)) {
 return false;
@@ -415,6 +437,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
 export function isRef(value: unknown): value is types.Ref {
 if(!_isReferenceRef(value)) {
 return false;
@@ -427,6 +450,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
 export function isAnchor(value: unknown): value is types.Anchor {
 if(!_isReferenceAnchor(value)) {
 return false;
@@ -439,6 +463,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef
 export function isDynamicRef(value: unknown): value is types.DynamicRef {
 if(!_isReferenceDynamicRef(value)) {
 return false;
@@ -451,6 +476,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor
 export function isDynamicAnchor(value: unknown): value is types.DynamicAnchor {
 if(!_isReferenceDynamicAnchor(value)) {
 return false;
@@ -463,6 +489,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary
 export function isVocabulary(value: unknown): value is types.Vocabulary {
 if(!_isMapVocabulary(value)) {
 return false;
@@ -475,7 +502,7 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
-if(!isVocabularyPropertyNames(propertyValue)) {
+if(!isVocabularyPropertyNames(propertyName)) {
 return false;
 }
 continue;
@@ -486,6 +513,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$comment
 export function isComment(value: unknown): value is types.Comment {
 if(!_isStringComment(value)) {
 return false;
@@ -498,6 +526,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs
 export function isDefs(value: unknown): value is types.Defs {
 if(!_isMapDefs(value)) {
 return false;
@@ -517,6 +546,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties
 export function isVocabularyAdditionalProperties(value: unknown): value is types.VocabularyAdditionalProperties {
 if(!_isBooleanVocabularyAdditionalProperties(value)) {
 return false;
@@ -529,6 +559,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
 export function isVocabularyPropertyNames(value: unknown): value is types.VocabularyPropertyNames {
 if(!_isReferenceVocabularyPropertyNames(value)) {
 return false;
@@ -541,6 +572,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
 export function isDefsAdditionalProperties(value: unknown): value is types.DefsAdditionalProperties {
 if(!_isReferenceDefsAdditionalProperties(value)) {
 return false;
@@ -553,6 +585,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator
 export function isApplicator(value: unknown): value is types.Applicator {
 if(!_isMapApplicator(value) && !_isBooleanApplicator(value)) {
 return false;
@@ -651,6 +684,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
 if(!_isArraySchemaArray(value)) {
 return false;
@@ -672,6 +706,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
 export function isPrefixItems(value: unknown): value is types.PrefixItems {
 if(!_isReferencePrefixItems(value)) {
 return false;
@@ -684,6 +719,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
 export function isPropertiesItems(value: unknown): value is types.PropertiesItems {
 if(!_isReferencePropertiesItems(value)) {
 return false;
@@ -696,6 +732,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
 export function isContains(value: unknown): value is types.Contains {
 if(!_isReferenceContains(value)) {
 return false;
@@ -708,6 +745,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
 export function isApplicatorPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPropertiesAdditionalProperties {
 if(!_isReferenceApplicatorPropertiesAdditionalProperties(value)) {
 return false;
@@ -720,6 +758,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties
 export function isProperties(value: unknown): value is types.Properties {
 if(!_isMapProperties(value)) {
 return false;
@@ -739,6 +778,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties
 export function isPatternProperties(value: unknown): value is types.PatternProperties {
 if(!_isMapPatternProperties(value)) {
 return false;
@@ -751,7 +791,7 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
-if(!isPatternPropertiesPropertyNames(propertyValue)) {
+if(!isPatternPropertiesPropertyNames(propertyName)) {
 return false;
 }
 continue;
@@ -762,6 +802,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas
 export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
 if(!_isMapDependentSchemas(value)) {
 return false;
@@ -781,6 +822,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
 export function isPropertiesPropertyNames(value: unknown): value is types.PropertiesPropertyNames {
 if(!_isReferencePropertiesPropertyNames(value)) {
 return false;
@@ -793,6 +835,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
 export function isIf(value: unknown): value is types.If {
 if(!_isReferenceIf(value)) {
 return false;
@@ -805,6 +848,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
 export function isThen(value: unknown): value is types.Then {
 if(!_isReferenceThen(value)) {
 return false;
@@ -817,6 +861,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
 export function isElse(value: unknown): value is types.Else {
 if(!_isReferenceElse(value)) {
 return false;
@@ -829,6 +874,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
 export function isAllOf(value: unknown): value is types.AllOf {
 if(!_isReferenceAllOf(value)) {
 return false;
@@ -841,6 +887,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
 export function isAnyOf(value: unknown): value is types.AnyOf {
 if(!_isReferenceAnyOf(value)) {
 return false;
@@ -853,6 +900,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
 export function isOneOf(value: unknown): value is types.OneOf {
 if(!_isReferenceOneOf(value)) {
 return false;
@@ -865,6 +913,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
 export function isNot(value: unknown): value is types.Not {
 if(!_isReferenceNot(value)) {
 return false;
@@ -877,6 +926,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
 export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
 if(!_isReferenceSchemaArrayItems(value)) {
 return false;
@@ -889,6 +939,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
 export function isPropertiesPropertiesAdditionalProperties(value: unknown): value is types.PropertiesPropertiesAdditionalProperties {
 if(!_isReferencePropertiesPropertiesAdditionalProperties(value)) {
 return false;
@@ -901,6 +952,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
 export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
 if(!_isReferencePatternPropertiesAdditionalProperties(value)) {
 return false;
@@ -913,6 +965,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames
 export function isPatternPropertiesPropertyNames(value: unknown): value is types.PatternPropertiesPropertyNames {
 if(!_isStringPatternPropertiesPropertyNames(value)) {
 return false;
@@ -925,6 +978,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
 export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
 if(!_isReferenceDependentSchemasAdditionalProperties(value)) {
 return false;
@@ -937,6 +991,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/unevaluated
 export function isUnevaluated(value: unknown): value is types.Unevaluated {
 if(!_isMapUnevaluated(value) && !_isBooleanUnevaluated(value)) {
 return false;
@@ -970,6 +1025,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
 export function isUnevaluatedItems(value: unknown): value is types.UnevaluatedItems {
 if(!_isReferenceUnevaluatedItems(value)) {
 return false;
@@ -982,6 +1038,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
 export function isUnevaluatedProperties(value: unknown): value is types.UnevaluatedProperties {
 if(!_isReferenceUnevaluatedProperties(value)) {
 return false;
@@ -994,6 +1051,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation
 export function isValidation(value: unknown): value is types.Validation {
 if(!_isMapValidation(value) && !_isBooleanValidation(value)) {
 return false;
@@ -1117,6 +1175,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger
 export function isNonNegativeInteger(value: unknown): value is types.NonNegativeInteger {
 if(!_isIntegerNonNegativeInteger(value)) {
 return false;
@@ -1132,6 +1191,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0
 export function isNonNegativeIntegerDefault0(value: unknown): value is types.NonNegativeIntegerDefault0 {
 if(!_isReferenceNonNegativeIntegerDefault0(value)) {
 return false;
@@ -1144,6 +1204,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes
 export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
 if(!_isStringSimpleTypes(value)) {
 return false;
@@ -1159,6 +1220,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray
 export function isStringArray(value: unknown): value is types.StringArray {
 if(!_isArrayStringArray(value)) {
 return false;
@@ -1182,6 +1244,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type
 export function isType(value: unknown): value is types.Type {
 if(!_isAnyOfType(value)) {
 return false;
@@ -1197,6 +1260,7 @@ return true;
 }
 return false;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/const
 export function isConst(value: unknown): value is types.Const {
 if(!_isAnyConst(value)) {
 return false;
@@ -1206,6 +1270,7 @@ return true;
 function _isAnyConst(value: unknown): value is unknown {
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum
 export function isEnum(value: unknown): value is types.Enum {
 if(!_isArrayEnum(value)) {
 return false;
@@ -1224,6 +1289,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
 if(!_isNumberMultipleOf(value)) {
 return false;
@@ -1239,6 +1305,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum
 export function isMaximum(value: unknown): value is types.Maximum {
 if(!_isNumberMaximum(value)) {
 return false;
@@ -1251,6 +1318,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum
 export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
 if(!_isNumberExclusiveMaximum(value)) {
 return false;
@@ -1263,6 +1331,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum
 export function isMinimum(value: unknown): value is types.Minimum {
 if(!_isNumberMinimum(value)) {
 return false;
@@ -1275,6 +1344,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum
 export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
 if(!_isNumberExclusiveMinimum(value)) {
 return false;
@@ -1287,6 +1357,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength
 export function isMaxLength(value: unknown): value is types.MaxLength {
 if(!_isReferenceMaxLength(value)) {
 return false;
@@ -1299,6 +1370,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength
 export function isMinLength(value: unknown): value is types.MinLength {
 if(!_isReferenceMinLength(value)) {
 return false;
@@ -1311,6 +1383,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern
 export function isPattern(value: unknown): value is types.Pattern {
 if(!_isStringPattern(value)) {
 return false;
@@ -1323,6 +1396,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems
 export function isMaxItems(value: unknown): value is types.MaxItems {
 if(!_isReferenceMaxItems(value)) {
 return false;
@@ -1335,6 +1409,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems
 export function isMinItems(value: unknown): value is types.MinItems {
 if(!_isReferenceMinItems(value)) {
 return false;
@@ -1347,6 +1422,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems
 export function isUniqueItems(value: unknown): value is types.UniqueItems {
 if(!_isBooleanUniqueItems(value)) {
 return false;
@@ -1359,6 +1435,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains
 export function isMaxContains(value: unknown): value is types.MaxContains {
 if(!_isReferenceMaxContains(value)) {
 return false;
@@ -1371,6 +1448,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains
 export function isMinContains(value: unknown): value is types.MinContains {
 if(!_isReferenceMinContains(value)) {
 return false;
@@ -1383,6 +1461,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties
 export function isMaxProperties(value: unknown): value is types.MaxProperties {
 if(!_isReferenceMaxProperties(value)) {
 return false;
@@ -1395,6 +1474,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties
 export function isMinProperties(value: unknown): value is types.MinProperties {
 if(!_isReferenceMinProperties(value)) {
 return false;
@@ -1407,6 +1487,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/required
 export function isRequired(value: unknown): value is types.Required {
 if(!_isReferenceRequired(value)) {
 return false;
@@ -1419,6 +1500,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired
 export function isDependentRequired(value: unknown): value is types.DependentRequired {
 if(!_isMapDependentRequired(value)) {
 return false;
@@ -1438,6 +1520,7 @@ continue;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items
 export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
 if(!_isStringStringArrayItems(value)) {
 return false;
@@ -1450,6 +1533,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
 export function isTypeAnyOf0(value: unknown): value is types.TypeAnyOf0 {
 if(!_isReferenceTypeAnyOf0(value)) {
 return false;
@@ -1462,6 +1546,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
 export function isTypeAnyOf1(value: unknown): value is types.TypeAnyOf1 {
 if(!_isArrayTypeAnyOf1(value)) {
 return false;
@@ -1488,6 +1573,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items
 export function isEnumItems(value: unknown): value is types.EnumItems {
 if(!_isAnyEnumItems(value)) {
 return false;
@@ -1497,6 +1583,7 @@ return true;
 function _isAnyEnumItems(value: unknown): value is unknown {
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
 export function isDependentRequiredAdditionalProperties(value: unknown): value is types.DependentRequiredAdditionalProperties {
 if(!_isReferenceDependentRequiredAdditionalProperties(value)) {
 return false;
@@ -1509,6 +1596,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
 export function isAnyOf1Items(value: unknown): value is types.AnyOf1Items {
 if(!_isReferenceAnyOf1Items(value)) {
 return false;
@@ -1521,6 +1609,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data
 export function isMetaData(value: unknown): value is types.MetaData {
 if(!_isMapMetaData(value) && !_isBooleanMetaData(value)) {
 return false;
@@ -1579,6 +1668,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title
 export function isTitle(value: unknown): value is types.Title {
 if(!_isStringTitle(value)) {
 return false;
@@ -1591,6 +1681,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description
 export function isDescription(value: unknown): value is types.Description {
 if(!_isStringDescription(value)) {
 return false;
@@ -1603,6 +1694,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default
 export function isDefault(value: unknown): value is types.Default {
 if(!_isAnyDefault(value)) {
 return false;
@@ -1612,6 +1704,7 @@ return true;
 function _isAnyDefault(value: unknown): value is unknown {
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated
 export function isDeprecated(value: unknown): value is types.Deprecated {
 if(!_isBooleanDeprecated(value)) {
 return false;
@@ -1624,6 +1717,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly
 export function isReadOnly(value: unknown): value is types.ReadOnly {
 if(!_isBooleanReadOnly(value)) {
 return false;
@@ -1636,6 +1730,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly
 export function isWriteOnly(value: unknown): value is types.WriteOnly {
 if(!_isBooleanWriteOnly(value)) {
 return false;
@@ -1648,6 +1743,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples
 export function isExamples(value: unknown): value is types.Examples {
 if(!_isArrayExamples(value)) {
 return false;
@@ -1666,6 +1762,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items
 export function isExamplesItems(value: unknown): value is types.ExamplesItems {
 if(!_isAnyExamplesItems(value)) {
 return false;
@@ -1675,6 +1772,7 @@ return true;
 function _isAnyExamplesItems(value: unknown): value is unknown {
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/format-annotation
 export function isFormatAnnotation(value: unknown): value is types.FormatAnnotation {
 if(!_isMapFormatAnnotation(value) && !_isBooleanFormatAnnotation(value)) {
 return false;
@@ -1703,6 +1801,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format
 export function isFormat(value: unknown): value is types.Format {
 if(!_isStringFormat(value)) {
 return false;
@@ -1715,6 +1814,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/content
 export function isContent(value: unknown): value is types.Content {
 if(!_isMapContent(value) && !_isBooleanContent(value)) {
 return false;
@@ -1753,6 +1853,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding
 export function isContentEncoding(value: unknown): value is types.ContentEncoding {
 if(!_isStringContentEncoding(value)) {
 return false;
@@ -1765,6 +1866,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType
 export function isContentMediaType(value: unknown): value is types.ContentMediaType {
 if(!_isStringContentMediaType(value)) {
 return false;
@@ -1777,6 +1879,7 @@ return false;
 }
 return true;
 }
+// https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
 export function isContentSchema(value: unknown): value is types.ContentSchema {
 if(!_isReferenceContentSchema(value)) {
 return false;

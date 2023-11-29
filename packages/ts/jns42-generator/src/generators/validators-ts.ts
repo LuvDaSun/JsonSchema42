@@ -19,6 +19,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       const functionBody = generateValidationBody(specification, nodeId);
 
       yield itt`
+        // ${nodeId}
         export function ${functionName}(value: unknown): value is types.${typeName} {
           ${functionBody}
         }
@@ -764,7 +765,7 @@ function* generateMapTypeItemValidationStatements(
     const validatorFunctionName = toCamel("is", names[node.propertyNames]);
 
     yield itt`
-      if(!${validatorFunctionName}(propertyValue)) {
+      if(!${validatorFunctionName}(propertyName)) {
         return false;
       }
       continue;
