@@ -13,6 +13,7 @@ import { generatePackage } from "../generators/index.js";
 import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
+  "not",
   "parse",
   "string-or-boolean",
   "simple-object",
