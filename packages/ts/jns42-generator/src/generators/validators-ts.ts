@@ -19,6 +19,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       const functionBody = generateValidationBody(specification, nodeId);
 
       yield itt`
+        // ${nodeId}
         export function ${functionName}(value: unknown): value is types.${typeName} {
           ${functionBody}
         }
