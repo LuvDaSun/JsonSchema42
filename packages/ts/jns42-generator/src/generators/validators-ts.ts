@@ -164,18 +164,18 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
     `;
   }
 
-  // if (compoundValidatorFunctionNames.length > 0) {
-  //   yield itt`
-  //     if(${joinIterable(
-  //       mapIterable(compoundValidatorFunctionNames, (functionName) => {
-  //         return itt`!${functionName}(value)`;
-  //       }),
-  //       " || ",
-  //     )}) {
-  //       return false;
-  //     }
-  //   `;
-  // }
+  if (compoundValidatorFunctionNames.length > 0) {
+    yield itt`
+      if(${joinIterable(
+        mapIterable(compoundValidatorFunctionNames, (functionName) => {
+          return itt`!${functionName}(value)`;
+        }),
+        " || ",
+      )}) {
+        return false;
+      }
+    `;
+  }
 
   yield itt`
     return true;
@@ -765,7 +765,7 @@ function* generateMapTypeItemValidationStatements(
     const validatorFunctionName = toCamel("is", names[node.propertyNames]);
 
     yield itt`
-      if(!${validatorFunctionName}(propertyValue)) {
+      if(!${validatorFunctionName}(propertyName)) {
         return false;
       }
       continue;

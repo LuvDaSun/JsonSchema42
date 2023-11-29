@@ -10,6 +10,9 @@ export function isDraft202012Schema(value: unknown): value is types.Draft202012S
 if(!_isMapDraft202012Schema(value) && !_isBooleanDraft202012Schema(value)) {
 return false;
 }
+if(!_isAllOfDraft202012Schema(value)) {
+return false;
+}
 return true;
 }
 function _isMapDraft202012Schema(value: unknown): value is unknown {
@@ -115,6 +118,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor
 export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
+if(!_isReferenceRecursiveAnchor(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceRecursiveAnchor(value: unknown): value is unknown {
@@ -125,6 +131,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef
 export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
+if(!_isReferenceRecursiveRef(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceRecursiveRef(value: unknown): value is unknown {
@@ -135,6 +144,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/0
 export function isAllOf0(value: unknown): value is types.AllOf0 {
+if(!_isReferenceAllOf0(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf0(value: unknown): value is unknown {
@@ -145,6 +157,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/1
 export function isAllOf1(value: unknown): value is types.AllOf1 {
+if(!_isReferenceAllOf1(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf1(value: unknown): value is unknown {
@@ -155,6 +170,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/2
 export function isAllOf2(value: unknown): value is types.AllOf2 {
+if(!_isReferenceAllOf2(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf2(value: unknown): value is unknown {
@@ -165,6 +183,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/3
 export function isAllOf3(value: unknown): value is types.AllOf3 {
+if(!_isReferenceAllOf3(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf3(value: unknown): value is unknown {
@@ -175,6 +196,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/4
 export function isAllOf4(value: unknown): value is types.AllOf4 {
+if(!_isReferenceAllOf4(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf4(value: unknown): value is unknown {
@@ -185,6 +209,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/5
 export function isAllOf5(value: unknown): value is types.AllOf5 {
+if(!_isReferenceAllOf5(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf5(value: unknown): value is unknown {
@@ -195,6 +222,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/allOf/6
 export function isAllOf6(value: unknown): value is types.AllOf6 {
+if(!_isReferenceAllOf6(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf6(value: unknown): value is unknown {
@@ -205,6 +235,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
 export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
+if(!_isReferenceDefinitionsAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceDefinitionsAdditionalProperties(value: unknown): value is unknown {
@@ -215,6 +248,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
 export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
+if(!_isAnyOfDependenciesAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isAnyOfDependenciesAdditionalProperties(value: unknown): value is unknown {
@@ -228,6 +264,9 @@ return false;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
 export function isAdditionalPropertiesAnyOf0(value: unknown): value is types.AdditionalPropertiesAnyOf0 {
+if(!_isReferenceAdditionalPropertiesAnyOf0(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAdditionalPropertiesAnyOf0(value: unknown): value is unknown {
@@ -238,6 +277,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
 export function isAdditionalPropertiesAnyOf1(value: unknown): value is types.AdditionalPropertiesAnyOf1 {
+if(!_isReferenceAdditionalPropertiesAnyOf1(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAdditionalPropertiesAnyOf1(value: unknown): value is unknown {
@@ -362,6 +404,9 @@ export function isId(value: unknown): value is types.Id {
 if(!_isStringId(value)) {
 return false;
 }
+if(!_isReferenceId(value)) {
+return false;
+}
 return true;
 }
 function _isStringId(value: unknown): value is unknown {
@@ -381,6 +426,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
 export function isPropertiesSchema(value: unknown): value is types.PropertiesSchema {
+if(!_isReferencePropertiesSchema(value)) {
+return false;
+}
 return true;
 }
 function _isReferencePropertiesSchema(value: unknown): value is unknown {
@@ -391,6 +439,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
 export function isRef(value: unknown): value is types.Ref {
+if(!_isReferenceRef(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceRef(value: unknown): value is unknown {
@@ -401,6 +452,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
 export function isAnchor(value: unknown): value is types.Anchor {
+if(!_isReferenceAnchor(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAnchor(value: unknown): value is unknown {
@@ -411,6 +465,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef
 export function isDynamicRef(value: unknown): value is types.DynamicRef {
+if(!_isReferenceDynamicRef(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceDynamicRef(value: unknown): value is unknown {
@@ -421,6 +478,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor
 export function isDynamicAnchor(value: unknown): value is types.DynamicAnchor {
+if(!_isReferenceDynamicAnchor(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceDynamicAnchor(value: unknown): value is unknown {
@@ -442,7 +502,7 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
-if(!isVocabularyPropertyNames(propertyValue)) {
+if(!isVocabularyPropertyNames(propertyName)) {
 return false;
 }
 continue;
@@ -501,6 +561,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
 export function isVocabularyPropertyNames(value: unknown): value is types.VocabularyPropertyNames {
+if(!_isReferenceVocabularyPropertyNames(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceVocabularyPropertyNames(value: unknown): value is unknown {
@@ -511,6 +574,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
 export function isDefsAdditionalProperties(value: unknown): value is types.DefsAdditionalProperties {
+if(!_isReferenceDefsAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceDefsAdditionalProperties(value: unknown): value is unknown {
@@ -642,6 +708,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
 export function isPrefixItems(value: unknown): value is types.PrefixItems {
+if(!_isReferencePrefixItems(value)) {
+return false;
+}
 return true;
 }
 function _isReferencePrefixItems(value: unknown): value is unknown {
@@ -652,6 +721,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
 export function isPropertiesItems(value: unknown): value is types.PropertiesItems {
+if(!_isReferencePropertiesItems(value)) {
+return false;
+}
 return true;
 }
 function _isReferencePropertiesItems(value: unknown): value is unknown {
@@ -662,6 +734,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
 export function isContains(value: unknown): value is types.Contains {
+if(!_isReferenceContains(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceContains(value: unknown): value is unknown {
@@ -672,6 +747,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
 export function isApplicatorPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPropertiesAdditionalProperties {
+if(!_isReferenceApplicatorPropertiesAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceApplicatorPropertiesAdditionalProperties(value: unknown): value is unknown {
@@ -713,7 +791,7 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
-if(!isPatternPropertiesPropertyNames(propertyValue)) {
+if(!isPatternPropertiesPropertyNames(propertyName)) {
 return false;
 }
 continue;
@@ -746,6 +824,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
 export function isPropertiesPropertyNames(value: unknown): value is types.PropertiesPropertyNames {
+if(!_isReferencePropertiesPropertyNames(value)) {
+return false;
+}
 return true;
 }
 function _isReferencePropertiesPropertyNames(value: unknown): value is unknown {
@@ -756,6 +837,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
 export function isIf(value: unknown): value is types.If {
+if(!_isReferenceIf(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceIf(value: unknown): value is unknown {
@@ -766,6 +850,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
 export function isThen(value: unknown): value is types.Then {
+if(!_isReferenceThen(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceThen(value: unknown): value is unknown {
@@ -776,6 +863,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
 export function isElse(value: unknown): value is types.Else {
+if(!_isReferenceElse(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceElse(value: unknown): value is unknown {
@@ -786,6 +876,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
 export function isAllOf(value: unknown): value is types.AllOf {
+if(!_isReferenceAllOf(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAllOf(value: unknown): value is unknown {
@@ -796,6 +889,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
 export function isAnyOf(value: unknown): value is types.AnyOf {
+if(!_isReferenceAnyOf(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAnyOf(value: unknown): value is unknown {
@@ -806,6 +902,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
 export function isOneOf(value: unknown): value is types.OneOf {
+if(!_isReferenceOneOf(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceOneOf(value: unknown): value is unknown {
@@ -816,6 +915,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
 export function isNot(value: unknown): value is types.Not {
+if(!_isReferenceNot(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceNot(value: unknown): value is unknown {
@@ -826,6 +928,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
 export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
+if(!_isReferenceSchemaArrayItems(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceSchemaArrayItems(value: unknown): value is unknown {
@@ -836,6 +941,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
 export function isPropertiesPropertiesAdditionalProperties(value: unknown): value is types.PropertiesPropertiesAdditionalProperties {
+if(!_isReferencePropertiesPropertiesAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferencePropertiesPropertiesAdditionalProperties(value: unknown): value is unknown {
@@ -846,6 +954,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
 export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
+if(!_isReferencePatternPropertiesAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferencePatternPropertiesAdditionalProperties(value: unknown): value is unknown {
@@ -869,6 +980,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
 export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
+if(!_isReferenceDependentSchemasAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceDependentSchemasAdditionalProperties(value: unknown): value is unknown {
@@ -913,6 +1027,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
 export function isUnevaluatedItems(value: unknown): value is types.UnevaluatedItems {
+if(!_isReferenceUnevaluatedItems(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceUnevaluatedItems(value: unknown): value is unknown {
@@ -923,6 +1040,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
 export function isUnevaluatedProperties(value: unknown): value is types.UnevaluatedProperties {
+if(!_isReferenceUnevaluatedProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceUnevaluatedProperties(value: unknown): value is unknown {
@@ -1073,6 +1193,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0
 export function isNonNegativeIntegerDefault0(value: unknown): value is types.NonNegativeIntegerDefault0 {
+if(!_isReferenceNonNegativeIntegerDefault0(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceNonNegativeIntegerDefault0(value: unknown): value is unknown {
@@ -1123,6 +1246,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type
 export function isType(value: unknown): value is types.Type {
+if(!_isAnyOfType(value)) {
+return false;
+}
 return true;
 }
 function _isAnyOfType(value: unknown): value is unknown {
@@ -1233,6 +1359,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength
 export function isMaxLength(value: unknown): value is types.MaxLength {
+if(!_isReferenceMaxLength(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMaxLength(value: unknown): value is unknown {
@@ -1243,6 +1372,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength
 export function isMinLength(value: unknown): value is types.MinLength {
+if(!_isReferenceMinLength(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMinLength(value: unknown): value is unknown {
@@ -1266,6 +1398,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems
 export function isMaxItems(value: unknown): value is types.MaxItems {
+if(!_isReferenceMaxItems(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMaxItems(value: unknown): value is unknown {
@@ -1276,6 +1411,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems
 export function isMinItems(value: unknown): value is types.MinItems {
+if(!_isReferenceMinItems(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMinItems(value: unknown): value is unknown {
@@ -1299,6 +1437,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains
 export function isMaxContains(value: unknown): value is types.MaxContains {
+if(!_isReferenceMaxContains(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMaxContains(value: unknown): value is unknown {
@@ -1309,6 +1450,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains
 export function isMinContains(value: unknown): value is types.MinContains {
+if(!_isReferenceMinContains(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMinContains(value: unknown): value is unknown {
@@ -1319,6 +1463,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties
 export function isMaxProperties(value: unknown): value is types.MaxProperties {
+if(!_isReferenceMaxProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMaxProperties(value: unknown): value is unknown {
@@ -1329,6 +1476,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties
 export function isMinProperties(value: unknown): value is types.MinProperties {
+if(!_isReferenceMinProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceMinProperties(value: unknown): value is unknown {
@@ -1339,6 +1489,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/required
 export function isRequired(value: unknown): value is types.Required {
+if(!_isReferenceRequired(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceRequired(value: unknown): value is unknown {
@@ -1382,6 +1535,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
 export function isTypeAnyOf0(value: unknown): value is types.TypeAnyOf0 {
+if(!_isReferenceTypeAnyOf0(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceTypeAnyOf0(value: unknown): value is unknown {
@@ -1429,6 +1585,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
 export function isDependentRequiredAdditionalProperties(value: unknown): value is types.DependentRequiredAdditionalProperties {
+if(!_isReferenceDependentRequiredAdditionalProperties(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceDependentRequiredAdditionalProperties(value: unknown): value is unknown {
@@ -1439,6 +1598,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
 export function isAnyOf1Items(value: unknown): value is types.AnyOf1Items {
+if(!_isReferenceAnyOf1Items(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceAnyOf1Items(value: unknown): value is unknown {
@@ -1719,6 +1881,9 @@ return true;
 }
 // https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
 export function isContentSchema(value: unknown): value is types.ContentSchema {
+if(!_isReferenceContentSchema(value)) {
+return false;
+}
 return true;
 }
 function _isReferenceContentSchema(value: unknown): value is unknown {
