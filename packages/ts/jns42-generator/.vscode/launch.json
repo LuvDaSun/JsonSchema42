@@ -36,46 +36,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package draft-2020-12",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "https://json-schema.org/draft/2020-12/schema",
-        "--package-directory",
-        ".package/schema/draft-2020-12",
-        "--package-name",
-        "draft-2020-12",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package draft-04",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "http://json-schema.org/draft-04/schema#",
-        "--package-directory",
-        ".package/schema/draft-04",
-        "--package-name",
-        "draft-04",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "package swagger v2",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [

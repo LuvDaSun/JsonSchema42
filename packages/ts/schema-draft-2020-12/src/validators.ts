@@ -3,10 +3,13 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.12                         -- www.JsonSchema42.org
+// v0.8.13                         -- www.JsonSchema42.org
 import * as types from "./types.js";
 export function isDraft202012Schema(value: unknown): value is types.Draft202012Schema {
-if(!_isMapDraft202012Schema(value) && !_isBooleanDraft202012Schema(value) && !_isAllOfDraft202012Schema(value)) {
+if(!_isMapDraft202012Schema(value) && !_isBooleanDraft202012Schema(value)) {
+return false;
+}
+if(!_isAllOfDraft202012Schema(value)) {
 return false;
 }
 return true;
@@ -377,7 +380,10 @@ return false;
 return true;
 }
 export function isId(value: unknown): value is types.Id {
-if(!_isStringId(value) && !_isReferenceId(value)) {
+if(!_isStringId(value)) {
+return false;
+}
+if(!_isReferenceId(value)) {
 return false;
 }
 return true;

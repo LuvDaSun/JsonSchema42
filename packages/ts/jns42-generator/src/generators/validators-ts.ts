@@ -110,52 +110,66 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
   const { names, nodes } = specification;
   const node = nodes[nodeId];
 
-  const validatorFunctionNames = new Array<string>();
+  const compoundValidatorFunctionNames = new Array<string>();
+  const typeValidatorFunctionNames = new Array<string>();
 
   if (node.types.length > 0) {
     for (const type of node.types) {
       const functionName = "_" + toCamel("is", type, names[nodeId]);
-      validatorFunctionNames.push(functionName);
+      typeValidatorFunctionNames.push(functionName);
     }
   }
 
   if (node.reference != null) {
     const functionName = "_" + toCamel("is", "reference", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    compoundValidatorFunctionNames.push(functionName);
   }
 
   if (node.oneOf != null) {
     const functionName = "_" + toCamel("is", "oneOf", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    compoundValidatorFunctionNames.push(functionName);
   }
 
   if (node.anyOf != null) {
     const functionName = "_" + toCamel("is", "anyOf", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    compoundValidatorFunctionNames.push(functionName);
   }
 
   if (node.allOf != null) {
     const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    compoundValidatorFunctionNames.push(functionName);
   }
 
   if (node.if != null) {
     const functionName = "_" + toCamel("is", "if", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    compoundValidatorFunctionNames.push(functionName);
   }
 
   if (node.not != null) {
     const functionName = "_" + toCamel("is", "not", names[nodeId]);
-    validatorFunctionNames.push(functionName);
+    compoundValidatorFunctionNames.push(functionName);
   }
 
-  if (validatorFunctionNames.length > 0) {
+  if (typeValidatorFunctionNames.length > 0) {
     yield itt`
       if(${joinIterable(
-        mapIterable(validatorFunctionNames, (functionName) => {
+        mapIterable(typeValidatorFunctionNames, (functionName) => {
           return itt`!${functionName}(value)`;
         }),
         " && ",
+      )}) {
+        return false;
+      }
+    `;
+  }
+
+  if (compoundValidatorFunctionNames.length > 0) {
+    yield itt`
+      if(${joinIterable(
+        mapIterable(compoundValidatorFunctionNames, (functionName) => {
+          return itt`!${functionName}(value)`;
+        }),
+        " || ",
       )}) {
         return false;
       }
