@@ -5,7 +5,7 @@
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
   "bin": {
-    "jns42-generator": "out/program.js"
+    "jns42-generator": "bin/jns42-generator"
   },
   "main": "out/main.js",
   "types": "out/main.d.ts",
@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "tsc --build",
-    "clean": "tsc --build --clean && rm -rf ./out",
+    "clean": "rm -rf ./out && tsc --build --clean",
     "test": "node --test ./out/**/*.test.js"
   },
   "repository": {
