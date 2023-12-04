@@ -39,10 +39,15 @@ export function configurePackageProgram(argv: yargs.Argv) {
           description: "version of the package",
           type: "string",
         })
-        .option("root-name-part", {
-          description: "root name of the schema",
+        .option("default-name", {
+          description: "default name for types",
           type: "string",
-          default: "schema",
+          default: "schema-document",
+        })
+        .option("namer-maximum-iterations", {
+          description: "maximum number of iterations for finding unique names",
+          type: "number",
+          default: 5,
         }),
     (argv) => main(argv as MainOptions),
   );
@@ -54,7 +59,8 @@ interface MainOptions {
   packageDirectory: string;
   packageName: string;
   packageVersion: string;
-  rootNamePart: string;
+  defaultName: string;
+  namerMaximumIterations: number;
 }
 
 async function main(options: MainOptions) {
@@ -67,7 +73,7 @@ async function main(options: MainOptions) {
 
   const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
   const packageDirectoryPath = path.resolve(options.packageDirectory);
-  const { packageName, packageVersion, rootNamePart } = options;
+  const { packageName, packageVersion, namerMaximumIterations, defaultName } = options;
 
   const context = new DocumentContext();
   context.registerFactory(
@@ -89,7 +95,7 @@ async function main(options: MainOptions) {
 
   const intermediateData = context.getIntermediateData();
 
-  const namer = new Namer();
+  const namer = new Namer(defaultName, namerMaximumIterations);
   for (const nodeId in intermediateData.schemas) {
     const nodeUrl = new URL(nodeId);
     const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");

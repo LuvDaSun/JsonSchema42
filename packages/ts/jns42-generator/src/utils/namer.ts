@@ -2,42 +2,22 @@ import camelcase from "camelcase";
 
 const startsWithLetterRe = /^[a-zA-Z]/u;
 const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
-const maximumIterations = 5;
-
-/*
-First, split the paths in name-parts.
-
-Then count every name-part by it's value.
-
-For every path store the name-parts in a list with their count and original position, and a flag that indicates if this was the last name part.
-
-Now sort all name-parts, last position first, then by ascending count and then ascending position.
-
-Take the first name-part in the list, this will be the name.
-
-Count the names by their value.
-
-For every name that's is not unique, so has a count greater than 1, take the next name part and append it.
-
-Continue until there are only unique names left, or 5 name parts are used.
-
-For every not unique name part, append a number to make it unique.
-*/
+const identifierRe = /^[a-zA-Z0-9]+$/u;
 
 export interface PartInfo {
   value: string;
-  isLast: boolean;
   index: number;
   cardinality: number;
+  isHead: boolean;
 }
 
 // Sort Name-parts, last position first, then by ascending
 // cardinality and then descending index. See test for example
 export function comparePartInfos(a: PartInfo, b: PartInfo) {
-  if (a.isLast > b.isLast) {
+  if (a.isHead > b.isHead) {
     return -1;
   }
-  if (a.isLast < b.isLast) {
+  if (a.isHead < b.isHead) {
     return 1;
   }
 
@@ -48,10 +28,10 @@ export function comparePartInfos(a: PartInfo, b: PartInfo) {
     return 1;
   }
 
-  if (a.index > b.index) {
+  if (a.index < b.index) {
     return -1;
   }
-  if (a.index < b.index) {
+  if (a.index > b.index) {
     return 1;
   }
 
@@ -64,11 +44,17 @@ export function comparePartInfos(a: PartInfo, b: PartInfo) {
 export class Namer {
   private partCounters: Record<string, number> = {};
   private parts: Record<string, string[]> = {};
+  private idCount = 0;
 
   /**
    * Namer unique name generator class
    */
-  constructor() {}
+  constructor(
+    private readonly defaultName: string,
+    private readonly maximumIterations: number,
+  ) {
+    //
+  }
 
   public registerPath(id: string, path: string) {
     const nameParts = path
@@ -79,15 +65,17 @@ export class Namer {
       // remove all non identifiers
       .map((part) => part.replace(nonIdentifierRe, " "))
       .map((part) => part.trim())
-      // remove all empty parts
-      .filter((part) => part.length > 0)
       // camelcase the parts
-      .map((part) => camelcase(part, { pascalCase: true }));
+      .map((part) => camelcase(part, { pascalCase: true }))
+      // remove all empty parts
+      .filter((part) => part.length > 0);
     this.registerNameParts(id, nameParts);
   }
 
   private registerNameParts(id: string, nameParts: string[]) {
-    // count every name-part
+    this.idCount++;
+
+    // count every unique name-part
     for (const namePart of nameParts) {
       this.partCounters[namePart] ??= 0;
       this.partCounters[namePart] += 1;
@@ -111,23 +99,27 @@ export class Namer {
       partInfos[id] = ["", []];
 
       const parts = this.parts[id];
-      let lastPartInfo: PartInfo | undefined;
+      const cardinalities: Record<string, number> = {};
+
       for (let index = 0; index < parts.length; index++) {
         const part = parts[index];
+
+        cardinalities[part] ??= 0;
+        const cardinality = Math.min(this.idCount, this.partCounters[part] - cardinalities[part]);
+        cardinalities[part] += cardinality;
+
+        if (cardinality === this.idCount) {
+          continue;
+        }
+
         const partInfo = {
-          cardinality: this.partCounters[part],
+          cardinality,
           value: parts[index],
           index,
-          isLast: false,
+          isHead: index === parts.length - 1,
         };
-        if (startsWithLetterRe.test(parts[index])) {
-          lastPartInfo = partInfo;
-        }
-        partInfos[id][1].push(partInfo);
-      }
 
-      if (lastPartInfo != null) {
-        lastPartInfo.isLast = true;
+        partInfos[id][1].push(partInfo);
       }
 
       // sort all name-parts
@@ -135,8 +127,11 @@ export class Namer {
     }
 
     let names: Record<string, string[]> = {};
-    for (let iteration = 0; iteration < maximumIterations; iteration++) {
+    let iterate = true;
+    for (let iteration = 0; iterate && iteration < this.maximumIterations; iteration++) {
       names = {};
+      iterate = false;
+
       for (const id in partInfos) {
         const name = partInfos[id][0];
         names[name] ??= [];
@@ -149,6 +144,8 @@ export class Namer {
           continue;
         }
 
+        iterate = true;
+
         // For every name that's is not unique, take the next name part
         // and append it.
         for (const id of names[name]) {
@@ -156,23 +153,30 @@ export class Namer {
           if (partInfo == null) {
             continue;
           }
-          partInfos[id][0] += partInfo.value;
+          partInfos[id][0] = partInfo.value + partInfos[id][0];
         }
       }
 
       for (const id in partInfos) {
-        const name = partInfos[id][0];
-
         // if the name starts with a letter
-        if (startsWithLetterRe.test(name)) {
+        while (!startsWithLetterRe.test(partInfos[id][0])) {
+          const partInfo = partInfos[id][1].shift();
+          if (partInfo == null) {
+            break;
+          }
+
+          partInfos[id][0] = partInfo.value + partInfos[id][0];
+        }
+      }
+
+      for (const id in partInfos) {
+        if (startsWithLetterRe.test(partInfos[id][0]) || partInfos[id][1].length > 0) {
           continue;
         }
 
-        const partInfo = partInfos[id][1].shift();
-        if (partInfo == null) {
-          continue;
-        }
-        partInfos[id][0] = partInfo.value + partInfos[id][0];
+        iterate = true;
+
+        partInfos[id][0] = camelcase(this.defaultName, { pascalCase: true }) + partInfos[id][0];
       }
     }
 
