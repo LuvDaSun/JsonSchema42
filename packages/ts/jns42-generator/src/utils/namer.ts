@@ -28,13 +28,6 @@ export function comparePartInfos(a: PartInfo, b: PartInfo) {
     return 1;
   }
 
-  if (a.value.length < b.value.length) {
-    return -1;
-  }
-  if (a.value.length > b.value.length) {
-    return 1;
-  }
-
   if (a.index < b.index) {
     return -1;
   }
