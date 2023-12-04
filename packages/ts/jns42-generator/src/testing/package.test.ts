@@ -45,7 +45,7 @@ async function runTest(packageName: string) {
   }
 
   const testUrl = new URL(`file://${testPath}`);
-  const rootTypeName = camelcase(`${packageName}.yaml`, { pascalCase: true });
+  const defaultTypeName = camelcase("schema-document", { pascalCase: true });
 
   const testContent = fs.readFileSync(testPath, "utf8");
   const testData = YAML.parse(testContent);
@@ -128,9 +128,9 @@ async function runTest(packageName: string) {
         await test(testName, async () => {
           const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
-            data = packageMain[`parse${rootTypeName}`](data);
+            data = packageMain[`parse${defaultTypeName}`](data);
           }
-          assert.equal(packageMain[`is${rootTypeName}`](data), true);
+          assert.equal(packageMain[`is${defaultTypeName}`](data), true);
         });
       }
     });
@@ -141,9 +141,9 @@ async function runTest(packageName: string) {
         await test(testName, async () => {
           const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
-            data = packageMain[`parse${rootTypeName}`](data);
+            data = packageMain[`parse${defaultTypeName}`](data);
           }
-          assert.equal(packageMain[`is${rootTypeName}`](data), false);
+          assert.equal(packageMain[`is${defaultTypeName}`](data), false);
         });
       }
     });
