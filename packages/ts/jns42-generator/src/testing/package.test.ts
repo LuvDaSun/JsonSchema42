@@ -85,7 +85,7 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
-      const namer = new Namer("schema");
+      const namer = new Namer();
       for (const nodeId in intermediateData.schemas) {
         const nodeUrl = new URL(nodeId);
         const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");

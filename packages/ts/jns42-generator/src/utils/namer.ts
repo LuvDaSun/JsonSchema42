@@ -1,67 +1,99 @@
 import camelcase from "camelcase";
-import assert from "node:assert";
 
 const startsWithLetterRe = /^[a-zA-Z]/u;
 const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
+const maximumIterations = 5;
 
-interface NameNode {
-  part: string;
-  children: Record<string, NameNode>;
-  parent?: NameNode;
-  ids: Array<string>;
+/*
+First, split the paths in name-parts.
+
+Then count every name-part by it's value.
+
+For every path store the name-parts in a list with their count and original position, and a flag that indicates if this was the last name part.
+
+Now sort all name-parts, last position first, then by ascending count and then ascending position.
+
+Take the first name-part in the list, this will be the name.
+
+Count the names by their value.
+
+For every name that's is not unique, so has a count greater than 1, take the next name part and append it.
+
+Continue until there are only unique names left, or 5 name parts are used.
+
+For every not unique name part, append a number to make it unique.
+*/
+
+export interface PartInfo {
+  value: string;
+  isLast: boolean;
+  index: number;
+  cardinality: number;
+}
+
+// Sort Name-parts, last position first, then by ascending
+// cardinality and then descending index. See test for example
+export function comparePartInfos(a: PartInfo, b: PartInfo) {
+  if (a.isLast > b.isLast) {
+    return -1;
+  }
+  if (a.isLast < b.isLast) {
+    return 1;
+  }
+
+  if (a.cardinality < b.cardinality) {
+    return -1;
+  }
+  if (a.cardinality > b.cardinality) {
+    return 1;
+  }
+
+  if (a.index > b.index) {
+    return -1;
+  }
+  if (a.index < b.index) {
+    return 1;
+  }
+
+  return 0;
 }
 
 /**
  * Namer unique name generator class
  */
 export class Namer {
+  private partCounters: Record<string, number> = {};
+  private parts: Record<string, string[]> = {};
+
   /**
    * Namer unique name generator class
-   * @param seed if a name collision happened namer will suffix the name with a crc of the id. If
-   * this would ever result in a collision then change the seed!
    */
-  constructor(rootNamePart: string) {
-    rootNamePart = rootNamePart.replace(nonIdentifierRe, "");
-    rootNamePart = camelcase(rootNamePart, { pascalCase: true });
-    this.rootNameNode = {
-      part: rootNamePart,
-      children: {},
-      ids: [],
-    };
-  }
-
-  private rootNameNode: NameNode;
-  private leafNodes: Record<string, NameNode> = {};
+  constructor() {}
 
   public registerPath(id: string, path: string) {
     const nameParts = path
+      // split the path
       .split("/")
-      .map(decodeURI)
+      // decode the parts
+      .map(decodeURIComponent)
+      // remove all non identifiers
       .map((part) => part.replace(nonIdentifierRe, " "))
-      .map((part) => camelcase(part, { pascalCase: true }))
-      .filter((part) => part.length > 0);
+      .map((part) => part.trim())
+      // remove all empty parts
+      .filter((part) => part.length > 0)
+      // camelcase the parts
+      .map((part) => camelcase(part, { pascalCase: true }));
     this.registerNameParts(id, nameParts);
   }
 
   private registerNameParts(id: string, nameParts: string[]) {
-    let node = this.rootNameNode;
+    // count every name-part
     for (const namePart of nameParts) {
-      let childNode = node.children[namePart];
-      if (childNode == null) {
-        childNode = {
-          part: namePart,
-          children: {},
-          ids: [],
-        };
-        node.children[namePart] = childNode;
-        childNode.parent = node;
-      }
-      node = childNode;
+      this.partCounters[namePart] ??= 0;
+      this.partCounters[namePart] += 1;
     }
-    node.ids.push(id);
-    node.ids.sort();
-    assert(this.leafNodes[id] == null);
-    this.leafNodes[id] = node;
+
+    this.parts[id] = nameParts;
   }
 
   public getNames() {
@@ -70,125 +102,91 @@ export class Namer {
   }
 
   private *getNameEntries(): Iterable<[string, string]> {
-    let nameMap = new Map<
-      string, // this is the name
-      Array<[NameNode | undefined, NameNode]>
-    >();
+    const partInfos: Record<string, [string, PartInfo[]]> = {};
 
-    /*
-    Should we continue?
-    */
-    let shouldContinueCounter = 0;
+    for (const id in this.parts) {
+      // For every path store the name-parts in a list with their count and
+      // original position, and a flag that indicates if this was the last
+      // name part.
+      partInfos[id] = ["", []];
 
-    /*
-    Initially fill nameMap
-    */
-    for (const [id, node] of Object.entries(this.leafNodes)) {
-      let nodes = nameMap.get(node.part);
-      if (nodes == null) {
-        nodes = [];
-        nameMap.set(node.part, nodes);
-        if (!startsWithLetterRe.test(node.part)) {
-          shouldContinueCounter += 1;
+      const parts = this.parts[id];
+      let lastPartInfo: PartInfo | undefined;
+      for (let index = 0; index < parts.length; index++) {
+        const part = parts[index];
+        const partInfo = {
+          cardinality: this.partCounters[part],
+          value: parts[index],
+          index,
+          isLast: false,
+        };
+        if (startsWithLetterRe.test(parts[index])) {
+          lastPartInfo = partInfo;
         }
-      } else {
-        shouldContinueCounter += 1;
+        partInfos[id][1].push(partInfo);
       }
-      nodes.push([node, node]);
+
+      if (lastPartInfo != null) {
+        lastPartInfo.isLast = true;
+      }
+
+      // sort all name-parts
+      partInfos[id][1].sort(comparePartInfos);
     }
 
-    /*
-    De-duping process
-    */
-    while (shouldContinueCounter > 0) {
-      const newNameMap = new Map<string, Array<[NameNode | undefined, NameNode]>>();
+    let names: Record<string, string[]> = {};
+    for (let iteration = 0; iteration < maximumIterations; iteration++) {
+      names = {};
+      for (const id in partInfos) {
+        const name = partInfos[id][0];
+        names[name] ??= [];
+        names[name].push(id);
+      }
 
-      shouldContinueCounter = 0;
-
-      for (const [name, nodes] of nameMap) {
-        /*
-        if nodes.length is one then there are no duplicates. If then
-        name starts with a letter, we can move on to the next name.
-        */
-        if (nodes.length === 1 && startsWithLetterRe.test(name) && !newNameMap.has(name)) {
-          const [[currentNode, targetNode]] = nodes;
-          newNameMap.set(name, [[currentNode, targetNode]]);
+      for (const name in names) {
+        // if name is unique then we don't have to do anything
+        if (names[name].length === 1) {
           continue;
         }
 
-        /*
-        Collect unique parents nameParts. If there are no unique parents, we want
-        to not include the parents namePart in the name.
-        */
-        const uniqueParentNameParts = new Set<string | undefined>();
-        for (const [currentNode] of nodes) {
-          /*
-          we are at the root or have no parent, we cannot add a parent's part!
-          */
-          if (currentNode?.parent == null) {
+        // For every name that's is not unique, take the next name part
+        // and append it.
+        for (const id of names[name]) {
+          const partInfo = partInfos[id][1].shift();
+          if (partInfo == null) {
             continue;
           }
-
-          uniqueParentNameParts.add(currentNode.parent.part);
-        }
-
-        for (const [currentNode, targetNode] of nodes) {
-          let newCurrentNode = currentNode?.parent;
-          let newName = name;
-          if (newCurrentNode != null) {
-            /*
-            if uniqueParentNameParts size == 1 then there are no unique parents.
-            If the size is > 1 then lest prepend the unique name to the newName
-            */
-            if (uniqueParentNameParts.size > 1 || !startsWithLetterRe.test(newName)) {
-              newName = newCurrentNode.part + newName;
-            }
-          }
-
-          let newNodes = newNameMap.get(newName);
-          if (newNodes == null) {
-            /*
-            create new nodes if it does not exist, add it to the new name map
-            */
-            newNodes = [];
-            newNameMap.set(newName, newNodes);
-            if (!startsWithLetterRe.test(newName)) {
-              shouldContinueCounter += 1;
-            }
-          } else {
-            /*
-            if the newNodes was not null then we are going to push something
-            to it later, and that will result in at least 2 nodes, so continue
-            */
-            shouldContinueCounter += 1;
-          }
-          newNodes.push([newCurrentNode, targetNode]);
+          partInfos[id][0] += partInfo.value;
         }
       }
 
-      /*
-      set the current name map to the new one, and possibly continue the
-      deduping
-      */
-      nameMap = newNameMap;
+      for (const id in partInfos) {
+        const name = partInfos[id][0];
+
+        // if the name starts with a letter
+        if (startsWithLetterRe.test(name)) {
+          continue;
+        }
+
+        const partInfo = partInfos[id][1].shift();
+        if (partInfo == null) {
+          continue;
+        }
+        partInfos[id][0] = partInfo.value + partInfos[id][0];
+      }
     }
 
-    /*
-    Output nameMap into an iterable of entries
-    */
-    for (const [name, nodes] of nameMap) {
-      assert(nodes.length === 1);
-      const [[currentNode, targetNode]] = nodes;
-
-      if (targetNode.ids.length === 1) {
-        const [id] = targetNode.ids;
+    for (const name in names) {
+      if (names[name].length === 1) {
+        const [id] = names[name];
         yield [id, name];
+        continue;
       }
 
-      if (targetNode.ids.length > 1) {
-        for (const [index, id] of Object.entries(targetNode.ids)) {
-          yield [id, name + "$" + index];
-        }
+      // For every not unique name part, append a number to make it unique.
+      for (let index = 0; index < names[name].length; index++) {
+        const id = names[name][index];
+        yield [id, `${name}${index + 1}`];
       }
     }
   }
