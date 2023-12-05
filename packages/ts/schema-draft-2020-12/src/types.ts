@@ -3,12 +3,12 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
+// v0.8.21                         -- www.JsonSchema42.org
 // https://json-schema.org/draft/2020-12/schema
 /**
 Core and Validation specifications meta-schema
 */
-export type Draft202012Schema = (AllOf0 &
+export type Schema = (AllOf0 &
 AllOf1 &
 AllOf2 &
 AllOf3 &
@@ -67,15 +67,15 @@ export type AllOf5 = (FormatAnnotation);
 // https://json-schema.org/draft/2020-12/schema#/allOf/6
 export type AllOf6 = (Content);
 // https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
-export type DefinitionsAdditionalProperties = (Draft202012Schema);
+export type DefinitionsAdditionalProperties = (Schema);
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
-export type DependenciesAdditionalProperties = ((AdditionalPropertiesAnyOf0) |
-(AdditionalPropertiesAnyOf1) |
-(AdditionalPropertiesAnyOf0 & AdditionalPropertiesAnyOf1));
+export type DependenciesAdditionalProperties = ((Dependencies0) |
+(Dependencies1) |
+(Dependencies0 & Dependencies1));
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
-export type AdditionalPropertiesAnyOf0 = (Draft202012Schema);
+export type Dependencies0 = (Schema);
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
-export type AdditionalPropertiesAnyOf1 = (StringArray);
+export type Dependencies1 = (StringArray);
 // https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString
 export type AnchorString = ((string));
 // https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString
@@ -87,7 +87,7 @@ Core vocabulary meta-schema
 export type Core = ((
 {
 "$id"?: Id,
-"$schema"?: PropertiesSchema,
+"$schema"?: CoreSchema,
 "$ref"?: Ref,
 "$anchor"?: Anchor,
 "$dynamicRef"?: DynamicRef,
@@ -104,7 +104,7 @@ export type UriString = ((string));
 export type Id = (UriReferenceString) &
 ((string));
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
-export type PropertiesSchema = (UriString);
+export type CoreSchema = (UriString);
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
 export type Ref = (UriReferenceString);
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
@@ -132,7 +132,7 @@ export type VocabularyAdditionalProperties = ((boolean));
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
 export type VocabularyPropertyNames = (UriString);
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
-export type DefsAdditionalProperties = (Draft202012Schema);
+export type DefsAdditionalProperties = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator
 /**
 Applicator vocabulary meta-schema
@@ -140,13 +140,13 @@ Applicator vocabulary meta-schema
 export type Applicator = ((
 {
 "prefixItems"?: PrefixItems,
-"items"?: PropertiesItems,
+"items"?: ApplicatorItems,
 "contains"?: Contains,
-"additionalProperties"?: ApplicatorPropertiesAdditionalProperties,
+"additionalProperties"?: ApplicatorAdditionalProperties,
 "properties"?: Properties,
 "patternProperties"?: PatternProperties,
 "dependentSchemas"?: DependentSchemas,
-"propertyNames"?: PropertiesPropertyNames,
+"propertyNames"?: ApplicatorPropertyNames,
 "if"?: If,
 "then"?: Then,
 "else"?: Else,
@@ -162,15 +162,15 @@ export type SchemaArray = (((SchemaArrayItems)[]));
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
 export type PrefixItems = (SchemaArray);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
-export type PropertiesItems = (Draft202012Schema);
+export type ApplicatorItems = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
-export type Contains = (Draft202012Schema);
+export type Contains = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
-export type ApplicatorPropertiesAdditionalProperties = (Draft202012Schema);
+export type ApplicatorAdditionalProperties = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties
 export type Properties = ((
 {
-[key: string]: PropertiesPropertiesAdditionalProperties,
+[key: string]: PropertiesAdditionalProperties,
 }
 ));
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties
@@ -186,13 +186,13 @@ export type DependentSchemas = ((
 }
 ));
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
-export type PropertiesPropertyNames = (Draft202012Schema);
+export type ApplicatorPropertyNames = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
-export type If = (Draft202012Schema);
+export type If = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
-export type Then = (Draft202012Schema);
+export type Then = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
-export type Else = (Draft202012Schema);
+export type Else = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
 export type AllOf = (SchemaArray);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
@@ -200,17 +200,17 @@ export type AnyOf = (SchemaArray);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
 export type OneOf = (SchemaArray);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
-export type Not = (Draft202012Schema);
+export type Not = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
-export type SchemaArrayItems = (Draft202012Schema);
+export type SchemaArrayItems = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
-export type PropertiesPropertiesAdditionalProperties = (Draft202012Schema);
+export type PropertiesAdditionalProperties = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
-export type PatternPropertiesAdditionalProperties = (Draft202012Schema);
+export type PatternPropertiesAdditionalProperties = (Schema);
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames
 export type PatternPropertiesPropertyNames = ((string));
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
-export type DependentSchemasAdditionalProperties = (Draft202012Schema);
+export type DependentSchemasAdditionalProperties = (Schema);
 // https://json-schema.org/draft/2020-12/meta/unevaluated
 /**
 Unevaluated applicator vocabulary meta-schema
@@ -223,9 +223,9 @@ export type Unevaluated = ((
 ) |
 (boolean));
 // https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
-export type UnevaluatedItems = (Draft202012Schema);
+export type UnevaluatedItems = (Schema);
 // https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
-export type UnevaluatedProperties = (Draft202012Schema);
+export type UnevaluatedProperties = (Schema);
 // https://json-schema.org/draft/2020-12/meta/validation
 /**
 Validation vocabulary meta-schema
@@ -270,9 +270,9 @@ export type SimpleTypes = (("array" |
 // https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray
 export type StringArray = (((StringArrayItems)[]));
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type
-export type Type = ((TypeAnyOf0) |
-(TypeAnyOf1) |
-(TypeAnyOf0 & TypeAnyOf1));
+export type Type = ((Type0) |
+(Type1) |
+(Type0 & Type1));
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/const
 export type Const = ((any));
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/enum
@@ -318,15 +318,15 @@ export type DependentRequired = ((
 // https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items
 export type StringArrayItems = ((string));
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
-export type TypeAnyOf0 = (SimpleTypes);
+export type Type0 = (SimpleTypes);
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
-export type TypeAnyOf1 = (((AnyOf1Items)[]));
+export type Type1 = (((TypeItems)[]));
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items
 export type EnumItems = ((any));
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
 export type DependentRequiredAdditionalProperties = (StringArray);
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
-export type AnyOf1Items = (SimpleTypes);
+export type TypeItems = (SimpleTypes);
 // https://json-schema.org/draft/2020-12/meta/meta-data
 /**
 Meta-data vocabulary meta-schema
@@ -388,4 +388,4 @@ export type ContentEncoding = ((string));
 // https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType
 export type ContentMediaType = ((string));
 // https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
-export type ContentSchema = (Draft202012Schema);
+export type ContentSchema = (Schema);

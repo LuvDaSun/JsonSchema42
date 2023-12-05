@@ -3,12 +3,12 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
+// v0.8.21                         -- www.JsonSchema42.org
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json
 /**
 JsonSchema42 intermediate schema
 */
-export type SchemaJson = ((
+export type SchemaDocument = ((
 {
 "$schema": Schema,
 "schemas": Schemas,

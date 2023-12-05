@@ -45,12 +45,13 @@ async function runTest(packageName: string) {
   }
 
   const testUrl = new URL(`file://${testPath}`);
-  const rootTypeName = camelcase(`${packageName}.yaml`, { pascalCase: true });
+  const defaultTypeName = camelcase("schema-document", { pascalCase: true });
 
   const testContent = fs.readFileSync(testPath, "utf8");
   const testData = YAML.parse(testContent);
 
   const parseData = testData.parse ?? false;
+  const rootTypeName = testData.rootTypeName ?? defaultTypeName;
   const schemas = testData.schemas as Record<string, unknown>;
   for (const schemaName in schemas) {
     const schema = schemas[schemaName];
@@ -85,7 +86,7 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
-      const namer = new Namer("schema");
+      const namer = new Namer(defaultTypeName, 5);
       for (const nodeId in intermediateData.schemas) {
         const nodeUrl = new URL(nodeId);
         const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
@@ -116,17 +117,17 @@ async function runTest(packageName: string) {
     });
 
     await test("test package", () => {
-      cp.execSync("test package", {
+      cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,
       });
     });
 
     await test("valid", async () => {
+      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
         await test(testName, async () => {
-          const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
@@ -136,10 +137,10 @@ async function runTest(packageName: string) {
     });
 
     await test("invalid", async () => {
+      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];
         await test(testName, async () => {
-          const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }

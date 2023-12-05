@@ -3,16 +3,16 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
+// v0.8.21                         -- www.JsonSchema42.org
 import * as types from "./types.js";
 // http://json-schema.org/draft-04/schema#
-export function isDraft04Schema(value: unknown): value is types.Draft04Schema {
-if(!_isMapDraft04Schema(value)) {
+export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
+if(!_isMapSchemaDocument(value)) {
 return false;
 }
 return true;
 }
-function _isMapDraft04Schema(value: unknown): value is unknown {
+function _isMapSchemaDocument(value: unknown): value is unknown {
 if(typeof value !== "object" || value === null || Array.isArray(value)) {
 return false;
 }
@@ -25,7 +25,7 @@ return false;
 }
 continue;
 case "$schema":
-if(!isPropertiesSchema(propertyValue)) {
+if(!isSchema(propertyValue)) {
 return false;
 }
 continue;
@@ -125,7 +125,7 @@ return false;
 }
 continue;
 case "additionalProperties":
-if(!isSchemaPropertiesAdditionalProperties(propertyValue)) {
+if(!isPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
 continue;
@@ -234,10 +234,10 @@ return false;
 return true;
 }
 function _isAllOfPositiveIntegerDefault0(value: unknown): value is unknown {
-if(!isAllOf0(value)) {
+if(!isPositiveIntegerDefault00(value)) {
 return false;
 }
-if(!isAllOf1(value)) {
+if(!isPositiveIntegerDefault01(value)) {
 return false;
 }
 return true;
@@ -299,13 +299,13 @@ return false;
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/$schema
-export function isPropertiesSchema(value: unknown): value is types.PropertiesSchema {
-if(!_isStringPropertiesSchema(value)) {
+export function isSchema(value: unknown): value is types.Schema {
+if(!_isStringSchema(value)) {
 return false;
 }
 return true;
 }
-function _isStringPropertiesSchema(value: unknown): value is unknown {
+function _isStringSchema(value: unknown): value is unknown {
 if(typeof value !== "string") {
 return false;
 }
@@ -456,10 +456,10 @@ return false;
 return true;
 }
 function _isAnyOfAdditionalItems(value: unknown): value is unknown {
-if(isAdditionalItemsAnyOf0(value)) {
+if(isAdditionalItems0(value)) {
 return true;
 }
-if(isAdditionalItemsAnyOf1(value)) {
+if(isAdditionalItems1(value)) {
 return true;
 }
 return false;
@@ -472,10 +472,10 @@ return false;
 return true;
 }
 function _isAnyOfPropertiesItems(value: unknown): value is unknown {
-if(isItemsAnyOf0(value)) {
+if(isItems0(value)) {
 return true;
 }
-if(isItemsAnyOf1(value)) {
+if(isItems1(value)) {
 return true;
 }
 return false;
@@ -559,17 +559,17 @@ return false;
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/additionalProperties
-export function isSchemaPropertiesAdditionalProperties(value: unknown): value is types.SchemaPropertiesAdditionalProperties {
-if(!_isAnyOfSchemaPropertiesAdditionalProperties(value)) {
+export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
+if(!_isAnyOfPropertiesAdditionalProperties(value)) {
 return false;
 }
 return true;
 }
-function _isAnyOfSchemaPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(isPropertiesAdditionalPropertiesAnyOf0(value)) {
+function _isAnyOfPropertiesAdditionalProperties(value: unknown): value is unknown {
+if(isAdditionalProperties0(value)) {
 return true;
 }
-if(isPropertiesAdditionalPropertiesAnyOf1(value)) {
+if(isAdditionalProperties1(value)) {
 return true;
 }
 return false;
@@ -686,10 +686,10 @@ return false;
 return true;
 }
 function _isAnyOfType(value: unknown): value is unknown {
-if(isTypeAnyOf0(value)) {
+if(isType0(value)) {
 return true;
 }
-if(isTypeAnyOf1(value)) {
+if(isType1(value)) {
 return true;
 }
 return false;
@@ -754,7 +754,7 @@ return false;
 return true;
 }
 function _isReferenceNot(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
@@ -767,26 +767,26 @@ return false;
 return true;
 }
 function _isReferenceSchemaArrayItems(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0
-export function isAllOf0(value: unknown): value is types.AllOf0 {
-if(!_isReferenceAllOf0(value)) {
+export function isPositiveIntegerDefault00(value: unknown): value is types.PositiveIntegerDefault00 {
+if(!_isReferencePositiveIntegerDefault00(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceAllOf0(value: unknown): value is unknown {
+function _isReferencePositiveIntegerDefault00(value: unknown): value is unknown {
 if(!isPositiveInteger(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1
-export function isAllOf1(value: unknown): value is types.AllOf1 {
+export function isPositiveIntegerDefault01(value: unknown): value is types.PositiveIntegerDefault01 {
 return true;
 }
 // http://json-schema.org/draft-04/schema#/definitions/stringArray/items
@@ -803,79 +803,79 @@ return false;
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0
-export function isAdditionalItemsAnyOf0(value: unknown): value is types.AdditionalItemsAnyOf0 {
-if(!_isBooleanAdditionalItemsAnyOf0(value)) {
+export function isAdditionalItems0(value: unknown): value is types.AdditionalItems0 {
+if(!_isBooleanAdditionalItems0(value)) {
 return false;
 }
 return true;
 }
-function _isBooleanAdditionalItemsAnyOf0(value: unknown): value is unknown {
+function _isBooleanAdditionalItems0(value: unknown): value is unknown {
 if(typeof value !== "boolean") {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1
-export function isAdditionalItemsAnyOf1(value: unknown): value is types.AdditionalItemsAnyOf1 {
-if(!_isReferenceAdditionalItemsAnyOf1(value)) {
+export function isAdditionalItems1(value: unknown): value is types.AdditionalItems1 {
+if(!_isReferenceAdditionalItems1(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceAdditionalItemsAnyOf1(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+function _isReferenceAdditionalItems1(value: unknown): value is unknown {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/items/anyOf/0
-export function isItemsAnyOf0(value: unknown): value is types.ItemsAnyOf0 {
-if(!_isReferenceItemsAnyOf0(value)) {
+export function isItems0(value: unknown): value is types.Items0 {
+if(!_isReferenceItems0(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceItemsAnyOf0(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+function _isReferenceItems0(value: unknown): value is unknown {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/items/anyOf/1
-export function isItemsAnyOf1(value: unknown): value is types.ItemsAnyOf1 {
-if(!_isReferenceItemsAnyOf1(value)) {
+export function isItems1(value: unknown): value is types.Items1 {
+if(!_isReferenceItems1(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceItemsAnyOf1(value: unknown): value is unknown {
+function _isReferenceItems1(value: unknown): value is unknown {
 if(!isSchemaArray(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0
-export function isPropertiesAdditionalPropertiesAnyOf0(value: unknown): value is types.PropertiesAdditionalPropertiesAnyOf0 {
-if(!_isBooleanPropertiesAdditionalPropertiesAnyOf0(value)) {
+export function isAdditionalProperties0(value: unknown): value is types.AdditionalProperties0 {
+if(!_isBooleanAdditionalProperties0(value)) {
 return false;
 }
 return true;
 }
-function _isBooleanPropertiesAdditionalPropertiesAnyOf0(value: unknown): value is unknown {
+function _isBooleanAdditionalProperties0(value: unknown): value is unknown {
 if(typeof value !== "boolean") {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1
-export function isPropertiesAdditionalPropertiesAnyOf1(value: unknown): value is types.PropertiesAdditionalPropertiesAnyOf1 {
-if(!_isReferencePropertiesAdditionalPropertiesAnyOf1(value)) {
+export function isAdditionalProperties1(value: unknown): value is types.AdditionalProperties1 {
+if(!_isReferenceAdditionalProperties1(value)) {
 return false;
 }
 return true;
 }
-function _isReferencePropertiesAdditionalPropertiesAnyOf1(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+function _isReferenceAdditionalProperties1(value: unknown): value is unknown {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
@@ -888,7 +888,7 @@ return false;
 return true;
 }
 function _isReferenceDefinitionsAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
@@ -901,7 +901,7 @@ return false;
 return true;
 }
 function _isReferencePropertiesPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
@@ -914,7 +914,7 @@ return false;
 return true;
 }
 function _isReferencePatternPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
@@ -927,35 +927,35 @@ return false;
 return true;
 }
 function _isAnyOfDependenciesAdditionalProperties(value: unknown): value is unknown {
-if(isDependenciesAdditionalPropertiesAnyOf0(value)) {
+if(isDependencies0(value)) {
 return true;
 }
-if(isDependenciesAdditionalPropertiesAnyOf1(value)) {
+if(isDependencies1(value)) {
 return true;
 }
 return false;
 }
 // http://json-schema.org/draft-04/schema#/properties/type/anyOf/0
-export function isTypeAnyOf0(value: unknown): value is types.TypeAnyOf0 {
-if(!_isReferenceTypeAnyOf0(value)) {
+export function isType0(value: unknown): value is types.Type0 {
+if(!_isReferenceType0(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceTypeAnyOf0(value: unknown): value is unknown {
+function _isReferenceType0(value: unknown): value is unknown {
 if(!isSimpleTypes(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/type/anyOf/1
-export function isTypeAnyOf1(value: unknown): value is types.TypeAnyOf1 {
-if(!_isArrayTypeAnyOf1(value)) {
+export function isType1(value: unknown): value is types.Type1 {
+if(!_isArrayType1(value)) {
 return false;
 }
 return true;
 }
-function _isArrayTypeAnyOf1(value: unknown): value is unknown {
+function _isArrayType1(value: unknown): value is unknown {
 if(!Array.isArray(value)) {
 return false;
 }
@@ -969,46 +969,46 @@ if(elementValueSeen.has(elementValue)) {
 return false;
 }
 elementValueSeen.add(elementValue);
-if(!isAnyOf1Items(elementValue)) {
+if(!isTypeItems(elementValue)) {
 return false;
 }
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0
-export function isDependenciesAdditionalPropertiesAnyOf0(value: unknown): value is types.DependenciesAdditionalPropertiesAnyOf0 {
-if(!_isReferenceDependenciesAdditionalPropertiesAnyOf0(value)) {
+export function isDependencies0(value: unknown): value is types.Dependencies0 {
+if(!_isReferenceDependencies0(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceDependenciesAdditionalPropertiesAnyOf0(value: unknown): value is unknown {
-if(!isDraft04Schema(value)) {
+function _isReferenceDependencies0(value: unknown): value is unknown {
+if(!isSchemaDocument(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1
-export function isDependenciesAdditionalPropertiesAnyOf1(value: unknown): value is types.DependenciesAdditionalPropertiesAnyOf1 {
-if(!_isReferenceDependenciesAdditionalPropertiesAnyOf1(value)) {
+export function isDependencies1(value: unknown): value is types.Dependencies1 {
+if(!_isReferenceDependencies1(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceDependenciesAdditionalPropertiesAnyOf1(value: unknown): value is unknown {
+function _isReferenceDependencies1(value: unknown): value is unknown {
 if(!isStringArray(value)) {
 return false;
 }
 return true;
 }
 // http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items
-export function isAnyOf1Items(value: unknown): value is types.AnyOf1Items {
-if(!_isReferenceAnyOf1Items(value)) {
+export function isTypeItems(value: unknown): value is types.TypeItems {
+if(!_isReferenceTypeItems(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceAnyOf1Items(value: unknown): value is unknown {
+function _isReferenceTypeItems(value: unknown): value is unknown {
 if(!isSimpleTypes(value)) {
 return false;
 }

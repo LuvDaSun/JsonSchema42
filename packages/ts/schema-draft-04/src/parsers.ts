@@ -3,11 +3,11 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
-export function parseDraft04Schema(value: unknown): unknown {
-return _parseMapDraft04Schema(value);
+// v0.8.21                         -- www.JsonSchema42.org
+export function parseSchemaDocument(value: unknown): unknown {
+return _parseMapSchemaDocument(value);
 }
-function _parseMapDraft04Schema(value: unknown): unknown {
+function _parseMapSchemaDocument(value: unknown): unknown {
 if(typeof value === "object" && value !== null && !Array.isArray(value)) {
 const result = {} as Record<string, unknown>;
 for(const propertyName in value) {
@@ -18,7 +18,7 @@ result[propertyName] = propertyValue;
 break;
 }
 case "$schema": {
-const propertyValue = parsePropertiesSchema(value[propertyName as keyof typeof value]);
+const propertyValue = parseSchema(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
@@ -118,7 +118,7 @@ result[propertyName] = propertyValue;
 break;
 }
 case "additionalProperties": {
-const propertyValue = parseSchemaPropertiesAdditionalProperties(value[propertyName as keyof typeof value]);
+const propertyValue = parsePropertiesAdditionalProperties(value[propertyName as keyof typeof value]);
 result[propertyName] = propertyValue;
 break;
 }
@@ -214,7 +214,7 @@ export function parsePositiveIntegerDefault0(value: unknown): unknown {
 return _parseAllOfPositiveIntegerDefault0(value);
 }
 function _parseAllOfPositiveIntegerDefault0(value: unknown): unknown {
-return parseAllOf0(value) ?? parseAllOf1(value);
+return parsePositiveIntegerDefault00(value) ?? parsePositiveIntegerDefault01(value);
 }
 export function parseSimpleTypes(value: unknown): unknown {
 return _parseStringSimpleTypes(value);
@@ -257,10 +257,10 @@ default:
 return undefined;
 }
 }
-export function parsePropertiesSchema(value: unknown): unknown {
-return _parseStringPropertiesSchema(value);
+export function parseSchema(value: unknown): unknown {
+return _parseStringSchema(value);
 }
-function _parseStringPropertiesSchema(value: unknown): unknown {
+function _parseStringSchema(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -426,13 +426,13 @@ export function parseAdditionalItems(value: unknown): unknown {
 return _parseAnyOfAdditionalItems(value);
 }
 function _parseAnyOfAdditionalItems(value: unknown): unknown {
-return parseAdditionalItemsAnyOf0(value) ?? parseAdditionalItemsAnyOf1(value);
+return parseAdditionalItems0(value) ?? parseAdditionalItems1(value);
 }
 export function parsePropertiesItems(value: unknown): unknown {
 return _parseAnyOfPropertiesItems(value);
 }
 function _parseAnyOfPropertiesItems(value: unknown): unknown {
-return parseItemsAnyOf0(value) ?? parseItemsAnyOf1(value);
+return parseItems0(value) ?? parseItems1(value);
 }
 export function parseMaxItems(value: unknown): unknown {
 return _parseReferenceMaxItems(value);
@@ -490,11 +490,11 @@ return _parseReferenceRequired(value);
 function _parseReferenceRequired(value: unknown): unknown {
 return parseStringArray(value);
 }
-export function parseSchemaPropertiesAdditionalProperties(value: unknown): unknown {
-return _parseAnyOfSchemaPropertiesAdditionalProperties(value);
+export function parsePropertiesAdditionalProperties(value: unknown): unknown {
+return _parseAnyOfPropertiesAdditionalProperties(value);
 }
-function _parseAnyOfSchemaPropertiesAdditionalProperties(value: unknown): unknown {
-return parsePropertiesAdditionalPropertiesAnyOf0(value) ?? parsePropertiesAdditionalPropertiesAnyOf1(value);
+function _parseAnyOfPropertiesAdditionalProperties(value: unknown): unknown {
+return parseAdditionalProperties0(value) ?? parseAdditionalProperties1(value);
 }
 export function parseDefinitions(value: unknown): unknown {
 return _parseMapDefinitions(value);
@@ -565,7 +565,7 @@ export function parseType(value: unknown): unknown {
 return _parseAnyOfType(value);
 }
 function _parseAnyOfType(value: unknown): unknown {
-return parseTypeAnyOf0(value) ?? parseTypeAnyOf1(value);
+return parseType0(value) ?? parseType1(value);
 }
 export function parseFormat(value: unknown): unknown {
 return _parseStringFormat(value);
@@ -603,21 +603,21 @@ export function parseNot(value: unknown): unknown {
 return _parseReferenceNot(value);
 }
 function _parseReferenceNot(value: unknown): unknown {
-return parseDraft04Schema(value);
+return parseSchemaDocument(value);
 }
 export function parseSchemaArrayItems(value: unknown): unknown {
 return _parseReferenceSchemaArrayItems(value);
 }
 function _parseReferenceSchemaArrayItems(value: unknown): unknown {
-return parseDraft04Schema(value);
+return parseSchemaDocument(value);
 }
-export function parseAllOf0(value: unknown): unknown {
-return _parseReferenceAllOf0(value);
+export function parsePositiveIntegerDefault00(value: unknown): unknown {
+return _parseReferencePositiveIntegerDefault00(value);
 }
-function _parseReferenceAllOf0(value: unknown): unknown {
+function _parseReferencePositiveIntegerDefault00(value: unknown): unknown {
 return parsePositiveInteger(value);
 }
-export function parseAllOf1(value: unknown): unknown {
+export function parsePositiveIntegerDefault01(value: unknown): unknown {
 return ;
 }
 export function parseStringArrayItems(value: unknown): unknown {
@@ -634,10 +634,10 @@ default:
 return undefined;
 }
 }
-export function parseAdditionalItemsAnyOf0(value: unknown): unknown {
-return _parseBooleanAdditionalItemsAnyOf0(value);
+export function parseAdditionalItems0(value: unknown): unknown {
+return _parseBooleanAdditionalItems0(value);
 }
-function _parseBooleanAdditionalItemsAnyOf0(value: unknown): unknown {
+function _parseBooleanAdditionalItems0(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -660,28 +660,28 @@ return value;
 }
 return undefined;
 }
-export function parseAdditionalItemsAnyOf1(value: unknown): unknown {
-return _parseReferenceAdditionalItemsAnyOf1(value);
+export function parseAdditionalItems1(value: unknown): unknown {
+return _parseReferenceAdditionalItems1(value);
 }
-function _parseReferenceAdditionalItemsAnyOf1(value: unknown): unknown {
-return parseDraft04Schema(value);
+function _parseReferenceAdditionalItems1(value: unknown): unknown {
+return parseSchemaDocument(value);
 }
-export function parseItemsAnyOf0(value: unknown): unknown {
-return _parseReferenceItemsAnyOf0(value);
+export function parseItems0(value: unknown): unknown {
+return _parseReferenceItems0(value);
 }
-function _parseReferenceItemsAnyOf0(value: unknown): unknown {
-return parseDraft04Schema(value);
+function _parseReferenceItems0(value: unknown): unknown {
+return parseSchemaDocument(value);
 }
-export function parseItemsAnyOf1(value: unknown): unknown {
-return _parseReferenceItemsAnyOf1(value);
+export function parseItems1(value: unknown): unknown {
+return _parseReferenceItems1(value);
 }
-function _parseReferenceItemsAnyOf1(value: unknown): unknown {
+function _parseReferenceItems1(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-export function parsePropertiesAdditionalPropertiesAnyOf0(value: unknown): unknown {
-return _parseBooleanPropertiesAdditionalPropertiesAnyOf0(value);
+export function parseAdditionalProperties0(value: unknown): unknown {
+return _parseBooleanAdditionalProperties0(value);
 }
-function _parseBooleanPropertiesAdditionalPropertiesAnyOf0(value: unknown): unknown {
+function _parseBooleanAdditionalProperties0(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -704,70 +704,70 @@ return value;
 }
 return undefined;
 }
-export function parsePropertiesAdditionalPropertiesAnyOf1(value: unknown): unknown {
-return _parseReferencePropertiesAdditionalPropertiesAnyOf1(value);
+export function parseAdditionalProperties1(value: unknown): unknown {
+return _parseReferenceAdditionalProperties1(value);
 }
-function _parseReferencePropertiesAdditionalPropertiesAnyOf1(value: unknown): unknown {
-return parseDraft04Schema(value);
+function _parseReferenceAdditionalProperties1(value: unknown): unknown {
+return parseSchemaDocument(value);
 }
 export function parseDefinitionsAdditionalProperties(value: unknown): unknown {
 return _parseReferenceDefinitionsAdditionalProperties(value);
 }
 function _parseReferenceDefinitionsAdditionalProperties(value: unknown): unknown {
-return parseDraft04Schema(value);
+return parseSchemaDocument(value);
 }
 export function parsePropertiesPropertiesAdditionalProperties(value: unknown): unknown {
 return _parseReferencePropertiesPropertiesAdditionalProperties(value);
 }
 function _parseReferencePropertiesPropertiesAdditionalProperties(value: unknown): unknown {
-return parseDraft04Schema(value);
+return parseSchemaDocument(value);
 }
 export function parsePatternPropertiesAdditionalProperties(value: unknown): unknown {
 return _parseReferencePatternPropertiesAdditionalProperties(value);
 }
 function _parseReferencePatternPropertiesAdditionalProperties(value: unknown): unknown {
-return parseDraft04Schema(value);
+return parseSchemaDocument(value);
 }
 export function parseDependenciesAdditionalProperties(value: unknown): unknown {
 return _parseAnyOfDependenciesAdditionalProperties(value);
 }
 function _parseAnyOfDependenciesAdditionalProperties(value: unknown): unknown {
-return parseDependenciesAdditionalPropertiesAnyOf0(value) ?? parseDependenciesAdditionalPropertiesAnyOf1(value);
+return parseDependencies0(value) ?? parseDependencies1(value);
 }
-export function parseTypeAnyOf0(value: unknown): unknown {
-return _parseReferenceTypeAnyOf0(value);
+export function parseType0(value: unknown): unknown {
+return _parseReferenceType0(value);
 }
-function _parseReferenceTypeAnyOf0(value: unknown): unknown {
+function _parseReferenceType0(value: unknown): unknown {
 return parseSimpleTypes(value);
 }
-export function parseTypeAnyOf1(value: unknown): unknown {
-return _parseArrayTypeAnyOf1(value);
+export function parseType1(value: unknown): unknown {
+return _parseArrayType1(value);
 }
-function _parseArrayTypeAnyOf1(value: unknown): unknown {
+function _parseArrayType1(value: unknown): unknown {
 if(Array.isArray(value)) {
 const result = new Array<unknown>(value.length);
 for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseAnyOf1Items(value[elementIndex]);
+result[elementIndex] = parseTypeItems(value[elementIndex]);
 }
 return result;
 }
 return undefined;
 }
-export function parseDependenciesAdditionalPropertiesAnyOf0(value: unknown): unknown {
-return _parseReferenceDependenciesAdditionalPropertiesAnyOf0(value);
+export function parseDependencies0(value: unknown): unknown {
+return _parseReferenceDependencies0(value);
 }
-function _parseReferenceDependenciesAdditionalPropertiesAnyOf0(value: unknown): unknown {
-return parseDraft04Schema(value);
+function _parseReferenceDependencies0(value: unknown): unknown {
+return parseSchemaDocument(value);
 }
-export function parseDependenciesAdditionalPropertiesAnyOf1(value: unknown): unknown {
-return _parseReferenceDependenciesAdditionalPropertiesAnyOf1(value);
+export function parseDependencies1(value: unknown): unknown {
+return _parseReferenceDependencies1(value);
 }
-function _parseReferenceDependenciesAdditionalPropertiesAnyOf1(value: unknown): unknown {
+function _parseReferenceDependencies1(value: unknown): unknown {
 return parseStringArray(value);
 }
-export function parseAnyOf1Items(value: unknown): unknown {
-return _parseReferenceAnyOf1Items(value);
+export function parseTypeItems(value: unknown): unknown {
+return _parseReferenceTypeItems(value);
 }
-function _parseReferenceAnyOf1Items(value: unknown): unknown {
+function _parseReferenceTypeItems(value: unknown): unknown {
 return parseSimpleTypes(value);
 }

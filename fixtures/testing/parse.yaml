@@ -12,7 +12,9 @@ schemas:
         type: number
       string:
         type: string
+
 parse: true
+
 valid:
   one: "1"
   two: "2"
