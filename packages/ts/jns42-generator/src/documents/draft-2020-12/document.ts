@@ -1,4 +1,4 @@
-import { Draft202012Schema as N, isDraft202012Schema as isNode } from "schema-draft-2020-12";
+import { Schema as N, isSchema as isNode } from "schema-draft-2020-12";
 import * as schemaIntermediate from "schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";

@@ -1,12 +1,12 @@
-import { Draft04Schema, isDraft04Schema } from "schema-draft-04";
+import { SchemaDocument, isSchemaDocument } from "schema-draft-04";
 import * as schemaIntermediateB from "schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
-type N = Draft04Schema | boolean;
+type N = SchemaDocument | boolean;
 
 function isNode(value: unknown): value is N {
-  return isDraft04Schema(value) || typeof value === "boolean";
+  return isSchemaDocument(value) || typeof value === "boolean";
 }
 
 export class Document extends SchemaDocumentBase<N> {

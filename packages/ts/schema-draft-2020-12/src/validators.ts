@@ -3,19 +3,19 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
+// v0.8.21                         -- www.JsonSchema42.org
 import * as types from "./types.js";
 // https://json-schema.org/draft/2020-12/schema
-export function isDraft202012Schema(value: unknown): value is types.Draft202012Schema {
-if(!_isMapDraft202012Schema(value) && !_isBooleanDraft202012Schema(value)) {
+export function isSchema(value: unknown): value is types.Schema {
+if(!_isMapSchema(value) && !_isBooleanSchema(value)) {
 return false;
 }
-if(!_isAllOfDraft202012Schema(value)) {
+if(!_isAllOfSchema(value)) {
 return false;
 }
 return true;
 }
-function _isMapDraft202012Schema(value: unknown): value is unknown {
+function _isMapSchema(value: unknown): value is unknown {
 if(typeof value !== "object" || value === null || Array.isArray(value)) {
 return false;
 }
@@ -46,13 +46,13 @@ continue;
 }
 return true;
 }
-function _isBooleanDraft202012Schema(value: unknown): value is unknown {
+function _isBooleanSchema(value: unknown): value is unknown {
 if(typeof value !== "boolean") {
 return false;
 }
 return true;
 }
-function _isAllOfDraft202012Schema(value: unknown): value is unknown {
+function _isAllOfSchema(value: unknown): value is unknown {
 if(!isAllOf0(value)) {
 return false;
 }
@@ -241,7 +241,7 @@ return false;
 return true;
 }
 function _isReferenceDefinitionsAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -254,35 +254,35 @@ return false;
 return true;
 }
 function _isAnyOfDependenciesAdditionalProperties(value: unknown): value is unknown {
-if(isAdditionalPropertiesAnyOf0(value)) {
+if(isDependencies0(value)) {
 return true;
 }
-if(isAdditionalPropertiesAnyOf1(value)) {
+if(isDependencies1(value)) {
 return true;
 }
 return false;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
-export function isAdditionalPropertiesAnyOf0(value: unknown): value is types.AdditionalPropertiesAnyOf0 {
-if(!_isReferenceAdditionalPropertiesAnyOf0(value)) {
+export function isDependencies0(value: unknown): value is types.Dependencies0 {
+if(!_isReferenceDependencies0(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceAdditionalPropertiesAnyOf0(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+function _isReferenceDependencies0(value: unknown): value is unknown {
+if(!isSchema(value)) {
 return false;
 }
 return true;
 }
 // https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
-export function isAdditionalPropertiesAnyOf1(value: unknown): value is types.AdditionalPropertiesAnyOf1 {
-if(!_isReferenceAdditionalPropertiesAnyOf1(value)) {
+export function isDependencies1(value: unknown): value is types.Dependencies1 {
+if(!_isReferenceDependencies1(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceAdditionalPropertiesAnyOf1(value: unknown): value is unknown {
+function _isReferenceDependencies1(value: unknown): value is unknown {
 if(!isStringArray(value)) {
 return false;
 }
@@ -337,7 +337,7 @@ return false;
 }
 continue;
 case "$schema":
-if(!isPropertiesSchema(propertyValue)) {
+if(!isCoreSchema(propertyValue)) {
 return false;
 }
 continue;
@@ -425,13 +425,13 @@ return false;
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
-export function isPropertiesSchema(value: unknown): value is types.PropertiesSchema {
-if(!_isReferencePropertiesSchema(value)) {
+export function isCoreSchema(value: unknown): value is types.CoreSchema {
+if(!_isReferenceCoreSchema(value)) {
 return false;
 }
 return true;
 }
-function _isReferencePropertiesSchema(value: unknown): value is unknown {
+function _isReferenceCoreSchema(value: unknown): value is unknown {
 if(!isUriString(value)) {
 return false;
 }
@@ -580,7 +580,7 @@ return false;
 return true;
 }
 function _isReferenceDefsAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -605,7 +605,7 @@ return false;
 }
 continue;
 case "items":
-if(!isPropertiesItems(propertyValue)) {
+if(!isApplicatorItems(propertyValue)) {
 return false;
 }
 continue;
@@ -615,7 +615,7 @@ return false;
 }
 continue;
 case "additionalProperties":
-if(!isApplicatorPropertiesAdditionalProperties(propertyValue)) {
+if(!isApplicatorAdditionalProperties(propertyValue)) {
 return false;
 }
 continue;
@@ -635,7 +635,7 @@ return false;
 }
 continue;
 case "propertyNames":
-if(!isPropertiesPropertyNames(propertyValue)) {
+if(!isApplicatorPropertyNames(propertyValue)) {
 return false;
 }
 continue;
@@ -720,14 +720,14 @@ return false;
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
-export function isPropertiesItems(value: unknown): value is types.PropertiesItems {
-if(!_isReferencePropertiesItems(value)) {
+export function isApplicatorItems(value: unknown): value is types.ApplicatorItems {
+if(!_isReferenceApplicatorItems(value)) {
 return false;
 }
 return true;
 }
-function _isReferencePropertiesItems(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+function _isReferenceApplicatorItems(value: unknown): value is unknown {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -740,20 +740,20 @@ return false;
 return true;
 }
 function _isReferenceContains(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
-export function isApplicatorPropertiesAdditionalProperties(value: unknown): value is types.ApplicatorPropertiesAdditionalProperties {
-if(!_isReferenceApplicatorPropertiesAdditionalProperties(value)) {
+export function isApplicatorAdditionalProperties(value: unknown): value is types.ApplicatorAdditionalProperties {
+if(!_isReferenceApplicatorAdditionalProperties(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceApplicatorPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+function _isReferenceApplicatorAdditionalProperties(value: unknown): value is unknown {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -771,7 +771,7 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
-if(!isPropertiesPropertiesAdditionalProperties(propertyValue)) {
+if(!isPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
 continue;
@@ -823,14 +823,14 @@ continue;
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
-export function isPropertiesPropertyNames(value: unknown): value is types.PropertiesPropertyNames {
-if(!_isReferencePropertiesPropertyNames(value)) {
+export function isApplicatorPropertyNames(value: unknown): value is types.ApplicatorPropertyNames {
+if(!_isReferenceApplicatorPropertyNames(value)) {
 return false;
 }
 return true;
 }
-function _isReferencePropertiesPropertyNames(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+function _isReferenceApplicatorPropertyNames(value: unknown): value is unknown {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -843,7 +843,7 @@ return false;
 return true;
 }
 function _isReferenceIf(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -856,7 +856,7 @@ return false;
 return true;
 }
 function _isReferenceThen(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -869,7 +869,7 @@ return false;
 return true;
 }
 function _isReferenceElse(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -921,7 +921,7 @@ return false;
 return true;
 }
 function _isReferenceNot(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -934,20 +934,20 @@ return false;
 return true;
 }
 function _isReferenceSchemaArrayItems(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
-export function isPropertiesPropertiesAdditionalProperties(value: unknown): value is types.PropertiesPropertiesAdditionalProperties {
-if(!_isReferencePropertiesPropertiesAdditionalProperties(value)) {
+export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
+if(!_isReferencePropertiesAdditionalProperties(value)) {
 return false;
 }
 return true;
 }
-function _isReferencePropertiesPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+function _isReferencePropertiesAdditionalProperties(value: unknown): value is unknown {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -960,7 +960,7 @@ return false;
 return true;
 }
 function _isReferencePatternPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -986,7 +986,7 @@ return false;
 return true;
 }
 function _isReferenceDependentSchemasAdditionalProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -1033,7 +1033,7 @@ return false;
 return true;
 }
 function _isReferenceUnevaluatedItems(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -1046,7 +1046,7 @@ return false;
 return true;
 }
 function _isReferenceUnevaluatedProperties(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
@@ -1252,10 +1252,10 @@ return false;
 return true;
 }
 function _isAnyOfType(value: unknown): value is unknown {
-if(isTypeAnyOf0(value)) {
+if(isType0(value)) {
 return true;
 }
-if(isTypeAnyOf1(value)) {
+if(isType1(value)) {
 return true;
 }
 return false;
@@ -1534,26 +1534,26 @@ return false;
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
-export function isTypeAnyOf0(value: unknown): value is types.TypeAnyOf0 {
-if(!_isReferenceTypeAnyOf0(value)) {
+export function isType0(value: unknown): value is types.Type0 {
+if(!_isReferenceType0(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceTypeAnyOf0(value: unknown): value is unknown {
+function _isReferenceType0(value: unknown): value is unknown {
 if(!isSimpleTypes(value)) {
 return false;
 }
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
-export function isTypeAnyOf1(value: unknown): value is types.TypeAnyOf1 {
-if(!_isArrayTypeAnyOf1(value)) {
+export function isType1(value: unknown): value is types.Type1 {
+if(!_isArrayType1(value)) {
 return false;
 }
 return true;
 }
-function _isArrayTypeAnyOf1(value: unknown): value is unknown {
+function _isArrayType1(value: unknown): value is unknown {
 if(!Array.isArray(value)) {
 return false;
 }
@@ -1567,7 +1567,7 @@ if(elementValueSeen.has(elementValue)) {
 return false;
 }
 elementValueSeen.add(elementValue);
-if(!isAnyOf1Items(elementValue)) {
+if(!isTypeItems(elementValue)) {
 return false;
 }
 }
@@ -1597,13 +1597,13 @@ return false;
 return true;
 }
 // https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
-export function isAnyOf1Items(value: unknown): value is types.AnyOf1Items {
-if(!_isReferenceAnyOf1Items(value)) {
+export function isTypeItems(value: unknown): value is types.TypeItems {
+if(!_isReferenceTypeItems(value)) {
 return false;
 }
 return true;
 }
-function _isReferenceAnyOf1Items(value: unknown): value is unknown {
+function _isReferenceTypeItems(value: unknown): value is unknown {
 if(!isSimpleTypes(value)) {
 return false;
 }
@@ -1887,7 +1887,7 @@ return false;
 return true;
 }
 function _isReferenceContentSchema(value: unknown): value is unknown {
-if(!isDraft202012Schema(value)) {
+if(!isSchema(value)) {
 return false;
 }
 return true;
