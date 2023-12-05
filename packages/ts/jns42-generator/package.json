@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
