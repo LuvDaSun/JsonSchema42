@@ -50,7 +50,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
           default: 5,
         })
         .option("any-of-hack", {
-          description: "quickfix to make any of work with many types",
+          description: "quick-fix to make any of work with many types",
           type: "boolean",
           default: false,
         }),
