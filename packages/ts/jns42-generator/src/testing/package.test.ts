@@ -117,17 +117,17 @@ async function runTest(packageName: string) {
     });
 
     await test("test package", () => {
-      cp.execSync("test package", {
+      cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,
       });
     });
 
     await test("valid", async () => {
+      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
         await test(testName, async () => {
-          const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
@@ -137,10 +137,10 @@ async function runTest(packageName: string) {
     });
 
     await test("invalid", async () => {
+      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];
         await test(testName, async () => {
-          const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
