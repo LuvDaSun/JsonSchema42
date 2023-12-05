@@ -6,7 +6,6 @@
 !.prettierignore
 !.gitattributes
 !.editorconfig
-!.npmrc
 
 node_modules/
 target/
