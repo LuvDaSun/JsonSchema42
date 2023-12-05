@@ -6,7 +6,7 @@ export * from "./load.js";
 export * from "./name.js";
 export * from "./namer.js";
 export * from "./package.js";
-export * from "./read-json.js";
+export * from "./read-node.js";
 export * from "./root.js";
 export * from "./schema.js";
 export * from "./url.js";

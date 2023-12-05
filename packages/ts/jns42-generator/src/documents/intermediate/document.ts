@@ -1,7 +1,7 @@
-import { Node, SchemaJson, isSchemaJson } from "schema-intermediate";
+import { Node, SchemaDocument, isSchemaDocument } from "schema-intermediate";
 import { DocumentBase } from "../document-base.js";
 
-export class Document extends DocumentBase<SchemaJson> {
+export class Document extends DocumentBase<SchemaDocument> {
   constructor(
     public readonly documentNodeUrl: URL,
     documentNode: unknown,
@@ -9,8 +9,8 @@ export class Document extends DocumentBase<SchemaJson> {
     super(documentNode);
   }
 
-  protected isDocumentNode(node: unknown): node is SchemaJson {
-    return isSchemaJson(node);
+  protected isDocumentNode(node: unknown): node is SchemaDocument {
+    return isSchemaDocument(node);
   }
 
   public getIntermediateNodeEntries(): Iterable<readonly [string, Node]> {

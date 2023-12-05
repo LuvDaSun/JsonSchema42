@@ -3,16 +3,16 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
+// v0.8.21                         -- www.JsonSchema42.org
 import * as types from "./types.js";
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json
-export function isSchemaJson(value: unknown): value is types.SchemaJson {
-if(!_isMapSchemaJson(value)) {
+export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
+if(!_isMapSchemaDocument(value)) {
 return false;
 }
 return true;
 }
-function _isMapSchemaJson(value: unknown): value is unknown {
+function _isMapSchemaDocument(value: unknown): value is unknown {
 if(typeof value !== "object" || value === null || Array.isArray(value)) {
 return false;
 }

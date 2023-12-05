@@ -3,11 +3,11 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.14                         -- www.JsonSchema42.org
-export function parseSchemaJson(value: unknown): unknown {
-return _parseMapSchemaJson(value);
+// v0.8.21                         -- www.JsonSchema42.org
+export function parseSchemaDocument(value: unknown): unknown {
+return _parseMapSchemaDocument(value);
 }
-function _parseMapSchemaJson(value: unknown): unknown {
+function _parseMapSchemaDocument(value: unknown): unknown {
 if(typeof value === "object" && value !== null && !Array.isArray(value)) {
 const result = {} as Record<string, unknown>;
 for(const propertyName in value) {

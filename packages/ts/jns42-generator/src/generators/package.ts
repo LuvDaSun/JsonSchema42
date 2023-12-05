@@ -1,6 +1,6 @@
-import * as schemaIntermediate from "schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
+import * as schemaIntermediate from "schema-intermediate";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
@@ -17,7 +17,7 @@ export interface PackageOptions {
 }
 
 export function generatePackage(
-  intermediateData: schemaIntermediate.SchemaJson,
+  intermediateData: schemaIntermediate.SchemaDocument,
   namesData: Record<string, string>,
   options: PackageOptions,
 ) {

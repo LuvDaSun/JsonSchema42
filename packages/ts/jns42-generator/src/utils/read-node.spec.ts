@@ -1,10 +1,10 @@
 import assert from "assert";
 import test from "node:test";
-import { readJson } from "./read-json.js";
+import { readNode } from "./read-node.js";
 
-test("read json", (t) => {
+test("read node", (t) => {
   const actual = [
-    ...readJson("#", {
+    ...readNode("#", {
       a: "b",
       c: ["d", "e"],
     }),
