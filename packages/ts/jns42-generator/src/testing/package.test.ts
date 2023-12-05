@@ -96,9 +96,10 @@ async function runTest(packageName: string) {
       const names = namer.getNames();
 
       generatePackage(intermediateData, names, {
-        directoryPath: packageDirectoryPath,
-        name: packageName,
-        version: "v0.0.0",
+        packageDirectoryPath: packageDirectoryPath,
+        packageName: packageName,
+        packageVersion: "v0.0.0",
+        anyOfHack: false,
       });
     });
 

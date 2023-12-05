@@ -222,7 +222,7 @@ function* generateArrayTypeDefinition(specification: models.Specification, nodeI
     return;
   }
 
-  yield "Array<unknown>";
+  yield "unknown[]";
 }
 function* generateMapTypeDefinition(specification: models.Specification, nodeId: string) {
   const node = specification.nodes[nodeId];
@@ -296,17 +296,37 @@ function* generateOneOfCompoundDefinition(specification: models.Specification, o
   yield joinIterable(types, " |\n");
 }
 function* generateAnyOfCompoundDefinition(specification: models.Specification, anyOf: string[]) {
-  const unionTypes = new Array<NestedText>();
-  for (let count = 0; count < anyOf.length; count++) {
-    for (const intersectionTypes of choose(anyOf, count + 1)) {
-      const types = intersectionTypes.map((nodeId) => toPascal(specification.names[nodeId]));
-      unionTypes.push(joinIterable(types, " & "));
+  const { anyOfHack } = specification.options;
+
+  if (anyOfHack) {
+    /*
+    this is a more efficient implementation, it is less perfect but many times faster,
+    especially with a lot of anyof types
+    */
+    const intersectionTypes = anyOf.map((nodeId) => toPascal(specification.names[nodeId]));
+
+    yield joinIterable(
+      mapIterable(intersectionTypes, (type) => itt`(Partial<${type}>)`),
+      " &\n",
+    );
+  } else {
+    /*
+    this is the correct implementation of anyof, it may yield an incredibel amount of code.
+    */
+    const unionTypes = new Array<NestedText>();
+
+    for (let count = 0; count < anyOf.length; count++) {
+      for (const intersectionTypes of choose(anyOf, count + 1)) {
+        const types = intersectionTypes.map((nodeId) => toPascal(specification.names[nodeId]));
+        unionTypes.push(joinIterable(types, " & "));
+      }
     }
+
+    yield joinIterable(
+      mapIterable(unionTypes, (type) => itt`(${type})`),
+      " |\n",
+    );
   }
-  yield joinIterable(
-    mapIterable(unionTypes, (type) => itt`(${type})`),
-    " |\n",
-  );
 }
 function* generateAllOfCompoundDefinition(specification: models.Specification, allOf: string[]) {
   const types = allOf.map((nodeId) => toPascal(specification.names[nodeId]));

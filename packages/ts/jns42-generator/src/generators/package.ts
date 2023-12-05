@@ -11,9 +11,10 @@ import { generateValidatorsTestTsCode } from "./validators-test-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
 
 export interface PackageOptions {
-  name: string;
-  version: string;
-  directoryPath: string;
+  packageName: string;
+  packageVersion: string;
+  packageDirectoryPath: string;
+  anyOfHack: boolean;
 }
 
 export function generatePackage(
@@ -21,65 +22,70 @@ export function generatePackage(
   namesData: Record<string, string>,
   options: PackageOptions,
 ) {
+  const { anyOfHack, packageDirectoryPath, packageName, packageVersion } = options;
+
   const specification = {
     names: namesData,
     nodes: intermediateData.schemas,
+    options: {
+      anyOfHack,
+    },
   };
 
-  fs.mkdirSync(options.directoryPath, { recursive: true });
-  fs.mkdirSync(path.join(options.directoryPath, "src"));
+  fs.mkdirSync(packageDirectoryPath, { recursive: true });
+  fs.mkdirSync(path.join(packageDirectoryPath, "src"));
 
   {
-    const content = getPackageJsonData(options.name, options.version);
-    const filePath = path.join(options.directoryPath, "package.json");
+    const content = getPackageJsonData(packageName, packageVersion);
+    const filePath = path.join(packageDirectoryPath, "package.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
     const content = namesData;
-    const filePath = path.join(options.directoryPath, "names.json");
+    const filePath = path.join(packageDirectoryPath, "names.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
     const content = intermediateData;
-    const filePath = path.join(options.directoryPath, "intermediate.json");
+    const filePath = path.join(packageDirectoryPath, "intermediate.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
     const content = getTsconfigJsonData();
-    const filePath = path.join(options.directoryPath, "tsconfig.json");
+    const filePath = path.join(packageDirectoryPath, "tsconfig.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 
   {
     const content = generateMainTsCode(specification);
-    const filePath = path.join(options.directoryPath, "src", "main.ts");
+    const filePath = path.join(packageDirectoryPath, "src", "main.ts");
     writeContentToFile(filePath, content);
   }
 
   {
     const content = generateValidatorsTsCode(specification);
-    const filePath = path.join(options.directoryPath, "src", "validators.ts");
+    const filePath = path.join(packageDirectoryPath, "src", "validators.ts");
     writeContentToFile(filePath, content);
   }
 
   {
     const content = generateTypesTsCode(specification);
-    const filePath = path.join(options.directoryPath, "src", "types.ts");
+    const filePath = path.join(packageDirectoryPath, "src", "types.ts");
     writeContentToFile(filePath, content);
   }
 
   {
     const content = generateParsersTsCode(specification);
-    const filePath = path.join(options.directoryPath, "src", "parsers.ts");
+    const filePath = path.join(packageDirectoryPath, "src", "parsers.ts");
     writeContentToFile(filePath, content);
   }
 
   {
     const content = generateValidatorsTestTsCode(specification);
-    const filePath = path.join(options.directoryPath, "src", "validators.test.ts");
+    const filePath = path.join(packageDirectoryPath, "src", "validators.test.ts");
     writeContentToFile(filePath, content);
   }
 
@@ -88,7 +94,7 @@ export function generatePackage(
       *.tsbuildinfo
       out/
     `;
-    const filePath = path.join(options.directoryPath, ".gitignore");
+    const filePath = path.join(packageDirectoryPath, ".gitignore");
     writeContentToFile(filePath, content);
   }
 }

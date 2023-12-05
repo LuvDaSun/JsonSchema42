@@ -48,6 +48,11 @@ export function configurePackageProgram(argv: yargs.Argv) {
           description: "maximum number of iterations for finding unique names",
           type: "number",
           default: 5,
+        })
+        .option("any-of-hack", {
+          description: "quickfix to make any of work with many types",
+          type: "boolean",
+          default: false,
         }),
     (argv) => main(argv as MainOptions),
   );
@@ -61,9 +66,11 @@ interface MainOptions {
   packageVersion: string;
   defaultName: string;
   namerMaximumIterations: number;
+  anyOfHack: boolean;
 }
 
 async function main(options: MainOptions) {
+  const { anyOfHack } = options;
   let instanceSchemaUrl: URL;
   if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
     instanceSchemaUrl = new URL(options.instanceSchemaUrl);
@@ -105,8 +112,9 @@ async function main(options: MainOptions) {
   const namesData = namer.getNames();
 
   generatePackage(intermediateData, namesData, {
-    directoryPath: packageDirectoryPath,
-    name: packageName,
-    version: packageVersion,
+    packageDirectoryPath,
+    packageName,
+    packageVersion,
+    anyOfHack,
   });
 }
