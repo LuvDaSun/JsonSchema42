@@ -23,6 +23,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       node.description ?? "",
       node.deprecated ? "@deprecated" : "",
     ]
+      .map((line) => line.replaceAll("*/", "*\\/"))
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
 
