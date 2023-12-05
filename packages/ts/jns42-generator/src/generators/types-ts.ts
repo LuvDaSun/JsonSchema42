@@ -23,6 +23,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       node.description ?? "",
       node.deprecated ? "@deprecated" : "",
     ]
+      .map((line) => line.replaceAll("*/", "*\\/"))
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
 
@@ -311,7 +312,7 @@ function* generateAnyOfCompoundDefinition(specification: models.Specification, a
     );
   } else {
     /*
-    this is the correct implementation of anyof, it may yield an incredibel amount of code.
+    this is the correct implementation of anyof, it may yield an incredible amount of code.
     */
     const unionTypes = new Array<NestedText>();
 

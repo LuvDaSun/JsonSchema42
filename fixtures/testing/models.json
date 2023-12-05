@@ -4,7 +4,7 @@
   "$defs": {
     "id": {
       "$anchor": "id",
-      "description": "An identity",
+      "description": "An identity */",
       "type": "integer",
       "exclusiveMinimum": 0,
       "examples": [1, 2, 3]
