@@ -312,7 +312,7 @@ function* generateAnyOfCompoundDefinition(specification: models.Specification, a
     );
   } else {
     /*
-    this is the correct implementation of anyof, it may yield an incredibel amount of code.
+    this is the correct implementation of anyof, it may yield an incredible amount of code.
     */
     const unionTypes = new Array<NestedText>();
 
