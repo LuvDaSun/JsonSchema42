@@ -7,12 +7,14 @@ schemas:
       b: { type: "string" }
     not:
       required: ["a", "b"]
+
 valid:
   empty: {}
   onlyA:
     a: "A"
   onlyB:
     b: "B"
+
 invalid:
   bothAandB:
     a: "A"

@@ -51,6 +51,7 @@ async function runTest(packageName: string) {
   const testData = YAML.parse(testContent);
 
   const parseData = testData.parse ?? false;
+  const rootTypeName = testData.rootTypeName ?? defaultTypeName;
   const schemas = testData.schemas as Record<string, unknown>;
   for (const schemaName in schemas) {
     const schema = schemas[schemaName];
@@ -85,7 +86,7 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
-      const namer = new Namer("schema-document", 5);
+      const namer = new Namer(defaultTypeName, 5);
       for (const nodeId in intermediateData.schemas) {
         const nodeUrl = new URL(nodeId);
         const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
@@ -128,9 +129,9 @@ async function runTest(packageName: string) {
         await test(testName, async () => {
           const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
-            data = packageMain[`parse${defaultTypeName}`](data);
+            data = packageMain[`parse${rootTypeName}`](data);
           }
-          assert.equal(packageMain[`is${defaultTypeName}`](data), true);
+          assert.equal(packageMain[`is${rootTypeName}`](data), true);
         });
       }
     });
@@ -141,9 +142,9 @@ async function runTest(packageName: string) {
         await test(testName, async () => {
           const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
           if (parseData) {
-            data = packageMain[`parse${defaultTypeName}`](data);
+            data = packageMain[`parse${rootTypeName}`](data);
           }
-          assert.equal(packageMain[`is${defaultTypeName}`](data), false);
+          assert.equal(packageMain[`is${rootTypeName}`](data), false);
         });
       }
     });

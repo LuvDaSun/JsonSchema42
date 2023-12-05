@@ -12,9 +12,11 @@ schemas:
     examples:
       - "hi!"
       - false
+
 valid:
   hi: "hi!"
   "false": false
+
 invalid:
   one: 1
   object: {}
