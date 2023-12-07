@@ -7,6 +7,10 @@
     {
       "name": "jns42-generator",
       "path": "jns42-generator"
+    },
+    {
+      "name": "jns42-optimizer",
+      "path": "jns42-optimizer"
     }
   ],
   "settings": {

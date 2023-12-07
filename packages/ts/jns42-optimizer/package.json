@@ -1,21 +1,16 @@
 {
-  "name": "jns42-generator",
-  "version": "0.9.6",
+  "name": "jns42-optimizer",
+  "private": true,
   "sideEffects": false,
-  "description": "generate interfaces and validators from a json schema",
+  "description": "",
   "type": "module",
-  "bin": {
-    "jns42-generator": "bin/jns42-generator"
-  },
   "main": "out/main.js",
   "types": "out/main.d.ts",
   "files": [
-    "bin/*",
     "out/*",
     "src/*"
   ],
   "scripts": {
-    "prepack": "npm install --no-workspaces",
     "prepare": "tsc --build",
     "build": "tsc --build",
     "clean": "rm -rf ./out && tsc --build --clean",
@@ -30,11 +25,6 @@
   "bugs": {
     "url": "https://github.com/LuvDaSun/JsonSchema42/issues"
   },
-  "keywords": [
-    "json",
-    "schema",
-    "generator"
-  ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
@@ -45,19 +35,9 @@
     "@types/node": "^20.10.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
-    "jns42-optimizer": "file:../jns42-optimizer",
-    "schema-draft-04": "file:../schema-draft-04",
-    "schema-draft-2020-12": "file:../schema-draft-2020-12",
-    "schema-intermediate": "file:../schema-intermediate",
     "tslib": "^2.6.2",
     "type-fest": "^4.6.0",
     "typescript": "^5.3.2",
     "yargs": "^17.7.2"
-  },
-  "bundledDependencies": [
-    "jns42-optimizer",
-    "schema-draft-04",
-    "schema-draft-2020-12",
-    "schema-intermediate"
-  ]
+  }
 }
