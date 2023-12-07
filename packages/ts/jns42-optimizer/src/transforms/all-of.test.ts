@@ -22,9 +22,9 @@ test("all-of utility", () => {
       { type: "never" },
       { type: "any" },
       { type: "number" },
-      { type: "number" },
+      { type: "alias", target: 4 },
       { type: "never" },
-      { type: "number" },
+      { type: "alias", target: 4 },
     ],
   );
 });

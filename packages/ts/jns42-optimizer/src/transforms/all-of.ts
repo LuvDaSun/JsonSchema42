@@ -7,15 +7,8 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     return item;
   }
 
-  const uniqueElements = new Set(item.elements);
-
-  if (uniqueElements.size === 1) {
-    const [target] = item.elements;
-    return { type: "alias", target };
-  }
-
-  let mergedItem: types.Primitive | types.Complex | undefined;
-  for (const subKey of uniqueElements) {
+  const uniqueElements = new Set<number>();
+  for (const subKey of item.elements) {
     const subItem = arena.getItemUnalias(subKey);
 
     switch (subItem.type) {
@@ -36,6 +29,13 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         // don't merge these, these types have no influence on the merged type
         continue;
     }
+
+    uniqueElements.add(subKey);
+  }
+
+  let mergedItem: types.Union | undefined;
+  for (const subKey of uniqueElements) {
+    const subItem = arena.getItemUnalias(subKey);
 
     // if there is no merged item, we have nothing to compare to! we will be able to do this
     // in the next cycle
