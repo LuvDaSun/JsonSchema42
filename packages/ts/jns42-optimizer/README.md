@@ -55,7 +55,7 @@ Can be optimized into
 
 This, however can lead to a lot of items in the arena, we want to optimize this at some point.
 
-Also this method will result is a `oneOf` with many elements. This may be correct but this is no how the `anyOf` is used most of the time.
+Also this method will result is a `oneOf` with many `anyOf` elements. This may be correct but this is no how the `anyOf` is used most of the time.
 
 A better solution would be to first group the elements by type, that will be a `oneOf` type. This is so because a value can never be two types at the same time.
 
