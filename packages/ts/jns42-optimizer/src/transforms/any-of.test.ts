@@ -59,4 +59,6 @@ test("any-of many", () => {
   });
 
   while (arena.applyTransform(flatten, alias, anyOf, allOf, oneOf) > 0);
+
+  debugger;
 });

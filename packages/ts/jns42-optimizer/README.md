@@ -53,4 +53,10 @@ Can be optimized into
     - 3
 ```
 
-This, however can lead to a log of items in the arena, we want to optimize this at some point.
+This, however can lead to a lot of items in the arena, we want to optimize this at some point.
+
+Also this method will result is a `oneOf` with many elements. This may be correct but this is no how the `anyOf` is used most of the time.
+
+A better solution would be to first group the elements by type, that will be a `oneOf` type. This is so because a value can never be two types at the same time.
+
+Then, complex types are merged as anyOf types of their elements. In case of an object then only if both properties are required then the merged property is required.
