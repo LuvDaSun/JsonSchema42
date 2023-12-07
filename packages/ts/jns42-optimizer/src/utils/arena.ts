@@ -21,7 +21,7 @@ export class Arena<T> {
     return index;
   }
 
-  public applyTransform(transform: ArenaTransform<T>): number {
+  public applyTransform(transform: ArenaTransform<T, typeof this>): number {
     let counter = 0;
     for (let index = 0; index < this.items.length; index++) {
       const item = this.items[index];
