@@ -33,6 +33,13 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     uniqueElements.add(subKey);
   }
 
+  if (uniqueElements.size !== item.elements.length) {
+    return {
+      type: "allOf",
+      elements: [...uniqueElements],
+    };
+  }
+
   let mergedItem: types.Union | undefined;
   for (const subKey of uniqueElements) {
     const subItem = arena.getItemUnalias(subKey);

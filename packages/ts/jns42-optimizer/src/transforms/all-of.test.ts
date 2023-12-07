@@ -1,7 +1,9 @@
 import assert from "node:assert";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
+import { alias } from "./alias.js";
 import { allOf } from "./all-of.js";
+import { flatten } from "./flatten.js";
 
 test("all-of utility", () => {
   const arena = new TypeArena();
@@ -13,7 +15,7 @@ test("all-of utility", () => {
   arena.addItem({ type: "allOf", elements: [num, n] });
   arena.addItem({ type: "allOf", elements: [num, a] });
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -36,7 +38,7 @@ test("all-of alias", () => {
   const allOf1 = arena.addItem({ type: "allOf", elements: [str2] });
   arena.addItem({ type: "allOf", elements: [str1, allOf1] });
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -49,7 +51,7 @@ test("all-of unique", () => {
   const num = arena.addItem({ type: "number" });
   arena.addItem({ type: "allOf", elements: [num, num, num] });
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual([...arena], [{ type: "number" }, { type: "alias", target: num }]);
 });
@@ -62,7 +64,7 @@ test("all-of primitive", () => {
   arena.addItem({ type: "allOf", elements: [num, str1] });
   arena.addItem({ type: "allOf", elements: [str1, str2] });
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -86,7 +88,7 @@ test("all-of tuple", () => {
   arena.addItem({ type: "tuple", elements: [3, 4] }); // 6
   arena.addItem({ type: "allOf", elements: [5, 6] }); // 7
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -112,7 +114,7 @@ test("all-of array", () => {
   arena.addItem({ type: "array", element: 2 }); // 4
   arena.addItem({ type: "allOf", elements: [3, 4] }); // 5
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -149,7 +151,7 @@ test("all-of object", () => {
   }); // 6
   arena.addItem({ type: "allOf", elements: [5, 6] }); // 7
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -195,7 +197,7 @@ test("all-of map", () => {
   arena.addItem({ type: "map", name: 3, element: 4 }); // 6
   arena.addItem({ type: "allOf", elements: [5, 6] }); // 7
 
-  while (arena.applyTransform(allOf) > 0);
+  while (arena.applyTransform(flatten, alias, allOf) > 0);
 
   assert.deepEqual(
     [...arena],

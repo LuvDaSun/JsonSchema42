@@ -21,14 +21,16 @@ export class Arena<T> {
     return key;
   }
 
-  public applyTransform(transform: ArenaTransform<T, typeof this>): number {
+  public applyTransform(...transformers: ArenaTransform<T, typeof this>[]): number {
     let counter = 0;
     for (let index = 0; index < this.items.length; index++) {
-      const item = this.items[index];
-      const itemNew = transform(this, item);
-      if (item !== itemNew) {
-        counter++;
-        this.items[index] = itemNew;
+      let item = this.items[index];
+      for (const transform of transformers) {
+        item = transform(this, item);
+        if (item !== this.items[index]) {
+          counter++;
+          this.items[index] = item;
+        }
       }
     }
     return counter;
