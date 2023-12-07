@@ -1,4 +1,4 @@
-export type ArenaTransform<T> = (arena: Arena<T>, item: T) => T;
+export type ArenaTransform<T, A extends Arena<T> = Arena<T>> = (arena: A, item: T) => T;
 
 export class Arena<T> {
   private items = new Array<T>();

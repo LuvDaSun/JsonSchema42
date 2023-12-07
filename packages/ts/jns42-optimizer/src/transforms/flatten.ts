@@ -1,7 +1,6 @@
-import { ArenaTransform } from "../arena.js";
-import * as types from "../types.js";
+import { TypeArenaTransform } from "../type-arena.js";
 
-export const flatten: ArenaTransform<types.Union> = (arena, item) => {
+export const flatten: TypeArenaTransform = (arena, item) => {
   switch (item.type) {
     case "allOf":
     case "anyOf":
