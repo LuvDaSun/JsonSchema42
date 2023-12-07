@@ -1,19 +1,8 @@
-export type Union =
-  | Unknown
-  | Never
-  | Any
-  | Boolean
-  | Integer
-  | Number
-  | String
-  | Tuple
-  | Array
-  | Object
-  | Map
-  | Alias
-  | OneOf
-  | AnyOf
-  | AllOf;
+export type Union = Unknown | Never | Any | Primitive | Complex | Merge;
+
+export type Primitive = Boolean | Integer | Number | String;
+export type Complex = Tuple | Array | Object | Map;
+export type Merge = OneOf | AnyOf | AllOf;
 
 export interface Base<Type extends string> {
   uri?: string;
@@ -49,19 +38,20 @@ export interface String extends Base<"string"> {
 }
 
 export interface Tuple extends Base<"tuple"> {
-  // TODO
+  elements: number[];
 }
 
 export interface Array extends Base<"array"> {
-  // TODO
+  element: number;
 }
 
 export interface Object extends Base<"object"> {
-  // TODO
+  properties: { [name: string]: { element: number; required: boolean } };
 }
 
 export interface Map extends Base<"map"> {
-  // TODO
+  name: number;
+  element: number;
 }
 
 export interface Alias extends Base<"alias"> {

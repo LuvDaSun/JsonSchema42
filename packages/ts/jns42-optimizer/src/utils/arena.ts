@@ -11,14 +11,14 @@ export class Arena<T> {
     return this.items.length;
   }
 
-  public getItem(index: number): T {
-    return this.items[index];
+  public getItem(key: number): T {
+    return this.items[key - 1];
   }
 
   public addItem(item: T): number {
-    const index = this.items.length;
+    const key = this.items.length + 1;
     this.items.push(item);
-    return index;
+    return key;
   }
 
   public applyTransform(transform: ArenaTransform<T, typeof this>): number {

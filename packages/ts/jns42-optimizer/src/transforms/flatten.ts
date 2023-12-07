@@ -7,14 +7,14 @@ export const flatten: TypeArenaTransform = (arena, item) => {
     case "oneOf": {
       let elements = new Array<number>();
       let createNew = false;
-      for (const subIndex of item.elements) {
-        const subItem = arena.getItemUnalias(subIndex);
+      for (const subKey of item.elements) {
+        const subItem = arena.getItemUnalias(subKey);
 
         if (subItem.type === item.type) {
           createNew = true;
           elements.push(...subItem.elements);
         } else {
-          elements.push(subIndex);
+          elements.push(subKey);
         }
       }
       if (createNew) {
