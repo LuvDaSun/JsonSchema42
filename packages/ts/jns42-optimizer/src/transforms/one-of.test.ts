@@ -1,9 +1,10 @@
 import assert from "node:assert";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { alias } from "./alias.js";
-import { flatten } from "./flatten.js";
-import { oneOf } from "./one-of.js";
+import { hasDoubleReference } from "../utils/index.js";
+import * as transforms from "./index.js";
+
+const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.oneOf];
 
 test("one-of utility", () => {
   const arena = new TypeArena();
@@ -15,7 +16,7 @@ test("one-of utility", () => {
   arena.addItem({ type: "oneOf", elements: [num, n] });
   arena.addItem({ type: "oneOf", elements: [num, a] });
 
-  while (arena.applyTransform(flatten, alias, oneOf) > 0);
+  while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -29,6 +30,7 @@ test("one-of utility", () => {
       { type: "any" },
     ],
   );
+  assert(!hasDoubleReference([...arena]));
 });
 
 test("one-of alias", () => {
@@ -38,7 +40,7 @@ test("one-of alias", () => {
   const oneOf1 = arena.addItem({ type: "oneOf", elements: [str2] });
   arena.addItem({ type: "oneOf", elements: [str1, oneOf1] });
 
-  while (arena.applyTransform(flatten, alias, oneOf) > 0);
+  while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena],
@@ -49,6 +51,7 @@ test("one-of alias", () => {
       { type: "oneOf", elements: [str1, oneOf1] },
     ],
   );
+  assert(!hasDoubleReference([...arena]));
 });
 
 test("one-of unique", () => {
@@ -56,7 +59,8 @@ test("one-of unique", () => {
   const num = arena.addItem({ type: "number" });
   arena.addItem({ type: "oneOf", elements: [num, num, num] });
 
-  while (arena.applyTransform(flatten, alias, oneOf) > 0);
+  while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual([...arena], [{ type: "number" }, { type: "alias", target: num }]);
+  assert(!hasDoubleReference([...arena]));
 });

@@ -1,7 +1,7 @@
 import { TypeArenaTransform } from "../type-arena.js";
 
 export const oneOf: TypeArenaTransform = (arena, item) => {
-  if (item.type !== "oneOf") {
+  if (item.type !== "oneOf" || item.elements.length < 2) {
     return item;
   }
 
