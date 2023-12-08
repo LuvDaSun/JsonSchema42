@@ -5,9 +5,27 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 
+  const stringKey = arena.addItem({
+    type: "string",
+  });
+  const anyKey = arena.addItem({
+    type: "any",
+  });
+
+  for (const id in document.schemas) {
+    const newItem: types.Unknown = {
+      id,
+      type: "unknown",
+    };
+
+    const newKey = arena.addItem(newItem);
+    idMap[id] = newKey;
+  }
+
   for (const id in document.schemas) {
     const node = document.schemas[id];
 
+    const nodeKey = idMap[id];
     const typeKeys = new Array<number>();
 
     for (const type of node.types) {
@@ -72,19 +90,87 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
           typeKeys.push(newKey);
         }
         case "array": {
-          const newItem: types.Array = {
-            type: "array",
-            element: 0,
+          const compoundElements = new Array<number>();
+
+          if (node.tupleItems != null) {
+            const elements = node.tupleItems.map((tupleItem) => idMap[tupleItem]);
+
+            const newItem: types.Tuple = {
+              type: "tuple",
+              elements,
+            };
+
+            const newKey = arena.addItem(newItem);
+            compoundElements.push(newKey);
+          }
+
+          if (node.arrayItems != null) {
+            const element = idMap[node.arrayItems];
+
+            const newItem: types.Array = {
+              type: "array",
+              element,
+            };
+
+            const newKey = arena.addItem(newItem);
+            compoundElements.push(newKey);
+          }
+
+          const newItem: types.AllOf = {
+            type: "allOf",
+            elements: compoundElements,
           };
 
           const newKey = arena.addItem(newItem);
           typeKeys.push(newKey);
         }
         case "map": {
-          const newItem: types.Map = {
-            type: "map",
-            name: 0,
-            element: 0,
+          const compoundElements = new Array<number>();
+
+          if (node.objectProperties != null || node.required != null) {
+            const requiredProperties = new Set(node.required);
+            const propertyNames = new Set([
+              ...Object.keys(node.objectProperties ?? {}),
+              ...requiredProperties,
+            ]);
+            const propertyEntries = [...propertyNames].map((propertyName) => [
+              propertyName,
+              {
+                required: requiredProperties.has(propertyName),
+                element:
+                  node.objectProperties?.[propertyName] == null
+                    ? anyKey
+                    : idMap[node.objectProperties[propertyName]],
+              },
+            ]);
+            const properties = Object.fromEntries(propertyEntries);
+
+            const newItem: types.Object = {
+              type: "object",
+              properties,
+            };
+
+            const newKey = arena.addItem(newItem);
+            compoundElements.push(newKey);
+          }
+
+          if (node.mapProperties != null) {
+            const name = node.propertyNames == null ? stringKey : idMap[node.propertyNames];
+            const element = idMap[node.mapProperties];
+
+            const newItem: types.Map = {
+              type: "map",
+              name,
+              element,
+            };
+
+            const newKey = arena.addItem(newItem);
+            compoundElements.push(newKey);
+          }
+
+          const newItem: types.AllOf = {
+            type: "allOf",
+            elements: compoundElements,
           };
 
           const newKey = arena.addItem(newItem);
@@ -98,10 +184,10 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
       type: "oneOf",
       elements: typeKeys,
     };
-
-    const newKey = arena.addItem(newItem);
-    idMap[id] = newKey;
+    arena.replaceItem(nodeKey, newItem);
   }
+
+  debugger;
 
   while (
     arena.applyTransform(
