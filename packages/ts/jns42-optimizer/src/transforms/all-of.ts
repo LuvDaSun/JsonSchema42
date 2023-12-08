@@ -63,6 +63,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     }
 
     switch (subItem.type) {
+      case "null":
       case "boolean":
       case "integer":
       case "number":

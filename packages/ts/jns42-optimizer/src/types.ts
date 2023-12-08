@@ -1,6 +1,6 @@
 export type Union = Unknown | Never | Any | Primitive | Complex | Merge;
 
-export type Primitive = Boolean | Integer | Number | String;
+export type Primitive = Null | Boolean | Integer | Number | String;
 export type Complex = Tuple | Array | Object | Map;
 export type Merge = OneOf | AnyOf | AllOf;
 
@@ -18,6 +18,10 @@ export interface Never extends Base<"never"> {
 }
 
 export interface Any extends Base<"any"> {
+  //
+}
+
+export interface Null extends Base<"null"> {
   //
 }
 

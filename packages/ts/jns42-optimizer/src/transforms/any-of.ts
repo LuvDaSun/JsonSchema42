@@ -72,7 +72,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
       }
 
       switch (type) {
-        case "boolean":
+        case "null":
         case "integer":
         case "number":
         case "string":
