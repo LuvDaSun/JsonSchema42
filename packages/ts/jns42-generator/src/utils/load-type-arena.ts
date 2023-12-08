@@ -104,7 +104,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
             compoundElements.push(newKey);
           }
 
-          if (node.arrayItems != null) {
+          if (node.arrayItems != null && node.arrayItems.length > 0) {
             const element = idMap[node.arrayItems];
 
             const newItem: types.Array = {
@@ -127,7 +127,10 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
         case "map": {
           const compoundElements = new Array<number>();
 
-          if (node.objectProperties != null || node.required != null) {
+          if (
+            node.objectProperties != null ||
+            (node.required != null && node.required.length > 0)
+          ) {
             const requiredProperties = new Set(node.required);
             const propertyNames = new Set([
               ...Object.keys(node.objectProperties ?? {}),
