@@ -7,6 +7,8 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     return item;
   }
 
+  const { id } = item;
+
   const uniqueElements = new Set<number>();
   for (const subKey of item.elements) {
     const subItem = arena.getItemUnalias(subKey);
@@ -22,7 +24,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
 
       case "never":
         // merging with a never type will always yield never
-        return { type: "never" };
+        return { id, type: "never" };
 
       case "any":
       case "unknown":
@@ -35,6 +37,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
 
   if (uniqueElements.size !== item.elements.length) {
     return {
+      id,
       type: "allOf",
       elements: [...uniqueElements],
     };
@@ -54,6 +57,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     if (subItem.type !== mergedItem.type) {
       // we cannot merge two types that are not the same!
       return {
+        id,
         type: "never",
       };
     }
@@ -87,10 +91,12 @@ export const allOf: TypeArenaTransform = (arena, item) => {
             elements.push(subItem.elements[index]);
           }
         }
-        return {
+        mergedItem = {
+          id,
           type: "tuple",
           elements,
         };
+        break;
       }
 
       case "array": {
@@ -101,10 +107,12 @@ export const allOf: TypeArenaTransform = (arena, item) => {
           elements: [mergedItem.element, subItem.element],
         };
         const newKey = arena.addItem(newItem);
-        return {
+        mergedItem = {
+          id,
           type: "array",
           element: newKey,
         };
+        break;
       }
 
       case "object": {
@@ -136,10 +144,12 @@ export const allOf: TypeArenaTransform = (arena, item) => {
             properties[propertyName] = { ...subItemProperty };
           }
         }
-        return {
+        mergedItem = {
+          id,
           type: "object",
           properties,
         };
+        break;
       }
 
       case "map": {
@@ -156,11 +166,13 @@ export const allOf: TypeArenaTransform = (arena, item) => {
           elements: [mergedItem.element, subItem.element],
         };
         const newElementKey = arena.addItem(newElementItem);
-        return {
+        mergedItem = {
+          id,
           type: "map",
           name: newNameKey,
           element: newElementKey,
         };
+        break;
       }
     }
   }

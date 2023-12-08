@@ -7,6 +7,8 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
     return item;
   }
 
+  const { id } = item;
+
   const uniqueElements = new Set<number>();
   for (const subKey of item.elements) {
     const subItem = arena.getItemUnalias(subKey);
@@ -22,7 +24,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
 
       case "any":
         // merging with a any type will always yield any
-        return { type: "any" };
+        return { id, type: "any" };
 
       case "never":
       case "unknown":
@@ -35,6 +37,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
 
   if (uniqueElements.size !== item.elements.length) {
     return {
+      id,
       type: "anyOf",
       elements: [...uniqueElements],
     };
@@ -98,10 +101,12 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
               elements.push(subItem.elements[index]);
             }
           }
-          return {
+          mergedItem = {
+            id,
             type: "tuple",
             elements,
           };
+          break;
         }
 
         case "array": {
@@ -113,10 +118,12 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
             elements: [mergedItem.element, subItem.element],
           };
           const newKey = arena.addItem(newItem);
-          return {
+          mergedItem = {
+            id,
             type: "array",
             element: newKey,
           };
+          break;
         }
 
         case "object": {
@@ -149,10 +156,12 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
               properties[propertyName] = { ...subItemProperty };
             }
           }
-          return {
+          mergedItem = {
+            id,
             type: "object",
             properties,
           };
+          break;
         }
 
         case "map": {
@@ -170,11 +179,13 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
             elements: [mergedItem.element, subItem.element],
           };
           const newElementKey = arena.addItem(newElementItem);
-          return {
+          mergedItem = {
+            id,
             type: "map",
             name: newNameKey,
             element: newElementKey,
           };
+          break;
         }
       }
     }
@@ -186,6 +197,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
   }
 
   return {
+    id,
     type: "oneOf",
     elements: oneOfElements,
   };

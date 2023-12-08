@@ -5,6 +5,8 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
     return item;
   }
 
+  const { id } = item;
+
   const uniqueElements = new Set<number>();
   for (const subKey of item.elements) {
     const subItem = arena.getItemUnalias(subKey);
@@ -20,7 +22,7 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
 
       case "any":
         // merging with a any type will always yield any
-        return { type: "any" };
+        return { id, type: "any" };
 
       case "never":
       case "unknown":
@@ -33,6 +35,7 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
 
   if (uniqueElements.size !== item.elements.length) {
     return {
+      id,
       type: "oneOf",
       elements: [...uniqueElements],
     };

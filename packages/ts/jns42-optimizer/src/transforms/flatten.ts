@@ -1,6 +1,8 @@
 import { TypeArenaTransform } from "../type-arena.js";
 
 export const flatten: TypeArenaTransform = (arena, item) => {
+  const { id } = item;
+
   switch (item.type) {
     case "allOf":
     case "anyOf":
@@ -19,6 +21,7 @@ export const flatten: TypeArenaTransform = (arena, item) => {
       }
       if (createNew) {
         return {
+          id,
           type: item.type,
           elements,
         };
