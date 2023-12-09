@@ -3,8 +3,11 @@ export type ArenaTransform<T, A extends Arena<T> = Arena<T>> = (arena: A, item: 
 export class Arena<T> {
   private items = new Array<T>();
 
-  public [Symbol.iterator]() {
-    return this.items[Symbol.iterator]();
+  public *[Symbol.iterator]() {
+    for (let index = 0; index < this.items.length; index++) {
+      const item = this.items[index];
+      yield [index + 1, item] as const;
+    }
   }
 
   public get size() {
