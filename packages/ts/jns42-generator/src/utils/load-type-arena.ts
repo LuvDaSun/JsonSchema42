@@ -6,9 +6,11 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
   const idMap: Record<string, number> = {};
 
   const stringKey = arena.addItem({
+    id: null,
     type: "string",
   });
   const anyKey = arena.addItem({
+    id: null,
     type: "any",
   });
 
@@ -40,6 +42,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
         switch (type) {
           case "never": {
             const newItem: types.Never = {
+              id: null,
               type: "never",
             };
 
@@ -49,6 +52,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
           case "any": {
             const newItem: types.Any = {
+              id: null,
               type: "any",
             };
 
@@ -58,6 +62,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
           case "null": {
             const newItem: types.Null = {
+              id: null,
               type: "null",
             };
 
@@ -67,6 +72,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
           case "boolean": {
             const newItem: types.Boolean = {
+              id: null,
               type: "boolean",
             };
 
@@ -75,6 +81,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
           }
           case "number": {
             const newItem: types.Number = {
+              id: null,
               type: "number",
             };
 
@@ -83,6 +90,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
           }
           case "integer": {
             const newItem: types.Integer = {
+              id: null,
               type: "integer",
             };
 
@@ -91,6 +99,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
           }
           case "string": {
             const newItem: types.String = {
+              id: null,
               type: "string",
             };
 
@@ -104,6 +113,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
               const elements = node.tupleItems.map((tupleItem) => idMap[tupleItem]);
 
               const newItem: types.Tuple = {
+                id: null,
                 type: "tuple",
                 elements,
               };
@@ -116,6 +126,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
               const element = idMap[node.arrayItems];
 
               const newItem: types.Array = {
+                id: null,
                 type: "array",
                 element,
               };
@@ -126,6 +137,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
             if (compoundElements.length > 0) {
               const compoundItem: types.AllOf = {
+                id: null,
                 type: "allOf",
                 elements: compoundElements,
               };
@@ -159,6 +171,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
               const properties = Object.fromEntries(propertyEntries);
 
               const newItem: types.Object = {
+                id: null,
                 type: "object",
                 properties,
               };
@@ -172,6 +185,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
               const element = idMap[node.mapProperties];
 
               const newItem: types.Map = {
+                id: null,
                 type: "map",
                 name,
                 element,
@@ -183,6 +197,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
             if (compoundElements.length > 0) {
               const compoundItem: types.AllOf = {
+                id: null,
                 type: "allOf",
                 elements: compoundElements,
               };
@@ -196,6 +211,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
       if (typeElements.length > 0) {
         const typeItem: types.OneOf = {
+          id: null,
           type: "oneOf",
           elements: typeElements,
         };
@@ -207,6 +223,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
     if (node.allOf != null && node.allOf.length > 0) {
       const newItem: types.AllOf = {
+        id: null,
         type: "allOf",
         elements: node.allOf.map((element) => idMap[element]),
       };
@@ -216,6 +233,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
     if (node.anyOf != null && node.anyOf.length > 0) {
       const newItem: types.AnyOf = {
+        id: null,
         type: "anyOf",
         elements: node.anyOf.map((element) => idMap[element]),
       };
@@ -226,6 +244,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
 
     if (node.oneOf != null && node.oneOf.length > 0) {
       const newItem: types.OneOf = {
+        id: null,
         type: "oneOf",
         elements: node.oneOf.map((element) => idMap[element]),
       };

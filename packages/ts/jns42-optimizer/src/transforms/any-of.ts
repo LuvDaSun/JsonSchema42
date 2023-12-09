@@ -77,6 +77,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
         case "number":
         case "string":
           mergedItem = {
+            id: null,
             type,
           };
           break;
@@ -90,6 +91,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
           for (let index = 0; index < length; index++) {
             if (index < mergedItem.elements.length && index < subItem.elements.length) {
               const newItem: types.AnyOf = {
+                id: null,
                 type: "anyOf",
                 elements: [mergedItem.elements[index], subItem.elements[index]],
               };
@@ -114,6 +116,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
           assert(type === subItem.type);
 
           const newItem: types.AnyOf = {
+            id: null,
             type: "anyOf",
             elements: [mergedItem.element, subItem.element],
           };
@@ -141,6 +144,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
             const subItemProperty = subItem.properties[propertyName];
             if (mergedItemProperty != null && subItemProperty != null) {
               const newItem: types.AnyOf = {
+                id: null,
                 type: "anyOf",
                 elements: [mergedItemProperty.element, subItemProperty.element],
               };
@@ -169,12 +173,14 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
           assert(type === subItem.type);
 
           const newNameItem: types.AnyOf = {
+            id: null,
             type: "anyOf",
             elements: [mergedItem.name, subItem.name],
           };
           const newNameKey = arena.addItem(newNameItem);
 
           const newElementItem: types.AnyOf = {
+            id: null,
             type: "anyOf",
             elements: [mergedItem.element, subItem.element],
           };

@@ -69,6 +69,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
       case "number":
       case "string":
         mergedItem = {
+          id: null,
           type: subItem.type,
         };
         break;
@@ -81,6 +82,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         for (let index = 0; index < length; index++) {
           if (index < subItem.elements.length && index < mergedItem.elements.length) {
             const newItem: types.AllOf = {
+              id: null,
               type: "allOf",
               elements: [mergedItem.elements[index], subItem.elements[index]],
             };
@@ -104,6 +106,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         assert(mergedItem.type === subItem.type);
 
         const newItem: types.AllOf = {
+          id: null,
           type: "allOf",
           elements: [mergedItem.element, subItem.element],
         };
@@ -130,6 +133,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
           const subItemProperty = subItem.properties[propertyName];
           if (mergedItemProperty != null && subItemProperty != null) {
             const newItem: types.AllOf = {
+              id: null,
               type: "allOf",
               elements: [mergedItemProperty.element, subItemProperty.element],
             };
@@ -157,12 +161,14 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         assert(mergedItem.type === subItem.type);
 
         const newNameItem: types.AllOf = {
+          id: null,
           type: "allOf",
           elements: [mergedItem.name, subItem.name],
         };
         const newNameKey = arena.addItem(newNameItem);
 
         const newElementItem: types.AllOf = {
+          id: null,
           type: "allOf",
           elements: [mergedItem.element, subItem.element],
         };
