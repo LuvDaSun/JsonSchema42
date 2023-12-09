@@ -22,10 +22,15 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
     idMap[id] = newKey;
   }
 
-  for (const id in document.schemas) {
+  arena.applyTransform((arena, item) => {
+    const { id } = item;
+
+    if (id == null) {
+      return item;
+    }
+
     const node = document.schemas[id];
 
-    const nodeKey = idMap[id];
     const typeKeys = new Array<number>();
 
     for (const type of node.types) {
@@ -187,8 +192,9 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
       type: "oneOf",
       elements: typeKeys,
     };
-    arena.replaceItem(nodeKey, newItem);
-  }
+
+    return newItem;
+  });
 
   debugger;
 

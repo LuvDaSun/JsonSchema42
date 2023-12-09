@@ -21,12 +21,6 @@ export class Arena<T> {
     return key;
   }
 
-  public replaceItem(key: number, item: T): T | undefined {
-    const itemOld = this.items[key - 1];
-    this.items[key - 1] = item;
-    return itemOld;
-  }
-
   public applyTransform(...transformers: ArenaTransform<T, typeof this>[]): number {
     let counter = 0;
     for (let index = 0; index < this.items.length; index++) {
