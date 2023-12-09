@@ -20,6 +20,7 @@ export const flatten: TypeArenaTransform = (arena, item) => {
         }
       }
       if (createNew) {
+        debugger;
         return {
           id,
           type: item.type,
