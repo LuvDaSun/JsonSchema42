@@ -187,12 +187,17 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
       }
     }
 
-    const newItem: types.OneOf = {
-      id,
+    const typeElements: types.OneOf = {
       type: "oneOf",
       elements: typeKeys,
     };
+    const typeKey = arena.addItem(typeElements);
 
+    const newItem: types.AllOf = {
+      id,
+      type: "allOf",
+      elements: [typeKey],
+    };
     return newItem;
   });
 
