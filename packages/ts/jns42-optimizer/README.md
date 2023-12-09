@@ -59,4 +59,4 @@ Also this method will result is a `oneOf` with many `anyOf` elements. This may b
 
 A better solution would be to first group the elements by type, that will be a `oneOf` type. This is so because a value can never be two types at the same time.
 
-Then, complex types are merged as anyOf types of their elements. In case of an object then only if both properties are required then the merged property is required.
+Then, complex types are merged as `anyOf` types of their elements. In case of an object then only if both properties are required then the merged property is required.
