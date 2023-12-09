@@ -13,7 +13,7 @@ test("alias", () => {
   while (arena.applyTransform(alias) > 0);
 
   assert.deepEqual(
-    [...arena],
+    [...arena].map(([k, v]) => v),
     [
       { type: "string" },
       { type: "alias", target: i1 },

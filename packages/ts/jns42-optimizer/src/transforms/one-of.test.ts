@@ -19,7 +19,7 @@ test("one-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena],
+    [...arena].map(([k, v]) => v),
     [
       { type: "unknown" },
       { type: "never" },
@@ -43,7 +43,7 @@ test("one-of alias", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena],
+    [...arena].map(([k, v]) => v),
     [
       { type: "string" },
       { type: "string" },
@@ -61,6 +61,9 @@ test("one-of unique", () => {
 
   while (arena.applyTransform(...useTransforms) > 0);
 
-  assert.deepEqual([...arena], [{ type: "number" }, { type: "alias", target: num }]);
+  assert.deepEqual(
+    [...arena].map(([k, v]) => v),
+    [{ type: "number" }, { type: "alias", target: num }],
+  );
   assert(!hasDoubleReference([...arena]));
 });

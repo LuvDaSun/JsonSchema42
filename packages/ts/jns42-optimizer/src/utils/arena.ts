@@ -6,7 +6,7 @@ export class Arena<T> {
   public *[Symbol.iterator]() {
     for (let index = 0; index < this.items.length; index++) {
       const item = this.items[index];
-      yield [index + 1, item] as const;
+      yield [index, item] as const;
     }
   }
 
@@ -15,11 +15,11 @@ export class Arena<T> {
   }
 
   public getItem(key: number): T {
-    return this.items[key - 1];
+    return this.items[key];
   }
 
   public addItem(item: T): number {
-    const key = this.items.length + 1;
+    const key = this.items.length;
     this.items.push(item);
     return key;
   }

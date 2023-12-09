@@ -15,7 +15,7 @@ test("flatten", () => {
   while (arena.applyTransform(flatten) > 0);
 
   assert.deepEqual(
-    [...arena],
+    [...arena].map(([k, v]) => v),
     [
       { type: "string" },
       { type: "string" },
