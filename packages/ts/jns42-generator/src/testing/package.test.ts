@@ -20,7 +20,7 @@ const packageNames = [
   "all-of-object",
   "any-of-object",
   "one-of-object",
-  // "all-types",
+  "all-types",
 ];
 
 for (const packageName of packageNames) {

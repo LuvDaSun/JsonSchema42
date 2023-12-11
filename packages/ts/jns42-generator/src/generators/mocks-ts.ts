@@ -1,5 +1,14 @@
 import * as models from "../models/index.js";
-import { NestedText, banner, itt, joinIterable, toCamel, toPascal } from "../utils/index.js";
+import {
+  NestedText,
+  banner,
+  itt,
+  joinIterable,
+  mapIterable,
+  repeat,
+  toCamel,
+  toPascal,
+} from "../utils/index.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
@@ -67,29 +76,26 @@ function* generateMockLiteral(
 
   switch (typeItem.type) {
     case "anyOf":
-      yield itt`
-        // anyOf
-        (${JSON.stringify({})} as any)
-      `;
-      break;
+      throw new TypeError("anyOf not supported");
 
     case "allOf":
-      yield itt`
-        // allOf
-        (${JSON.stringify({})} as any)
-      `;
-      break;
+      throw new TypeError("allOf not supported");
 
     case "never":
-      yield itt`(${JSON.stringify({})} as never)`;
-      break;
+      throw new TypeError("never not supported");
 
     case "unknown":
-      yield itt`(${JSON.stringify({})} as unknown)`;
+      yield itt`
+        // unknown
+        ${JSON.stringify({})}
+      `;
       break;
 
     case "any":
-      yield itt`(${JSON.stringify({})} as any)`;
+      yield itt`
+        // any
+        ${JSON.stringify({})}
+      `;
       break;
 
     case "null":
@@ -112,15 +118,38 @@ function* generateMockLiteral(
       yield JSON.stringify("string");
       break;
 
-    case "tuple":
-      yield JSON.stringify([]);
+    case "tuple": {
+      yield itt`
+        {
+          ${joinIterable(
+            typeItem.elements.map(
+              (element) => itt`
+                ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
+              `,
+            ),
+            "",
+          )}
+        }
+      `;
       break;
+    }
 
-    case "array":
-      yield JSON.stringify([]);
+    case "array": {
+      const { element } = typeItem;
+      yield itt`
+        [
+          ${mapIterable(
+            repeat(5),
+            () => itt`
+              ${generateMockStatement(specification, element)}
+            `,
+          )}
+        ]
+      `;
       break;
+    }
 
-    case "object":
+    case "object": {
       yield itt`
         {
           ${joinIterable(
@@ -130,7 +159,7 @@ function* generateMockLiteral(
                 ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
               `
                 : itt`
-              ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ?${generateMockStatement(
+              ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ? ${generateMockStatement(
                 specification,
                 element,
               )} : undefined,
@@ -141,12 +170,27 @@ function* generateMockLiteral(
         }
       `;
       break;
+    }
 
-    case "map":
-      yield JSON.stringify({});
+    case "map": {
+      const { name, element } = typeItem;
+      yield itt`
+        {
+          ${mapIterable(
+            repeat(5),
+            () => itt`
+              ${generateMockStatement(specification, name)}: ${generateMockStatement(
+                specification,
+                element,
+              )}
+            `,
+          )}
+        }
+      `;
       break;
+    }
 
-    case "oneOf":
+    case "oneOf": {
       yield itt`
         (
           () => {
@@ -168,5 +212,7 @@ function* generateMockLiteral(
           }
         )()
       `;
+      break;
+    }
   }
 }

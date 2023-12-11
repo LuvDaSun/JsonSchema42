@@ -15,8 +15,8 @@ schemas:
       - { $ref: "#/$defs/object-model" }
       - { $ref: "#/$defs/record-model" }
     $defs:
-      never-model: false
-      any-model: true
+      # never-model: false
+      # any-model: true
       null-model: { type: "null" }
       boolean-model: { type: "boolean" }
       integer-model: { type: "integer" }
