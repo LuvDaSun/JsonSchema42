@@ -48,6 +48,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
 
           case "any": {
@@ -58,6 +60,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
 
           case "null": {
@@ -68,6 +72,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
 
           case "boolean": {
@@ -78,6 +84,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
           case "number": {
             const newItem: types.Number = {
@@ -87,6 +95,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
           case "integer": {
             const newItem: types.Integer = {
@@ -96,6 +106,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
           case "string": {
             const newItem: types.String = {
@@ -105,6 +117,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
 
             const newKey = arena.addItem(newItem);
             typeElements.push(newKey);
+
+            break;
           }
           case "array": {
             const compoundElements = new Array<number>();
@@ -145,6 +159,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
               const compoundKey = arena.addItem(compoundItem);
               typeElements.push(compoundKey);
             }
+
+            break;
           }
           case "map": {
             const compoundElements = new Array<number>();
@@ -205,6 +221,8 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
               const compoundKey = arena.addItem(compoundItem);
               typeElements.push(compoundKey);
             }
+
+            break;
           }
         }
       }

@@ -1,5 +1,5 @@
 import * as models from "../models/index.js";
-import { NestedText, banner, itt, toCamel, toPascal } from "../utils/index.js";
+import { NestedText, banner, itt, joinIterable, toCamel, toPascal } from "../utils/index.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
@@ -23,11 +23,26 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     yield itt`
       // ${nodeId}
-      export function ${functionName}(seed: number): types.${typeName} {
-        return (${mock}) as types.${typeName};
+      export function ${functionName}(): types.${typeName} {
+        return (${mock});
       }
     `;
   }
+
+  yield itt`
+    let seed = 0;
+    function nextSeed() {
+      // https://en.wikipedia.org/wiki/Linear_congruential_generator
+      // https://statmath.wu.ac.at/software/src/prng-3.0.2/doc/prng.html/Table_LCG.html
+      const p = Math.pow(2, 31) - 1;
+      const a = 950706376;
+      const b = 0;
+  
+      seed = (a * seed + b) % p;
+
+      return seed;
+    }
+    `;
 }
 
 function* generateMockStatement(
@@ -42,7 +57,7 @@ function* generateMockStatement(
     yield generateMockLiteral(specification, typeKey);
   } else {
     const functionName = toCamel("mock", names[typeItem.id]);
-    yield itt`${functionName}(seed)`;
+    yield itt`${functionName}()`;
   }
 }
 
@@ -84,15 +99,15 @@ function* generateMockLiteral(
       break;
 
     case "boolean":
-      yield JSON.stringify(true);
+      yield `Boolean(nextSeed() % 2)`;
       break;
 
     case "integer":
-      yield JSON.stringify(10);
+      yield `Number(nextSeed() % ${JSON.stringify(1000)})`;
       break;
 
     case "number":
-      yield JSON.stringify(10.1);
+      yield `Number(nextSeed() % ${JSON.stringify(1000)} * 10) / 10`;
       break;
 
     case "string":
@@ -108,11 +123,28 @@ function* generateMockLiteral(
       break;
 
     case "object":
-      yield JSON.stringify({});
+      yield itt`
+        {
+          ${joinIterable(
+            Object.entries(typeItem.properties).map(([name, { required, element }]) =>
+              required
+                ? itt`
+                ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
+              `
+                : itt`
+              ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ?${generateMockStatement(
+                specification,
+                element,
+              )} : undefined,
+            `,
+            ),
+            "",
+          )}
+        }
+      `;
       break;
 
     case "map":
-    case "object":
       yield JSON.stringify({});
       break;
 
@@ -120,7 +152,14 @@ function* generateMockLiteral(
       yield itt`
         (
           () => {
-            switch(seed % ${JSON.stringify(typeItem.elements.length)}) {
+            switch (
+              (
+                nextSeed() % ${JSON.stringify(typeItem.elements.length)}
+              ) as ${joinIterable(
+                typeItem.elements.map((element, index) => JSON.stringify(index)),
+                " | ",
+              )}
+            ) {
               ${typeItem.elements.map(
                 (element, index) => itt`
                   case ${JSON.stringify(index)}:

@@ -21,20 +21,12 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
-    // https://en.wikipedia.org/wiki/Linear_congruential_generator
-    // https://statmath.wu.ac.at/software/src/prng-3.0.2/doc/prng.html/Table_LCG.html
-    const p = Math.pow(2, 31) - 1;
-    const a = 950706376;
-    const b = 0;
-
-    seed = (a * seed + b) % p;
-
     const typeName = names[nodeId];
     const validatorFunctionName = toCamel("is", names[nodeId]);
     const mockFunctionName = toCamel("mock", names[nodeId]);
     yield itt`
       test(${JSON.stringify(typeName)}, () => {
-        const mock = mocks.${mockFunctionName}(${JSON.stringify(seed)});
+        const mock = mocks.${mockFunctionName}();
         assert.equal(
           validators.${validatorFunctionName}(mock),
           true,

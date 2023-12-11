@@ -13,14 +13,14 @@ import { generatePackage } from "../generators/index.js";
 import { Namer, loadTypes, projectRoot } from "../utils/index.js";
 
 const packageNames = [
-  "not",
+  // "not",
   "parse",
   "string-or-boolean",
-  "simple-object",
+  // "simple-object",
   "all-of-object",
   "any-of-object",
   "one-of-object",
-  "all-types",
+  // "all-types",
 ];
 
 for (const packageName of packageNames) {
