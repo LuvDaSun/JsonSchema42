@@ -12,12 +12,19 @@ import {
 export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;
 
-  for (const nodeId in specification.nodes) {
-    const node = specification.nodes[nodeId];
-    const typeName = toPascal(specification.names[nodeId]);
+  const { names, typeArena } = specification;
 
+  for (const [typeKey, item] of typeArena) {
+    const { id: nodeId } = item;
+
+    if (nodeId == null) {
+      continue;
+    }
+
+    const typeName = toPascal(names[nodeId]);
     const typeDefinition = generateDeclaration(specification, nodeId);
 
+    const node = specification.nodes[nodeId];
     const comments = [
       node.title ?? "",
       node.description ?? "",
@@ -28,8 +35,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
       .filter((line) => line.length > 0);
 
     yield itt`
-        // ${nodeId}
-      `;
+      // ${nodeId}
+    `;
 
     if (comments.length > 0) {
       yield itt`
