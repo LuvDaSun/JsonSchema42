@@ -21,7 +21,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     `;
 
     yield itt`
-      export function ${functionName}(value: any): unknown {
+      export function ${functionName}(value: unknown): unknown {
         ${definition}
       }
     `;
@@ -35,7 +35,7 @@ function* generateParserReference(
   const { names, typeArena } = specification;
   const typeItem = typeArena.getItem(typeKey);
   if (typeItem.id == null) {
-    yield itt`((value: any) => {
+    yield itt`((value: unknown) => {
       ${generateParserDefinition(specification, typeKey)}
     })`;
   } else {
@@ -183,7 +183,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
                 ${JSON.stringify(name)}: ${generateParserReference(
                   specification,
                   element,
-                )}(value[${JSON.stringify(name)}]),
+                )}(value[${JSON.stringify(name)} as keyof typeof value]),
               `,
             )}
           } :
