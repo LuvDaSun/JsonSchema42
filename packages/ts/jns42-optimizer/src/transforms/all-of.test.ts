@@ -22,13 +22,12 @@ test("all-of utility", () => {
     [...arena].map(([k, v]) => v),
     [
       { id: null, type: "unknown" },
-      { id: null, type: "unknown" },
       { id: null, type: "never" },
       { id: null, type: "any" },
       { id: null, type: "number" },
-      { id: null, type: "alias", target: 4 },
+      { id: null, type: "alias", target: num },
       { id: null, type: "never" },
-      { id: null, type: "alias", target: 4 },
+      { id: null, type: "alias", target: num },
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -97,30 +96,28 @@ test("all-of primitive", () => {
 
 test("all-of tuple", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "unknown" });
-  arena.addItem({ id: null, type: "number" }); // 1
+  arena.addItem({ id: null, type: "number" }); // 0
+  arena.addItem({ id: null, type: "string" }); // 1
   arena.addItem({ id: null, type: "string" }); // 2
   arena.addItem({ id: null, type: "string" }); // 3
-  arena.addItem({ id: null, type: "string" }); // 4
-  arena.addItem({ id: null, type: "tuple", elements: [1, 2] }); // 5
-  arena.addItem({ id: null, type: "tuple", elements: [3, 4] }); // 6
-  arena.addItem({ id: null, type: "allOf", elements: [5, 6] }); // 7
+  arena.addItem({ id: null, type: "tuple", elements: [0, 1] }); // 4
+  arena.addItem({ id: null, type: "tuple", elements: [2, 3] }); // 5
+  arena.addItem({ id: null, type: "allOf", elements: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "unknown" },
-      { id: null, type: "number" }, // 1
+      { id: null, type: "number" }, // 0
+      { id: null, type: "string" }, // 1
       { id: null, type: "string" }, // 2
       { id: null, type: "string" }, // 3
-      { id: null, type: "string" }, // 4
-      { id: null, type: "tuple", elements: [1, 2] }, // 5
-      { id: null, type: "tuple", elements: [3, 4] }, // 6
-      { id: null, type: "tuple", elements: [8, 9] }, // 7
-      { id: null, type: "never" }, // 8
-      { id: null, type: "string" }, // 9
+      { id: null, type: "tuple", elements: [0, 1] }, // 4
+      { id: null, type: "tuple", elements: [2, 3] }, // 5
+      { id: null, type: "tuple", elements: [7, 8] }, // 6
+      { id: null, type: "never" }, // 7
+      { id: null, type: "string" }, // 8
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -128,25 +125,23 @@ test("all-of tuple", () => {
 
 test("all-of array", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "unknown" });
-  arena.addItem({ id: null, type: "number" }); // 1
-  arena.addItem({ id: null, type: "string" }); // 2
+  arena.addItem({ id: null, type: "number" }); // 0
+  arena.addItem({ id: null, type: "string" }); // 1
+  arena.addItem({ id: null, type: "array", element: 0 }); // 2
   arena.addItem({ id: null, type: "array", element: 1 }); // 3
-  arena.addItem({ id: null, type: "array", element: 2 }); // 4
-  arena.addItem({ id: null, type: "allOf", elements: [3, 4] }); // 5
+  arena.addItem({ id: null, type: "allOf", elements: [2, 3] }); // 4
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "unknown" },
-      { id: null, type: "number" }, // 1
-      { id: null, type: "string" }, // 2
+      { id: null, type: "number" }, // 0
+      { id: null, type: "string" }, // 1
+      { id: null, type: "array", element: 0 }, // 2
       { id: null, type: "array", element: 1 }, // 3
-      { id: null, type: "array", element: 2 }, // 4
-      { id: null, type: "array", element: 6 }, // 5
-      { id: null, type: "never" }, // 6
+      { id: null, type: "array", element: 5 }, // 4
+      { id: null, type: "never" }, // 5
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -154,62 +149,63 @@ test("all-of array", () => {
 
 test("all-of object", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "unknown" });
-  arena.addItem({ id: null, type: "number" }); // 1
+  arena.addItem({ id: null, type: "number" }); // 0
+  arena.addItem({ id: null, type: "string" }); // 1
   arena.addItem({ id: null, type: "string" }); // 2
   arena.addItem({ id: null, type: "string" }); // 3
-  arena.addItem({ id: null, type: "string" }); // 4
   arena.addItem({
     id: null,
     type: "object",
     properties: {
-      a: { required: false, element: 1 },
-      b: { required: false, element: 2 },
+      a: { required: false, element: 0 },
+      b: { required: false, element: 1 },
+    },
+  }); // 4
+  arena.addItem({
+    id: null,
+    type: "object",
+    properties: {
+      b: { required: true, element: 2 },
+      c: { required: false, element: 3 },
     },
   }); // 5
-  arena.addItem({
-    id: null,
-    type: "object",
-    properties: {
-      b: { required: true, element: 3 },
-      c: { required: false, element: 4 },
-    },
-  }); // 6
-  arena.addItem({ id: null, type: "allOf", elements: [5, 6] }); // 7
+  arena.addItem({ id: null, type: "allOf", elements: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "unknown" },
-      { id: null, type: "number" }, // 1
+      { id: null, type: "number" }, // 0
+      { id: null, type: "string" }, // 1
       { id: null, type: "string" }, // 2
       { id: null, type: "string" }, // 3
-      { id: null, type: "string" }, // 4
       {
+        id: null,
         type: "object",
         properties: {
-          a: { required: false, element: 1 },
-          b: { required: false, element: 2 },
+          a: { required: false, element: 0 },
+          b: { required: false, element: 1 },
+        },
+      }, // 4
+      {
+        id: null,
+        type: "object",
+        properties: {
+          b: { required: true, element: 2 },
+          c: { required: false, element: 3 },
         },
       }, // 5
       {
+        id: null,
         type: "object",
         properties: {
-          b: { required: true, element: 3 },
-          c: { required: false, element: 4 },
+          a: { required: false, element: 0 },
+          b: { required: true, element: 7 },
+          c: { required: false, element: 3 },
         },
       }, // 6
-      {
-        type: "object",
-        properties: {
-          a: { required: false, element: 1 },
-          b: { required: true, element: 8 },
-          c: { required: false, element: 4 },
-        },
-      }, // 7
-      { id: null, type: "string" }, // 8
+      { id: null, type: "string" }, // 7
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -217,30 +213,28 @@ test("all-of object", () => {
 
 test("all-of map", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "unknown" });
+  arena.addItem({ id: null, type: "string" }); // 0
   arena.addItem({ id: null, type: "string" }); // 1
   arena.addItem({ id: null, type: "string" }); // 2
-  arena.addItem({ id: null, type: "string" }); // 3
-  arena.addItem({ id: null, type: "number" }); // 4
-  arena.addItem({ id: null, type: "map", name: 1, element: 2 }); // 5
-  arena.addItem({ id: null, type: "map", name: 3, element: 4 }); // 6
-  arena.addItem({ id: null, type: "allOf", elements: [5, 6] }); // 7
+  arena.addItem({ id: null, type: "number" }); // 3
+  arena.addItem({ id: null, type: "map", name: 0, element: 1 }); // 4
+  arena.addItem({ id: null, type: "map", name: 2, element: 3 }); // 5
+  arena.addItem({ id: null, type: "allOf", elements: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "unknown" },
+      { id: null, type: "string" }, // 0
       { id: null, type: "string" }, // 1
       { id: null, type: "string" }, // 2
-      { id: null, type: "string" }, // 3
-      { id: null, type: "number" }, // 4
-      { id: null, type: "map", name: 1, element: 2 }, // 5
-      { id: null, type: "map", name: 3, element: 4 }, // 6
-      { id: null, type: "map", name: 8, element: 9 }, // 7
-      { id: null, type: "string" }, // 8
-      { id: null, type: "never" }, // 9
+      { id: null, type: "number" }, // 3
+      { id: null, type: "map", name: 0, element: 1 }, // 4
+      { id: null, type: "map", name: 2, element: 3 }, // 5
+      { id: null, type: "map", name: 7, element: 8 }, // 6
+      { id: null, type: "string" }, // 7
+      { id: null, type: "never" }, // 8
     ],
   );
   assert(!hasDoubleReference([...arena]));

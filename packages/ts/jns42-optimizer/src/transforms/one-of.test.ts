@@ -25,8 +25,8 @@ test("one-of utility", () => {
       { id: null, type: "never" },
       { id: null, type: "any" },
       { id: null, type: "number" },
-      { id: null, type: "alias", target: 4 },
-      { id: null, type: "alias", target: 4 },
+      { id: null, type: "alias", target: num },
+      { id: null, type: "alias", target: num },
       { id: null, type: "any" },
     ],
   );
