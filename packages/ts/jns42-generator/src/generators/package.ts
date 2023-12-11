@@ -2,12 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import * as schemaIntermediate from "schema-intermediate";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
+import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
-import { generateValidatorsTestTsCode } from "./validators-test-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
 
 export interface PackageOptions {
@@ -84,8 +84,8 @@ export function generatePackage(
   }
 
   {
-    const content = generateValidatorsTestTsCode(specification);
-    const filePath = path.join(packageDirectoryPath, "src", "validators.test.ts");
+    const content = generateExamplesTestTsCode(specification);
+    const filePath = path.join(packageDirectoryPath, "src", "examples.test.ts");
     writeContentToFile(filePath, content);
   }
 
