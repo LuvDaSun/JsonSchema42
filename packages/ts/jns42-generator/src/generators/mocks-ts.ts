@@ -115,12 +115,12 @@ function* generateMockLiteral(
       break;
 
     case "string":
-      yield JSON.stringify("string");
+      yield `${JSON.stringify("string")} + nextSeed()`;
       break;
 
     case "tuple": {
       yield itt`
-        {
+        [
           ${joinIterable(
             typeItem.elements.map(
               (element) => itt`
@@ -129,7 +129,7 @@ function* generateMockLiteral(
             ),
             "",
           )}
-        }
+        ]
       `;
       break;
     }
@@ -141,7 +141,7 @@ function* generateMockLiteral(
           ${mapIterable(
             repeat(5),
             () => itt`
-              ${generateMockStatement(specification, element)}
+              ${generateMockStatement(specification, element)},
             `,
           )}
         ]
@@ -156,13 +156,13 @@ function* generateMockLiteral(
             Object.entries(typeItem.properties).map(([name, { required, element }]) =>
               required
                 ? itt`
-                ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
-              `
+                  ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
+                `
                 : itt`
-              ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ? ${generateMockStatement(
-                specification,
-                element,
-              )} : undefined,
+                  ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ? ${generateMockStatement(
+                    specification,
+                    element,
+                  )} : undefined,
             `,
             ),
             "",
@@ -179,10 +179,10 @@ function* generateMockLiteral(
           ${mapIterable(
             repeat(5),
             () => itt`
-              ${generateMockStatement(specification, name)}: ${generateMockStatement(
+              [${generateMockStatement(specification, name)}]: ${generateMockStatement(
                 specification,
                 element,
-              )}
+              )},
             `,
           )}
         }
