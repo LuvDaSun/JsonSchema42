@@ -28,12 +28,12 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     const typeName = toPascal(names[nodeId]);
     const functionName = toCamel("mock", names[nodeId]);
-    const mock = generateMockLiteral(specification, typeKey);
+    const definition = generateMockDefinition(specification, typeKey);
 
     yield itt`
       // ${nodeId}
       export function ${functionName}(): types.${typeName} {
-        return (${mock});
+        return (${definition});
       }
     `;
   }
@@ -63,36 +63,27 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 }
 
-function* generateMockStatement(
+function* generateMockReference(
   specification: models.Specification,
   typeKey: number,
 ): Iterable<NestedText> {
   const { names, typeArena } = specification;
-  const typeItem = specification.typeArena.getItem(typeKey);
+  const typeItem = typeArena.getItem(typeKey);
   if (typeItem.id == null) {
-    yield generateMockLiteral(specification, typeKey);
+    yield itt`(${generateMockDefinition(specification, typeKey)})`;
   } else {
     const functionName = toCamel("mock", names[typeItem.id]);
     yield itt`${functionName}()`;
   }
 }
 
-function* generateMockLiteral(
+function* generateMockDefinition(
   specification: models.Specification,
   typeKey: number,
 ): Iterable<NestedText> {
   const typeItem = specification.typeArena.getItemUnalias(typeKey);
 
   switch (typeItem.type) {
-    case "anyOf":
-      throw new TypeError("anyOf not supported");
-
-    case "allOf":
-      throw new TypeError("allOf not supported");
-
-    case "never":
-      throw new TypeError("never not supported");
-
     case "unknown":
       yield itt`
         // unknown
@@ -133,7 +124,7 @@ function* generateMockLiteral(
           ${joinIterable(
             typeItem.elements.map(
               (element) => itt`
-                ${generateMockStatement(specification, element)},
+                ${generateMockReference(specification, element)},
               `,
             ),
             "",
@@ -150,7 +141,7 @@ function* generateMockLiteral(
           ${mapIterable(
             repeat(5),
             () => itt`
-              ${generateMockStatement(specification, element)},
+              ${generateMockReference(specification, element)},
             `,
           )}
         ]
@@ -165,10 +156,10 @@ function* generateMockLiteral(
             Object.entries(typeItem.properties).map(([name, { required, element }]) =>
               required
                 ? itt`
-                  ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
+                  ${JSON.stringify(name)}: ${generateMockReference(specification, element)},
                 `
                 : itt`
-                  ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ? ${generateMockStatement(
+                  ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ? ${generateMockReference(
                     specification,
                     element,
                   )} : undefined,
@@ -188,7 +179,7 @@ function* generateMockLiteral(
           ${mapIterable(
             repeat(5),
             () => itt`
-              [${generateMockStatement(specification, name)}]: ${generateMockStatement(
+              [${generateMockReference(specification, name)}]: ${generateMockReference(
                 specification,
                 element,
               )},
@@ -214,7 +205,7 @@ function* generateMockLiteral(
               ${typeItem.elements.map(
                 (element, index) => itt`
                   case ${JSON.stringify(index)}:
-                    return (${generateMockStatement(specification, element)});
+                    return (${generateMockReference(specification, element)});
                 `,
               )}              
             }
@@ -223,5 +214,8 @@ function* generateMockLiteral(
       `;
       break;
     }
+
+    default:
+      throw new TypeError(`${typeItem.type} not supported`);
   }
 }
