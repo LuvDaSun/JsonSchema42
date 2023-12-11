@@ -1,3 +1,4 @@
+import { TypeArena } from "jns42-optimizer";
 import fs from "node:fs";
 import path from "node:path";
 import * as schemaIntermediate from "schema-intermediate";
@@ -21,6 +22,7 @@ export interface PackageOptions {
 export function generatePackage(
   intermediateData: schemaIntermediate.SchemaDocument,
   namesData: Record<string, string>,
+  arena: TypeArena,
   options: PackageOptions,
 ) {
   const { anyOfHack, packageDirectoryPath, packageName, packageVersion } = options;
@@ -28,6 +30,7 @@ export function generatePackage(
   const specification = {
     names: namesData,
     nodes: intermediateData.schemas,
+    arena,
     options: {
       anyOfHack,
     },

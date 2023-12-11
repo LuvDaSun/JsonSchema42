@@ -102,7 +102,7 @@ async function main(options: MainOptions) {
 
   const intermediateData = context.getIntermediateData();
 
-  const typeArena = loadTypeArena(intermediateData);
+  const arena = loadTypeArena(intermediateData);
 
   const namer = new Namer(defaultName, namerMaximumIterations);
   for (const nodeId in intermediateData.schemas) {
@@ -113,7 +113,7 @@ async function main(options: MainOptions) {
 
   const namesData = namer.getNames();
 
-  generatePackage(intermediateData, namesData, {
+  generatePackage(intermediateData, namesData, arena, {
     packageDirectoryPath,
     packageName,
     packageVersion,

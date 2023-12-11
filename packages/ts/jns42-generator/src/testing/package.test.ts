@@ -10,7 +10,7 @@ import * as schema202012 from "../documents/draft-2020-12/index.js";
 import { DocumentContext } from "../documents/index.js";
 import * as schemaIntermediateB from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer, projectRoot } from "../utils/index.js";
+import { Namer, loadTypeArena, projectRoot } from "../utils/index.js";
 
 const packageNames = [
   "not",
@@ -95,7 +95,9 @@ async function runTest(packageName: string) {
 
       const names = namer.getNames();
 
-      generatePackage(intermediateData, names, {
+      const arena = loadTypeArena(intermediateData);
+
+      generatePackage(intermediateData, names, arena, {
         packageDirectoryPath: packageDirectoryPath,
         packageName: packageName,
         packageVersion: "v0.0.0",
