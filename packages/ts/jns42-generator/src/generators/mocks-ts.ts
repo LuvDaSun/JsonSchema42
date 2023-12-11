@@ -30,7 +30,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   }
 
   yield itt`
-    let seed = 0;
+    let seed = 1;
     function nextSeed() {
       // https://en.wikipedia.org/wiki/Linear_congruential_generator
       // https://statmath.wu.ac.at/software/src/prng-3.0.2/doc/prng.html/Table_LCG.html
@@ -50,9 +50,7 @@ function* generateMockStatement(
   typeKey: number,
 ): Iterable<NestedText> {
   const { names, typeArena } = specification;
-  const mock = generateMockLiteral(specification, typeKey);
-
-  const typeItem = specification.typeArena.getItemUnalias(typeKey);
+  const typeItem = specification.typeArena.getItem(typeKey);
   if (typeItem.id == null) {
     yield generateMockLiteral(specification, typeKey);
   } else {

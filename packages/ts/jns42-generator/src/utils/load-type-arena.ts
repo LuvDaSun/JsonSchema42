@@ -227,6 +227,12 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
         }
       }
 
+      if (node.reference != null) {
+        const referenceKey = idMap[node.reference];
+
+        baseElements.push(referenceKey);
+      }
+
       if (typeElements.length > 0) {
         const typeItem: types.OneOf = {
           id: null,
