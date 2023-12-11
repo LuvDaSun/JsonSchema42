@@ -51,7 +51,16 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
       return seed;
     }
-    `;
+
+    const chars = "abcdefghijklmnopqrstuvwxyz";
+    function randomString(length: number) {
+      let str = ""
+      while(str.length < length) {
+        str += chars[nextSeed() % chars.length];
+      }
+      return str;
+    }
+  `;
 }
 
 function* generateMockStatement(
@@ -115,7 +124,7 @@ function* generateMockLiteral(
       break;
 
     case "string":
-      yield `${JSON.stringify("string")} + nextSeed()`;
+      yield `randomString(10)`;
       break;
 
     case "tuple": {
