@@ -158,7 +158,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
                 ${generateParserReference(specification, element)}(value[${JSON.stringify(index)}]),
               `,
             )}
-          ]
+          ] :
           undefined;
       `;
       break;
