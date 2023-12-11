@@ -124,7 +124,7 @@ function* generateMockLiteral(
           ${joinIterable(
             typeItem.elements.map(
               (element) => itt`
-                ${JSON.stringify(name)}: ${generateMockStatement(specification, element)},
+                ${generateMockStatement(specification, element)},
               `,
             ),
             "",
