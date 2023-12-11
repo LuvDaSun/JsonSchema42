@@ -1,7 +1,9 @@
 import { TypeArena, transforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 
-export function loadTypeArena(document: schemaIntermediate.SchemaDocument): TypeArena {
+export function* loadTypes(
+  document: schemaIntermediate.SchemaDocument,
+): Iterable<[number, types.Union | types.Alias | types.Merge]> {
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 
@@ -312,16 +314,11 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
     }
   }
 
-  let unknownCount = 0;
   for (const [key, item] of arena) {
     if (!keep.has(key)) {
       continue;
     }
 
-    if (item.type === "unknown") {
-      unknownCount++;
-    }
+    yield [key, item];
   }
-
-  return arena;
 }

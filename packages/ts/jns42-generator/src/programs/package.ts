@@ -5,7 +5,7 @@ import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer, loadTypeArena } from "../utils/index.js";
+import { Namer, loadTypes } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(
@@ -102,18 +102,23 @@ async function main(options: MainOptions) {
 
   const intermediateData = context.getIntermediateData();
 
-  const arena = loadTypeArena(intermediateData);
+  const typeMap = new Map(loadTypes(intermediateData));
 
   const namer = new Namer(defaultName, namerMaximumIterations);
-  for (const nodeId in intermediateData.schemas) {
+  for (const [typeKey, typeItem] of typeMap) {
+    const { id: nodeId } = typeItem;
+    if (nodeId == null) {
+      continue;
+    }
+
     const nodeUrl = new URL(nodeId);
     const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
     namer.registerPath(nodeId, path);
   }
 
-  const namesData = namer.getNames();
+  const names = namer.getNames();
 
-  generatePackage(intermediateData, namesData, arena, {
+  generatePackage(intermediateData, names, typeMap, {
     packageDirectoryPath,
     packageName,
     packageVersion,

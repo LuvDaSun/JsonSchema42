@@ -4,13 +4,19 @@ import { banner, itt, toCamel, toPascal } from "../utils/index.js";
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, nodes } = specification;
+  const { names, nodes, typeMap } = specification;
 
   yield itt`
     import * as types from "./types.js";
   `;
 
-  for (const nodeId in nodes) {
+  for (const [key, item] of typeMap) {
+    const { id: nodeId } = item;
+
+    if (nodeId == null) {
+      continue;
+    }
+
     const node = nodes[nodeId];
     const typeName = toPascal(names[nodeId]);
 
