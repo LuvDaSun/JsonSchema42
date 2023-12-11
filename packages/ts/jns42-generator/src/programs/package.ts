@@ -102,10 +102,10 @@ async function main(options: MainOptions) {
 
   const intermediateData = context.getIntermediateData();
 
-  const typeMap = new Map(loadTypes(intermediateData));
+  const typeArena = loadTypes(intermediateData);
 
   const namer = new Namer(defaultName, namerMaximumIterations);
-  for (const [typeKey, typeItem] of typeMap) {
+  for (const [typeKey, typeItem] of typeArena) {
     const { id: nodeId } = typeItem;
     if (nodeId == null) {
       continue;
@@ -118,7 +118,7 @@ async function main(options: MainOptions) {
 
   const names = namer.getNames();
 
-  generatePackage(intermediateData, names, typeMap, {
+  generatePackage(intermediateData, names, typeArena, {
     packageDirectoryPath,
     packageName,
     packageVersion,

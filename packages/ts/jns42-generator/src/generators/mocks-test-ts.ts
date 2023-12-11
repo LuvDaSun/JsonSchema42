@@ -4,7 +4,7 @@ import { banner, itt, toCamel } from "../utils/index.js";
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, nodes, typeMap } = specification;
+  const { names, nodes, typeArena: typeMap } = specification;
 
   yield itt`
     import assert from "node:assert/strict";

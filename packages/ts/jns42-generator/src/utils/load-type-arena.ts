@@ -1,9 +1,7 @@
 import { TypeArena, transforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 
-export function* loadTypes(
-  document: schemaIntermediate.SchemaDocument,
-): Iterable<[number, types.Union | types.Alias | types.Merge]> {
+export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeArena {
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 
@@ -275,6 +273,10 @@ export function* loadTypes(
     ) > 0
   );
 
+  return arena;
+}
+
+function loadTypeArenaKeep(arena: TypeArena) {
   const keep = new Set<number>();
   for (const [key, item] of arena) {
     if (item.id != null) {
@@ -313,12 +315,5 @@ export function* loadTypes(
         break;
     }
   }
-
-  for (const [key, item] of arena) {
-    if (!keep.has(key)) {
-      continue;
-    }
-
-    yield [key, item];
-  }
+  return keep;
 }
