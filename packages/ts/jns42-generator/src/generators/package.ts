@@ -33,7 +33,7 @@ export function generatePackage(
   };
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
-  fs.mkdirSync(path.join(packageDirectoryPath, "src"));
+  fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
 
   {
     const content = getPackageJsonData(packageName, packageVersion);
