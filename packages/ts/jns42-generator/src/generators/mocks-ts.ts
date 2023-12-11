@@ -32,6 +32,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     yield itt`
       // ${nodeId}
+    `;
+
+    yield itt`
       export function ${functionName}(): types.${typeName} {
         return (${definition});
       }
@@ -192,25 +195,23 @@ function* generateMockDefinition(
 
     case "oneOf": {
       yield itt`
-        (
-          () => {
-            switch (
-              (
-                nextSeed() % ${JSON.stringify(typeItem.elements.length)}
-              ) as ${joinIterable(
-                typeItem.elements.map((element, index) => JSON.stringify(index)),
-                " | ",
-              )}
-            ) {
-              ${typeItem.elements.map(
-                (element, index) => itt`
-                  case ${JSON.stringify(index)}:
-                    return (${generateMockReference(specification, element)});
-                `,
-              )}              
-            }
+        (() => {
+          switch (
+            (
+              nextSeed() % ${JSON.stringify(typeItem.elements.length)}
+            ) as ${joinIterable(
+              typeItem.elements.map((element, index) => JSON.stringify(index)),
+              " | ",
+            )}
+          ) {
+            ${typeItem.elements.map(
+              (element, index) => itt`
+                case ${JSON.stringify(index)}:
+                  return (${generateMockReference(specification, element)});
+              `,
+            )}              
           }
-        )()
+        })()
       `;
       break;
     }
