@@ -4,6 +4,7 @@ import * as schemaIntermediate from "schema-intermediate";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
+import { generateMocksTsCode } from "./mocks-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
@@ -80,6 +81,12 @@ export function generatePackage(
   {
     const content = generateParsersTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "parsers.ts");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateMocksTsCode(specification);
+    const filePath = path.join(packageDirectoryPath, "src", "mocks.ts");
     writeContentToFile(filePath, content);
   }
 

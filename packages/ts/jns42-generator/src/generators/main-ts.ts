@@ -8,5 +8,6 @@ export function* generateMainTsCode(specification: models.Specification) {
     export * from "./types.js";
     export * from "./validators.js";
     export * from "./parsers.js";
+    export * from "./mocks.js";
   `;
 }
