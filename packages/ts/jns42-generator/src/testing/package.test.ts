@@ -15,6 +15,7 @@ import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
   // "not",
+
   "parse",
   "string-or-boolean",
   "simple-object",
@@ -22,6 +23,8 @@ const packageNames = [
   "any-of-object",
   "one-of-object",
   "all-types",
+
+  "all-of-one-of-object",
 ];
 
 for (const packageName of packageNames) {

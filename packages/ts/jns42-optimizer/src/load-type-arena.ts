@@ -296,6 +296,7 @@ export function loadTypeArena(document: schemaIntermediate.SchemaDocument): Type
       transforms.allOf,
       transforms.anyOf,
       transforms.oneOf,
+      transforms.allOfOneOf,
     ) > 0
   );
 
