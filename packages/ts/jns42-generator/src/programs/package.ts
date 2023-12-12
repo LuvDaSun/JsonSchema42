@@ -1,3 +1,4 @@
+import { loadTypeArena } from "jns42-optimizer";
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
@@ -5,7 +6,7 @@ import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer, loadTypes } from "../utils/index.js";
+import { Namer } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(
@@ -102,7 +103,7 @@ async function main(options: MainOptions) {
 
   const intermediateData = context.getIntermediateData();
 
-  const typeArena = loadTypes(intermediateData);
+  const typeArena = loadTypeArena(intermediateData);
 
   const namer = new Namer(defaultName, namerMaximumIterations);
   for (const [typeKey, typeItem] of typeArena) {

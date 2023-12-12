@@ -11,6 +11,7 @@
     "src/*"
   ],
   "scripts": {
+    "prepack": "npm install --no-workspaces",
     "prepare": "tsc --build",
     "build": "tsc --build",
     "clean": "rm -rf ./out && tsc --build --clean",
@@ -38,6 +39,10 @@
     "tslib": "^2.6.2",
     "type-fest": "^4.6.0",
     "typescript": "^5.3.3",
-    "yargs": "^17.7.2"
-  }
+    "yargs": "^17.7.2",
+    "schema-intermediate": "file:../schema-intermediate"
+  },
+  "bundleDependencies": [
+    "schema-intermediate"
+  ]
 }

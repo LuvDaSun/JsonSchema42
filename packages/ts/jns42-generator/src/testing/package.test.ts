@@ -1,5 +1,6 @@
 import camelcase from "camelcase";
 import cp from "child_process";
+import { loadTypeArena } from "jns42-optimizer";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -10,7 +11,7 @@ import * as schema202012 from "../documents/draft-2020-12/index.js";
 import { DocumentContext } from "../documents/index.js";
 import * as schemaIntermediateB from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer, loadTypes, projectRoot } from "../utils/index.js";
+import { Namer, projectRoot } from "../utils/index.js";
 
 const packageNames = [
   // "not",
@@ -86,7 +87,7 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
-      const typeArena = loadTypes(intermediateData);
+      const typeArena = loadTypeArena(intermediateData);
 
       const namer = new Namer(defaultTypeName, 5);
       for (const [typeKey, typeItem] of typeArena) {

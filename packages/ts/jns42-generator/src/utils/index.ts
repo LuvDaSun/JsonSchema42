@@ -2,7 +2,6 @@ export * from "./banner.js";
 export * from "./choose.js";
 export * from "./iterable-text-template.js";
 export * from "./iterable.js";
-export * from "./load-type-arena.js";
 export * from "./load.js";
 export * from "./name.js";
 export * from "./namer.js";
