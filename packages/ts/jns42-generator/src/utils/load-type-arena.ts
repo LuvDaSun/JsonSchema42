@@ -1,9 +1,7 @@
+import { TypeArena, transforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
-import * as transforms from "./transforms/index.js";
-import { TypeArena } from "./type-arena.js";
-import * as types from "./types.js";
 
-export function loadTypeArena(document: schemaIntermediate.SchemaDocument): TypeArena {
+export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeArena {
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 

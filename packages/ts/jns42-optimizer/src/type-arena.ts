@@ -12,4 +12,3 @@ export class TypeArena extends Arena<types.Union | types.Alias | types.Merge> {
     return item;
   }
 }
-

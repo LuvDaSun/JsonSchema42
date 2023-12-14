@@ -55,6 +55,12 @@
     "typescript": "^5.3.3",
     "yargs": "^17.7.2"
   },
+  "bundledDependencies": [
+    "jns42-optimizer",
+    "schema-draft-04",
+    "schema-draft-2020-12",
+    "schema-intermediate"
+  ],
   "bundleDependencies": [
     "jns42-optimizer",
     "schema-draft-04",
