@@ -12,9 +12,9 @@ test("one-of utility", () => {
   const n = arena.addItem({ id: null, type: "never" });
   const a = arena.addItem({ id: null, type: "any" });
   const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "oneOf", elements: [num, u] });
-  arena.addItem({ id: null, type: "oneOf", elements: [num, n] });
-  arena.addItem({ id: null, type: "oneOf", elements: [num, a] });
+  arena.addItem({ id: null, type: "oneOf", oneOf: [num, u] });
+  arena.addItem({ id: null, type: "oneOf", oneOf: [num, n] });
+  arena.addItem({ id: null, type: "oneOf", oneOf: [num, a] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -37,8 +37,8 @@ test("one-of alias", () => {
   const arena = new TypeArena();
   const str1 = arena.addItem({ id: null, type: "string" });
   const str2 = arena.addItem({ id: null, type: "string" });
-  const oneOf1 = arena.addItem({ id: null, type: "oneOf", elements: [str2] });
-  arena.addItem({ id: null, type: "oneOf", elements: [str1, oneOf1] });
+  const oneOf1 = arena.addItem({ id: null, type: "oneOf", oneOf: [str2] });
+  arena.addItem({ id: null, type: "oneOf", oneOf: [str1, oneOf1] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -57,7 +57,7 @@ test("one-of alias", () => {
 test("one-of unique", () => {
   const arena = new TypeArena();
   const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "oneOf", elements: [num, num, num] });
+  arena.addItem({ id: null, type: "oneOf", oneOf: [num, num, num] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 

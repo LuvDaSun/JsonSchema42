@@ -142,11 +142,6 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: s
       break;
     }
 
-    case "alias": {
-      yield generateTypeReference(specification, typeItem.target);
-      break;
-    }
-
     case "union": {
       yield itt`
         ${joinIterable(
@@ -158,6 +153,11 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: s
           " | ",
         )}
       `;
+      break;
+    }
+
+    case "alias": {
+      yield generateTypeReference(specification, typeItem.target);
       break;
     }
   }

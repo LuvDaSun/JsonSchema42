@@ -5,13 +5,6 @@ import * as models from "../models/index.js";
 export function loadTypes(
   document: schemaIntermediate.SchemaDocument,
 ): Record<string, models.Item | models.Alias> {
-  const arena = arenaFromIntermediate(document);
-  const typesEntries = Array.from(typesFromTypeArena(arena));
-  const types = Object.fromEntries(typesEntries);
-  return types;
-}
-
-function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 
@@ -163,7 +156,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
               const compoundItem: types.AllOf = {
                 id: null,
                 type: "allOf",
-                elements: compoundElements,
+                allOf: compoundElements,
               };
 
               const compoundKey = arena.addItem(compoundItem);
@@ -225,7 +218,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
               const compoundItem: types.AllOf = {
                 id: null,
                 type: "allOf",
-                elements: compoundElements,
+                allOf: compoundElements,
               };
 
               const compoundKey = arena.addItem(compoundItem);
@@ -247,7 +240,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
         const typeItem: types.OneOf = {
           id: null,
           type: "oneOf",
-          elements: typeElements,
+          oneOf: typeElements,
         };
         const typeKey = arena.addItem(typeItem);
 
@@ -259,7 +252,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
       const newItem: types.AllOf = {
         id: null,
         type: "allOf",
-        elements: node.allOf.map((element) => idMap[element]),
+        allOf: node.allOf.map((element) => idMap[element]),
       };
       const newKey = arena.addItem(newItem);
       baseElements.push(newKey);
@@ -269,7 +262,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
       const newItem: types.AnyOf = {
         id: null,
         type: "anyOf",
-        elements: node.anyOf.map((element) => idMap[element]),
+        anyOf: node.anyOf.map((element) => idMap[element]),
       };
       const newKey = arena.addItem(newItem);
 
@@ -280,7 +273,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
       const newItem: types.OneOf = {
         id: null,
         type: "oneOf",
-        elements: node.oneOf.map((element) => idMap[element]),
+        oneOf: node.oneOf.map((element) => idMap[element]),
       };
       const newKey = arena.addItem(newItem);
 
@@ -290,7 +283,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
     const baseItem: types.AllOf = {
       id,
       type: "allOf",
-      elements: baseElements,
+      allOf: baseElements,
     };
 
     return baseItem;
@@ -308,214 +301,177 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
     ) > 0
   );
 
-  return arena;
+  const usedKeys = new Set<number>();
+  for (const [key, item] of arena) {
+    if (item.id != null) {
+      usedKeys.add(key);
+      continue;
+    }
+
+    for (const key of types.dependencies(item)) {
+      usedKeys.add(key);
+    }
+  }
+
+  const result: Record<string, models.Item | models.Alias> = {};
+  for (const key of usedKeys) {
+    const item = arena.getItem(key);
+    const [newKey, newItem] = convertTypeEntry([key, item]);
+    result[newKey] = newItem;
+  }
+
+  return result;
 }
 
-function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Item | models.Alias]> {
-  const usedKeys = new Set(findUsedKeys(arena));
+function convertTypeEntry(
+  entry: [key: number, item: types.Item | types.Alias],
+): [string, models.Item | models.Alias] {
+  const [key, item] = entry;
 
   const mapKey = (key: number) => String(key);
 
-  for (const key of usedKeys) {
-    const item = arena.getItem(key);
+  switch (item.type) {
+    case "unknown":
+      // TODO should error in the future
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "unknown",
+        },
+      ];
 
-    switch (item.type) {
-      case "unknown":
-        // TODO should error in the future
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "unknown",
-          },
-        ];
-        break;
+    case "never":
+      // TODO should error in the future
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "never",
+        },
+      ];
 
-      case "never":
-        // TODO should error in the future
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "never",
-          },
-        ];
-        break;
+    case "any":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "any",
+        },
+      ];
 
-      case "any":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "any",
-          },
-        ];
-        break;
+    case "null":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "null",
+        },
+      ];
 
-      case "null":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "null",
-          },
-        ];
-        break;
+    case "boolean":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "boolean",
+        },
+      ];
 
-      case "boolean":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "boolean",
-          },
-        ];
-        break;
+    case "integer":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "integer",
+        },
+      ];
 
-      case "integer":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "integer",
-          },
-        ];
-        break;
+    case "number":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "number",
+        },
+      ];
 
-      case "number":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "number",
-          },
-        ];
-        break;
+    case "string":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "string",
+        },
+      ];
 
-      case "string":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "string",
-          },
-        ];
-        break;
+    case "tuple":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "tuple",
+          elements: item.elements.map(mapKey),
+        },
+      ];
 
-      case "tuple":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "tuple",
-            elements: item.elements.map(mapKey),
-          },
-        ];
-        break;
+    case "array":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "array",
+          element: mapKey(item.element),
+        },
+      ];
 
-      case "array":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "array",
-            element: mapKey(item.element),
-          },
-        ];
-        break;
+    case "object":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "object",
+          properties: Object.fromEntries(
+            Object.entries(item.properties).map(([name, { required, element }]) => [
+              name,
+              { required, element: mapKey(element) },
+            ]),
+          ),
+        },
+      ];
 
-      case "object":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "object",
-            properties: Object.fromEntries(
-              Object.entries(item.properties).map(([name, { required, element }]) => [
-                name,
-                { required, element: mapKey(element) },
-              ]),
-            ),
-          },
-        ];
-        break;
+    case "map":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "map",
+          name: mapKey(item.name),
+          element: mapKey(item.element),
+        },
+      ];
 
-      case "map":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "map",
-            name: mapKey(item.name),
-            element: mapKey(item.element),
-          },
-        ];
-        break;
+    case "oneOf":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "union",
+          elements: item.oneOf.map(mapKey),
+        },
+      ];
 
-      case "oneOf":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "union",
-            elements: item.elements.map(mapKey),
-          },
-        ];
-        break;
+    case "alias":
+      return [
+        mapKey(key),
+        {
+          id: item.id,
+          type: "alias",
+          target: mapKey(item.alias),
+        },
+      ];
 
-      case "alias":
-        yield [
-          String(key),
-          {
-            id: item.id,
-            type: "alias",
-            target: mapKey(item.target),
-          },
-        ];
-        break;
-
-      default:
-        throw new TypeError(`${item.type} not supported`);
-    }
-  }
-}
-
-function* findUsedKeys(arena: TypeArena) {
-  for (const [key, item] of arena) {
-    if (item.id != null) {
-      yield key;
-    }
-
-    switch (item.type) {
-      case "oneOf":
-      case "anyOf":
-      case "allOf":
-        for (const element of item.elements) {
-          yield element;
-        }
-        break;
-
-      case "alias":
-        yield item.target;
-        break;
-
-      case "tuple":
-        for (const element of item.elements) {
-          yield element;
-        }
-        break;
-      case "array":
-        yield item.element;
-        break;
-      case "object":
-        for (const { element } of Object.values(item.properties)) {
-          yield element;
-        }
-        break;
-      case "map":
-        yield item.name;
-        yield item.element;
-        break;
-    }
+    default:
+      throw new TypeError(`${item.type} not supported`);
   }
 }

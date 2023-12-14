@@ -12,9 +12,9 @@ test("any-of utility", () => {
   const n = arena.addItem({ id: null, type: "never" });
   const a = arena.addItem({ id: null, type: "any" });
   const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "anyOf", elements: [num, u] });
-  arena.addItem({ id: null, type: "anyOf", elements: [num, n] });
-  arena.addItem({ id: null, type: "anyOf", elements: [num, a] });
+  arena.addItem({ id: null, type: "anyOf", anyOf: [num, u] });
+  arena.addItem({ id: null, type: "anyOf", anyOf: [num, n] });
+  arena.addItem({ id: null, type: "anyOf", anyOf: [num, a] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -36,7 +36,7 @@ test("any-of utility", () => {
 test("any-of unique", () => {
   const arena = new TypeArena();
   const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "anyOf", elements: [num, num, num] });
+  arena.addItem({ id: null, type: "anyOf", anyOf: [num, num, num] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -56,8 +56,8 @@ test("any-of primitive", () => {
   arena.addItem({ id: null, type: "string" }); // 1
   arena.addItem({ id: null, type: "string" }); // 2
   arena.addItem({ id: null, type: "string" }); // 3
-  arena.addItem({ id: null, type: "anyOf", elements: [0, 1] }); // 4
-  arena.addItem({ id: null, type: "anyOf", elements: [2, 3] }); // 5
+  arena.addItem({ id: null, type: "anyOf", anyOf: [0, 1] }); // 4
+  arena.addItem({ id: null, type: "anyOf", anyOf: [2, 3] }); // 5
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -84,7 +84,7 @@ test("any-of tuple", () => {
   arena.addItem({ id: null, type: "string" }); // 3
   arena.addItem({ id: null, type: "tuple", elements: [0, 1] }); // 4
   arena.addItem({ id: null, type: "tuple", elements: [2, 3] }); // 5
-  arena.addItem({ id: null, type: "anyOf", elements: [4, 5] }); // 6
+  arena.addItem({ id: null, type: "anyOf", anyOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -113,7 +113,7 @@ test("any-of array", () => {
   arena.addItem({ id: null, type: "string" }); // 1
   arena.addItem({ id: null, type: "array", element: 0 }); // 2
   arena.addItem({ id: null, type: "array", element: 1 }); // 3
-  arena.addItem({ id: null, type: "anyOf", elements: [2, 3] }); // 4
+  arena.addItem({ id: null, type: "anyOf", anyOf: [2, 3] }); // 4
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -154,7 +154,7 @@ test("any-of object", () => {
       c: { required: false, element: 3 },
     },
   }); // 5
-  arena.addItem({ id: null, type: "anyOf", elements: [4, 5] }); // 6
+  arena.addItem({ id: null, type: "anyOf", anyOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -206,7 +206,7 @@ test("any-of map", () => {
   arena.addItem({ id: null, type: "number" }); // 3
   arena.addItem({ id: null, type: "map", name: 0, element: 1 }); // 4
   arena.addItem({ id: null, type: "map", name: 2, element: 3 }); // 5
-  arena.addItem({ id: null, type: "anyOf", elements: [4, 5] }); // 6
+  arena.addItem({ id: null, type: "anyOf", anyOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 

@@ -14,7 +14,7 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
     return item;
   }
 
-  const uniqueElements = new Set(item.elements);
+  const uniqueElements = new Set(item.allOf);
   if (uniqueElements.size < 2) {
     return item;
   }
@@ -27,7 +27,7 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
     .map((element) => [element, arena.resolveItem(element)] as const)
     .filter(([element, item]) => item.type === "oneOf")
     .map(([element, item]) => [element, item as types.OneOf] as const);
-  const leafElements = baseElementEntries.flatMap(([key, item]) => item.elements);
+  const leafElements = baseElementEntries.flatMap(([key, item]) => item.oneOf);
   const uniqueBaseElements = new Set(baseElementEntries.map(([key, item]) => key));
   const uniqueLeafElements = new Set(leafElements);
   if (uniqueLeafElements.size < 2) {
@@ -42,7 +42,7 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
     const newLeafItem: types.AllOf = {
       id: null,
       type: "allOf",
-      elements: newLeafElements,
+      allOf: newLeafElements,
     };
     const newLeafKey = arena.addItem(newLeafItem);
     newElements.push(newLeafKey);
@@ -51,6 +51,6 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
   return {
     id,
     type: "oneOf",
-    elements: newElements,
+    oneOf: newElements,
   };
 };

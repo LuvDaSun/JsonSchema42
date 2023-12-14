@@ -12,9 +12,9 @@ test("all-of utility", () => {
   const n = arena.addItem({ id: null, type: "never" });
   const a = arena.addItem({ id: null, type: "any" });
   const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "allOf", elements: [num, u] });
-  arena.addItem({ id: null, type: "allOf", elements: [num, n] });
-  arena.addItem({ id: null, type: "allOf", elements: [num, a] });
+  arena.addItem({ id: null, type: "allOf", allOf: [num, u] });
+  arena.addItem({ id: null, type: "allOf", allOf: [num, n] });
+  arena.addItem({ id: null, type: "allOf", allOf: [num, a] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -37,8 +37,8 @@ test("all-of alias", () => {
   const arena = new TypeArena();
   const str1 = arena.addItem({ id: null, type: "string" });
   const str2 = arena.addItem({ id: null, type: "string" });
-  const allOf1 = arena.addItem({ id: null, type: "allOf", elements: [str2] });
-  arena.addItem({ id: null, type: "allOf", elements: [str1, allOf1] });
+  const allOf1 = arena.addItem({ id: null, type: "allOf", allOf: [str2] });
+  arena.addItem({ id: null, type: "allOf", allOf: [str1, allOf1] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -57,7 +57,7 @@ test("all-of alias", () => {
 test("all-of unique", () => {
   const arena = new TypeArena();
   const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "allOf", elements: [num, num, num] });
+  arena.addItem({ id: null, type: "allOf", allOf: [num, num, num] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -76,8 +76,8 @@ test("all-of primitive", () => {
   const num = arena.addItem({ id: null, type: "number" });
   const str1 = arena.addItem({ id: null, type: "string" });
   const str2 = arena.addItem({ id: null, type: "string" });
-  arena.addItem({ id: null, type: "allOf", elements: [num, str1] });
-  arena.addItem({ id: null, type: "allOf", elements: [str1, str2] });
+  arena.addItem({ id: null, type: "allOf", allOf: [num, str1] });
+  arena.addItem({ id: null, type: "allOf", allOf: [str1, str2] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -102,7 +102,7 @@ test("all-of tuple", () => {
   arena.addItem({ id: null, type: "string" }); // 3
   arena.addItem({ id: null, type: "tuple", elements: [0, 1] }); // 4
   arena.addItem({ id: null, type: "tuple", elements: [2, 3] }); // 5
-  arena.addItem({ id: null, type: "allOf", elements: [4, 5] }); // 6
+  arena.addItem({ id: null, type: "allOf", allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -129,7 +129,7 @@ test("all-of array", () => {
   arena.addItem({ id: null, type: "string" }); // 1
   arena.addItem({ id: null, type: "array", element: 0 }); // 2
   arena.addItem({ id: null, type: "array", element: 1 }); // 3
-  arena.addItem({ id: null, type: "allOf", elements: [2, 3] }); // 4
+  arena.addItem({ id: null, type: "allOf", allOf: [2, 3] }); // 4
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -169,7 +169,7 @@ test("all-of object", () => {
       c: { required: false, element: 3 },
     },
   }); // 5
-  arena.addItem({ id: null, type: "allOf", elements: [4, 5] }); // 6
+  arena.addItem({ id: null, type: "allOf", allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -219,7 +219,7 @@ test("all-of map", () => {
   arena.addItem({ id: null, type: "number" }); // 3
   arena.addItem({ id: null, type: "map", name: 0, element: 1 }); // 4
   arena.addItem({ id: null, type: "map", name: 2, element: 3 }); // 5
-  arena.addItem({ id: null, type: "allOf", elements: [4, 5] }); // 6
+  arena.addItem({ id: null, type: "allOf", allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 

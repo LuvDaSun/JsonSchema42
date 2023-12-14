@@ -14,9 +14,9 @@ test("all-of-one-of", () => {
   arena.addItem({ id: null, type: "string" }); // 3
   arena.addItem({ id: null, type: "string" }); // 4
   arena.addItem({ id: null, type: "string" }); // 5
-  arena.addItem({ id: null, type: "oneOf", elements: [2, 3] }); // 6
-  arena.addItem({ id: null, type: "oneOf", elements: [4, 5] }); // 7
-  arena.addItem({ id: null, type: "allOf", elements: [0, 1, 6, 7] }); // 8
+  arena.addItem({ id: null, type: "oneOf", oneOf: [2, 3] }); // 6
+  arena.addItem({ id: null, type: "oneOf", oneOf: [4, 5] }); // 7
+  arena.addItem({ id: null, type: "allOf", allOf: [0, 1, 6, 7] }); // 8
 
   while (arena.applyTransform(...useTransforms) > 0);
 

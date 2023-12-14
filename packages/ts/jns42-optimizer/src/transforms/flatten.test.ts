@@ -8,9 +8,9 @@ test("flatten", () => {
   const i1 = arena.addItem({ id: null, type: "string" });
   const i2 = arena.addItem({ id: null, type: "string" });
   const i3 = arena.addItem({ id: null, type: "string" });
-  const i4 = arena.addItem({ id: null, type: "oneOf", elements: [i1, i2] });
-  const i5 = arena.addItem({ id: null, type: "alias", target: i4 });
-  const i6 = arena.addItem({ id: null, type: "oneOf", elements: [i5, i3] });
+  const i4 = arena.addItem({ id: null, type: "oneOf", oneOf: [i1, i2] });
+  const i5 = arena.addItem({ id: null, type: "alias", alias: i4 });
+  const i6 = arena.addItem({ id: null, type: "oneOf", oneOf: [i5, i3] });
 
   while (arena.applyTransform(flatten) > 0);
 

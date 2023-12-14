@@ -3,14 +3,14 @@ import { TypeArenaTransform } from "../type-arena.js";
 import * as types from "../types.js";
 
 export const allOf: TypeArenaTransform = (arena, item) => {
-  if (item.type !== "allOf" || item.elements.length < 2) {
+  if (item.type !== "allOf" || item.allOf.length < 2) {
     return item;
   }
 
   const { id } = item;
 
   const uniqueElements = new Set<number>();
-  for (const subKey of item.elements) {
+  for (const subKey of item.allOf) {
     const subItem = arena.resolveItem(subKey);
 
     switch (subItem.type) {
@@ -35,11 +35,11 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     uniqueElements.add(subKey);
   }
 
-  if (uniqueElements.size !== item.elements.length) {
+  if (uniqueElements.size !== item.allOf.length) {
     return {
       id,
       type: "allOf",
-      elements: [...uniqueElements],
+      allOf: [...uniqueElements],
     };
   }
 
@@ -84,7 +84,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
             const newItem: types.AllOf = {
               id: null,
               type: "allOf",
-              elements: [mergedItem.elements[index], subItem.elements[index]],
+              allOf: [mergedItem.elements[index], subItem.elements[index]],
             };
             const newKey = arena.addItem(newItem);
             elements.push(newKey);
@@ -108,7 +108,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         const newItem: types.AllOf = {
           id: null,
           type: "allOf",
-          elements: [mergedItem.element, subItem.element],
+          allOf: [mergedItem.element, subItem.element],
         };
         const newKey = arena.addItem(newItem);
         mergedItem = {
@@ -135,7 +135,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
             const newItem: types.AllOf = {
               id: null,
               type: "allOf",
-              elements: [mergedItemProperty.element, subItemProperty.element],
+              allOf: [mergedItemProperty.element, subItemProperty.element],
             };
             const newKey = arena.addItem(newItem);
             const required = mergedItemProperty.required || subItemProperty.required;
@@ -163,14 +163,14 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         const newNameItem: types.AllOf = {
           id: null,
           type: "allOf",
-          elements: [mergedItem.name, subItem.name],
+          allOf: [mergedItem.name, subItem.name],
         };
         const newNameKey = arena.addItem(newNameItem);
 
         const newElementItem: types.AllOf = {
           id: null,
           type: "allOf",
-          elements: [mergedItem.element, subItem.element],
+          allOf: [mergedItem.element, subItem.element],
         };
         const newElementKey = arena.addItem(newElementItem);
         mergedItem = {

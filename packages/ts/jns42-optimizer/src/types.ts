@@ -10,7 +10,7 @@ export interface Base<Type extends string> {
 }
 
 export interface Alias extends Base<"alias"> {
-  target: number;
+  alias: number;
 }
 
 export interface Unknown extends Base<"unknown"> {
@@ -63,13 +63,62 @@ export interface Map extends Base<"map"> {
 }
 
 export interface OneOf extends Base<"oneOf"> {
-  elements: number[];
+  oneOf: number[];
 }
 
 export interface AnyOf extends Base<"anyOf"> {
-  elements: number[];
+  anyOf: number[];
 }
 
 export interface AllOf extends Base<"allOf"> {
-  elements: number[];
+  allOf: number[];
+}
+
+/**
+ * retrieves depenencies of a type item or alias
+ *
+ * @param item the type to get dependencies
+ */
+export function* dependencies(item: Item | Alias) {
+  switch (item.type) {
+    case "allOf":
+      for (const element of item.allOf) {
+        yield element;
+      }
+      break;
+
+    case "anyOf":
+      for (const element of item.anyOf) {
+        yield element;
+      }
+      break;
+
+    case "oneOf":
+      for (const element of item.oneOf) {
+        yield element;
+      }
+      break;
+
+    case "alias":
+      yield item.alias;
+      break;
+
+    case "tuple":
+      for (const element of item.elements) {
+        yield element;
+      }
+      break;
+    case "array":
+      yield item.element;
+      break;
+    case "object":
+      for (const { element } of Object.values(item.properties)) {
+        yield element;
+      }
+      break;
+    case "map":
+      yield item.name;
+      yield item.element;
+      break;
+  }
 }

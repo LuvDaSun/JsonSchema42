@@ -7,7 +7,7 @@ export class TypeArena extends Arena<types.Item | types.Alias | types.Merge> {
   public resolveItem(key: number): types.Item {
     let item = this.getItem(key);
     while (item.type === "alias") {
-      item = this.getItem(item.target);
+      item = this.getItem(item.alias);
     }
     return item;
   }
@@ -15,7 +15,7 @@ export class TypeArena extends Arena<types.Item | types.Alias | types.Merge> {
   public resolveKey(key: number): number {
     let item = this.getItem(key);
     while (item.type === "alias") {
-      key = item.target;
+      key = item.alias;
       item = this.getItem(key);
     }
     return key;

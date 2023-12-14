@@ -1,14 +1,14 @@
 import { TypeArenaTransform } from "../type-arena.js";
 
 export const oneOf: TypeArenaTransform = (arena, item) => {
-  if (item.type !== "oneOf" || item.elements.length < 2) {
+  if (item.type !== "oneOf" || item.oneOf.length < 2) {
     return item;
   }
 
   const { id } = item;
 
   const uniqueElements = new Set<number>();
-  for (const subKey of item.elements) {
+  for (const subKey of item.oneOf) {
     const subItem = arena.resolveItem(subKey);
 
     switch (subItem.type) {
@@ -33,11 +33,11 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
     uniqueElements.add(subKey);
   }
 
-  if (uniqueElements.size !== item.elements.length) {
+  if (uniqueElements.size !== item.oneOf.length) {
     return {
       id,
       type: "oneOf",
-      elements: [...uniqueElements],
+      oneOf: [...uniqueElements],
     };
   }
 
