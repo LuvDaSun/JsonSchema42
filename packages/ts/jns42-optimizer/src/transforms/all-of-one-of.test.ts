@@ -14,9 +14,9 @@ test("all-of-one-of", () => {
   arena.addItem({ type: "string" }); // 3
   arena.addItem({ type: "string" }); // 4
   arena.addItem({ type: "string" }); // 5
-  arena.addItem({ type: "oneOf", oneOf: [2, 3] }); // 6
-  arena.addItem({ type: "oneOf", oneOf: [4, 5] }); // 7
-  arena.addItem({ type: "allOf", allOf: [0, 1, 6, 7] }); // 8
+  arena.addItem({ oneOf: [2, 3] }); // 6
+  arena.addItem({ oneOf: [4, 5] }); // 7
+  arena.addItem({ allOf: [0, 1, 6, 7] }); // 8
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -29,13 +29,13 @@ test("all-of-one-of", () => {
       { type: "string" }, // 3
       { type: "string" }, // 4
       { type: "string" }, // 5
-      { type: "oneOf", oneOf: [2, 3] }, // 6
-      { type: "oneOf", oneOf: [4, 5] }, // 7
-      { type: "oneOf", oneOf: [9, 10, 11, 12] }, // 8
-      { type: "allOf", allOf: [0, 1, 2] }, // 9
-      { type: "allOf", allOf: [0, 1, 3] }, // 10
-      { type: "allOf", allOf: [0, 1, 4] }, // 11
-      { type: "allOf", allOf: [0, 1, 5] }, // 12
+      { oneOf: [2, 3] }, // 6
+      { oneOf: [4, 5] }, // 7
+      { oneOf: [9, 10, 11, 12] }, // 8
+      { allOf: [0, 1, 2] }, // 9
+      { allOf: [0, 1, 3] }, // 10
+      { allOf: [0, 1, 4] }, // 11
+      { allOf: [0, 1, 5] }, // 12
     ],
   );
   assert(!hasDoubleReference([...arena]));

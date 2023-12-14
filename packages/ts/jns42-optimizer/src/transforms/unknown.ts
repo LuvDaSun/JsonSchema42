@@ -8,36 +8,26 @@ export const unknown: TypeArenaTransform = (arena, item) => {
 
   const { id } = item;
 
-  switch (item.type) {
-    case "allOf": {
-      if (item.allOf.length === 0) {
-        return {
-          id,
-          type: "unknown",
-        };
-      }
-      break;
-    }
-
-    case "anyOf": {
-      if (item.anyOf.length === 0) {
-        return {
-          id,
-          type: "unknown",
-        };
-      }
-      break;
-    }
-
-    case "oneOf": {
-      if (item.oneOf.length === 0) {
-        return {
-          id,
-          type: "unknown",
-        };
-      }
-      break;
-    }
+  if (types.isOneOf(item) && item.oneOf.length === 0) {
+    return {
+      id,
+      type: "unknown",
+    };
   }
+
+  if (types.isAnyOf(item) && item.anyOf.length === 0) {
+    return {
+      id,
+      type: "unknown",
+    };
+  }
+
+  if (types.isAllOf(item) && item.allOf.length === 0) {
+    return {
+      id,
+      type: "unknown",
+    };
+  }
+
   return item;
 };

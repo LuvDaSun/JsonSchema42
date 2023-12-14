@@ -143,7 +143,6 @@ export function loadTypes(
 
             if (compoundElements.length > 0) {
               const compoundItem: types.AllOf = {
-                type: "allOf",
                 allOf: compoundElements,
               };
 
@@ -202,7 +201,6 @@ export function loadTypes(
 
             if (compoundElements.length > 0) {
               const compoundItem: types.AllOf = {
-                type: "allOf",
                 allOf: compoundElements,
               };
 
@@ -223,7 +221,6 @@ export function loadTypes(
 
       if (typeElements.length > 0) {
         const typeItem: types.OneOf = {
-          type: "oneOf",
           oneOf: typeElements,
         };
         const typeKey = arena.addItem(typeItem);
@@ -234,7 +231,6 @@ export function loadTypes(
 
     if (node.allOf != null && node.allOf.length > 0) {
       const newItem: types.AllOf = {
-        type: "allOf",
         allOf: node.allOf.map((element) => idMap[element]),
       };
       const newKey = arena.addItem(newItem);
@@ -243,7 +239,6 @@ export function loadTypes(
 
     if (node.anyOf != null && node.anyOf.length > 0) {
       const newItem: types.AnyOf = {
-        type: "anyOf",
         anyOf: node.anyOf.map((element) => idMap[element]),
       };
       const newKey = arena.addItem(newItem);
@@ -253,7 +248,6 @@ export function loadTypes(
 
     if (node.oneOf != null && node.oneOf.length > 0) {
       const newItem: types.OneOf = {
-        type: "oneOf",
         oneOf: node.oneOf.map((element) => idMap[element]),
       };
       const newKey = arena.addItem(newItem);
@@ -263,7 +257,6 @@ export function loadTypes(
 
     const baseItem: types.AllOf = {
       id,
-      type: "allOf",
       allOf: baseElements,
     };
 
@@ -324,138 +317,140 @@ function convertTypeEntry(
     ];
   }
 
-  switch (item.type) {
-    case "unknown":
-      // TODO should error in the future
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "unknown",
-        },
-      ];
-
-    case "never":
-      // TODO should error in the future
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "never",
-        },
-      ];
-
-    case "any":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "any",
-        },
-      ];
-
-    case "null":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "null",
-        },
-      ];
-
-    case "boolean":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "boolean",
-        },
-      ];
-
-    case "integer":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "integer",
-        },
-      ];
-
-    case "number":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "number",
-        },
-      ];
-
-    case "string":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "string",
-        },
-      ];
-
-    case "tuple":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "tuple",
-          elements: item.elements.map(mapKey),
-        },
-      ];
-
-    case "array":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "array",
-          element: mapKey(item.element),
-        },
-      ];
-
-    case "object":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "object",
-          properties: Object.fromEntries(
-            Object.entries(item.properties).map(([name, { required, element }]) => [
-              name,
-              { required, element: mapKey(element) },
-            ]),
-          ),
-        },
-      ];
-
-    case "map":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "map",
-          name: mapKey(item.name),
-          element: mapKey(item.element),
-        },
-      ];
-
-    case "oneOf":
-      return [
-        mapKey(key),
-        {
-          id: item.id,
-          type: "union",
-          elements: item.oneOf.map(mapKey),
-        },
-      ];
-
-    default:
-      throw new TypeError(`${item.type} not supported`);
+  if (types.isOneOf(item)) {
+    return [
+      mapKey(key),
+      {
+        id: item.id,
+        type: "union",
+        elements: item.oneOf.map(mapKey),
+      },
+    ];
   }
+
+  if ("type" in item) {
+    switch (item.type) {
+      case "unknown":
+        // TODO should error in the future
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "unknown",
+          },
+        ];
+
+      case "never":
+        // TODO should error in the future
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "never",
+          },
+        ];
+
+      case "any":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "any",
+          },
+        ];
+
+      case "null":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "null",
+          },
+        ];
+
+      case "boolean":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "boolean",
+          },
+        ];
+
+      case "integer":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "integer",
+          },
+        ];
+
+      case "number":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "number",
+          },
+        ];
+
+      case "string":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "string",
+          },
+        ];
+
+      case "tuple":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "tuple",
+            elements: item.elements.map(mapKey),
+          },
+        ];
+
+      case "array":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "array",
+            element: mapKey(item.element),
+          },
+        ];
+
+      case "object":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "object",
+            properties: Object.fromEntries(
+              Object.entries(item.properties).map(([name, { required, element }]) => [
+                name,
+                { required, element: mapKey(element) },
+              ]),
+            ),
+          },
+        ];
+
+      case "map":
+        return [
+          mapKey(key),
+          {
+            id: item.id,
+            type: "map",
+            name: mapKey(item.name),
+            element: mapKey(item.element),
+          },
+        ];
+    }
+  }
+
+  throw new TypeError(`item not supported`);
 }

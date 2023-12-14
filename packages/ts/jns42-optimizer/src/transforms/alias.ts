@@ -8,33 +8,19 @@ export const alias: TypeArenaTransform = (arena, item) => {
     return item;
   }
 
-  switch (item.type) {
-    case "allOf": {
-      const uniqueElements = new Set(item.allOf);
-      if (uniqueElements.size === 1) {
-        const [alias] = item.allOf;
-        return { id, alias };
-      }
-      break;
-    }
+  if (types.isOneOf(item) && item.oneOf.length === 1) {
+    const [alias] = item.oneOf;
+    return { id, alias };
+  }
 
-    case "anyOf": {
-      const uniqueElements = new Set(item.anyOf);
-      if (uniqueElements.size === 1) {
-        const [alias] = item.anyOf;
-        return { id, alias };
-      }
-      break;
-    }
+  if (types.isAnyOf(item) && item.anyOf.length === 1) {
+    const [alias] = item.anyOf;
+    return { id, alias };
+  }
 
-    case "oneOf": {
-      const uniqueElements = new Set(item.oneOf);
-      if (uniqueElements.size === 1) {
-        const [alias] = item.oneOf;
-        return { id, alias };
-      }
-      break;
-    }
+  if (types.isAllOf(item) && item.allOf.length === 1) {
+    const [alias] = item.allOf;
+    return { id, alias };
   }
 
   return item;

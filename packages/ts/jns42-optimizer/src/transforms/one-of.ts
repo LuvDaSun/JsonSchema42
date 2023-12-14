@@ -1,13 +1,8 @@
-import assert from "assert";
 import { TypeArenaTransform } from "../type-arena.js";
 import * as types from "../types.js";
 
 export const oneOf: TypeArenaTransform = (arena, item) => {
-  if (types.isAlias(item)) {
-    return item;
-  }
-
-  if (item.type !== "oneOf" || item.oneOf.length < 2) {
+  if (!types.isOneOf(item) || item.oneOf.length < 2) {
     return item;
   }
 
@@ -17,17 +12,11 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
   for (const subKey of item.oneOf) {
     const subItem = arena.resolveItem(subKey);
 
-    assert("type" in subItem);
+    if (!("type" in subItem)) {
+      return item;
+    }
 
     switch (subItem.type) {
-      case "allOf":
-      case "anyOf":
-      case "oneOf":
-        // if the sub item is one of these if cannot be processed! the
-        // sub item needs to be optimized away by another transform and then
-        // we might be able to try this again.
-        return item;
-
       case "any":
         // merging with a any type will always yield any
         return { id, type: "any" };
@@ -44,7 +33,7 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
   if (uniqueElements.size !== item.oneOf.length) {
     return {
       id,
-      type: "oneOf",
+
       oneOf: [...uniqueElements],
     };
   }

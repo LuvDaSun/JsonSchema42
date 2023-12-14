@@ -1,88 +1,63 @@
-import assert from "assert";
 import { TypeArenaTransform } from "../type-arena.js";
 import * as types from "../types.js";
 
 export const flatten: TypeArenaTransform = (arena, item) => {
-  if (types.isAlias(item)) {
-    return item;
-  }
-
   const { id } = item;
 
-  switch (item.type) {
-    case "allOf": {
-      let elements = new Array<number>();
-      let createNew = false;
-      for (const subKey of item.allOf) {
-        const subItem = arena.resolveItem(subKey);
+  if (types.isOneOf(item)) {
+    const elements = new Array<number>();
+    for (const subKey of item.oneOf) {
+      const subItem = arena.resolveItem(subKey);
 
-        assert("type" in subItem);
-
-        if (subItem.type === item.type) {
-          createNew = true;
-          elements.push(...subItem.allOf);
-        } else {
-          elements.push(subKey);
-        }
+      if (types.isOneOf(subItem)) {
+        elements.push(...subItem.oneOf);
+      } else {
+        elements.push(subKey);
       }
-      if (createNew) {
-        return {
-          id,
-          type: item.type,
-          allOf: elements,
-        };
-      }
-      break;
     }
-
-    case "anyOf": {
-      let elements = new Array<number>();
-      let createNew = false;
-      for (const subKey of item.anyOf) {
-        const subItem = arena.resolveItem(subKey);
-
-        assert("type" in subItem);
-
-        if (subItem.type === item.type) {
-          createNew = true;
-          elements.push(...subItem.anyOf);
-        } else {
-          elements.push(subKey);
-        }
-      }
-      if (createNew) {
-        return {
-          id,
-          type: item.type,
-          anyOf: elements,
-        };
-      }
-      break;
+    if (elements.length > item.oneOf.length) {
+      return {
+        id,
+        oneOf: elements,
+      };
     }
+  }
 
-    case "oneOf": {
-      let elements = new Array<number>();
-      let createNew = false;
-      for (const subKey of item.oneOf) {
-        const subItem = arena.resolveItem(subKey);
+  if (types.isAnyOf(item)) {
+    const elements = new Array<number>();
+    for (const subKey of item.anyOf) {
+      const subItem = arena.resolveItem(subKey);
 
-        assert("type" in subItem);
-
-        if (subItem.type === item.type) {
-          createNew = true;
-          elements.push(...subItem.oneOf);
-        } else {
-          elements.push(subKey);
-        }
+      if (types.isAnyOf(subItem)) {
+        elements.push(...subItem.anyOf);
+      } else {
+        elements.push(subKey);
       }
-      if (createNew) {
-        return {
-          id,
-          type: item.type,
-          oneOf: elements,
-        };
+    }
+    if (elements.length > item.anyOf.length) {
+      return {
+        id,
+        anyOf: elements,
+      };
+    }
+  }
+
+  if (types.isAllOf(item)) {
+    const elements = new Array<number>();
+    for (const subKey of item.allOf) {
+      const subItem = arena.resolveItem(subKey);
+
+      if (types.isAllOf(subItem)) {
+        elements.push(...subItem.allOf);
+      } else {
+        elements.push(subKey);
       }
-      break;
+    }
+    if (elements.length > item.allOf.length) {
+      return {
+        id,
+        allOf: elements,
+      };
     }
   }
 

@@ -9,9 +9,9 @@ test("flatten", () => {
   const i1 = arena.addItem({ type: "string" });
   const i2 = arena.addItem({ type: "string" });
   const i3 = arena.addItem({ type: "string" });
-  const i4 = arena.addItem({ type: "oneOf", oneOf: [i1, i2] });
+  const i4 = arena.addItem({ oneOf: [i1, i2] });
   const i5 = arena.addItem({ alias: i4 });
-  const i6 = arena.addItem({ type: "oneOf", oneOf: [i5, i3] });
+  const i6 = arena.addItem({ oneOf: [i5, i3] });
 
   while (arena.applyTransform(flatten) > 0);
 
@@ -22,9 +22,9 @@ test("flatten", () => {
       { type: "string" },
       { type: "string" },
       { type: "string" },
-      { type: "oneOf", oneOf: [i1, i2] },
+      { oneOf: [i1, i2] },
       { alias: i4 },
-      { type: "oneOf", oneOf: [i1, i2, i3] },
+      { oneOf: [i1, i2, i3] },
     ],
   );
 });

@@ -3,11 +3,7 @@ import { TypeArenaTransform } from "../type-arena.js";
 import * as types from "../types.js";
 
 export const allOf: TypeArenaTransform = (arena, item) => {
-  if (types.isAlias(item)) {
-    return item;
-  }
-
-  if (item.type !== "allOf" || item.allOf.length < 2) {
+  if (!types.isAllOf(item) || item.allOf.length < 2) {
     return item;
   }
 
@@ -17,17 +13,11 @@ export const allOf: TypeArenaTransform = (arena, item) => {
   for (const subKey of item.allOf) {
     const subItem = arena.resolveItem(subKey);
 
-    assert("type" in subItem);
+    if (!("type" in subItem)) {
+      return item;
+    }
 
     switch (subItem.type) {
-      case "allOf":
-      case "anyOf":
-      case "oneOf":
-        // if the sub item is one of these if cannot be processed! the
-        // sub item needs to be optimized away by another transform and then
-        // we might be able to try this again.
-        return item;
-
       case "never":
         // merging with a never type will always yield never
         return { id, type: "never" };
@@ -44,7 +34,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
   if (uniqueElements.size !== item.allOf.length) {
     return {
       id,
-      type: "allOf",
+
       allOf: [...uniqueElements],
     };
   }
@@ -89,7 +79,6 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         for (let index = 0; index < length; index++) {
           if (index < subItem.elements.length && index < mergedItem.elements.length) {
             const newItem: types.AllOf = {
-              type: "allOf",
               allOf: [mergedItem.elements[index], subItem.elements[index]],
             };
             const newKey = arena.addItem(newItem);
@@ -112,7 +101,6 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         assert(mergedItem.type === subItem.type);
 
         const newItem: types.AllOf = {
-          type: "allOf",
           allOf: [mergedItem.element, subItem.element],
         };
         const newKey = arena.addItem(newItem);
@@ -138,7 +126,6 @@ export const allOf: TypeArenaTransform = (arena, item) => {
           const subItemProperty = subItem.properties[propertyName];
           if (mergedItemProperty != null && subItemProperty != null) {
             const newItem: types.AllOf = {
-              type: "allOf",
               allOf: [mergedItemProperty.element, subItemProperty.element],
             };
             const newKey = arena.addItem(newItem);
@@ -165,13 +152,11 @@ export const allOf: TypeArenaTransform = (arena, item) => {
         assert(mergedItem.type === subItem.type);
 
         const newNameItem: types.AllOf = {
-          type: "allOf",
           allOf: [mergedItem.name, subItem.name],
         };
         const newNameKey = arena.addItem(newNameItem);
 
         const newElementItem: types.AllOf = {
-          type: "allOf",
           allOf: [mergedItem.element, subItem.element],
         };
         const newElementKey = arena.addItem(newElementItem);

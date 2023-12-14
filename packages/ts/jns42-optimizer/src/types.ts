@@ -1,6 +1,7 @@
+import assert from "node:assert";
 import { hasProperties } from "./utils/index.js";
 
-export type ArenaTypeItem = Alias | Item;
+export type ArenaTypeItem = Partial<Alias & OneOf & AnyOf & AllOf> | Item;
 
 export interface Alias {
   id?: string;
@@ -13,11 +14,43 @@ export function isAlias(item: ArenaTypeItem): item is Alias {
   return hasProperties(item, ["alias"], ["id"]);
 }
 
-export type Item = Unknown | Never | Any | Primitive | Complex | Merge;
+export interface OneOf {
+  id?: string;
+  oneOf: number[];
+}
+export function isOneOf(item: ArenaTypeItem): item is OneOf {
+  if (!("oneOf" in item)) {
+    return false;
+  }
+  return hasProperties(item, ["oneOf"], ["id"]);
+}
+
+export interface AnyOf {
+  id?: string;
+  anyOf: number[];
+}
+export function isAnyOf(item: ArenaTypeItem): item is AnyOf {
+  if (!("anyOf" in item)) {
+    return false;
+  }
+  return hasProperties(item, ["anyOf"], ["id"]);
+}
+
+export interface AllOf {
+  id?: string;
+  allOf: number[];
+}
+export function isAllOf(item: ArenaTypeItem): item is AllOf {
+  if (!("allOf" in item)) {
+    return false;
+  }
+  return hasProperties(item, ["allOf"], ["id"]);
+}
+
+export type Item = Unknown | Never | Any | Primitive | Complex;
 
 export type Primitive = Null | Boolean | Integer | Number | String;
 export type Complex = Tuple | Array | Object | Map;
-export type Merge = OneOf | AnyOf | AllOf;
 
 export interface Base<Type extends string> {
   id?: string;
@@ -73,18 +106,6 @@ export interface Map extends Base<"map"> {
   element: number;
 }
 
-export interface OneOf extends Base<"oneOf"> {
-  oneOf: number[];
-}
-
-export interface AnyOf extends Base<"anyOf"> {
-  anyOf: number[];
-}
-
-export interface AllOf extends Base<"allOf"> {
-  allOf: number[];
-}
-
 /**
  * retrieves depenencies of a type item or alias
  *
@@ -96,25 +117,30 @@ export function* dependencies(item: ArenaTypeItem) {
     return;
   }
 
+  if (isOneOf(item)) {
+    for (const element of item.oneOf) {
+      yield element;
+    }
+    return;
+  }
+
+  if (isAnyOf(item)) {
+    for (const element of item.anyOf) {
+      yield element;
+    }
+    return;
+  }
+
+  if (isAllOf(item)) {
+    for (const element of item.allOf) {
+      yield element;
+    }
+    return;
+  }
+
+  assert("type" in item);
+
   switch (item.type) {
-    case "allOf":
-      for (const element of item.allOf) {
-        yield element;
-      }
-      break;
-
-    case "anyOf":
-      for (const element of item.anyOf) {
-        yield element;
-      }
-      break;
-
-    case "oneOf":
-      for (const element of item.oneOf) {
-        yield element;
-      }
-      break;
-
     case "tuple":
       for (const element of item.elements) {
         yield element;
