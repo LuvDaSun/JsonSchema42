@@ -9,44 +9,25 @@ export const allOf: TypeArenaTransform = (arena, item) => {
 
   const { id } = item;
 
-  const uniqueElements = new Set<number>();
+  let mergedItem: types.Item | undefined;
   for (const subKey of item.allOf) {
     const subItem = arena.resolveItem(subKey);
 
-    if (!("type" in subItem)) {
-      continue;
+    if (subItem.type === "never") {
+      // merging with never will result in never
+      return {
+        type: "never",
+      };
     }
 
-    switch (subItem.type) {
-      case "never":
-        // merging with a never type will always yield never
-        return { id, type: "never" };
-
-      case "any":
-      case "unknown":
-        // don't merge these, these types have no influence on the merged type
-        continue;
+    if ("oneOf" in subItem || "anyOf" in subItem || "allOf" in subItem) {
+      return item;
     }
-
-    uniqueElements.add(subKey);
-  }
-
-  if (uniqueElements.size !== item.allOf.length) {
-    return {
-      id,
-
-      allOf: [...uniqueElements],
-    };
-  }
-
-  let mergedItem: types.Item | undefined;
-  for (const subKey of uniqueElements) {
-    const subItem = arena.resolveItem(subKey);
 
     // if there is no merged item, we have nothing to compare to! we will be able to do this
     // in the next cycle
     if (mergedItem == null) {
-      mergedItem = subItem;
+      mergedItem = { ...subItem };
       continue;
     }
 
@@ -58,9 +39,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
       };
     }
 
-    mergedItem = {
-      type: subItem.type,
-    };
+    mergedItem.type ??= subItem.type;
 
     if (subItem.tupleElements != null) {
       if (mergedItem.tupleElements == null) {

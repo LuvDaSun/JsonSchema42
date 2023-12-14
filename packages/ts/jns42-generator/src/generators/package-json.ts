@@ -25,9 +25,12 @@ export function getPackageJsonData(name: string, version: string) {
       },
     },
     scripts: {
+      prepack: "npm install --no-workspaces",
+      pretest: "tsc --build",
+      prepare: "tsc --build",
       build: "tsc --build",
       clean: "rm -rf ./out && tsc --build --clean",
-      test: "node --test ./out/*.test.js",
+      test: "node --test ./out/**/*.test.js",
     },
     author: "",
     license: "ISC",

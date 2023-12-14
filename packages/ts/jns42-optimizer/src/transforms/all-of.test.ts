@@ -110,9 +110,9 @@ test("all-of tuple", () => {
       { type: "string" }, // 1
       { type: "string" }, // 2
       { type: "string" }, // 3
-      { type: "tuple", elements: [0, 1] }, // 4
-      { type: "tuple", elements: [2, 3] }, // 5
-      { type: "tuple", elements: [7, 8] }, // 6
+      { type: "tuple", tupleElements: [0, 1] }, // 4
+      { type: "tuple", tupleElements: [2, 3] }, // 5
+      { type: "tuple", tupleElements: [7, 8] }, // 6
       { type: "never" }, // 7
       { type: "string" }, // 8
     ],
@@ -136,9 +136,9 @@ test("all-of array", () => {
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
-      { type: "array", element: 0 }, // 2
-      { type: "array", element: 1 }, // 3
-      { type: "array", element: 5 }, // 4
+      { type: "array", arrayElement: 0 }, // 2
+      { type: "array", arrayElement: 1 }, // 3
+      { type: "array", arrayElement: 5 }, // 4
       { type: "never" }, // 5
     ],
   );
@@ -179,21 +179,21 @@ test("all-of object", () => {
       { type: "string" }, // 3
       {
         type: "object",
-        properties: {
+        objectProperties: {
           a: { required: false, element: 0 },
           b: { required: false, element: 1 },
         },
       }, // 4
       {
         type: "object",
-        properties: {
+        objectProperties: {
           b: { required: true, element: 2 },
           c: { required: false, element: 3 },
         },
       }, // 5
       {
         type: "object",
-        properties: {
+        objectProperties: {
           a: { required: false, element: 0 },
           b: { required: true, element: 7 },
           c: { required: false, element: 3 },
@@ -225,9 +225,9 @@ test("all-of map", () => {
       { type: "string" }, // 1
       { type: "string" }, // 2
       { type: "number" }, // 3
-      { type: "map", name: 0, element: 1 }, // 4
-      { type: "map", name: 2, element: 3 }, // 5
-      { type: "map", name: 7, element: 8 }, // 6
+      { type: "map", propertyName: 0, mapElement: 1 }, // 4
+      { type: "map", propertyName: 2, mapElement: 3 }, // 5
+      { type: "map", propertyName: 7, mapElement: 8 }, // 6
       { type: "string" }, // 7
       { type: "never" }, // 8
     ],

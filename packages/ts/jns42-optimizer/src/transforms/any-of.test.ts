@@ -96,12 +96,12 @@ test("any-of tuple", () => {
       { type: "string" }, // 1
       { type: "string" }, // 2
       { type: "string" }, // 3
-      { type: "tuple", elements: [0, 1] }, // 4
-      { type: "tuple", elements: [2, 3] }, // 5
+      { type: "tuple", tupleElements: [0, 1] }, // 4
+      { type: "tuple", tupleElements: [2, 3] }, // 5
       { alias: 9 }, // 6
       { oneOf: [0, 2] }, // 7
       { alias: 10 }, // 8
-      { type: "tuple", elements: [7, 8] }, // 9
+      { type: "tuple", tupleElements: [7, 8] }, // 9
       { type: "string" }, // 10
     ],
   );
@@ -124,11 +124,11 @@ test("any-of array", () => {
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
-      { type: "array", element: 0 }, // 2
-      { type: "array", element: 1 }, // 3
+      { type: "array", arrayElement: 0 }, // 2
+      { type: "array", arrayElement: 1 }, // 3
       { alias: 6 }, // 4
       { oneOf: [0, 1] }, // 5
-      { type: "array", element: 5 }, // 6
+      { type: "array", arrayElement: 5 }, // 6
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -168,14 +168,14 @@ test("any-of object", () => {
       { type: "string" }, // 3
       {
         type: "object",
-        properties: {
+        objectProperties: {
           a: { required: false, element: 0 },
           b: { required: false, element: 1 },
         },
       }, // 4
       {
         type: "object",
-        properties: {
+        objectProperties: {
           b: { required: true, element: 2 },
           c: { required: false, element: 3 },
         },
@@ -184,7 +184,7 @@ test("any-of object", () => {
       { alias: 9 }, // 7
       {
         type: "object",
-        properties: {
+        objectProperties: {
           a: { required: false, element: 0 },
           b: { required: true, element: 7 },
           c: { required: false, element: 3 },
@@ -216,12 +216,12 @@ test("any-of map", () => {
       { type: "string" }, // 1
       { type: "string" }, // 2
       { type: "number" }, // 3
-      { type: "map", name: 0, element: 1 }, // 4
-      { type: "map", name: 2, element: 3 }, // 5
+      { type: "map", propertyName: 0, mapElement: 1 }, // 4
+      { type: "map", propertyName: 2, mapElement: 3 }, // 5
       { alias: 9 }, // 6
       { alias: 10 }, // 7
       { oneOf: [1, 3] }, // 8
-      { type: "map", name: 7, element: 8 }, // 9
+      { type: "map", propertyName: 7, mapElement: 8 }, // 9
       { type: "string" }, // 10
     ],
   );
