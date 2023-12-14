@@ -13,13 +13,13 @@ import {
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, typeArena } = specification;
+  const { names, types } = specification;
 
   yield itt`
     import * as types from "./types.js";
   `;
 
-  for (const [typeKey, item] of typeArena) {
+  for (const [typeKey, item] of Object.entries(types)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -68,10 +68,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
 function* generateMockReference(
   specification: models.Specification,
-  typeKey: number,
+  typeKey: string,
 ): Iterable<NestedText> {
-  const { names, typeArena } = specification;
-  const typeItem = typeArena.getItem(typeKey);
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`(${generateMockDefinition(specification, typeKey)})`;
   } else {
@@ -82,9 +82,10 @@ function* generateMockReference(
 
 function* generateMockDefinition(
   specification: models.Specification,
-  typeKey: number,
+  typeKey: string,
 ): Iterable<NestedText> {
-  const typeItem = specification.typeArena.getItemUnalias(typeKey);
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
 
   switch (typeItem.type) {
     case "unknown":

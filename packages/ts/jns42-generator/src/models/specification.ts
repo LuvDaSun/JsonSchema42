@@ -1,10 +1,10 @@
-import { TypeArena } from "jns42-optimizer";
-import * as schemaIntermediateB from "schema-intermediate";
+import * as schemaIntermediate from "schema-intermediate";
+import * as models from "../models/index.js";
 
 export interface Specification {
   names: Record<string, string>;
-  nodes: Record<string, schemaIntermediateB.Node>;
-  typeArena: TypeArena;
+  nodes: Record<string, schemaIntermediate.Node>;
+  types: Record<string, models.Union>;
   options: {
     anyOfHack: boolean;
   };

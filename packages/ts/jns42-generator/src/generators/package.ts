@@ -1,7 +1,7 @@
-import { TypeArena } from "jns42-optimizer";
 import fs from "node:fs";
 import path from "node:path";
 import * as schemaIntermediate from "schema-intermediate";
+import * as models from "../models/index.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
@@ -23,7 +23,7 @@ export interface PackageOptions {
 export function generatePackage(
   intermediateData: schemaIntermediate.SchemaDocument,
   namesData: Record<string, string>,
-  typeArena: TypeArena,
+  types: Record<string, models.Union>,
   options: PackageOptions,
 ) {
   const { anyOfHack, packageDirectoryPath, packageName, packageVersion } = options;
@@ -31,7 +31,7 @@ export function generatePackage(
   const specification = {
     names: namesData,
     nodes: intermediateData.schemas,
-    typeArena,
+    types,
     options: {
       anyOfHack,
     },

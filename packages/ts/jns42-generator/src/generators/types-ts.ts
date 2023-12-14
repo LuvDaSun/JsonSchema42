@@ -4,9 +4,9 @@ import { NestedText, banner, itt, joinIterable, toPascal } from "../utils/index.
 export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, typeArena } = specification;
+  const { names, types } = specification;
 
-  for (const [typeKey, item] of typeArena) {
+  for (const [typeKey, item] of Object.entries(types)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -45,10 +45,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
 function* generateTypeReference(
   specification: models.Specification,
-  typeKey: number,
+  typeKey: string,
 ): Iterable<NestedText> {
-  const { names, typeArena } = specification;
-  const typeItem = typeArena.getItem(typeKey);
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`(${generateTypeDefinition(specification, typeKey)})`;
   } else {
@@ -57,9 +57,9 @@ function* generateTypeReference(
   }
 }
 
-function* generateTypeDefinition(specification: models.Specification, typeKey: number) {
-  const { names, typeArena } = specification;
-  const typeItem = typeArena.getItemUnalias(typeKey);
+function* generateTypeDefinition(specification: models.Specification, typeKey: string) {
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
 
   switch (typeItem.type) {
     case "unknown":
@@ -155,8 +155,5 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: n
       `;
       break;
     }
-
-    default:
-      throw new TypeError(`${typeItem.type} not supported`);
   }
 }

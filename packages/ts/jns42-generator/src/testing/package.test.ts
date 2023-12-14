@@ -89,10 +89,10 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
-      const typeArena = loadTypes(intermediateData);
+      const types = loadTypes(intermediateData);
 
       const namer = new Namer(defaultTypeName, 5);
-      for (const [typeKey, typeItem] of typeArena) {
+      for (const [typeKey, typeItem] of Object.entries(types)) {
         const { id: nodeId } = typeItem;
         if (nodeId == null) {
           continue;
@@ -105,7 +105,7 @@ async function runTest(packageName: string) {
 
       const names = namer.getNames();
 
-      generatePackage(intermediateData, names, typeArena, {
+      generatePackage(intermediateData, names, types, {
         packageDirectoryPath: packageDirectoryPath,
         packageName: packageName,
         packageVersion: "v0.0.0",

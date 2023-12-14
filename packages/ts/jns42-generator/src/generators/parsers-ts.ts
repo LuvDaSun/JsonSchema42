@@ -4,9 +4,9 @@ import { NestedText, banner, itt, joinIterable, toCamel } from "../utils/index.j
 export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, typeArena } = specification;
+  const { names, types } = specification;
 
-  for (const [typeKey, item] of typeArena) {
+  for (const [typeKey, item] of Object.entries(types)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -30,10 +30,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
 function* generateParserReference(
   specification: models.Specification,
-  typeKey: number,
+  typeKey: string,
 ): Iterable<NestedText> {
-  const { names, typeArena } = specification;
-  const typeItem = typeArena.getItem(typeKey);
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`((value: unknown) => {
       ${generateParserDefinition(specification, typeKey)}
@@ -44,9 +44,9 @@ function* generateParserReference(
   }
 }
 
-function* generateParserDefinition(specification: models.Specification, typeKey: number) {
-  const { names, typeArena } = specification;
-  const typeItem = typeArena.getItemUnalias(typeKey);
+function* generateParserDefinition(specification: models.Specification, typeKey: string) {
+  const { names, types: typeA } = specification;
+  const typeItem = typeA[typeKey];
 
   switch (typeItem.type) {
     case "unknown":
@@ -216,8 +216,5 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
       )};`;
       break;
     }
-
-    default:
-      throw new TypeError(`${typeItem.type} not supported`);
   }
 }

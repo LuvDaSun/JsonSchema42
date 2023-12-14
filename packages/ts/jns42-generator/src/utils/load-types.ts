@@ -1,7 +1,16 @@
 import { TypeArena, transforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
+import * as models from "../models/index.js";
 
-export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeArena {
+export function loadTypes(
+  document: schemaIntermediate.SchemaDocument,
+): Record<string, models.Union> {
+  const arena = arenaFromIntermediate(document);
+  const types = typesFromTypeArena(arena);
+  return Object.fromEntries(types);
+}
+
+function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 
@@ -301,11 +310,167 @@ export function loadTypes(document: schemaIntermediate.SchemaDocument): TypeAren
   return arena;
 }
 
-function loadTypeArenaKeep(arena: TypeArena) {
-  const keep = new Set<number>();
+function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]> {
+  const usedKeys = new Set(findUsedKeys(arena));
+
+  for (const key of usedKeys) {
+    const { id } = arena.getItem(key);
+    const item = arena.getItemUnalias(key);
+
+    switch (item.type) {
+      case "unknown":
+        // TODO should error in the future
+        yield [
+          String(key),
+          {
+            id: id,
+            type: "unknown",
+          },
+        ];
+        break;
+
+      case "never":
+        // TODO should error in the future
+        yield [
+          String(key),
+          {
+            id,
+            type: "never",
+          },
+        ];
+        break;
+
+      case "any":
+        yield [
+          String(key),
+          {
+            id,
+            type: "any",
+          },
+        ];
+        break;
+
+      case "null":
+        yield [
+          String(key),
+          {
+            id,
+            type: "null",
+          },
+        ];
+        break;
+
+      case "boolean":
+        yield [
+          String(key),
+          {
+            id,
+            type: "boolean",
+          },
+        ];
+        break;
+
+      case "integer":
+        yield [
+          String(key),
+          {
+            id,
+            type: "integer",
+          },
+        ];
+        break;
+
+      case "number":
+        yield [
+          String(key),
+          {
+            id,
+            type: "number",
+          },
+        ];
+        break;
+
+      case "string":
+        yield [
+          String(key),
+          {
+            id,
+            type: "string",
+          },
+        ];
+        break;
+
+      case "tuple":
+        yield [
+          String(key),
+          {
+            id,
+            type: "tuple",
+            elements: item.elements.map(String),
+          },
+        ];
+        break;
+
+      case "array":
+        yield [
+          String(key),
+          {
+            id,
+            type: "array",
+            element: String(item.element),
+          },
+        ];
+        break;
+
+      case "object":
+        yield [
+          String(key),
+          {
+            id,
+            type: "object",
+            properties: Object.fromEntries(
+              Object.entries(item.properties).map(([name, { required, element }]) => [
+                name,
+                { required, element: String(element) },
+              ]),
+            ),
+          },
+        ];
+        break;
+
+      case "map":
+        yield [
+          String(key),
+          {
+            id,
+            type: "map",
+            name: String(item.name),
+            element: String(item.element),
+          },
+        ];
+        break;
+
+      case "oneOf":
+        yield [
+          String(key),
+          {
+            id,
+            type: "oneOf",
+            elements: item.elements.map(String),
+          },
+        ];
+        break;
+
+      default:
+        throw new TypeError(`${item.type} not supported`);
+    }
+  }
+}
+
+function* findUsedKeys(arena: TypeArena) {
   for (const [key, item] of arena) {
     if (item.id != null) {
-      keep.add(key);
+      yield key;
     }
 
     switch (item.type) {
@@ -313,32 +478,31 @@ function loadTypeArenaKeep(arena: TypeArena) {
       case "anyOf":
       case "allOf":
         for (const element of item.elements) {
-          keep.add(element);
+          yield element;
         }
         break;
 
       case "alias":
-        keep.add(item.target);
+        yield item.target;
         break;
 
       case "tuple":
         for (const element of item.elements) {
-          keep.add(element);
+          yield element;
         }
         break;
       case "array":
-        keep.add(item.element);
+        yield item.element;
         break;
       case "object":
         for (const { element } of Object.values(item.properties)) {
-          keep.add(element);
+          yield element;
         }
         break;
       case "map":
-        keep.add(item.name);
-        keep.add(item.element);
+        yield item.name;
+        yield item.element;
         break;
     }
   }
-  return keep;
 }
