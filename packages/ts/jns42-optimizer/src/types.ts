@@ -1,3 +1,18 @@
+import { hasProperties } from "./utils/index.js";
+
+export type ArenaTypeItem = Alias | Item;
+
+export interface Alias {
+  id?: string;
+  alias: number;
+}
+export function isAlias(item: ArenaTypeItem): item is Alias {
+  if (!("alias" in item)) {
+    return false;
+  }
+  return hasProperties(item, ["alias"], ["id"]);
+}
+
 export type Item = Unknown | Never | Any | Primitive | Complex | Merge;
 
 export type Primitive = Null | Boolean | Integer | Number | String;
@@ -5,12 +20,8 @@ export type Complex = Tuple | Array | Object | Map;
 export type Merge = OneOf | AnyOf | AllOf;
 
 export interface Base<Type extends string> {
-  id: string | null;
+  id?: string;
   type: Type;
-}
-
-export interface Alias extends Base<"alias"> {
-  alias: number;
 }
 
 export interface Unknown extends Base<"unknown"> {
@@ -79,7 +90,12 @@ export interface AllOf extends Base<"allOf"> {
  *
  * @param item the type to get dependencies
  */
-export function* dependencies(item: Item | Alias) {
+export function* dependencies(item: ArenaTypeItem) {
+  if (isAlias(item)) {
+    yield item.alias;
+    return;
+  }
+
   switch (item.type) {
     case "allOf":
       for (const element of item.allOf) {
@@ -97,10 +113,6 @@ export function* dependencies(item: Item | Alias) {
       for (const element of item.oneOf) {
         yield element;
       }
-      break;
-
-    case "alias":
-      yield item.alias;
       break;
 
     case "tuple":

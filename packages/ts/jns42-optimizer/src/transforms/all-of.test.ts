@@ -8,26 +8,26 @@ const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown,
 
 test("all-of utility", () => {
   const arena = new TypeArena();
-  const u = arena.addItem({ id: null, type: "unknown" });
-  const n = arena.addItem({ id: null, type: "never" });
-  const a = arena.addItem({ id: null, type: "any" });
-  const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "allOf", allOf: [num, u] });
-  arena.addItem({ id: null, type: "allOf", allOf: [num, n] });
-  arena.addItem({ id: null, type: "allOf", allOf: [num, a] });
+  const u = arena.addItem({ type: "unknown" });
+  const n = arena.addItem({ type: "never" });
+  const a = arena.addItem({ type: "any" });
+  const num = arena.addItem({ type: "number" });
+  arena.addItem({ type: "allOf", allOf: [num, u] });
+  arena.addItem({ type: "allOf", allOf: [num, n] });
+  arena.addItem({ type: "allOf", allOf: [num, a] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "unknown" },
-      { id: null, type: "never" },
-      { id: null, type: "any" },
-      { id: null, type: "number" },
-      { id: null, type: "alias", target: num },
-      { id: null, type: "never" },
-      { id: null, type: "alias", target: num },
+      { type: "unknown" },
+      { type: "never" },
+      { type: "any" },
+      { type: "number" },
+      { alias: num },
+      { type: "never" },
+      { alias: num },
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -35,60 +35,52 @@ test("all-of utility", () => {
 
 test("all-of alias", () => {
   const arena = new TypeArena();
-  const str1 = arena.addItem({ id: null, type: "string" });
-  const str2 = arena.addItem({ id: null, type: "string" });
-  const allOf1 = arena.addItem({ id: null, type: "allOf", allOf: [str2] });
-  arena.addItem({ id: null, type: "allOf", allOf: [str1, allOf1] });
+  const str1 = arena.addItem({ type: "string" });
+  const str2 = arena.addItem({ type: "string" });
+  const allOf1 = arena.addItem({ type: "allOf", allOf: [str2] });
+  arena.addItem({ type: "allOf", allOf: [str1, allOf1] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
-    [
-      { id: null, type: "string" },
-      { id: null, type: "string" },
-      { id: null, type: "alias", target: str2 },
-      { id: null, type: "string" },
-    ],
+    [{ type: "string" }, { type: "string" }, { alias: str2 }, { type: "string" }],
   );
   assert(!hasDoubleReference([...arena]));
 });
 
 test("all-of unique", () => {
   const arena = new TypeArena();
-  const num = arena.addItem({ id: null, type: "number" });
-  arena.addItem({ id: null, type: "allOf", allOf: [num, num, num] });
+  const num = arena.addItem({ type: "number" });
+  arena.addItem({ type: "allOf", allOf: [num, num, num] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
-    [
-      { id: null, type: "number" },
-      { id: null, type: "alias", target: num },
-    ],
+    [{ type: "number" }, { alias: num }],
   );
   assert(!hasDoubleReference([...arena]));
 });
 
 test("all-of primitive", () => {
   const arena = new TypeArena();
-  const num = arena.addItem({ id: null, type: "number" });
-  const str1 = arena.addItem({ id: null, type: "string" });
-  const str2 = arena.addItem({ id: null, type: "string" });
-  arena.addItem({ id: null, type: "allOf", allOf: [num, str1] });
-  arena.addItem({ id: null, type: "allOf", allOf: [str1, str2] });
+  const num = arena.addItem({ type: "number" });
+  const str1 = arena.addItem({ type: "string" });
+  const str2 = arena.addItem({ type: "string" });
+  arena.addItem({ type: "allOf", allOf: [num, str1] });
+  arena.addItem({ type: "allOf", allOf: [str1, str2] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "number" },
-      { id: null, type: "string" },
-      { id: null, type: "string" },
-      { id: null, type: "never" },
-      { id: null, type: "string" },
+      { type: "number" },
+      { type: "string" },
+      { type: "string" },
+      { type: "never" },
+      { type: "string" },
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -96,28 +88,28 @@ test("all-of primitive", () => {
 
 test("all-of tuple", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "number" }); // 0
-  arena.addItem({ id: null, type: "string" }); // 1
-  arena.addItem({ id: null, type: "string" }); // 2
-  arena.addItem({ id: null, type: "string" }); // 3
-  arena.addItem({ id: null, type: "tuple", elements: [0, 1] }); // 4
-  arena.addItem({ id: null, type: "tuple", elements: [2, 3] }); // 5
-  arena.addItem({ id: null, type: "allOf", allOf: [4, 5] }); // 6
+  arena.addItem({ type: "number" }); // 0
+  arena.addItem({ type: "string" }); // 1
+  arena.addItem({ type: "string" }); // 2
+  arena.addItem({ type: "string" }); // 3
+  arena.addItem({ type: "tuple", elements: [0, 1] }); // 4
+  arena.addItem({ type: "tuple", elements: [2, 3] }); // 5
+  arena.addItem({ type: "allOf", allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "number" }, // 0
-      { id: null, type: "string" }, // 1
-      { id: null, type: "string" }, // 2
-      { id: null, type: "string" }, // 3
-      { id: null, type: "tuple", elements: [0, 1] }, // 4
-      { id: null, type: "tuple", elements: [2, 3] }, // 5
-      { id: null, type: "tuple", elements: [7, 8] }, // 6
-      { id: null, type: "never" }, // 7
-      { id: null, type: "string" }, // 8
+      { type: "number" }, // 0
+      { type: "string" }, // 1
+      { type: "string" }, // 2
+      { type: "string" }, // 3
+      { type: "tuple", elements: [0, 1] }, // 4
+      { type: "tuple", elements: [2, 3] }, // 5
+      { type: "tuple", elements: [7, 8] }, // 6
+      { type: "never" }, // 7
+      { type: "string" }, // 8
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -125,23 +117,23 @@ test("all-of tuple", () => {
 
 test("all-of array", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "number" }); // 0
-  arena.addItem({ id: null, type: "string" }); // 1
-  arena.addItem({ id: null, type: "array", element: 0 }); // 2
-  arena.addItem({ id: null, type: "array", element: 1 }); // 3
-  arena.addItem({ id: null, type: "allOf", allOf: [2, 3] }); // 4
+  arena.addItem({ type: "number" }); // 0
+  arena.addItem({ type: "string" }); // 1
+  arena.addItem({ type: "array", element: 0 }); // 2
+  arena.addItem({ type: "array", element: 1 }); // 3
+  arena.addItem({ type: "allOf", allOf: [2, 3] }); // 4
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "number" }, // 0
-      { id: null, type: "string" }, // 1
-      { id: null, type: "array", element: 0 }, // 2
-      { id: null, type: "array", element: 1 }, // 3
-      { id: null, type: "array", element: 5 }, // 4
-      { id: null, type: "never" }, // 5
+      { type: "number" }, // 0
+      { type: "string" }, // 1
+      { type: "array", element: 0 }, // 2
+      { type: "array", element: 1 }, // 3
+      { type: "array", element: 5 }, // 4
+      { type: "never" }, // 5
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -149,12 +141,11 @@ test("all-of array", () => {
 
 test("all-of object", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "number" }); // 0
-  arena.addItem({ id: null, type: "string" }); // 1
-  arena.addItem({ id: null, type: "string" }); // 2
-  arena.addItem({ id: null, type: "string" }); // 3
+  arena.addItem({ type: "number" }); // 0
+  arena.addItem({ type: "string" }); // 1
+  arena.addItem({ type: "string" }); // 2
+  arena.addItem({ type: "string" }); // 3
   arena.addItem({
-    id: null,
     type: "object",
     properties: {
       a: { required: false, element: 0 },
@@ -162,26 +153,24 @@ test("all-of object", () => {
     },
   }); // 4
   arena.addItem({
-    id: null,
     type: "object",
     properties: {
       b: { required: true, element: 2 },
       c: { required: false, element: 3 },
     },
   }); // 5
-  arena.addItem({ id: null, type: "allOf", allOf: [4, 5] }); // 6
+  arena.addItem({ type: "allOf", allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "number" }, // 0
-      { id: null, type: "string" }, // 1
-      { id: null, type: "string" }, // 2
-      { id: null, type: "string" }, // 3
+      { type: "number" }, // 0
+      { type: "string" }, // 1
+      { type: "string" }, // 2
+      { type: "string" }, // 3
       {
-        id: null,
         type: "object",
         properties: {
           a: { required: false, element: 0 },
@@ -189,7 +178,6 @@ test("all-of object", () => {
         },
       }, // 4
       {
-        id: null,
         type: "object",
         properties: {
           b: { required: true, element: 2 },
@@ -197,7 +185,6 @@ test("all-of object", () => {
         },
       }, // 5
       {
-        id: null,
         type: "object",
         properties: {
           a: { required: false, element: 0 },
@@ -205,7 +192,7 @@ test("all-of object", () => {
           c: { required: false, element: 3 },
         },
       }, // 6
-      { id: null, type: "string" }, // 7
+      { type: "string" }, // 7
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -213,28 +200,28 @@ test("all-of object", () => {
 
 test("all-of map", () => {
   const arena = new TypeArena();
-  arena.addItem({ id: null, type: "string" }); // 0
-  arena.addItem({ id: null, type: "string" }); // 1
-  arena.addItem({ id: null, type: "string" }); // 2
-  arena.addItem({ id: null, type: "number" }); // 3
-  arena.addItem({ id: null, type: "map", name: 0, element: 1 }); // 4
-  arena.addItem({ id: null, type: "map", name: 2, element: 3 }); // 5
-  arena.addItem({ id: null, type: "allOf", allOf: [4, 5] }); // 6
+  arena.addItem({ type: "string" }); // 0
+  arena.addItem({ type: "string" }); // 1
+  arena.addItem({ type: "string" }); // 2
+  arena.addItem({ type: "number" }); // 3
+  arena.addItem({ type: "map", name: 0, element: 1 }); // 4
+  arena.addItem({ type: "map", name: 2, element: 3 }); // 5
+  arena.addItem({ type: "allOf", allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "string" }, // 0
-      { id: null, type: "string" }, // 1
-      { id: null, type: "string" }, // 2
-      { id: null, type: "number" }, // 3
-      { id: null, type: "map", name: 0, element: 1 }, // 4
-      { id: null, type: "map", name: 2, element: 3 }, // 5
-      { id: null, type: "map", name: 7, element: 8 }, // 6
-      { id: null, type: "string" }, // 7
-      { id: null, type: "never" }, // 8
+      { type: "string" }, // 0
+      { type: "string" }, // 1
+      { type: "string" }, // 2
+      { type: "number" }, // 3
+      { type: "map", name: 0, element: 1 }, // 4
+      { type: "map", name: 2, element: 3 }, // 5
+      { type: "map", name: 7, element: 8 }, // 6
+      { type: "string" }, // 7
+      { type: "never" }, // 8
     ],
   );
   assert(!hasDoubleReference([...arena]));

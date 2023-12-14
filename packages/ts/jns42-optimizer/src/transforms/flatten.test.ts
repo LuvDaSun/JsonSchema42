@@ -5,24 +5,24 @@ import { flatten } from "./flatten.js";
 
 test("flatten", () => {
   const arena = new TypeArena();
-  const i1 = arena.addItem({ id: null, type: "string" });
-  const i2 = arena.addItem({ id: null, type: "string" });
-  const i3 = arena.addItem({ id: null, type: "string" });
-  const i4 = arena.addItem({ id: null, type: "oneOf", oneOf: [i1, i2] });
-  const i5 = arena.addItem({ id: null, type: "alias", alias: i4 });
-  const i6 = arena.addItem({ id: null, type: "oneOf", oneOf: [i5, i3] });
+  const i1 = arena.addItem({ type: "string" });
+  const i2 = arena.addItem({ type: "string" });
+  const i3 = arena.addItem({ type: "string" });
+  const i4 = arena.addItem({ type: "oneOf", oneOf: [i1, i2] });
+  const i5 = arena.addItem({ alias: i4 });
+  const i6 = arena.addItem({ type: "oneOf", oneOf: [i5, i3] });
 
   while (arena.applyTransform(flatten) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => v),
     [
-      { id: null, type: "string" },
-      { id: null, type: "string" },
-      { id: null, type: "string" },
-      { id: null, type: "oneOf", elements: [i1, i2] },
-      { id: null, type: "alias", target: i4 },
-      { id: null, type: "oneOf", elements: [i1, i2, i3] },
+      { type: "string" },
+      { type: "string" },
+      { type: "string" },
+      { type: "oneOf", elements: [i1, i2] },
+      { alias: i4 },
+      { type: "oneOf", elements: [i1, i2, i3] },
     ],
   );
 });

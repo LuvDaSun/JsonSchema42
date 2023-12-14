@@ -10,6 +10,10 @@ import * as types from "../types.js";
  * @returns the untransformed item, or a new item.
  */
 export const allOfOneOf: TypeArenaTransform = (arena, item) => {
+  if (types.isAlias(item)) {
+    return item;
+  }
+
   if (item.type !== "allOf") {
     return item;
   }
@@ -25,7 +29,13 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
 
   const baseElementEntries = [...uniqueElements]
     .map((element) => [element, arena.resolveItem(element)] as const)
-    .filter(([element, item]) => item.type === "oneOf")
+    .filter(([element, item]) => {
+      if (types.isAlias(item)) {
+        return false;
+      }
+
+      return item.type === "oneOf";
+    })
     .map(([element, item]) => [element, item as types.OneOf] as const);
   const leafElements = baseElementEntries.flatMap(([key, item]) => item.oneOf);
   const uniqueBaseElements = new Set(baseElementEntries.map(([key, item]) => key));
@@ -40,7 +50,6 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
     );
 
     const newLeafItem: types.AllOf = {
-      id: null,
       type: "allOf",
       allOf: newLeafElements,
     };

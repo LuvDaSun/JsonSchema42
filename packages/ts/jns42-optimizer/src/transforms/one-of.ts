@@ -1,6 +1,12 @@
+import assert from "assert";
 import { TypeArenaTransform } from "../type-arena.js";
+import * as types from "../types.js";
 
 export const oneOf: TypeArenaTransform = (arena, item) => {
+  if (types.isAlias(item)) {
+    return item;
+  }
+
   if (item.type !== "oneOf" || item.oneOf.length < 2) {
     return item;
   }
@@ -10,6 +16,8 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
   const uniqueElements = new Set<number>();
   for (const subKey of item.oneOf) {
     const subItem = arena.resolveItem(subKey);
+
+    assert("type" in subItem);
 
     switch (subItem.type) {
       case "allOf":

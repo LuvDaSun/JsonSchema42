@@ -5,7 +5,7 @@ export type Complex = Tuple | Array | Object | Map;
 export type Merge = Union;
 
 export interface Base<Type extends string> {
-  id: string | null;
+  id?: string;
   type: Type;
 }
 

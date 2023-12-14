@@ -1,6 +1,11 @@
 import { TypeArenaTransform } from "../type-arena.js";
+import * as types from "../types.js";
 
 export const unknown: TypeArenaTransform = (arena, item) => {
+  if (types.isAlias(item)) {
+    return item;
+  }
+
   const { id } = item;
 
   switch (item.type) {

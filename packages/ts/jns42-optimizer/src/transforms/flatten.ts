@@ -1,6 +1,12 @@
+import assert from "assert";
 import { TypeArenaTransform } from "../type-arena.js";
+import * as types from "../types.js";
 
 export const flatten: TypeArenaTransform = (arena, item) => {
+  if (types.isAlias(item)) {
+    return item;
+  }
+
   const { id } = item;
 
   switch (item.type) {
@@ -9,6 +15,8 @@ export const flatten: TypeArenaTransform = (arena, item) => {
       let createNew = false;
       for (const subKey of item.allOf) {
         const subItem = arena.resolveItem(subKey);
+
+        assert("type" in subItem);
 
         if (subItem.type === item.type) {
           createNew = true;
@@ -33,6 +41,8 @@ export const flatten: TypeArenaTransform = (arena, item) => {
       for (const subKey of item.anyOf) {
         const subItem = arena.resolveItem(subKey);
 
+        assert("type" in subItem);
+
         if (subItem.type === item.type) {
           createNew = true;
           elements.push(...subItem.anyOf);
@@ -55,6 +65,8 @@ export const flatten: TypeArenaTransform = (arena, item) => {
       let createNew = false;
       for (const subKey of item.oneOf) {
         const subItem = arena.resolveItem(subKey);
+
+        assert("type" in subItem);
 
         if (subItem.type === item.type) {
           createNew = true;
