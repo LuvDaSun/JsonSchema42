@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
+import { deleteUndefined } from "../utils/index.js";
 import { flatten } from "./flatten.js";
 
 test("flatten", () => {
@@ -15,14 +16,15 @@ test("flatten", () => {
   while (arena.applyTransform(flatten) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "string" },
       { type: "string" },
       { type: "string" },
-      { type: "oneOf", elements: [i1, i2] },
+      { type: "oneOf", oneOf: [i1, i2] },
       { alias: i4 },
-      { type: "oneOf", elements: [i1, i2, i3] },
+      { type: "oneOf", oneOf: [i1, i2, i3] },
     ],
   );
 });

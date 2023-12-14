@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { hasDoubleReference } from "../utils/index.js";
+import { deleteUndefined, hasDoubleReference } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.oneOf];
@@ -19,7 +19,8 @@ test("one-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "unknown" },
       { type: "never" },
@@ -43,12 +44,13 @@ test("one-of alias", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "string" },
       { type: "string" },
       { alias: str2 },
-      { type: "oneOf", elements: [str1, oneOf1] },
+      { type: "oneOf", oneOf: [str1, oneOf1] },
     ],
   );
   assert(!hasDoubleReference([...arena]));
@@ -62,7 +64,8 @@ test("one-of unique", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [{ type: "number" }, { alias: num }],
   );
   assert(!hasDoubleReference([...arena]));

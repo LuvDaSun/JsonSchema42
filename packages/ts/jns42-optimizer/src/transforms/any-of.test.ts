@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { hasDoubleReference } from "../utils/index.js";
+import { deleteUndefined, hasDoubleReference } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.anyOf];
@@ -19,7 +19,8 @@ test("any-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "unknown" },
       { type: "never" },
@@ -41,7 +42,8 @@ test("any-of unique", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [{ type: "number" }, { alias: num }],
   );
   assert(!hasDoubleReference([...arena]));
@@ -59,13 +61,14 @@ test("any-of primitive", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
       { type: "string" }, // 2
       { type: "string" }, // 3
-      { type: "oneOf", elements: [0, 1] }, // 4
+      { type: "oneOf", oneOf: [0, 1] }, // 4
       { alias: 6 }, // 5
       { type: "string" }, // 6
     ],
@@ -86,7 +89,8 @@ test("any-of tuple", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
@@ -95,7 +99,7 @@ test("any-of tuple", () => {
       { type: "tuple", elements: [0, 1] }, // 4
       { type: "tuple", elements: [2, 3] }, // 5
       { alias: 9 }, // 6
-      { type: "oneOf", elements: [0, 2] }, // 7
+      { type: "oneOf", oneOf: [0, 2] }, // 7
       { alias: 10 }, // 8
       { type: "tuple", elements: [7, 8] }, // 9
       { type: "string" }, // 10
@@ -115,14 +119,15 @@ test("any-of array", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
       { type: "array", element: 0 }, // 2
       { type: "array", element: 1 }, // 3
       { alias: 6 }, // 4
-      { type: "oneOf", elements: [0, 1] }, // 5
+      { type: "oneOf", oneOf: [0, 1] }, // 5
       { type: "array", element: 5 }, // 6
     ],
   );
@@ -154,7 +159,8 @@ test("any-of object", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
@@ -203,7 +209,8 @@ test("any-of map", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "string" }, // 0
       { type: "string" }, // 1
@@ -213,7 +220,7 @@ test("any-of map", () => {
       { type: "map", name: 2, element: 3 }, // 5
       { alias: 9 }, // 6
       { alias: 10 }, // 7
-      { type: "oneOf", elements: [1, 3] }, // 8
+      { type: "oneOf", oneOf: [1, 3] }, // 8
       { type: "map", name: 7, element: 8 }, // 9
       { type: "string" }, // 10
     ],

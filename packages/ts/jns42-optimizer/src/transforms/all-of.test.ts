@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { hasDoubleReference } from "../utils/index.js";
+import { deleteUndefined, hasDoubleReference } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.allOf];
@@ -19,7 +19,8 @@ test("all-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "unknown" },
       { type: "never" },
@@ -43,7 +44,8 @@ test("all-of alias", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [{ type: "string" }, { type: "string" }, { alias: str2 }, { type: "string" }],
   );
   assert(!hasDoubleReference([...arena]));
@@ -57,7 +59,8 @@ test("all-of unique", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [{ type: "number" }, { alias: num }],
   );
   assert(!hasDoubleReference([...arena]));
@@ -74,7 +77,8 @@ test("all-of primitive", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" },
       { type: "string" },
@@ -99,7 +103,8 @@ test("all-of tuple", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
@@ -126,7 +131,8 @@ test("all-of array", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
@@ -164,7 +170,8 @@ test("all-of object", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "number" }, // 0
       { type: "string" }, // 1
@@ -211,7 +218,8 @@ test("all-of map", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => v),
+    [...arena].map(([k, v]) => deleteUndefined(v)),
+
     [
       { type: "string" }, // 0
       { type: "string" }, // 1
