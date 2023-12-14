@@ -61,3 +61,7 @@ export interface Map extends Base<"map"> {
 export interface OneOf extends Base<"oneOf"> {
   elements: string[];
 }
+
+export interface Alias extends Base<"alias"> {
+  target: string;
+}

@@ -216,5 +216,10 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
       )};`;
       break;
     }
+
+    case "alias": {
+      yield itt`return ${generateParserReference(specification, typeItem.target)}(value);`;
+      break;
+    }
   }
 }

@@ -4,7 +4,7 @@ import * as models from "../models/index.js";
 
 export function loadTypes(
   document: schemaIntermediate.SchemaDocument,
-): Record<string, models.Union> {
+): Record<string, models.Union | models.Alias> {
   const arena = arenaFromIntermediate(document);
   const typesEntries = Array.from(typesFromTypeArena(arena));
   const types = Object.fromEntries(typesEntries);
@@ -311,14 +311,13 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
   return arena;
 }
 
-function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]> {
+function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union | models.Alias]> {
   const usedKeys = new Set(findUsedKeys(arena));
 
-  const mapKey = (key: number) => String(arena.resolveKey(key));
+  const mapKey = (key: number) => String(key);
 
   for (const key of usedKeys) {
-    const item = arena.resolveItem(key);
-    const { id } = arena.getItem(key);
+    const item = arena.getItem(key);
 
     switch (item.type) {
       case "unknown":
@@ -326,7 +325,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "unknown",
           },
         ];
@@ -337,7 +336,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "never",
           },
         ];
@@ -347,7 +346,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "any",
           },
         ];
@@ -357,7 +356,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "null",
           },
         ];
@@ -367,7 +366,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "boolean",
           },
         ];
@@ -377,7 +376,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "integer",
           },
         ];
@@ -387,7 +386,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "number",
           },
         ];
@@ -397,7 +396,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "string",
           },
         ];
@@ -407,7 +406,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "tuple",
             elements: item.elements.map(mapKey),
           },
@@ -418,7 +417,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "array",
             element: mapKey(item.element),
           },
@@ -429,7 +428,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "object",
             properties: Object.fromEntries(
               Object.entries(item.properties).map(([name, { required, element }]) => [
@@ -445,7 +444,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "map",
             name: mapKey(item.name),
             element: mapKey(item.element),
@@ -457,9 +456,20 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id,
+            id: item.id,
             type: "oneOf",
             elements: item.elements.map(mapKey),
+          },
+        ];
+        break;
+
+      case "alias":
+        yield [
+          String(key),
+          {
+            id: item.id,
+            type: "alias",
+            target: mapKey(item.target),
           },
         ];
         break;

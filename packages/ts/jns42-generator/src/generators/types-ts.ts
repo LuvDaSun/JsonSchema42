@@ -142,6 +142,11 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: s
       break;
     }
 
+    case "alias": {
+      yield generateTypeReference(specification, typeItem.target);
+      break;
+    }
+
     case "oneOf": {
       yield itt`
         ${joinIterable(
