@@ -218,10 +218,7 @@ function* generateMockDefinition(
     }
 
     case "alias": {
-      yield itt`
-        // alias
-        (${generateMockReference(specification, typeItem.target)})
-      `;
+      yield generateMockReference(specification, typeItem.target);
       break;
     }
     default:
