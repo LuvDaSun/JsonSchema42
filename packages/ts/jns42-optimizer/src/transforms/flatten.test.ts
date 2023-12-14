@@ -1,4 +1,4 @@
-import assert from "node:assert";
+import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
 import { deleteUndefined } from "../utils/index.js";
