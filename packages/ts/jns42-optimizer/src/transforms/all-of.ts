@@ -43,7 +43,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     };
   }
 
-  let mergedItem: types.Union | undefined;
+  let mergedItem: types.Base | undefined;
   for (const subKey of uniqueElements) {
     const subItem = arena.resolveItem(subKey);
 

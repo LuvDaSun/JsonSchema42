@@ -147,7 +147,7 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: s
       break;
     }
 
-    case "oneOf": {
+    case "union": {
       yield itt`
         ${joinIterable(
           typeItem.elements.map(

@@ -207,7 +207,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
       break;
     }
 
-    case "oneOf": {
+    case "union": {
       yield itt`return ${joinIterable(
         typeItem.elements.map(
           (element) => itt`${generateParserReference(specification, element)}(value)`,

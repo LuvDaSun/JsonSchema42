@@ -1,10 +1,10 @@
 import * as types from "./types.js";
 import { Arena, ArenaTransform } from "./utils/arena.js";
 
-export type TypeArenaTransform = ArenaTransform<types.Union | types.Alias, TypeArena>;
+export type TypeArenaTransform = ArenaTransform<types.Base | types.Alias, TypeArena>;
 
-export class TypeArena extends Arena<types.Union | types.Alias | types.Merge> {
-  public resolveItem(key: number): types.Union {
+export class TypeArena extends Arena<types.Base | types.Alias | types.Merge> {
+  public resolveItem(key: number): types.Base {
     let item = this.getItem(key);
     while (item.type === "alias") {
       item = this.getItem(item.target);

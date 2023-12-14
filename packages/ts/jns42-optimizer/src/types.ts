@@ -1,4 +1,4 @@
-export type Union = Unknown | Never | Any | Primitive | Complex | Merge;
+export type Item = Unknown | Never | Any | Primitive | Complex | Merge;
 
 export type Primitive = Null | Boolean | Integer | Number | String;
 export type Complex = Tuple | Array | Object | Map;
@@ -7,6 +7,10 @@ export type Merge = OneOf | AnyOf | AllOf;
 export interface Base<Type extends string> {
   id: string | null;
   type: Type;
+}
+
+export interface Alias {
+  alias: number;
 }
 
 export interface Unknown extends Base<"unknown"> {
@@ -56,10 +60,6 @@ export interface Object extends Base<"object"> {
 export interface Map extends Base<"map"> {
   name: number;
   element: number;
-}
-
-export interface Alias extends Base<"alias"> {
-  target: number;
 }
 
 export interface OneOf extends Base<"oneOf"> {

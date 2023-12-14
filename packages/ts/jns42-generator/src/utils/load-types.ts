@@ -4,7 +4,7 @@ import * as models from "../models/index.js";
 
 export function loadTypes(
   document: schemaIntermediate.SchemaDocument,
-): Record<string, models.Union | models.Alias> {
+): Record<string, models.Item | models.Alias> {
   const arena = arenaFromIntermediate(document);
   const typesEntries = Array.from(typesFromTypeArena(arena));
   const types = Object.fromEntries(typesEntries);
@@ -311,7 +311,7 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
   return arena;
 }
 
-function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union | models.Alias]> {
+function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Item | models.Alias]> {
   const usedKeys = new Set(findUsedKeys(arena));
 
   const mapKey = (key: number) => String(key);

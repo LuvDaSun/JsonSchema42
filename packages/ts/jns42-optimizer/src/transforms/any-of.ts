@@ -60,7 +60,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
       continue;
     }
 
-    let mergedItem: types.Union | undefined;
+    let mergedItem: types.Base | undefined;
     for (const subKey of subKeys) {
       const subItem = arena.resolveItem(subKey);
 

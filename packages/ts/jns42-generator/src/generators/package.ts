@@ -23,7 +23,7 @@ export interface PackageOptions {
 export function generatePackage(
   intermediateData: schemaIntermediate.SchemaDocument,
   namesData: Record<string, string>,
-  types: Record<string, models.Union | models.Alias>,
+  types: Record<string, models.Item | models.Alias>,
   options: PackageOptions,
 ) {
   const { anyOfHack, packageDirectoryPath, packageName, packageVersion } = options;

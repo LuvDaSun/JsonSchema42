@@ -194,7 +194,7 @@ function* generateMockDefinition(
       break;
     }
 
-    case "oneOf": {
+    case "union": {
       yield itt`
         (() => {
           switch (
