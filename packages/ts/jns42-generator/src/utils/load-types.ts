@@ -457,7 +457,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Item | 
           String(key),
           {
             id: item.id,
-            type: "oneOf",
+            type: "union",
             elements: item.elements.map(mapKey),
           },
         ];

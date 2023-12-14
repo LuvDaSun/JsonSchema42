@@ -9,8 +9,8 @@ export interface Base<Type extends string> {
   type: Type;
 }
 
-export interface Alias {
-  alias: number;
+export interface Alias extends Base<"alias"> {
+  target: number;
 }
 
 export interface Unknown extends Base<"unknown"> {
