@@ -8,7 +8,7 @@ import YAML from "yaml";
 import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
 import { DocumentContext } from "../documents/index.js";
-import * as schemaIntermediateB from "../documents/intermediate/index.js";
+import * as schemaIntermediate from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
 import { Namer, loadTypes, projectRoot } from "../utils/index.js";
 
@@ -80,9 +80,9 @@ async function runTest(packageName: string) {
           new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
-        schemaIntermediateB.metaSchemaId,
+        schemaIntermediate.metaSchemaId,
         ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediateB.Document(givenUrl, rootNode),
+          new schemaIntermediate.Document(givenUrl, rootNode),
       );
 
       await context.loadFromDocument(testUrl, testUrl, null, schema, schema202012.metaSchemaId);
