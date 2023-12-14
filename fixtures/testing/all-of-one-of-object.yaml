@@ -1,0 +1,41 @@
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    allOf:
+      - type: object
+        required: [a, b]
+        properties:
+          a: { type: string }
+          b: { type: string }
+      - oneOf:
+        - type: object
+          required: [c, d]
+          properties:
+            c: { type: string }
+            d: { type: string }
+        - type: object
+          required: [e, f]
+          properties:
+            e: { type: string }
+            f: { type: string }
+
+valid:
+  abcd:
+    a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+  abcde:
+    a: "a"
+    b: "b"
+    e: "e"
+    f: "f"
+
+invalid:
+  abc:
+    a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+    e: "e"
+    f: "f"

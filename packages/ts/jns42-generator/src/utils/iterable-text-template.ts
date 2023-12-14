@@ -25,10 +25,3 @@ export function* flattenNestedText(nestedText: NestedText): Iterable<string> {
     }
   }
 }
-
-function unindent(text: string) {
-  return text
-    .split("\n")
-    .map((line) => line.trimStart())
-    .join("\n");
-}

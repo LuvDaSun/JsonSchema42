@@ -736,6 +736,10 @@ function* generateMapTypeItemValidationStatements(
 
   yield itt`
     const propertyValue = value[propertyName as keyof typeof value];
+
+    if(propertyValue === undefined) {
+      continue;
+    }
   `;
 
   if (node.objectProperties != null) {

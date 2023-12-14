@@ -1,7 +1,7 @@
 import * as models from "../models/index.js";
 import { banner, itt, toCamel } from "../utils/index.js";
 
-export function* generateValidatorsTestTsCode(specification: models.Specification) {
+export function* generateExamplesTestTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, nodes } = specification;

@@ -10,10 +10,11 @@ import * as schema202012 from "../documents/draft-2020-12/index.js";
 import { DocumentContext } from "../documents/index.js";
 import * as schemaIntermediateB from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer, projectRoot } from "../utils/index.js";
+import { Namer, loadTypes, projectRoot } from "../utils/index.js";
 
 const packageNames = [
-  "not",
+  // "not",
+
   "parse",
   "string-or-boolean",
   "simple-object",
@@ -21,6 +22,8 @@ const packageNames = [
   "any-of-object",
   "one-of-object",
   "all-types",
+
+  "all-of-one-of-object",
 ];
 
 for (const packageName of packageNames) {
@@ -86,8 +89,15 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
+      const typeArena = loadTypes(intermediateData);
+
       const namer = new Namer(defaultTypeName, 5);
-      for (const nodeId in intermediateData.schemas) {
+      for (const [typeKey, typeItem] of typeArena) {
+        const { id: nodeId } = typeItem;
+        if (nodeId == null) {
+          continue;
+        }
+
         const nodeUrl = new URL(nodeId);
         const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
         namer.registerPath(nodeId, path);
@@ -95,7 +105,7 @@ async function runTest(packageName: string) {
 
       const names = namer.getNames();
 
-      generatePackage(intermediateData, names, {
+      generatePackage(intermediateData, names, typeArena, {
         packageDirectoryPath: packageDirectoryPath,
         packageName: packageName,
         packageVersion: "v0.0.0",
