@@ -13,7 +13,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
   for (const subKey of item.anyOf) {
     const subItem = arena.resolveItem(subKey);
 
-    if (!("type" in subItem)) {
+    if (!types.isType(subItem)) {
       return item;
     }
 
@@ -34,7 +34,6 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
   if (uniqueElements.size !== item.anyOf.length) {
     return {
       id,
-
       anyOf: [...uniqueElements],
     };
   }
@@ -45,7 +44,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
   for (const elementKey of uniqueElements) {
     const elementItem = arena.resolveItem(elementKey);
 
-    assert("type" in elementItem);
+    assert(types.isType(elementItem));
 
     groupedElements[elementItem.type] ??= [];
     groupedElements[elementItem.type].push(elementKey);
@@ -59,85 +58,64 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
       continue;
     }
 
-    let mergedItem: types.Item | undefined;
+    let mergedItem = {
+      type,
+    } as types.Item;
     for (const subKey of subKeys) {
       const subItem = arena.resolveItem(subKey);
 
-      assert("type" in subItem);
+      assert(types.isType(subItem));
 
-      // if there is no merged item, we have nothing to compare to! we will be able to do this
-      // in the next cycle
-      if (mergedItem == null) {
-        mergedItem = subItem;
-        continue;
-      }
-
-      switch (type) {
-        case "null":
-        case "integer":
-        case "number":
-        case "string":
-          mergedItem = {
-            type,
-          };
-          break;
-
-        case "tuple": {
-          assert(type === mergedItem.type);
-          assert(type === subItem.type);
-
-          const elements: types.Tuple["elements"] = [];
-          const length = Math.max(mergedItem.elements.length, subItem.elements.length);
+      if (subItem.tupleElements != null) {
+        if (mergedItem.tupleElements == null) {
+          mergedItem.tupleElements = subItem.tupleElements;
+        } else {
+          const elements: types.Type["tupleElements"] = [];
+          const length = Math.max(mergedItem.tupleElements.length, subItem.tupleElements.length);
           for (let index = 0; index < length; index++) {
-            if (index < mergedItem.elements.length && index < subItem.elements.length) {
+            if (index < mergedItem.tupleElements.length && index < subItem.tupleElements.length) {
               const newItem: types.AnyOf = {
-                anyOf: [mergedItem.elements[index], subItem.elements[index]],
+                anyOf: [mergedItem.tupleElements[index], subItem.tupleElements[index]],
               };
               const newKey = arena.addItem(newItem);
               elements.push(newKey);
-            } else if (index < mergedItem.elements.length) {
-              elements.push(mergedItem.elements[index]);
-            } else if (index < subItem.elements.length) {
-              elements.push(subItem.elements[index]);
+            } else if (index < mergedItem.tupleElements.length) {
+              elements.push(mergedItem.tupleElements[index]);
+            } else if (index < subItem.tupleElements.length) {
+              elements.push(subItem.tupleElements[index]);
             }
           }
-          mergedItem = {
-            id,
-            type: "tuple",
-            elements,
-          };
-          break;
+
+          mergedItem.tupleElements = elements;
         }
+      }
 
-        case "array": {
-          assert(type === mergedItem.type);
-          assert(type === subItem.type);
-
+      if (subItem.arrayElement != null) {
+        if (mergedItem.arrayElement == null) {
+          mergedItem.arrayElement = subItem.arrayElement;
+        } else {
           const newItem: types.AnyOf = {
-            anyOf: [mergedItem.element, subItem.element],
+            anyOf: [mergedItem.arrayElement, subItem.arrayElement],
           };
           const newKey = arena.addItem(newItem);
-          mergedItem = {
-            id,
-            type: "array",
-            element: newKey,
-          };
-          break;
+
+          mergedItem.arrayElement = newKey;
         }
+      }
 
-        case "object": {
-          assert(type === mergedItem.type);
-          assert(type === subItem.type);
-
-          const properties: types.Object["properties"] = {};
+      if (subItem.objectProperties != null) {
+        if (mergedItem.objectProperties == null) {
+          mergedItem.objectProperties = subItem.objectProperties;
+        } else {
+          const properties: types.Type["objectProperties"] = {};
 
           const propertyNames = new Set([
-            ...Object.keys(mergedItem.properties),
-            ...Object.keys(subItem.properties),
+            ...Object.keys(mergedItem.objectProperties),
+            ...Object.keys(subItem.objectProperties),
           ]);
           for (const propertyName of propertyNames) {
-            const mergedItemProperty = mergedItem.properties[propertyName];
-            const subItemProperty = subItem.properties[propertyName];
+            const mergedItemProperty = mergedItem.objectProperties[propertyName];
+            const subItemProperty = subItem.objectProperties[propertyName];
             if (mergedItemProperty != null && subItemProperty != null) {
               const newItem: types.AnyOf = {
                 anyOf: [mergedItemProperty.element, subItemProperty.element],
@@ -154,34 +132,34 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
               properties[propertyName] = { ...subItemProperty };
             }
           }
-          mergedItem = {
-            id,
-            type: "object",
-            properties,
-          };
-          break;
+
+          mergedItem.objectProperties = properties;
         }
+      }
 
-        case "map": {
-          assert(type === mergedItem.type);
-          assert(type === subItem.type);
+      if (subItem.propertyName != null) {
+        if (mergedItem.propertyName == null) {
+          mergedItem.propertyName = subItem.propertyName;
+        } else {
+          const newItem: types.AnyOf = {
+            anyOf: [mergedItem.propertyName, subItem.propertyName],
+          };
+          const newKey = arena.addItem(newItem);
 
-          const newNameItem: types.AnyOf = {
-            anyOf: [mergedItem.name, subItem.name],
-          };
-          const newNameKey = arena.addItem(newNameItem);
+          mergedItem.propertyName = newKey;
+        }
+      }
 
-          const newElementItem: types.AnyOf = {
-            anyOf: [mergedItem.element, subItem.element],
+      if (subItem.mapElement != null) {
+        if (mergedItem.mapElement == null) {
+          mergedItem.mapElement = subItem.mapElement;
+        } else {
+          const newItem: types.AnyOf = {
+            anyOf: [mergedItem.mapElement, subItem.mapElement],
           };
-          const newElementKey = arena.addItem(newElementItem);
-          mergedItem = {
-            id,
-            type: "map",
-            name: newNameKey,
-            element: newElementKey,
-          };
-          break;
+          const newKey = arena.addItem(newItem);
+
+          mergedItem.mapElement = newKey;
         }
       }
     }

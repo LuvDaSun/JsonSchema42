@@ -1,109 +1,86 @@
-import assert from "node:assert";
 import { hasProperties } from "./utils/index.js";
 
-export type ArenaTypeItem = Partial<Alias & OneOf & AnyOf & AllOf> | Item;
+export type Item = Partial<Alias & OneOf & AnyOf & AllOf & Type>;
 
-export interface Alias {
+export interface Base {
+  id?: string;
+  tupleElements?: number[];
+  arrayElement?: number;
+  objectProperties?: { [name: string]: { element: number; required: boolean } };
+  propertyName?: number;
+  mapElement?: number;
+}
+
+const optionalBaseProperties = new Array<keyof Base>(
+  "id",
+  "tupleElements",
+  "arrayElement",
+  "objectProperties",
+  "propertyName",
+  "mapElement",
+);
+
+export interface Alias extends Base {
   id?: string;
   alias: number;
 }
-export function isAlias(item: ArenaTypeItem): item is Alias {
+export function isAlias(item: Item): item is Alias {
   if (!("alias" in item)) {
     return false;
   }
-  return hasProperties(item, ["alias"], ["id"]);
+  return hasProperties(item, ["alias"], optionalBaseProperties);
 }
 
-export interface OneOf {
-  id?: string;
+export interface OneOf extends Base {
   oneOf: number[];
 }
-export function isOneOf(item: ArenaTypeItem): item is OneOf {
+export function isOneOf(item: Item): item is OneOf {
   if (!("oneOf" in item)) {
     return false;
   }
-  return hasProperties(item, ["oneOf"], ["id"]);
+  return hasProperties(item, ["oneOf"], optionalBaseProperties);
 }
 
-export interface AnyOf {
-  id?: string;
+export interface AnyOf extends Base {
   anyOf: number[];
 }
-export function isAnyOf(item: ArenaTypeItem): item is AnyOf {
+export function isAnyOf(item: Item): item is AnyOf {
   if (!("anyOf" in item)) {
     return false;
   }
-  return hasProperties(item, ["anyOf"], ["id"]);
+  return hasProperties(item, ["anyOf"], optionalBaseProperties);
 }
 
-export interface AllOf {
-  id?: string;
+export interface AllOf extends Base {
   allOf: number[];
 }
-export function isAllOf(item: ArenaTypeItem): item is AllOf {
+export function isAllOf(item: Item): item is AllOf {
   if (!("allOf" in item)) {
     return false;
   }
-  return hasProperties(item, ["allOf"], ["id"]);
+  return hasProperties(item, ["allOf"], optionalBaseProperties);
 }
 
-export type Item = Unknown | Never | Any | Primitive | Complex;
-
-export type Primitive = Null | Boolean | Integer | Number | String;
-export type Complex = Tuple | Array | Object | Map;
-
-export interface Base<Type extends string> {
-  id?: string;
-  type: Type;
+export interface Type extends Base {
+  type:
+    | "unknown"
+    | "never"
+    | "any"
+    | "null"
+    | "boolean"
+    | "integer"
+    | "number"
+    | "string"
+    | "tuple"
+    | "array"
+    | "object"
+    | "map";
 }
-
-export interface Unknown extends Base<"unknown"> {
-  //
-}
-
-export interface Never extends Base<"never"> {
-  //
-}
-
-export interface Any extends Base<"any"> {
-  //
-}
-
-export interface Null extends Base<"null"> {
-  //
-}
-
-export interface Boolean extends Base<"boolean"> {
-  //
-}
-
-export interface Integer extends Base<"integer"> {
-  //
-}
-
-export interface Number extends Base<"number"> {
-  //
-}
-
-export interface String extends Base<"string"> {
-  //
-}
-
-export interface Tuple extends Base<"tuple"> {
-  elements: number[];
-}
-
-export interface Array extends Base<"array"> {
-  element: number;
-}
-
-export interface Object extends Base<"object"> {
-  properties: { [name: string]: { element: number; required: boolean } };
-}
-
-export interface Map extends Base<"map"> {
-  name: number;
-  element: number;
+export function isType(item: Item): item is Type {
+  if (!("type" in item)) {
+    return false;
+  }
+  return hasProperties(item, ["type"], optionalBaseProperties);
 }
 
 /**
@@ -111,52 +88,40 @@ export interface Map extends Base<"map"> {
  *
  * @param item the type to get dependencies
  */
-export function* dependencies(item: ArenaTypeItem) {
-  if (isAlias(item)) {
+export function* dependencies(item: Item) {
+  if (item.alias != null) {
     yield item.alias;
-    return;
   }
 
-  if (isOneOf(item)) {
-    for (const element of item.oneOf) {
-      yield element;
-    }
-    return;
+  if (item.oneOf != null) {
+    yield* item.oneOf;
   }
 
-  if (isAnyOf(item)) {
-    for (const element of item.anyOf) {
-      yield element;
-    }
-    return;
+  if (item.anyOf != null) {
+    yield* item.anyOf;
   }
 
-  if (isAllOf(item)) {
-    for (const element of item.allOf) {
-      yield element;
-    }
-    return;
+  if (item.allOf != null) {
+    yield* item.allOf;
   }
 
-  assert("type" in item);
+  if (item.tupleElements != null) {
+    yield* item.tupleElements;
+  }
 
-  switch (item.type) {
-    case "tuple":
-      for (const element of item.elements) {
-        yield element;
-      }
-      break;
-    case "array":
-      yield item.element;
-      break;
-    case "object":
-      for (const { element } of Object.values(item.properties)) {
-        yield element;
-      }
-      break;
-    case "map":
-      yield item.name;
-      yield item.element;
-      break;
+  if (item.arrayElement != null) {
+    yield item.arrayElement;
+  }
+
+  if (item.objectProperties != null) {
+    yield* Object.values(item.objectProperties).map(({ element }) => element);
+  }
+
+  if (item.propertyName != null) {
+    yield item.propertyName;
+  }
+
+  if (item.mapElement != null) {
+    yield item.mapElement;
   }
 }

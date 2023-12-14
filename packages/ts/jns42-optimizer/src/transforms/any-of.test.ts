@@ -82,8 +82,8 @@ test("any-of tuple", () => {
   arena.addItem({ type: "string" }); // 1
   arena.addItem({ type: "string" }); // 2
   arena.addItem({ type: "string" }); // 3
-  arena.addItem({ type: "tuple", elements: [0, 1] }); // 4
-  arena.addItem({ type: "tuple", elements: [2, 3] }); // 5
+  arena.addItem({ type: "tuple", tupleElements: [0, 1] }); // 4
+  arena.addItem({ type: "tuple", tupleElements: [2, 3] }); // 5
   arena.addItem({ anyOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
@@ -112,8 +112,8 @@ test("any-of array", () => {
   const arena = new TypeArena();
   arena.addItem({ type: "number" }); // 0
   arena.addItem({ type: "string" }); // 1
-  arena.addItem({ type: "array", element: 0 }); // 2
-  arena.addItem({ type: "array", element: 1 }); // 3
+  arena.addItem({ type: "array", arrayElement: 0 }); // 2
+  arena.addItem({ type: "array", arrayElement: 1 }); // 3
   arena.addItem({ anyOf: [2, 3] }); // 4
 
   while (arena.applyTransform(...useTransforms) > 0);
@@ -142,14 +142,14 @@ test("any-of object", () => {
   arena.addItem({ type: "string" }); // 3
   arena.addItem({
     type: "object",
-    properties: {
+    objectProperties: {
       a: { required: false, element: 0 },
       b: { required: false, element: 1 },
     },
   }); // 4
   arena.addItem({
     type: "object",
-    properties: {
+    objectProperties: {
       b: { required: true, element: 2 },
       c: { required: false, element: 3 },
     },
@@ -202,8 +202,8 @@ test("any-of map", () => {
   arena.addItem({ type: "string" }); // 1
   arena.addItem({ type: "string" }); // 2
   arena.addItem({ type: "number" }); // 3
-  arena.addItem({ type: "map", name: 0, element: 1 }); // 4
-  arena.addItem({ type: "map", name: 2, element: 3 }); // 5
+  arena.addItem({ type: "map", propertyName: 0, mapElement: 1 }); // 4
+  arena.addItem({ type: "map", propertyName: 2, mapElement: 3 }); // 5
   arena.addItem({ anyOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);

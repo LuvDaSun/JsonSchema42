@@ -1,3 +1,4 @@
+import assert from "assert";
 import { TypeArena, transforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
@@ -16,7 +17,7 @@ export function loadTypes(
   });
 
   for (const id in document.schemas) {
-    const newItem: types.Unknown = {
+    const newItem: types.Type = {
       id,
       type: "unknown",
     };
@@ -42,7 +43,7 @@ export function loadTypes(
       for (const type of node.types) {
         switch (type) {
           case "never": {
-            const newItem: types.Never = {
+            const newItem: types.Type = {
               type: "never",
             };
 
@@ -53,7 +54,7 @@ export function loadTypes(
           }
 
           case "any": {
-            const newItem: types.Any = {
+            const newItem: types.Type = {
               type: "any",
             };
 
@@ -64,7 +65,7 @@ export function loadTypes(
           }
 
           case "null": {
-            const newItem: types.Null = {
+            const newItem: types.Type = {
               type: "null",
             };
 
@@ -75,7 +76,7 @@ export function loadTypes(
           }
 
           case "boolean": {
-            const newItem: types.Boolean = {
+            const newItem: types.Type = {
               type: "boolean",
             };
 
@@ -85,7 +86,7 @@ export function loadTypes(
             break;
           }
           case "number": {
-            const newItem: types.Number = {
+            const newItem: types.Type = {
               type: "number",
             };
 
@@ -95,7 +96,7 @@ export function loadTypes(
             break;
           }
           case "integer": {
-            const newItem: types.Integer = {
+            const newItem: types.Type = {
               type: "integer",
             };
 
@@ -105,7 +106,7 @@ export function loadTypes(
             break;
           }
           case "string": {
-            const newItem: types.String = {
+            const newItem: types.Type = {
               type: "string",
             };
 
@@ -120,9 +121,9 @@ export function loadTypes(
             if (node.tupleItems != null) {
               const elements = node.tupleItems.map((tupleItem) => idMap[tupleItem]);
 
-              const newItem: types.Tuple = {
+              const newItem: types.Type = {
                 type: "tuple",
-                elements,
+                tupleElements: elements,
               };
 
               const newKey = arena.addItem(newItem);
@@ -132,9 +133,9 @@ export function loadTypes(
             if (node.arrayItems != null && node.arrayItems.length > 0) {
               const element = idMap[node.arrayItems];
 
-              const newItem: types.Array = {
+              const newItem: types.Type = {
                 type: "array",
-                element,
+                arrayElement: element,
               };
 
               const newKey = arena.addItem(newItem);
@@ -152,6 +153,7 @@ export function loadTypes(
 
             break;
           }
+
           case "map": {
             const compoundElements = new Array<number>();
 
@@ -176,9 +178,9 @@ export function loadTypes(
               ]);
               const properties = Object.fromEntries(propertyEntries);
 
-              const newItem: types.Object = {
+              const newItem: types.Type = {
                 type: "object",
-                properties,
+                objectProperties: properties,
               };
 
               const newKey = arena.addItem(newItem);
@@ -189,10 +191,10 @@ export function loadTypes(
               const name = node.propertyNames == null ? stringKey : idMap[node.propertyNames];
               const element = idMap[node.mapProperties];
 
-              const newItem: types.Map = {
+              const newItem: types.Type = {
                 type: "map",
-                name,
-                element,
+                propertyName: name,
+                mapElement: element,
               };
 
               const newKey = arena.addItem(newItem);
@@ -300,7 +302,7 @@ export function loadTypes(
 }
 
 function convertTypeEntry(
-  entry: [key: number, item: types.ArenaTypeItem],
+  entry: [key: number, item: types.Item],
 ): [string, models.Item | models.Alias] {
   const [key, item] = entry;
 
@@ -328,7 +330,7 @@ function convertTypeEntry(
     ];
   }
 
-  if ("type" in item) {
+  if (types.isType(item)) {
     switch (item.type) {
       case "unknown":
         // TODO should error in the future
@@ -405,33 +407,39 @@ function convertTypeEntry(
         ];
 
       case "tuple":
+        assert(item.tupleElements != null);
+
         return [
           mapKey(key),
           {
             id: item.id,
             type: "tuple",
-            elements: item.elements.map(mapKey),
+            elements: item.tupleElements.map(mapKey),
           },
         ];
 
       case "array":
+        assert(item.arrayElement != null);
+
         return [
           mapKey(key),
           {
             id: item.id,
             type: "array",
-            element: mapKey(item.element),
+            element: mapKey(item.arrayElement),
           },
         ];
 
       case "object":
+        assert(item.objectProperties != null);
+
         return [
           mapKey(key),
           {
             id: item.id,
             type: "object",
             properties: Object.fromEntries(
-              Object.entries(item.properties).map(([name, { required, element }]) => [
+              Object.entries(item.objectProperties).map(([name, { required, element }]) => [
                 name,
                 { required, element: mapKey(element) },
               ]),
@@ -440,13 +448,16 @@ function convertTypeEntry(
         ];
 
       case "map":
+        assert(item.propertyName != null);
+        assert(item.mapElement != null);
+
         return [
           mapKey(key),
           {
             id: item.id,
             type: "map",
-            name: mapKey(item.name),
-            element: mapKey(item.element),
+            name: mapKey(item.propertyName),
+            element: mapKey(item.mapElement),
           },
         ];
     }
