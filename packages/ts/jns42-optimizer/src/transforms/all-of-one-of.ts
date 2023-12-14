@@ -24,7 +24,7 @@ export const allOfOneOf: TypeArenaTransform = (arena, item) => {
   const newElements = new Array<number>();
 
   const baseElementEntries = [...uniqueElements]
-    .map((element) => [element, arena.getItemUnalias(element)] as const)
+    .map((element) => [element, arena.resolveItem(element)] as const)
     .filter(([element, item]) => item.type === "oneOf")
     .map(([element, item]) => [element, item as types.OneOf] as const);
   const leafElements = baseElementEntries.flatMap(([key, item]) => item.elements);

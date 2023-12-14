@@ -6,8 +6,9 @@ export function loadTypes(
   document: schemaIntermediate.SchemaDocument,
 ): Record<string, models.Union> {
   const arena = arenaFromIntermediate(document);
-  const types = typesFromTypeArena(arena);
-  return Object.fromEntries(types);
+  const typesEntries = Array.from(typesFromTypeArena(arena));
+  const types = Object.fromEntries(typesEntries);
+  return types;
 }
 
 function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
@@ -313,9 +314,11 @@ function arenaFromIntermediate(document: schemaIntermediate.SchemaDocument) {
 function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]> {
   const usedKeys = new Set(findUsedKeys(arena));
 
+  const mapKey = (key: number) => String(arena.resolveKey(key));
+
   for (const key of usedKeys) {
+    const item = arena.resolveItem(key);
     const { id } = arena.getItem(key);
-    const item = arena.getItemUnalias(key);
 
     switch (item.type) {
       case "unknown":
@@ -323,7 +326,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
         yield [
           String(key),
           {
-            id: id,
+            id,
             type: "unknown",
           },
         ];
@@ -406,7 +409,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
           {
             id,
             type: "tuple",
-            elements: item.elements.map(String),
+            elements: item.elements.map(mapKey),
           },
         ];
         break;
@@ -417,7 +420,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
           {
             id,
             type: "array",
-            element: String(item.element),
+            element: mapKey(item.element),
           },
         ];
         break;
@@ -431,7 +434,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
             properties: Object.fromEntries(
               Object.entries(item.properties).map(([name, { required, element }]) => [
                 name,
-                { required, element: String(element) },
+                { required, element: mapKey(element) },
               ]),
             ),
           },
@@ -444,8 +447,8 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
           {
             id,
             type: "map",
-            name: String(item.name),
-            element: String(item.element),
+            name: mapKey(item.name),
+            element: mapKey(item.element),
           },
         ];
         break;
@@ -456,7 +459,7 @@ function* typesFromTypeArena(arena: TypeArena): Iterable<[string, models.Union]>
           {
             id,
             type: "oneOf",
-            elements: item.elements.map(String),
+            elements: item.elements.map(mapKey),
           },
         ];
         break;

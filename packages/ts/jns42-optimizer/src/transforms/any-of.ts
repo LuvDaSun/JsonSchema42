@@ -11,7 +11,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
 
   const uniqueElements = new Set<number>();
   for (const subKey of item.elements) {
-    const subItem = arena.getItemUnalias(subKey);
+    const subItem = arena.resolveItem(subKey);
 
     switch (subItem.type) {
       case "allOf":
@@ -47,7 +47,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
 
   const groupedElements: { [type: string]: number[] } = {};
   for (const elementKey of uniqueElements) {
-    const elementItem = arena.getItemUnalias(elementKey);
+    const elementItem = arena.resolveItem(elementKey);
     groupedElements[elementItem.type] ??= [];
     groupedElements[elementItem.type].push(elementKey);
   }
@@ -62,7 +62,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
 
     let mergedItem: types.Union | undefined;
     for (const subKey of subKeys) {
-      const subItem = arena.getItemUnalias(subKey);
+      const subItem = arena.resolveItem(subKey);
 
       // if there is no merged item, we have nothing to compare to! we will be able to do this
       // in the next cycle

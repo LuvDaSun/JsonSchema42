@@ -9,7 +9,7 @@ export const oneOf: TypeArenaTransform = (arena, item) => {
 
   const uniqueElements = new Set<number>();
   for (const subKey of item.elements) {
-    const subItem = arena.getItemUnalias(subKey);
+    const subItem = arena.resolveItem(subKey);
 
     switch (subItem.type) {
       case "allOf":

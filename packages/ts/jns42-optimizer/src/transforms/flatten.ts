@@ -10,7 +10,7 @@ export const flatten: TypeArenaTransform = (arena, item) => {
       let elements = new Array<number>();
       let createNew = false;
       for (const subKey of item.elements) {
-        const subItem = arena.getItemUnalias(subKey);
+        const subItem = arena.resolveItem(subKey);
 
         if (subItem.type === item.type) {
           createNew = true;

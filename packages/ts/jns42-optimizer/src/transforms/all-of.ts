@@ -11,7 +11,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
 
   const uniqueElements = new Set<number>();
   for (const subKey of item.elements) {
-    const subItem = arena.getItemUnalias(subKey);
+    const subItem = arena.resolveItem(subKey);
 
     switch (subItem.type) {
       case "allOf":
@@ -45,7 +45,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
 
   let mergedItem: types.Union | undefined;
   for (const subKey of uniqueElements) {
-    const subItem = arena.getItemUnalias(subKey);
+    const subItem = arena.resolveItem(subKey);
 
     // if there is no merged item, we have nothing to compare to! we will be able to do this
     // in the next cycle
