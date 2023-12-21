@@ -22,7 +22,6 @@ const packageNames = [
   "any-of-object",
   "one-of-object",
   "all-types",
-
   "all-of-one-of-object",
 ];
 

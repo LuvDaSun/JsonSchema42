@@ -16,6 +16,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     if (subItem.type === "never") {
       // merging with never will result in never
       return {
+        id,
         type: "never",
       };
     }
@@ -27,7 +28,7 @@ export const allOf: TypeArenaTransform = (arena, item) => {
     // if there is no merged item, we have nothing to compare to! we will be able to do this
     // in the next cycle
     if (mergedItem == null) {
-      mergedItem = { ...subItem };
+      mergedItem = { id, ...subItem };
       continue;
     }
 
