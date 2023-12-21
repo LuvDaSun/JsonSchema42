@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "name": "fixtures",
+      "path": "./fixtures"
+    },
+    {
+      "name": "ts/jns42-generator",
+      "path": "./packages/ts/jns42-generator"
+    },
+    {
+      "name": "ts/jns42-optimizer",
+      "path": "./packages/ts/jns42-optimizer"
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "./node_modules/typescript/lib",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
