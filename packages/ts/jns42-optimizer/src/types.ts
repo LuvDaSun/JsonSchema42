@@ -86,7 +86,7 @@ export function isType(item: Item): item is Type {
 }
 
 /**
- * retrieves depenencies of a type item or alias
+ * retrieves dependencies of a type item or alias
  *
  * @param item the type to get dependencies
  */

@@ -67,7 +67,7 @@ export const anyOf: TypeArenaTransform = (arena, item) => {
       assert(types.isType(subItem));
 
       if (subItem.required != null && mergedItem.required != null) {
-        // merged fiels are only required when both the merged and the sub item require
+        // merged fields are only required when both the merged and the sub item require
         // them. We use sets to guarantee uniqueness
         const required = new Array<string>();
         const subRequired = new Set(subItem.required);
