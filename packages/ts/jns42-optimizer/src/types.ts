@@ -4,15 +4,17 @@ export type Item = Partial<Alias & OneOf & AnyOf & AllOf & Type>;
 
 export interface Base {
   id?: string;
+  required?: string[];
   tupleElements?: number[];
   arrayElement?: number;
-  objectProperties?: { [name: string]: { element: number; required: boolean } };
+  objectProperties?: { [name: string]: number };
   propertyName?: number;
   mapElement?: number;
 }
 
 const optionalBaseProperties = new Array<keyof Base>(
   "id",
+  "required",
   "tupleElements",
   "arrayElement",
   "objectProperties",
@@ -114,7 +116,7 @@ export function* dependencies(item: Item) {
   }
 
   if (item.objectProperties != null) {
-    yield* Object.values(item.objectProperties).map(({ element }) => element);
+    yield* Object.values(item.objectProperties).map((element) => element);
   }
 
   if (item.propertyName != null) {

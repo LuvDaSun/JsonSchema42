@@ -9,12 +9,14 @@ export function loadTypes(
   const arena = new TypeArena();
   const idMap: Record<string, number> = {};
 
-  const stringKey = arena.addItem({
-    type: "string",
-  });
-  const anyKey = arena.addItem({
-    type: "any",
-  });
+  const utilityTypes = {
+    any: arena.addItem({
+      type: "any",
+    }),
+    string: arena.addItem({
+      type: "string",
+    }),
+  };
 
   for (const id in document.schemas) {
     const newItem: types.Type = {
@@ -161,25 +163,19 @@ export function loadTypes(
               node.objectProperties != null ||
               (node.required != null && node.required.length > 0)
             ) {
-              const requiredProperties = new Set(node.required);
-              const propertyNames = new Set([
-                ...Object.keys(node.objectProperties ?? {}),
-                ...requiredProperties,
-              ]);
-              const propertyEntries = [...propertyNames].map((propertyName) => [
-                propertyName,
-                {
-                  required: requiredProperties.has(propertyName),
-                  element:
-                    node.objectProperties?.[propertyName] == null
-                      ? anyKey
-                      : idMap[node.objectProperties[propertyName]],
-                },
-              ]);
-              const properties = Object.fromEntries(propertyEntries);
+              const properties =
+                node.objectProperties == null
+                  ? undefined
+                  : Object.fromEntries(
+                      Object.entries(node.objectProperties).map(([name, element]) => [
+                        name,
+                        idMap[element],
+                      ]),
+                    );
 
               const newItem: types.Type = {
                 type: "object",
+                required: node.required,
                 objectProperties: properties,
               };
 
@@ -188,7 +184,8 @@ export function loadTypes(
             }
 
             if (node.mapProperties != null) {
-              const name = node.propertyNames == null ? stringKey : idMap[node.propertyNames];
+              const name =
+                node.propertyNames == null ? utilityTypes.string : idMap[node.propertyNames];
               const element = idMap[node.mapProperties];
 
               const newItem: types.Type = {
@@ -294,7 +291,7 @@ export function loadTypes(
       continue;
     }
 
-    const [newKey, newItem] = convertTypeEntry([key, item]);
+    const [newKey, newItem] = convertTypeEntry([key, item], utilityTypes);
     result[newKey] = newItem;
   }
 
@@ -303,6 +300,7 @@ export function loadTypes(
 
 function convertTypeEntry(
   entry: [key: number, item: types.Item],
+  utilityTypes: { any: number; string: number },
 ): [string, models.Item | models.Alias] {
   const [key, item] = entry;
 
@@ -430,8 +428,12 @@ function convertTypeEntry(
           },
         ];
 
-      case "object":
-        assert(item.objectProperties != null);
+      case "object": {
+        assert(item.objectProperties != null || item.required != null);
+        const required = new Set(item.required);
+        const propertyNames = [
+          ...new Set([...required, ...Object.keys(item.objectProperties ?? {})]),
+        ];
 
         return [
           mapKey(key),
@@ -439,16 +441,18 @@ function convertTypeEntry(
             id: item.id,
             type: "object",
             properties: Object.fromEntries(
-              Object.entries(item.objectProperties).map(([name, { required, element }]) => [
+              propertyNames.map((name) => [
                 name,
-                { required, element: mapKey(element) },
+                {
+                  required: required.has(name),
+                  element: mapKey(item.objectProperties?.[name] ?? utilityTypes.any),
+                },
               ]),
             ),
           },
         ];
-
+      }
       case "map":
-        assert(item.propertyName != null);
         assert(item.mapElement != null);
 
         return [
@@ -456,7 +460,7 @@ function convertTypeEntry(
           {
             id: item.id,
             type: "map",
-            name: mapKey(item.propertyName),
+            name: mapKey(item.propertyName ?? utilityTypes.string),
             element: mapKey(item.mapElement),
           },
         ];

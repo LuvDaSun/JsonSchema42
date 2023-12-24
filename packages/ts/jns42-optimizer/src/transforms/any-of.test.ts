@@ -143,15 +143,16 @@ test("any-of object", () => {
   arena.addItem({
     type: "object",
     objectProperties: {
-      a: { required: false, element: 0 },
-      b: { required: false, element: 1 },
+      a: 0,
+      b: 1,
     },
   }); // 4
   arena.addItem({
     type: "object",
+    required: ["b"],
     objectProperties: {
-      b: { required: true, element: 2 },
-      c: { required: false, element: 3 },
+      b: 2,
+      c: 3,
     },
   }); // 5
   arena.addItem({ anyOf: [4, 5] }); // 6
@@ -169,25 +170,27 @@ test("any-of object", () => {
       {
         type: "object",
         objectProperties: {
-          a: { required: false, element: 0 },
-          b: { required: false, element: 1 },
+          a: 0,
+          b: 1,
         },
       }, // 4
       {
         type: "object",
+        required: ["b"],
         objectProperties: {
-          b: { required: true, element: 2 },
-          c: { required: false, element: 3 },
+          b: 2,
+          c: 3,
         },
       }, // 5
       { alias: 8 }, // 6
       { alias: 9 }, // 7
       {
         type: "object",
+        required: ["b"],
         objectProperties: {
-          a: { required: false, element: 0 },
-          b: { required: true, element: 7 },
-          c: { required: false, element: 3 },
+          a: 0,
+          b: 7,
+          c: 3,
         },
       }, // 8
       { type: "string" }, // 9
