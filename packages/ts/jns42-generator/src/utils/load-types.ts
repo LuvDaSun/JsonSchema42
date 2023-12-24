@@ -163,15 +163,16 @@ export function loadTypes(
               node.objectProperties != null ||
               (node.required != null && node.required.length > 0)
             ) {
-              const properties =
-                node.objectProperties == null
-                  ? undefined
-                  : Object.fromEntries(
-                      Object.entries(node.objectProperties).map(([name, element]) => [
-                        name,
-                        idMap[element],
-                      ]),
-                    );
+              const properties = Object.fromEntries(
+                Object.entries(node.objectProperties ?? {}).map(([name, element]) => [
+                  name,
+                  idMap[element],
+                ]),
+              );
+
+              for (const required of node.required ?? []) {
+                properties[required] ??= utilityTypes.any;
+              }
 
               const newItem: types.Type = {
                 type: "object",
@@ -291,7 +292,7 @@ export function loadTypes(
       continue;
     }
 
-    const [newKey, newItem] = convertTypeEntry([key, item], utilityTypes);
+    const [newKey, newItem] = convertTypeEntry([key, item]);
     result[newKey] = newItem;
   }
 
@@ -300,7 +301,6 @@ export function loadTypes(
 
 function convertTypeEntry(
   entry: [key: number, item: types.Item],
-  utilityTypes: { any: number; string: number },
 ): [string, models.Item | models.Alias] {
   const [key, item] = entry;
 
@@ -429,11 +429,8 @@ function convertTypeEntry(
         ];
 
       case "object": {
-        assert(item.objectProperties != null || item.required != null);
+        assert(item.objectProperties != null);
         const required = new Set(item.required);
-        const propertyNames = [
-          ...new Set([...required, ...Object.keys(item.objectProperties ?? {})]),
-        ];
 
         return [
           mapKey(key),
@@ -441,11 +438,11 @@ function convertTypeEntry(
             id: item.id,
             type: "object",
             properties: Object.fromEntries(
-              propertyNames.map((name) => [
+              Object.entries(item.objectProperties).map(([name, element]) => [
                 name,
                 {
                   required: required.has(name),
-                  element: mapKey(item.objectProperties?.[name] ?? utilityTypes.any),
+                  element: mapKey(element),
                 },
               ]),
             ),
@@ -453,14 +450,14 @@ function convertTypeEntry(
         ];
       }
       case "map":
-        assert(item.mapElement != null);
+        assert(item.propertyName != null && item.mapElement != null);
 
         return [
           mapKey(key),
           {
             id: item.id,
             type: "map",
-            name: mapKey(item.propertyName ?? utilityTypes.string),
+            name: mapKey(item.propertyName),
             element: mapKey(item.mapElement),
           },
         ];
