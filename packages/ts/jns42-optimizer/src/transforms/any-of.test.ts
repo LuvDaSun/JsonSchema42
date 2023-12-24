@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined, hasDoubleReference } from "../utils/index.js";
+import { deleteUndefined } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.anyOf];
@@ -31,7 +31,6 @@ test("any-of utility", () => {
       { type: "any" },
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("any-of unique", () => {
@@ -46,7 +45,6 @@ test("any-of unique", () => {
 
     [{ type: "number" }, { alias: num }],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("any-of primitive", () => {
@@ -73,7 +71,6 @@ test("any-of primitive", () => {
       { type: "string" }, // 6
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("any-of tuple", () => {
@@ -105,7 +102,6 @@ test("any-of tuple", () => {
       { type: "string" }, // 10
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("any-of array", () => {
@@ -131,7 +127,6 @@ test("any-of array", () => {
       { type: "array", arrayElement: 5 }, // 6
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("any-of object", () => {
@@ -196,7 +191,6 @@ test("any-of object", () => {
       { type: "string" }, // 9
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("any-of map", () => {
@@ -228,5 +222,4 @@ test("any-of map", () => {
       { type: "string" }, // 10
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });

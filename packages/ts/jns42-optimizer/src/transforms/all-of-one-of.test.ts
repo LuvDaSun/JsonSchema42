@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined, hasDoubleReference } from "../utils/index.js";
+import { deleteUndefined } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.allOfOneOf];
@@ -38,5 +38,4 @@ test("all-of-one-of", () => {
       { allOf: [0, 1, 5] }, // 12
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });

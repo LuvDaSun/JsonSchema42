@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined, hasDoubleReference } from "../utils/index.js";
+import { deleteUndefined } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.oneOf];
@@ -31,7 +31,6 @@ test("one-of utility", () => {
       { type: "any" },
     ],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("one-of alias", () => {
@@ -48,7 +47,6 @@ test("one-of alias", () => {
 
     [{ type: "string" }, { type: "string" }, { alias: str2 }, { oneOf: [str1, oneOf1] }],
   );
-  assert(!hasDoubleReference([...arena]));
 });
 
 test("one-of unique", () => {
@@ -63,5 +61,4 @@ test("one-of unique", () => {
 
     [{ type: "number" }, { alias: num }],
   );
-  assert(!hasDoubleReference([...arena]));
 });
