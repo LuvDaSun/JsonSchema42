@@ -13,16 +13,16 @@ export const allOf: TypeArenaTransform = (arena, item) => {
   for (const subKey of item.allOf) {
     const subItem = arena.resolveItem(subKey);
 
+    if ("oneOf" in subItem || "anyOf" in subItem || "allOf" in subItem) {
+      return item;
+    }
+
     if (subItem.type === "never") {
       // merging with never will result in never
       return {
         id,
         type: "never",
       };
-    }
-
-    if ("oneOf" in subItem || "anyOf" in subItem || "allOf" in subItem) {
-      return item;
     }
 
     // if there is no merged item, we have nothing to compare to! we will be able to do this
