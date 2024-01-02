@@ -2,6 +2,7 @@ export * from "./banner.js";
 export * from "./choose.js";
 export * from "./iterable-text-template.js";
 export * from "./iterable.js";
+export * from "./load-model.js";
 export * from "./load-types.js";
 export * from "./load.js";
 export * from "./name.js";
