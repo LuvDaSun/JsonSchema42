@@ -42,173 +42,175 @@ export function loadTypes(
     {
       const typeElements = new Array<number>();
 
-      for (const type of node.types) {
-        switch (type) {
-          case "never": {
-            const newItem: types.Type = {
-              type: "never",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-
-          case "any": {
-            const newItem: types.Type = {
-              type: "any",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-
-          case "null": {
-            const newItem: types.Type = {
-              type: "null",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-
-          case "boolean": {
-            const newItem: types.Type = {
-              type: "boolean",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-          case "number": {
-            const newItem: types.Type = {
-              type: "number",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-          case "integer": {
-            const newItem: types.Type = {
-              type: "integer",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-          case "string": {
-            const newItem: types.Type = {
-              type: "string",
-            };
-
-            const newKey = arena.addItem(newItem);
-            typeElements.push(newKey);
-
-            break;
-          }
-          case "array": {
-            const compoundElements = new Array<number>();
-
-            if (node.tupleItems != null) {
-              const elements = node.tupleItems.map((tupleItem) => idMap[tupleItem]);
-
+      if (node.types != null) {
+        for (const type of node.types) {
+          switch (type) {
+            case "never": {
               const newItem: types.Type = {
-                type: "tuple",
-                tupleElements: elements,
+                type: "never",
               };
 
               const newKey = arena.addItem(newItem);
-              compoundElements.push(newKey);
+              typeElements.push(newKey);
+
+              break;
             }
 
-            if (node.arrayItems != null && node.arrayItems.length > 0) {
-              const element = idMap[node.arrayItems];
-
+            case "any": {
               const newItem: types.Type = {
-                type: "array",
-                arrayElement: element,
+                type: "any",
               };
 
               const newKey = arena.addItem(newItem);
-              compoundElements.push(newKey);
+              typeElements.push(newKey);
+
+              break;
             }
 
-            if (compoundElements.length > 0) {
-              const compoundItem: types.AllOf = {
-                allOf: compoundElements,
+            case "null": {
+              const newItem: types.Type = {
+                type: "null",
               };
 
-              const compoundKey = arena.addItem(compoundItem);
-              typeElements.push(compoundKey);
+              const newKey = arena.addItem(newItem);
+              typeElements.push(newKey);
+
+              break;
             }
 
-            break;
-          }
+            case "boolean": {
+              const newItem: types.Type = {
+                type: "boolean",
+              };
 
-          case "map": {
-            const compoundElements = new Array<number>();
+              const newKey = arena.addItem(newItem);
+              typeElements.push(newKey);
 
-            if (
-              node.objectProperties != null ||
-              (node.required != null && node.required.length > 0)
-            ) {
-              const properties = Object.fromEntries(
-                Object.entries(node.objectProperties ?? {}).map(([name, element]) => [
-                  name,
-                  idMap[element],
-                ]),
-              );
+              break;
+            }
+            case "number": {
+              const newItem: types.Type = {
+                type: "number",
+              };
 
-              for (const required of node.required ?? []) {
-                properties[required] ??= utilityTypes.any;
+              const newKey = arena.addItem(newItem);
+              typeElements.push(newKey);
+
+              break;
+            }
+            case "integer": {
+              const newItem: types.Type = {
+                type: "integer",
+              };
+
+              const newKey = arena.addItem(newItem);
+              typeElements.push(newKey);
+
+              break;
+            }
+            case "string": {
+              const newItem: types.Type = {
+                type: "string",
+              };
+
+              const newKey = arena.addItem(newItem);
+              typeElements.push(newKey);
+
+              break;
+            }
+            case "array": {
+              const compoundElements = new Array<number>();
+
+              if (node.tupleItems != null) {
+                const elements = node.tupleItems.map((tupleItem) => idMap[tupleItem]);
+
+                const newItem: types.Type = {
+                  type: "tuple",
+                  tupleElements: elements,
+                };
+
+                const newKey = arena.addItem(newItem);
+                compoundElements.push(newKey);
               }
 
-              const newItem: types.Type = {
-                type: "object",
-                required: node.required,
-                objectProperties: properties,
-              };
+              if (node.arrayItems != null && node.arrayItems.length > 0) {
+                const element = idMap[node.arrayItems];
 
-              const newKey = arena.addItem(newItem);
-              compoundElements.push(newKey);
+                const newItem: types.Type = {
+                  type: "array",
+                  arrayElement: element,
+                };
+
+                const newKey = arena.addItem(newItem);
+                compoundElements.push(newKey);
+              }
+
+              if (compoundElements.length > 0) {
+                const compoundItem: types.AllOf = {
+                  allOf: compoundElements,
+                };
+
+                const compoundKey = arena.addItem(compoundItem);
+                typeElements.push(compoundKey);
+              }
+
+              break;
             }
 
-            if (node.mapProperties != null) {
-              const name =
-                node.propertyNames == null ? utilityTypes.string : idMap[node.propertyNames];
-              const element = idMap[node.mapProperties];
+            case "map": {
+              const compoundElements = new Array<number>();
 
-              const newItem: types.Type = {
-                type: "map",
-                propertyName: name,
-                mapElement: element,
-              };
+              if (
+                node.objectProperties != null ||
+                (node.required != null && node.required.length > 0)
+              ) {
+                const properties = Object.fromEntries(
+                  Object.entries(node.objectProperties ?? {}).map(([name, element]) => [
+                    name,
+                    idMap[element],
+                  ]),
+                );
 
-              const newKey = arena.addItem(newItem);
-              compoundElements.push(newKey);
+                for (const required of node.required ?? []) {
+                  properties[required] ??= utilityTypes.any;
+                }
+
+                const newItem: types.Type = {
+                  type: "object",
+                  required: node.required,
+                  objectProperties: properties,
+                };
+
+                const newKey = arena.addItem(newItem);
+                compoundElements.push(newKey);
+              }
+
+              if (node.mapProperties != null) {
+                const name =
+                  node.propertyNames == null ? utilityTypes.string : idMap[node.propertyNames];
+                const element = idMap[node.mapProperties];
+
+                const newItem: types.Type = {
+                  type: "map",
+                  propertyName: name,
+                  mapElement: element,
+                };
+
+                const newKey = arena.addItem(newItem);
+                compoundElements.push(newKey);
+              }
+
+              if (compoundElements.length > 0) {
+                const compoundItem: types.AllOf = {
+                  allOf: compoundElements,
+                };
+
+                const compoundKey = arena.addItem(compoundItem);
+                typeElements.push(compoundKey);
+              }
+
+              break;
             }
-
-            if (compoundElements.length > 0) {
-              const compoundItem: types.AllOf = {
-                allOf: compoundElements,
-              };
-
-              const compoundKey = arena.addItem(compoundItem);
-              typeElements.push(compoundKey);
-            }
-
-            break;
           }
         }
       }

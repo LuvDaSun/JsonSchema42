@@ -26,15 +26,17 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    for (const type of node.types) {
-      const functionName = "_" + toCamel("is", type, names[nodeId]);
-      const functionBody = generateTypeValidationBody(specification, nodeId, type);
+    if (node.types != null) {
+      for (const type of node.types) {
+        const functionName = "_" + toCamel("is", type, names[nodeId]);
+        const functionBody = generateTypeValidationBody(specification, nodeId, type);
 
-      yield itt`
+        yield itt`
         function ${functionName}(value: unknown): value is unknown {
           ${functionBody}
         }
       `;
+      }
     }
 
     if (node.reference != null) {
@@ -114,7 +116,7 @@ function* generateValidationBody(specification: models.Specification, nodeId: st
   const compoundValidatorFunctionNames = new Array<string>();
   const typeValidatorFunctionNames = new Array<string>();
 
-  if (node.types.length > 0) {
+  if (node.types != null && node.types.length > 0) {
     for (const type of node.types) {
       const functionName = "_" + toCamel("is", type, names[nodeId]);
       typeValidatorFunctionNames.push(functionName);
