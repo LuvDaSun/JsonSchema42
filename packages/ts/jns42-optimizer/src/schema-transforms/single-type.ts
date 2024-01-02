@@ -16,17 +16,14 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  * - oneOf:
  *   - 1
  *   - 2
- * - types:
+ * - parent: 0
+ *   types:
  *   - number
- * - types:
+ * - parent: 0
+ *   types:
  *   - string
  * ```
- *
- * @param arena
- * @param model
- * @returns
  */
-
 export const singleType: SchemaTransform = (arena, model, modelKey) => {
   if (model.types == null || model.types.length == 1) {
     return model;
