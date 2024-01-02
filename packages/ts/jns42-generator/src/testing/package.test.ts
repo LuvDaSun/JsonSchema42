@@ -10,7 +10,7 @@ import * as schema202012 from "../documents/draft-2020-12/index.js";
 import { DocumentContext } from "../documents/index.js";
 import * as schemaIntermediate from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer, loadTypes, projectRoot } from "../utils/index.js";
+import { Namer, projectRoot, transformSchema } from "../utils/index.js";
 
 const packageNames = [
   // "not",
@@ -88,7 +88,7 @@ async function runTest(packageName: string) {
 
       const intermediateData = context.getIntermediateData();
 
-      const types = loadTypes(intermediateData);
+      const types = transformSchema(intermediateData);
 
       const namer = new Namer(defaultTypeName, 5);
       for (const [typeKey, typeItem] of Object.entries(types)) {
