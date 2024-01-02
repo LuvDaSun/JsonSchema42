@@ -1,4 +1,4 @@
-import { SchemaArena, SchemaModel, types } from "jns42-optimizer";
+import { SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 
@@ -98,10 +98,10 @@ export function loadModel(
   });
 
   while (
-    arena
-      .applyTransform
-      // some transforms here
-      () > 0
+    arena.applyTransform(
+      schemaTransforms.singleType,
+      //
+    ) > 0
   );
 
   const usedKeys = new Set<number>();
