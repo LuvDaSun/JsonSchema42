@@ -1,5 +1,5 @@
 import assert from "assert";
-import { TypeArena, transforms, types } from "jns42-optimizer";
+import { TypeArena, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 
@@ -263,17 +263,7 @@ export function loadTypes(
     return baseItem;
   });
 
-  while (
-    arena.applyTransform(
-      transforms.flatten,
-      transforms.alias,
-      transforms.unknown,
-      transforms.allOf,
-      transforms.anyOf,
-      transforms.oneOf,
-      transforms.allOfOneOf,
-    ) > 0
-  );
+  while (arena.applyTransform() > 0);
 
   const usedKeys = new Set<number>();
   for (const [key, item] of arena) {

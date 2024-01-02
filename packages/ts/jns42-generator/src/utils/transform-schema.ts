@@ -116,20 +116,186 @@ export function transformSchema(
   }
 
   const result: Record<string, models.Item | models.Alias> = {};
-  for (const [key, item] of arena) {
+  for (const [key, model] of arena) {
     if (!usedKeys.has(key)) {
       continue;
     }
 
-    const [newKey, newItem] = convertTypeEntry([key, item]);
+    const [newKey, newItem] = convertEntry([key, model]);
     result[newKey] = newItem;
   }
 
   return result;
 }
 
-function convertTypeEntry(
-  entry: [key: number, item: types.Item],
+function convertEntry(
+  entry: [key: number, model: SchemaModel],
 ): [string, models.Item | models.Alias] {
-  throw "TODO";
+  const [key, model] = entry;
+
+  const mapKey = (key: number) => String(key);
+
+  if (model.types != null && model.types.length === 1) {
+    const type = model.types[0];
+    switch (type) {
+      case "never":
+        // TODO should error in the future
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "never",
+          },
+        ];
+
+      case "any":
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "any",
+          },
+        ];
+
+      case "null":
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "null",
+          },
+        ];
+
+      case "boolean":
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "boolean",
+          },
+        ];
+
+      case "integer":
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "integer",
+          },
+        ];
+
+      case "number":
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "number",
+          },
+        ];
+
+      case "string":
+        return [
+          mapKey(key),
+          {
+            id: model.id,
+            type: "string",
+          },
+        ];
+
+      case "array": {
+        if (model.tupleItems != null) {
+          return [
+            mapKey(key),
+            {
+              id: model.id,
+              type: "tuple",
+              elements: model.tupleItems.map(mapKey),
+            },
+          ];
+        }
+
+        if (model.arrayItems != null) {
+          return [
+            mapKey(key),
+            {
+              id: model.id,
+              type: "array",
+              element: mapKey(model.arrayItems),
+            },
+          ];
+        }
+
+        throw new TypeError("no type for array elements");
+      }
+
+      case "map": {
+        if (model.objectProperties != null) {
+          const required = new Set(model.required);
+          const { objectProperties } = model;
+          const propertyNames = [...new Set([...Object.keys(model.objectProperties), ...required])];
+
+          return [
+            mapKey(key),
+            {
+              id: model.id,
+              type: "object",
+              properties: Object.fromEntries(
+                propertyNames.map((propertyName) => [
+                  propertyName,
+                  {
+                    required: required.has(propertyName),
+                    element:
+                      objectProperties[propertyName] == null
+                        ? "any"
+                        : mapKey(objectProperties[propertyName]),
+                  },
+                ]),
+              ),
+            },
+          ];
+        }
+
+        if (model.mapProperties != null) {
+          return [
+            mapKey(key),
+            {
+              id: model.id,
+              type: "map",
+              name: "string",
+              element: mapKey(model.mapProperties),
+            },
+          ];
+        }
+      }
+    }
+  }
+
+  if (model.alias != null) {
+    return [
+      mapKey(key),
+      {
+        id: model.id,
+        type: "alias",
+        target: mapKey(model.alias),
+      },
+    ];
+  }
+
+  if (model.oneOf != null) {
+    return [
+      mapKey(key),
+      {
+        id: model.id,
+        type: "union",
+        elements: model.oneOf.map(mapKey),
+      },
+    ];
+  }
+
+  return [
+    mapKey(key),
+    {
+      type: "unknown",
+    },
+  ];
 }
