@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined } from "../utils/index.js";
+import { normalizeObject } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.oneOf];
@@ -19,7 +19,7 @@ test("one-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "unknown" },
@@ -43,7 +43,7 @@ test("one-of alias", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [{ type: "string" }, { type: "string" }, { alias: str2 }, { oneOf: [str1, oneOf1] }],
   );
@@ -57,7 +57,7 @@ test("one-of unique", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [{ type: "number" }, { alias: num }],
   );

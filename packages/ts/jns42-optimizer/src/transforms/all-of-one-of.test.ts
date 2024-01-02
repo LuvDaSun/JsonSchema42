@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined } from "../utils/index.js";
+import { normalizeObject } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.allOfOneOf];
@@ -21,7 +21,7 @@ test("all-of-one-of", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
     [
       { type: "string" }, // 0
       { type: "string" }, // 1

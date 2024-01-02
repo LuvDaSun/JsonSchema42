@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined } from "../utils/index.js";
+import { normalizeObject } from "../utils/index.js";
 import { alias } from "./alias.js";
 
 test("alias", () => {
@@ -14,7 +14,7 @@ test("alias", () => {
   while (arena.applyTransform(alias) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [{ type: "string" }, { alias: i1 }, { alias: i1 }, { alias: i1 }],
   );

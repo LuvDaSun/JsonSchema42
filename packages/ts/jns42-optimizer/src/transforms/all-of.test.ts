@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { TypeArena } from "../type-arena.js";
-import { deleteUndefined } from "../utils/index.js";
+import { normalizeObject } from "../utils/index.js";
 import * as transforms from "./index.js";
 
 const useTransforms = [transforms.flatten, transforms.alias, transforms.unknown, transforms.allOf];
@@ -19,7 +19,7 @@ test("all-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "unknown" },
@@ -43,7 +43,7 @@ test("all-of alias", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [{ type: "string" }, { type: "string" }, { alias: str2 }, { type: "string" }],
   );
@@ -57,7 +57,7 @@ test("all-of unique", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [{ type: "number" }, { alias: num }],
   );
@@ -74,7 +74,7 @@ test("all-of primitive", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "number" },
@@ -99,7 +99,7 @@ test("all-of tuple", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "number" }, // 0
@@ -126,7 +126,7 @@ test("all-of array", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "number" }, // 0
@@ -165,7 +165,7 @@ test("all-of object", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "number" }, // 0
@@ -214,7 +214,7 @@ test("all-of map", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => deleteUndefined(v)),
+    [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
       { type: "string" }, // 0
