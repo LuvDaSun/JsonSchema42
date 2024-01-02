@@ -1,4 +1,4 @@
-import { SchemaAlias, SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimizer";
+import { SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 
@@ -10,14 +10,48 @@ export function transformSchema(
   the schemas in the arena get a new id
   */
   const idMap: Record<string, number> = {};
+  const parents: Record<string, string> = {};
 
   for (const id in document.schemas) {
+    const schema = document.schemas[id];
     const newItem: SchemaModel = {
       id,
     };
 
     const newKey = arena.addItem(newItem);
     idMap[id] = newKey;
+
+    if (schema.allOf != null) {
+      for (const child of schema.allOf) {
+        parents[child] = id;
+      }
+    }
+
+    if (schema.anyOf != null) {
+      for (const child of schema.anyOf) {
+        parents[child] = id;
+      }
+    }
+
+    if (schema.oneOf != null) {
+      for (const child of schema.oneOf) {
+        parents[child] = id;
+      }
+    }
+
+    if (schema.if != null) {
+      parents[schema.if] = id;
+    }
+    if (schema.then != null) {
+      parents[schema.then] = id;
+    }
+    if (schema.else != null) {
+      parents[schema.else] = id;
+    }
+
+    if (schema.not != null) {
+      parents[schema.not] = id;
+    }
   }
 
   /*
@@ -34,6 +68,7 @@ export function transformSchema(
 
     const model: SchemaModel = {
       id,
+      parent: parents[id] == null ? undefined : idMap[parents[id]],
     };
 
     model.title = schema.title;
@@ -97,6 +132,10 @@ export function transformSchema(
     return model;
   });
 
+  /*
+  set parent schemas
+  */
+
   while (
     arena.applyTransform(
       schemaTransforms.singleType,
@@ -129,13 +168,13 @@ export function transformSchema(
 }
 
 function convertEntry(
-  entry: [key: number, model: SchemaModel | SchemaAlias],
+  entry: [key: number, model: SchemaModel],
 ): [string, models.Item | models.Alias] {
   const [key, model] = entry;
 
   const mapKey = (key: number) => String(key);
 
-  if ("alias" in model) {
+  if (model.alias != null) {
     return [
       mapKey(key),
       {

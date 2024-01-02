@@ -1,13 +1,13 @@
 import { Arena, ArenaTransform } from "../utils/arena.js";
-import { SchemaAlias, SchemaModel } from "./model.js";
+import { SchemaModel } from "./model.js";
 
-export type SchemaTransform = ArenaTransform<SchemaModel | SchemaAlias, SchemaArena>;
+export type SchemaTransform = ArenaTransform<SchemaModel, SchemaArena>;
 
-export class SchemaArena extends Arena<SchemaModel | SchemaAlias> {
+export class SchemaArena extends Arena<SchemaModel> {
   public resolveAlias(key: number): [number, SchemaModel] {
     let resolvedKey = key;
     let resolvedItem = this.getItem(resolvedKey);
-    while ("alias" in resolvedItem) {
+    while (resolvedItem.alias != null) {
       resolvedKey = resolvedItem.alias;
       resolvedItem = this.getItem(resolvedKey);
     }
