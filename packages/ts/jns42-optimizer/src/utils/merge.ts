@@ -1,3 +1,10 @@
+export function intersectionMerge<T>(values: undefined, otherValues: undefined): undefined;
+export function intersectionMerge<T>(values: T[], otherValues: T[] | undefined): T[];
+export function intersectionMerge<T>(values: T[] | undefined, otherValues: T[]): T[];
+export function intersectionMerge<T>(
+  values: T[] | undefined,
+  otherValues: T[] | undefined,
+): T[] | undefined;
 export function intersectionMerge<T>(
   values: T[] | undefined,
   otherValues: T[] | undefined,
@@ -21,6 +28,13 @@ export function intersectionMerge<T>(
   return result;
 }
 
+export function unionMerge<T>(values: undefined, otherValues: undefined): undefined;
+export function unionMerge<T>(values: T[], otherValues: T[] | undefined): T[];
+export function unionMerge<T>(values: T[] | undefined, otherValues: T[]): T[];
+export function unionMerge<T>(
+  values: T[] | undefined,
+  otherValues: T[] | undefined,
+): T[] | undefined;
 export function unionMerge<T>(
   values: T[] | undefined,
   otherValues: T[] | undefined,

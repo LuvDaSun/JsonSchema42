@@ -142,6 +142,7 @@ export function transformSchema(
       schemaTransforms.singleMergeType,
       schemaTransforms.flatten,
       schemaTransforms.alias,
+      schemaTransforms.mergeAllOf,
     ) > 0
   );
 
@@ -181,7 +182,7 @@ function convertEntry(
     return [
       mapKey(key),
       {
-        id: model.id,
+        id,
         type: "alias",
         target: mapKey(model.alias),
       },
@@ -192,7 +193,7 @@ function convertEntry(
     return [
       mapKey(key),
       {
-        id: model.id,
+        id,
         type: "union",
         elements: model.oneOf.map(mapKey),
       },
@@ -207,7 +208,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "never",
           },
         ];
@@ -216,7 +217,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "any",
           },
         ];
@@ -225,7 +226,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "null",
           },
         ];
@@ -234,7 +235,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "boolean",
           },
         ];
@@ -243,7 +244,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "integer",
           },
         ];
@@ -252,7 +253,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "number",
           },
         ];
@@ -261,7 +262,7 @@ function convertEntry(
         return [
           mapKey(key),
           {
-            id: model.id,
+            id,
             type: "string",
           },
         ];
@@ -271,7 +272,7 @@ function convertEntry(
           return [
             mapKey(key),
             {
-              id: model.id,
+              id,
               type: "tuple",
               elements: model.tupleItems.map(mapKey),
             },
@@ -282,7 +283,7 @@ function convertEntry(
           return [
             mapKey(key),
             {
-              id: model.id,
+              id,
               type: "array",
               element: mapKey(model.arrayItems),
             },
@@ -301,7 +302,7 @@ function convertEntry(
           return [
             mapKey(key),
             {
-              id: model.id,
+              id,
               type: "object",
               properties: Object.fromEntries(
                 propertyNames.map((propertyName) => [
@@ -323,7 +324,7 @@ function convertEntry(
           return [
             mapKey(key),
             {
-              id: model.id,
+              id,
               type: "map",
               name: "string",
               element: mapKey(model.mapProperties),

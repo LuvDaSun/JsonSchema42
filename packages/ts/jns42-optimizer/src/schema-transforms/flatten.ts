@@ -33,7 +33,7 @@ export const flatten: SchemaTransform = (arena, model, modelKey) => {
   if (isAllOf(model)) {
     const elements = new Array<number>();
     for (const subKey of model.allOf) {
-      const [, subModel] = arena.resolveAlias(subKey);
+      const [, subModel] = arena.resolveItem(subKey);
 
       if (isAllOf(subModel)) {
         elements.push(...subModel.allOf);
@@ -52,7 +52,7 @@ export const flatten: SchemaTransform = (arena, model, modelKey) => {
   if (isAnyOf(model)) {
     const elements = new Array<number>();
     for (const subKey of model.anyOf) {
-      const [, subModel] = arena.resolveAlias(subKey);
+      const [, subModel] = arena.resolveItem(subKey);
 
       if (isAnyOf(subModel)) {
         elements.push(...subModel.anyOf);
@@ -71,7 +71,7 @@ export const flatten: SchemaTransform = (arena, model, modelKey) => {
   if (isOneOf(model)) {
     const elements = new Array<number>();
     for (const subKey of model.oneOf) {
-      const [, subModel] = arena.resolveAlias(subKey);
+      const [, subModel] = arena.resolveItem(subKey);
 
       if (isOneOf(subModel)) {
         elements.push(...subModel.oneOf);

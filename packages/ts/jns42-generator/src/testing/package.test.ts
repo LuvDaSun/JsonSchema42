@@ -18,7 +18,7 @@ const packageNames = [
   // "parse",
   "string-or-boolean",
   // "simple-object",
-  // "all-of-object",
+  "all-of-object",
   // "any-of-object",
   "one-of-object",
   // "all-types",
