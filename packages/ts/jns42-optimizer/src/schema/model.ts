@@ -11,6 +11,8 @@ export type SchemaModelType =
   | "map";
 
 export type SchemaModel = {
+  parent?: SchemaModelKey;
+
   id?: string;
 
   title?: string;

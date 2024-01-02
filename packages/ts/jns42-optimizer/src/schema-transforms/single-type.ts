@@ -27,7 +27,7 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  * @returns
  */
 
-export const singleType: SchemaTransform = (arena, model) => {
+export const singleType: SchemaTransform = (arena, model, modelKey) => {
   if (model.types == null || model.types.length === 1) {
     return model;
   }
@@ -45,6 +45,7 @@ export const singleType: SchemaTransform = (arena, model) => {
   newModel.oneOf = [];
   for (const type of model.types) {
     const newSubModel: SchemaModel = {
+      parent: modelKey,
       types: [type],
     };
     const newSubKey = arena.addItem(newSubModel);
