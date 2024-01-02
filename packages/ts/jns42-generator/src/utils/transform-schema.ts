@@ -2,7 +2,7 @@ import { SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimiz
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 
-export function loadModel(
+export function transformSchema(
   document: schemaIntermediate.SchemaDocument,
 ): Record<string, models.Item | models.Alias> {
   const arena = new SchemaArena();
