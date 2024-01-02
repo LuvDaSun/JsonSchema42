@@ -41,6 +41,10 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  *
  */
 export const toAllOf: SchemaTransform = (arena, model, modelKey) => {
+  if ("alias" in model) {
+    return model;
+  }
+
   let count = 0;
   if (model.allOf != null && model.allOf.length > 0) {
     count++;

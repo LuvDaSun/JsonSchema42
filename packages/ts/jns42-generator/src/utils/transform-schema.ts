@@ -1,4 +1,4 @@
-import { SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimizer";
+import { SchemaAlias, SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 
@@ -129,11 +129,22 @@ export function transformSchema(
 }
 
 function convertEntry(
-  entry: [key: number, model: SchemaModel],
+  entry: [key: number, model: SchemaModel | SchemaAlias],
 ): [string, models.Item | models.Alias] {
   const [key, model] = entry;
 
   const mapKey = (key: number) => String(key);
+
+  if ("alias" in model) {
+    return [
+      mapKey(key),
+      {
+        id: model.id,
+        type: "alias",
+        target: mapKey(model.alias),
+      },
+    ];
+  }
 
   if (model.types != null && model.types.length === 1) {
     const type = model.types[0];
@@ -268,17 +279,6 @@ function convertEntry(
         }
       }
     }
-  }
-
-  if (model.alias != null) {
-    return [
-      mapKey(key),
-      {
-        id: model.id,
-        type: "alias",
-        target: mapKey(model.alias),
-      },
-    ];
   }
 
   if (model.oneOf != null) {

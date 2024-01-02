@@ -10,10 +10,15 @@ export type SchemaModelType =
   | "array"
   | "map";
 
+export type SchemaAlias = {
+  id?: string;
+
+  alias: SchemaModelKey;
+};
+
 export type SchemaModel = {
   id?: string;
 
-  alias?: SchemaModelKey;
   parent?: SchemaModelKey;
 
   title?: string;

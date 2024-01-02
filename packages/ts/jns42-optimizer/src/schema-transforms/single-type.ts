@@ -25,6 +25,10 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  * ```
  */
 export const singleType: SchemaTransform = (arena, model, modelKey) => {
+  if ("alias" in model) {
+    return model;
+  }
+
   if (model.types == null || model.types.length == 1) {
     return model;
   }
