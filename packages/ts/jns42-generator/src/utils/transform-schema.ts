@@ -105,10 +105,10 @@ export function transformSchema(
     model.arrayItems = schema.arrayItems == null ? undefined : idMap[schema.arrayItems];
     model.contains = schema.contains == null ? undefined : idMap[schema.contains];
 
-    model.oneOf = model.oneOf?.map((id) => idMap[id]);
-    model.anyOf = model.anyOf?.map((id) => idMap[id]);
-    model.allOf = model.allOf?.map((id) => idMap[id]);
-    model.tupleItems = model.tupleItems?.map((id) => idMap[id]);
+    model.oneOf = schema.oneOf?.map((id) => idMap[id]);
+    model.anyOf = schema.anyOf?.map((id) => idMap[id]);
+    model.allOf = schema.allOf?.map((id) => idMap[id]);
+    model.tupleItems = schema.tupleItems?.map((id) => idMap[id]);
 
     model.dependentSchemas =
       schema.dependentSchemas == null
