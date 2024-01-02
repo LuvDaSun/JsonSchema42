@@ -139,7 +139,9 @@ export function transformSchema(
   while (
     arena.applyTransform(
       schemaTransforms.singleType,
-      //
+      schemaTransforms.singleMergeType,
+      schemaTransforms.flatten,
+      schemaTransforms.alias,
     ) > 0
   );
 
@@ -171,6 +173,7 @@ function convertEntry(
   entry: [key: number, model: SchemaModel],
 ): [string, models.Item | models.Alias] {
   const [key, model] = entry;
+  const { id } = model;
 
   const mapKey = (key: number) => String(key);
 
@@ -181,6 +184,17 @@ function convertEntry(
         id: model.id,
         type: "alias",
         target: mapKey(model.alias),
+      },
+    ];
+  }
+
+  if (model.oneOf != null && model.oneOf.length > 0) {
+    return [
+      mapKey(key),
+      {
+        id: model.id,
+        type: "union",
+        elements: model.oneOf.map(mapKey),
       },
     ];
   }
@@ -320,20 +334,10 @@ function convertEntry(
     }
   }
 
-  if (model.oneOf != null) {
-    return [
-      mapKey(key),
-      {
-        id: model.id,
-        type: "union",
-        elements: model.oneOf.map(mapKey),
-      },
-    ];
-  }
-
   return [
     mapKey(key),
     {
+      id,
       type: "unknown",
     },
   ];

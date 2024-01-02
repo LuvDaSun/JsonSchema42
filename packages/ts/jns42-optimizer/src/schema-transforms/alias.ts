@@ -1,4 +1,11 @@
-import { SchemaTransform } from "../schema/index.js";
+import {
+  SchemaTransform,
+  isAlias,
+  isAllOf,
+  isAnyOf,
+  isOneOf,
+  isReference,
+} from "../schema/index.js";
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -16,41 +23,32 @@ import { SchemaTransform } from "../schema/index.js";
  * ```
  */
 export const alias: SchemaTransform = (arena, model, modelKey) => {
-  if ("alias" in model) {
+  if (isAlias(model)) {
     return model;
   }
 
-  let counter = 0;
-  for (const member in model) {
-    switch (member) {
-      case "id":
-        break;
-
-      default:
-        counter++;
-        break;
-    }
+  if (isReference(model)) {
+    return {
+      id: model.id,
+      alias: model.reference,
+    };
   }
 
-  if (counter > 1) {
-    return model;
-  }
-
-  if (model.allOf != null && model.allOf.length === 1) {
+  if (isAllOf(model) && model.allOf.length === 1) {
     return {
       id: model.id,
       alias: model.allOf[0],
     };
   }
 
-  if (model.anyOf != null && model.anyOf.length === 1) {
+  if (isAnyOf(model) && model.anyOf.length === 1) {
     return {
       id: model.id,
       alias: model.anyOf[0],
     };
   }
 
-  if (model.oneOf != null && model.oneOf.length === 1) {
+  if (isOneOf(model) && model.oneOf.length === 1) {
     return {
       id: model.id,
       alias: model.oneOf[0],

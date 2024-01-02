@@ -50,12 +50,6 @@ function _isMapNode(value: unknown): value is unknown {
 if(typeof value !== "object" || value === null || Array.isArray(value)) {
 return false;
 }
-if(!("deprecated" in value)) {
-return false;
-}
-if(!("types" in value)) {
-return false;
-}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 switch(propertyName) {

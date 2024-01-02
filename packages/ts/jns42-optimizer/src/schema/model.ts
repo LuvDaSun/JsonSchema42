@@ -57,3 +57,62 @@ export type SchemaModel = {
   minimumProperties?: number;
   maximumProperties?: number;
 };
+
+export type AliasModel = {
+  id?: string;
+  alias: SchemaModelKey;
+};
+export function isAlias(model: SchemaModel): model is AliasModel {
+  return hasMembers(model, new Set(["alias"]), new Set(["id"]));
+}
+
+export type ReferenceModel = {
+  id?: string;
+  reference: SchemaModelKey;
+};
+export function isReference(model: SchemaModel): model is ReferenceModel {
+  return hasMembers(model, new Set(["reference"]), new Set(["id"]));
+}
+
+export type OneOfModel = {
+  id?: string;
+  oneOf: SchemaModelKey[];
+};
+export function isOneOf(model: SchemaModel): model is OneOfModel {
+  return hasMembers(model, new Set(["oneOf"]), new Set(["id"]));
+}
+
+export type AnyOfModel = {
+  id?: string;
+  anyOf: SchemaModelKey[];
+};
+export function isAnyOf(model: SchemaModel): model is AnyOfModel {
+  return hasMembers(model, new Set(["anyOf"]), new Set(["id"]));
+}
+
+export type AllOfModel = {
+  id?: string;
+  allOf: SchemaModelKey[];
+};
+export function isAllOf(model: SchemaModel): model is AllOfModel {
+  return hasMembers(model, new Set(["allOf"]), new Set(["id"]));
+}
+
+function hasMembers<T>(model: T, required = new Set<keyof T>(), optional = new Set<keyof T>()) {
+  let requiredCount = 0;
+  for (const member in model) {
+    if (model[member] === undefined) {
+      continue;
+    }
+
+    if (required.has(member)) {
+      requiredCount++;
+      continue;
+    }
+    if (optional.has(member)) {
+      continue;
+    }
+    return false;
+  }
+  return requiredCount === required.size;
+}

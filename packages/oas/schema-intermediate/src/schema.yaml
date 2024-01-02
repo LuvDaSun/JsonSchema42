@@ -15,9 +15,6 @@ properties:
 $defs:
   node:
     type: object
-    required:
-      - deprecated
-      - types
     properties:
       title: { $ref: "#/$defs/non-empty-string-value" }
       description: { $ref: "#/$defs/non-empty-string-value" }

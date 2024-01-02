@@ -2,15 +2,22 @@
   "folders": [
     {
       "name": "fixtures",
-      "path": "./fixtures"
+      "path": "fixtures"
+    },
+    {
+      "name": "schema-intermediate",
+      "path": "packages/oas/schema-intermediate"
     },
     {
       "name": "ts/jns42-generator",
-      "path": "./packages/ts/jns42-generator"
+      "path": "packages/ts/jns42-generator"
     },
     {
       "name": "ts/jns42-optimizer",
-      "path": "./packages/ts/jns42-optimizer"
+      "path": "packages/ts/jns42-optimizer"
+    },
+    {
+      "path": "packages/ts/schema-intermediate"
     }
   ],
   "settings": {

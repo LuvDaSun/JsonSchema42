@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../schema/index.js";
+import { SchemaModel, SchemaTransform, isAlias } from "../schema/index.js";
 
 /**
  * turns the model into a single all-of with various
@@ -40,8 +40,8 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  * ```
  *
  */
-export const toAllOf: SchemaTransform = (arena, model, modelKey) => {
-  if ("alias" in model) {
+export const singleMergeType: SchemaTransform = (arena, model, modelKey) => {
+  if (isAlias(model)) {
     return model;
   }
 

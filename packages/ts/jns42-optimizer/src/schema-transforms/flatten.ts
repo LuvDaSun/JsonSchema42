@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../schema/index.js";
+import { SchemaTransform, isAllOf, isAnyOf, isOneOf } from "../schema/index.js";
 
 /**
  * Flattens nested allOf, anyOf, oneOf
@@ -28,33 +28,64 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  * ```
  */
 export const flatten: SchemaTransform = (arena, model, modelKey) => {
-  if ("alias" in model) {
-    return model;
+  const { id } = model;
+
+  if (isAllOf(model)) {
+    const elements = new Array<number>();
+    for (const subKey of model.allOf) {
+      const [, subModel] = arena.resolveAlias(subKey);
+
+      if (isAllOf(subModel)) {
+        elements.push(...subModel.allOf);
+      } else {
+        elements.push(subKey);
+      }
+    }
+    if (elements.length > model.allOf.length) {
+      return {
+        id,
+        allOf: elements,
+      };
+    }
   }
 
-  if (model.types == null || model.types.length == 1) {
-    return model;
+  if (isAnyOf(model)) {
+    const elements = new Array<number>();
+    for (const subKey of model.anyOf) {
+      const [, subModel] = arena.resolveAlias(subKey);
+
+      if (isAnyOf(subModel)) {
+        elements.push(...subModel.anyOf);
+      } else {
+        elements.push(subKey);
+      }
+    }
+    if (elements.length > model.anyOf.length) {
+      return {
+        id,
+        anyOf: elements,
+      };
+    }
   }
 
-  if (model.oneOf != null) {
-    return model;
+  if (isOneOf(model)) {
+    const elements = new Array<number>();
+    for (const subKey of model.oneOf) {
+      const [, subModel] = arena.resolveAlias(subKey);
+
+      if (isOneOf(subModel)) {
+        elements.push(...subModel.oneOf);
+      } else {
+        elements.push(subKey);
+      }
+    }
+    if (elements.length > model.oneOf.length) {
+      return {
+        id,
+        oneOf: elements,
+      };
+    }
   }
 
-  // copy the model
-  const newModel = { ...model };
-  // remove the types
-  delete newModel.types;
-
-  // create the oneOf
-  newModel.oneOf = [];
-  for (const type of model.types) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-      types: [type],
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.oneOf.push(newSubKey);
-  }
-
-  return newModel;
+  return model;
 };

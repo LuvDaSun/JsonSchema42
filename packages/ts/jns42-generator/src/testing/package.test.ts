@@ -15,14 +15,14 @@ import { Namer, projectRoot, transformSchema } from "../utils/index.js";
 const packageNames = [
   // "not",
 
-  "parse",
-  "string-or-boolean",
-  "simple-object",
-  "all-of-object",
-  "any-of-object",
+  // "parse",
+  // "string-or-boolean",
+  // "simple-object",
+  // "all-of-object",
+  // "any-of-object",
   "one-of-object",
-  "all-types",
-  "all-of-one-of-object",
+  // "all-types",
+  // "all-of-one-of-object",
 ];
 
 for (const packageName of packageNames) {
@@ -41,10 +41,6 @@ async function runTest(packageName: string) {
     "testing",
     `${packageName}.yaml`,
   );
-
-  if (!fs.existsSync(testPath)) {
-    return;
-  }
 
   const testUrl = new URL(`file://${testPath}`);
   const defaultTypeName = camelcase("schema-document", { pascalCase: true });

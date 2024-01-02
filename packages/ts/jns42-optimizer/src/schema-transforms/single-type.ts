@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../schema/index.js";
+import { SchemaModel, SchemaTransform, isAlias } from "../schema/index.js";
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -25,7 +25,7 @@ import { SchemaModel, SchemaTransform } from "../schema/index.js";
  * ```
  */
 export const singleType: SchemaTransform = (arena, model, modelKey) => {
-  if ("alias" in model) {
+  if (isAlias(model)) {
     return model;
   }
 

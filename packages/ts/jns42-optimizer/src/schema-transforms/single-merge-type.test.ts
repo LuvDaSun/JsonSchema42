@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { SchemaArena } from "../schema/arena.js";
 import { normalizeObject } from "../utils/index.js";
-import { toAllOf } from "./single-merge-type.js";
+import { singleMergeType } from "./single-merge-type.js";
 
 test("single-merge-type", () => {
   const arena = new SchemaArena();
@@ -15,7 +15,7 @@ test("single-merge-type", () => {
     else: 900,
   });
 
-  while (arena.applyTransform(toAllOf) > 0);
+  while (arena.applyTransform(singleMergeType) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => normalizeObject(v)),
