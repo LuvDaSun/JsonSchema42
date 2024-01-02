@@ -40,12 +40,15 @@ import { SchemaModel, SchemaTransform, isAlias } from "../schema/index.js";
  * ```
  *
  */
-export const singleMergeType: SchemaTransform = (arena, model, modelKey) => {
+export const explode: SchemaTransform = (arena, model, modelKey) => {
   if (isAlias(model)) {
     return model;
   }
 
   let count = 0;
+  if (model.reference != null) {
+    count++;
+  }
   if (model.allOf != null && model.allOf.length > 0) {
     count++;
   }
@@ -64,6 +67,7 @@ export const singleMergeType: SchemaTransform = (arena, model, modelKey) => {
   }
 
   let newModel = { ...model };
+  delete newModel.reference;
   delete newModel.allOf;
   delete newModel.anyOf;
   delete newModel.oneOf;
@@ -72,6 +76,14 @@ export const singleMergeType: SchemaTransform = (arena, model, modelKey) => {
   delete newModel.else;
 
   newModel.allOf = [];
+
+  if (model.reference != null) {
+    const newSubModel: SchemaModel = {
+      reference: model.reference,
+    };
+    const newSubKey = arena.addItem(newSubModel);
+    newModel.allOf.push(newSubKey);
+  }
 
   if (model.allOf != null && model.allOf.length > 0) {
     const newSubModel: SchemaModel = {

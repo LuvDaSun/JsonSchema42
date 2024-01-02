@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { SchemaArena } from "../schema/arena.js";
 import { normalizeObject } from "../utils/index.js";
-import { singleMergeType } from "./single-merge-type.js";
+import { explode } from "./explode.js";
 
-test("single-merge-type", () => {
+test("explode", () => {
   const arena = new SchemaArena();
   arena.addItem({
+    reference: 10,
     allOf: [100, 200],
     anyOf: [300, 400],
     oneOf: [500, 600],
@@ -15,13 +16,14 @@ test("single-merge-type", () => {
     else: 900,
   });
 
-  while (arena.applyTransform(singleMergeType) > 0);
+  while (arena.applyTransform(explode) > 0);
 
   assert.deepEqual(
     [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
-      { allOf: [1, 2, 3, 4] },
+      { allOf: [1, 2, 3, 4, 5] },
+      { reference: 10 },
       { parent: 0, allOf: [100, 200] },
       { parent: 0, anyOf: [300, 400] },
       { parent: 0, oneOf: [500, 600] },

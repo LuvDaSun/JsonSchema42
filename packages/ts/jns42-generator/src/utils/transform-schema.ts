@@ -139,10 +139,11 @@ export function transformSchema(
   while (
     arena.applyTransform(
       schemaTransforms.singleType,
-      schemaTransforms.singleMergeType,
+      schemaTransforms.explode,
       schemaTransforms.flatten,
       schemaTransforms.alias,
       schemaTransforms.mergeAllOf,
+      schemaTransforms.mergeParent,
     ) > 0
   );
 
@@ -166,6 +167,13 @@ export function transformSchema(
     const [newKey, newItem] = convertEntry([key, model]);
     result[newKey] = newItem;
   }
+
+  result["any"] = {
+    type: "any",
+  };
+  result["string"] = {
+    type: "string",
+  };
 
   return result;
 }

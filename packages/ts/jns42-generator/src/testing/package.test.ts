@@ -17,11 +17,11 @@ const packageNames = [
 
   // "parse",
   "string-or-boolean",
-  // "simple-object",
+  "simple-object",
   "all-of-object",
   // "any-of-object",
   "one-of-object",
-  // "all-types",
+  "all-types",
   // "all-of-one-of-object",
 ];
 
