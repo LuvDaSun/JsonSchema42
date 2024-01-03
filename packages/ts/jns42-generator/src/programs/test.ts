@@ -96,7 +96,7 @@ async function main(options: MainOptions) {
   const schemas = testData.schemas as Record<string, unknown>;
   for (const schemaName in schemas) {
     const schema = schemas[schemaName];
-    const packageDirectoryPath = path.join(packageDirectoryRoot, schemaName, packageName);
+    const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
     await test("generate package", async () => {
