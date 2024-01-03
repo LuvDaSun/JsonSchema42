@@ -2,7 +2,7 @@ import { SchemaModel, SchemaTransform, isAlias } from "../schema/index.js";
 
 /**
  * turns the model into a single all-of with various
- * new applicators models in it
+ * sub models in it
  *
  * this
  * ```yaml
@@ -63,6 +63,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
   }
 
   if (count <= 1) {
+    // nothing to explode here
     return model;
   }
 
