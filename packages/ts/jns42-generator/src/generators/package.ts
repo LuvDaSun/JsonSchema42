@@ -15,7 +15,7 @@ import { generateValidatorsTsCode } from "./validators-ts.js";
 
 export interface PackageOptions {
   packageName: string;
-  packageVersion: string;
+  packageVersion?: string;
   packageDirectoryPath: string;
   anyOfHack: boolean;
 }

@@ -16,6 +16,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
         .positional("instance-schema-url", {
           description: "url to download schema from",
           type: "string",
+          demandOption: true,
         })
         .option("default-meta-schema-url", {
           description: "the default meta schema to use",
@@ -30,10 +31,12 @@ export function configurePackageProgram(argv: yargs.Argv) {
         .option("package-directory", {
           description: "where to output the package",
           type: "string",
+          demandOption: true,
         })
         .option("package-name", {
           description: "name of the package",
           type: "string",
+          demandOption: true,
         })
         .option("package-version", {
           description: "version of the package",
@@ -54,7 +57,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
           type: "boolean",
           default: false,
         }),
-    (argv) => main(argv as MainOptions),
+    (argv) => main(argv),
   );
 }
 
@@ -63,7 +66,7 @@ interface MainOptions {
   defaultMetaSchemaUrl: string;
   packageDirectory: string;
   packageName: string;
-  packageVersion: string;
+  packageVersion?: string;
   defaultName: string;
   namerMaximumIterations: number;
   anyOfHack: boolean;

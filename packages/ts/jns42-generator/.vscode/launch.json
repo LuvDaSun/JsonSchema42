@@ -10,7 +10,8 @@
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
-      "preLaunchTask": "build"
+      "preLaunchTask": "build",
+      "outputCapture": "std"
     },
     {
       "type": "node",
@@ -23,14 +24,25 @@
         "--package-directory",
         ".package/file",
         "--package-name",
-        "file",
-        "--package-version",
-        "0.0.0"
+        "file"
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
-      "preLaunchTask": "build"
+      "preLaunchTask": "build",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "test fixture",
+      "program": "${workspaceFolder}/src/program.ts",
+      "args": ["test", "${file}", "--package-directory", ".package/test", "--package-name", "test"],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
+      "preLaunchTask": "build",
+      "outputCapture": "std"
     }
   ]
 }

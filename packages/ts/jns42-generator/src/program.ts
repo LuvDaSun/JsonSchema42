@@ -9,6 +9,7 @@ async function main() {
 
   programs.configurePackageProgram(program);
   programs.configureIntermediateProgram(program);
+  programs.configureTestProgram(program);
 
-  program.parse();
+  program.demandCommand().parse();
 }

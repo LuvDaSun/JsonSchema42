@@ -14,6 +14,7 @@ export function configureIntermediateProgram(argv: yargs.Argv) {
         .positional("instance-schema-url", {
           description: "url to download schema from",
           type: "string",
+          demandOption: true,
         })
         .option("default-meta-schema-url", {
           description: "the default meta schema to use",
@@ -25,7 +26,7 @@ export function configureIntermediateProgram(argv: yargs.Argv) {
           ] as const,
           default: schema202012.metaSchemaId,
         }),
-    (argv) => main(argv as MainOptions),
+    (argv) => main(argv),
   );
 }
 
