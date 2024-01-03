@@ -345,6 +345,16 @@ function convertEntry(
             },
           ];
         }
+
+        return [
+          mapKey(key),
+          {
+            id,
+            type: "map",
+            name: "string",
+            element: "any",
+          },
+        ];
       }
     }
   }
