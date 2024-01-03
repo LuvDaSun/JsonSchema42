@@ -9,7 +9,7 @@ async function main() {
 
   programs.configurePackageProgram(program);
   programs.configureIntermediateProgram(program);
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     // only enabled when debugging
     programs.configureTestProgram(program);
   }

@@ -35,6 +35,11 @@ export class Arena<T> {
       for (const transform of transformers) {
         item = transform(this, item, index);
         if (item !== this.items[index]) {
+          // console.group(`${transform.name}-${index}`);
+          // console.log(this.items[index]);
+          // console.log(item);
+          // console.log();
+          // console.groupEnd();
           counter++;
           this.items[index] = item;
         }

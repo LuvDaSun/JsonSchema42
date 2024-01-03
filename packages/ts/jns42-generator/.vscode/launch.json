@@ -7,6 +7,9 @@
       "name": "run file",
       "program": "${file}",
       "args": [],
+      "env": {
+        "NODE_ENV": "development"
+      },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
@@ -26,6 +29,9 @@
         "--package-name",
         "${fileBasenameNoExtension}"
       ],
+      "env": {
+        "NODE_ENV": "development"
+      },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
@@ -45,6 +51,9 @@
         "--package-name",
         "${fileBasenameNoExtension}"
       ],
+      "env": {
+        "NODE_ENV": "development"
+      },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
