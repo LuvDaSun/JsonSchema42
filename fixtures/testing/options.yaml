@@ -6,13 +6,13 @@ schemas:
     description: "An object"
     oneOf:
       - type: "string"
-        options: ["a", "b"]
+        enum: ["a", "b"]
       - type: "integer"
-        options: [1, 2]
+        enum: [1, 2]
       - type: "number"
-        options: [3, 4, 5]
+        enum: [3, 4, 5]
       - type: "boolean"
-        options: ["true"]
+        enum: [true]
 
 valid:
   a: a

@@ -106,19 +106,48 @@ function* generateMockDefinition(
       yield JSON.stringify(null);
       break;
 
-    case "boolean":
+    case "boolean": {
+      if (typeItem.options != null) {
+        yield itt`([${joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          ", ",
+        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
+        break;
+      }
       yield `Boolean(nextSeed() % 2)`;
       break;
+    }
 
     case "integer":
+      if (typeItem.options != null) {
+        yield itt`([${joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          ", ",
+        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
+        break;
+      }
       yield `Number(nextSeed() % ${JSON.stringify(1000)})`;
       break;
 
     case "number":
+      if (typeItem.options != null) {
+        yield itt`([${joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          ", ",
+        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
+        break;
+      }
       yield `Number(nextSeed() % ${JSON.stringify(1000)} * 10) / 10`;
       break;
 
     case "string":
+      if (typeItem.options != null) {
+        yield itt`([${joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          ", ",
+        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
+        break;
+      }
       yield `randomString(10)`;
       break;
 

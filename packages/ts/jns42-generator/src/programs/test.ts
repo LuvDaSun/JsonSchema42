@@ -82,7 +82,7 @@ async function main(options: MainOptions) {
   const pathToTest = path.resolve(options.pathToTest);
 
   const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-  const packageDirectoryPath = path.resolve(options.packageDirectory);
+  const packageDirectoryRoot = path.resolve(options.packageDirectory);
   const { packageName, packageVersion, namerMaximumIterations, defaultName, anyOfHack } = options;
 
   const testUrl = new URL(`file://${pathToTest}`);
@@ -96,6 +96,7 @@ async function main(options: MainOptions) {
   const schemas = testData.schemas as Record<string, unknown>;
   for (const schemaName in schemas) {
     const schema = schemas[schemaName];
+    const packageDirectoryPath = path.join(packageDirectoryRoot, schemaName, packageName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
     await test("generate package", async () => {

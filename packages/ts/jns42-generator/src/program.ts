@@ -9,7 +9,10 @@ async function main() {
 
   programs.configurePackageProgram(program);
   programs.configureIntermediateProgram(program);
-  programs.configureTestProgram(program);
+  if (process.env.NODE_ENV !== "production") {
+    // only enabled when debugging
+    programs.configureTestProgram(program);
+  }
 
   program.demandCommand().parse();
 }

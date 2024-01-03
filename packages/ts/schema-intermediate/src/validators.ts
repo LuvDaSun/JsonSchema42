@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.21                         -- www.JsonSchema42.org
+// v0.9.6                          -- www.JsonSchema42.org
 import * as types from "./types.js";
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json
 export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
@@ -24,6 +24,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "$schema":
 if(!isSchema(propertyValue)) {
@@ -52,6 +55,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "title":
 if(!isTitle(propertyValue)) {
@@ -362,6 +368,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -581,6 +590,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -601,6 +613,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isObjectPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -634,6 +649,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
