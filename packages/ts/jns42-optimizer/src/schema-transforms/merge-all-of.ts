@@ -1,4 +1,10 @@
-import { SchemaArena, SchemaModel, SchemaModelType, SchemaTransform } from "../schema/index.js";
+import {
+  SchemaArena,
+  SchemaModel,
+  SchemaModelType,
+  SchemaTransform,
+  isType,
+} from "../schema/index.js";
 import { intersectionMerge, unionMerge } from "../utils/index.js";
 
 /**
@@ -38,13 +44,14 @@ export const mergeAllOf: SchemaTransform = (arena, model, modelKey) => {
 
   let newModel!: SchemaModel;
   for (const subModelKey of model.allOf) {
-    const [resolvedSubModelKey, subModel] = arena.resolveItem(subModelKey);
+    const [, subModel] = arena.resolveItem(subModelKey);
 
-    if (subModel.types != null && subModel.types.length > 1) {
+    if (!isType(subModel)) {
       // we want to only only merge single types
       return model;
     }
 
+    // first pass
     if (newModel == null) {
       newModel = { ...subModel, id };
       continue;

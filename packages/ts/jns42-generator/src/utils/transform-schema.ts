@@ -1,4 +1,9 @@
-import { SchemaArena, SchemaModel, schemaTransforms, types } from "jns42-optimizer";
+import {
+  SchemaArena,
+  SchemaModel,
+  schemaTransforms,
+  selectSchemaDependencies,
+} from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 
@@ -143,6 +148,7 @@ export function transformSchema(
       schemaTransforms.flatten,
       schemaTransforms.alias,
       schemaTransforms.mergeAllOf,
+      schemaTransforms.mergeAnyOf,
       schemaTransforms.mergeParent,
     ) > 0
   );
@@ -153,7 +159,7 @@ export function transformSchema(
       usedKeys.add(key);
     }
 
-    for (const key of types.dependencies(item)) {
+    for (const key of selectSchemaDependencies(item)) {
       usedKeys.add(key);
     }
   }

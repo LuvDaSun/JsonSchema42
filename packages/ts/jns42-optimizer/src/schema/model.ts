@@ -57,6 +57,37 @@ export type SchemaModel = {
   minimumProperties?: number;
   maximumProperties?: number;
 };
+export type TypeModel = {
+  id?: string;
+  types: [SchemaModelType];
+  objectProperties?: Record<string, SchemaModelKey>;
+  mapProperties?: SchemaModelKey;
+  patternProperties?: Record<string, SchemaModelKey>;
+  propertyNames?: SchemaModelKey;
+  tupleItems?: SchemaModelKey[];
+  arrayItems?: SchemaModelKey;
+  contains?: SchemaModelKey;
+  required?: string[];
+  options?: any[];
+};
+export function isType(model: SchemaModel): model is TypeModel {
+  return hasMembers(
+    model,
+    new Set(["types"]),
+    new Set([
+      "id",
+      "objectProperties",
+      "mapProperties",
+      "patternProperties",
+      "propertyNames",
+      "tupleItems",
+      "arrayItems",
+      "contains",
+      "required",
+      "options",
+    ]),
+  );
+}
 
 export type AliasModel = {
   id?: string;

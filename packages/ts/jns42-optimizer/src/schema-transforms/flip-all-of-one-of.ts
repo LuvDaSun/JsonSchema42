@@ -1,5 +1,4 @@
-import { OneOfModel, SchemaTransform, isAllOf, isOneOf } from "../schema/index.js";
-import * as types from "../types.js";
+import { AllOfModel, OneOfModel, SchemaTransform, isAllOf, isOneOf } from "../schema/index.js";
 
 /**
  * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
@@ -29,7 +28,7 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   for (const leafElement of leafElements) {
     const newLeafElements = [...model.allOf, leafElement].filter((key) => !baseElementSet.has(key));
 
-    const newLeafItem: types.AllOf = {
+    const newLeafItem: AllOfModel = {
       allOf: newLeafElements,
     };
     const newLeafKey = arena.addItem(newLeafItem);
