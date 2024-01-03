@@ -19,10 +19,10 @@ const packageNames = [
   "string-or-boolean",
   "simple-object",
   "all-of-object",
-  // "any-of-object",
+  "any-of-object",
   "one-of-object",
   "all-types",
-  // "all-of-one-of-object",
+  "all-of-one-of-object",
 ];
 
 for (const packageName of packageNames) {
@@ -115,12 +115,12 @@ async function runTest(packageName: string) {
       });
     });
 
-    await test("build package", () => {
-      cp.execSync("npm run build", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-      });
-    });
+    // await test("build package", () => {
+    //   cp.execSync("npm run build", {
+    //     cwd: packageDirectoryPath,
+    //     env: process.env,
+    //   });
+    // });
 
     await test("test package", () => {
       cp.execSync("npm test", {

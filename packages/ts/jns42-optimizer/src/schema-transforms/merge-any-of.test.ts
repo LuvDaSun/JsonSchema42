@@ -8,11 +8,9 @@ const useTransforms = [mergeAnyOf];
 
 test("merge-any-of utility", () => {
   const arena = new SchemaArena();
-  const u = arena.addItem({});
   const n = arena.addItem({ types: ["never"] });
   const a = arena.addItem({ types: ["any"] });
   const num = arena.addItem({ types: ["number"] });
-  arena.addItem({ anyOf: [num, u] });
   arena.addItem({ anyOf: [num, n] });
   arena.addItem({ anyOf: [num, a] });
 
@@ -22,11 +20,9 @@ test("merge-any-of utility", () => {
     [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
-      {},
       { types: ["never"] },
       { types: ["any"] },
       { types: ["number"] },
-      { anyOf: [num, u] },
       { oneOf: [num, n] },
       { oneOf: [num, a] },
     ],

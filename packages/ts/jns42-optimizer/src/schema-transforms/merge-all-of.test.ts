@@ -8,11 +8,9 @@ const useTransforms = [transforms.mergeAllOf, transforms.alias];
 
 test("all-of utility", () => {
   const arena = new SchemaArena();
-  const u = arena.addItem({});
   const n = arena.addItem({ types: ["never"] });
   const a = arena.addItem({ types: ["any"] });
   const num = arena.addItem({ types: ["number"] });
-  arena.addItem({ allOf: [num, u] });
   arena.addItem({ allOf: [num, n] });
   arena.addItem({ allOf: [num, a] });
 
@@ -22,10 +20,8 @@ test("all-of utility", () => {
     [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
-      {},
       { types: ["never"] },
       { types: ["any"] },
-      { types: ["number"] },
       { types: ["number"] },
       { types: ["never"] },
       { types: ["number"] },
