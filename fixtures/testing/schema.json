@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "valid": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "invalid": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "parse": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

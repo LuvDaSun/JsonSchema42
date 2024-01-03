@@ -251,6 +251,7 @@ function convertEntry(
           {
             id,
             type: "boolean",
+            options: model.options,
           },
         ];
 
@@ -260,6 +261,7 @@ function convertEntry(
           {
             id,
             type: "integer",
+            options: model.options,
           },
         ];
 
@@ -269,6 +271,7 @@ function convertEntry(
           {
             id,
             type: "number",
+            options: model.options,
           },
         ];
 
@@ -278,6 +281,7 @@ function convertEntry(
           {
             id,
             type: "string",
+            options: model.options,
           },
         ];
 

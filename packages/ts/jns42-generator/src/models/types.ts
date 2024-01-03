@@ -26,19 +26,19 @@ export interface Null extends Base<"null"> {
 }
 
 export interface Boolean extends Base<"boolean"> {
-  //
+  options?: boolean[];
 }
 
 export interface Integer extends Base<"integer"> {
-  //
+  options?: number[];
 }
 
 export interface Number extends Base<"number"> {
-  //
+  options?: number[];
 }
 
 export interface String extends Base<"string"> {
-  //
+  options?: string[];
 }
 
 export interface Tuple extends Base<"tuple"> {

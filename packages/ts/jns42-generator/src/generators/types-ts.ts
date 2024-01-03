@@ -78,18 +78,45 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: s
       yield "null";
       break;
 
-    case "boolean":
+    case "boolean": {
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          " |\n",
+        );
+        break;
+      }
+
       yield "boolean";
       break;
+    }
 
     case "integer":
-    case "number":
+    case "number": {
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          " |\n",
+        );
+        break;
+      }
+
       yield "number";
       break;
+    }
 
-    case "string":
+    case "string": {
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => JSON.stringify(option)),
+          " |\n",
+        );
+        break;
+      }
+
       yield "string";
       break;
+    }
 
     case "tuple": {
       yield itt`

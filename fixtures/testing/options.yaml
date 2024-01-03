@@ -1,0 +1,27 @@
+$schema: "./schema.json"
+
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    description: "An object"
+    oneOf:
+      - type: "string"
+        options: ["a", "b"]
+      - type: "integer"
+        options: [1, 2]
+      - type: "number"
+        options: [3, 4, 5]
+      - type: "boolean"
+        options: ["true"]
+
+valid:
+  a: a
+  "1": 1
+  "5": 5
+  "true": true
+
+invalid:
+  z: z
+  "1": "1"
+  "6": 6
+  "false": false

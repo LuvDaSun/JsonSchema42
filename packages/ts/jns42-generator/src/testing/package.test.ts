@@ -15,6 +15,7 @@ import { Namer, projectRoot, transformSchema } from "../utils/index.js";
 const packageNames = [
   // "not",
 
+  "options",
   "parse",
   "string-or-boolean",
   "simple-object",
