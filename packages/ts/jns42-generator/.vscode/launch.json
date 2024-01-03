@@ -22,9 +22,9 @@
         "package",
         "${file}",
         "--package-directory",
-        ".package/file",
+        ".package/file/${fileBasenameNoExtension}",
         "--package-name",
-        "file"
+        "${fileBasenameNoExtension}"
       ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
@@ -37,7 +37,14 @@
       "request": "launch",
       "name": "test fixture",
       "program": "${workspaceFolder}/src/program.ts",
-      "args": ["test", "${file}", "--package-directory", ".package/test", "--package-name", "test"],
+      "args": [
+        "test",
+        "${file}",
+        "--output-directory",
+        ".package/test",
+        "--package-name",
+        "${fileBasenameNoExtension}"
+      ],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],

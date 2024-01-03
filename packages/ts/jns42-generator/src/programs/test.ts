@@ -34,8 +34,8 @@ export function configureTestProgram(argv: yargs.Argv) {
           ] as const,
           default: schema202012.metaSchemaId,
         })
-        .option("package-directory", {
-          description: "where to output the package",
+        .option("output-directory", {
+          description: "where to output the packages",
           type: "string",
           demandOption: true,
         })
@@ -70,7 +70,7 @@ export function configureTestProgram(argv: yargs.Argv) {
 interface MainOptions {
   pathToTest: string;
   defaultMetaSchemaUrl: string;
-  packageDirectory: string;
+  outputDirectory: string;
   packageName: string;
   packageVersion?: string;
   defaultName: string;
@@ -82,7 +82,7 @@ async function main(options: MainOptions) {
   const pathToTest = path.resolve(options.pathToTest);
 
   const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-  const packageDirectoryRoot = path.resolve(options.packageDirectory);
+  const packageDirectoryRoot = path.resolve(options.outputDirectory);
   const { packageName, packageVersion, namerMaximumIterations, defaultName, anyOfHack } = options;
 
   const testUrl = new URL(`file://${pathToTest}`);
