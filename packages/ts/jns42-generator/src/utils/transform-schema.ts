@@ -174,8 +174,8 @@ export function transformSchema(
     result[newKey] = newItem;
   }
 
-  result["any"] = {
-    type: "any",
+  result["unknown"] = {
+    type: "unknown",
   };
   result["string"] = {
     type: "string",
@@ -304,7 +304,14 @@ function convertEntry(
           ];
         }
 
-        throw new TypeError("no type for array elements");
+        return [
+          mapKey(key),
+          {
+            id,
+            type: "array",
+            element: "unknown",
+          },
+        ];
       }
 
       case "map": {
@@ -352,7 +359,7 @@ function convertEntry(
             id,
             type: "map",
             name: "string",
-            element: "any",
+            element: "unknown",
           },
         ];
       }
