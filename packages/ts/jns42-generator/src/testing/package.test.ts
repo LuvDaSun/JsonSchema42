@@ -16,13 +16,13 @@ const packageNames = [
   // "not",
 
   "parse",
-  // "string-or-boolean",
-  // "simple-object",
-  // "all-of-object",
-  // "any-of-object",
-  // "one-of-object",
-  // "all-types",
-  // "all-of-one-of-object",
+  "string-or-boolean",
+  "simple-object",
+  "all-of-object",
+  "any-of-object",
+  "one-of-object",
+  "all-types",
+  "all-of-one-of-object",
 ];
 
 for (const packageName of packageNames) {

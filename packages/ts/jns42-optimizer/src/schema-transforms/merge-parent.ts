@@ -1,7 +1,8 @@
 import { SchemaArena, SchemaModelType, SchemaTransform } from "../schema/index.js";
+import { intersectionMerge, unionMerge } from "../utils/index.js";
 
 /**
- * Merges and resolves parent relations
+ * Resolves parent relations
  *
  */
 export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
@@ -19,6 +20,20 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
 
   const newModel = { ...model };
   delete newModel.parent;
+
+  newModel.types = mergeTypes(newModel.types, parentModel.types);
+  newModel.options = intersectionMerge(newModel.options, parentModel.options);
+  newModel.required = unionMerge(newModel.required, parentModel.required);
+  newModel.propertyNames = mergeKey(arena, newModel.propertyNames, parentModel.propertyNames);
+  newModel.contains = mergeKey(arena, newModel.contains, parentModel.contains);
+  newModel.tupleItems = mergeKeysArray(arena, newModel.tupleItems, parentModel.tupleItems);
+  newModel.arrayItems = mergeKey(arena, newModel.arrayItems, parentModel.arrayItems);
+  newModel.objectProperties = mergeKeysRecord(
+    arena,
+    newModel.objectProperties,
+    parentModel.objectProperties,
+  );
+  newModel.mapProperties = mergeKey(arena, newModel.mapProperties, parentModel.mapProperties);
 
   return newModel;
 };
