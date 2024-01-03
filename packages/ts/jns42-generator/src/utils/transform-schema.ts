@@ -144,9 +144,9 @@ export function transformSchema(
   while (
     arena.applyTransform(
       schemaTransforms.singleType,
-      // schemaTransforms.explode,
       schemaTransforms.flatten,
       schemaTransforms.alias,
+      schemaTransforms.flipAllOfOneOf,
       schemaTransforms.mergeAllOf,
       schemaTransforms.mergeAnyOf,
       schemaTransforms.mergeParent,

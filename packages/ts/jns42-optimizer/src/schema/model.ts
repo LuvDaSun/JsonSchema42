@@ -11,6 +11,7 @@ export type SchemaModelType =
   | "map";
 
 export type SchemaModel = {
+  $schema?: string;
   id?: string;
 
   alias?: SchemaModelKey;
@@ -57,6 +58,7 @@ export type SchemaModel = {
   minimumProperties?: number;
   maximumProperties?: number;
 };
+
 export type TypeModel = {
   id?: string;
   types: [SchemaModelType];
@@ -75,6 +77,7 @@ export function isType(model: SchemaModel): model is TypeModel {
     model,
     new Set(["types"]),
     new Set([
+      "$schema",
       "id",
       "objectProperties",
       "mapProperties",
@@ -102,7 +105,23 @@ export type ReferenceModel = {
   reference: SchemaModelKey;
 };
 export function isReference(model: SchemaModel): model is ReferenceModel {
-  return hasMembers(model, new Set(["reference"]), new Set(["id"]));
+  return hasMembers(
+    model,
+    new Set(["reference"]),
+    new Set([
+      "$schema",
+      "id",
+      "objectProperties",
+      "mapProperties",
+      "patternProperties",
+      "propertyNames",
+      "tupleItems",
+      "arrayItems",
+      "contains",
+      "required",
+      "options",
+    ]),
+  );
 }
 
 export type OneOfModel = {
@@ -110,7 +129,23 @@ export type OneOfModel = {
   oneOf: SchemaModelKey[];
 };
 export function isOneOf(model: SchemaModel): model is OneOfModel {
-  return hasMembers(model, new Set(["oneOf"]), new Set(["id"]));
+  return hasMembers(
+    model,
+    new Set(["oneOf"]),
+    new Set([
+      "$schema",
+      "id",
+      "objectProperties",
+      "mapProperties",
+      "patternProperties",
+      "propertyNames",
+      "tupleItems",
+      "arrayItems",
+      "contains",
+      "required",
+      "options",
+    ]),
+  );
 }
 
 export type AnyOfModel = {
@@ -118,7 +153,23 @@ export type AnyOfModel = {
   anyOf: SchemaModelKey[];
 };
 export function isAnyOf(model: SchemaModel): model is AnyOfModel {
-  return hasMembers(model, new Set(["anyOf"]), new Set(["id"]));
+  return hasMembers(
+    model,
+    new Set(["anyOf"]),
+    new Set([
+      "$schema",
+      "id",
+      "objectProperties",
+      "mapProperties",
+      "patternProperties",
+      "propertyNames",
+      "tupleItems",
+      "arrayItems",
+      "contains",
+      "required",
+      "options",
+    ]),
+  );
 }
 
 export type AllOfModel = {
@@ -126,7 +177,23 @@ export type AllOfModel = {
   allOf: SchemaModelKey[];
 };
 export function isAllOf(model: SchemaModel): model is AllOfModel {
-  return hasMembers(model, new Set(["allOf"]), new Set(["id"]));
+  return hasMembers(
+    model,
+    new Set(["allOf"]),
+    new Set([
+      "$schema",
+      "id",
+      "objectProperties",
+      "mapProperties",
+      "patternProperties",
+      "propertyNames",
+      "tupleItems",
+      "arrayItems",
+      "contains",
+      "required",
+      "options",
+    ]),
+  );
 }
 
 function hasMembers<T>(model: T, required = new Set<keyof T>(), optional = new Set<keyof T>()) {
