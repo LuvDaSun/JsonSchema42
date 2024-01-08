@@ -9,6 +9,9 @@ import {
 /**
  * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
  * will flip em! It will become a oneOf with an allOf in it.
+ *
+ * We can generate code for a oneOf with some allOfs in it, but for an allOf with
+ * a bunch of oneOfs, we cannot generate code.
  */
 export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
