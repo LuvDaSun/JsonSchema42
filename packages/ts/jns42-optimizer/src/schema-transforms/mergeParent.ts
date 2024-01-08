@@ -1,5 +1,5 @@
 import { SchemaTransform, mergeKeyAllOf, mergeTypes } from "../schema/index.js";
-import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
+import { intersectionMerge, unionMerge } from "../utils/index.js";
 
 /**
  * Resolves parent relations
@@ -8,6 +8,7 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  * and then removing the parent relation by setting it to undefined.
  *
  */
+
 export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
   // we need a parent
   if (model.parent == null) {
@@ -30,15 +31,17 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
   newModel.propertyNames = mergeKeyAllOf(arena, newModel.propertyNames, parentModel.propertyNames);
   newModel.contains = mergeKeyAllOf(arena, newModel.contains, parentModel.contains);
   newModel.tupleItems = mergeKeysArray(
+    arena,
     newModel.tupleItems,
     parentModel.tupleItems,
-    (key, otherKey) => mergeKeyAllOf(arena, key, otherKey),
+    mergeKeyAllOf,
   );
   newModel.arrayItems = mergeKeyAllOf(arena, newModel.arrayItems, parentModel.arrayItems);
   newModel.objectProperties = mergeKeysRecord(
+    arena,
     newModel.objectProperties,
     parentModel.objectProperties,
-    (key, otherKey) => mergeKeyAllOf(arena, key, otherKey),
+    mergeKeyAllOf,
   );
   newModel.mapProperties = mergeKeyAllOf(arena, newModel.mapProperties, parentModel.mapProperties);
 

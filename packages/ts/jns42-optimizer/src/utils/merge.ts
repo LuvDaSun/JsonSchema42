@@ -1,10 +1,3 @@
-export function intersectionMerge<T>(values: undefined, otherValues: undefined): undefined;
-export function intersectionMerge<T>(values: T[], otherValues: T[] | undefined): T[];
-export function intersectionMerge<T>(values: T[] | undefined, otherValues: T[]): T[];
-export function intersectionMerge<T>(
-  values: T[] | undefined,
-  otherValues: T[] | undefined,
-): T[] | undefined;
 export function intersectionMerge<T>(
   values: T[] | undefined,
   otherValues: T[] | undefined,
@@ -28,13 +21,6 @@ export function intersectionMerge<T>(
   return result;
 }
 
-export function unionMerge<T>(values: undefined, otherValues: undefined): undefined;
-export function unionMerge<T>(values: T[], otherValues: T[] | undefined): T[];
-export function unionMerge<T>(values: T[] | undefined, otherValues: T[]): T[];
-export function unionMerge<T>(
-  values: T[] | undefined,
-  otherValues: T[] | undefined,
-): T[] | undefined;
 export function unionMerge<T>(
   values: T[] | undefined,
   otherValues: T[] | undefined,
@@ -52,4 +38,62 @@ export function unionMerge<T>(
     set.add(value);
   }
   return [...set];
+}
+
+export function mergeKeysArray(
+  keys: number[] | undefined,
+  otherKeys: number[] | undefined,
+  mergeKey: (key: number | undefined, otherKey: number | undefined) => number | undefined,
+): number[] | undefined {
+  if (keys === otherKeys) {
+    return keys;
+  }
+
+  if (keys == null) {
+    return otherKeys;
+  }
+
+  if (otherKeys == null) {
+    return keys;
+  }
+
+  const resultKeys = new Array<number>();
+  const length = Math.max(keys.length, otherKeys.length);
+  for (let index = 0; index < length; index++) {
+    const key = mergeKey(keys[index], otherKeys[index]);
+    if (key == null) {
+      continue;
+    }
+    resultKeys.push(key);
+  }
+  return resultKeys;
+}
+
+export function mergeKeysRecord(
+  keys: Record<string, number> | undefined,
+  otherKeys: Record<string, number> | undefined,
+  mergeKey: (key: number | undefined, otherKey: number | undefined) => number | undefined,
+): Record<string, number> | undefined {
+  if (keys === otherKeys) {
+    return keys;
+  }
+
+  if (keys == null) {
+    return otherKeys;
+  }
+
+  if (otherKeys == null) {
+    return keys;
+  }
+
+  const resultKeys: Record<string, number> = {};
+  const propertyNames = new Set([...Object.keys(keys), ...Object.keys(otherKeys)]);
+  for (const propertyName of propertyNames) {
+    const key = mergeKey(keys[propertyName], otherKeys[propertyName]);
+    if (key == null) {
+      continue;
+    }
+    resultKeys[propertyName] = key;
+  }
+  return resultKeys;
 }

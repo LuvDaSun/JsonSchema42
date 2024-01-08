@@ -2,13 +2,14 @@ import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/inde
 
 /**
  * Turns the model into a single all-of with various
- * sub models in it.
+ * sub compound models in it.
  * This is useful for the rare case in wich a schema defines different compounds on a single
  * schema node. So if a schema has an allOf *and* a oneOf. This edge case is handled buy
  * exploding the schema into a schem of allOf with all of the compounds in it.
  *
  * this
  * ```yaml
+ * - reference: 10
  * - allOf
  *   - 100
  *   - 200
@@ -18,6 +19,9 @@ import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/inde
  * - oneOf
  *   - 500
  *   - 600
+ * - if: 700
+ *   then: 800
+ *   else: 900
  * ```
  *
  * will become
@@ -26,6 +30,10 @@ import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/inde
  *   - 1
  *   - 2
  *   - 3
+ *   - 4
+ *   - 5
+ * - parent: 0
+ *   reference: 10
  * - allOf
  *   parent: 0
  *   allOf
@@ -39,7 +47,11 @@ import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/inde
  *   oneOf
  *   - 500
  *   - 600
- *
+ * - parent: 0
+ *   if: 700
+ *   then: 800
+ *   else: 900
+
  * ```
  *
  */
