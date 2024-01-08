@@ -24,27 +24,26 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
   newModel.types = mergeTypes(newModel.types, parentModel.types);
   newModel.options = intersectionMerge(newModel.options, parentModel.options);
   newModel.required = unionMerge(newModel.required, parentModel.required);
-  newModel.propertyNames = mergeKey(arena, newModel.propertyNames, parentModel.propertyNames);
-  newModel.contains = mergeKey(arena, newModel.contains, parentModel.contains);
-  newModel.tupleItems = mergeKeysArray(arena, newModel.tupleItems, parentModel.tupleItems);
-  newModel.arrayItems = mergeKey(arena, newModel.arrayItems, parentModel.arrayItems);
+  newModel.propertyNames = mergeKeyAllOf(arena, newModel.propertyNames, parentModel.propertyNames);
+  newModel.contains = mergeKeyAllOf(arena, newModel.contains, parentModel.contains);
+  newModel.tupleItems = mergeKeysArray(
+    arena,
+    newModel.tupleItems,
+    parentModel.tupleItems,
+    mergeKeyAllOf,
+  );
+  newModel.arrayItems = mergeKeyAllOf(arena, newModel.arrayItems, parentModel.arrayItems);
   newModel.objectProperties = mergeKeysRecord(
     arena,
     newModel.objectProperties,
     parentModel.objectProperties,
+    mergeKeyAllOf,
   );
-  newModel.mapProperties = mergeKey(arena, newModel.mapProperties, parentModel.mapProperties);
+  newModel.mapProperties = mergeKeyAllOf(arena, newModel.mapProperties, parentModel.mapProperties);
 
   return newModel;
 };
 
-function mergeTypes(types: undefined, otherTypes: undefined): undefined;
-function mergeTypes(types: SchemaType[], otherTypes: SchemaType[] | undefined): SchemaType[];
-function mergeTypes(types: SchemaType[] | undefined, otherTypes: SchemaType[]): SchemaType[];
-function mergeTypes(
-  types: SchemaType[] | undefined,
-  otherTypes: SchemaType[] | undefined,
-): SchemaType[] | undefined;
 function mergeTypes(
   types: SchemaType[] | undefined,
   otherTypes: SchemaType[] | undefined,
@@ -87,16 +86,7 @@ function mergeTypes(
 
   return ["never"];
 }
-
-function mergeKey(arena: SchemaArena, key: undefined, otherKey: undefined): undefined;
-function mergeKey(arena: SchemaArena, key: number, otherKey: number | undefined): number;
-function mergeKey(arena: SchemaArena, key: number | undefined, otherKey: number): number;
-function mergeKey(
-  arena: SchemaArena,
-  key: number | undefined,
-  otherKey: number | undefined,
-): number | undefined;
-function mergeKey(
+function mergeKeyAllOf(
   arena: SchemaArena,
   key: number | undefined,
   otherKey: number | undefined,
@@ -119,26 +109,15 @@ function mergeKey(
   return newKey;
 }
 
-function mergeKeysArray(arena: SchemaArena, keys: undefined, otherKeys: undefined): undefined;
-function mergeKeysArray(
-  arena: SchemaArena,
-  keys: number[],
-  otherKeys: number[] | undefined,
-): number[];
-function mergeKeysArray(
-  arena: SchemaArena,
-  keys: number[] | undefined,
-  otherKeys: number[],
-): number[];
 function mergeKeysArray(
   arena: SchemaArena,
   keys: number[] | undefined,
   otherKeys: number[] | undefined,
-): number[] | undefined;
-function mergeKeysArray(
-  arena: SchemaArena,
-  keys: number[] | undefined,
-  otherKeys: number[] | undefined,
+  mergeKey: (
+    arena: SchemaArena,
+    key: number | undefined,
+    otherKey: number | undefined,
+  ) => number | undefined,
 ): number[] | undefined {
   if (keys === otherKeys) {
     return keys;
@@ -155,31 +134,24 @@ function mergeKeysArray(
   const resultKeys = new Array<number>();
   const length = Math.max(keys.length, otherKeys.length);
   for (let index = 0; index < length; index++) {
-    resultKeys.push(mergeKey(arena, keys[index], otherKeys[index]));
+    const key = mergeKey(arena, keys[index], otherKeys[index]);
+    if (key == null) {
+      continue;
+    }
+    resultKeys.push(key);
   }
   return resultKeys;
 }
 
-function mergeKeysRecord(arena: SchemaArena, keys: undefined, otherKeys: undefined): undefined;
-function mergeKeysRecord(
-  arena: SchemaArena,
-  keys: Record<string, number> | undefined,
-  otherKeys: Record<string, number>,
-): Record<string, number>;
-function mergeKeysRecord(
-  arena: SchemaArena,
-  keys: Record<string, number>,
-  otherKeys: Record<string, number> | undefined,
-): Record<string, number>;
 function mergeKeysRecord(
   arena: SchemaArena,
   keys: Record<string, number> | undefined,
   otherKeys: Record<string, number> | undefined,
-): Record<string, number> | undefined;
-function mergeKeysRecord(
-  arena: SchemaArena,
-  keys: Record<string, number> | undefined,
-  otherKeys: Record<string, number> | undefined,
+  mergeKey: (
+    arena: SchemaArena,
+    key: number | undefined,
+    otherKey: number | undefined,
+  ) => number | undefined,
 ): Record<string, number> | undefined {
   if (keys === otherKeys) {
     return keys;
@@ -196,7 +168,11 @@ function mergeKeysRecord(
   const resultKeys: Record<string, number> = {};
   const propertyNames = new Set([...Object.keys(keys), ...Object.keys(otherKeys)]);
   for (const propertyName of propertyNames) {
-    resultKeys[propertyName] = mergeKey(arena, keys[propertyName], otherKeys[propertyName]);
+    const key = mergeKey(arena, keys[propertyName], otherKeys[propertyName]);
+    if (key == null) {
+      continue;
+    }
+    resultKeys[propertyName] = key;
   }
   return resultKeys;
 }

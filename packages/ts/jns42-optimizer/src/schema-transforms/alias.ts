@@ -8,8 +8,7 @@ import {
 } from "../schema/index.js";
 
 /**
- * This transformer makes the types array into a single type. This is achieved by creating a
- * few new types with a single type and putting them in a oneOf.
+ * This transformer makes an alias if there is a single reference, allOf, anyOf or oneOf.
  *
  * ```yaml
  * - oneOf:

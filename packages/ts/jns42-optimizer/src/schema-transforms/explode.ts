@@ -1,8 +1,11 @@
 import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/index.js";
 
 /**
- * turns the model into a single all-of with various
- * sub models in it
+ * Turns the model into a single all-of with various
+ * sub models in it.
+ * This is useful for the rare case in wich a schema defines different compounds on a single
+ * schema node. So if a schema has an allOf *and* a oneOf. This edge case is handled buy
+ * exploding the schema into a schem of allOf with all of the compounds in it.
  *
  * this
  * ```yaml
