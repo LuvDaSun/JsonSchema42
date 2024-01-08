@@ -1,4 +1,9 @@
-import { SchemaTransform, isAllOf, isAnyOf, isOneOf } from "../schema/index.js";
+import {
+  SchemaTransform,
+  isAllOfSchemaModel,
+  isAnyOfSchemaModel,
+  isOneOfSchemaModel,
+} from "../schema/index.js";
 
 /**
  * Flattens nested allOf, anyOf, oneOf
@@ -30,12 +35,12 @@ import { SchemaTransform, isAllOf, isAnyOf, isOneOf } from "../schema/index.js";
 export const flatten: SchemaTransform = (arena, model, modelKey) => {
   const { id } = model;
 
-  if (isAllOf(model)) {
+  if (isAllOfSchemaModel(model)) {
     const elements = new Array<number>();
     for (const subKey of model.allOf) {
       const [, subModel] = arena.resolveItem(subKey);
 
-      if (isAllOf(subModel)) {
+      if (isAllOfSchemaModel(subModel)) {
         elements.push(...subModel.allOf);
       } else {
         elements.push(subKey);
@@ -49,12 +54,12 @@ export const flatten: SchemaTransform = (arena, model, modelKey) => {
     }
   }
 
-  if (isAnyOf(model)) {
+  if (isAnyOfSchemaModel(model)) {
     const elements = new Array<number>();
     for (const subKey of model.anyOf) {
       const [, subModel] = arena.resolveItem(subKey);
 
-      if (isAnyOf(subModel)) {
+      if (isAnyOfSchemaModel(subModel)) {
         elements.push(...subModel.anyOf);
       } else {
         elements.push(subKey);
@@ -68,12 +73,12 @@ export const flatten: SchemaTransform = (arena, model, modelKey) => {
     }
   }
 
-  if (isOneOf(model)) {
+  if (isOneOfSchemaModel(model)) {
     const elements = new Array<number>();
     for (const subKey of model.oneOf) {
       const [, subModel] = arena.resolveItem(subKey);
 
-      if (isOneOf(subModel)) {
+      if (isOneOfSchemaModel(subModel)) {
         elements.push(...subModel.oneOf);
       } else {
         elements.push(subKey);

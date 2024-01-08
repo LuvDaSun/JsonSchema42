@@ -1,5 +1,13 @@
-export type SchemaModelKey = number;
-export type SchemaModelType =
+import { isEmpty } from "../utils/index.js";
+
+/**
+ * Key for referencing other schemas
+ */
+export type SchemaKey = number;
+/**
+ * Type for the SchmaModel
+ */
+export type SchemaType =
   | "never"
   | "any"
   | "null"
@@ -9,36 +17,38 @@ export type SchemaModelType =
   | "string"
   | "array"
   | "map";
-
+/**
+ * the entire SchemaModel, everyting is optional!
+ */
 export type SchemaModel = {
   id?: string;
 
-  alias?: SchemaModelKey;
-  parent?: SchemaModelKey;
+  alias?: SchemaKey;
+  parent?: SchemaKey;
 
   title?: string;
   description?: string;
   examples?: any[];
   deprecated?: boolean;
 
-  types?: SchemaModelType[];
+  types?: SchemaType[];
 
-  reference?: SchemaModelKey;
-  oneOf?: SchemaModelKey[];
-  anyOf?: SchemaModelKey[];
-  allOf?: SchemaModelKey[];
-  if?: SchemaModelKey;
-  then?: SchemaModelKey;
-  else?: SchemaModelKey;
-  not?: SchemaModelKey;
-  dependentSchemas?: Record<string, SchemaModelKey>;
-  objectProperties?: Record<string, SchemaModelKey>;
-  mapProperties?: SchemaModelKey;
-  patternProperties?: Record<string, SchemaModelKey>;
-  propertyNames?: SchemaModelKey;
-  tupleItems?: SchemaModelKey[];
-  arrayItems?: SchemaModelKey;
-  contains?: SchemaModelKey;
+  reference?: SchemaKey;
+  oneOf?: SchemaKey[];
+  anyOf?: SchemaKey[];
+  allOf?: SchemaKey[];
+  if?: SchemaKey;
+  then?: SchemaKey;
+  else?: SchemaKey;
+  not?: SchemaKey;
+  dependentSchemas?: Record<string, SchemaKey>;
+  objectProperties?: Record<string, SchemaKey>;
+  mapProperties?: SchemaKey;
+  patternProperties?: Record<string, SchemaKey>;
+  propertyNames?: SchemaKey;
+  tupleItems?: SchemaKey[];
+  arrayItems?: SchemaKey;
+  contains?: SchemaKey;
   required?: string[];
   options?: any[];
 
@@ -58,20 +68,20 @@ export type SchemaModel = {
   maximumProperties?: number;
 };
 
-export type TypeModel = {
+export type SingleTypeSchemaModel = {
   id?: string;
-  types: [SchemaModelType];
-  objectProperties?: Record<string, SchemaModelKey>;
-  mapProperties?: SchemaModelKey;
-  patternProperties?: Record<string, SchemaModelKey>;
-  propertyNames?: SchemaModelKey;
-  tupleItems?: SchemaModelKey[];
-  arrayItems?: SchemaModelKey;
-  contains?: SchemaModelKey;
+  types: [SchemaType];
+  objectProperties?: Record<string, SchemaKey>;
+  mapProperties?: SchemaKey;
+  patternProperties?: Record<string, SchemaKey>;
+  propertyNames?: SchemaKey;
+  tupleItems?: SchemaKey[];
+  arrayItems?: SchemaKey;
+  contains?: SchemaKey;
   required?: string[];
   options?: any[];
 };
-export function isType(model: SchemaModel): model is TypeModel {
+export function isSingleTypeSchemaModel(model: SchemaModel): model is SingleTypeSchemaModel {
   return hasMembers(
     model,
     new Set(["types"]),
@@ -90,19 +100,19 @@ export function isType(model: SchemaModel): model is TypeModel {
   );
 }
 
-export type AliasModel = {
+export type AliasSchemaModel = {
   id?: string;
-  alias: SchemaModelKey;
+  alias: SchemaKey;
 };
-export function isAlias(model: SchemaModel): model is AliasModel {
+export function isAlias(model: SchemaModel): model is AliasSchemaModel {
   return hasMembers(model, new Set(["alias"]), new Set(["id"]));
 }
 
-export type ReferenceModel = {
+export type ReferenceSchemaModel = {
   id?: string;
-  reference: SchemaModelKey;
+  reference: SchemaKey;
 };
-export function isReference(model: SchemaModel): model is ReferenceModel {
+export function isReferenceSchemaModel(model: SchemaModel): model is ReferenceSchemaModel {
   return hasMembers(
     model,
     new Set(["reference"]),
@@ -121,11 +131,11 @@ export function isReference(model: SchemaModel): model is ReferenceModel {
   );
 }
 
-export type OneOfModel = {
+export type OneOfSchemaModel = {
   id?: string;
-  oneOf: SchemaModelKey[];
+  oneOf: SchemaKey[];
 };
-export function isOneOf(model: SchemaModel): model is OneOfModel {
+export function isOneOfSchemaModel(model: SchemaModel): model is OneOfSchemaModel {
   return hasMembers(
     model,
     new Set(["oneOf"]),
@@ -144,11 +154,11 @@ export function isOneOf(model: SchemaModel): model is OneOfModel {
   );
 }
 
-export type AnyOfModel = {
+export type AnyOfSchemaModel = {
   id?: string;
-  anyOf: SchemaModelKey[];
+  anyOf: SchemaKey[];
 };
-export function isAnyOf(model: SchemaModel): model is AnyOfModel {
+export function isAnyOfSchemaModel(model: SchemaModel): model is AnyOfSchemaModel {
   return hasMembers(
     model,
     new Set(["anyOf"]),
@@ -167,11 +177,11 @@ export function isAnyOf(model: SchemaModel): model is AnyOfModel {
   );
 }
 
-export type AllOfModel = {
+export type AllOfSchemaModel = {
   id?: string;
-  allOf: SchemaModelKey[];
+  allOf: SchemaKey[];
 };
-export function isAllOf(model: SchemaModel): model is AllOfModel {
+export function isAllOfSchemaModel(model: SchemaModel): model is AllOfSchemaModel {
   return hasMembers(
     model,
     new Set(["allOf"]),
@@ -193,7 +203,7 @@ export function isAllOf(model: SchemaModel): model is AllOfModel {
 function hasMembers<T>(model: T, required = new Set<keyof T>(), optional = new Set<keyof T>()) {
   let requiredCount = 0;
   for (const member in model) {
-    if (model[member] === undefined) {
+    if (isEmpty(model[member])) {
       continue;
     }
 

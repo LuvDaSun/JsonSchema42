@@ -1,4 +1,10 @@
-import { AllOfModel, OneOfModel, SchemaTransform, isAllOf, isOneOf } from "../schema/index.js";
+import {
+  AllOfSchemaModel,
+  OneOfSchemaModel,
+  SchemaTransform,
+  isAllOfSchemaModel,
+  isOneOfSchemaModel,
+} from "../schema/index.js";
 
 /**
  * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
@@ -6,7 +12,7 @@ import { AllOfModel, OneOfModel, SchemaTransform, isAllOf, isOneOf } from "../sc
  */
 export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (!isAllOf(model) || model.allOf.length < 2) {
+  if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
     return model;
   }
 
@@ -16,8 +22,8 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
 
   const baseElementEntries = model.allOf
     .map((element) => [element, arena.resolveItem(element)] as const)
-    .filter(([element, [, item]]) => isOneOf(item))
-    .map(([element, [, item]]) => [element, item as OneOfModel] as const);
+    .filter(([element, [, item]]) => isOneOfSchemaModel(item))
+    .map(([element, [, item]]) => [element, item as OneOfSchemaModel] as const);
   const leafElements = baseElementEntries.flatMap(([key, item]) => item.oneOf);
   if (leafElements.length < 2) {
     return model;
@@ -28,7 +34,7 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   for (const leafElement of leafElements) {
     const newLeafElements = [...model.allOf, leafElement].filter((key) => !baseElementSet.has(key));
 
-    const newLeafItem: AllOfModel = {
+    const newLeafItem: AllOfSchemaModel = {
       allOf: newLeafElements,
     };
     const newLeafKey = arena.addItem(newLeafItem);

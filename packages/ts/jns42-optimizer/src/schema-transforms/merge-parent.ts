@@ -1,4 +1,4 @@
-import { SchemaArena, SchemaModelType, SchemaTransform } from "../schema/index.js";
+import { SchemaArena, SchemaTransform, SchemaType } from "../schema/index.js";
 import { intersectionMerge, unionMerge } from "../utils/index.js";
 
 /**
@@ -39,22 +39,16 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
 };
 
 function mergeTypes(types: undefined, otherTypes: undefined): undefined;
+function mergeTypes(types: SchemaType[], otherTypes: SchemaType[] | undefined): SchemaType[];
+function mergeTypes(types: SchemaType[] | undefined, otherTypes: SchemaType[]): SchemaType[];
 function mergeTypes(
-  types: SchemaModelType[],
-  otherTypes: SchemaModelType[] | undefined,
-): SchemaModelType[];
+  types: SchemaType[] | undefined,
+  otherTypes: SchemaType[] | undefined,
+): SchemaType[] | undefined;
 function mergeTypes(
-  types: SchemaModelType[] | undefined,
-  otherTypes: SchemaModelType[],
-): SchemaModelType[];
-function mergeTypes(
-  types: SchemaModelType[] | undefined,
-  otherTypes: SchemaModelType[] | undefined,
-): SchemaModelType[] | undefined;
-function mergeTypes(
-  types: SchemaModelType[] | undefined,
-  otherTypes: SchemaModelType[] | undefined,
-): SchemaModelType[] | undefined {
+  types: SchemaType[] | undefined,
+  otherTypes: SchemaType[] | undefined,
+): SchemaType[] | undefined {
   if (types === otherTypes) {
     return types;
   }

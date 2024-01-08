@@ -1,9 +1,15 @@
 import assert from "assert";
-import { SchemaArena, SchemaModel, SchemaTransform, isAnyOf, isType } from "../schema/index.js";
+import {
+  SchemaArena,
+  SchemaModel,
+  SchemaTransform,
+  isAnyOfSchemaModel,
+  isSingleTypeSchemaModel,
+} from "../schema/index.js";
 import { intersectionMerge } from "../utils/index.js";
 
 export const mergeAnyOf: SchemaTransform = (arena, model, modelKey) => {
-  if (!isAnyOf(model) || model.anyOf.length < 2) {
+  if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
     return model;
   }
 
@@ -15,7 +21,7 @@ export const mergeAnyOf: SchemaTransform = (arena, model, modelKey) => {
   for (const elementKey of model.anyOf) {
     const [, elementModel] = arena.resolveItem(elementKey);
 
-    if (!isType(elementModel)) {
+    if (!isSingleTypeSchemaModel(elementModel)) {
       return model;
     }
 
@@ -36,7 +42,7 @@ export const mergeAnyOf: SchemaTransform = (arena, model, modelKey) => {
       const [, subModel] = arena.resolveItem(subKey);
 
       // this will never happen because of the isType guard earlier
-      assert(isType(subModel));
+      assert(isSingleTypeSchemaModel(subModel));
 
       // first pass
       if (newModel == null) {

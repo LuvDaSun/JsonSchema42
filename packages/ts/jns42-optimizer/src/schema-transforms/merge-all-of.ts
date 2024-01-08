@@ -1,9 +1,9 @@
 import {
   SchemaArena,
   SchemaModel,
-  SchemaModelType,
   SchemaTransform,
-  isType,
+  SchemaType,
+  isSingleTypeSchemaModel,
 } from "../schema/index.js";
 import { intersectionMerge, unionMerge } from "../utils/index.js";
 
@@ -46,7 +46,7 @@ export const mergeAllOf: SchemaTransform = (arena, model, modelKey) => {
   for (const subModelKey of model.allOf) {
     const [, subModel] = arena.resolveItem(subModelKey);
 
-    if (!isType(subModel)) {
+    if (!isSingleTypeSchemaModel(subModel)) {
       // we want to only only merge single types
       return model;
     }
@@ -76,22 +76,16 @@ export const mergeAllOf: SchemaTransform = (arena, model, modelKey) => {
 };
 
 function mergeTypes(types: undefined, otherTypes: undefined): undefined;
+function mergeTypes(types: SchemaType[], otherTypes: SchemaType[] | undefined): SchemaType[];
+function mergeTypes(types: SchemaType[] | undefined, otherTypes: SchemaType[]): SchemaType[];
 function mergeTypes(
-  types: SchemaModelType[],
-  otherTypes: SchemaModelType[] | undefined,
-): SchemaModelType[];
+  types: SchemaType[] | undefined,
+  otherTypes: SchemaType[] | undefined,
+): SchemaType[] | undefined;
 function mergeTypes(
-  types: SchemaModelType[] | undefined,
-  otherTypes: SchemaModelType[],
-): SchemaModelType[];
-function mergeTypes(
-  types: SchemaModelType[] | undefined,
-  otherTypes: SchemaModelType[] | undefined,
-): SchemaModelType[] | undefined;
-function mergeTypes(
-  types: SchemaModelType[] | undefined,
-  otherTypes: SchemaModelType[] | undefined,
-): SchemaModelType[] | undefined {
+  types: SchemaType[] | undefined,
+  otherTypes: SchemaType[] | undefined,
+): SchemaType[] | undefined {
   if (types === otherTypes) {
     return types;
   }

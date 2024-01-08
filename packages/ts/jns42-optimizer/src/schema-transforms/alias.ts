@@ -1,10 +1,10 @@
 import {
   SchemaTransform,
   isAlias,
-  isAllOf,
-  isAnyOf,
-  isOneOf,
-  isReference,
+  isAllOfSchemaModel,
+  isAnyOfSchemaModel,
+  isOneOfSchemaModel,
+  isReferenceSchemaModel,
 } from "../schema/index.js";
 
 /**
@@ -27,28 +27,28 @@ export const alias: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  if (isReference(model)) {
+  if (isReferenceSchemaModel(model)) {
     return {
       id: model.id,
       alias: model.reference,
     };
   }
 
-  if (isAllOf(model) && model.allOf.length === 1) {
+  if (isAllOfSchemaModel(model) && model.allOf.length === 1) {
     return {
       id: model.id,
       alias: model.allOf[0],
     };
   }
 
-  if (isAnyOf(model) && model.anyOf.length === 1) {
+  if (isAnyOfSchemaModel(model) && model.anyOf.length === 1) {
     return {
       id: model.id,
       alias: model.anyOf[0],
     };
   }
 
-  if (isOneOf(model) && model.oneOf.length === 1) {
+  if (isOneOfSchemaModel(model) && model.oneOf.length === 1) {
     return {
       id: model.id,
       alias: model.oneOf[0],
