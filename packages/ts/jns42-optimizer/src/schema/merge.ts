@@ -1,7 +1,7 @@
 import { SchemaArena } from "./arena.js";
 import { SchemaType } from "./model.js";
 
-export function mergeTypes(
+export function intersectionMergeTypes(
   types: SchemaType[] | undefined,
   otherTypes: SchemaType[] | undefined,
 ): SchemaType[] | undefined {

@@ -1,4 +1,4 @@
-import { SchemaTransform, mergeKeyAllOf, mergeTypes } from "../schema/index.js";
+import { SchemaTransform, intersectionMergeTypes } from "../schema/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
 
 /**
@@ -24,23 +24,38 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
   const newModel = { ...model };
   delete newModel.parent;
 
-  newModel.types = mergeTypes(newModel.types, parentModel.types);
+  const mergeKey = (key: number | undefined, otherKey: number | undefined): number | undefined => {
+    if (key === otherKey) {
+      return key;
+    }
+
+    if (key == null) {
+      return otherKey;
+    }
+    if (otherKey == null) {
+      return key;
+    }
+
+    const newModel = {
+      allOf: [key, otherKey],
+    };
+    const newKey = arena.addItem(newModel);
+    return newKey;
+  };
+
+  newModel.types = intersectionMergeTypes(newModel.types, parentModel.types);
   newModel.options = intersectionMerge(newModel.options, parentModel.options);
   newModel.required = unionMerge(newModel.required, parentModel.required);
-  newModel.propertyNames = mergeKeyAllOf(arena, newModel.propertyNames, parentModel.propertyNames);
-  newModel.contains = mergeKeyAllOf(arena, newModel.contains, parentModel.contains);
-  newModel.tupleItems = mergeKeysArray(
-    newModel.tupleItems,
-    parentModel.tupleItems,
-    (key, otherKey) => mergeKeyAllOf(arena, key, otherKey),
-  );
-  newModel.arrayItems = mergeKeyAllOf(arena, newModel.arrayItems, parentModel.arrayItems);
+  newModel.propertyNames = mergeKey(newModel.propertyNames, parentModel.propertyNames);
+  newModel.contains = mergeKey(newModel.contains, parentModel.contains);
+  newModel.tupleItems = mergeKeysArray(newModel.tupleItems, parentModel.tupleItems, mergeKey);
+  newModel.arrayItems = mergeKey(newModel.arrayItems, parentModel.arrayItems);
   newModel.objectProperties = mergeKeysRecord(
     newModel.objectProperties,
     parentModel.objectProperties,
-    (key, otherKey) => mergeKeyAllOf(arena, key, otherKey),
+    mergeKey,
   );
-  newModel.mapProperties = mergeKeyAllOf(arena, newModel.mapProperties, parentModel.mapProperties);
+  newModel.mapProperties = mergeKey(newModel.mapProperties, parentModel.mapProperties);
 
   return newModel;
 };
