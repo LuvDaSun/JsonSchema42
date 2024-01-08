@@ -11,7 +11,6 @@ export type SchemaModelType =
   | "map";
 
 export type SchemaModel = {
-  $schema?: string;
   id?: string;
 
   alias?: SchemaModelKey;
@@ -77,7 +76,6 @@ export function isType(model: SchemaModel): model is TypeModel {
     model,
     new Set(["types"]),
     new Set([
-      "$schema",
       "id",
       "objectProperties",
       "mapProperties",
@@ -109,7 +107,6 @@ export function isReference(model: SchemaModel): model is ReferenceModel {
     model,
     new Set(["reference"]),
     new Set([
-      "$schema",
       "id",
       "objectProperties",
       "mapProperties",
@@ -133,7 +130,6 @@ export function isOneOf(model: SchemaModel): model is OneOfModel {
     model,
     new Set(["oneOf"]),
     new Set([
-      "$schema",
       "id",
       "objectProperties",
       "mapProperties",
@@ -157,7 +153,6 @@ export function isAnyOf(model: SchemaModel): model is AnyOfModel {
     model,
     new Set(["anyOf"]),
     new Set([
-      "$schema",
       "id",
       "objectProperties",
       "mapProperties",
@@ -181,7 +176,6 @@ export function isAllOf(model: SchemaModel): model is AllOfModel {
     model,
     new Set(["allOf"]),
     new Set([
-      "$schema",
       "id",
       "objectProperties",
       "mapProperties",
