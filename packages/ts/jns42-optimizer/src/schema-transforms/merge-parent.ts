@@ -24,7 +24,23 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
   const newModel = { ...model };
   delete newModel.parent;
 
-  const mergeKey = (key: number | undefined, otherKey: number | undefined): number | undefined => {
+  newModel.types = intersectionMergeTypes(newModel.types, parentModel.types);
+  newModel.options = intersectionMerge(newModel.options, parentModel.options);
+  newModel.required = unionMerge(newModel.required, parentModel.required);
+  newModel.propertyNames = mergeKey(newModel.propertyNames, parentModel.propertyNames);
+  newModel.contains = mergeKey(newModel.contains, parentModel.contains);
+  newModel.tupleItems = mergeKeysArray(newModel.tupleItems, parentModel.tupleItems, mergeKey);
+  newModel.arrayItems = mergeKey(newModel.arrayItems, parentModel.arrayItems);
+  newModel.objectProperties = mergeKeysRecord(
+    newModel.objectProperties,
+    parentModel.objectProperties,
+    mergeKey,
+  );
+  newModel.mapProperties = mergeKey(newModel.mapProperties, parentModel.mapProperties);
+
+  return newModel;
+
+  function mergeKey(key: number | undefined, otherKey: number | undefined): number | undefined {
     if (key === otherKey) {
       return key;
     }
@@ -41,21 +57,5 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
     };
     const newKey = arena.addItem(newModel);
     return newKey;
-  };
-
-  newModel.types = intersectionMergeTypes(newModel.types, parentModel.types);
-  newModel.options = intersectionMerge(newModel.options, parentModel.options);
-  newModel.required = unionMerge(newModel.required, parentModel.required);
-  newModel.propertyNames = mergeKey(newModel.propertyNames, parentModel.propertyNames);
-  newModel.contains = mergeKey(newModel.contains, parentModel.contains);
-  newModel.tupleItems = mergeKeysArray(newModel.tupleItems, parentModel.tupleItems, mergeKey);
-  newModel.arrayItems = mergeKey(newModel.arrayItems, parentModel.arrayItems);
-  newModel.objectProperties = mergeKeysRecord(
-    newModel.objectProperties,
-    parentModel.objectProperties,
-    mergeKey,
-  );
-  newModel.mapProperties = mergeKey(newModel.mapProperties, parentModel.mapProperties);
-
-  return newModel;
+  }
 };
