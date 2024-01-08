@@ -1,6 +1,6 @@
 import {
   SchemaTransform,
-  isAlias,
+  isAliasSchemaModel,
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
   isOneOfSchemaModel,
@@ -23,7 +23,7 @@ import {
  * ```
  */
 export const alias: SchemaTransform = (arena, model, modelKey) => {
-  if (isAlias(model)) {
+  if (isAliasSchemaModel(model)) {
     return model;
   }
 

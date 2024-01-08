@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform, isAlias } from "../schema/index.js";
+import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/index.js";
 
 /**
  * turns the model into a single all-of with various
@@ -41,7 +41,7 @@ import { SchemaModel, SchemaTransform, isAlias } from "../schema/index.js";
  *
  */
 export const explode: SchemaTransform = (arena, model, modelKey) => {
-  if (isAlias(model)) {
+  if (isAliasSchemaModel(model)) {
     return model;
   }
 
