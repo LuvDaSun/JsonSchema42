@@ -1,4 +1,8 @@
 import {
+  AllOfSchemaModel,
+  AnyOfSchemaModel,
+  OneOfSchemaModel,
+  SchemaModel,
   SchemaTransform,
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
@@ -13,11 +17,11 @@ import {
  *   - 1
  *   - 2
  * - parent: 0
- *    oneOf:
+ *   oneOf:
  *   - 200
  *   - 300
  * - parent: 0
- * - oneOf:
+ *   oneOf:
  *   - 400
  *   - 500
  * ```
@@ -33,62 +37,60 @@ import {
  * ```
  */
 export const flatten: SchemaTransform = (arena, model, modelKey) => {
-  const { id } = model;
-
   if (isAllOfSchemaModel(model)) {
-    const elements = new Array<number>();
+    const newModel: SchemaModel & AllOfSchemaModel = {
+      ...model,
+      allOf: [],
+    };
     for (const subKey of model.allOf) {
       const [, subModel] = arena.resolveItem(subKey);
 
       if (isAllOfSchemaModel(subModel)) {
-        elements.push(...subModel.allOf);
+        newModel.allOf.push(...subModel.allOf);
       } else {
-        elements.push(subKey);
+        newModel.allOf.push(subKey);
       }
     }
-    if (elements.length > model.allOf.length) {
-      return {
-        id,
-        allOf: elements,
-      };
+    if (newModel.allOf.length > model.allOf.length) {
+      return newModel;
     }
   }
 
   if (isAnyOfSchemaModel(model)) {
-    const elements = new Array<number>();
+    const newModel: SchemaModel & AnyOfSchemaModel = {
+      ...model,
+      anyOf: [],
+    };
     for (const subKey of model.anyOf) {
       const [, subModel] = arena.resolveItem(subKey);
 
       if (isAnyOfSchemaModel(subModel)) {
-        elements.push(...subModel.anyOf);
+        newModel.anyOf.push(...subModel.anyOf);
       } else {
-        elements.push(subKey);
+        newModel.anyOf.push(subKey);
       }
     }
-    if (elements.length > model.anyOf.length) {
-      return {
-        id,
-        anyOf: elements,
-      };
+    if (newModel.anyOf.length > model.anyOf.length) {
+      return newModel;
     }
   }
 
   if (isOneOfSchemaModel(model)) {
-    const elements = new Array<number>();
+    const newModel: SchemaModel & OneOfSchemaModel = {
+      ...model,
+      oneOf: [],
+    };
     for (const subKey of model.oneOf) {
       const [, subModel] = arena.resolveItem(subKey);
 
       if (isOneOfSchemaModel(subModel)) {
-        elements.push(...subModel.oneOf);
+        newModel.oneOf.push(...subModel.oneOf);
       } else {
-        elements.push(subKey);
+        newModel.oneOf.push(subKey);
       }
     }
-    if (elements.length > model.oneOf.length) {
-      return {
-        id,
-        oneOf: elements,
-      };
+    if (newModel.oneOf.length > model.oneOf.length) {
+      return newModel;
     }
   }
 
