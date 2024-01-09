@@ -56,19 +56,22 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
       continue;
     }
 
-    newModel.types = intersectionMergeTypes(newModel.types, subModel.types);
-    newModel.options = intersectionMerge(newModel.options, subModel.options);
-    newModel.required = unionMerge(newModel.required, subModel.required);
-    newModel.propertyNames = mergeKey(newModel.propertyNames, subModel.propertyNames);
-    newModel.contains = mergeKey(newModel.contains, subModel.contains);
-    newModel.tupleItems = mergeKeysArray(newModel.tupleItems, subModel.tupleItems, mergeKey);
-    newModel.arrayItems = mergeKey(newModel.arrayItems, subModel.arrayItems);
-    newModel.objectProperties = mergeKeysRecord(
-      newModel.objectProperties,
-      subModel.objectProperties,
-      mergeKey,
-    );
-    newModel.mapProperties = mergeKey(newModel.mapProperties, subModel.mapProperties);
+    newModel = {
+      ...newModel,
+      types: intersectionMergeTypes(newModel.types, subModel.types),
+      options: intersectionMerge(newModel.options, subModel.options),
+      required: unionMerge(newModel.required, subModel.required),
+      propertyNames: mergeKey(newModel.propertyNames, subModel.propertyNames),
+      contains: mergeKey(newModel.contains, subModel.contains),
+      tupleItems: mergeKeysArray(newModel.tupleItems, subModel.tupleItems, mergeKey),
+      arrayItems: mergeKey(newModel.arrayItems, subModel.arrayItems),
+      objectProperties: mergeKeysRecord(
+        newModel.objectProperties,
+        subModel.objectProperties,
+        mergeKey,
+      ),
+      mapProperties: mergeKey(newModel.mapProperties, subModel.mapProperties),
+    };
   }
 
   return newModel;

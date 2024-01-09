@@ -13,8 +13,6 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  const { id } = model;
-
   const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], anyOf: undefined };
 
   // first we group elements by their type
@@ -53,22 +51,21 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
         continue;
       }
 
-      newSubModel.options = intersectionMerge(newSubModel.options, subModel.options);
-      newSubModel.required = intersectionMerge(newSubModel.required, subModel.required);
-      newSubModel.propertyNames = mergeKey(newSubModel.propertyNames, subModel.propertyNames);
-      newSubModel.contains = mergeKey(newSubModel.contains, subModel.contains);
-      newSubModel.tupleItems = mergeKeysArray(
-        newSubModel.tupleItems,
-        subModel.tupleItems,
-        mergeKey,
-      );
-      newSubModel.arrayItems = mergeKey(newSubModel.arrayItems, subModel.arrayItems);
-      newSubModel.objectProperties = mergeKeysRecord(
-        newSubModel.objectProperties,
-        subModel.objectProperties,
-        mergeKey,
-      );
-      newSubModel.mapProperties = mergeKey(newSubModel.mapProperties, subModel.mapProperties);
+      newSubModel = {
+        ...newSubModel,
+        options: intersectionMerge(newSubModel.options, subModel.options),
+        required: intersectionMerge(newSubModel.required, subModel.required),
+        propertyNames: mergeKey(newSubModel.propertyNames, subModel.propertyNames),
+        contains: mergeKey(newSubModel.contains, subModel.contains),
+        tupleItems: mergeKeysArray(newSubModel.tupleItems, subModel.tupleItems, mergeKey),
+        arrayItems: mergeKey(newSubModel.arrayItems, subModel.arrayItems),
+        objectProperties: mergeKeysRecord(
+          newSubModel.objectProperties,
+          subModel.objectProperties,
+          mergeKey,
+        ),
+        mapProperties: mergeKey(newSubModel.mapProperties, subModel.mapProperties),
+      };
     }
 
     const newSubKey = arena.addItem(newSubModel);

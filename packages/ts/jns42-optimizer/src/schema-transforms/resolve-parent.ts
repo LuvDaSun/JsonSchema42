@@ -14,34 +14,35 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  *
  */
 export const resolveParent: SchemaTransform = (arena, model, modelKey) => {
-  // we need a parent
+  // we need to have a parent, we need to be a child
   if (!isChildSchemaModel(model)) {
     return model;
   }
 
   const [, parentModel] = arena.resolveItem(model.parent);
 
-  // we don't want the parent to have a parent
-  if (parentModel.parent != null) {
+  // we don't want the parent to be a child (aka have a parent)
+  if (isChildSchemaModel(parentModel)) {
     return model;
   }
 
-  const newModel: SchemaModel = { ...model };
-  delete newModel.parent;
-
-  newModel.types = intersectionMergeTypes(newModel.types, parentModel.types);
-  newModel.options = intersectionMerge(newModel.options, parentModel.options);
-  newModel.required = unionMerge(newModel.required, parentModel.required);
-  newModel.propertyNames = mergeKey(newModel.propertyNames, parentModel.propertyNames);
-  newModel.contains = mergeKey(newModel.contains, parentModel.contains);
-  newModel.tupleItems = mergeKeysArray(newModel.tupleItems, parentModel.tupleItems, mergeKey);
-  newModel.arrayItems = mergeKey(newModel.arrayItems, parentModel.arrayItems);
-  newModel.objectProperties = mergeKeysRecord(
-    newModel.objectProperties,
-    parentModel.objectProperties,
-    mergeKey,
-  );
-  newModel.mapProperties = mergeKey(newModel.mapProperties, parentModel.mapProperties);
+  const newModel: SchemaModel = {
+    ...model,
+    parent: undefined,
+    types: intersectionMergeTypes(model.types, parentModel.types),
+    options: intersectionMerge(model.options, parentModel.options),
+    required: unionMerge(model.required, parentModel.required),
+    propertyNames: mergeKey(model.propertyNames, parentModel.propertyNames),
+    contains: mergeKey(model.contains, parentModel.contains),
+    tupleItems: mergeKeysArray(model.tupleItems, parentModel.tupleItems, mergeKey),
+    arrayItems: mergeKey(model.arrayItems, parentModel.arrayItems),
+    objectProperties: mergeKeysRecord(
+      model.objectProperties,
+      parentModel.objectProperties,
+      mergeKey,
+    ),
+    mapProperties: mergeKey(model.mapProperties, parentModel.mapProperties),
+  };
 
   return newModel;
 

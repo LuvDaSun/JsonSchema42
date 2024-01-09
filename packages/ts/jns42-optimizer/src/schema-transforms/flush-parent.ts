@@ -8,8 +8,8 @@ import {
 } from "../schema/index.js";
 
 /**
- * Flushes unused type properties from parents by first checking if all children have
- * successfully merged those properties. This applies to reference, allOf, anyOf, oneOf
+ * Flushes type properties from parents if the children have no parent relationship
+ * anymore. This applies to reference, allOf, anyOf, oneOf
  * schema models.
  *
  * ```yaml
