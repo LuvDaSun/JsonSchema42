@@ -24,7 +24,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
   for (const subKey of model.anyOf) {
     const [, subModel] = arena.resolveItem(subKey);
 
-    if (!isSingleTypeSchemaModel(subModel)) {
+    if (!isSingleTypeSchemaModel(subModel) || subModel.types == null) {
       // we can only work with single types
       return model;
     }
@@ -47,7 +47,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
       const [, subModel] = arena.resolveItem(subKey);
 
       // this will never happen because of the isSingleType guard earlier
-      assert(isSingleTypeSchemaModel(subModel));
+      assert(isSingleTypeSchemaModel(subModel) && subModel.types !== null);
 
       // first pass
       if (newSubModel == null) {

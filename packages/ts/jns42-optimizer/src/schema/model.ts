@@ -148,11 +148,10 @@ export function isTypeSchemaModel(model: SchemaModel): model is TypeSchemaModel 
 export type SingleTypeSchemaModel = Partial<TypeSchemaModel & MetaSchemaModel> & {
   types: [SchemaType];
 };
-export const singleTypeSchemaRequired = ["types"] as const;
 export function isSingleTypeSchemaModel(model: SchemaModel): model is SingleTypeSchemaModel {
   return (
-    hasMembers(model, singleTypeSchemaRequired, [...typeSchemaOptional, ...metaSchemaOptional]) &&
-    model.types!.length == 1
+    hasMembers(model, [], [...typeSchemaOptional, ...metaSchemaOptional]) &&
+    (model.types == null || model.types.length === 1)
   );
 }
 
