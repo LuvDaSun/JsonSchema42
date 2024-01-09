@@ -69,7 +69,7 @@ export const flushParent: SchemaTransform = (arena, model, modelKey) => {
 
   if (isReferenceSchemaModel(model)) {
     const [, subModel] = arena.resolveItem(model.reference);
-    if (isChildSchemaModel(subModel)) {
+    if (!isChildSchemaModel(subModel)) {
       return model;
     }
     return newModel;
@@ -78,7 +78,7 @@ export const flushParent: SchemaTransform = (arena, model, modelKey) => {
   if (isAllOfSchemaModel(model)) {
     for (const subKey of model.allOf) {
       const [, subModel] = arena.resolveItem(subKey);
-      if (isChildSchemaModel(subModel)) {
+      if (!isChildSchemaModel(subModel)) {
         return model;
       }
     }
@@ -88,7 +88,7 @@ export const flushParent: SchemaTransform = (arena, model, modelKey) => {
   if (isAnyOfSchemaModel(model)) {
     for (const subKey of model.anyOf) {
       const [, subModel] = arena.resolveItem(subKey);
-      if (isChildSchemaModel(subModel)) {
+      if (!isChildSchemaModel(subModel)) {
         return model;
       }
     }
@@ -98,7 +98,7 @@ export const flushParent: SchemaTransform = (arena, model, modelKey) => {
   if (isOneOfSchemaModel(model)) {
     for (const subKey of model.oneOf) {
       const [, subModel] = arena.resolveItem(subKey);
-      if (isChildSchemaModel(subModel)) {
+      if (!isChildSchemaModel(subModel)) {
         return model;
       }
     }

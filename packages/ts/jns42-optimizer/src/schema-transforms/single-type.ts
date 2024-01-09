@@ -2,6 +2,7 @@ import {
   SchemaModel,
   SchemaTransform,
   isAliasSchemaModel,
+  isSingleTypeSchemaModel,
   isTypeSchemaModel,
 } from "../schema/index.js";
 
@@ -31,6 +32,10 @@ import {
  */
 export const singleType: SchemaTransform = (arena, model, modelKey) => {
   if (isAliasSchemaModel(model)) {
+    return model;
+  }
+
+  if (isSingleTypeSchemaModel(model)) {
     return model;
   }
 
