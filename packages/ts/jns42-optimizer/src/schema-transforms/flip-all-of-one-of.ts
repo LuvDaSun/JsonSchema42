@@ -1,6 +1,7 @@
 import {
   AllOfSchemaModel,
   OneOfSchemaModel,
+  SchemaModel,
   SchemaTransform,
   isAllOfSchemaModel,
   isOneOfSchemaModel,
@@ -19,9 +20,7 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  const { id } = model;
-
-  const newElements = new Array<number>();
+  const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], allOf: undefined };
 
   const baseElementEntries = model.allOf
     .map((element) => [element, arena.resolveItem(element)] as const)
@@ -36,16 +35,12 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
 
   for (const leafElement of leafElements) {
     const newLeafElements = [...model.allOf, leafElement].filter((key) => !baseElementSet.has(key));
-
-    const newLeafItem: AllOfSchemaModel = {
+    const newLeafModel: AllOfSchemaModel = {
       allOf: newLeafElements,
     };
-    const newLeafKey = arena.addItem(newLeafItem);
-    newElements.push(newLeafKey);
+    const newLeafKey = arena.addItem(newLeafModel);
+    newModel.oneOf.push(newLeafKey);
   }
 
-  return {
-    id,
-    oneOf: newElements,
-  };
+  return newModel;
 };

@@ -1,4 +1,9 @@
-import { SchemaTransform, intersectionMergeTypes } from "../schema/index.js";
+import {
+  SchemaModel,
+  SchemaTransform,
+  intersectionMergeTypes,
+  isChildSchemaModel,
+} from "../schema/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
 
 /**
@@ -10,7 +15,7 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  */
 export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
   // we need a parent
-  if (model.parent == null) {
+  if (!isChildSchemaModel(model)) {
     return model;
   }
 
@@ -21,7 +26,7 @@ export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  const newModel = { ...model };
+  const newModel: SchemaModel = { ...model };
   delete newModel.parent;
 
   newModel.types = intersectionMergeTypes(newModel.types, parentModel.types);

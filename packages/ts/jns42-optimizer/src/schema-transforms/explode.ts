@@ -1,4 +1,9 @@
-import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../schema/index.js";
+import {
+  AllOfSchemaModel,
+  SchemaModel,
+  SchemaTransform,
+  isAliasSchemaModel,
+} from "../schema/index.js";
 
 /**
  * Turns the model into a single all-of with various
@@ -82,16 +87,16 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  let newModel = { ...model };
-  delete newModel.reference;
-  delete newModel.allOf;
-  delete newModel.anyOf;
-  delete newModel.oneOf;
-  delete newModel.if;
-  delete newModel.then;
-  delete newModel.else;
-
-  newModel.allOf = [];
+  const newModel: SchemaModel & AllOfSchemaModel = {
+    ...model,
+    reference: undefined,
+    allOf: [],
+    anyOf: undefined,
+    oneOf: undefined,
+    if: undefined,
+    then: undefined,
+    else: undefined,
+  };
 
   if (model.reference != null) {
     const newSubModel: SchemaModel = {

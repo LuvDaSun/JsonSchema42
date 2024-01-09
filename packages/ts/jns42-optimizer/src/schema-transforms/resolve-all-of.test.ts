@@ -1,18 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SchemaArena } from "../schema/index.js";
+import { SchemaArena } from "../schema/arena.js";
 import { normalizeObject } from "../utils/index.js";
-import { mergeAnyOf } from "./merge-any-of.js";
+import * as transforms from "./index.js";
 
-const useTransforms = [mergeAnyOf];
+const useTransforms = [transforms.mergeAllOf, transforms.alias];
 
-test("merge-any-of utility", () => {
+test("resolve-all-of utility", () => {
   const arena = new SchemaArena();
   const n = arena.addItem({ types: ["never"] });
   const a = arena.addItem({ types: ["any"] });
   const num = arena.addItem({ types: ["number"] });
-  arena.addItem({ anyOf: [num, n] });
-  arena.addItem({ anyOf: [num, a] });
+  arena.addItem({ allOf: [num, n] });
+  arena.addItem({ allOf: [num, a] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -23,20 +23,35 @@ test("merge-any-of utility", () => {
       { types: ["never"] },
       { types: ["any"] },
       { types: ["number"] },
-      { oneOf: [num, n] },
-      { oneOf: [num, a] },
+      { types: ["never"] },
+      { types: ["number"] },
     ],
   );
 });
 
-test("merge-any-of primitive", () => {
+test("resolve-all-of alias", () => {
   const arena = new SchemaArena();
-  arena.addItem({ types: ["number"] }); // 0
-  arena.addItem({ types: ["string"] }); // 1
-  arena.addItem({ types: ["string"] }); // 2
-  arena.addItem({ types: ["string"] }); // 3
-  arena.addItem({ anyOf: [0, 1] }); // 4
-  arena.addItem({ anyOf: [2, 3] }); // 5
+  const str1 = arena.addItem({ types: ["string"] });
+  const str2 = arena.addItem({ types: ["string"] });
+  const allOf1 = arena.addItem({ allOf: [str2] });
+  arena.addItem({ allOf: [str1, allOf1] });
+
+  while (arena.applyTransform(...useTransforms) > 0);
+
+  assert.deepEqual(
+    [...arena].map(([k, v]) => normalizeObject(v)),
+
+    [{ types: ["string"] }, { types: ["string"] }, { alias: str2 }, { types: ["string"] }],
+  );
+});
+
+test("resolve-all-of primitive", () => {
+  const arena = new SchemaArena();
+  const num = arena.addItem({ types: ["number"] });
+  const str1 = arena.addItem({ types: ["string"] });
+  const str2 = arena.addItem({ types: ["string"] });
+  arena.addItem({ allOf: [num, str1] });
+  arena.addItem({ allOf: [str1, str2] });
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -44,18 +59,16 @@ test("merge-any-of primitive", () => {
     [...arena].map(([k, v]) => normalizeObject(v)),
 
     [
-      { types: ["number"] }, // 0
-      { types: ["string"] }, // 1
-      { types: ["string"] }, // 2
-      { types: ["string"] }, // 3
-      { oneOf: [0, 1] }, // 4
-      { oneOf: [6] }, // 5
-      { types: ["string"] }, // 6
+      { types: ["number"] },
+      { types: ["string"] },
+      { types: ["string"] },
+      { types: ["never"] },
+      { types: ["string"] },
     ],
   );
 });
 
-test("merge-any-of tuple", () => {
+test("resolve-all-of tuple", () => {
   const arena = new SchemaArena();
   arena.addItem({ types: ["number"] }); // 0
   arena.addItem({ types: ["string"] }); // 1
@@ -63,7 +76,7 @@ test("merge-any-of tuple", () => {
   arena.addItem({ types: ["string"] }); // 3
   arena.addItem({ types: ["array"], tupleItems: [0, 1] }); // 4
   arena.addItem({ types: ["array"], tupleItems: [2, 3] }); // 5
-  arena.addItem({ anyOf: [4, 5] }); // 6
+  arena.addItem({ allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -77,22 +90,20 @@ test("merge-any-of tuple", () => {
       { types: ["string"] }, // 3
       { types: ["array"], tupleItems: [0, 1] }, // 4
       { types: ["array"], tupleItems: [2, 3] }, // 5
-      { oneOf: [9] }, // 6
-      { oneOf: [0, 2] }, // 7
-      { oneOf: [10] }, // 8
-      { types: ["array"], tupleItems: [7, 8] }, // 9
-      { types: ["string"] }, // 10
+      { types: ["array"], tupleItems: [7, 8] }, // 6
+      { types: ["never"] }, // 7
+      { types: ["string"] }, // 8
     ],
   );
 });
 
-test("merge-any-of array", () => {
+test("resolve-all-of array", () => {
   const arena = new SchemaArena();
   arena.addItem({ types: ["number"] }); // 0
   arena.addItem({ types: ["string"] }); // 1
   arena.addItem({ types: ["array"], arrayItems: 0 }); // 2
   arena.addItem({ types: ["array"], arrayItems: 1 }); // 3
-  arena.addItem({ anyOf: [2, 3] }); // 4
+  arena.addItem({ allOf: [2, 3] }); // 4
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -104,14 +115,13 @@ test("merge-any-of array", () => {
       { types: ["string"] }, // 1
       { types: ["array"], arrayItems: 0 }, // 2
       { types: ["array"], arrayItems: 1 }, // 3
-      { oneOf: [6] }, // 4
-      { oneOf: [0, 1] }, // 5
-      { types: ["array"], arrayItems: 5 }, // 6
+      { types: ["array"], arrayItems: 5 }, // 4
+      { types: ["never"] }, // 5
     ],
   );
 });
 
-test("merge-any-of object", () => {
+test("resolve-all-of object", () => {
   const arena = new SchemaArena();
   arena.addItem({ types: ["number"] }); // 0
   arena.addItem({ types: ["string"] }); // 1
@@ -132,7 +142,7 @@ test("merge-any-of object", () => {
       c: 3,
     },
   }); // 5
-  arena.addItem({ anyOf: [4, 5] }); // 6
+  arena.addItem({ allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -159,8 +169,6 @@ test("merge-any-of object", () => {
           c: 3,
         },
       }, // 5
-      { oneOf: [8] }, // 6
-      { oneOf: [9] }, // 7
       {
         types: ["map"],
         required: ["b"],
@@ -169,13 +177,13 @@ test("merge-any-of object", () => {
           b: 7,
           c: 3,
         },
-      }, // 8
-      { types: ["string"] }, // 9
+      }, // 6
+      { types: ["string"] }, // 7
     ],
   );
 });
 
-test("merge-any-of map", () => {
+test("resolve-all-of map", () => {
   const arena = new SchemaArena();
   arena.addItem({ types: ["string"] }); // 0
   arena.addItem({ types: ["string"] }); // 1
@@ -183,7 +191,7 @@ test("merge-any-of map", () => {
   arena.addItem({ types: ["number"] }); // 3
   arena.addItem({ types: ["map"], propertyNames: 0, mapProperties: 1 }); // 4
   arena.addItem({ types: ["map"], propertyNames: 2, mapProperties: 3 }); // 5
-  arena.addItem({ anyOf: [4, 5] }); // 6
+  arena.addItem({ allOf: [4, 5] }); // 6
 
   while (arena.applyTransform(...useTransforms) > 0);
 
@@ -197,11 +205,9 @@ test("merge-any-of map", () => {
       { types: ["number"] }, // 3
       { types: ["map"], propertyNames: 0, mapProperties: 1 }, // 4
       { types: ["map"], propertyNames: 2, mapProperties: 3 }, // 5
-      { oneOf: [9] }, // 6
-      { oneOf: [10] }, // 7
-      { oneOf: [1, 3] }, // 8
-      { types: ["map"], propertyNames: 7, mapProperties: 8 }, // 9
-      { types: ["string"] }, // 10
+      { types: ["map"], propertyNames: 7, mapProperties: 8 }, // 6
+      { types: ["string"] }, // 7
+      { types: ["never"] }, // 8
     ],
   );
 });

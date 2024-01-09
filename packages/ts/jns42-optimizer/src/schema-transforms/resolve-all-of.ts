@@ -2,6 +2,7 @@ import {
   SchemaModel,
   SchemaTransform,
   intersectionMergeTypes,
+  isAllOfSchemaModel,
   isSingleTypeSchemaModel,
 } from "../schema/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
@@ -35,24 +36,23 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  */
 export const mergeAllOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (model.allOf == null || model.allOf.length < 2) {
+  if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
     return model;
   }
 
-  const { id } = model;
-
   let newModel!: SchemaModel;
-  for (const subModelKey of model.allOf) {
-    const [, subModel] = arena.resolveItem(subModelKey);
+  for (const subKey of model.allOf) {
+    const [, subModel] = arena.resolveItem(subKey);
 
     if (!isSingleTypeSchemaModel(subModel)) {
-      // we want to only only merge single types
+      // we want to only only merge single types this is because the intersectionMergeTypes
+      // function can only merge single types
       return model;
     }
 
     // first pass
     if (newModel == null) {
-      newModel = { ...subModel, id };
+      newModel = { ...subModel, ...model };
       continue;
     }
 

@@ -27,30 +27,30 @@ export const alias: SchemaTransform = (arena, model, modelKey) => {
   }
 
   if (isReferenceSchemaModel(model)) {
-    return {
-      id: model.id,
-      alias: model.reference,
-    };
+    return { ...model, alias: model.reference, reference: undefined };
   }
 
   if (isAllOfSchemaModel(model) && model.allOf.length === 1) {
     return {
-      id: model.id,
+      ...model,
       alias: model.allOf[0],
+      allOf: undefined,
     };
   }
 
   if (isAnyOfSchemaModel(model) && model.anyOf.length === 1) {
     return {
-      id: model.id,
+      ...model,
       alias: model.anyOf[0],
+      anyOf: undefined,
     };
   }
 
   if (isOneOfSchemaModel(model) && model.oneOf.length === 1) {
     return {
-      id: model.id,
+      ...model,
       alias: model.oneOf[0],
+      oneOf: undefined,
     };
   }
 
