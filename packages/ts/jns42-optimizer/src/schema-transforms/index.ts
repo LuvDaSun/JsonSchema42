@@ -6,5 +6,6 @@ export * from "./flush-parent.js";
 export * from "./resolve-all-of.js";
 export * from "./resolve-any-of-choose.js";
 export * from "./resolve-any-of.js";
+export * from "./resolve-one-of.js";
 export * from "./resolve-parent.js";
 export * from "./single-type.js";

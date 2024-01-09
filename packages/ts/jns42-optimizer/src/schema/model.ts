@@ -146,7 +146,7 @@ export function isTypeSchemaModel(model: SchemaModel): model is TypeSchemaModel 
 }
 
 export type SingleTypeSchemaModel = Partial<TypeSchemaModel & MetaSchemaModel> & {
-  types: [SchemaType];
+  types?: [SchemaType];
 };
 export function isSingleTypeSchemaModel(model: SchemaModel): model is SingleTypeSchemaModel {
   return (

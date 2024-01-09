@@ -152,6 +152,7 @@ export function transformSchema(
       schemaTransforms.flipAllOfOneOf,
       schemaTransforms.resolveAllOf,
       schemaTransforms.resolveAnyOfChoose,
+      schemaTransforms.resolveOneOf,
       schemaTransforms.resolveParent,
       schemaTransforms.flushParent,
     ) > 0
