@@ -1,0 +1,26 @@
+#!/bin/sh
+
+cd $(dirname $0)
+
+export NODE_ENV=development
+ERROR=0
+
+npm run build
+
+for F in $(ls ../../../fixtures/testing/*.yaml); do
+  echo $(basename $F .yaml)
+
+  ./bin/jns42-generator test \
+    $F \
+    --output-directory .package/test \
+    --package-name $(basename $F .yaml) \
+
+  if [ $? -ne 0 ]; then
+    ERROR=1
+  fi;
+
+done;
+
+exit $ERROR
+
+

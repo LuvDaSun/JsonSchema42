@@ -9,6 +9,7 @@ import * as models from "../models/index.js";
 
 export function transformSchema(
   document: schemaIntermediate.SchemaDocument,
+  maximumIterations: number,
 ): Record<string, models.Item | models.Alias> {
   const arena = new SchemaArena();
   /*
@@ -141,6 +142,7 @@ export function transformSchema(
   set parent schemas
   */
 
+  let iterations = 0;
   while (
     arena.applyTransform(
       schemaTransforms.singleType,
@@ -153,7 +155,13 @@ export function transformSchema(
       schemaTransforms.resolveParent,
       schemaTransforms.flushParent,
     ) > 0
-  );
+  ) {
+    iterations++;
+    if (iterations < maximumIterations) {
+      continue;
+    }
+    throw new Error("maximum number of iterations reached");
+  }
 
   const usedKeys = new Set<number>();
   for (const [key, item] of arena) {

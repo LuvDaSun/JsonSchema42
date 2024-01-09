@@ -58,6 +58,11 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "number",
           default: 5,
         })
+        .option("transform-maximum-iterations", {
+          description: "maximum number of iterations for transforming",
+          type: "number",
+          default: 100,
+        })
         .option("any-of-hack", {
           description: "quick-fix to make any of work with many types",
           type: "boolean",
@@ -75,6 +80,7 @@ interface MainOptions {
   packageVersion?: string;
   defaultName: string;
   namerMaximumIterations: number;
+  transformMaximumIterations: number;
   anyOfHack: boolean;
 }
 
@@ -83,7 +89,14 @@ async function main(options: MainOptions) {
 
   const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
   const packageDirectoryRoot = path.resolve(options.outputDirectory);
-  const { packageName, packageVersion, namerMaximumIterations, defaultName, anyOfHack } = options;
+  const {
+    packageName,
+    packageVersion,
+    namerMaximumIterations,
+    transformMaximumIterations,
+    defaultName,
+    anyOfHack,
+  } = options;
 
   const testUrl = new URL(`file://${pathToTest}`);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
@@ -121,7 +134,7 @@ async function main(options: MainOptions) {
 
       const intermediateData = context.getIntermediateData();
 
-      const types = transformSchema(intermediateData);
+      const types = transformSchema(intermediateData, transformMaximumIterations);
 
       const namer = new Namer(defaultTypeName, namerMaximumIterations);
       for (const [typeKey, typeItem] of Object.entries(types)) {
