@@ -2,7 +2,14 @@ import {
   AllOfSchemaModel,
   SchemaModel,
   SchemaTransform,
+  allOfSchemaRequired,
+  anyOfSchemaRequired,
+  ifSchemaOptional,
+  ifSchemaRequired,
   isAliasSchemaModel,
+  oneOfSchemaRequired,
+  referenceSchemaRequired,
+  typeSchemaOptional,
 } from "../schema/index.js";
 
 /**
@@ -65,22 +72,39 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  let count = 0;
-  if (model.reference != null) {
-    count++;
-  }
-  if (model.allOf != null && model.allOf.length > 0) {
-    count++;
-  }
-  if (model.anyOf != null && model.anyOf.length > 0) {
-    count++;
-  }
-  if (model.oneOf != null && model.oneOf.length > 0) {
-    count++;
-  }
-  if (model.if != null || model.then != null || model.else != null) {
-    count++;
-  }
+  const propertyGroups = {
+    reference: referenceSchemaRequired,
+    allOf: allOfSchemaRequired,
+    anyOf: anyOfSchemaRequired,
+    oneOf: oneOfSchemaRequired,
+    if: [...ifSchemaRequired, ...ifSchemaOptional],
+    type: typeSchemaOptional,
+  };
+
+  const schemaModels = Object.fromEntries(
+    Object.entries(propertyGroups).map(([key, properties]) => [
+      key,
+      properties.some((property) => model[property] != null),
+    ]),
+  ) as Record<keyof typeof propertyGroups, boolean>;
+
+  let count = Object.values(schemaModels).filter((value) => value).length;
+
+  // if (model.reference != null) {
+  //   count++;
+  // }
+  // if (model.allOf != null && model.allOf.length > 0) {
+  //   count++;
+  // }
+  // if (model.anyOf != null && model.anyOf.length > 0) {
+  //   count++;
+  // }
+  // if (model.oneOf != null && model.oneOf.length > 0) {
+  //   count++;
+  // }
+  // if (model.if != null || model.then != null || model.else != null) {
+  //   count++;
+  // }
 
   if (count <= 1) {
     // nothing to explode here
@@ -96,9 +120,36 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     if: undefined,
     then: undefined,
     else: undefined,
+
+    types: undefined,
+    dependentSchemas: undefined,
+    objectProperties: undefined,
+    mapProperties: undefined,
+    patternProperties: undefined,
+    propertyNames: undefined,
+    tupleItems: undefined,
+    arrayItems: undefined,
+    contains: undefined,
+    required: undefined,
+    options: undefined,
+
+    minimumInclusive: undefined,
+    minimumExclusive: undefined,
+    maximumInclusive: undefined,
+    maximumExclusive: undefined,
+    multipleOf: undefined,
+    minimumLength: undefined,
+    maximumLength: undefined,
+    valuePattern: undefined,
+    valueFormat: undefined,
+    minimumItems: undefined,
+    maximumItems: undefined,
+    uniqueItems: undefined,
+    minimumProperties: undefined,
+    maximumProperties: undefined,
   };
 
-  if (model.reference != null) {
+  if (schemaModels.reference) {
     const newSubModel: SchemaModel = {
       reference: model.reference,
     };
@@ -106,7 +157,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     newModel.allOf.push(newSubKey);
   }
 
-  if (model.allOf != null && model.allOf.length > 0) {
+  if (schemaModels.allOf) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
       allOf: model.allOf,
@@ -115,7 +166,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     newModel.allOf.push(newSubKey);
   }
 
-  if (model.anyOf != null && model.anyOf.length > 0) {
+  if (schemaModels.anyOf) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
       anyOf: model.anyOf,
@@ -124,7 +175,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     newModel.allOf.push(newSubKey);
   }
 
-  if (model.oneOf != null && model.oneOf.length > 0) {
+  if (schemaModels.oneOf) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
       oneOf: model.oneOf,
@@ -133,12 +184,47 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     newModel.allOf.push(newSubKey);
   }
 
-  if (model.if != null || model.then != null || model.else != null) {
+  if (schemaModels.if) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
       if: model.if,
       then: model.then,
       else: model.else,
+    };
+    const newSubKey = arena.addItem(newSubModel);
+    newModel.allOf.push(newSubKey);
+  }
+
+  if (schemaModels.type) {
+    const newSubModel: SchemaModel = {
+      parent: modelKey,
+
+      types: model.types,
+      dependentSchemas: model.dependentSchemas,
+      objectProperties: model.objectProperties,
+      mapProperties: model.mapProperties,
+      patternProperties: model.patternProperties,
+      propertyNames: model.propertyNames,
+      tupleItems: model.tupleItems,
+      arrayItems: model.arrayItems,
+      contains: model.contains,
+      required: model.required,
+      options: model.options,
+
+      minimumInclusive: model.minimumInclusive,
+      minimumExclusive: model.minimumExclusive,
+      maximumInclusive: model.maximumInclusive,
+      maximumExclusive: model.maximumExclusive,
+      multipleOf: model.multipleOf,
+      minimumLength: model.minimumLength,
+      maximumLength: model.maximumLength,
+      valuePattern: model.valuePattern,
+      valueFormat: model.valueFormat,
+      minimumItems: model.minimumItems,
+      maximumItems: model.maximumItems,
+      uniqueItems: model.uniqueItems,
+      minimumProperties: model.minimumProperties,
+      maximumProperties: model.maximumProperties,
     };
     const newSubKey = arena.addItem(newSubModel);
     newModel.allOf.push(newSubKey);
