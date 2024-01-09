@@ -5,7 +5,5 @@ export interface Specification {
   names: Record<string, string>;
   nodes: Record<string, schemaIntermediate.Node>;
   types: Record<string, models.Item | models.Alias>;
-  options: {
-    anyOfHack: boolean;
-  };
+  options: {};
 }

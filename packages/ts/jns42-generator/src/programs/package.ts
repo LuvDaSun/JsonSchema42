@@ -56,11 +56,6 @@ export function configurePackageProgram(argv: yargs.Argv) {
           description: "maximum number of iterations for transforming",
           type: "number",
           default: 100,
-        })
-        .option("any-of-hack", {
-          description: "quick-fix to make any of work with many types",
-          type: "boolean",
-          default: false,
         }),
     (argv) => main(argv),
   );
@@ -75,11 +70,9 @@ interface MainOptions {
   defaultName: string;
   namerMaximumIterations: number;
   transformMaximumIterations: number;
-  anyOfHack: boolean;
 }
 
 async function main(options: MainOptions) {
-  const { anyOfHack } = options;
   let instanceSchemaUrl: URL;
   if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
     instanceSchemaUrl = new URL(options.instanceSchemaUrl);
@@ -137,6 +130,5 @@ async function main(options: MainOptions) {
     packageDirectoryPath,
     packageName,
     packageVersion,
-    anyOfHack,
   });
 }

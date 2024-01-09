@@ -17,7 +17,6 @@ export interface PackageOptions {
   packageName: string;
   packageVersion?: string;
   packageDirectoryPath: string;
-  anyOfHack: boolean;
 }
 
 export function generatePackage(
@@ -26,15 +25,13 @@ export function generatePackage(
   types: Record<string, models.Item | models.Alias>,
   options: PackageOptions,
 ) {
-  const { anyOfHack, packageDirectoryPath, packageName, packageVersion } = options;
+  const { packageDirectoryPath, packageName, packageVersion } = options;
 
   const specification = {
     names: namesData,
     nodes: intermediateData.schemas,
     types,
-    options: {
-      anyOfHack,
-    },
+    options: {},
   };
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });

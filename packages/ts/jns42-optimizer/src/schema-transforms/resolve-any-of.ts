@@ -13,7 +13,17 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], anyOf: undefined };
+  const newModel: SchemaModel & OneOfSchemaModel = {
+    ...model,
+    oneOf: [],
+    anyOf: undefined,
+    // meta fields
+    id: model.id,
+    title: model.title,
+    description: model.description,
+    examples: model.examples,
+    deprecated: model.deprecated,
+  };
 
   // first we group elements by their type
   const groupedElements: { [type: string]: number[] } = {};

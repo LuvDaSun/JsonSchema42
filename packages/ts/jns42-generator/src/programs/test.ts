@@ -62,11 +62,6 @@ export function configureTestProgram(argv: yargs.Argv) {
           description: "maximum number of iterations for transforming",
           type: "number",
           default: 100,
-        })
-        .option("any-of-hack", {
-          description: "quick-fix to make any of work with many types",
-          type: "boolean",
-          default: false,
         }),
     (argv) => main(argv),
   );
@@ -81,7 +76,6 @@ interface MainOptions {
   defaultName: string;
   namerMaximumIterations: number;
   transformMaximumIterations: number;
-  anyOfHack: boolean;
 }
 
 async function main(options: MainOptions) {
@@ -95,7 +89,6 @@ async function main(options: MainOptions) {
     namerMaximumIterations,
     transformMaximumIterations,
     defaultName,
-    anyOfHack,
   } = options;
 
   const testUrl = new URL(`file://${pathToTest}`);
@@ -155,7 +148,6 @@ async function main(options: MainOptions) {
         packageDirectoryPath,
         packageName,
         packageVersion,
-        anyOfHack,
       });
     }
 

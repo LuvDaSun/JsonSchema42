@@ -52,7 +52,16 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
 
     // first pass
     if (newModel == null) {
-      newModel = { ...subModel, ...model, allOf: undefined };
+      newModel = {
+        ...subModel,
+        allOf: undefined,
+        // meta fields
+        id: model.id,
+        title: model.title,
+        description: model.description,
+        examples: model.examples,
+        deprecated: model.deprecated,
+      };
       continue;
     }
 
