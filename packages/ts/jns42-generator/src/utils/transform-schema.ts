@@ -148,9 +148,10 @@ export function transformSchema(
       schemaTransforms.flatten,
       schemaTransforms.alias,
       schemaTransforms.flipAllOfOneOf,
-      schemaTransforms.mergeAllOf,
-      schemaTransforms.mergeAnyOf,
-      schemaTransforms.mergeParent,
+      schemaTransforms.resolveAllOf,
+      schemaTransforms.resolveAnyOf,
+      schemaTransforms.resolveParent,
+      schemaTransforms.flushParent,
     ) > 0
   );
 

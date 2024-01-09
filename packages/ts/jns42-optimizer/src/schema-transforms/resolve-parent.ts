@@ -13,7 +13,7 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  * and then removing the parent relation by setting it to undefined.
  *
  */
-export const mergeParent: SchemaTransform = (arena, model, modelKey) => {
+export const resolveParent: SchemaTransform = (arena, model, modelKey) => {
   // we need a parent
   if (!isChildSchemaModel(model)) {
     return model;

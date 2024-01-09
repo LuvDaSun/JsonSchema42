@@ -2,7 +2,9 @@ import {
   SchemaTransform,
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
+  isChildSchemaModel,
   isOneOfSchemaModel,
+  isReferenceSchemaModel,
 } from "../schema/index.js";
 
 /**
@@ -19,9 +21,12 @@ import {
  *   oneOf:
  *   - 1
  *   - 2
- * - required:
+ * - types:
+ *   - object
+ *   required:
  *   - "a"
  *   - "b"
+ *   - "c"
  * - types:
  *   - object
  *   required:
@@ -32,14 +37,15 @@ import {
  * will become
  *
  * ```yaml
- * - types:
- *   - object
- *   oneOf:
+ * - oneOf:
  *   - 1
  *   - 2
- * - required:
+ * - types:
+ *   - object
+ *   required:
  *   - "a"
  *   - "b"
+ *   - "c"
  * - types:
  *   - object
  *   required:
@@ -48,63 +54,55 @@ import {
  * ```
  */
 export const flushParent: SchemaTransform = (arena, model, modelKey) => {
-  const { id } = model;
+  const newModel = {
+    ...model,
+    types: undefined,
+    options: undefined,
+    required: undefined,
+    propertyNames: undefined,
+    contains: undefined,
+    tupleItems: undefined,
+    arrayItems: undefined,
+    objectProperties: undefined,
+    mapProperties: undefined,
+  };
+
+  if (isReferenceSchemaModel(model)) {
+    const [, subModel] = arena.resolveItem(model.reference);
+    if (isChildSchemaModel(subModel)) {
+      return model;
+    }
+    return newModel;
+  }
 
   if (isAllOfSchemaModel(model)) {
-    const elements = new Array<number>();
     for (const subKey of model.allOf) {
       const [, subModel] = arena.resolveItem(subKey);
-
-      if (isAllOfSchemaModel(subModel)) {
-        elements.push(...subModel.allOf);
-      } else {
-        elements.push(subKey);
+      if (isChildSchemaModel(subModel)) {
+        return model;
       }
     }
-    if (elements.length > model.allOf.length) {
-      return {
-        id,
-        allOf: elements,
-      };
-    }
+    return newModel;
   }
 
   if (isAnyOfSchemaModel(model)) {
-    const elements = new Array<number>();
     for (const subKey of model.anyOf) {
       const [, subModel] = arena.resolveItem(subKey);
-
-      if (isAnyOfSchemaModel(subModel)) {
-        elements.push(...subModel.anyOf);
-      } else {
-        elements.push(subKey);
+      if (isChildSchemaModel(subModel)) {
+        return model;
       }
     }
-    if (elements.length > model.anyOf.length) {
-      return {
-        id,
-        anyOf: elements,
-      };
-    }
+    return newModel;
   }
 
   if (isOneOfSchemaModel(model)) {
-    const elements = new Array<number>();
     for (const subKey of model.oneOf) {
       const [, subModel] = arena.resolveItem(subKey);
-
-      if (isOneOfSchemaModel(subModel)) {
-        elements.push(...subModel.oneOf);
-      } else {
-        elements.push(subKey);
+      if (isChildSchemaModel(subModel)) {
+        return model;
       }
     }
-    if (elements.length > model.oneOf.length) {
-      return {
-        id,
-        oneOf: elements,
-      };
-    }
+    return newModel;
   }
 
   return model;

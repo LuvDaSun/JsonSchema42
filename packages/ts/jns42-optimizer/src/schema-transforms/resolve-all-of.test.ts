@@ -4,7 +4,7 @@ import { SchemaArena } from "../schema/arena.js";
 import { normalizeObject } from "../utils/index.js";
 import * as transforms from "./index.js";
 
-const useTransforms = [transforms.mergeAllOf, transforms.alias];
+const useTransforms = [transforms.resolveAllOf, transforms.alias];
 
 test("resolve-all-of utility", () => {
   const arena = new SchemaArena();

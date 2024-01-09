@@ -34,7 +34,7 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  *   - 300
  * ```
  */
-export const mergeAllOf: SchemaTransform = (arena, model, modelKey) => {
+export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
   if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
     return model;
