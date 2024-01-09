@@ -52,7 +52,7 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
 
     // first pass
     if (newModel == null) {
-      newModel = { ...subModel, ...model };
+      newModel = { ...subModel, ...model, allOf: undefined };
       continue;
     }
 
