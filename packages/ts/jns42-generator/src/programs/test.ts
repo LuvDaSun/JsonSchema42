@@ -112,7 +112,8 @@ async function main(options: MainOptions) {
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
-    await test("generate package", async () => {
+    // generate package
+    {
       const context = new DocumentContext();
       context.registerFactory(
         schema202012.metaSchemaId,
@@ -156,21 +157,15 @@ async function main(options: MainOptions) {
         packageVersion,
         anyOfHack,
       });
-    });
+    }
 
-    await test("install package", () => {
+    // install (and implicitly build) package
+    {
       cp.execSync("npm install", {
         cwd: packageDirectoryPath,
         env: process.env,
       });
-    });
-
-    // await test("build package", () => {
-    //   cp.execSync("npm run build", {
-    //     cwd: packageDirectoryPath,
-    //     env: process.env,
-    //   });
-    // });
+    }
 
     await test("test package", () => {
       cp.execSync("npm test", {
