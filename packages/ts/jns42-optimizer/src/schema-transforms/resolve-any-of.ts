@@ -17,12 +17,6 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
     ...model,
     oneOf: [],
     anyOf: undefined,
-    // meta fields
-    id: model.id,
-    title: model.title,
-    description: model.description,
-    examples: model.examples,
-    deprecated: model.deprecated,
   };
 
   // first we group elements by their type
@@ -40,7 +34,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
   }
 
   // we make a oneOf with every type as it's element
-  for (const [type, subKeys] of Object.entries(groupedElements)) {
+  for (const [, subKeys] of Object.entries(groupedElements)) {
     if (subKeys.length < 2) {
       for (const subKey of subKeys) {
         newModel.oneOf.push(subKey);
@@ -57,7 +51,15 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
 
       // first pass
       if (newSubModel == null) {
-        newSubModel = { ...subModel };
+        newSubModel = {
+          ...subModel,
+          // meta fields
+          id: undefined,
+          title: undefined,
+          description: undefined,
+          examples: undefined,
+          deprecated: undefined,
+        };
         continue;
       }
 
