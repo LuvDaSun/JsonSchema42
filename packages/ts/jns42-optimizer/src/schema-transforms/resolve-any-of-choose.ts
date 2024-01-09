@@ -23,6 +23,7 @@ export const resolveAnyOfChoose: SchemaTransform = (arena, model, modelKey) => {
   for (let count = 0; count < model.anyOf.length; count++) {
     for (const elements of choose(model.anyOf, count + 1)) {
       const newSubModel = {
+        parent: modelKey,
         allOf: elements,
       };
       const newSubKey = arena.addItem(newSubModel);
