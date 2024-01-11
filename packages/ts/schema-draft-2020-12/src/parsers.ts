@@ -3,42 +3,76 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.21                         -- www.JsonSchema42.org
+// v0.9.6                          -- www.JsonSchema42.org
+// https://json-schema.org/draft/2020-12/schema
 export function parseSchema(value: unknown): unknown {
-return _parseMapSchema(value) ?? _parseBooleanSchema(value) ?? _parseAllOfSchema(value);
-}
-function _parseMapSchema(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "definitions": {
-const propertyValue = parseDefinitions(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "dependencies": {
-const propertyValue = parseDependencies(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$recursiveAnchor": {
-const propertyValue = parseRecursiveAnchor(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$recursiveRef": {
-const propertyValue = parseRecursiveRef(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanSchema(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -60,118 +94,632 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value) ?? ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
+if(value == null) {
+return false;
 }
-function _parseAllOfSchema(value: unknown): unknown {
-return parseAllOf0(value) ?? parseAllOf1(value) ?? parseAllOf2(value) ?? parseAllOf3(value) ?? parseAllOf4(value) ?? parseAllOf5(value) ?? parseAllOf6(value);
+switch(typeof value) {
+case "string":
+switch(value.trim()) {
+case "":
+case "no":
+case "off":
+case "false":
+case "0":
+return false;
+default:
+return true;
 }
+case "number":
+return Boolean(value);
+case "boolean":
+return value;
+}
+return undefined;
+})(value) ?? ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
+if(value == null) {
+return false;
+}
+switch(typeof value) {
+case "string":
+switch(value.trim()) {
+case "":
+case "no":
+case "off":
+case "false":
+case "0":
+return false;
+default:
+return true;
+}
+case "number":
+return Boolean(value);
+case "boolean":
+return value;
+}
+return undefined;
+})(value) ?? ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
+if(value == null) {
+return false;
+}
+switch(typeof value) {
+case "string":
+switch(value.trim()) {
+case "":
+case "no":
+case "off":
+case "false":
+case "0":
+return false;
+default:
+return true;
+}
+case "number":
+return Boolean(value);
+case "boolean":
+return value;
+}
+return undefined;
+})(value) ?? ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
+if(value == null) {
+return false;
+}
+switch(typeof value) {
+case "string":
+switch(value.trim()) {
+case "":
+case "no":
+case "off":
+case "false":
+case "0":
+return false;
+default:
+return true;
+}
+case "number":
+return Boolean(value);
+case "boolean":
+return value;
+}
+return undefined;
+})(value) ?? ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
+if(value == null) {
+return false;
+}
+switch(typeof value) {
+case "string":
+switch(value.trim()) {
+case "":
+case "no":
+case "off":
+case "false":
+case "0":
+return false;
+default:
+return true;
+}
+case "number":
+return Boolean(value);
+case "boolean":
+return value;
+}
+return undefined;
+})(value) ?? ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"format": parseFormat(value["format" as keyof typeof value]),
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
+"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
+"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
+"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
+if(value == null) {
+return false;
+}
+switch(typeof value) {
+case "string":
+switch(value.trim()) {
+case "":
+case "no":
+case "off":
+case "false":
+case "0":
+return false;
+default:
+return true;
+}
+case "number":
+return Boolean(value);
+case "boolean":
+return value;
+}
+return undefined;
+})(value);
+}
+// https://json-schema.org/draft/2020-12/schema#/properties/definitions
 export function parseDefinitions(value: unknown): unknown {
-return _parseMapDefinitions(value);
-}
-function _parseMapDefinitions(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseDefinitionsAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parseDefinitionsAdditionalProperties(value),
+])
+) :
+undefined;
+}
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies
 export function parseDependencies(value: unknown): unknown {
-return _parseMapDependencies(value);
-}
-function _parseMapDependencies(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseDependenciesAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
-export function parseRecursiveAnchor(value: unknown): unknown {
-return _parseReferenceRecursiveAnchor(value);
+})(name),
+parseDependenciesAdditionalProperties(value),
+])
+) :
+undefined;
 }
-function _parseReferenceRecursiveAnchor(value: unknown): unknown {
+// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor
+export function parseRecursiveAnchor(value: unknown): unknown {
 return parseAnchorString(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef
 export function parseRecursiveRef(value: unknown): unknown {
-return _parseReferenceRecursiveRef(value);
-}
-function _parseReferenceRecursiveRef(value: unknown): unknown {
 return parseUriReferenceString(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/0
 export function parseAllOf0(value: unknown): unknown {
-return _parseReferenceAllOf0(value);
-}
-function _parseReferenceAllOf0(value: unknown): unknown {
 return parseCore(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/1
 export function parseAllOf1(value: unknown): unknown {
-return _parseReferenceAllOf1(value);
-}
-function _parseReferenceAllOf1(value: unknown): unknown {
 return parseApplicator(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/2
 export function parseAllOf2(value: unknown): unknown {
-return _parseReferenceAllOf2(value);
-}
-function _parseReferenceAllOf2(value: unknown): unknown {
 return parseUnevaluated(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/3
 export function parseAllOf3(value: unknown): unknown {
-return _parseReferenceAllOf3(value);
-}
-function _parseReferenceAllOf3(value: unknown): unknown {
 return parseValidation(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/4
 export function parseAllOf4(value: unknown): unknown {
-return _parseReferenceAllOf4(value);
-}
-function _parseReferenceAllOf4(value: unknown): unknown {
 return parseMetaData(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/5
 export function parseAllOf5(value: unknown): unknown {
-return _parseReferenceAllOf5(value);
-}
-function _parseReferenceAllOf5(value: unknown): unknown {
 return parseFormatAnnotation(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/allOf/6
 export function parseAllOf6(value: unknown): unknown {
-return _parseReferenceAllOf6(value);
-}
-function _parseReferenceAllOf6(value: unknown): unknown {
 return parseContent(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
 export function parseDefinitionsAdditionalProperties(value: unknown): unknown {
-return _parseReferenceDefinitionsAdditionalProperties(value);
-}
-function _parseReferenceDefinitionsAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
 export function parseDependenciesAdditionalProperties(value: unknown): unknown {
-return _parseAnyOfDependenciesAdditionalProperties(value);
+return value;
 }
-function _parseAnyOfDependenciesAdditionalProperties(value: unknown): unknown {
-return parseDependencies0(value) ?? parseDependencies1(value);
-}
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
 export function parseDependencies0(value: unknown): unknown {
-return _parseReferenceDependencies0(value);
-}
-function _parseReferenceDependencies0(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
 export function parseDependencies1(value: unknown): unknown {
-return _parseReferenceDependencies1(value);
-}
-function _parseReferenceDependencies1(value: unknown): unknown {
 return parseStringArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString
 export function parseAnchorString(value: unknown): unknown {
-return _parseStringAnchorString(value);
-}
-function _parseStringAnchorString(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -182,10 +730,8 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString
 export function parseUriReferenceString(value: unknown): unknown {
-return _parseStringUriReferenceString(value);
-}
-function _parseStringUriReferenceString(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -196,66 +742,23 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/core
 export function parseCore(value: unknown): unknown {
-return _parseMapCore(value) ?? _parseBooleanCore(value);
-}
-function _parseMapCore(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "$id": {
-const propertyValue = parseId(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$schema": {
-const propertyValue = parseCoreSchema(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$ref": {
-const propertyValue = parseRef(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$anchor": {
-const propertyValue = parseAnchor(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$dynamicRef": {
-const propertyValue = parseDynamicRef(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$dynamicAnchor": {
-const propertyValue = parseDynamicAnchor(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$vocabulary": {
-const propertyValue = parseVocabulary(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$comment": {
-const propertyValue = parseComment(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "$defs": {
-const propertyValue = parseDefs(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanCore(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$id": parseId(value["$id" as keyof typeof value]),
+"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
+"$ref": parseRef(value["$ref" as keyof typeof value]),
+"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
+"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
+"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
+"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
+"$comment": parseComment(value["$comment" as keyof typeof value]),
+"$defs": parseDefs(value["$defs" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -277,11 +780,10 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString
 export function parseUriString(value: unknown): unknown {
-return _parseStringUriString(value);
-}
-function _parseStringUriString(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -292,10 +794,8 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$id
 export function parseId(value: unknown): unknown {
-return _parseStringId(value) ?? _parseReferenceId(value);
-}
-function _parseStringId(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -306,57 +806,49 @@ default:
 return undefined;
 }
 }
-function _parseReferenceId(value: unknown): unknown {
-return parseUriReferenceString(value);
-}
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
 export function parseCoreSchema(value: unknown): unknown {
-return _parseReferenceCoreSchema(value);
-}
-function _parseReferenceCoreSchema(value: unknown): unknown {
 return parseUriString(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
 export function parseRef(value: unknown): unknown {
-return _parseReferenceRef(value);
-}
-function _parseReferenceRef(value: unknown): unknown {
 return parseUriReferenceString(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
 export function parseAnchor(value: unknown): unknown {
-return _parseReferenceAnchor(value);
-}
-function _parseReferenceAnchor(value: unknown): unknown {
 return parseAnchorString(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef
 export function parseDynamicRef(value: unknown): unknown {
-return _parseReferenceDynamicRef(value);
-}
-function _parseReferenceDynamicRef(value: unknown): unknown {
 return parseUriReferenceString(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor
 export function parseDynamicAnchor(value: unknown): unknown {
-return _parseReferenceDynamicAnchor(value);
-}
-function _parseReferenceDynamicAnchor(value: unknown): unknown {
 return parseAnchorString(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary
 export function parseVocabulary(value: unknown): unknown {
-return _parseMapVocabulary(value);
-}
-function _parseMapVocabulary(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseVocabularyPropertyNames(value[propertyName as keyof typeof value]);
-result[propertyName] ??= parseVocabularyAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
-export function parseComment(value: unknown): unknown {
-return _parseStringComment(value);
+})(name),
+parseVocabularyAdditionalProperties(value),
+])
+) :
+undefined;
 }
-function _parseStringComment(value: unknown): unknown {
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$comment
+export function parseComment(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -367,23 +859,29 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs
 export function parseDefs(value: unknown): unknown {
-return _parseMapDefs(value);
-}
-function _parseMapDefs(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseDefsAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
-export function parseVocabularyAdditionalProperties(value: unknown): unknown {
-return _parseBooleanVocabularyAdditionalProperties(value);
+})(name),
+parseDefsAdditionalProperties(value),
+])
+) :
+undefined;
 }
-function _parseBooleanVocabularyAdditionalProperties(value: unknown): unknown {
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties
+export function parseVocabularyAdditionalProperties(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -406,108 +904,37 @@ return value;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
 export function parseVocabularyPropertyNames(value: unknown): unknown {
-return _parseReferenceVocabularyPropertyNames(value);
-}
-function _parseReferenceVocabularyPropertyNames(value: unknown): unknown {
 return parseUriString(value);
 }
+// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
 export function parseDefsAdditionalProperties(value: unknown): unknown {
-return _parseReferenceDefsAdditionalProperties(value);
-}
-function _parseReferenceDefsAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator
 export function parseApplicator(value: unknown): unknown {
-return _parseMapApplicator(value) ?? _parseBooleanApplicator(value);
-}
-function _parseMapApplicator(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "prefixItems": {
-const propertyValue = parsePrefixItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "items": {
-const propertyValue = parseApplicatorItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "contains": {
-const propertyValue = parseContains(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "additionalProperties": {
-const propertyValue = parseApplicatorAdditionalProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "properties": {
-const propertyValue = parseProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "patternProperties": {
-const propertyValue = parsePatternProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "dependentSchemas": {
-const propertyValue = parseDependentSchemas(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "propertyNames": {
-const propertyValue = parseApplicatorPropertyNames(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "if": {
-const propertyValue = parseIf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "then": {
-const propertyValue = parseThen(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "else": {
-const propertyValue = parseElse(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "allOf": {
-const propertyValue = parseAllOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "anyOf": {
-const propertyValue = parseAnyOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "oneOf": {
-const propertyValue = parseOneOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "not": {
-const propertyValue = parseNot(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanApplicator(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
+"items": parseApplicatorItems(value["items" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
+"properties": parseProperties(value["properties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -529,154 +956,139 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray
 export function parseSchemaArray(value: unknown): unknown {
-return _parseArraySchemaArray(value);
+return Array.isArray(value) ?
+value.map(value => parseSchemaArrayItems(value)) :
+undefined;
 }
-function _parseArraySchemaArray(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseSchemaArrayItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
 export function parsePrefixItems(value: unknown): unknown {
-return _parseReferencePrefixItems(value);
-}
-function _parseReferencePrefixItems(value: unknown): unknown {
 return parseSchemaArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
 export function parseApplicatorItems(value: unknown): unknown {
-return _parseReferenceApplicatorItems(value);
-}
-function _parseReferenceApplicatorItems(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
 export function parseContains(value: unknown): unknown {
-return _parseReferenceContains(value);
-}
-function _parseReferenceContains(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
 export function parseApplicatorAdditionalProperties(value: unknown): unknown {
-return _parseReferenceApplicatorAdditionalProperties(value);
-}
-function _parseReferenceApplicatorAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties
 export function parseProperties(value: unknown): unknown {
-return _parseMapProperties(value);
-}
-function _parseMapProperties(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parsePropertiesAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parsePropertiesAdditionalProperties(value),
+])
+) :
+undefined;
+}
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties
 export function parsePatternProperties(value: unknown): unknown {
-return _parseMapPatternProperties(value);
-}
-function _parseMapPatternProperties(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parsePatternPropertiesPropertyNames(value[propertyName as keyof typeof value]);
-result[propertyName] ??= parsePatternPropertiesAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parsePatternPropertiesAdditionalProperties(value),
+])
+) :
+undefined;
+}
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas
 export function parseDependentSchemas(value: unknown): unknown {
-return _parseMapDependentSchemas(value);
-}
-function _parseMapDependentSchemas(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseDependentSchemasAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parseDependentSchemasAdditionalProperties(value),
+])
+) :
+undefined;
+}
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
 export function parseApplicatorPropertyNames(value: unknown): unknown {
-return _parseReferenceApplicatorPropertyNames(value);
-}
-function _parseReferenceApplicatorPropertyNames(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
 export function parseIf(value: unknown): unknown {
-return _parseReferenceIf(value);
-}
-function _parseReferenceIf(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
 export function parseThen(value: unknown): unknown {
-return _parseReferenceThen(value);
-}
-function _parseReferenceThen(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
 export function parseElse(value: unknown): unknown {
-return _parseReferenceElse(value);
-}
-function _parseReferenceElse(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
 export function parseAllOf(value: unknown): unknown {
-return _parseReferenceAllOf(value);
-}
-function _parseReferenceAllOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
 export function parseAnyOf(value: unknown): unknown {
-return _parseReferenceAnyOf(value);
-}
-function _parseReferenceAnyOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
 export function parseOneOf(value: unknown): unknown {
-return _parseReferenceOneOf(value);
-}
-function _parseReferenceOneOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
 export function parseNot(value: unknown): unknown {
-return _parseReferenceNot(value);
-}
-function _parseReferenceNot(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
 export function parseSchemaArrayItems(value: unknown): unknown {
-return _parseReferenceSchemaArrayItems(value);
-}
-function _parseReferenceSchemaArrayItems(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
 export function parsePropertiesAdditionalProperties(value: unknown): unknown {
-return _parseReferencePropertiesAdditionalProperties(value);
-}
-function _parseReferencePropertiesAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
 export function parsePatternPropertiesAdditionalProperties(value: unknown): unknown {
-return _parseReferencePatternPropertiesAdditionalProperties(value);
-}
-function _parseReferencePatternPropertiesAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames
 export function parsePatternPropertiesPropertyNames(value: unknown): unknown {
-return _parseStringPatternPropertiesPropertyNames(value);
-}
-function _parseStringPatternPropertiesPropertyNames(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -687,37 +1099,20 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
 export function parseDependentSchemasAdditionalProperties(value: unknown): unknown {
-return _parseReferenceDependentSchemasAdditionalProperties(value);
-}
-function _parseReferenceDependentSchemasAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/unevaluated
 export function parseUnevaluated(value: unknown): unknown {
-return _parseMapUnevaluated(value) ?? _parseBooleanUnevaluated(value);
-}
-function _parseMapUnevaluated(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "unevaluatedItems": {
-const propertyValue = parseUnevaluatedItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "unevaluatedProperties": {
-const propertyValue = parseUnevaluatedProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanUnevaluated(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
+"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -739,134 +1134,44 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
 export function parseUnevaluatedItems(value: unknown): unknown {
-return _parseReferenceUnevaluatedItems(value);
-}
-function _parseReferenceUnevaluatedItems(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
 export function parseUnevaluatedProperties(value: unknown): unknown {
-return _parseReferenceUnevaluatedProperties(value);
-}
-function _parseReferenceUnevaluatedProperties(value: unknown): unknown {
 return parseSchema(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation
 export function parseValidation(value: unknown): unknown {
-return _parseMapValidation(value) ?? _parseBooleanValidation(value);
-}
-function _parseMapValidation(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "type": {
-const propertyValue = parseType(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "const": {
-const propertyValue = parseConst(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "enum": {
-const propertyValue = parseEnum(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "multipleOf": {
-const propertyValue = parseMultipleOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximum": {
-const propertyValue = parseMaximum(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "exclusiveMaximum": {
-const propertyValue = parseExclusiveMaximum(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimum": {
-const propertyValue = parseMinimum(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "exclusiveMinimum": {
-const propertyValue = parseExclusiveMinimum(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maxLength": {
-const propertyValue = parseMaxLength(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minLength": {
-const propertyValue = parseMinLength(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "pattern": {
-const propertyValue = parsePattern(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maxItems": {
-const propertyValue = parseMaxItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minItems": {
-const propertyValue = parseMinItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "uniqueItems": {
-const propertyValue = parseUniqueItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maxContains": {
-const propertyValue = parseMaxContains(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minContains": {
-const propertyValue = parseMinContains(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maxProperties": {
-const propertyValue = parseMaxProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minProperties": {
-const propertyValue = parseMinProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "required": {
-const propertyValue = parseRequired(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "dependentRequired": {
-const propertyValue = parseDependentRequired(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanValidation(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"type": parseType(value["type" as keyof typeof value]),
+"const": parseConst(value["const" as keyof typeof value]),
+"enum": parseEnum(value["enum" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"maximum": parseMaximum(value["maximum" as keyof typeof value]),
+"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
+"minimum": parseMinimum(value["minimum" as keyof typeof value]),
+"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
+"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
+"minLength": parseMinLength(value["minLength" as keyof typeof value]),
+"pattern": parsePattern(value["pattern" as keyof typeof value]),
+"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
+"minItems": parseMinItems(value["minItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
+"minContains": parseMinContains(value["minContains" as keyof typeof value]),
+"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
+"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -888,11 +1193,10 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger
 export function parseNonNegativeInteger(value: unknown): unknown {
-return _parseIntegerNonNegativeInteger(value);
-}
-function _parseIntegerNonNegativeInteger(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -903,16 +1207,12 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0
 export function parseNonNegativeIntegerDefault0(value: unknown): unknown {
-return _parseReferenceNonNegativeIntegerDefault0(value);
-}
-function _parseReferenceNonNegativeIntegerDefault0(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes
 export function parseSimpleTypes(value: unknown): unknown {
-return _parseStringSimpleTypes(value);
-}
-function _parseStringSimpleTypes(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -923,48 +1223,28 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray
 export function parseStringArray(value: unknown): unknown {
-return _parseArrayStringArray(value);
+return Array.isArray(value) ?
+value.map(value => parseStringArrayItems(value)) :
+undefined;
 }
-function _parseArrayStringArray(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseStringArrayItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type
 export function parseType(value: unknown): unknown {
-return _parseAnyOfType(value);
-}
-function _parseAnyOfType(value: unknown): unknown {
 return parseType0(value) ?? parseType1(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/const
 export function parseConst(value: unknown): unknown {
-return _parseAnyConst(value);
-}
-function _parseAnyConst(value: unknown): unknown {
 return value;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum
 export function parseEnum(value: unknown): unknown {
-return _parseArrayEnum(value);
+return Array.isArray(value) ?
+value.map(value => parseEnumItems(value)) :
+undefined;
 }
-function _parseArrayEnum(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseEnumItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf
 export function parseMultipleOf(value: unknown): unknown {
-return _parseNumberMultipleOf(value);
-}
-function _parseNumberMultipleOf(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -975,10 +1255,8 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum
 export function parseMaximum(value: unknown): unknown {
-return _parseNumberMaximum(value);
-}
-function _parseNumberMaximum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -989,10 +1267,8 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum
 export function parseExclusiveMaximum(value: unknown): unknown {
-return _parseNumberExclusiveMaximum(value);
-}
-function _parseNumberExclusiveMaximum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -1003,10 +1279,8 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum
 export function parseMinimum(value: unknown): unknown {
-return _parseNumberMinimum(value);
-}
-function _parseNumberMinimum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -1017,10 +1291,8 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum
 export function parseExclusiveMinimum(value: unknown): unknown {
-return _parseNumberExclusiveMinimum(value);
-}
-function _parseNumberExclusiveMinimum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -1031,22 +1303,16 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength
 export function parseMaxLength(value: unknown): unknown {
-return _parseReferenceMaxLength(value);
-}
-function _parseReferenceMaxLength(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength
 export function parseMinLength(value: unknown): unknown {
-return _parseReferenceMinLength(value);
-}
-function _parseReferenceMinLength(value: unknown): unknown {
 return parseNonNegativeIntegerDefault0(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern
 export function parsePattern(value: unknown): unknown {
-return _parseStringPattern(value);
-}
-function _parseStringPattern(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1057,22 +1323,16 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems
 export function parseMaxItems(value: unknown): unknown {
-return _parseReferenceMaxItems(value);
-}
-function _parseReferenceMaxItems(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems
 export function parseMinItems(value: unknown): unknown {
-return _parseReferenceMinItems(value);
-}
-function _parseReferenceMinItems(value: unknown): unknown {
 return parseNonNegativeIntegerDefault0(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems
 export function parseUniqueItems(value: unknown): unknown {
-return _parseBooleanUniqueItems(value);
-}
-function _parseBooleanUniqueItems(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -1095,53 +1355,49 @@ return value;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains
 export function parseMaxContains(value: unknown): unknown {
-return _parseReferenceMaxContains(value);
-}
-function _parseReferenceMaxContains(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains
 export function parseMinContains(value: unknown): unknown {
-return _parseReferenceMinContains(value);
-}
-function _parseReferenceMinContains(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties
 export function parseMaxProperties(value: unknown): unknown {
-return _parseReferenceMaxProperties(value);
-}
-function _parseReferenceMaxProperties(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties
 export function parseMinProperties(value: unknown): unknown {
-return _parseReferenceMinProperties(value);
-}
-function _parseReferenceMinProperties(value: unknown): unknown {
 return parseNonNegativeIntegerDefault0(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/required
 export function parseRequired(value: unknown): unknown {
-return _parseReferenceRequired(value);
-}
-function _parseReferenceRequired(value: unknown): unknown {
 return parseStringArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired
 export function parseDependentRequired(value: unknown): unknown {
-return _parseMapDependentRequired(value);
-}
-function _parseMapDependentRequired(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseDependentRequiredAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
-export function parseStringArrayItems(value: unknown): unknown {
-return _parseStringStringArrayItems(value);
+})(name),
+parseDependentRequiredAdditionalProperties(value),
+])
+) :
+undefined;
 }
-function _parseStringStringArrayItems(value: unknown): unknown {
+// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items
+export function parseStringArrayItems(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1152,93 +1408,43 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
 export function parseType0(value: unknown): unknown {
-return _parseReferenceType0(value);
-}
-function _parseReferenceType0(value: unknown): unknown {
 return parseSimpleTypes(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
 export function parseType1(value: unknown): unknown {
-return _parseArrayType1(value);
+return Array.isArray(value) ?
+value.map(value => parseTypeItems(value)) :
+undefined;
 }
-function _parseArrayType1(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseTypeItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items
 export function parseEnumItems(value: unknown): unknown {
-return _parseAnyEnumItems(value);
-}
-function _parseAnyEnumItems(value: unknown): unknown {
 return value;
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
 export function parseDependentRequiredAdditionalProperties(value: unknown): unknown {
-return _parseReferenceDependentRequiredAdditionalProperties(value);
-}
-function _parseReferenceDependentRequiredAdditionalProperties(value: unknown): unknown {
 return parseStringArray(value);
 }
+// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
 export function parseTypeItems(value: unknown): unknown {
-return _parseReferenceTypeItems(value);
-}
-function _parseReferenceTypeItems(value: unknown): unknown {
 return parseSimpleTypes(value);
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data
 export function parseMetaData(value: unknown): unknown {
-return _parseMapMetaData(value) ?? _parseBooleanMetaData(value);
-}
-function _parseMapMetaData(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "title": {
-const propertyValue = parseTitle(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "description": {
-const propertyValue = parseDescription(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "default": {
-const propertyValue = parseDefault(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "deprecated": {
-const propertyValue = parseDeprecated(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "readOnly": {
-const propertyValue = parseReadOnly(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "writeOnly": {
-const propertyValue = parseWriteOnly(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "examples": {
-const propertyValue = parseExamples(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanMetaData(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"default": parseDefault(value["default" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
+"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -1260,11 +1466,10 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title
 export function parseTitle(value: unknown): unknown {
-return _parseStringTitle(value);
-}
-function _parseStringTitle(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1275,10 +1480,8 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description
 export function parseDescription(value: unknown): unknown {
-return _parseStringDescription(value);
-}
-function _parseStringDescription(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1289,16 +1492,12 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default
 export function parseDefault(value: unknown): unknown {
-return _parseAnyDefault(value);
-}
-function _parseAnyDefault(value: unknown): unknown {
 return value;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated
 export function parseDeprecated(value: unknown): unknown {
-return _parseBooleanDeprecated(value);
-}
-function _parseBooleanDeprecated(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -1321,10 +1520,8 @@ return value;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly
 export function parseReadOnly(value: unknown): unknown {
-return _parseBooleanReadOnly(value);
-}
-function _parseBooleanReadOnly(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -1347,10 +1544,8 @@ return value;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly
 export function parseWriteOnly(value: unknown): unknown {
-return _parseBooleanWriteOnly(value);
-}
-function _parseBooleanWriteOnly(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -1373,45 +1568,25 @@ return value;
 }
 return undefined;
 }
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples
 export function parseExamples(value: unknown): unknown {
-return _parseArrayExamples(value);
+return Array.isArray(value) ?
+value.map(value => parseExamplesItems(value)) :
+undefined;
 }
-function _parseArrayExamples(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseExamplesItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items
 export function parseExamplesItems(value: unknown): unknown {
-return _parseAnyExamplesItems(value);
-}
-function _parseAnyExamplesItems(value: unknown): unknown {
 return value;
 }
+// https://json-schema.org/draft/2020-12/meta/format-annotation
 export function parseFormatAnnotation(value: unknown): unknown {
-return _parseMapFormatAnnotation(value) ?? _parseBooleanFormatAnnotation(value);
-}
-function _parseMapFormatAnnotation(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "format": {
-const propertyValue = parseFormat(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanFormatAnnotation(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"format": parseFormat(value["format" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -1433,11 +1608,10 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format
 export function parseFormat(value: unknown): unknown {
-return _parseStringFormat(value);
-}
-function _parseStringFormat(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1448,36 +1622,17 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/content
 export function parseContent(value: unknown): unknown {
-return _parseMapContent(value) ?? _parseBooleanContent(value);
-}
-function _parseMapContent(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "contentEncoding": {
-const propertyValue = parseContentEncoding(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "contentMediaType": {
-const propertyValue = parseContentMediaType(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "contentSchema": {
-const propertyValue = parseContentSchema(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
-function _parseBooleanContent(value: unknown): unknown {
+return ((value: unknown) => {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
+"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
+"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
+} :
+undefined;
+})(value) ?? ((value: unknown) => {
 if(value == null) {
 return false;
 }
@@ -1499,11 +1654,10 @@ case "boolean":
 return value;
 }
 return undefined;
+})(value);
 }
+// https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding
 export function parseContentEncoding(value: unknown): unknown {
-return _parseStringContentEncoding(value);
-}
-function _parseStringContentEncoding(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1514,10 +1668,8 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType
 export function parseContentMediaType(value: unknown): unknown {
-return _parseStringContentMediaType(value);
-}
-function _parseStringContentMediaType(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -1528,9 +1680,7 @@ default:
 return undefined;
 }
 }
+// https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
 export function parseContentSchema(value: unknown): unknown {
-return _parseReferenceContentSchema(value);
-}
-function _parseReferenceContentSchema(value: unknown): unknown {
 return parseSchema(value);
 }

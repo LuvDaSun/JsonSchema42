@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.21                         -- www.JsonSchema42.org
+// v0.9.6                          -- www.JsonSchema42.org
 import * as types from "./types.js";
 // http://json-schema.org/draft-04/schema#
 export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
@@ -18,6 +18,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "id":
 if(!isId(propertyValue)) {
@@ -587,6 +590,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDefinitionsAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -607,6 +613,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isPropertiesPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -627,6 +636,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -647,6 +659,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDependenciesAdditionalProperties(propertyValue)) {
 return false;
 }

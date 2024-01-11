@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.21                         -- www.JsonSchema42.org
+// v0.9.6                          -- www.JsonSchema42.org
 import * as types from "./types.js";
 // https://json-schema.org/draft/2020-12/schema
 export function isSchema(value: unknown): value is types.Schema {
@@ -21,6 +21,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "definitions":
 if(!isDefinitions(propertyValue)) {
@@ -89,6 +92,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDefinitionsAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -109,6 +115,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDependenciesAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -330,6 +339,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "$id":
 if(!isId(propertyValue)) {
@@ -502,6 +514,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isVocabularyPropertyNames(propertyName)) {
 return false;
 }
@@ -539,6 +554,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDefsAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -598,6 +616,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "prefixItems":
 if(!isPrefixItems(propertyValue)) {
@@ -771,6 +792,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -791,6 +815,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isPatternPropertiesPropertyNames(propertyName)) {
 return false;
 }
@@ -815,6 +842,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -1004,6 +1034,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "unevaluatedItems":
 if(!isUnevaluatedItems(propertyValue)) {
@@ -1064,6 +1097,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "type":
 if(!isType(propertyValue)) {
@@ -1513,6 +1549,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 if(!isDependentRequiredAdditionalProperties(propertyValue)) {
 return false;
 }
@@ -1622,6 +1661,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "title":
 if(!isTitle(propertyValue)) {
@@ -1785,6 +1827,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "format":
 if(!isFormat(propertyValue)) {
@@ -1827,6 +1872,9 @@ return false;
 }
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
 switch(propertyName) {
 case "contentEncoding":
 if(!isContentEncoding(propertyValue)) {

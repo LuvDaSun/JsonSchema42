@@ -11,9 +11,13 @@ import { resolveParent } from "./resolve-parent.js";
 import { singleType } from "./single-type.js";
 
 export const all: SchemaTransform = (arena, model, modelKey) => {
-  // explode before singleType
+  /* 
+  order matters here!
+  */
+  // TODO make the order of these not matter
   model = explode(arena, model, modelKey);
   model = singleType(arena, model, modelKey);
+  /* */
   model = resolveAllOf(arena, model, modelKey);
   model = resolveAnyOf(arena, model, modelKey);
   model = resolveOneOf(arena, model, modelKey);

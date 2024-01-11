@@ -1,6 +1,5 @@
 {
   "name": "schema-draft-2020-12",
-  "version": "0.0.0",
   "sideEffects": false,
   "type": "module",
   "main": "./out/main.js",
@@ -24,9 +23,12 @@
     }
   },
   "scripts": {
+    "prepack": "npm install --no-workspaces",
+    "pretest": "tsc --build",
+    "prepare": "tsc --build",
     "build": "tsc --build",
     "clean": "rm -rf ./out && tsc --build --clean",
-    "test": "node --test ./out/*.test.js"
+    "test": "node --test ./out/**/*.test.js"
   },
   "author": "",
   "license": "ISC",
@@ -34,7 +36,8 @@
     "@types/node": "^20.11.0"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.2",
-    "typescript": "^5.3.3"
-  }
+    "typescript": "^5.3.3",
+    "@tsconfig/node20": "^20.1.2"
+  },
+  "private": true
 }

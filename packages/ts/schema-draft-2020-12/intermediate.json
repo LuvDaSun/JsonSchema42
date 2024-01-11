@@ -2,16 +2,11 @@
   "$schema": "https://schema.JsonSchema42.org/jns42-intermediate/schema.json",
   "schemas": {
     "https://json-schema.org/draft/2020-12/schema": {
-      "deprecated": false,
       "title": "Core and Validation specifications meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "allOf": [
         "https://json-schema.org/draft/2020-12/schema#/allOf/0",
         "https://json-schema.org/draft/2020-12/schema#/allOf/1",
@@ -30,196 +25,80 @@
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/definitions": {
       "deprecated": true,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties"
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/dependencies": {
       "deprecated": true,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties"
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor": {
       "deprecated": true,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString"
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef": {
       "deprecated": true,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/0": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/1": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/applicator"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/2": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/unevaluated"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/3": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/4": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/meta-data"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/5": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/format-annotation"
     },
     "https://json-schema.org/draft/2020-12/schema#/allOf/6": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/content"
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "anyOf": [
         "https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0",
         "https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1"
       ]
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
-      "valuePattern": "^[A-Za-z_][-A-Za-z0-9._]*$",
-      "uniqueItems": false,
-      "required": []
+      "valuePattern": "^[A-Za-z_][-A-Za-z0-9._]*$"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
-      "valueFormat": "uri-reference",
-      "uniqueItems": false,
-      "required": []
+      "valueFormat": "uri-reference"
     },
     "https://json-schema.org/draft/2020-12/meta/core": {
-      "deprecated": false,
       "title": "Core vocabulary meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "$id": "https://json-schema.org/draft/2020-12/meta/core#/properties/$id",
         "$schema": "https://json-schema.org/draft/2020-12/meta/core#/properties/$schema",
@@ -233,158 +112,68 @@
       }
     },
     "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
-      "valueFormat": "uri",
-      "uniqueItems": false,
-      "required": []
+      "valueFormat": "uri"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$id": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
       "valuePattern": "^[^#]*#?$",
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$schema": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$ref": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties",
       "propertyNames": "https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$comment": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$defs": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "boolean"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString"
     },
     "https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator": {
-      "deprecated": false,
       "title": "Applicator vocabulary meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "prefixItems": "https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems",
         "items": "https://json-schema.org/draft/2020-12/meta/applicator#/properties/items",
@@ -404,274 +193,108 @@
       }
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "array"
       ],
       "minimumItems": 1,
-      "uniqueItems": false,
-      "required": [],
       "arrayItems": "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/items": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties",
       "propertyNames": "https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/if": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/then": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/else": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/not": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
-      "valueFormat": "regex",
-      "uniqueItems": false,
-      "required": []
+      "valueFormat": "regex"
     },
     "https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/unevaluated": {
-      "deprecated": false,
       "title": "Unevaluated applicator vocabulary meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "unevaluatedItems": "https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems",
         "unevaluatedProperties": "https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties"
       }
     },
     "https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     },
     "https://json-schema.org/draft/2020-12/meta/validation": {
-      "deprecated": false,
       "title": "Validation vocabulary meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "type": "https://json-schema.org/draft/2020-12/meta/validation#/properties/type",
         "const": "https://json-schema.org/draft/2020-12/meta/validation#/properties/const",
@@ -696,32 +319,15 @@
       }
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "integer"
       ],
-      "minimumInclusive": 0,
-      "uniqueItems": false,
-      "required": []
+      "minimumInclusive": 0
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
@@ -733,315 +339,135 @@
         "number",
         "object",
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "array"
       ],
       "uniqueItems": true,
-      "required": [],
       "arrayItems": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/type": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "anyOf": [
         "https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0",
         "https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1"
       ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/const": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "any"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/enum": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "array"
       ],
-      "uniqueItems": false,
-      "required": [],
       "arrayItems": "https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "number"
       ],
-      "minimumExclusive": 0,
-      "uniqueItems": false,
-      "required": []
+      "minimumExclusive": 0
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "number"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "number"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "number"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "number"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
       ],
-      "valueFormat": "regex",
-      "uniqueItems": false,
-      "required": []
+      "valueFormat": "regex"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "boolean"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/required": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "map"
       ],
-      "uniqueItems": false,
-      "required": [],
       "mapProperties": "https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "array"
       ],
       "minimumItems": 1,
       "uniqueItems": true,
-      "required": [],
       "arrayItems": "https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "any"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray"
     },
     "https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes"
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data": {
-      "deprecated": false,
       "title": "Meta-data vocabulary meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "title": "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title",
         "description": "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description",
@@ -1053,131 +479,67 @@
       }
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "any"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "boolean"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "boolean"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "boolean"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "array"
       ],
-      "uniqueItems": false,
-      "required": [],
       "arrayItems": "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items"
     },
     "https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "any"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/format-annotation": {
-      "deprecated": false,
       "title": "Format vocabulary meta-schema for annotation results",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "format": "https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format"
       }
     },
     "https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/content": {
-      "deprecated": false,
       "title": "Content vocabulary meta-schema",
-      "description": "",
-      "examples": [],
       "types": [
         "map",
         "boolean"
       ],
-      "uniqueItems": false,
-      "required": [],
       "objectProperties": {
         "contentEncoding": "https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding",
         "contentMediaType": "https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType",
@@ -1185,35 +547,16 @@
       }
     },
     "https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
       "types": [
         "string"
-      ],
-      "uniqueItems": false,
-      "required": []
+      ]
     },
     "https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema": {
-      "deprecated": false,
-      "title": "",
-      "description": "",
-      "examples": [],
-      "types": [],
-      "uniqueItems": false,
-      "required": [],
       "reference": "https://json-schema.org/draft/2020-12/schema"
     }
   }
