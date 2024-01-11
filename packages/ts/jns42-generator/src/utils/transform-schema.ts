@@ -10,7 +10,7 @@ import * as models from "../models/index.js";
 export function transformSchema(
   document: schemaIntermediate.SchemaDocument,
   maximumIterations: number,
-): Record<string, models.Item | models.Alias> {
+): Record<string, models.Item> {
   const arena = new SchemaArena();
   /*
   the schemas in the arena get a new id
@@ -162,14 +162,15 @@ export function transformSchema(
     }
   }
 
-  const result: Record<string, models.Item | models.Alias> = {};
+  const result: Record<string, models.Item> = {};
   for (const [key, model] of arena) {
     if (!usedKeys.has(key)) {
       continue;
     }
 
-    const [newKey, newItem] = convertEntry([key, model]);
-    result[newKey] = newItem;
+    for (const [newKey, newItem] of convertEntry([key, model])) {
+      result[newKey] = newItem;
+    }
   }
 
   result["unknown"] = {
@@ -183,199 +184,220 @@ export function transformSchema(
   };
 
   return result;
-}
 
-function convertEntry(
-  entry: [key: number, model: SchemaModel],
-): [string, models.Item | models.Alias] {
-  const [key, model] = entry;
-  const { id } = model;
+  function* convertEntry(
+    entry: [key: number, model: SchemaModel],
+  ): Iterable<[string, models.Item]> {
+    const [key, model] = entry;
+    const { id } = model;
 
-  const mapKey = (key: number) => String(key);
+    const mapKey = (key: number) => String(key);
+    const unaliasKey = (key: number) => {
+      const [unaliasedKey] = arena.resolveItem(key);
+      return unaliasedKey;
+    };
 
-  if (model.alias != null) {
-    return [
-      mapKey(key),
-      {
-        id,
-        type: "alias",
-        target: mapKey(model.alias),
-      },
-    ];
-  }
+    if (model.alias != null) {
+      return;
+      // return [
+      //   mapKey(key),
+      //   {
+      //     id,
+      //     type: "alias",
+      //     target: mapKey(unaliasKey(model.alias)),
+      //   },
+      // ];
+    }
 
-  if (model.oneOf != null && model.oneOf.length > 0) {
-    return [
-      mapKey(key),
-      {
-        id,
-        type: "union",
-        elements: model.oneOf.map(mapKey),
-      },
-    ];
-  }
+    if (model.oneOf != null && model.oneOf.length > 0) {
+      yield [
+        mapKey(key),
+        {
+          id,
+          type: "union",
+          elements: model.oneOf.map((key) => mapKey(unaliasKey(key))),
+        },
+      ];
+      return;
+    }
 
-  if (model.types != null && model.types.length === 1) {
-    const type = model.types[0];
-    switch (type) {
-      case "never":
-        // TODO should error in the future
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "never",
-          },
-        ];
-
-      case "any":
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "any",
-          },
-        ];
-
-      case "null":
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "null",
-          },
-        ];
-
-      case "boolean":
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "boolean",
-            options: model.options,
-          },
-        ];
-
-      case "integer":
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "integer",
-            options: model.options,
-          },
-        ];
-
-      case "number":
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "number",
-            options: model.options,
-          },
-        ];
-
-      case "string":
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "string",
-            options: model.options,
-          },
-        ];
-
-      case "array": {
-        if (model.tupleItems != null) {
-          return [
+    if (model.types != null && model.types.length === 1) {
+      const type = model.types[0];
+      switch (type) {
+        case "never":
+          // TODO should error in the future
+          yield [
             mapKey(key),
             {
               id,
-              type: "tuple",
-              elements: model.tupleItems.map(mapKey),
+              type: "never",
             },
           ];
-        }
+          break;
 
-        if (model.arrayItems != null) {
-          return [
+        case "any":
+          yield [
+            mapKey(key),
+            {
+              id,
+              type: "any",
+            },
+          ];
+          break;
+
+        case "null":
+          yield [
+            mapKey(key),
+            {
+              id,
+              type: "null",
+            },
+          ];
+          break;
+
+        case "boolean":
+          yield [
+            mapKey(key),
+            {
+              id,
+              type: "boolean",
+              options: model.options,
+            },
+          ];
+          break;
+
+        case "integer":
+          yield [
+            mapKey(key),
+            {
+              id,
+              type: "integer",
+              options: model.options,
+            },
+          ];
+          break;
+
+        case "number":
+          yield [
+            mapKey(key),
+            {
+              id,
+              type: "number",
+              options: model.options,
+            },
+          ];
+          break;
+
+        case "string":
+          yield [
+            mapKey(key),
+            {
+              id,
+              type: "string",
+              options: model.options,
+            },
+          ];
+          break;
+
+        case "array": {
+          if (model.tupleItems != null) {
+            yield [
+              mapKey(key),
+              {
+                id,
+                type: "tuple",
+                elements: model.tupleItems.map((key) => mapKey(unaliasKey(key))),
+              },
+            ];
+            break;
+          }
+
+          if (model.arrayItems != null) {
+            yield [
+              mapKey(key),
+              {
+                id,
+                type: "array",
+                element: mapKey(unaliasKey(model.arrayItems)),
+              },
+            ];
+            break;
+          }
+
+          yield [
             mapKey(key),
             {
               id,
               type: "array",
-              element: mapKey(model.arrayItems),
+              element: "any",
             },
           ];
+          break;
         }
 
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "array",
-            element: "any",
-          },
-        ];
-      }
+        case "map": {
+          if (model.objectProperties != null) {
+            const required = new Set(model.required);
+            const { objectProperties } = model;
+            const propertyNames = [
+              ...new Set([...Object.keys(model.objectProperties), ...required]),
+            ];
 
-      case "map": {
-        if (model.objectProperties != null) {
-          const required = new Set(model.required);
-          const { objectProperties } = model;
-          const propertyNames = [...new Set([...Object.keys(model.objectProperties), ...required])];
+            yield [
+              mapKey(key),
+              {
+                id,
+                type: "object",
+                properties: Object.fromEntries(
+                  propertyNames.map((propertyName) => [
+                    propertyName,
+                    {
+                      required: required.has(propertyName),
+                      element:
+                        objectProperties[propertyName] == null
+                          ? "any"
+                          : mapKey(unaliasKey(objectProperties[propertyName])),
+                    },
+                  ]),
+                ),
+              },
+            ];
+            break;
+          }
 
-          return [
-            mapKey(key),
-            {
-              id,
-              type: "object",
-              properties: Object.fromEntries(
-                propertyNames.map((propertyName) => [
-                  propertyName,
-                  {
-                    required: required.has(propertyName),
-                    element:
-                      objectProperties[propertyName] == null
-                        ? "any"
-                        : mapKey(objectProperties[propertyName]),
-                  },
-                ]),
-              ),
-            },
-          ];
-        }
+          if (model.mapProperties != null) {
+            yield [
+              mapKey(key),
+              {
+                id,
+                type: "map",
+                name: "string",
+                element: mapKey(unaliasKey(model.mapProperties)),
+              },
+            ];
+            break;
+          }
 
-        if (model.mapProperties != null) {
-          return [
+          yield [
             mapKey(key),
             {
               id,
               type: "map",
               name: "string",
-              element: mapKey(model.mapProperties),
+              element: "any",
             },
           ];
+          break;
         }
-
-        return [
-          mapKey(key),
-          {
-            id,
-            type: "map",
-            name: "string",
-            element: "any",
-          },
-        ];
       }
     }
-  }
 
-  return [
-    mapKey(key),
-    {
-      id,
-      type: "unknown",
-    },
-  ];
+    yield [
+      mapKey(key),
+      {
+        id,
+        type: "unknown",
+      },
+    ];
+  }
 }

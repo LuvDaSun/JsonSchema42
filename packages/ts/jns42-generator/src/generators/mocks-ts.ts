@@ -71,7 +71,7 @@ function* generateMockReference(
   typeKey: string,
 ): Iterable<NestedText> {
   const { names, types } = specification;
-  const typeItem = unalias(types, typeKey); // types[typeKey];
+  const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`(${generateMockDefinition(specification, typeKey)})`;
   } else {
@@ -246,19 +246,12 @@ function* generateMockDefinition(
       break;
     }
 
-    case "alias": {
-      yield generateMockReference(specification, typeItem.target);
-      break;
-    }
+    // case "alias": {
+    //   yield generateMockReference(specification, typeItem.target);
+    //   break;
+    // }
+
     default:
       throw new TypeError(`${typeItem.type} not supported`);
   }
-}
-
-function unalias(types: Record<string, models.Item | models.Alias>, typeKey: string): models.Item {
-  let typeItem = types[typeKey];
-  while (typeItem.type === "alias") {
-    typeItem = types[typeItem.target];
-  }
-  return typeItem;
 }
