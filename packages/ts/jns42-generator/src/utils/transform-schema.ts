@@ -233,7 +233,7 @@ export function transformSchema(
               type: "never",
             },
           ];
-          break;
+          return;
 
         case "any":
           yield [
@@ -243,7 +243,7 @@ export function transformSchema(
               type: "any",
             },
           ];
-          break;
+          return;
 
         case "null":
           yield [
@@ -253,7 +253,7 @@ export function transformSchema(
               type: "null",
             },
           ];
-          break;
+          return;
 
         case "boolean":
           yield [
@@ -264,7 +264,7 @@ export function transformSchema(
               options: model.options,
             },
           ];
-          break;
+          return;
 
         case "integer":
           yield [
@@ -275,7 +275,7 @@ export function transformSchema(
               options: model.options,
             },
           ];
-          break;
+          return;
 
         case "number":
           yield [
@@ -286,7 +286,7 @@ export function transformSchema(
               options: model.options,
             },
           ];
-          break;
+          return;
 
         case "string":
           yield [
@@ -297,7 +297,7 @@ export function transformSchema(
               options: model.options,
             },
           ];
-          break;
+          return;
 
         case "array": {
           if (model.tupleItems != null) {
@@ -309,7 +309,7 @@ export function transformSchema(
                 elements: model.tupleItems.map((key) => mapKey(unaliasKey(key))),
               },
             ];
-            break;
+            return;
           }
 
           if (model.arrayItems != null) {
@@ -321,7 +321,7 @@ export function transformSchema(
                 element: mapKey(unaliasKey(model.arrayItems)),
               },
             ];
-            break;
+            return;
           }
 
           yield [
@@ -332,7 +332,7 @@ export function transformSchema(
               element: "any",
             },
           ];
-          break;
+          return;
         }
 
         case "map": {
@@ -362,7 +362,7 @@ export function transformSchema(
                 ),
               },
             ];
-            break;
+            return;
           }
 
           if (model.mapProperties != null) {
@@ -375,7 +375,7 @@ export function transformSchema(
                 element: mapKey(unaliasKey(model.mapProperties)),
               },
             ];
-            break;
+            return;
           }
 
           yield [
@@ -387,7 +387,7 @@ export function transformSchema(
               element: "any",
             },
           ];
-          break;
+          return;
         }
       }
     }

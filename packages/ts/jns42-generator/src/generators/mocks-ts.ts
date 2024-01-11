@@ -246,11 +246,6 @@ function* generateMockDefinition(
       break;
     }
 
-    // case "alias": {
-    //   yield generateMockReference(specification, typeItem.target);
-    //   break;
-    // }
-
     default:
       throw new TypeError(`${typeItem.type} not supported`);
   }

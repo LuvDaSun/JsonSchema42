@@ -1,660 +1,542 @@
+import assert from "assert";
 import * as models from "../models/index.js";
-import { banner, itt, joinIterable, mapIterable, toCamel, toPascal } from "../utils/index.js";
+import {
+  NestedText,
+  banner,
+  itt,
+  joinIterable,
+  mapIterable,
+  toCamel,
+  toPascal,
+} from "../utils/index.js";
+
+const rules = {
+  minimumInclusive: undefined,
+  minimumExclusive: undefined,
+  maximumInclusive: undefined,
+  maximumExclusive: undefined,
+  multipleOf: undefined,
+  minimumLength: undefined,
+  maximumLength: undefined,
+  valuePattern: undefined,
+  required: [],
+  unique: undefined,
+  minimumProperties: undefined,
+  maximumProperties: undefined,
+  minimumItems: undefined,
+  maximumItems: undefined,
+};
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, nodes } = specification;
+  const { names, types } = specification;
 
   yield itt`
     import * as types from "./types.js";
   `;
 
-  for (const nodeId in nodes) {
-    const node = nodes[nodeId];
+  for (const [typeKey, item] of Object.entries(types)) {
+    const { id: nodeId } = item;
+
+    if (nodeId == null) {
+      continue;
+    }
+
     const typeName = toPascal(names[nodeId]);
+    const functionName = toCamel("is", names[nodeId]);
+    const definition = generateValidatorDefinition(specification, typeKey, "value");
 
-    {
-      const functionName = toCamel("is", names[nodeId]);
-      const functionBody = generateValidationBody(specification, nodeId);
-
-      yield itt`
-        // ${nodeId}
-        export function ${functionName}(value: unknown): value is types.${typeName} {
-          ${functionBody}
-        }
-      `;
-    }
-
-    if (node.types != null) {
-      for (const type of node.types) {
-        const functionName = "_" + toCamel("is", type, names[nodeId]);
-        const functionBody = generateTypeValidationBody(specification, nodeId, type);
-
-        yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-      }
-    }
-
-    if (node.reference != null) {
-      const functionName = "_" + toCamel("is", "reference", names[nodeId]);
-      const functionBody = generateReferenceCompoundValidationStatements(
-        specification,
-        node.reference,
-      );
-      yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-    }
-
-    if (node.oneOf != null) {
-      const functionName = "_" + toCamel("is", "oneOf", names[nodeId]);
-      const functionBody = generateOneOfCompoundValidationStatements(specification, node.oneOf);
-      yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-    }
-
-    if (node.anyOf != null) {
-      const functionName = "_" + toCamel("is", "anyOf", names[nodeId]);
-      const functionBody = generateAnyOfCompoundValidationStatements(specification, node.anyOf);
-      yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-    }
-
-    if (node.allOf != null) {
-      const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
-      const functionBody = generateAllOfCompoundValidationStatements(specification, node.allOf);
-      yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-    }
-
-    if (node.if != null) {
-      const functionName = "_" + toCamel("is", "if", names[nodeId]);
-      const functionBody = generateIfCompoundValidationStatements(
-        specification,
-        node.if,
-        node.then,
-        node.else,
-      );
-      yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-    }
-
-    if (node.not != null) {
-      const functionName = "_" + toCamel("is", "not", names[nodeId]);
-      const functionBody = generateNotCompoundValidationStatements(specification, node.not);
-      yield itt`
-        function ${functionName}(value: unknown): value is unknown {
-          ${functionBody}
-        }
-      `;
-    }
-  }
-}
-
-function* generateValidationBody(specification: models.Specification, nodeId: string) {
-  const { names, nodes } = specification;
-  const node = nodes[nodeId];
-
-  const compoundValidatorFunctionNames = new Array<string>();
-  const typeValidatorFunctionNames = new Array<string>();
-
-  if (node.types != null && node.types.length > 0) {
-    for (const type of node.types) {
-      const functionName = "_" + toCamel("is", type, names[nodeId]);
-      typeValidatorFunctionNames.push(functionName);
-    }
-  }
-
-  if (node.reference != null) {
-    const functionName = "_" + toCamel("is", "reference", names[nodeId]);
-    compoundValidatorFunctionNames.push(functionName);
-  }
-
-  if (node.oneOf != null) {
-    const functionName = "_" + toCamel("is", "oneOf", names[nodeId]);
-    compoundValidatorFunctionNames.push(functionName);
-  }
-
-  if (node.anyOf != null) {
-    const functionName = "_" + toCamel("is", "anyOf", names[nodeId]);
-    compoundValidatorFunctionNames.push(functionName);
-  }
-
-  if (node.allOf != null) {
-    const functionName = "_" + toCamel("is", "allOf", names[nodeId]);
-    compoundValidatorFunctionNames.push(functionName);
-  }
-
-  if (node.if != null) {
-    const functionName = "_" + toCamel("is", "if", names[nodeId]);
-    compoundValidatorFunctionNames.push(functionName);
-  }
-
-  if (node.not != null) {
-    const functionName = "_" + toCamel("is", "not", names[nodeId]);
-    compoundValidatorFunctionNames.push(functionName);
-  }
-
-  if (typeValidatorFunctionNames.length > 0) {
     yield itt`
-      if(${joinIterable(
-        mapIterable(typeValidatorFunctionNames, (functionName) => {
-          return itt`!${functionName}(value)`;
-        }),
-        " && ",
-      )}) {
-        return false;
+      // ${nodeId}
+    `;
+
+    yield itt`
+      export function ${functionName}(value: unknown): value is types.${typeName} {
+        return (${definition});
       }
     `;
   }
-
-  if (compoundValidatorFunctionNames.length > 0) {
-    yield itt`
-      if(${joinIterable(
-        mapIterable(compoundValidatorFunctionNames, (functionName) => {
-          return itt`!${functionName}(value)`;
-        }),
-        " || ",
-      )}) {
-        return false;
-      }
-    `;
-  }
-
-  yield itt`
-    return true;
-  `;
 }
 
-function* generateTypeValidationBody(
+function* generateValidatorReference(
   specification: models.Specification,
-  nodeId: string,
-  type: string,
-) {
-  switch (type) {
-    case "never":
-      yield* generateNeverTypeValidationStatements(specification, nodeId);
+  typeKey: string,
+  valueExpression: string,
+): Iterable<NestedText> {
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
+  if (typeItem.id == null) {
+    yield itt`${generateValidatorDefinition(specification, typeKey, valueExpression)}`;
+  } else {
+    const functionName = toCamel("is", names[typeItem.id]);
+    yield itt`${functionName}(${valueExpression})`;
+  }
+}
+
+function* generateValidatorDefinition(
+  specification: models.Specification,
+  typeKey: string,
+  valueExpression: string,
+): Iterable<NestedText> {
+  yield* joinIterable(
+    mapIterable(generateRules(specification, typeKey, valueExpression), (text) => itt`(${text})`),
+    " &&\n",
+  );
+}
+
+function* generateRules(
+  specification: models.Specification,
+  typeKey: string,
+  valueExpression: string,
+): Iterable<NestedText> {
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
+
+  switch (typeItem.type) {
+    case "unknown":
+      yield itt`
+        // unknown
+        true
+      `;
       break;
 
     case "any":
-      yield* generateAnyTypeValidationStatements(specification, nodeId);
+      yield itt`
+        // any
+        true
+      `;
       break;
 
     case "null":
-      yield* generateNullTypeValidationStatements(specification, nodeId);
+      yield itt`${valueExpression} === null`;
       break;
 
-    case "boolean":
-      yield* generateBooleanTypeValidationStatements(specification, nodeId);
+    case "boolean": {
+      yield itt`typeof ${valueExpression} === "boolean"`;
+
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
+          " ||\n",
+        );
+      }
       break;
+    }
 
     case "integer":
-      yield* generateIntegerTypeValidationStatements(specification, nodeId);
+      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression}) && ${valueExpression} % 1 === 0`;
+
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
+          " ||\n",
+        );
+      }
+
+      if (rules.minimumInclusive != null) {
+        yield itt`${valueExpression} >= ${JSON.stringify(rules.minimumInclusive)}`;
+      }
+
+      if (rules.minimumExclusive != null) {
+        yield itt`${valueExpression} > ${JSON.stringify(rules.minimumExclusive)}`;
+      }
+
+      if (rules.maximumInclusive != null) {
+        yield itt`${valueExpression} <= ${JSON.stringify(rules.maximumInclusive)}`;
+      }
+
+      if (rules.maximumExclusive != null) {
+        yield itt`${valueExpression} < ${JSON.stringify(rules.maximumExclusive)}`;
+      }
+
+      if (rules.multipleOf != null) {
+        yield itt`${valueExpression} % ${JSON.stringify(rules.multipleOf)} === 0`;
+      }
+
       break;
 
-    case "number":
-      yield* generateNumberTypeValidationStatements(specification, nodeId);
+    case "number": {
+      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression})`;
+
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
+          " ||\n",
+        );
+      }
+
+      if (rules.minimumInclusive != null) {
+        yield itt`${valueExpression} >= ${JSON.stringify(rules.minimumInclusive)}`;
+      }
+
+      if (rules.minimumExclusive != null) {
+        yield itt`${valueExpression} > ${JSON.stringify(rules.minimumExclusive)}`;
+      }
+
+      if (rules.maximumInclusive != null) {
+        yield itt`${valueExpression} <= ${JSON.stringify(rules.maximumInclusive)}`;
+      }
+
+      if (rules.maximumExclusive != null) {
+        yield itt`${valueExpression} < ${JSON.stringify(rules.maximumExclusive)}`;
+      }
+
+      if (rules.multipleOf != null) {
+        yield itt`${valueExpression} % ${JSON.stringify(rules.multipleOf)} === 0`;
+      }
+
       break;
+    }
 
     case "string":
-      yield* generateStringTypeValidationStatements(specification, nodeId);
+      yield itt`typeof ${valueExpression} === "string"`;
+
+      if (typeItem.options != null) {
+        yield joinIterable(
+          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
+          " ||\n",
+        );
+      }
+
+      if (rules.minimumLength != null) {
+        yield itt`${valueExpression}.length >= ${JSON.stringify(rules.minimumLength)}`;
+      }
+
+      if (rules.maximumLength != null) {
+        yield itt`value.length <= ${JSON.stringify(rules.maximumLength)}`;
+      }
+
+      if (rules.valuePattern != null) {
+        yield itt`new RegExp(${JSON.stringify(rules.valuePattern)}).test(${valueExpression})`;
+      }
+
       break;
 
-    case "array":
-      yield* generateArrayTypeValidationStatements(specification, nodeId);
+    case "tuple": {
+      const unique = rules.unique ?? false;
+
+      yield itt`Array.isArray(${valueExpression}) && ${valueExpression}.length === ${JSON.stringify(
+        typeItem.elements.length,
+      )}`;
+
+      if (rules.minimumItems != null) {
+        yield itt`${valueExpression}.length >= ${JSON.stringify(rules.minimumItems)}`;
+      }
+
+      if (rules.minimumItems != null) {
+        yield itt`${valueExpression}.length <= ${JSON.stringify(rules.maximumItems)}`;
+      }
+
+      yield itt`
+        (()=>{
+          ${generateAdvancedRules()}
+        })()
+      `;
       break;
 
-    case "map":
-      yield* generateMapTypeValidationStatements(specification, nodeId);
+      function* generateAdvancedRules() {
+        if (unique) {
+          yield itt`
+            const elementValueSeen = new Set<unknown>();
+          `;
+        }
+
+        yield itt`
+          for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
+            ${generateAdvancedElementRules()}
+          }
+        `;
+        return true;
+      }
+
+      function* generateAdvancedElementRules() {
+        yield itt`
+          const elementValue = ${valueExpression}[elementIndex];
+        `;
+
+        if (unique) {
+          yield itt`
+            if(elementValueSeen.has(elementValue)) {
+              return false;
+            }
+            elementValueSeen.add(elementValue);
+          `;
+        }
+
+        yield itt`
+          switch(elementIndex) {
+            ${generateAdvancedElementCaseRules()}
+          }
+        `;
+      }
+
+      function* generateAdvancedElementCaseRules() {
+        assert(typeItem.type === "tuple");
+        for (let elementIndex = 0; elementIndex < typeItem.elements.length; elementIndex++) {
+          const elementKey = typeItem.elements[elementIndex];
+          yield itt`
+            case ${JSON.stringify(Number(elementIndex))}:
+              if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
+                return false;
+              }
+              break;
+          `;
+        }
+      }
+    }
+
+    case "array": {
+      const unique = rules.unique ?? false;
+
+      yield itt`Array.isArray(${valueExpression})`;
+
+      if (rules.minimumItems != null) {
+        yield itt`${valueExpression}.length >= ${JSON.stringify(rules.minimumItems)}`;
+      }
+
+      if (rules.minimumItems != null) {
+        yield itt`${valueExpression}.length <= ${JSON.stringify(rules.maximumItems)}`;
+      }
+
+      yield itt`
+        (()=>{
+          ${generateAdvancedRules()}
+        })()
+      `;
       break;
+
+      function* generateAdvancedRules() {
+        if (unique) {
+          yield itt`
+            const elementValueSeen = new Set<unknown>();
+          `;
+        }
+
+        yield itt`
+          for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
+            ${generateAdvancedElementRules()}
+          }
+          return true;
+        `;
+      }
+
+      function* generateAdvancedElementRules() {
+        assert(typeItem.type === "array");
+
+        yield itt`
+          const elementValue = ${valueExpression}[elementIndex];
+        `;
+
+        if (unique) {
+          yield itt`
+            if(elementValueSeen.has(elementValue)) {
+              return false;
+            }
+            elementValueSeen.add(elementValue);
+          `;
+        }
+
+        yield itt`
+          if(!${generateValidatorReference(specification, typeItem.element, `elementValue`)}) {
+            return false;
+          }
+        `;
+      }
+    }
+
+    case "object": {
+      const countProperties = rules.minimumProperties != null || rules.maximumProperties != null;
+
+      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
+
+      /**
+       * check if all the required properties are present
+       */
+      for (const propertyName in typeItem.properties ?? []) {
+        if (!typeItem.properties[propertyName].required) {
+          continue;
+        }
+        yield itt`${JSON.stringify(propertyName)} in ${valueExpression}`;
+        yield itt`${valueExpression}[${JSON.stringify(propertyName)}] !== undefined`;
+      }
+
+      yield itt`
+        (()=>{
+          ${generateAdvancedRules()}
+        })()
+      `;
+      break;
+
+      function* generateAdvancedRules() {
+        if (countProperties) {
+          yield itt`
+            let propertyCount = 0;
+          `;
+        }
+
+        yield itt`
+          for(const propertyName in ${valueExpression}) {
+            ${generateAdvancedPropertyRules()}
+          }
+        `;
+
+        if (countProperties) {
+          if (rules.minimumProperties != null) {
+            yield itt`
+              if(propertyCount < ${JSON.stringify(rules.minimumProperties)}) {
+                return false;
+              }
+            `;
+          }
+
+          if (rules.maximumProperties != null) {
+            yield itt`
+              if(propertyCount > ${JSON.stringify(rules.maximumProperties)}) {
+                return false;
+              }
+            `;
+          }
+        }
+
+        yield itt`
+          return true;
+        `;
+      }
+
+      function* generateAdvancedPropertyRules() {
+        yield itt`
+          const propertyValue = value[propertyName as keyof typeof value];
+          if(propertyValue === undefined) {
+            continue;
+          }
+        `;
+
+        if (countProperties) {
+          yield itt`
+            propertyCount++;
+          `;
+        }
+
+        yield itt`
+          switch(propertyName) {
+            ${generateAdvancedPropertyCaseRules()}
+          }
+        `;
+      }
+
+      function* generateAdvancedPropertyCaseRules() {
+        assert(typeItem.type === "object");
+
+        for (const propertyName in typeItem.properties) {
+          yield itt`
+            case ${JSON.stringify(propertyName)}:
+              if(!${generateValidatorReference(
+                specification,
+                typeItem.properties[propertyName].element,
+                `propertyValue`,
+              )}) {
+                return false;
+              }
+              break;
+          `;
+        }
+      }
+    }
+
+    case "map": {
+      const countProperties = rules.minimumProperties != null || rules.maximumProperties != null;
+
+      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
+
+      yield itt`
+        (()=>{
+          ${generateAdvancedRules()}
+        })()
+      `;
+      break;
+
+      function* generateAdvancedRules() {
+        if (countProperties) {
+          yield itt`
+            let propertyCount = 0;
+          `;
+        }
+
+        yield itt`
+          for(const propertyName in ${valueExpression}) {
+            ${generateAdvancedPropertyRules()}
+          }
+        `;
+
+        if (countProperties) {
+          if (rules.minimumProperties != null) {
+            yield itt`
+              if(propertyCount < ${JSON.stringify(rules.minimumProperties)}) {
+                return false;
+              }
+            `;
+          }
+
+          if (rules.maximumProperties != null) {
+            yield itt`
+              if(propertyCount > ${JSON.stringify(rules.maximumProperties)}) {
+                return false;
+              }
+            `;
+          }
+        }
+
+        yield itt`
+          return true;
+        `;
+      }
+
+      function* generateAdvancedPropertyRules() {
+        assert(typeItem.type === "map");
+
+        yield itt`
+          const propertyValue = value[propertyName as keyof typeof value];
+          if(propertyValue === undefined) {
+            continue;
+          }
+        `;
+
+        if (countProperties) {
+          yield itt`
+            propertyCount++;
+          `;
+        }
+
+        yield itt`
+          if(!${generateValidatorReference(specification, typeItem.name, `propertyName`)}) {
+            return false;
+          }
+        `;
+
+        yield itt`
+          if(!${generateValidatorReference(specification, typeItem.element, `propertyValue`)}) {
+            return false;
+          }
+        `;
+      }
+    }
+
+    case "union": {
+      yield joinIterable(
+        typeItem.elements.map(
+          (element) => itt`${generateValidatorReference(specification, element, valueExpression)}`,
+        ),
+        " ||\n",
+      );
+      break;
+    }
 
     default:
-      throw new Error("type not supported");
+      throw new TypeError(`${typeItem.type} not supported`);
   }
 }
 
-function* generateNeverTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  yield itt`
-    return false;
-  `;
-}
-function* generateAnyTypeValidationStatements(specification: models.Specification, nodeId: string) {
-  yield itt`
-    return true;
-  `;
-}
-function* generateNullTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  yield itt`
-    if(value !== null) {
-      return false;
-    }
-  `;
-
-  yield itt`
-    return true;
-  `;
-}
-function* generateBooleanTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-
-  yield itt`
-    if(typeof value !== "boolean") {
-      return false;
-    }
-  `;
-
-  const options = node.options?.filter((option) => typeof option === "boolean");
-
-  if (options != null && options.length > 0) {
-    yield itt`
-      if(${joinIterable(
-        options.map((option) => {
-          return itt`value !== ${JSON.stringify(option)}`;
-        }),
-        " && ",
-      )}) {
-        return false;
-      }
-    `;
-  }
-
-  yield itt`
-    return true;
-  `;
-}
-function* generateIntegerTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-
-  yield itt`
-    if(typeof value !== "number" || isNaN(value)) {
-      return false;
-    }
-  `;
-
-  if (node.minimumInclusive != null) {
-    yield itt`
-      if(value < ${JSON.stringify(node.minimumInclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.minimumExclusive != null) {
-    yield itt`
-      if(value <= ${JSON.stringify(node.minimumExclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.maximumInclusive != null) {
-    yield itt`
-      if(value > ${JSON.stringify(node.minimumInclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.maximumExclusive != null) {
-    yield itt`
-      if(value >= ${JSON.stringify(node.minimumExclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.multipleOf != null) {
-    yield itt`
-      if(value % ${JSON.stringify(node.multipleOf)} !== 0) {
-        return false;
-      }
-    `;
-  }
-
-  const options = node.options?.filter((option) => typeof option === "number");
-
-  if (options != null && options.length > 0) {
-    yield itt`
-      if(${joinIterable(
-        options.map((option) => {
-          return itt`value !== ${JSON.stringify(option)}`;
-        }),
-        " && ",
-      )}) {
-        return false;
-      }
-    `;
-  }
-
-  yield itt`
-    return true;
-  `;
-}
-function* generateNumberTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-
-  yield itt`
-    if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-      return false;
-    }
-  `;
-
-  if (node.minimumInclusive != null) {
-    yield itt`
-      if(value < ${JSON.stringify(node.minimumInclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.minimumExclusive != null) {
-    yield itt`
-      if(value <= ${JSON.stringify(node.minimumExclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.maximumInclusive != null) {
-    yield itt`
-      if(value > ${JSON.stringify(node.minimumInclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.maximumExclusive != null) {
-    yield itt`
-      if(value >= ${JSON.stringify(node.minimumExclusive)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.multipleOf != null) {
-    yield itt`
-      if(value % ${JSON.stringify(node.multipleOf)} !== 0) {
-        return false;
-      }
-    `;
-  }
-
-  const options = node.options?.filter((option) => typeof option === "number");
-
-  if (options != null && options.length > 0) {
-    yield itt`
-      if(${joinIterable(
-        options.map((option) => {
-          return itt`value !== ${JSON.stringify(option)}`;
-        }),
-        " && ",
-      )}) {
-        return false;
-      }
-    `;
-  }
-
-  yield itt`
-    return true;
-  `;
-}
-function* generateStringTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-
-  yield itt`
-    if(typeof value !== "string") {
-      return false;
-    }
-  `;
-
-  if (node.minimumLength != null) {
-    yield itt`
-      if(value.length < ${JSON.stringify(node.minimumLength)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.maximumLength != null) {
-    yield itt`
-      if(value.length > ${JSON.stringify(node.maximumLength)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.valuePattern != null) {
-    yield itt`
-      if(!new RegExp(${JSON.stringify(node.valuePattern)}).test(value)) {
-        return false;
-      }
-    `;
-  }
-
-  const options = node.options?.filter((option) => typeof option === "string");
-
-  if (options != null && options.length > 0) {
-    if (options != null && options.length > 0) {
-      yield itt`
-        if(${joinIterable(
-          options.map((option) => {
-            return itt`value !== ${JSON.stringify(option)}`;
-          }),
-          " && ",
-        )}) {
-          return false;
-        }
-      `;
-    }
-  }
-
-  yield itt`
-    return true;
-  `;
-}
-function* generateArrayTypeValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes } = specification;
-  const node = nodes[nodeId];
-
-  const hasSeenSet = node.uniqueItems ?? false;
-
-  yield itt`
-    if(!Array.isArray(value)) {
-      return false;
-    }
-  `;
-
-  if (node.minimumItems != null) {
-    yield itt`
-      if(value.length < ${JSON.stringify(node.minimumItems)}) {
-        return false;
-      }
-    `;
-  }
-
-  if (node.maximumItems != null) {
-    yield itt`
-      if(value.length > ${JSON.stringify(node.maximumItems)}) {
-        return false;
-      }
-    `;
-  }
-
-  /**
-   * if we want unique values, create a set to keep track of em
-   */
-  if (hasSeenSet) {
-    yield itt`
-      const elementValueSeen = new Set<unknown>();
-    `;
-  }
-
-  /**
-   * if we have tuple items the length should be the length of the tuple
-   * or at least the length of the tuple if there are array items
-   */
-  if (node.tupleItems != null) {
-    if (node.arrayItems == null) {
-      yield itt`
-        if(value.length !== ${JSON.stringify(node.tupleItems.length)}) {
-          return false;
-        }
-      `;
-    } else {
-      yield itt`
-        if(value.length < ${JSON.stringify(node.tupleItems.length)}) {
-          return false;
-        }
-      `;
-    }
-  }
-
-  /**
-   * Loop through the elements to validate them!
-   */
-  yield itt`
-    for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
-      ${generateArrayTypeItemValidationStatements(specification, nodeId)}
-    }
-  `;
-
-  yield itt`
-    return true;
-  `;
-}
-function* generateArrayTypeItemValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes, names } = specification;
-  const node = nodes[nodeId];
-
-  const hasSeenSet = node.uniqueItems ?? false;
-
-  yield itt`
-    const elementValue = value[elementIndex];
-  `;
-
-  if (hasSeenSet) {
-    /**
-     * if we want uniqueness, check iof the value is already present.
-     */
-    yield itt`
-      if(elementValueSeen.has(elementValue)) {
-        return false;
-      }
-      elementValueSeen.add(elementValue);
-    `;
-  }
-
-  if (node.tupleItems != null && node.arrayItems != null) {
-    const itemValidatorFunctionName = toCamel("is", names[node.arrayItems]);
-
-    yield itt`
-      if(elementIndex < ${JSON.stringify(node.tupleItems.length)}) {
-        switch(elementIndex) {
-          ${generateArrayTypeItemCaseClausesValidationStatements(specification, nodeId)}
-        }
-      }
-      else {
-        if(!${itemValidatorFunctionName}(elementValue)) {
-          return false;
-        }
-      }
-    `;
-  }
-
-  if (node.tupleItems != null && node.arrayItems == null) {
-    yield itt`
-      if(elementIndex < ${JSON.stringify(node.tupleItems.length)}) {
-        switch(elementIndex) {
-          ${generateArrayTypeItemCaseClausesValidationStatements(specification, nodeId)}
-        }
-      }
-    `;
-  }
-
-  if (node.tupleItems == null && node.arrayItems != null) {
-    const itemValidatorFunctionName = toCamel("is", names[node.arrayItems]);
-    yield itt`
-      if(!${itemValidatorFunctionName}(elementValue)) {
-        return false;
-      }
-    `;
-  }
-}
-function* generateArrayTypeItemCaseClausesValidationStatements(
-  specification: models.Specification,
-  nodeId: string,
-) {
-  const { nodes, names } = specification;
-  const node = nodes[nodeId];
-
-  if (node.tupleItems == null) {
-    return;
-  }
-
-  for (const elementIndex in node.tupleItems) {
-    const itemTypeNodeId = node.tupleItems[elementIndex];
-    const itemValidatorFunctionName = toCamel("is", names[itemTypeNodeId]);
-
-    yield itt`
-      case ${JSON.stringify(Number(elementIndex))}:
-        if(!${itemValidatorFunctionName}(elementValue)) {
-          return false;
-        }
-        break;
-    `;
-  }
-
-  yield itt`
-    default:
-      return false;
-  `;
-}
 function* generateMapTypeValidationStatements(specification: models.Specification, nodeId: string) {
   const { nodes } = specification;
   const node = nodes[nodeId];
