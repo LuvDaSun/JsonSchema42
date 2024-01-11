@@ -6,6 +6,16 @@ import { all } from "./all.js";
 
 test("all", () => {
   const arena = new SchemaArena();
+  arena.addItem({
+    types: ["null", "boolean"],
+    allOf: [1, 2],
+  });
+  arena.addItem({
+    types: ["null", "boolean"],
+  });
+  arena.addItem({
+    types: ["null", "boolean"],
+  });
 
   while (arena.applyTransform(all) > 0);
 

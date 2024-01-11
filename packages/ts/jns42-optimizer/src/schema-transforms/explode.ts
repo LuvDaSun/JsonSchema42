@@ -90,22 +90,6 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
 
   let count = Object.values(schemaModels).filter((value) => value).length;
 
-  // if (model.reference != null) {
-  //   count++;
-  // }
-  // if (model.allOf != null && model.allOf.length > 0) {
-  //   count++;
-  // }
-  // if (model.anyOf != null && model.anyOf.length > 0) {
-  //   count++;
-  // }
-  // if (model.oneOf != null && model.oneOf.length > 0) {
-  //   count++;
-  // }
-  // if (model.if != null || model.then != null || model.else != null) {
-  //   count++;
-  // }
-
   if (count <= 1) {
     // nothing to explode here
     return model;

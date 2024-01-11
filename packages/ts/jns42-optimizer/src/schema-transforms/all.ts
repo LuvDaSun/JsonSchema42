@@ -11,15 +11,16 @@ import { resolveParent } from "./resolve-parent.js";
 import { singleType } from "./single-type.js";
 
 export const all: SchemaTransform = (arena, model, modelKey) => {
-  model = singleType(arena, model, modelKey);
+  // explode before singleType
   model = explode(arena, model, modelKey);
-  model = flatten(arena, model, modelKey);
-  model = alias(arena, model, modelKey);
-  model = flipAllOfOneOf(arena, model, modelKey);
+  model = singleType(arena, model, modelKey);
   model = resolveAllOf(arena, model, modelKey);
   model = resolveAnyOf(arena, model, modelKey);
   model = resolveOneOf(arena, model, modelKey);
   model = resolveParent(arena, model, modelKey);
   model = flushParent(arena, model, modelKey);
+  model = flipAllOfOneOf(arena, model, modelKey);
+  model = flatten(arena, model, modelKey);
+  model = alias(arena, model, modelKey);
   return model;
 };

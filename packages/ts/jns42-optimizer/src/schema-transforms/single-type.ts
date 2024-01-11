@@ -1,4 +1,5 @@
 import {
+  OneOfSchemaModel,
   SchemaModel,
   SchemaTransform,
   isAliasSchemaModel,
@@ -39,17 +40,24 @@ export const singleType: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  if (!isTypeSchemaModel(model) || model.types == null) {
+  if (!isTypeSchemaModel(model)) {
     return model;
   }
 
-  // copy the model
-  const newModel = { ...model };
-  // remove the types
-  delete newModel.types;
+  if (model.types == null) {
+    return model;
+  }
 
-  // create the oneOf
-  newModel.oneOf = [];
+  if (model.types.length == 0) {
+    return {
+      ...model,
+      types: undefined,
+    };
+  }
+
+  // copy the model
+  const newModel: SchemaModel & OneOfSchemaModel = { ...model, types: undefined, oneOf: [] };
+
   for (const type of model.types) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
