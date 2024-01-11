@@ -5,6 +5,7 @@ import {
   SchemaTransform,
   isAllOfSchemaModel,
   isOneOfSchemaModel,
+  isSingleTypeSchemaModel,
 } from "../schema/index.js";
 
 /**
@@ -32,6 +33,13 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   }
 
   const baseElementSet = new Set(baseElementEntries.map(([key, item]) => key));
+
+  for (const leafElement of leafElements) {
+    const [, leafModel] = arena.resolveItem(leafElement);
+    if (!isSingleTypeSchemaModel(leafModel)) {
+      return model;
+    }
+  }
 
   for (const leafElement of leafElements) {
     const newLeafElements = [...model.allOf, leafElement].filter((key) => !baseElementSet.has(key));

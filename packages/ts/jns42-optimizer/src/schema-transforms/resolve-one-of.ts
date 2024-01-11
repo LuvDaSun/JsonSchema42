@@ -31,11 +31,11 @@ export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
   for (const elementKey of elementKeys) {
     const [, elementModel] = arena.resolveItem(elementKey);
 
-    if (
-      isSingleTypeSchemaModel(elementModel) &&
-      elementModel.types != null &&
-      elementModel.types[0] === "never"
-    ) {
+    if (!isSingleTypeSchemaModel(elementModel)) {
+      return model;
+    }
+
+    if (elementModel.types != null && elementModel.types[0] === "never") {
       continue;
     }
 

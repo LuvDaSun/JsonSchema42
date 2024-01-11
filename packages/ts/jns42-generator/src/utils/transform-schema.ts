@@ -143,20 +143,7 @@ export function transformSchema(
   */
 
   let iterations = 0;
-  while (
-    arena.applyTransform(
-      schemaTransforms.singleType,
-      schemaTransforms.explode,
-      schemaTransforms.flatten,
-      schemaTransforms.alias,
-      schemaTransforms.flipAllOfOneOf,
-      schemaTransforms.resolveAllOf,
-      schemaTransforms.resolveAnyOfChoose,
-      schemaTransforms.resolveOneOf,
-      schemaTransforms.resolveParent,
-      schemaTransforms.flushParent,
-    ) > 0
-  ) {
+  while (arena.applyTransform(schemaTransforms.all) > 0) {
     iterations++;
     if (iterations < maximumIterations) {
       continue;
