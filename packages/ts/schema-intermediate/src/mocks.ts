@@ -18,43 +18,43 @@ return (
 export function mockNode(): types.Node {
 return (
 {
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
+"title": Boolean(nextSeed() % 2) ? mockNonEmptyStringValue() : undefined,
+"description": Boolean(nextSeed() % 2) ? mockNonEmptyStringValue() : undefined,
 "examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
+"deprecated": Boolean(nextSeed() % 2) ? mockBooleanValue() : undefined,
 "types": Boolean(nextSeed() % 2) ? mockTypes() : undefined,
-"reference": Boolean(nextSeed() % 2) ? mockReference() : undefined,
+"reference": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
 "oneOf": Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
 "anyOf": Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
 "allOf": Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockIf() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockThen() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockElse() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockNot() : undefined,
+"if": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
+"then": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
+"else": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
+"not": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
 "dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
 "objectProperties": Boolean(nextSeed() % 2) ? mockObjectProperties() : undefined,
-"mapProperties": Boolean(nextSeed() % 2) ? mockMapProperties() : undefined,
+"mapProperties": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
 "patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockPropertyNames() : undefined,
+"propertyNames": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
 "tupleItems": Boolean(nextSeed() % 2) ? mockTupleItems() : undefined,
-"arrayItems": Boolean(nextSeed() % 2) ? mockArrayItems() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockContains() : undefined,
+"arrayItems": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
+"contains": Boolean(nextSeed() % 2) ? mockNodeReference() : undefined,
 "options": Boolean(nextSeed() % 2) ? mockOptions() : undefined,
-"minimumInclusive": Boolean(nextSeed() % 2) ? mockMinimumInclusive() : undefined,
-"minimumExclusive": Boolean(nextSeed() % 2) ? mockMinimumExclusive() : undefined,
-"maximumInclusive": Boolean(nextSeed() % 2) ? mockMaximumInclusive() : undefined,
-"maximumExclusive": Boolean(nextSeed() % 2) ? mockMaximumExclusive() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"minimumLength": Boolean(nextSeed() % 2) ? mockMinimumLength() : undefined,
-"maximumLength": Boolean(nextSeed() % 2) ? mockMaximumLength() : undefined,
-"valuePattern": Boolean(nextSeed() % 2) ? mockValuePattern() : undefined,
-"valueFormat": Boolean(nextSeed() % 2) ? mockValueFormat() : undefined,
-"minimumItems": Boolean(nextSeed() % 2) ? mockMinimumItems() : undefined,
-"maximumItems": Boolean(nextSeed() % 2) ? mockMaximumItems() : undefined,
+"minimumInclusive": Boolean(nextSeed() % 2) ? mockNumberValue() : undefined,
+"minimumExclusive": Boolean(nextSeed() % 2) ? mockNumberValue() : undefined,
+"maximumInclusive": Boolean(nextSeed() % 2) ? mockNumberValue() : undefined,
+"maximumExclusive": Boolean(nextSeed() % 2) ? mockNumberValue() : undefined,
+"multipleOf": Boolean(nextSeed() % 2) ? mockNumberValue() : undefined,
+"minimumLength": Boolean(nextSeed() % 2) ? mockAmount() : undefined,
+"maximumLength": Boolean(nextSeed() % 2) ? mockAmount() : undefined,
+"valuePattern": Boolean(nextSeed() % 2) ? mockNonEmptyStringValue() : undefined,
+"valueFormat": Boolean(nextSeed() % 2) ? mockNonEmptyStringValue() : undefined,
+"minimumItems": Boolean(nextSeed() % 2) ? mockAmount() : undefined,
+"maximumItems": Boolean(nextSeed() % 2) ? mockAmount() : undefined,
 "uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
 "required": Boolean(nextSeed() % 2) ? mockRequired() : undefined,
-"minimumProperties": Boolean(nextSeed() % 2) ? mockMinimumProperties() : undefined,
-"maximumProperties": Boolean(nextSeed() % 2) ? mockMaximumProperties() : undefined,
+"minimumProperties": Boolean(nextSeed() % 2) ? mockAmount() : undefined,
+"maximumProperties": Boolean(nextSeed() % 2) ? mockAmount() : undefined,
 }
 );
 }
@@ -94,11 +94,11 @@ return ((["https://schema.JsonSchema42.org/jns42-intermediate/schema.json"] as c
 export function mockSchemas(): types.Schemas {
 return (
 {
-[(randomString(10))]: mockSchemasAdditionalProperties(),
-[(randomString(10))]: mockSchemasAdditionalProperties(),
-[(randomString(10))]: mockSchemasAdditionalProperties(),
-[(randomString(10))]: mockSchemasAdditionalProperties(),
-[(randomString(10))]: mockSchemasAdditionalProperties(),
+[(randomString(10))]: mockNode(),
+[(randomString(10))]: mockNode(),
+[(randomString(10))]: mockNode(),
+[(randomString(10))]: mockNode(),
+[(randomString(10))]: mockNode(),
 }
 );
 }
@@ -146,11 +146,11 @@ return (mockNodeReference());
 export function mockOneOf(): types.OneOf {
 return (
 [
-mockOneOfItems(),
-mockOneOfItems(),
-mockOneOfItems(),
-mockOneOfItems(),
-mockOneOfItems(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
 ]
 );
 }
@@ -158,11 +158,11 @@ mockOneOfItems(),
 export function mockAnyOf(): types.AnyOf {
 return (
 [
-mockAnyOfItems(),
-mockAnyOfItems(),
-mockAnyOfItems(),
-mockAnyOfItems(),
-mockAnyOfItems(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
 ]
 );
 }
@@ -170,11 +170,11 @@ mockAnyOfItems(),
 export function mockAllOf(): types.AllOf {
 return (
 [
-mockAllOfItems(),
-mockAllOfItems(),
-mockAllOfItems(),
-mockAllOfItems(),
-mockAllOfItems(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
 ]
 );
 }
@@ -198,11 +198,11 @@ return (mockNodeReference());
 export function mockDependentSchemas(): types.DependentSchemas {
 return (
 {
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
 }
 );
 }
@@ -210,11 +210,11 @@ return (
 export function mockObjectProperties(): types.ObjectProperties {
 return (
 {
-[(randomString(10))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString(10))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString(10))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString(10))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString(10))]: mockObjectPropertiesAdditionalProperties(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
 }
 );
 }
@@ -226,11 +226,11 @@ return (mockNodeReference());
 export function mockPatternProperties(): types.PatternProperties {
 return (
 {
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
+[(randomString(10))]: mockNodeReference(),
 }
 );
 }
@@ -242,11 +242,11 @@ return (mockNodeReference());
 export function mockTupleItems(): types.TupleItems {
 return (
 [
-mockTupleItemsItems(),
-mockTupleItemsItems(),
-mockTupleItemsItems(),
-mockTupleItemsItems(),
-mockTupleItemsItems(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
+mockNodeReference(),
 ]
 );
 }
@@ -322,11 +322,11 @@ return (Boolean(nextSeed() % 2));
 export function mockRequired(): types.Required {
 return (
 [
-mockRequiredItems(),
-mockRequiredItems(),
-mockRequiredItems(),
-mockRequiredItems(),
-mockRequiredItems(),
+mockStringValue(),
+mockStringValue(),
+mockStringValue(),
+mockStringValue(),
+mockStringValue(),
 ]
 );
 }

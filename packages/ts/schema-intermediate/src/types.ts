@@ -17,43 +17,43 @@ export type SchemaDocument = (
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node
 export type Node = (
 {
-"title"?: Title,
-"description"?: Description,
+"title"?: NonEmptyStringValue,
+"description"?: NonEmptyStringValue,
 "examples"?: Examples,
-"deprecated"?: Deprecated,
+"deprecated"?: BooleanValue,
 "types"?: Types,
-"reference"?: Reference,
+"reference"?: NodeReference,
 "oneOf"?: OneOf,
 "anyOf"?: AnyOf,
 "allOf"?: AllOf,
-"if"?: If,
-"then"?: Then,
-"else"?: Else,
-"not"?: Not,
+"if"?: NodeReference,
+"then"?: NodeReference,
+"else"?: NodeReference,
+"not"?: NodeReference,
 "dependentSchemas"?: DependentSchemas,
 "objectProperties"?: ObjectProperties,
-"mapProperties"?: MapProperties,
+"mapProperties"?: NodeReference,
 "patternProperties"?: PatternProperties,
-"propertyNames"?: PropertyNames,
+"propertyNames"?: NodeReference,
 "tupleItems"?: TupleItems,
-"arrayItems"?: ArrayItems,
-"contains"?: Contains,
+"arrayItems"?: NodeReference,
+"contains"?: NodeReference,
 "options"?: Options,
-"minimumInclusive"?: MinimumInclusive,
-"minimumExclusive"?: MinimumExclusive,
-"maximumInclusive"?: MaximumInclusive,
-"maximumExclusive"?: MaximumExclusive,
-"multipleOf"?: MultipleOf,
-"minimumLength"?: MinimumLength,
-"maximumLength"?: MaximumLength,
-"valuePattern"?: ValuePattern,
-"valueFormat"?: ValueFormat,
-"minimumItems"?: MinimumItems,
-"maximumItems"?: MaximumItems,
+"minimumInclusive"?: NumberValue,
+"minimumExclusive"?: NumberValue,
+"maximumInclusive"?: NumberValue,
+"maximumExclusive"?: NumberValue,
+"multipleOf"?: NumberValue,
+"minimumLength"?: Amount,
+"maximumLength"?: Amount,
+"valuePattern"?: NonEmptyStringValue,
+"valueFormat"?: NonEmptyStringValue,
+"minimumItems"?: Amount,
+"maximumItems"?: Amount,
 "uniqueItems"?: UniqueItems,
 "required"?: Required,
-"minimumProperties"?: MinimumProperties,
-"maximumProperties"?: MaximumProperties,
+"minimumProperties"?: Amount,
+"maximumProperties"?: Amount,
 }
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference
@@ -75,7 +75,7 @@ export type Schema = ("https://schema.JsonSchema42.org/jns42-intermediate/schema
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas
 export type Schemas = (
 {
-[name: (string)]: SchemasAdditionalProperties
+[name: (string)]: Node
 }
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title
@@ -99,15 +99,15 @@ TypesItems[]
 export type Reference = (NodeReference);
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf
 export type OneOf = (
-OneOfItems[]
+NodeReference[]
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf
 export type AnyOf = (
-AnyOfItems[]
+NodeReference[]
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf
 export type AllOf = (
-AllOfItems[]
+NodeReference[]
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if
 export type If = (NodeReference);
@@ -120,13 +120,13 @@ export type Not = (NodeReference);
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas
 export type DependentSchemas = (
 {
-[name: (string)]: DependentSchemasAdditionalProperties
+[name: (string)]: NodeReference
 }
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties
 export type ObjectProperties = (
 {
-[name: (string)]: ObjectPropertiesAdditionalProperties
+[name: (string)]: NodeReference
 }
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties
@@ -134,14 +134,14 @@ export type MapProperties = (NodeReference);
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties
 export type PatternProperties = (
 {
-[name: (string)]: PatternPropertiesAdditionalProperties
+[name: (string)]: NodeReference
 }
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames
 export type PropertyNames = (NodeReference);
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems
 export type TupleItems = (
-TupleItemsItems[]
+NodeReference[]
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems
 export type ArrayItems = (NodeReference);
@@ -177,7 +177,7 @@ export type MaximumItems = (Amount);
 export type UniqueItems = (boolean);
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required
 export type Required = (
-RequiredItems[]
+StringValue[]
 );
 // https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties
 export type MinimumProperties = (Amount);

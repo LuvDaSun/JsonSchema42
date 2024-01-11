@@ -175,6 +175,9 @@ export function transformSchema(
   result["unknown"] = {
     type: "unknown",
   };
+  result["any"] = {
+    type: "unknown",
+  };
   result["string"] = {
     type: "string",
   };
@@ -311,7 +314,7 @@ function convertEntry(
           {
             id,
             type: "array",
-            element: "unknown",
+            element: "any",
           },
         ];
       }
@@ -361,7 +364,7 @@ function convertEntry(
             id,
             type: "map",
             name: "string",
-            element: "unknown",
+            element: "any",
           },
         ];
       }

@@ -19,17 +19,17 @@ return (
 "exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
 "minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
 "exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
+"maxLength": Boolean(nextSeed() % 2) ? mockPositiveInteger() : undefined,
+"minLength": Boolean(nextSeed() % 2) ? mockPositiveIntegerDefault0() : undefined,
 "pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
 "additionalItems": Boolean(nextSeed() % 2) ? mockAdditionalItems() : undefined,
 "items": Boolean(nextSeed() % 2) ? mockPropertiesItems() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
+"maxItems": Boolean(nextSeed() % 2) ? mockPositiveInteger() : undefined,
+"minItems": Boolean(nextSeed() % 2) ? mockPositiveIntegerDefault0() : undefined,
 "uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockRequired() : undefined,
+"maxProperties": Boolean(nextSeed() % 2) ? mockPositiveInteger() : undefined,
+"minProperties": Boolean(nextSeed() % 2) ? mockPositiveIntegerDefault0() : undefined,
+"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
 "additionalProperties": Boolean(nextSeed() % 2) ? mockPropertiesAdditionalProperties() : undefined,
 "definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
 "properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
@@ -38,10 +38,10 @@ return (
 "enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
 "type": Boolean(nextSeed() % 2) ? mockType() : undefined,
 "format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockNot() : undefined,
+"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
+"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
+"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
+"not": Boolean(nextSeed() % 2) ? mockSchemaDocument() : undefined,
 }
 );
 }
@@ -49,11 +49,11 @@ return (
 export function mockSchemaArray(): types.SchemaArray {
 return (
 [
-mockSchemaArrayItems(),
-mockSchemaArrayItems(),
-mockSchemaArrayItems(),
-mockSchemaArrayItems(),
-mockSchemaArrayItems(),
+mockSchemaDocument(),
+mockSchemaDocument(),
+mockSchemaDocument(),
+mockSchemaDocument(),
+mockSchemaDocument(),
 ]
 );
 }
@@ -148,7 +148,7 @@ nextSeed() % 2
 case 0:
 return (mockAdditionalItems0());
 case 1:
-return (mockAdditionalItems1());
+return (mockSchemaDocument());
 }
 })()
 );
@@ -163,9 +163,9 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockItems0());
+return (mockSchemaDocument());
 case 1:
-return (mockItems1());
+return (mockSchemaArray());
 }
 })()
 );
@@ -206,7 +206,7 @@ nextSeed() % 2
 case 0:
 return (mockAdditionalProperties0());
 case 1:
-return (mockAdditionalProperties1());
+return (mockSchemaDocument());
 }
 })()
 );
@@ -215,11 +215,11 @@ return (mockAdditionalProperties1());
 export function mockDefinitions(): types.Definitions {
 return (
 {
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
 }
 );
 }
@@ -227,11 +227,11 @@ return (
 export function mockProperties(): types.Properties {
 return (
 {
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
 }
 );
 }
@@ -239,11 +239,11 @@ return (
 export function mockPatternProperties(): types.PatternProperties {
 return (
 {
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
+[(randomString(10))]: mockSchemaDocument(),
 }
 );
 }
@@ -296,7 +296,7 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockType0());
+return (mockSimpleTypes());
 case 1:
 return (mockType1());
 }
@@ -388,9 +388,9 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockDependencies0());
+return (mockSchemaDocument());
 case 1:
-return (mockDependencies1());
+return (mockStringArray());
 }
 })()
 );
@@ -403,11 +403,11 @@ return (mockSimpleTypes());
 export function mockType1(): types.Type1 {
 return (
 [
-mockTypeItems(),
-mockTypeItems(),
-mockTypeItems(),
-mockTypeItems(),
-mockTypeItems(),
+mockSimpleTypes(),
+mockSimpleTypes(),
+mockSimpleTypes(),
+mockSimpleTypes(),
+mockSimpleTypes(),
 ]
 );
 }
