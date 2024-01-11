@@ -7,7 +7,19 @@ import {
 } from "../schema/index.js";
 
 export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
-  if (!isOneOfSchemaModel(model) || model.oneOf.length < 2) {
+  if (!isOneOfSchemaModel(model)) {
+    return model;
+  }
+
+  const elementKeys = new Set(model.oneOf);
+  if (elementKeys.size < 1) {
+    return {
+      ...model,
+      oneOf: undefined,
+    };
+  }
+
+  if (elementKeys.size < 2) {
     return model;
   }
 
@@ -16,18 +28,18 @@ export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
     oneOf: [],
   };
 
-  for (const element of model.oneOf) {
-    const [, subModel] = arena.resolveItem(element);
+  for (const elementKey of elementKeys) {
+    const [, elementModel] = arena.resolveItem(elementKey);
 
     if (
-      isSingleTypeSchemaModel(subModel) &&
-      subModel.types != null &&
-      subModel.types[0] === "never"
+      isSingleTypeSchemaModel(elementModel) &&
+      elementModel.types != null &&
+      elementModel.types[0] === "never"
     ) {
       continue;
     }
 
-    newModel.oneOf.push(element);
+    newModel.oneOf.push(elementKey);
   }
 
   if (newModel.oneOf.length === model.oneOf.length) {

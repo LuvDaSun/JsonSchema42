@@ -36,15 +36,26 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  */
 export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
+  if (!isAllOfSchemaModel(model)) {
     return model;
   }
 
-  let newModel!: SchemaModel;
-  for (const subKey of model.allOf) {
-    const [, subModel] = arena.resolveItem(subKey);
+  const elementKeys = new Set(model.allOf);
+  if (elementKeys.size < 1) {
+    return {
+      ...model,
+      allOf: undefined,
+    };
+  }
 
-    if (!isSingleTypeSchemaModel(subModel)) {
+  if (elementKeys.size < 2) {
+    return model;
+  }
+  let newModel!: SchemaModel;
+  for (const elementKey of elementKeys) {
+    const [, elementModel] = arena.resolveItem(elementKey);
+
+    if (!isSingleTypeSchemaModel(elementModel)) {
       // we want to only only merge single types this is because the intersectionMergeTypes
       // function can only merge single types
       return model;
@@ -53,7 +64,7 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
     // first pass
     if (newModel == null) {
       newModel = {
-        ...subModel,
+        ...elementModel,
         allOf: undefined,
         // meta fields
         id: model.id,
@@ -67,19 +78,19 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
 
     newModel = {
       ...newModel,
-      types: intersectionMergeTypes(newModel.types, subModel.types),
-      options: intersectionMerge(newModel.options, subModel.options),
-      required: unionMerge(newModel.required, subModel.required),
-      propertyNames: mergeKey(newModel.propertyNames, subModel.propertyNames),
-      contains: mergeKey(newModel.contains, subModel.contains),
-      tupleItems: mergeKeysArray(newModel.tupleItems, subModel.tupleItems, mergeKey),
-      arrayItems: mergeKey(newModel.arrayItems, subModel.arrayItems),
+      types: intersectionMergeTypes(newModel.types, elementModel.types),
+      options: intersectionMerge(newModel.options, elementModel.options),
+      required: unionMerge(newModel.required, elementModel.required),
+      propertyNames: mergeKey(newModel.propertyNames, elementModel.propertyNames),
+      contains: mergeKey(newModel.contains, elementModel.contains),
+      tupleItems: mergeKeysArray(newModel.tupleItems, elementModel.tupleItems, mergeKey),
+      arrayItems: mergeKey(newModel.arrayItems, elementModel.arrayItems),
       objectProperties: mergeKeysRecord(
         newModel.objectProperties,
-        subModel.objectProperties,
+        elementModel.objectProperties,
         mergeKey,
       ),
-      mapProperties: mergeKey(newModel.mapProperties, subModel.mapProperties),
+      mapProperties: mergeKey(newModel.mapProperties, elementModel.mapProperties),
     };
   }
 
