@@ -10,7 +10,7 @@ import * as models from "../models/index.js";
 export function transformSchema(
   document: schemaIntermediate.SchemaDocument,
   maximumIterations: number,
-): Record<string, models.Item> {
+): Record<string, models.Item | models.Alias> {
   const arena = new SchemaArena();
   /*
   the schemas in the arena get a new id
@@ -162,7 +162,7 @@ export function transformSchema(
     }
   }
 
-  const result: Record<string, models.Item> = {};
+  const result: Record<string, models.Item | models.Alias> = {};
   for (const [key, model] of arena) {
     if (!usedKeys.has(key)) {
       continue;
@@ -187,7 +187,7 @@ export function transformSchema(
 
   function* convertEntry(
     entry: [key: number, model: SchemaModel],
-  ): Iterable<[string, models.Item]> {
+  ): Iterable<[string, models.Item | models.Alias]> {
     const [key, model] = entry;
     const metaModel = {
       id: model.id,
@@ -198,10 +198,18 @@ export function transformSchema(
     };
 
     const mapKey = (key: number) => String(key);
-    const unaliasKey = (key: number) => {
-      const [unaliasedKey] = arena.resolveItem(key);
-      return unaliasedKey;
-    };
+
+    if (model.alias != null) {
+      yield [
+        mapKey(key),
+        {
+          ...metaModel,
+          type: "alias",
+          target: mapKey(model.alias),
+        },
+      ];
+      return;
+    }
 
     if (model.oneOf != null && model.oneOf.length > 0) {
       yield [
@@ -209,7 +217,7 @@ export function transformSchema(
         {
           ...metaModel,
           type: "union",
-          elements: model.oneOf.map((key) => mapKey(unaliasKey(key))),
+          elements: model.oneOf.map((key) => mapKey(key)),
         },
       ];
       return;
@@ -300,7 +308,7 @@ export function transformSchema(
               {
                 ...metaModel,
                 type: "tuple",
-                elements: model.tupleItems.map((key) => mapKey(unaliasKey(key))),
+                elements: model.tupleItems.map((key) => mapKey(key)),
               },
             ];
             return;
@@ -312,7 +320,7 @@ export function transformSchema(
               {
                 ...metaModel,
                 type: "array",
-                element: mapKey(unaliasKey(model.arrayItems)),
+                element: mapKey(model.arrayItems),
               },
             ];
             return;
@@ -350,7 +358,7 @@ export function transformSchema(
                       element:
                         objectProperties[propertyName] == null
                           ? "any"
-                          : mapKey(unaliasKey(objectProperties[propertyName])),
+                          : mapKey(objectProperties[propertyName]),
                     },
                   ]),
                 ),
@@ -366,7 +374,7 @@ export function transformSchema(
                 ...metaModel,
                 type: "map",
                 name: "string",
-                element: mapKey(unaliasKey(model.mapProperties)),
+                element: mapKey(model.mapProperties),
               },
             ];
             return;

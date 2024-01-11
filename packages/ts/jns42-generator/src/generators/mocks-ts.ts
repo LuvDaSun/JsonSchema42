@@ -2,6 +2,7 @@ import * as models from "../models/index.js";
 import {
   NestedText,
   banner,
+  generateJsDocComments,
   itt,
   joinIterable,
   mapIterable,
@@ -31,10 +32,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     const definition = generateMockDefinition(specification, typeKey);
 
     yield itt`
-      // ${nodeId}
-    `;
-
-    yield itt`
+      ${generateJsDocComments(item)}
       export function ${functionName}(): types.${typeName} {
         return (${definition});
       }
@@ -243,6 +241,11 @@ function* generateMockDefinition(
           }
         })()
       `;
+      break;
+    }
+
+    case "alias": {
+      yield generateMockReference(specification, typeItem.target);
       break;
     }
 

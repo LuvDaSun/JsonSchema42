@@ -1,5 +1,12 @@
 import * as models from "../models/index.js";
-import { NestedText, banner, itt, joinIterable, toPascal } from "../utils/index.js";
+import {
+  NestedText,
+  banner,
+  generateJsDocComments,
+  itt,
+  joinIterable,
+  toPascal,
+} from "../utils/index.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;
@@ -16,27 +23,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
     const typeName = toPascal(names[nodeId]);
     const definition = generateTypeDefinition(specification, typeKey);
 
-    const comments = [
-      item.title ?? "",
-      item.description ?? "",
-      item.deprecated ? "@deprecated" : "",
-    ]
-      .map((line) => line.replaceAll("*/", "*\\/"))
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-
     yield itt`
-      // ${nodeId}
-    `;
-
-    if (comments.length > 0) {
-      yield itt`
-        /**
-        ${comments}
-        */
-      `;
-    }
-    yield itt`
+      ${generateJsDocComments(item)}
       export type ${typeName} = (${definition});
     `;
   }
@@ -182,9 +170,9 @@ function* generateTypeDefinition(specification: models.Specification, typeKey: s
       break;
     }
 
-    // case "alias": {
-    //   yield generateTypeReference(specification, typeItem.target);
-    //   break;
-    // }
+    case "alias": {
+      yield generateTypeReference(specification, typeItem.target);
+      break;
+    }
   }
 }

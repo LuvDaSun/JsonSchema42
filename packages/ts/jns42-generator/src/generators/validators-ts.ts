@@ -3,6 +3,7 @@ import * as models from "../models/index.js";
 import {
   NestedText,
   banner,
+  generateJsDocComments,
   itt,
   joinIterable,
   mapIterable,
@@ -48,10 +49,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     const definition = generateValidatorDefinition(specification, typeKey, "value");
 
     yield itt`
-      // ${nodeId}
-    `;
-
-    yield itt`
+      ${generateJsDocComments(item)}
       export function ${functionName}(value: unknown): value is types.${typeName} {
         return (${definition});
       }
@@ -159,7 +157,7 @@ function* generateRules(
       break;
 
     case "number": {
-      yield itt`typeof ${valueExpression}`;
+      yield itt`typeof ${valueExpression} === "number"`;
       yield itt`!isNaN(${valueExpression})`;
 
       if (typeItem.options != null) {
@@ -530,6 +528,11 @@ function* generateRules(
         ),
         " ||\n",
       );
+      break;
+    }
+
+    case "alias": {
+      yield generateValidatorReference(specification, typeItem.target, valueExpression);
       break;
     }
 

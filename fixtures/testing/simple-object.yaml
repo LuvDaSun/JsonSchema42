@@ -3,7 +3,13 @@ $schema: "./schema.json"
 schemas:
   draft_2020-12:
     $schema: "https://json-schema.org/draft/2020-12/schema"
-    description: "A very simple object"
+    title: A simple object
+    description: |
+      This is a very simple object
+
+      You cannot do a lot of complex things with it!
+
+      <b>xx</b>
     $dynamicAnchor: "child"
     type: object
     required:

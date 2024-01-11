@@ -1,5 +1,12 @@
 import * as models from "../models/index.js";
-import { NestedText, banner, itt, joinIterable, toCamel } from "../utils/index.js";
+import {
+  NestedText,
+  banner,
+  generateJsDocComments,
+  itt,
+  joinIterable,
+  toCamel,
+} from "../utils/index.js";
 
 export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
@@ -17,10 +24,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     const definition = generateParserDefinition(specification, typeKey);
 
     yield itt`
-      // ${nodeId}
-    `;
-
-    yield itt`
+      ${generateJsDocComments(item)}
       export function ${functionName}(value: unknown): unknown {
         ${definition}
       }
