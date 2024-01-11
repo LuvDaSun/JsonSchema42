@@ -1,10 +1,10 @@
 import * as models from "../models/index.js";
-import { banner, itt, toCamel } from "../utils/index.js";
+import { banner, itt, mapIterable, toCamel } from "../utils/index.js";
 
 export function* generateExamplesTestTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, nodes } = specification;
+  const { names, types } = specification;
 
   yield itt`
     import assert from "node:assert/strict";
@@ -12,32 +12,32 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     import * as validators from "./validators.js";
   `;
 
-  for (const nodeId in nodes) {
-    const node = nodes[nodeId];
-    if ((node.examples ?? []).length === 0) {
+  for (const [typeKey, typeItem] of Object.entries(types)) {
+    const { id: nodeId } = typeItem;
+
+    if (nodeId == null) {
       continue;
     }
+
+    if ((typeItem.examples ?? []).length === 0) {
+      continue;
+    }
+
     const typeName = names[nodeId];
-    const testBody = generateTestBody(specification, nodeId);
+    const validatorFunctionName = toCamel("is", names[nodeId]);
+
     yield itt`
       test(${JSON.stringify(typeName)}, () => {
-        ${testBody}
-      })
-    `;
-  }
-}
-
-function* generateTestBody(specification: models.Specification, nodeId: string) {
-  const { nodes, names } = specification;
-  const validatorFunctionName = toCamel("is", names[nodeId]);
-
-  const node = nodes[nodeId];
-  for (const example of node.examples ?? []) {
-    yield itt`
-      assert.equal(
-        validators.${validatorFunctionName}(${JSON.stringify(example)}),
-        true,
-      )
+        ${mapIterable(
+          typeItem.examples ?? [],
+          (example) => itt`
+            assert.equal(
+              validators.${validatorFunctionName}(${JSON.stringify(example)}),
+              true,
+            )
+          `,
+        )}
+      });
     `;
   }
 }

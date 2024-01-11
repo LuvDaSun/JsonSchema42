@@ -189,7 +189,13 @@ export function transformSchema(
     entry: [key: number, model: SchemaModel],
   ): Iterable<[string, models.Item]> {
     const [key, model] = entry;
-    const { id } = model;
+    const metaModel = {
+      id: model.id,
+      title: model.title,
+      description: model.description,
+      examples: model.examples,
+      deprecated: model.deprecated,
+    };
 
     const mapKey = (key: number) => String(key);
     const unaliasKey = (key: number) => {
@@ -197,23 +203,11 @@ export function transformSchema(
       return unaliasedKey;
     };
 
-    if (model.alias != null) {
-      return;
-      // return [
-      //   mapKey(key),
-      //   {
-      //     id,
-      //     type: "alias",
-      //     target: mapKey(unaliasKey(model.alias)),
-      //   },
-      // ];
-    }
-
     if (model.oneOf != null && model.oneOf.length > 0) {
       yield [
         mapKey(key),
         {
-          id,
+          ...metaModel,
           type: "union",
           elements: model.oneOf.map((key) => mapKey(unaliasKey(key))),
         },
@@ -229,7 +223,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "never",
             },
           ];
@@ -239,7 +233,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "any",
             },
           ];
@@ -249,7 +243,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "null",
             },
           ];
@@ -259,7 +253,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "boolean",
               options: model.options,
             },
@@ -270,7 +264,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "integer",
               options: model.options,
             },
@@ -281,7 +275,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "number",
               options: model.options,
             },
@@ -292,7 +286,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "string",
               options: model.options,
             },
@@ -304,7 +298,7 @@ export function transformSchema(
             yield [
               mapKey(key),
               {
-                id,
+                ...metaModel,
                 type: "tuple",
                 elements: model.tupleItems.map((key) => mapKey(unaliasKey(key))),
               },
@@ -316,7 +310,7 @@ export function transformSchema(
             yield [
               mapKey(key),
               {
-                id,
+                ...metaModel,
                 type: "array",
                 element: mapKey(unaliasKey(model.arrayItems)),
               },
@@ -327,7 +321,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "array",
               element: "any",
             },
@@ -346,7 +340,7 @@ export function transformSchema(
             yield [
               mapKey(key),
               {
-                id,
+                ...metaModel,
                 type: "object",
                 properties: Object.fromEntries(
                   propertyNames.map((propertyName) => [
@@ -369,7 +363,7 @@ export function transformSchema(
             yield [
               mapKey(key),
               {
-                id,
+                ...metaModel,
                 type: "map",
                 name: "string",
                 element: mapKey(unaliasKey(model.mapProperties)),
@@ -381,7 +375,7 @@ export function transformSchema(
           yield [
             mapKey(key),
             {
-              id,
+              ...metaModel,
               type: "map",
               name: "string",
               element: "any",
@@ -395,7 +389,7 @@ export function transformSchema(
     yield [
       mapKey(key),
       {
-        id,
+        ...metaModel,
         type: "unknown",
       },
     ];

@@ -16,11 +16,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
     const typeName = toPascal(names[nodeId]);
     const definition = generateTypeDefinition(specification, typeKey);
 
-    const node = specification.nodes[nodeId];
     const comments = [
-      node.title ?? "",
-      node.description ?? "",
-      node.deprecated ? "@deprecated" : "",
+      item.title ?? "",
+      item.description ?? "",
+      item.deprecated ? "@deprecated" : "",
     ]
       .map((line) => line.replaceAll("*/", "*\\/"))
       .map((line) => line.trim())

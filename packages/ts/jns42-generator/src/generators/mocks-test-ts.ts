@@ -30,7 +30,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
           validators.${validatorFunctionName}(mock),
           true,
         )
-      })
+      });
     `;
   }
 }

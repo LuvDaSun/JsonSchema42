@@ -5,8 +5,13 @@ export type Complex = Tuple | Array | Object | Map;
 export type Merge = Union;
 
 export interface Base<Type extends string> {
-  id?: string;
   type: Type;
+
+  id?: string;
+  title?: string;
+  description?: string;
+  examples?: any[];
+  deprecated?: boolean;
 }
 
 export interface Unknown extends Base<"unknown"> {
