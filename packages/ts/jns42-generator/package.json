@@ -43,7 +43,7 @@
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "@types/node": "^20.10.4",
+    "@types/node": "^20.11.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "jns42-optimizer": "file:../jns42-optimizer",
@@ -56,6 +56,12 @@
     "yargs": "^17.7.2"
   },
   "bundledDependencies": [
+    "jns42-optimizer",
+    "schema-draft-04",
+    "schema-draft-2020-12",
+    "schema-intermediate"
+  ],
+  "bundleDependencies": [
     "jns42-optimizer",
     "schema-draft-04",
     "schema-draft-2020-12",

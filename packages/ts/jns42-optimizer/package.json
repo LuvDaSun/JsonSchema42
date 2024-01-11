@@ -34,7 +34,7 @@
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "@types/node": "^20.10.4",
+    "@types/node": "^20.11.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "tslib": "^2.6.2",
