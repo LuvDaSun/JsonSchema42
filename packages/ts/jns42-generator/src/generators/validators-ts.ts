@@ -125,7 +125,9 @@ function* generateRules(
     }
 
     case "integer":
-      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression}) && ${valueExpression} % 1 === 0`;
+      yield itt`typeof ${valueExpression} === "number"`;
+      yield itt`!isNaN(${valueExpression})`;
+      yield itt`${valueExpression} % 1 === 0`;
 
       if (typeItem.options != null) {
         yield joinIterable(
@@ -157,7 +159,8 @@ function* generateRules(
       break;
 
     case "number": {
-      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression})`;
+      yield itt`typeof ${valueExpression}`;
+      yield itt`!isNaN(${valueExpression})`;
 
       if (typeItem.options != null) {
         yield joinIterable(
@@ -216,17 +219,8 @@ function* generateRules(
     case "tuple": {
       const unique = rules.unique ?? false;
 
-      yield itt`Array.isArray(${valueExpression}) && ${valueExpression}.length === ${JSON.stringify(
-        typeItem.elements.length,
-      )}`;
-
-      if (rules.minimumItems != null) {
-        yield itt`${valueExpression}.length >= ${JSON.stringify(rules.minimumItems)}`;
-      }
-
-      if (rules.minimumItems != null) {
-        yield itt`${valueExpression}.length <= ${JSON.stringify(rules.maximumItems)}`;
-      }
+      yield itt`Array.isArray(${valueExpression})`;
+      yield itt`${valueExpression}.length === ${JSON.stringify(typeItem.elements.length)}`;
 
       yield itt`
         (()=>{
@@ -244,6 +238,8 @@ function* generateRules(
 
         yield itt`
           for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
+            const elementValue = ${valueExpression}[elementIndex];
+
             ${generateAdvancedElementRules()}
           }
         `;
@@ -251,16 +247,11 @@ function* generateRules(
       }
 
       function* generateAdvancedElementRules() {
-        yield itt`
-          const elementValue = ${valueExpression}[elementIndex];
-        `;
-
         if (unique) {
           yield itt`
             if(elementValueSeen.has(elementValue)) {
               return false;
             }
-            elementValueSeen.add(elementValue);
           `;
         }
 
@@ -269,6 +260,12 @@ function* generateRules(
             ${generateAdvancedElementCaseRules()}
           }
         `;
+
+        if (unique) {
+          yield itt`
+            elementValueSeen.add(elementValue);
+          `;
+        }
       }
 
       function* generateAdvancedElementCaseRules() {
@@ -348,7 +345,9 @@ function* generateRules(
     case "object": {
       const countProperties = rules.minimumProperties != null || rules.maximumProperties != null;
 
-      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
+      yield itt`${valueExpression} !== null`;
+      yield itt`typeof ${valueExpression} === "object"`;
+      yield itt`!Array.isArray(${valueExpression})`;
 
       /**
        * check if all the required properties are present
@@ -447,7 +446,9 @@ function* generateRules(
     case "map": {
       const countProperties = rules.minimumProperties != null || rules.maximumProperties != null;
 
-      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
+      yield itt`${valueExpression} !== null`;
+      yield itt`typeof ${valueExpression} === "object"`;
+      yield itt`!Array.isArray(${valueExpression})`;
 
       yield itt`
         (()=>{
