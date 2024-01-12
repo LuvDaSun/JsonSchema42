@@ -182,8 +182,10 @@ function* generateMockDefinition(
     case "array": {
       const { element } = typeItem;
 
+      const [resolvedElement] = unalias(types, element);
+
       yield itt`
-        (depthCounters[${JSON.stringify(element)}] ?? 0) < maximumDepth ? [
+        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < maximumDepth ? [
           ${mapIterable(
             repeat(5),
             () => itt`
@@ -199,20 +201,22 @@ function* generateMockDefinition(
       yield itt`
         {
           ${joinIterable(
-            Object.entries(typeItem.properties).map(([name, { required, element }]) =>
-              required
+            Object.entries(typeItem.properties).map(([name, { required, element }]) => {
+              const [resolvedElement] = unalias(types, element);
+
+              return required
                 ? itt`
                   ${JSON.stringify(name)}: ${generateMockReference(specification, element)},
                 `
                 : itt`
                   ${JSON.stringify(name)}: (depthCounters[${JSON.stringify(
-                    element,
+                    resolvedElement,
                   )}] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? ${generateMockReference(
                     specification,
                     element,
                   )} : undefined,
-            `,
-            ),
+            `;
+            }),
             "",
           )}
         }
@@ -222,8 +226,10 @@ function* generateMockDefinition(
 
     case "map": {
       const { name, element } = typeItem;
+      const [resolvedElement] = unalias(types, element);
+
       yield itt`
-        (depthCounters[${JSON.stringify(element)}] ?? 0) < maximumDepth ? {
+        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < maximumDepth ? {
           ${mapIterable(
             repeat(5),
             () => itt`
@@ -269,4 +275,16 @@ function* generateMockDefinition(
     default:
       throw new TypeError(`${typeItem.type} not supported`);
   }
+}
+
+function unalias(
+  types: Record<string, models.Item | models.Alias>,
+  key: string,
+): [string, models.Item] {
+  let item = types[key];
+  while (item.type === "alias") {
+    key = item.target;
+    item = types[key];
+  }
+  return [key, item];
 }
