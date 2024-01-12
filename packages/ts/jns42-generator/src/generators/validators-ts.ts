@@ -11,23 +11,6 @@ import {
   toPascal,
 } from "../utils/index.js";
 
-const rules = {
-  minimumInclusive: undefined,
-  minimumExclusive: undefined,
-  maximumInclusive: undefined,
-  maximumExclusive: undefined,
-  multipleOf: undefined,
-  minimumLength: undefined,
-  maximumLength: undefined,
-  valuePattern: undefined,
-  required: [],
-  unique: undefined,
-  minimumProperties: undefined,
-  maximumProperties: undefined,
-  minimumItems: undefined,
-  maximumItems: undefined,
-};
-
 export function* generateValidatorsTsCode(specification: models.Specification) {
   yield banner;
 
@@ -134,24 +117,24 @@ function* generateRules(
         );
       }
 
-      if (rules.minimumInclusive != null) {
-        yield itt`${valueExpression} >= ${JSON.stringify(rules.minimumInclusive)}`;
+      for (const ruleValue of typeItem.minimumInclusive ?? []) {
+        yield itt`${valueExpression} >= ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.minimumExclusive != null) {
-        yield itt`${valueExpression} > ${JSON.stringify(rules.minimumExclusive)}`;
+      for (const ruleValue of typeItem.minimumExclusive ?? []) {
+        yield itt`${valueExpression} > ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.maximumInclusive != null) {
-        yield itt`${valueExpression} <= ${JSON.stringify(rules.maximumInclusive)}`;
+      for (const ruleValue of typeItem.maximumInclusive ?? []) {
+        yield itt`${valueExpression} <= ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.maximumExclusive != null) {
-        yield itt`${valueExpression} < ${JSON.stringify(rules.maximumExclusive)}`;
+      for (const ruleValue of typeItem.maximumExclusive ?? []) {
+        yield itt`${valueExpression} < ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.multipleOf != null) {
-        yield itt`${valueExpression} % ${JSON.stringify(rules.multipleOf)} === 0`;
+      for (const ruleValue of typeItem.multipleOf ?? []) {
+        yield itt`${valueExpression} % ${JSON.stringify(ruleValue)} === 0`;
       }
 
       break;
@@ -167,24 +150,24 @@ function* generateRules(
         );
       }
 
-      if (rules.minimumInclusive != null) {
-        yield itt`${valueExpression} >= ${JSON.stringify(rules.minimumInclusive)}`;
+      for (const ruleValue of typeItem.minimumInclusive ?? []) {
+        yield itt`${valueExpression} >= ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.minimumExclusive != null) {
-        yield itt`${valueExpression} > ${JSON.stringify(rules.minimumExclusive)}`;
+      for (const ruleValue of typeItem.minimumExclusive ?? []) {
+        yield itt`${valueExpression} > ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.maximumInclusive != null) {
-        yield itt`${valueExpression} <= ${JSON.stringify(rules.maximumInclusive)}`;
+      for (const ruleValue of typeItem.maximumInclusive ?? []) {
+        yield itt`${valueExpression} <= ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.maximumExclusive != null) {
-        yield itt`${valueExpression} < ${JSON.stringify(rules.maximumExclusive)}`;
+      for (const ruleValue of typeItem.maximumExclusive ?? []) {
+        yield itt`${valueExpression} < ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.multipleOf != null) {
-        yield itt`${valueExpression} % ${JSON.stringify(rules.multipleOf)} === 0`;
+      for (const ruleValue of typeItem.multipleOf ?? []) {
+        yield itt`${valueExpression} % ${JSON.stringify(ruleValue)} === 0`;
       }
 
       break;
@@ -200,22 +183,22 @@ function* generateRules(
         );
       }
 
-      if (rules.minimumLength != null) {
-        yield itt`${valueExpression}.length >= ${JSON.stringify(rules.minimumLength)}`;
+      for (const rulevalue of typeItem.minimumLength ?? []) {
+        yield itt`${valueExpression}.length >= ${JSON.stringify(rulevalue)}`;
       }
 
-      if (rules.maximumLength != null) {
-        yield itt`value.length <= ${JSON.stringify(rules.maximumLength)}`;
+      for (const rulevalue of typeItem.maximumLength ?? []) {
+        yield itt`value.length <= ${JSON.stringify(rulevalue)}`;
       }
 
-      if (rules.valuePattern != null) {
-        yield itt`new RegExp(${JSON.stringify(rules.valuePattern)}).test(${valueExpression})`;
+      for (const rulevalue of typeItem.valuePattern ?? []) {
+        yield itt`new RegExp(${JSON.stringify(rulevalue)}).test(${valueExpression})`;
       }
 
       break;
 
     case "tuple": {
-      const unique = rules.unique ?? false;
+      const unique = typeItem.uniqueItems ?? false;
 
       yield itt`Array.isArray(${valueExpression})`;
       yield itt`${valueExpression}.length === ${JSON.stringify(typeItem.elements.length)}`;
@@ -282,16 +265,16 @@ function* generateRules(
     }
 
     case "array": {
-      const unique = rules.unique ?? false;
+      const unique = typeItem.uniqueItems ?? false;
 
       yield itt`Array.isArray(${valueExpression})`;
 
-      if (rules.minimumItems != null) {
-        yield itt`${valueExpression}.length >= ${JSON.stringify(rules.minimumItems)}`;
+      for (const ruleValue of typeItem.minimumItems ?? []) {
+        yield itt`${valueExpression}.length >= ${JSON.stringify(ruleValue)}`;
       }
 
-      if (rules.minimumItems != null) {
-        yield itt`${valueExpression}.length <= ${JSON.stringify(rules.maximumItems)}`;
+      for (const ruleValue of typeItem.minimumItems ?? []) {
+        yield itt`${valueExpression}.length <= ${JSON.stringify(ruleValue)}`;
       }
 
       yield itt`
@@ -341,7 +324,9 @@ function* generateRules(
     }
 
     case "object": {
-      const countProperties = rules.minimumProperties != null || rules.maximumProperties != null;
+      const countProperties =
+        (typeItem.minimumProperties != null && typeItem.minimumProperties.length > 0) ||
+        (typeItem.maximumProperties != null && typeItem.maximumProperties.length > 0);
 
       yield itt`${valueExpression} !== null`;
       yield itt`typeof ${valueExpression} === "object"`;
@@ -366,6 +351,8 @@ function* generateRules(
       break;
 
       function* generateAdvancedRules() {
+        assert(typeItem.type === "object");
+
         if (countProperties) {
           yield itt`
             let propertyCount = 0;
@@ -379,17 +366,17 @@ function* generateRules(
         `;
 
         if (countProperties) {
-          if (rules.minimumProperties != null) {
+          for (const ruleValue of typeItem.minimumProperties ?? []) {
             yield itt`
-              if(propertyCount < ${JSON.stringify(rules.minimumProperties)}) {
+              if(propertyCount < ${JSON.stringify(ruleValue)}) {
                 return false;
               }
             `;
           }
 
-          if (rules.maximumProperties != null) {
+          for (const ruleValue of typeItem.maximumProperties ?? []) {
             yield itt`
-              if(propertyCount > ${JSON.stringify(rules.maximumProperties)}) {
+              if(propertyCount > ${JSON.stringify(ruleValue)}) {
                 return false;
               }
             `;
@@ -442,7 +429,9 @@ function* generateRules(
     }
 
     case "map": {
-      const countProperties = rules.minimumProperties != null || rules.maximumProperties != null;
+      const countProperties =
+        (typeItem.minimumProperties != null && typeItem.minimumProperties.length > 0) ||
+        (typeItem.maximumProperties != null && typeItem.maximumProperties.length > 0);
 
       yield itt`${valueExpression} !== null`;
       yield itt`typeof ${valueExpression} === "object"`;
@@ -456,6 +445,7 @@ function* generateRules(
       break;
 
       function* generateAdvancedRules() {
+        assert(typeItem.type === "map");
         if (countProperties) {
           yield itt`
             let propertyCount = 0;
@@ -469,17 +459,17 @@ function* generateRules(
         `;
 
         if (countProperties) {
-          if (rules.minimumProperties != null) {
+          for (const ruleValue of typeItem.minimumProperties ?? []) {
             yield itt`
-              if(propertyCount < ${JSON.stringify(rules.minimumProperties)}) {
+              if(propertyCount < ${JSON.stringify(ruleValue)}) {
                 return false;
               }
             `;
           }
 
-          if (rules.maximumProperties != null) {
+          for (const ruleValue of typeItem.maximumProperties ?? []) {
             yield itt`
-              if(propertyCount > ${JSON.stringify(rules.maximumProperties)}) {
+              if(propertyCount > ${JSON.stringify(ruleValue)}) {
                 return false;
               }
             `;

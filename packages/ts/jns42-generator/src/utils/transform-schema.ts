@@ -86,20 +86,26 @@ export function transformSchema(
     model.required = schema.required;
     model.options = schema.options;
 
-    model.minimumInclusive = schema.minimumInclusive;
-    model.minimumExclusive = schema.minimumExclusive;
-    model.maximumInclusive = schema.maximumInclusive;
-    model.maximumExclusive = schema.maximumExclusive;
-    model.multipleOf = schema.multipleOf;
-    model.minimumLength = schema.minimumLength;
-    model.maximumLength = schema.maximumLength;
-    model.valuePattern = schema.valuePattern;
-    model.valueFormat = schema.valueFormat;
-    model.minimumItems = schema.minimumItems;
-    model.maximumItems = schema.maximumItems;
-    model.uniqueItems = schema.uniqueItems;
-    model.minimumProperties = schema.minimumProperties;
-    model.maximumProperties = schema.maximumProperties;
+    model.minimumInclusive =
+      schema.minimumInclusive == null ? undefined : [schema.minimumInclusive];
+    model.minimumExclusive =
+      schema.minimumExclusive == null ? undefined : [schema.minimumExclusive];
+    model.maximumInclusive =
+      schema.maximumInclusive == null ? undefined : [schema.maximumInclusive];
+    model.maximumExclusive =
+      schema.maximumExclusive == null ? undefined : [schema.maximumExclusive];
+    model.multipleOf = schema.multipleOf == null ? undefined : [schema.multipleOf];
+    model.minimumLength = schema.minimumLength == null ? undefined : [schema.minimumLength];
+    model.maximumLength = schema.maximumLength == null ? undefined : [schema.maximumLength];
+    model.valuePattern = schema.valuePattern == null ? undefined : [schema.valuePattern];
+    model.valueFormat = schema.valueFormat == null ? undefined : [schema.valueFormat];
+    model.minimumItems = schema.minimumItems == null ? undefined : [schema.minimumItems];
+    model.maximumItems = schema.maximumItems == null ? undefined : [schema.maximumItems];
+    model.uniqueItems = schema.uniqueItems == null ? undefined : [schema.uniqueItems];
+    model.minimumProperties =
+      schema.minimumProperties == null ? undefined : [schema.minimumProperties];
+    model.maximumProperties =
+      schema.maximumProperties == null ? undefined : [schema.maximumProperties];
 
     model.reference = schema.reference == null ? undefined : idMap[schema.reference];
     model.if = schema.if == null ? undefined : idMap[schema.if];
