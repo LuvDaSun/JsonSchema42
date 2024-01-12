@@ -127,3 +127,39 @@ export function booleanMergeAnd(
 
   return value && otherValue;
 }
+
+export function numericMergeMinimum(
+  value: number | undefined,
+  otherValue: number | undefined,
+): number | undefined {
+  if (value == null) {
+    return otherValue;
+  }
+
+  if (otherValue == null) {
+    return value;
+  }
+
+  if (otherValue < value) {
+    return otherValue;
+  }
+
+  return value;
+}
+
+export function numericMergeMaximum(
+  value: number | undefined,
+  otherValue: number | undefined,
+): number | undefined {
+  if (value == null) {
+    return otherValue;
+  }
+
+  if (otherValue == null) {
+    return value;
+  }
+
+  if (otherValue > value) {
+    return otherValue;
+  }
+}

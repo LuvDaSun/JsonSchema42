@@ -37,28 +37,28 @@ export interface Boolean extends Base<"boolean"> {
 export interface Integer extends Base<"integer"> {
   options?: number[];
 
-  minimumInclusive?: number[];
-  minimumExclusive?: number[];
-  maximumInclusive?: number[];
-  maximumExclusive?: number[];
+  minimumInclusive?: number;
+  minimumExclusive?: number;
+  maximumInclusive?: number;
+  maximumExclusive?: number;
   multipleOf?: number[];
 }
 
 export interface Number extends Base<"number"> {
   options?: number[];
 
-  minimumInclusive?: number[];
-  minimumExclusive?: number[];
-  maximumInclusive?: number[];
-  maximumExclusive?: number[];
+  minimumInclusive?: number;
+  minimumExclusive?: number;
+  maximumInclusive?: number;
+  maximumExclusive?: number;
   multipleOf?: number[];
 }
 
 export interface String extends Base<"string"> {
   options?: string[];
 
-  minimumLength?: number[];
-  maximumLength?: number[];
+  minimumLength?: number;
+  maximumLength?: number;
   valuePattern?: string[];
   valueFormat?: string[];
 }
@@ -73,23 +73,23 @@ export interface Array extends Base<"array"> {
   element: string;
 
   uniqueItems?: boolean;
-  minimumItems?: number[];
-  maximumItems?: number[];
+  minimumItems?: number;
+  maximumItems?: number;
 }
 
 export interface Object extends Base<"object"> {
   properties: { [name: string]: { element: string; required: boolean } };
 
-  minimumProperties?: number[];
-  maximumProperties?: number[];
+  minimumProperties?: number;
+  maximumProperties?: number;
 }
 
 export interface Map extends Base<"map"> {
   name: string;
   element: string;
 
-  minimumProperties?: number[];
-  maximumProperties?: number[];
+  minimumProperties?: number;
+  maximumProperties?: number;
 }
 
 export interface Union extends Base<"union"> {

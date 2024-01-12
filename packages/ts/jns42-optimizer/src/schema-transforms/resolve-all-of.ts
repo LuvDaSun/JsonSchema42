@@ -10,6 +10,8 @@ import {
   intersectionMerge,
   mergeKeysArray,
   mergeKeysRecord,
+  numericMergeMaximum,
+  numericMergeMinimum,
   unionMerge,
 } from "../utils/index.js";
 
@@ -87,20 +89,38 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
       ),
       mapProperties: mergeKey(newModel.mapProperties, elementModel.mapProperties),
 
-      minimumInclusive: unionMerge(newModel.minimumInclusive, elementModel.minimumInclusive),
-      minimumExclusive: unionMerge(newModel.minimumExclusive, elementModel.minimumExclusive),
-      maximumInclusive: unionMerge(newModel.maximumInclusive, elementModel.maximumInclusive),
-      maximumExclusive: unionMerge(newModel.maximumExclusive, elementModel.maximumExclusive),
+      minimumInclusive: numericMergeMinimum(
+        newModel.minimumInclusive,
+        elementModel.minimumInclusive,
+      ),
+      minimumExclusive: numericMergeMinimum(
+        newModel.minimumExclusive,
+        elementModel.minimumExclusive,
+      ),
+      maximumInclusive: numericMergeMaximum(
+        newModel.maximumInclusive,
+        elementModel.maximumInclusive,
+      ),
+      maximumExclusive: numericMergeMaximum(
+        newModel.maximumExclusive,
+        elementModel.maximumExclusive,
+      ),
       multipleOf: unionMerge(newModel.multipleOf, elementModel.multipleOf),
-      minimumLength: unionMerge(newModel.minimumLength, elementModel.minimumLength),
-      maximumLength: unionMerge(newModel.maximumLength, elementModel.maximumLength),
+      minimumLength: numericMergeMinimum(newModel.minimumLength, elementModel.minimumLength),
+      maximumLength: numericMergeMaximum(newModel.maximumLength, elementModel.maximumLength),
       valuePattern: unionMerge(newModel.valuePattern, elementModel.valuePattern),
       valueFormat: unionMerge(newModel.valueFormat, elementModel.valueFormat),
-      minimumItems: unionMerge(newModel.minimumItems, elementModel.minimumItems),
-      maximumItems: unionMerge(newModel.maximumItems, elementModel.maximumItems),
+      minimumItems: numericMergeMinimum(newModel.minimumItems, elementModel.minimumItems),
+      maximumItems: numericMergeMaximum(newModel.maximumItems, elementModel.maximumItems),
       uniqueItems: booleanMergeOr(newModel.uniqueItems, elementModel.uniqueItems),
-      minimumProperties: unionMerge(newModel.minimumProperties, elementModel.minimumProperties),
-      maximumProperties: unionMerge(newModel.maximumProperties, elementModel.maximumProperties),
+      minimumProperties: numericMergeMinimum(
+        newModel.minimumProperties,
+        elementModel.minimumProperties,
+      ),
+      maximumProperties: numericMergeMaximum(
+        newModel.maximumProperties,
+        elementModel.maximumProperties,
+      ),
     };
   }
 

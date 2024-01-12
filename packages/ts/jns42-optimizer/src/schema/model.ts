@@ -57,20 +57,20 @@ export type SchemaModel = {
   required?: string[];
   options?: any[];
 
-  minimumInclusive?: number[];
-  minimumExclusive?: number[];
-  maximumInclusive?: number[];
-  maximumExclusive?: number[];
+  minimumInclusive?: number;
+  minimumExclusive?: number;
+  maximumInclusive?: number;
+  maximumExclusive?: number;
   multipleOf?: number[];
-  minimumLength?: number[];
-  maximumLength?: number[];
+  minimumLength?: number;
+  maximumLength?: number;
   valuePattern?: string[];
   valueFormat?: string[];
-  minimumItems?: number[];
-  maximumItems?: number[];
+  minimumItems?: number;
+  maximumItems?: number;
   uniqueItems?: boolean;
-  minimumProperties?: number[];
-  maximumProperties?: number[];
+  minimumProperties?: number;
+  maximumProperties?: number;
 };
 
 export type MetaSchemaModel = {
@@ -98,20 +98,20 @@ export type TypeSchemaModel = {
   required?: string[];
   options?: any[];
 
-  minimumInclusive?: number[];
-  minimumExclusive?: number[];
-  maximumInclusive?: number[];
-  maximumExclusive?: number[];
+  minimumInclusive?: number;
+  minimumExclusive?: number;
+  maximumInclusive?: number;
+  maximumExclusive?: number;
   multipleOf?: number[];
-  minimumLength?: number[];
-  maximumLength?: number[];
+  minimumLength?: number;
+  maximumLength?: number;
   valuePattern?: string[];
   valueFormat?: string[];
-  minimumItems?: number[];
-  maximumItems?: number[];
+  minimumItems?: number;
+  maximumItems?: number;
   uniqueItems?: boolean;
-  minimumProperties?: number[];
-  maximumProperties?: number[];
+  minimumProperties?: number;
+  maximumProperties?: number;
 };
 export const typeSchemaOptional = [
   "types",
