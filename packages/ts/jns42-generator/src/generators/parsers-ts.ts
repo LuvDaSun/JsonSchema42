@@ -49,8 +49,8 @@ function* generateParserReference(
 }
 
 function* generateParserDefinition(specification: models.Specification, typeKey: string) {
-  const { names, types: typeA } = specification;
-  const typeItem = typeA[typeKey];
+  const { names, types } = specification;
+  const typeItem = types[typeKey];
 
   switch (typeItem.type) {
     case "unknown":
