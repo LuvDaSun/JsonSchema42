@@ -162,7 +162,18 @@ export function transformSchema(
     }
   }
 
-  const result: Record<string, models.Item | models.Alias> = {};
+  const result: Record<string, models.Item | models.Alias> = {
+    unknown: {
+      type: "unknown",
+    },
+    any: {
+      type: "any",
+    },
+    string: {
+      type: "string",
+    },
+  };
+
   for (const [key, model] of arena) {
     if (!usedKeys.has(key)) {
       continue;
@@ -172,16 +183,6 @@ export function transformSchema(
       result[newKey] = newItem;
     }
   }
-
-  result["unknown"] = {
-    type: "unknown",
-  };
-  result["any"] = {
-    type: "unknown",
-  };
-  result["string"] = {
-    type: "string",
-  };
 
   return result;
 
