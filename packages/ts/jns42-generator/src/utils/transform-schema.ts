@@ -86,6 +86,8 @@ export function transformSchema(
     model.required = schema.required;
     model.options = schema.options;
 
+    model.uniqueItems = schema.uniqueItems;
+
     model.minimumInclusive =
       schema.minimumInclusive == null ? undefined : [schema.minimumInclusive];
     model.minimumExclusive =
@@ -101,7 +103,6 @@ export function transformSchema(
     model.valueFormat = schema.valueFormat == null ? undefined : [schema.valueFormat];
     model.minimumItems = schema.minimumItems == null ? undefined : [schema.minimumItems];
     model.maximumItems = schema.maximumItems == null ? undefined : [schema.maximumItems];
-    model.uniqueItems = schema.uniqueItems == null ? undefined : [schema.uniqueItems];
     model.minimumProperties =
       schema.minimumProperties == null ? undefined : [schema.minimumProperties];
     model.maximumProperties =
@@ -282,6 +283,11 @@ export function transformSchema(
               ...metaModel,
               type: "integer",
               options: model.options,
+              minimumInclusive: model.minimumInclusive,
+              minimumExclusive: model.minimumExclusive,
+              maximumInclusive: model.maximumInclusive,
+              maximumExclusive: model.maximumExclusive,
+              multipleOf: model.multipleOf,
             },
           ];
           return;
@@ -293,6 +299,11 @@ export function transformSchema(
               ...metaModel,
               type: "number",
               options: model.options,
+              minimumInclusive: model.minimumInclusive,
+              minimumExclusive: model.minimumExclusive,
+              maximumInclusive: model.maximumInclusive,
+              maximumExclusive: model.maximumExclusive,
+              multipleOf: model.multipleOf,
             },
           ];
           return;
@@ -304,6 +315,11 @@ export function transformSchema(
               ...metaModel,
               type: "string",
               options: model.options,
+
+              minimumLength: model.minimumLength,
+              maximumLength: model.maximumLength,
+              valuePattern: model.valuePattern,
+              valueFormat: model.valueFormat,
             },
           ];
           return;
@@ -316,6 +332,8 @@ export function transformSchema(
                 ...metaModel,
                 type: "tuple",
                 elements: model.tupleItems.map((key) => mapKey(key)),
+
+                uniqueItems: model.uniqueItems,
               },
             ];
             return;
@@ -328,6 +346,10 @@ export function transformSchema(
                 ...metaModel,
                 type: "array",
                 element: mapKey(model.arrayItems),
+
+                uniqueItems: model.uniqueItems,
+                minimumItems: model.minimumItems,
+                maximumItems: model.maximumItems,
               },
             ];
             return;
@@ -339,6 +361,10 @@ export function transformSchema(
               ...metaModel,
               type: "array",
               element: "any",
+
+              uniqueItems: model.uniqueItems,
+              minimumItems: model.minimumItems,
+              maximumItems: model.maximumItems,
             },
           ];
           return;
@@ -366,6 +392,9 @@ export function transformSchema(
                         objectProperties[propertyName] == null
                           ? "any"
                           : mapKey(objectProperties[propertyName]),
+
+                      minimumProperties: model.minimumProperties,
+                      maximumProperties: model.maximumProperties,
                     },
                   ]),
                 ),
@@ -380,8 +409,11 @@ export function transformSchema(
               {
                 ...metaModel,
                 type: "map",
-                name: "string",
+                name: model.propertyNames == null ? "string" : mapKey(model.propertyNames),
                 element: mapKey(model.mapProperties),
+
+                minimumProperties: model.minimumProperties,
+                maximumProperties: model.maximumProperties,
               },
             ];
             return;
@@ -392,8 +424,11 @@ export function transformSchema(
             {
               ...metaModel,
               type: "map",
-              name: "string",
+              name: model.propertyNames == null ? "string" : mapKey(model.propertyNames),
               element: "any",
+
+              minimumProperties: model.minimumProperties,
+              maximumProperties: model.maximumProperties,
             },
           ];
           return;

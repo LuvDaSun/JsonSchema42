@@ -72,9 +72,9 @@ export interface Tuple extends Base<"tuple"> {
 export interface Array extends Base<"array"> {
   element: string;
 
+  uniqueItems?: boolean;
   minimumItems?: number[];
   maximumItems?: number[];
-  uniqueItems?: boolean;
 }
 
 export interface Object extends Base<"object"> {

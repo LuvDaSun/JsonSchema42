@@ -38,6 +38,7 @@ invalid:
     a: "a"
     b: "b"
     c: "c"
+  def:
     d: "d"
     e: "e"
     f: "f"

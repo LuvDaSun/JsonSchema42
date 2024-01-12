@@ -5,7 +5,13 @@ import {
   isAllOfSchemaModel,
   isSingleTypeSchemaModel,
 } from "../schema/index.js";
-import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
+import {
+  booleanMergeOr,
+  intersectionMerge,
+  mergeKeysArray,
+  mergeKeysRecord,
+  unionMerge,
+} from "../utils/index.js";
 
 /**
  * This transformer merges all sub schemas in allOf.
@@ -92,7 +98,7 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
       valueFormat: unionMerge(newModel.valueFormat, elementModel.valueFormat),
       minimumItems: unionMerge(newModel.minimumItems, elementModel.minimumItems),
       maximumItems: unionMerge(newModel.maximumItems, elementModel.maximumItems),
-      uniqueItems: unionMerge(newModel.uniqueItems, elementModel.uniqueItems),
+      uniqueItems: booleanMergeOr(newModel.uniqueItems, elementModel.uniqueItems),
       minimumProperties: unionMerge(newModel.minimumProperties, elementModel.minimumProperties),
       maximumProperties: unionMerge(newModel.maximumProperties, elementModel.maximumProperties),
     };

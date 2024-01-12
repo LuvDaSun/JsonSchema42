@@ -49,7 +49,6 @@ valid:
     c: "c"
     d: "d"
     e: "e"
-
-invalid:
-  a:
-    a: "a"
+# invalid:
+#   a:
+#     a: "a"

@@ -97,3 +97,33 @@ export function mergeKeysRecord(
   }
   return resultKeys;
 }
+
+export function booleanMergeOr(
+  value: boolean | undefined,
+  otherValue: boolean | undefined,
+): boolean | undefined {
+  if (value == null) {
+    return otherValue;
+  }
+
+  if (otherValue == null) {
+    return value;
+  }
+
+  return value || otherValue;
+}
+
+export function booleanMergeAnd(
+  value: boolean | undefined,
+  otherValue: boolean | undefined,
+): boolean | undefined {
+  if (value == null) {
+    return otherValue;
+  }
+
+  if (otherValue == null) {
+    return value;
+  }
+
+  return value && otherValue;
+}

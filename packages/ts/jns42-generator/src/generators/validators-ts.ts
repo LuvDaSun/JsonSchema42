@@ -224,7 +224,10 @@ function* generateRules(
             ${generateAdvancedElementRules()}
           }
         `;
-        return true;
+
+        yield itt`
+          return true;
+        `;
       }
 
       function* generateAdvancedElementRules() {
@@ -295,6 +298,9 @@ function* generateRules(
           for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
             ${generateAdvancedElementRules()}
           }
+        `;
+
+        yield itt`
           return true;
         `;
       }
