@@ -24,7 +24,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     const validatorFunctionName = toCamel("is", names[nodeId]);
     const mockFunctionName = toCamel("mock", names[nodeId]);
     yield itt`
-      test.skip(${JSON.stringify(typeName)}, () => {
+      test(${JSON.stringify(typeName)}, () => {
         const mock = mocks.${mockFunctionName}();
         assert.equal(
           validators.${validatorFunctionName}(mock),
