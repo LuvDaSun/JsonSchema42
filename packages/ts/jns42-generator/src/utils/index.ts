@@ -1,5 +1,4 @@
 export * from "./banner.js";
-export * from "./choose.js";
 export * from "./comments.js";
 export * from "./iterable-text-template.js";
 export * from "./iterable.js";

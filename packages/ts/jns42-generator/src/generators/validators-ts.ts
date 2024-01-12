@@ -518,13 +518,33 @@ function* generateRules(
     }
 
     case "union": {
-      yield joinIterable(
-        typeItem.elements.map(
-          (element) => itt`${generateValidatorReference(specification, element, valueExpression)}`,
-        ),
-        " ||\n",
-      );
+      yield itt`
+        (()=>{
+          ${generateAdvancedRules()}
+        })()
+      `;
       break;
+
+      function* generateAdvancedRules() {
+        assert(typeItem.type === "union");
+
+        yield itt`
+          let count = 0;
+        `;
+        for (const element of typeItem.elements) {
+          yield itt`
+            if(${generateValidatorReference(specification, element, valueExpression)}) {
+              count++;
+              if(count > 1) {
+                return false;
+              }
+            }
+          `;
+        }
+        yield itt`
+          return count === 1;
+        `;
+      }
     }
 
     case "alias": {
