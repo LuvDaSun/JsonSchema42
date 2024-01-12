@@ -183,14 +183,14 @@ function* generateMockDefinition(
       const { element } = typeItem;
 
       yield itt`
-        [
+        (depthCounters[${JSON.stringify(element)}] ?? 0) < maximumDepth ? [
           ${mapIterable(
             repeat(5),
             () => itt`
               ${generateMockReference(specification, element)},
             `,
           )}
-        ]
+        ] : []
       `;
       break;
     }
@@ -223,7 +223,7 @@ function* generateMockDefinition(
     case "map": {
       const { name, element } = typeItem;
       yield itt`
-        {
+        (depthCounters[${JSON.stringify(element)}] ?? 0) < maximumDepth ? {
           ${mapIterable(
             repeat(5),
             () => itt`
@@ -233,7 +233,7 @@ function* generateMockDefinition(
               )},
             `,
           )}
-        }
+        } : {}
       `;
       break;
     }
