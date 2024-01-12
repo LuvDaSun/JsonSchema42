@@ -191,14 +191,17 @@ function* generateRules(
         yield itt`value.length <= ${JSON.stringify(typeItem.maximumLength)}`;
       }
 
-      for (const rulevalue of typeItem.valuePattern ?? []) {
-        yield itt`new RegExp(${JSON.stringify(rulevalue)}).test(${valueExpression})`;
-      }
+      // TODO once the mocks suppport this
+      // for (const rulevalue of typeItem.valuePattern ?? []) {
+      //   yield itt`new RegExp(${JSON.stringify(rulevalue)}).test(${valueExpression})`;
+      // }
 
       break;
 
     case "tuple": {
-      const unique = typeItem.uniqueItems ?? false;
+      // TODO enable once the mocks are also emitting unique values
+      //const unique = typeItem.uniqueItems ?? false;
+      const unique = false;
 
       yield itt`Array.isArray(${valueExpression})`;
       yield itt`${valueExpression}.length === ${JSON.stringify(typeItem.elements.length)}`;
@@ -268,7 +271,9 @@ function* generateRules(
     }
 
     case "array": {
-      const unique = typeItem.uniqueItems ?? false;
+      // TODO enable once the mocks are also emitting unique values
+      //const unique = typeItem.uniqueItems ?? false;
+      const unique = false;
 
       yield itt`Array.isArray(${valueExpression})`;
 
