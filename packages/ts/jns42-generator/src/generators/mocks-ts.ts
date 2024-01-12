@@ -205,7 +205,9 @@ function* generateMockDefinition(
                   ${JSON.stringify(name)}: ${generateMockReference(specification, element)},
                 `
                 : itt`
-                  ${JSON.stringify(name)}: Boolean(nextSeed() % 2) ? ${generateMockReference(
+                  ${JSON.stringify(name)}: (depthCounters[${JSON.stringify(
+                    element,
+                  )}] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? ${generateMockReference(
                     specification,
                     element,
                   )} : undefined,
