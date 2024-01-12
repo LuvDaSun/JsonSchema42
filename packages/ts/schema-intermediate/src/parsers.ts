@@ -4,7 +4,11 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json
+//
+/**
+* @summary JsonSchema42 intermediate schema
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json}
+*/
 export function parseSchemaDocument(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 {
@@ -13,7 +17,9 @@ return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 } :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node}
+*/
 export function parseNode(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 {
@@ -57,7 +63,9 @@ return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 } :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference}
+*/
 export function parseNodeReference(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -69,7 +77,9 @@ default:
 return undefined;
 }
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/integer-value
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/integer-value}
+*/
 export function parseIntegerValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -81,7 +91,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value}
+*/
 export function parseNumberValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -93,7 +105,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value}
+*/
 export function parseBooleanValue(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -117,7 +131,9 @@ return value;
 }
 return undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value}
+*/
 export function parseStringValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -129,7 +145,9 @@ default:
 return undefined;
 }
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value}
+*/
 export function parseNonEmptyStringValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -141,7 +159,9 @@ default:
 return undefined;
 }
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount}
+*/
 export function parseAmount(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -153,7 +173,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema}
+*/
 export function parseSchema(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -165,7 +187,9 @@ default:
 return undefined;
 }
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas}
+*/
 export function parseSchemas(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -186,69 +210,98 @@ parseSchemasAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title}
+*/
 export function parseTitle(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description}
+*/
 export function parseDescription(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
+*/
 export function parseExamples(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseExamplesItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
+*/
 export function parseDeprecated(value: unknown): unknown {
 return parseBooleanValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types
+/**
+* @description What types does this schema describe<br />
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types}
+*/
 export function parseTypes(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseTypesItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference}
+*/
 export function parseReference(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf}
+*/
 export function parseOneOf(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseOneOfItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf}
+*/
 export function parseAnyOf(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseAnyOfItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf}
+*/
 export function parseAllOf(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseAllOfItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if}
+*/
 export function parseIf(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then}
+*/
 export function parseThen(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else}
+*/
 export function parseElse(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not}
+*/
 export function parseNot(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas}
+*/
 export function parseDependentSchemas(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -269,7 +322,9 @@ parseDependentSchemasAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties}
+*/
 export function parseObjectProperties(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -290,11 +345,15 @@ parseObjectPropertiesAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties}
+*/
 export function parseMapProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties}
+*/
 export function parsePatternProperties(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -315,75 +374,109 @@ parsePatternPropertiesAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames}
+*/
 export function parsePropertyNames(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems}
+*/
 export function parseTupleItems(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseTupleItemsItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems}
+*/
 export function parseArrayItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains}
+*/
 export function parseContains(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
+*/
 export function parseOptions(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseOptionsItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive}
+*/
 export function parseMinimumInclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive}
+*/
 export function parseMinimumExclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive}
+*/
 export function parseMaximumInclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive}
+*/
 export function parseMaximumExclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf}
+*/
 export function parseMultipleOf(value: unknown): unknown {
 return parseNumberValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength}
+*/
 export function parseMinimumLength(value: unknown): unknown {
 return parseAmount(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength}
+*/
 export function parseMaximumLength(value: unknown): unknown {
 return parseAmount(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern}
+*/
 export function parseValuePattern(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat}
+*/
 export function parseValueFormat(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems}
+*/
 export function parseMinimumItems(value: unknown): unknown {
 return parseAmount(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems}
+*/
 export function parseMaximumItems(value: unknown): unknown {
 return parseAmount(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems}
+*/
 export function parseUniqueItems(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -407,29 +500,41 @@ return value;
 }
 return undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
+*/
 export function parseRequired(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseRequiredItems(value)) :
 undefined;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties}
+*/
 export function parseMinimumProperties(value: unknown): unknown {
 return parseAmount(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties}
+*/
 export function parseMaximumProperties(value: unknown): unknown {
 return parseAmount(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties}
+*/
 export function parseSchemasAdditionalProperties(value: unknown): unknown {
 return parseNode(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items}
+*/
 export function parseExamplesItems(value: unknown): unknown {
 return value;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items}
+*/
 export function parseTypesItems(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -441,39 +546,57 @@ default:
 return undefined;
 }
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items}
+*/
 export function parseOneOfItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items}
+*/
 export function parseAnyOfItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items}
+*/
 export function parseAllOfItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties}
+*/
 export function parseDependentSchemasAdditionalProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties}
+*/
 export function parseObjectPropertiesAdditionalProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties}
+*/
 export function parsePatternPropertiesAdditionalProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items}
+*/
 export function parseTupleItemsItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items}
+*/
 export function parseOptionsItems(value: unknown): unknown {
 return value;
 }
-// https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items}
+*/
 export function parseRequiredItems(value: unknown): unknown {
 return parseStringValue(value);
 }

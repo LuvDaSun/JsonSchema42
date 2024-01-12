@@ -4,140 +4,320 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
+//
 import * as types from "./types.js";
-// http://json-schema.org/draft-04/schema#
+const depthCounters: Record<string, number> = {};
+const maximumDepth = 2;
+/**
+* @description Core schema meta-schema
+* @see {@link http://json-schema.org/draft-04/schema#}
+*/
 export function mockSchemaDocument(): types.SchemaDocument {
+depthCounters["0"] ??= 0;
+try {
+depthCounters["0"]++;
 return (
 {
-"id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockPositiveInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockPositiveIntegerDefault0() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"additionalItems": Boolean(nextSeed() % 2) ? mockAdditionalItems() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockPropertiesItems() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockPositiveInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockPositiveIntegerDefault0() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockPositiveInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockPositiveIntegerDefault0() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockPropertiesAdditionalProperties() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchemaDocument() : undefined,
+"id": (depthCounters["6"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
+"$schema": (depthCounters["7"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockSchema() : undefined,
+"title": (depthCounters["8"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
+"description": (depthCounters["9"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
+"default": (depthCounters["10"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
+"multipleOf": (depthCounters["11"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
+"maximum": (depthCounters["12"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
+"exclusiveMaximum": (depthCounters["13"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
+"minimum": (depthCounters["14"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
+"exclusiveMinimum": (depthCounters["15"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
+"maxLength": (depthCounters["2"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
+"minLength": (depthCounters["3"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
+"pattern": (depthCounters["18"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
+"additionalItems": (depthCounters["19"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAdditionalItems() : undefined,
+"items": (depthCounters["20"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPropertiesItems() : undefined,
+"maxItems": (depthCounters["2"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
+"minItems": (depthCounters["3"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
+"uniqueItems": (depthCounters["23"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
+"maxProperties": (depthCounters["2"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
+"minProperties": (depthCounters["3"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
+"required": (depthCounters["5"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
+"additionalProperties": (depthCounters["27"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPropertiesAdditionalProperties() : undefined,
+"definitions": (depthCounters["28"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
+"properties": (depthCounters["29"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
+"patternProperties": (depthCounters["30"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
+"dependencies": (depthCounters["31"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
+"enum": (depthCounters["32"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
+"type": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
+"format": (depthCounters["34"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
+"allOf": (depthCounters["1"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
+"anyOf": (depthCounters["1"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
+"oneOf": (depthCounters["1"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
+"not": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
 }
 );
 }
-// http://json-schema.org/draft-04/schema#/definitions/schemaArray
+finally {
+depthCounters["0"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
+*/
 export function mockSchemaArray(): types.SchemaArray {
+depthCounters["1"] ??= 0;
+try {
+depthCounters["1"]++;
 return (
-[
-mockSchemaDocument(),
-mockSchemaDocument(),
-mockSchemaDocument(),
-mockSchemaDocument(),
-mockSchemaDocument(),
-]
+(depthCounters["0"] ?? 0) < maximumDepth ? [
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+] : []
 );
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveInteger
+finally {
+depthCounters["1"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
+*/
 export function mockPositiveInteger(): types.PositiveInteger {
+depthCounters["2"] ??= 0;
+try {
+depthCounters["2"]++;
 return (Number(nextSeed() % 1000));
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0
+finally {
+depthCounters["2"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
+*/
 export function mockPositiveIntegerDefault0(): types.PositiveIntegerDefault0 {
+depthCounters["3"] ??= 0;
+try {
+depthCounters["3"]++;
 return (Number(nextSeed() % 1000));
 }
-// http://json-schema.org/draft-04/schema#/definitions/simpleTypes
+finally {
+depthCounters["3"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
+*/
 export function mockSimpleTypes(): types.SimpleTypes {
+depthCounters["4"] ??= 0;
+try {
+depthCounters["4"]++;
 return ((["array", "boolean", "integer", "null", "number", "object", "string"] as const)[nextSeed() % 7]);
 }
-// http://json-schema.org/draft-04/schema#/definitions/stringArray
+finally {
+depthCounters["4"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
+*/
 export function mockStringArray(): types.StringArray {
+depthCounters["5"] ??= 0;
+try {
+depthCounters["5"]++;
 return (
-[
+(depthCounters["42"] ?? 0) < maximumDepth ? [
 mockStringArrayItems(),
 mockStringArrayItems(),
 mockStringArrayItems(),
 mockStringArrayItems(),
 mockStringArrayItems(),
-]
+] : []
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/id
+finally {
+depthCounters["5"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/id}
+*/
 export function mockId(): types.Id {
+depthCounters["6"] ??= 0;
+try {
+depthCounters["6"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/$schema
+finally {
+depthCounters["6"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
+*/
 export function mockSchema(): types.Schema {
+depthCounters["7"] ??= 0;
+try {
+depthCounters["7"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/title
+finally {
+depthCounters["7"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/title}
+*/
 export function mockTitle(): types.Title {
+depthCounters["8"] ??= 0;
+try {
+depthCounters["8"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/description
+finally {
+depthCounters["8"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/description}
+*/
 export function mockDescription(): types.Description {
+depthCounters["9"] ??= 0;
+try {
+depthCounters["9"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/default
+finally {
+depthCounters["9"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/default}
+*/
 export function mockDefault(): types.Default {
+depthCounters["10"] ??= 0;
+try {
+depthCounters["10"]++;
 return (
 // unknown
 {}
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/multipleOf
+finally {
+depthCounters["10"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
+*/
 export function mockMultipleOf(): types.MultipleOf {
+depthCounters["11"] ??= 0;
+try {
+depthCounters["11"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// http://json-schema.org/draft-04/schema#/properties/maximum
+finally {
+depthCounters["11"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
+*/
 export function mockMaximum(): types.Maximum {
+depthCounters["12"] ??= 0;
+try {
+depthCounters["12"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum
+finally {
+depthCounters["12"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
+*/
 export function mockExclusiveMaximum(): types.ExclusiveMaximum {
+depthCounters["13"] ??= 0;
+try {
+depthCounters["13"]++;
 return (Boolean(nextSeed() % 2));
 }
-// http://json-schema.org/draft-04/schema#/properties/minimum
+finally {
+depthCounters["13"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
+*/
 export function mockMinimum(): types.Minimum {
+depthCounters["14"] ??= 0;
+try {
+depthCounters["14"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum
+finally {
+depthCounters["14"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
+*/
 export function mockExclusiveMinimum(): types.ExclusiveMinimum {
+depthCounters["15"] ??= 0;
+try {
+depthCounters["15"]++;
 return (Boolean(nextSeed() % 2));
 }
-// http://json-schema.org/draft-04/schema#/properties/maxLength
+finally {
+depthCounters["15"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
+*/
 export function mockMaxLength(): types.MaxLength {
+depthCounters["16"] ??= 0;
+try {
+depthCounters["16"]++;
 return (mockPositiveInteger());
 }
-// http://json-schema.org/draft-04/schema#/properties/minLength
+finally {
+depthCounters["16"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
+*/
 export function mockMinLength(): types.MinLength {
+depthCounters["17"] ??= 0;
+try {
+depthCounters["17"]++;
 return (mockPositiveIntegerDefault0());
 }
-// http://json-schema.org/draft-04/schema#/properties/pattern
+finally {
+depthCounters["17"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/pattern}
+*/
 export function mockPattern(): types.Pattern {
+depthCounters["18"] ??= 0;
+try {
+depthCounters["18"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalItems
+finally {
+depthCounters["18"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
+*/
 export function mockAdditionalItems(): types.AdditionalItems {
+depthCounters["19"] ??= 0;
+try {
+depthCounters["19"]++;
 return (
 (() => {
 switch (
@@ -148,13 +328,22 @@ nextSeed() % 2
 case 0:
 return (mockAdditionalItems0());
 case 1:
-return (mockSchemaDocument());
+return (mockAdditionalItems1());
 }
 })()
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/items
+finally {
+depthCounters["19"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items}
+*/
 export function mockPropertiesItems(): types.PropertiesItems {
+depthCounters["20"] ??= 0;
+try {
+depthCounters["20"]++;
 return (
 (() => {
 switch (
@@ -163,39 +352,102 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockSchemaDocument());
+return (mockItems0());
 case 1:
-return (mockSchemaArray());
+return (mockItems1());
 }
 })()
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/maxItems
+finally {
+depthCounters["20"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
+*/
 export function mockMaxItems(): types.MaxItems {
+depthCounters["21"] ??= 0;
+try {
+depthCounters["21"]++;
 return (mockPositiveInteger());
 }
-// http://json-schema.org/draft-04/schema#/properties/minItems
+finally {
+depthCounters["21"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
+*/
 export function mockMinItems(): types.MinItems {
+depthCounters["22"] ??= 0;
+try {
+depthCounters["22"]++;
 return (mockPositiveIntegerDefault0());
 }
-// http://json-schema.org/draft-04/schema#/properties/uniqueItems
+finally {
+depthCounters["22"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
+*/
 export function mockUniqueItems(): types.UniqueItems {
+depthCounters["23"] ??= 0;
+try {
+depthCounters["23"]++;
 return (Boolean(nextSeed() % 2));
 }
-// http://json-schema.org/draft-04/schema#/properties/maxProperties
+finally {
+depthCounters["23"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
+*/
 export function mockMaxProperties(): types.MaxProperties {
+depthCounters["24"] ??= 0;
+try {
+depthCounters["24"]++;
 return (mockPositiveInteger());
 }
-// http://json-schema.org/draft-04/schema#/properties/minProperties
+finally {
+depthCounters["24"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
+*/
 export function mockMinProperties(): types.MinProperties {
+depthCounters["25"] ??= 0;
+try {
+depthCounters["25"]++;
 return (mockPositiveIntegerDefault0());
 }
-// http://json-schema.org/draft-04/schema#/properties/required
+finally {
+depthCounters["25"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/required}
+*/
 export function mockRequired(): types.Required {
+depthCounters["26"] ??= 0;
+try {
+depthCounters["26"]++;
 return (mockStringArray());
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties
+finally {
+depthCounters["26"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
+*/
 export function mockPropertiesAdditionalProperties(): types.PropertiesAdditionalProperties {
+depthCounters["27"] ??= 0;
+try {
+depthCounters["27"]++;
 return (
 (() => {
 switch (
@@ -206,88 +458,142 @@ nextSeed() % 2
 case 0:
 return (mockAdditionalProperties0());
 case 1:
-return (mockSchemaDocument());
+return (mockAdditionalProperties1());
 }
 })()
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/definitions
+finally {
+depthCounters["27"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
+*/
 export function mockDefinitions(): types.Definitions {
+depthCounters["28"] ??= 0;
+try {
+depthCounters["28"]++;
 return (
-{
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+} : {}
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/properties
+finally {
+depthCounters["28"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
+*/
 export function mockProperties(): types.Properties {
+depthCounters["29"] ??= 0;
+try {
+depthCounters["29"]++;
 return (
-{
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+} : {}
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/patternProperties
+finally {
+depthCounters["29"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
+*/
 export function mockPatternProperties(): types.PatternProperties {
+depthCounters["30"] ??= 0;
+try {
+depthCounters["30"]++;
 return (
-{
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-[(randomString(10))]: mockSchemaDocument(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+} : {}
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies
+finally {
+depthCounters["30"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
+*/
 export function mockDependencies(): types.Dependencies {
+depthCounters["31"] ??= 0;
+try {
+depthCounters["31"]++;
 return (
-{
+(depthCounters["52"] ?? 0) < maximumDepth ? {
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
-}
+} : {}
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/enum
+finally {
+depthCounters["31"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
+*/
 export function mockEnum(): types.Enum {
+depthCounters["32"] ??= 0;
+try {
+depthCounters["32"]++;
 return (
-[
+(depthCounters["any"] ?? 0) < maximumDepth ? [
 (
-// unknown
+// any
 {}
 ),
 (
-// unknown
+// any
 {}
 ),
 (
-// unknown
+// any
 {}
 ),
 (
-// unknown
+// any
 {}
 ),
 (
-// unknown
+// any
 {}
 ),
-]
+] : []
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/type
+finally {
+depthCounters["32"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type}
+*/
 export function mockType(): types.Type {
+depthCounters["33"] ??= 0;
+try {
+depthCounters["33"]++;
 return (
 (() => {
 switch (
@@ -296,90 +602,261 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockSimpleTypes());
+return (mockType0());
 case 1:
 return (mockType1());
 }
 })()
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/format
+finally {
+depthCounters["33"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/format}
+*/
 export function mockFormat(): types.Format {
+depthCounters["34"] ??= 0;
+try {
+depthCounters["34"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/allOf
+finally {
+depthCounters["34"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
+*/
 export function mockAllOf(): types.AllOf {
+depthCounters["35"] ??= 0;
+try {
+depthCounters["35"]++;
 return (mockSchemaArray());
 }
-// http://json-schema.org/draft-04/schema#/properties/anyOf
+finally {
+depthCounters["35"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
+*/
 export function mockAnyOf(): types.AnyOf {
+depthCounters["36"] ??= 0;
+try {
+depthCounters["36"]++;
 return (mockSchemaArray());
 }
-// http://json-schema.org/draft-04/schema#/properties/oneOf
+finally {
+depthCounters["36"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
+*/
 export function mockOneOf(): types.OneOf {
+depthCounters["37"] ??= 0;
+try {
+depthCounters["37"]++;
 return (mockSchemaArray());
 }
-// http://json-schema.org/draft-04/schema#/properties/not
+finally {
+depthCounters["37"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/not}
+*/
 export function mockNot(): types.Not {
+depthCounters["38"] ??= 0;
+try {
+depthCounters["38"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/definitions/schemaArray/items
+finally {
+depthCounters["38"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
+*/
 export function mockSchemaArrayItems(): types.SchemaArrayItems {
+depthCounters["39"] ??= 0;
+try {
+depthCounters["39"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0
+finally {
+depthCounters["39"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
+*/
 export function mockPositiveIntegerDefault00(): types.PositiveIntegerDefault00 {
+depthCounters["40"] ??= 0;
+try {
+depthCounters["40"]++;
 return (mockPositiveInteger());
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1
+finally {
+depthCounters["40"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
+*/
 export function mockPositiveIntegerDefault01(): types.PositiveIntegerDefault01 {
+depthCounters["41"] ??= 0;
+try {
+depthCounters["41"]++;
 return (
 // unknown
 {}
 );
 }
-// http://json-schema.org/draft-04/schema#/definitions/stringArray/items
+finally {
+depthCounters["41"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
+*/
 export function mockStringArrayItems(): types.StringArrayItems {
+depthCounters["42"] ??= 0;
+try {
+depthCounters["42"]++;
 return (randomString(10));
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0
+finally {
+depthCounters["42"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0}
+*/
 export function mockAdditionalItems0(): types.AdditionalItems0 {
+depthCounters["43"] ??= 0;
+try {
+depthCounters["43"]++;
 return (Boolean(nextSeed() % 2));
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1
+finally {
+depthCounters["43"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
+*/
 export function mockAdditionalItems1(): types.AdditionalItems1 {
+depthCounters["44"] ??= 0;
+try {
+depthCounters["44"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/items/anyOf/0
+finally {
+depthCounters["44"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
+*/
 export function mockItems0(): types.Items0 {
+depthCounters["45"] ??= 0;
+try {
+depthCounters["45"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/items/anyOf/1
+finally {
+depthCounters["45"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
+*/
 export function mockItems1(): types.Items1 {
+depthCounters["46"] ??= 0;
+try {
+depthCounters["46"]++;
 return (mockSchemaArray());
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0
+finally {
+depthCounters["46"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0}
+*/
 export function mockAdditionalProperties0(): types.AdditionalProperties0 {
+depthCounters["47"] ??= 0;
+try {
+depthCounters["47"]++;
 return (Boolean(nextSeed() % 2));
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1
+finally {
+depthCounters["47"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
+*/
 export function mockAdditionalProperties1(): types.AdditionalProperties1 {
+depthCounters["48"] ??= 0;
+try {
+depthCounters["48"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties
+finally {
+depthCounters["48"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
+*/
 export function mockDefinitionsAdditionalProperties(): types.DefinitionsAdditionalProperties {
+depthCounters["49"] ??= 0;
+try {
+depthCounters["49"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties
+finally {
+depthCounters["49"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
+*/
 export function mockPropertiesPropertiesAdditionalProperties(): types.PropertiesPropertiesAdditionalProperties {
+depthCounters["50"] ??= 0;
+try {
+depthCounters["50"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties
+finally {
+depthCounters["50"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
+*/
 export function mockPatternPropertiesAdditionalProperties(): types.PatternPropertiesAdditionalProperties {
+depthCounters["51"] ??= 0;
+try {
+depthCounters["51"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties
+finally {
+depthCounters["51"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
+*/
 export function mockDependenciesAdditionalProperties(): types.DependenciesAdditionalProperties {
+depthCounters["52"] ??= 0;
+try {
+depthCounters["52"]++;
 return (
 (() => {
 switch (
@@ -388,40 +865,89 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockSchemaDocument());
+return (mockDependencies0());
 case 1:
-return (mockStringArray());
+return (mockDependencies1());
 }
 })()
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/0
+finally {
+depthCounters["52"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
+*/
 export function mockType0(): types.Type0 {
+depthCounters["53"] ??= 0;
+try {
+depthCounters["53"]++;
 return (mockSimpleTypes());
 }
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/1
+finally {
+depthCounters["53"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
+*/
 export function mockType1(): types.Type1 {
+depthCounters["54"] ??= 0;
+try {
+depthCounters["54"]++;
 return (
-[
-mockSimpleTypes(),
-mockSimpleTypes(),
-mockSimpleTypes(),
-mockSimpleTypes(),
-mockSimpleTypes(),
-]
+(depthCounters["4"] ?? 0) < maximumDepth ? [
+mockTypeItems(),
+mockTypeItems(),
+mockTypeItems(),
+mockTypeItems(),
+mockTypeItems(),
+] : []
 );
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0
+finally {
+depthCounters["54"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
 export function mockDependencies0(): types.Dependencies0 {
+depthCounters["55"] ??= 0;
+try {
+depthCounters["55"]++;
 return (mockSchemaDocument());
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1
+finally {
+depthCounters["55"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
 export function mockDependencies1(): types.Dependencies1 {
+depthCounters["56"] ??= 0;
+try {
+depthCounters["56"]++;
 return (mockStringArray());
 }
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items
+finally {
+depthCounters["56"]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
+*/
 export function mockTypeItems(): types.TypeItems {
+depthCounters["57"] ??= 0;
+try {
+depthCounters["57"]++;
 return (mockSimpleTypes());
+}
+finally {
+depthCounters["57"]--;
+}
 }
 let seed = 1;
 function nextSeed() {

@@ -4,339 +4,21 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
+//
 import * as types from "./types.js";
-// https://json-schema.org/draft/2020-12/schema
+/**
+* @summary Core and Validation specifications meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/schema}
+*/
 export function isSchema(value: unknown): value is types.Schema {
-if(!_isMapSchema(value) && !_isBooleanSchema(value)) {
-return false;
-}
-if(!_isAllOfSchema(value)) {
-return false;
-}
-return true;
-}
-function _isMapSchema(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "definitions":
-if(!isDefinitions(propertyValue)) {
-return false;
-}
-continue;
-case "dependencies":
-if(!isDependencies(propertyValue)) {
-return false;
-}
-continue;
-case "$recursiveAnchor":
-if(!isRecursiveAnchor(propertyValue)) {
-return false;
-}
-continue;
-case "$recursiveRef":
-if(!isRecursiveRef(propertyValue)) {
-return false;
-}
-continue;
-}
-}
-return true;
-}
-function _isBooleanSchema(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
-}
-return true;
-}
-function _isAllOfSchema(value: unknown): value is unknown {
-if(!isAllOf0(value)) {
-return false;
-}
-if(!isAllOf1(value)) {
-return false;
-}
-if(!isAllOf2(value)) {
-return false;
-}
-if(!isAllOf3(value)) {
-return false;
-}
-if(!isAllOf4(value)) {
-return false;
-}
-if(!isAllOf5(value)) {
-return false;
-}
-if(!isAllOf6(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/definitions
-export function isDefinitions(value: unknown): value is types.Definitions {
-if(!_isMapDefinitions(value)) {
-return false;
-}
-return true;
-}
-function _isMapDefinitions(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-if(!isDefinitionsAdditionalProperties(propertyValue)) {
-return false;
-}
-continue;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies
-export function isDependencies(value: unknown): value is types.Dependencies {
-if(!_isMapDependencies(value)) {
-return false;
-}
-return true;
-}
-function _isMapDependencies(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-if(!isDependenciesAdditionalProperties(propertyValue)) {
-return false;
-}
-continue;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor
-export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
-if(!_isReferenceRecursiveAnchor(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceRecursiveAnchor(value: unknown): value is unknown {
-if(!isAnchorString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef
-export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
-if(!_isReferenceRecursiveRef(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceRecursiveRef(value: unknown): value is unknown {
-if(!isUriReferenceString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/0
-export function isAllOf0(value: unknown): value is types.AllOf0 {
-if(!_isReferenceAllOf0(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf0(value: unknown): value is unknown {
-if(!isCore(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/1
-export function isAllOf1(value: unknown): value is types.AllOf1 {
-if(!_isReferenceAllOf1(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf1(value: unknown): value is unknown {
-if(!isApplicator(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/2
-export function isAllOf2(value: unknown): value is types.AllOf2 {
-if(!_isReferenceAllOf2(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf2(value: unknown): value is unknown {
-if(!isUnevaluated(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/3
-export function isAllOf3(value: unknown): value is types.AllOf3 {
-if(!_isReferenceAllOf3(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf3(value: unknown): value is unknown {
-if(!isValidation(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/4
-export function isAllOf4(value: unknown): value is types.AllOf4 {
-if(!_isReferenceAllOf4(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf4(value: unknown): value is unknown {
-if(!isMetaData(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/5
-export function isAllOf5(value: unknown): value is types.AllOf5 {
-if(!_isReferenceAllOf5(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf5(value: unknown): value is unknown {
-if(!isFormatAnnotation(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/6
-export function isAllOf6(value: unknown): value is types.AllOf6 {
-if(!_isReferenceAllOf6(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceAllOf6(value: unknown): value is unknown {
-if(!isContent(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
-export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
-if(!_isReferenceDefinitionsAdditionalProperties(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceDefinitionsAdditionalProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
-export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
-if(!_isAnyOfDependenciesAdditionalProperties(value)) {
-return false;
-}
-return true;
-}
-function _isAnyOfDependenciesAdditionalProperties(value: unknown): value is unknown {
-if(isDependencies0(value)) {
-return true;
-}
-if(isDependencies1(value)) {
-return true;
-}
-return false;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
-export function isDependencies0(value: unknown): value is types.Dependencies0 {
-if(!_isReferenceDependencies0(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceDependencies0(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
-export function isDependencies1(value: unknown): value is types.Dependencies1 {
-if(!_isReferenceDependencies1(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceDependencies1(value: unknown): value is unknown {
-if(!isStringArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString
-export function isAnchorString(value: unknown): value is types.AnchorString {
-if(!_isStringAnchorString(value)) {
-return false;
-}
-return true;
-}
-function _isStringAnchorString(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-if(!new RegExp("^[A-Za-z_][-A-Za-z0-9._]*$").test(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString
-export function isUriReferenceString(value: unknown): value is types.UriReferenceString {
-if(!_isStringUriReferenceString(value)) {
-return false;
-}
-return true;
-}
-function _isStringUriReferenceString(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core
-export function isCore(value: unknown): value is types.Core {
-if(!_isMapCore(value) && !_isBooleanCore(value)) {
-return false;
-}
-return true;
-}
-function _isMapCore(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -347,171 +29,949 @@ case "$id":
 if(!isId(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$schema":
 if(!isCoreSchema(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$ref":
 if(!isRef(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$anchor":
 if(!isAnchor(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$dynamicRef":
 if(!isDynamicRef(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$dynamicAnchor":
 if(!isDynamicAnchor(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$vocabulary":
 if(!isVocabulary(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$comment":
 if(!isComment(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "$defs":
 if(!isDefs(propertyValue)) {
 return false;
 }
+break;
+case "prefixItems":
+if(!isPrefixItems(propertyValue)) {
+return false;
+}
+break;
+case "items":
+if(!isApplicatorItems(propertyValue)) {
+return false;
+}
+break;
+case "contains":
+if(!isContains(propertyValue)) {
+return false;
+}
+break;
+case "additionalProperties":
+if(!isApplicatorAdditionalProperties(propertyValue)) {
+return false;
+}
+break;
+case "properties":
+if(!isProperties(propertyValue)) {
+return false;
+}
+break;
+case "patternProperties":
+if(!isPatternProperties(propertyValue)) {
+return false;
+}
+break;
+case "dependentSchemas":
+if(!isDependentSchemas(propertyValue)) {
+return false;
+}
+break;
+case "propertyNames":
+if(!isApplicatorPropertyNames(propertyValue)) {
+return false;
+}
+break;
+case "if":
+if(!isIf(propertyValue)) {
+return false;
+}
+break;
+case "then":
+if(!isThen(propertyValue)) {
+return false;
+}
+break;
+case "else":
+if(!isElse(propertyValue)) {
+return false;
+}
+break;
+case "allOf":
+if(!isAllOf(propertyValue)) {
+return false;
+}
+break;
+case "anyOf":
+if(!isAnyOf(propertyValue)) {
+return false;
+}
+break;
+case "oneOf":
+if(!isOneOf(propertyValue)) {
+return false;
+}
+break;
+case "not":
+if(!isNot(propertyValue)) {
+return false;
+}
+break;
+case "unevaluatedItems":
+if(!isUnevaluatedItems(propertyValue)) {
+return false;
+}
+break;
+case "unevaluatedProperties":
+if(!isUnevaluatedProperties(propertyValue)) {
+return false;
+}
+break;
+case "type":
+if(!isType(propertyValue)) {
+return false;
+}
+break;
+case "const":
+if(!isConst(propertyValue)) {
+return false;
+}
+break;
+case "enum":
+if(!isEnum(propertyValue)) {
+return false;
+}
+break;
+case "multipleOf":
+if(!isMultipleOf(propertyValue)) {
+return false;
+}
+break;
+case "maximum":
+if(!isMaximum(propertyValue)) {
+return false;
+}
+break;
+case "exclusiveMaximum":
+if(!isExclusiveMaximum(propertyValue)) {
+return false;
+}
+break;
+case "minimum":
+if(!isMinimum(propertyValue)) {
+return false;
+}
+break;
+case "exclusiveMinimum":
+if(!isExclusiveMinimum(propertyValue)) {
+return false;
+}
+break;
+case "maxLength":
+if(!isMaxLength(propertyValue)) {
+return false;
+}
+break;
+case "minLength":
+if(!isMinLength(propertyValue)) {
+return false;
+}
+break;
+case "pattern":
+if(!isPattern(propertyValue)) {
+return false;
+}
+break;
+case "maxItems":
+if(!isMaxItems(propertyValue)) {
+return false;
+}
+break;
+case "minItems":
+if(!isMinItems(propertyValue)) {
+return false;
+}
+break;
+case "uniqueItems":
+if(!isUniqueItems(propertyValue)) {
+return false;
+}
+break;
+case "maxContains":
+if(!isMaxContains(propertyValue)) {
+return false;
+}
+break;
+case "minContains":
+if(!isMinContains(propertyValue)) {
+return false;
+}
+break;
+case "maxProperties":
+if(!isMaxProperties(propertyValue)) {
+return false;
+}
+break;
+case "minProperties":
+if(!isMinProperties(propertyValue)) {
+return false;
+}
+break;
+case "required":
+if(!isRequired(propertyValue)) {
+return false;
+}
+break;
+case "dependentRequired":
+if(!isDependentRequired(propertyValue)) {
+return false;
+}
+break;
+case "title":
+if(!isTitle(propertyValue)) {
+return false;
+}
+break;
+case "description":
+if(!isDescription(propertyValue)) {
+return false;
+}
+break;
+case "default":
+if(!isDefault(propertyValue)) {
+return false;
+}
+break;
+case "deprecated":
+if(!isDeprecated(propertyValue)) {
+return false;
+}
+break;
+case "readOnly":
+if(!isReadOnly(propertyValue)) {
+return false;
+}
+break;
+case "writeOnly":
+if(!isWriteOnly(propertyValue)) {
+return false;
+}
+break;
+case "examples":
+if(!isExamples(propertyValue)) {
+return false;
+}
+break;
+case "format":
+if(!isFormat(propertyValue)) {
+return false;
+}
+break;
+case "contentEncoding":
+if(!isContentEncoding(propertyValue)) {
+return false;
+}
+break;
+case "contentMediaType":
+if(!isContentMediaType(propertyValue)) {
+return false;
+}
+break;
+case "contentSchema":
+if(!isContentSchema(propertyValue)) {
+return false;
+}
+break;
+case "definitions":
+if(!isDefinitions(propertyValue)) {
+return false;
+}
+break;
+case "dependencies":
+if(!isDependencies(propertyValue)) {
+return false;
+}
+break;
+case "$recursiveAnchor":
+if(!isRecursiveAnchor(propertyValue)) {
+return false;
+}
+break;
+case "$recursiveRef":
+if(!isRecursiveRef(propertyValue)) {
+return false;
+}
+break;
+}
+}
+return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+return count === 1;
+})()
+));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
+* @deprecated
+*/
+export function isDefinitions(value: unknown): value is types.Definitions {
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
 continue;
 }
-}
-return true;
-}
-function _isBooleanCore(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
+if(!(typeof propertyName === "string")) {
 return false;
 }
-return true;
+if(!isDefinitionsAdditionalProperties(propertyValue)) {
+return false;
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString
+}
+return true;
+})()
+));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
+* @deprecated
+*/
+export function isDependencies(value: unknown): value is types.Dependencies {
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+if(!(typeof propertyName === "string")) {
+return false;
+}
+if(!isDependenciesAdditionalProperties(propertyValue)) {
+return false;
+}
+}
+return true;
+})()
+));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
+* @deprecated
+*/
+export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
+return ((isAnchorString(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
+* @deprecated
+*/
+export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
+return ((isUriReferenceString(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
+*/
+export function isAllOf0(value: unknown): value is types.AllOf0 {
+return ((isCore(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
+*/
+export function isAllOf1(value: unknown): value is types.AllOf1 {
+return ((isApplicator(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
+*/
+export function isAllOf2(value: unknown): value is types.AllOf2 {
+return ((isUnevaluated(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
+*/
+export function isAllOf3(value: unknown): value is types.AllOf3 {
+return ((isValidation(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
+*/
+export function isAllOf4(value: unknown): value is types.AllOf4 {
+return ((isMetaData(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
+*/
+export function isAllOf5(value: unknown): value is types.AllOf5 {
+return ((isFormatAnnotation(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
+*/
+export function isAllOf6(value: unknown): value is types.AllOf6 {
+return ((isContent(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
+*/
+export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
+return ((isSchema(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
+*/
+export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
+return ((
+(()=>{
+let count = 0;
+if(isStringArray(value)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+switch(propertyName) {
+case "$id":
+if(!isId(propertyValue)) {
+return false;
+}
+break;
+case "$schema":
+if(!isCoreSchema(propertyValue)) {
+return false;
+}
+break;
+case "$ref":
+if(!isRef(propertyValue)) {
+return false;
+}
+break;
+case "$anchor":
+if(!isAnchor(propertyValue)) {
+return false;
+}
+break;
+case "$dynamicRef":
+if(!isDynamicRef(propertyValue)) {
+return false;
+}
+break;
+case "$dynamicAnchor":
+if(!isDynamicAnchor(propertyValue)) {
+return false;
+}
+break;
+case "$vocabulary":
+if(!isVocabulary(propertyValue)) {
+return false;
+}
+break;
+case "$comment":
+if(!isComment(propertyValue)) {
+return false;
+}
+break;
+case "$defs":
+if(!isDefs(propertyValue)) {
+return false;
+}
+break;
+case "prefixItems":
+if(!isPrefixItems(propertyValue)) {
+return false;
+}
+break;
+case "items":
+if(!isApplicatorItems(propertyValue)) {
+return false;
+}
+break;
+case "contains":
+if(!isContains(propertyValue)) {
+return false;
+}
+break;
+case "additionalProperties":
+if(!isApplicatorAdditionalProperties(propertyValue)) {
+return false;
+}
+break;
+case "properties":
+if(!isProperties(propertyValue)) {
+return false;
+}
+break;
+case "patternProperties":
+if(!isPatternProperties(propertyValue)) {
+return false;
+}
+break;
+case "dependentSchemas":
+if(!isDependentSchemas(propertyValue)) {
+return false;
+}
+break;
+case "propertyNames":
+if(!isApplicatorPropertyNames(propertyValue)) {
+return false;
+}
+break;
+case "if":
+if(!isIf(propertyValue)) {
+return false;
+}
+break;
+case "then":
+if(!isThen(propertyValue)) {
+return false;
+}
+break;
+case "else":
+if(!isElse(propertyValue)) {
+return false;
+}
+break;
+case "allOf":
+if(!isAllOf(propertyValue)) {
+return false;
+}
+break;
+case "anyOf":
+if(!isAnyOf(propertyValue)) {
+return false;
+}
+break;
+case "oneOf":
+if(!isOneOf(propertyValue)) {
+return false;
+}
+break;
+case "not":
+if(!isNot(propertyValue)) {
+return false;
+}
+break;
+case "unevaluatedItems":
+if(!isUnevaluatedItems(propertyValue)) {
+return false;
+}
+break;
+case "unevaluatedProperties":
+if(!isUnevaluatedProperties(propertyValue)) {
+return false;
+}
+break;
+case "type":
+if(!isType(propertyValue)) {
+return false;
+}
+break;
+case "const":
+if(!isConst(propertyValue)) {
+return false;
+}
+break;
+case "enum":
+if(!isEnum(propertyValue)) {
+return false;
+}
+break;
+case "multipleOf":
+if(!isMultipleOf(propertyValue)) {
+return false;
+}
+break;
+case "maximum":
+if(!isMaximum(propertyValue)) {
+return false;
+}
+break;
+case "exclusiveMaximum":
+if(!isExclusiveMaximum(propertyValue)) {
+return false;
+}
+break;
+case "minimum":
+if(!isMinimum(propertyValue)) {
+return false;
+}
+break;
+case "exclusiveMinimum":
+if(!isExclusiveMinimum(propertyValue)) {
+return false;
+}
+break;
+case "maxLength":
+if(!isMaxLength(propertyValue)) {
+return false;
+}
+break;
+case "minLength":
+if(!isMinLength(propertyValue)) {
+return false;
+}
+break;
+case "pattern":
+if(!isPattern(propertyValue)) {
+return false;
+}
+break;
+case "maxItems":
+if(!isMaxItems(propertyValue)) {
+return false;
+}
+break;
+case "minItems":
+if(!isMinItems(propertyValue)) {
+return false;
+}
+break;
+case "uniqueItems":
+if(!isUniqueItems(propertyValue)) {
+return false;
+}
+break;
+case "maxContains":
+if(!isMaxContains(propertyValue)) {
+return false;
+}
+break;
+case "minContains":
+if(!isMinContains(propertyValue)) {
+return false;
+}
+break;
+case "maxProperties":
+if(!isMaxProperties(propertyValue)) {
+return false;
+}
+break;
+case "minProperties":
+if(!isMinProperties(propertyValue)) {
+return false;
+}
+break;
+case "required":
+if(!isRequired(propertyValue)) {
+return false;
+}
+break;
+case "dependentRequired":
+if(!isDependentRequired(propertyValue)) {
+return false;
+}
+break;
+case "title":
+if(!isTitle(propertyValue)) {
+return false;
+}
+break;
+case "description":
+if(!isDescription(propertyValue)) {
+return false;
+}
+break;
+case "default":
+if(!isDefault(propertyValue)) {
+return false;
+}
+break;
+case "deprecated":
+if(!isDeprecated(propertyValue)) {
+return false;
+}
+break;
+case "readOnly":
+if(!isReadOnly(propertyValue)) {
+return false;
+}
+break;
+case "writeOnly":
+if(!isWriteOnly(propertyValue)) {
+return false;
+}
+break;
+case "examples":
+if(!isExamples(propertyValue)) {
+return false;
+}
+break;
+case "format":
+if(!isFormat(propertyValue)) {
+return false;
+}
+break;
+case "contentEncoding":
+if(!isContentEncoding(propertyValue)) {
+return false;
+}
+break;
+case "contentMediaType":
+if(!isContentMediaType(propertyValue)) {
+return false;
+}
+break;
+case "contentSchema":
+if(!isContentSchema(propertyValue)) {
+return false;
+}
+break;
+case "definitions":
+if(!isDefinitions(propertyValue)) {
+return false;
+}
+break;
+case "dependencies":
+if(!isDependencies(propertyValue)) {
+return false;
+}
+break;
+case "$recursiveAnchor":
+if(!isRecursiveAnchor(propertyValue)) {
+return false;
+}
+break;
+case "$recursiveRef":
+if(!isRecursiveRef(propertyValue)) {
+return false;
+}
+break;
+}
+}
+return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+return count === 1;
+})()
+));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
+export function isDependencies0(value: unknown): value is types.Dependencies0 {
+return ((isSchema(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
+export function isDependencies1(value: unknown): value is types.Dependencies1 {
+return ((isStringArray(value)));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
+*/
+export function isAnchorString(value: unknown): value is types.AnchorString {
+return ((typeof value === "string"));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
+*/
+export function isUriReferenceString(value: unknown): value is types.UriReferenceString {
+return ((typeof value === "string"));
+}
+/**
+* @summary Core vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/core}
+*/
+export function isCore(value: unknown): value is types.Core {
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+switch(propertyName) {
+case "$id":
+if(!isId(propertyValue)) {
+return false;
+}
+break;
+case "$schema":
+if(!isCoreSchema(propertyValue)) {
+return false;
+}
+break;
+case "$ref":
+if(!isRef(propertyValue)) {
+return false;
+}
+break;
+case "$anchor":
+if(!isAnchor(propertyValue)) {
+return false;
+}
+break;
+case "$dynamicRef":
+if(!isDynamicRef(propertyValue)) {
+return false;
+}
+break;
+case "$dynamicAnchor":
+if(!isDynamicAnchor(propertyValue)) {
+return false;
+}
+break;
+case "$vocabulary":
+if(!isVocabulary(propertyValue)) {
+return false;
+}
+break;
+case "$comment":
+if(!isComment(propertyValue)) {
+return false;
+}
+break;
+case "$defs":
+if(!isDefs(propertyValue)) {
+return false;
+}
+break;
+}
+}
+return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
+}
+return count === 1;
+})()
+));
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
+*/
 export function isUriString(value: unknown): value is types.UriString {
-if(!_isStringUriString(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringUriString(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$id
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
+*/
 export function isId(value: unknown): value is types.Id {
-if(!_isStringId(value)) {
-return false;
+return ((typeof value === "string"));
 }
-if(!_isReferenceId(value)) {
-return false;
-}
-return true;
-}
-function _isStringId(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-if(!new RegExp("^[^#]*#?$").test(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceId(value: unknown): value is unknown {
-if(!isUriReferenceString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
+*/
 export function isCoreSchema(value: unknown): value is types.CoreSchema {
-if(!_isReferenceCoreSchema(value)) {
-return false;
+return ((isUriString(value)));
 }
-return true;
-}
-function _isReferenceCoreSchema(value: unknown): value is unknown {
-if(!isUriString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
+*/
 export function isRef(value: unknown): value is types.Ref {
-if(!_isReferenceRef(value)) {
-return false;
+return ((isUriReferenceString(value)));
 }
-return true;
-}
-function _isReferenceRef(value: unknown): value is unknown {
-if(!isUriReferenceString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
+*/
 export function isAnchor(value: unknown): value is types.Anchor {
-if(!_isReferenceAnchor(value)) {
-return false;
+return ((isAnchorString(value)));
 }
-return true;
-}
-function _isReferenceAnchor(value: unknown): value is unknown {
-if(!isAnchorString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
+*/
 export function isDynamicRef(value: unknown): value is types.DynamicRef {
-if(!_isReferenceDynamicRef(value)) {
-return false;
+return ((isUriReferenceString(value)));
 }
-return true;
-}
-function _isReferenceDynamicRef(value: unknown): value is unknown {
-if(!isUriReferenceString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
+*/
 export function isDynamicAnchor(value: unknown): value is types.DynamicAnchor {
-if(!_isReferenceDynamicAnchor(value)) {
-return false;
+return ((isAnchorString(value)));
 }
-return true;
-}
-function _isReferenceDynamicAnchor(value: unknown): value is unknown {
-if(!isAnchorString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
+*/
 export function isVocabulary(value: unknown): value is types.Vocabulary {
-if(!_isMapVocabulary(value)) {
-return false;
-}
-return true;
-}
-function _isMapVocabulary(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -520,100 +980,76 @@ continue;
 if(!isVocabularyPropertyNames(propertyName)) {
 return false;
 }
-continue;
 if(!isVocabularyAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$comment
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
+*/
 export function isComment(value: unknown): value is types.Comment {
-if(!_isStringComment(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringComment(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
+*/
 export function isDefs(value: unknown): value is types.Defs {
-if(!_isMapDefs(value)) {
-return false;
-}
-return true;
-}
-function _isMapDefs(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
+if(!(typeof propertyName === "string")) {
+return false;
+}
 if(!isDefsAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties}
+*/
 export function isVocabularyAdditionalProperties(value: unknown): value is types.VocabularyAdditionalProperties {
-if(!_isBooleanVocabularyAdditionalProperties(value)) {
-return false;
+return ((typeof value === "boolean"));
 }
-return true;
-}
-function _isBooleanVocabularyAdditionalProperties(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
+*/
 export function isVocabularyPropertyNames(value: unknown): value is types.VocabularyPropertyNames {
-if(!_isReferenceVocabularyPropertyNames(value)) {
-return false;
+return ((isUriString(value)));
 }
-return true;
-}
-function _isReferenceVocabularyPropertyNames(value: unknown): value is unknown {
-if(!isUriString(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
+*/
 export function isDefsAdditionalProperties(value: unknown): value is types.DefsAdditionalProperties {
-if(!_isReferenceDefsAdditionalProperties(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceDefsAdditionalProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator
+/**
+* @summary Applicator vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
+*/
 export function isApplicator(value: unknown): value is types.Applicator {
-if(!_isMapApplicator(value) && !_isBooleanApplicator(value)) {
-return false;
-}
-return true;
-}
-function _isMapApplicator(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -624,101 +1060,104 @@ case "prefixItems":
 if(!isPrefixItems(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "items":
 if(!isApplicatorItems(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "contains":
 if(!isContains(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "additionalProperties":
 if(!isApplicatorAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "properties":
 if(!isProperties(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "patternProperties":
 if(!isPatternProperties(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "dependentSchemas":
 if(!isDependentSchemas(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "propertyNames":
 if(!isApplicatorPropertyNames(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "if":
 if(!isIf(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "then":
 if(!isThen(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "else":
 if(!isElse(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "allOf":
 if(!isAllOf(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "anyOf":
 if(!isAnyOf(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "oneOf":
 if(!isOneOf(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "not":
 if(!isNot(propertyValue)) {
 return false;
 }
-continue;
+break;
 }
 }
 return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-function _isBooleanApplicator(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return true;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
+*/
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
-if(!_isArraySchemaArray(value)) {
-return false;
-}
-return true;
-}
-function _isArraySchemaArray(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-if(value.length < 1) {
-return false;
-}
+return ((Array.isArray(value)) &&
+(
+(()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isSchemaArrayItems(elementValue)) {
@@ -726,93 +1165,67 @@ return false;
 }
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
+*/
 export function isPrefixItems(value: unknown): value is types.PrefixItems {
-if(!_isReferencePrefixItems(value)) {
-return false;
+return ((isSchemaArray(value)));
 }
-return true;
-}
-function _isReferencePrefixItems(value: unknown): value is unknown {
-if(!isSchemaArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
+*/
 export function isApplicatorItems(value: unknown): value is types.ApplicatorItems {
-if(!_isReferenceApplicatorItems(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceApplicatorItems(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
+*/
 export function isContains(value: unknown): value is types.Contains {
-if(!_isReferenceContains(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceContains(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
+*/
 export function isApplicatorAdditionalProperties(value: unknown): value is types.ApplicatorAdditionalProperties {
-if(!_isReferenceApplicatorAdditionalProperties(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceApplicatorAdditionalProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
+*/
 export function isProperties(value: unknown): value is types.Properties {
-if(!_isMapProperties(value)) {
-return false;
-}
-return true;
-}
-function _isMapProperties(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
+if(!(typeof propertyName === "string")) {
+return false;
+}
 if(!isPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
+*/
 export function isPatternProperties(value: unknown): value is types.PatternProperties {
-if(!_isMapPatternProperties(value)) {
-return false;
-}
-return true;
-}
-function _isMapPatternProperties(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -821,217 +1234,130 @@ continue;
 if(!isPatternPropertiesPropertyNames(propertyName)) {
 return false;
 }
-continue;
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
+*/
 export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
-if(!_isMapDependentSchemas(value)) {
-return false;
-}
-return true;
-}
-function _isMapDependentSchemas(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
+if(!(typeof propertyName === "string")) {
+return false;
+}
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
+*/
 export function isApplicatorPropertyNames(value: unknown): value is types.ApplicatorPropertyNames {
-if(!_isReferenceApplicatorPropertyNames(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceApplicatorPropertyNames(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
+*/
 export function isIf(value: unknown): value is types.If {
-if(!_isReferenceIf(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceIf(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
+*/
 export function isThen(value: unknown): value is types.Then {
-if(!_isReferenceThen(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceThen(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
+*/
 export function isElse(value: unknown): value is types.Else {
-if(!_isReferenceElse(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceElse(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
+*/
 export function isAllOf(value: unknown): value is types.AllOf {
-if(!_isReferenceAllOf(value)) {
-return false;
+return ((isSchemaArray(value)));
 }
-return true;
-}
-function _isReferenceAllOf(value: unknown): value is unknown {
-if(!isSchemaArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
+*/
 export function isAnyOf(value: unknown): value is types.AnyOf {
-if(!_isReferenceAnyOf(value)) {
-return false;
+return ((isSchemaArray(value)));
 }
-return true;
-}
-function _isReferenceAnyOf(value: unknown): value is unknown {
-if(!isSchemaArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
+*/
 export function isOneOf(value: unknown): value is types.OneOf {
-if(!_isReferenceOneOf(value)) {
-return false;
+return ((isSchemaArray(value)));
 }
-return true;
-}
-function _isReferenceOneOf(value: unknown): value is unknown {
-if(!isSchemaArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
+*/
 export function isNot(value: unknown): value is types.Not {
-if(!_isReferenceNot(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceNot(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
+*/
 export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
-if(!_isReferenceSchemaArrayItems(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceSchemaArrayItems(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
+*/
 export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
-if(!_isReferencePropertiesAdditionalProperties(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferencePropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
+*/
 export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
-if(!_isReferencePatternPropertiesAdditionalProperties(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferencePatternPropertiesAdditionalProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
+*/
 export function isPatternPropertiesPropertyNames(value: unknown): value is types.PatternPropertiesPropertyNames {
-if(!_isStringPatternPropertiesPropertyNames(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringPatternPropertiesPropertyNames(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
+*/
 export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
-if(!_isReferenceDependentSchemasAdditionalProperties(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceDependentSchemasAdditionalProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/unevaluated
+/**
+* @summary Unevaluated applicator vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
+*/
 export function isUnevaluated(value: unknown): value is types.Unevaluated {
-if(!_isMapUnevaluated(value) && !_isBooleanUnevaluated(value)) {
-return false;
-}
-return true;
-}
-function _isMapUnevaluated(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1042,59 +1368,57 @@ case "unevaluatedItems":
 if(!isUnevaluatedItems(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "unevaluatedProperties":
 if(!isUnevaluatedProperties(propertyValue)) {
 return false;
 }
-continue;
+break;
 }
 }
 return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-function _isBooleanUnevaluated(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return true;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
+*/
 export function isUnevaluatedItems(value: unknown): value is types.UnevaluatedItems {
-if(!_isReferenceUnevaluatedItems(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceUnevaluatedItems(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
+*/
 export function isUnevaluatedProperties(value: unknown): value is types.UnevaluatedProperties {
-if(!_isReferenceUnevaluatedProperties(value)) {
-return false;
+return ((isSchema(value)));
 }
-return true;
-}
-function _isReferenceUnevaluatedProperties(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation
+/**
+* @summary Validation vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation}
+*/
 export function isValidation(value: unknown): value is types.Validation {
-if(!_isMapValidation(value) && !_isBooleanValidation(value)) {
-return false;
-}
-return true;
-}
-function _isMapValidation(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1105,218 +1429,205 @@ case "type":
 if(!isType(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "const":
 if(!isConst(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "enum":
 if(!isEnum(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "multipleOf":
 if(!isMultipleOf(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "maximum":
 if(!isMaximum(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "exclusiveMaximum":
 if(!isExclusiveMaximum(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "minimum":
 if(!isMinimum(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "exclusiveMinimum":
 if(!isExclusiveMinimum(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "maxLength":
 if(!isMaxLength(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "minLength":
 if(!isMinLength(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "pattern":
 if(!isPattern(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "maxItems":
 if(!isMaxItems(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "minItems":
 if(!isMinItems(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "uniqueItems":
 if(!isUniqueItems(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "maxContains":
 if(!isMaxContains(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "minContains":
 if(!isMinContains(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "maxProperties":
 if(!isMaxProperties(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "minProperties":
 if(!isMinProperties(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "required":
 if(!isRequired(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "dependentRequired":
 if(!isDependentRequired(propertyValue)) {
 return false;
 }
-continue;
+break;
 }
 }
 return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-function _isBooleanValidation(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return true;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
+*/
 export function isNonNegativeInteger(value: unknown): value is types.NonNegativeInteger {
-if(!_isIntegerNonNegativeInteger(value)) {
-return false;
+return ((typeof value === "number") &&
+(!isNaN(value)) &&
+(value % 1 === 0));
 }
-return true;
-}
-function _isIntegerNonNegativeInteger(value: unknown): value is unknown {
-if(typeof value !== "number" || isNaN(value)) {
-return false;
-}
-if(value < 0) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
+*/
 export function isNonNegativeIntegerDefault0(value: unknown): value is types.NonNegativeIntegerDefault0 {
-if(!_isReferenceNonNegativeIntegerDefault0(value)) {
-return false;
+return ((isNonNegativeInteger(value)));
 }
-return true;
-}
-function _isReferenceNonNegativeIntegerDefault0(value: unknown): value is unknown {
-if(!isNonNegativeInteger(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
+*/
 export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
-if(!_isStringSimpleTypes(value)) {
-return false;
+return ((typeof value === "string") &&
+(value === "array" ||
+value === "boolean" ||
+value === "integer" ||
+value === "null" ||
+value === "number" ||
+value === "object" ||
+value === "string"));
 }
-return true;
-}
-function _isStringSimpleTypes(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-if(value !== "array" && value !== "boolean" && value !== "integer" && value !== "null" && value !== "number" && value !== "object" && value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
+*/
 export function isStringArray(value: unknown): value is types.StringArray {
-if(!_isArrayStringArray(value)) {
-return false;
-}
-return true;
-}
-function _isArrayStringArray(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-const elementValueSeen = new Set<unknown>();
+return ((Array.isArray(value)) &&
+(
+(()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(elementValueSeen.has(elementValue)) {
-return false;
-}
-elementValueSeen.add(elementValue);
 if(!isStringArrayItems(elementValue)) {
 return false;
 }
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
+*/
 export function isType(value: unknown): value is types.Type {
-if(!_isAnyOfType(value)) {
-return false;
-}
-return true;
-}
-function _isAnyOfType(value: unknown): value is unknown {
+return ((
+(()=>{
+let count = 0;
 if(isType0(value)) {
-return true;
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
 if(isType1(value)) {
-return true;
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return false;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/const
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
+*/
 export function isConst(value: unknown): value is types.Const {
-if(!_isAnyConst(value)) {
-return false;
+return ((
+// any
+true
+));
 }
-return true;
-}
-function _isAnyConst(value: unknown): value is unknown {
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
+*/
 export function isEnum(value: unknown): value is types.Enum {
-if(!_isArrayEnum(value)) {
-return false;
-}
-return true;
-}
-function _isArrayEnum(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
+return ((Array.isArray(value)) &&
+(
+(()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isEnumItems(elementValue)) {
@@ -1324,341 +1635,198 @@ return false;
 }
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
+*/
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
-if(!_isNumberMultipleOf(value)) {
-return false;
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
-return true;
-}
-function _isNumberMultipleOf(value: unknown): value is unknown {
-if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-return false;
-}
-if(value <= 0) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}
+*/
 export function isMaximum(value: unknown): value is types.Maximum {
-if(!_isNumberMaximum(value)) {
-return false;
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
-return true;
-}
-function _isNumberMaximum(value: unknown): value is unknown {
-if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum}
+*/
 export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
-if(!_isNumberExclusiveMaximum(value)) {
-return false;
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
-return true;
-}
-function _isNumberExclusiveMaximum(value: unknown): value is unknown {
-if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum}
+*/
 export function isMinimum(value: unknown): value is types.Minimum {
-if(!_isNumberMinimum(value)) {
-return false;
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
-return true;
-}
-function _isNumberMinimum(value: unknown): value is unknown {
-if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum}
+*/
 export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
-if(!_isNumberExclusiveMinimum(value)) {
-return false;
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
-return true;
-}
-function _isNumberExclusiveMinimum(value: unknown): value is unknown {
-if(typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength}
+*/
 export function isMaxLength(value: unknown): value is types.MaxLength {
-if(!_isReferenceMaxLength(value)) {
-return false;
+return ((isNonNegativeInteger(value)));
 }
-return true;
-}
-function _isReferenceMaxLength(value: unknown): value is unknown {
-if(!isNonNegativeInteger(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength}
+*/
 export function isMinLength(value: unknown): value is types.MinLength {
-if(!_isReferenceMinLength(value)) {
-return false;
+return ((isNonNegativeIntegerDefault0(value)));
 }
-return true;
-}
-function _isReferenceMinLength(value: unknown): value is unknown {
-if(!isNonNegativeIntegerDefault0(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
+*/
 export function isPattern(value: unknown): value is types.Pattern {
-if(!_isStringPattern(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringPattern(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems}
+*/
 export function isMaxItems(value: unknown): value is types.MaxItems {
-if(!_isReferenceMaxItems(value)) {
-return false;
+return ((isNonNegativeInteger(value)));
 }
-return true;
-}
-function _isReferenceMaxItems(value: unknown): value is unknown {
-if(!isNonNegativeInteger(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems}
+*/
 export function isMinItems(value: unknown): value is types.MinItems {
-if(!_isReferenceMinItems(value)) {
-return false;
+return ((isNonNegativeIntegerDefault0(value)));
 }
-return true;
-}
-function _isReferenceMinItems(value: unknown): value is unknown {
-if(!isNonNegativeIntegerDefault0(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems}
+*/
 export function isUniqueItems(value: unknown): value is types.UniqueItems {
-if(!_isBooleanUniqueItems(value)) {
-return false;
+return ((typeof value === "boolean"));
 }
-return true;
-}
-function _isBooleanUniqueItems(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains}
+*/
 export function isMaxContains(value: unknown): value is types.MaxContains {
-if(!_isReferenceMaxContains(value)) {
-return false;
+return ((isNonNegativeInteger(value)));
 }
-return true;
-}
-function _isReferenceMaxContains(value: unknown): value is unknown {
-if(!isNonNegativeInteger(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains}
+*/
 export function isMinContains(value: unknown): value is types.MinContains {
-if(!_isReferenceMinContains(value)) {
-return false;
+return ((isNonNegativeInteger(value)));
 }
-return true;
-}
-function _isReferenceMinContains(value: unknown): value is unknown {
-if(!isNonNegativeInteger(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties}
+*/
 export function isMaxProperties(value: unknown): value is types.MaxProperties {
-if(!_isReferenceMaxProperties(value)) {
-return false;
+return ((isNonNegativeInteger(value)));
 }
-return true;
-}
-function _isReferenceMaxProperties(value: unknown): value is unknown {
-if(!isNonNegativeInteger(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties}
+*/
 export function isMinProperties(value: unknown): value is types.MinProperties {
-if(!_isReferenceMinProperties(value)) {
-return false;
+return ((isNonNegativeIntegerDefault0(value)));
 }
-return true;
-}
-function _isReferenceMinProperties(value: unknown): value is unknown {
-if(!isNonNegativeIntegerDefault0(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/required
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
+*/
 export function isRequired(value: unknown): value is types.Required {
-if(!_isReferenceRequired(value)) {
-return false;
+return ((isStringArray(value)));
 }
-return true;
-}
-function _isReferenceRequired(value: unknown): value is unknown {
-if(!isStringArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
+*/
 export function isDependentRequired(value: unknown): value is types.DependentRequired {
-if(!_isMapDependentRequired(value)) {
-return false;
-}
-return true;
-}
-function _isMapDependentRequired(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
+if(!(typeof propertyName === "string")) {
+return false;
+}
 if(!isDependentRequiredAdditionalProperties(propertyValue)) {
 return false;
 }
-continue;
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items}
+*/
 export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
-if(!_isStringStringArrayItems(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringStringArrayItems(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
+*/
 export function isType0(value: unknown): value is types.Type0 {
-if(!_isReferenceType0(value)) {
-return false;
+return ((isSimpleTypes(value)));
 }
-return true;
-}
-function _isReferenceType0(value: unknown): value is unknown {
-if(!isSimpleTypes(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
+*/
 export function isType1(value: unknown): value is types.Type1 {
-if(!_isArrayType1(value)) {
-return false;
-}
-return true;
-}
-function _isArrayType1(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
-if(value.length < 1) {
-return false;
-}
-const elementValueSeen = new Set<unknown>();
+return ((Array.isArray(value)) &&
+(
+(()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(elementValueSeen.has(elementValue)) {
-return false;
-}
-elementValueSeen.add(elementValue);
 if(!isTypeItems(elementValue)) {
 return false;
 }
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
+*/
 export function isEnumItems(value: unknown): value is types.EnumItems {
-if(!_isAnyEnumItems(value)) {
-return false;
+return ((
+// any
+true
+));
 }
-return true;
-}
-function _isAnyEnumItems(value: unknown): value is unknown {
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
+*/
 export function isDependentRequiredAdditionalProperties(value: unknown): value is types.DependentRequiredAdditionalProperties {
-if(!_isReferenceDependentRequiredAdditionalProperties(value)) {
-return false;
+return ((isStringArray(value)));
 }
-return true;
-}
-function _isReferenceDependentRequiredAdditionalProperties(value: unknown): value is unknown {
-if(!isStringArray(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
+*/
 export function isTypeItems(value: unknown): value is types.TypeItems {
-if(!_isReferenceTypeItems(value)) {
-return false;
+return ((isSimpleTypes(value)));
 }
-return true;
-}
-function _isReferenceTypeItems(value: unknown): value is unknown {
-if(!isSimpleTypes(value)) {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data
+/**
+* @summary Meta-data vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
+*/
 export function isMetaData(value: unknown): value is types.MetaData {
-if(!_isMapMetaData(value) && !_isBooleanMetaData(value)) {
-return false;
-}
-return true;
-}
-function _isMapMetaData(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1669,133 +1837,103 @@ case "title":
 if(!isTitle(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "description":
 if(!isDescription(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "default":
 if(!isDefault(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "deprecated":
 if(!isDeprecated(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "readOnly":
 if(!isReadOnly(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "writeOnly":
 if(!isWriteOnly(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "examples":
 if(!isExamples(propertyValue)) {
 return false;
 }
-continue;
+break;
 }
 }
 return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-function _isBooleanMetaData(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return true;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
+*/
 export function isTitle(value: unknown): value is types.Title {
-if(!_isStringTitle(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringTitle(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description}
+*/
 export function isDescription(value: unknown): value is types.Description {
-if(!_isStringDescription(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringDescription(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
+*/
 export function isDefault(value: unknown): value is types.Default {
-if(!_isAnyDefault(value)) {
-return false;
+return ((
+// any
+true
+));
 }
-return true;
-}
-function _isAnyDefault(value: unknown): value is unknown {
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated}
+*/
 export function isDeprecated(value: unknown): value is types.Deprecated {
-if(!_isBooleanDeprecated(value)) {
-return false;
+return ((typeof value === "boolean"));
 }
-return true;
-}
-function _isBooleanDeprecated(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly}
+*/
 export function isReadOnly(value: unknown): value is types.ReadOnly {
-if(!_isBooleanReadOnly(value)) {
-return false;
+return ((typeof value === "boolean"));
 }
-return true;
-}
-function _isBooleanReadOnly(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly}
+*/
 export function isWriteOnly(value: unknown): value is types.WriteOnly {
-if(!_isBooleanWriteOnly(value)) {
-return false;
+return ((typeof value === "boolean"));
 }
-return true;
-}
-function _isBooleanWriteOnly(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
+*/
 export function isExamples(value: unknown): value is types.Examples {
-if(!_isArrayExamples(value)) {
-return false;
-}
-return true;
-}
-function _isArrayExamples(value: unknown): value is unknown {
-if(!Array.isArray(value)) {
-return false;
-}
+return ((Array.isArray(value)) &&
+(
+(()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isExamplesItems(elementValue)) {
@@ -1803,28 +1941,31 @@ return false;
 }
 }
 return true;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
+*/
 export function isExamplesItems(value: unknown): value is types.ExamplesItems {
-if(!_isAnyExamplesItems(value)) {
-return false;
+return ((
+// any
+true
+));
 }
-return true;
-}
-function _isAnyExamplesItems(value: unknown): value is unknown {
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/format-annotation
+/**
+* @summary Format vocabulary meta-schema for annotation results
+* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
+*/
 export function isFormatAnnotation(value: unknown): value is types.FormatAnnotation {
-if(!_isMapFormatAnnotation(value) && !_isBooleanFormatAnnotation(value)) {
-return false;
-}
-return true;
-}
-function _isMapFormatAnnotation(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1835,41 +1976,46 @@ case "format":
 if(!isFormat(propertyValue)) {
 return false;
 }
-continue;
+break;
 }
 }
 return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-function _isBooleanFormatAnnotation(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return true;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
+*/
 export function isFormat(value: unknown): value is types.Format {
-if(!_isStringFormat(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringFormat(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/content
+/**
+* @summary Content vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/content}
+*/
 export function isContent(value: unknown): value is types.Content {
-if(!_isMapContent(value) && !_isBooleanContent(value)) {
-return false;
-}
-return true;
-}
-function _isMapContent(value: unknown): value is unknown {
-if(typeof value !== "object" || value === null || Array.isArray(value)) {
-return false;
-}
+return ((
+(()=>{
+let count = 0;
+if((value !== null) &&
+(typeof value === "object") &&
+(!Array.isArray(value)) &&
+(
+(()=>{
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1880,63 +2026,52 @@ case "contentEncoding":
 if(!isContentEncoding(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "contentMediaType":
 if(!isContentMediaType(propertyValue)) {
 return false;
 }
-continue;
+break;
 case "contentSchema":
 if(!isContentSchema(propertyValue)) {
 return false;
 }
-continue;
+break;
 }
 }
 return true;
+})()
+)) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-function _isBooleanContent(value: unknown): value is unknown {
-if(typeof value !== "boolean") {
-return false;
+if((typeof value === "boolean")) {
+count++;
+// if(count > 1) {
+//   return false;
+// }
 }
-return true;
+return count === 1;
+})()
+));
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}
+*/
 export function isContentEncoding(value: unknown): value is types.ContentEncoding {
-if(!_isStringContentEncoding(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringContentEncoding(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType}
+*/
 export function isContentMediaType(value: unknown): value is types.ContentMediaType {
-if(!_isStringContentMediaType(value)) {
-return false;
+return ((typeof value === "string"));
 }
-return true;
-}
-function _isStringContentMediaType(value: unknown): value is unknown {
-if(typeof value !== "string") {
-return false;
-}
-return true;
-}
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
+*/
 export function isContentSchema(value: unknown): value is types.ContentSchema {
-if(!_isReferenceContentSchema(value)) {
-return false;
-}
-return true;
-}
-function _isReferenceContentSchema(value: unknown): value is unknown {
-if(!isSchema(value)) {
-return false;
-}
-return true;
+return ((isSchema(value)));
 }

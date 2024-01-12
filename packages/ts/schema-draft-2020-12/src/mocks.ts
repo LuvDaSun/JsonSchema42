@@ -4,585 +4,429 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
+//
 import * as types from "./types.js";
-// https://json-schema.org/draft/2020-12/schema
+const depthCounters: Record<string, number> = {};
+const maximumDepth = 2;
+/**
+* @summary Core and Validation specifications meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/schema}
+*/
 export function mockSchema(): types.Schema {
+depthCounters["0"] ??= 0;
+try {
+depthCounters["0"]++;
 return (
 (() => {
 switch (
 (
-nextSeed() % 14
-) as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
+nextSeed() % 2
+) as 0 | 1
 ) {
 case 0:
 return ((
 {
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
+"$id": (depthCounters["20"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
+"$schema": (depthCounters["19"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockCoreSchema() : undefined,
+"$ref": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRef() : undefined,
+"$anchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnchor() : undefined,
+"$dynamicRef": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicRef() : undefined,
+"$dynamicAnchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicAnchor() : undefined,
+"$vocabulary": (depthCounters["26"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
+"$comment": (depthCounters["27"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockComment() : undefined,
+"$defs": (depthCounters["28"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefs() : undefined,
+"prefixItems": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPrefixItems() : undefined,
+"items": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorItems() : undefined,
+"contains": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContains() : undefined,
+"additionalProperties": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorAdditionalProperties() : undefined,
+"properties": (depthCounters["38"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
+"patternProperties": (depthCounters["39"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
+"dependentSchemas": (depthCounters["40"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
+"propertyNames": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorPropertyNames() : undefined,
+"if": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockIf() : undefined,
+"then": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockThen() : undefined,
+"else": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockElse() : undefined,
+"allOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
+"anyOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
+"oneOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
+"not": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
+"unevaluatedItems": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedItems() : undefined,
+"unevaluatedProperties": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedProperties() : undefined,
+"type": (depthCounters["62"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
+"const": (depthCounters["63"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockConst() : undefined,
+"enum": (depthCounters["64"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
+"multipleOf": (depthCounters["65"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
+"maximum": (depthCounters["66"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
+"exclusiveMaximum": (depthCounters["67"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
+"minimum": (depthCounters["68"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
+"exclusiveMinimum": (depthCounters["69"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
+"maxLength": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
+"minLength": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
+"pattern": (depthCounters["72"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
+"maxItems": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
+"minItems": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
+"uniqueItems": (depthCounters["75"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
+"maxContains": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxContains() : undefined,
+"minContains": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinContains() : undefined,
+"maxProperties": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
+"minProperties": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
+"required": (depthCounters["61"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
+"dependentRequired": (depthCounters["81"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
+"title": (depthCounters["89"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
+"description": (depthCounters["90"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
+"default": (depthCounters["91"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
+"deprecated": (depthCounters["92"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
+"readOnly": (depthCounters["93"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
+"writeOnly": (depthCounters["94"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
+"examples": (depthCounters["95"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExamples() : undefined,
+"format": (depthCounters["98"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
+"contentEncoding": (depthCounters["100"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
+"contentMediaType": (depthCounters["101"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
+"contentSchema": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentSchema() : undefined,
+"definitions": (depthCounters["1"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
+"dependencies": (depthCounters["2"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
+"$recursiveAnchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveAnchor() : undefined,
+"$recursiveRef": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveRef() : undefined,
 }
 ));
 case 1:
-return ((Boolean(nextSeed() % 2)));
-case 2:
-return ((
-{
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-}
-));
-case 3:
-return ((Boolean(nextSeed() % 2)));
-case 4:
-return ((
-{
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-}
-));
-case 5:
-return ((Boolean(nextSeed() % 2)));
-case 6:
-return ((
-{
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-}
-));
-case 7:
-return ((Boolean(nextSeed() % 2)));
-case 8:
-return ((
-{
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-}
-));
-case 9:
-return ((Boolean(nextSeed() % 2)));
-case 10:
-return ((
-{
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-}
-));
-case 11:
-return ((Boolean(nextSeed() % 2)));
-case 12:
-return ((
-{
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"definitions": Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$recursiveRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-}
-));
-case 13:
 return ((Boolean(nextSeed() % 2)));
 }
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/definitions
+finally {
+depthCounters["0"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
+* @deprecated
+*/
 export function mockDefinitions(): types.Definitions {
+depthCounters["1"] ??= 0;
+try {
+depthCounters["1"]++;
 return (
-{
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies
+finally {
+depthCounters["1"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
+* @deprecated
+*/
 export function mockDependencies(): types.Dependencies {
+depthCounters["2"] ??= 0;
+try {
+depthCounters["2"]++;
 return (
-{
+(depthCounters["13"] ?? 0) < maximumDepth ? {
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
 [(randomString(10))]: mockDependenciesAdditionalProperties(),
-}
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor
+finally {
+depthCounters["2"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
+* @deprecated
+*/
 export function mockRecursiveAnchor(): types.RecursiveAnchor {
+depthCounters["3"] ??= 0;
+try {
+depthCounters["3"]++;
 return (mockAnchorString());
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef
+finally {
+depthCounters["3"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
+* @deprecated
+*/
 export function mockRecursiveRef(): types.RecursiveRef {
+depthCounters["4"] ??= 0;
+try {
+depthCounters["4"]++;
 return (mockUriReferenceString());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/0
+finally {
+depthCounters["4"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
+*/
 export function mockAllOf0(): types.AllOf0 {
+depthCounters["5"] ??= 0;
+try {
+depthCounters["5"]++;
 return (mockCore());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/1
+finally {
+depthCounters["5"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
+*/
 export function mockAllOf1(): types.AllOf1 {
+depthCounters["6"] ??= 0;
+try {
+depthCounters["6"]++;
 return (mockApplicator());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/2
+finally {
+depthCounters["6"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
+*/
 export function mockAllOf2(): types.AllOf2 {
+depthCounters["7"] ??= 0;
+try {
+depthCounters["7"]++;
 return (mockUnevaluated());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/3
+finally {
+depthCounters["7"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
+*/
 export function mockAllOf3(): types.AllOf3 {
+depthCounters["8"] ??= 0;
+try {
+depthCounters["8"]++;
 return (mockValidation());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/4
+finally {
+depthCounters["8"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
+*/
 export function mockAllOf4(): types.AllOf4 {
+depthCounters["9"] ??= 0;
+try {
+depthCounters["9"]++;
 return (mockMetaData());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/5
+finally {
+depthCounters["9"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
+*/
 export function mockAllOf5(): types.AllOf5 {
+depthCounters["10"] ??= 0;
+try {
+depthCounters["10"]++;
 return (mockFormatAnnotation());
 }
-// https://json-schema.org/draft/2020-12/schema#/allOf/6
+finally {
+depthCounters["10"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
+*/
 export function mockAllOf6(): types.AllOf6 {
+depthCounters["11"] ??= 0;
+try {
+depthCounters["11"]++;
 return (mockContent());
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
+finally {
+depthCounters["11"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
+*/
 export function mockDefinitionsAdditionalProperties(): types.DefinitionsAdditionalProperties {
+depthCounters["12"] ??= 0;
+try {
+depthCounters["12"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
+finally {
+depthCounters["12"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
+*/
 export function mockDependenciesAdditionalProperties(): types.DependenciesAdditionalProperties {
+depthCounters["13"] ??= 0;
+try {
+depthCounters["13"]++;
 return (
-// unknown
-{}
+(() => {
+switch (
+(
+nextSeed() % 3
+) as 0 | 1 | 2
+) {
+case 0:
+return (mockStringArray());
+case 1:
+return ((
+{
+"$id": (depthCounters["20"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
+"$schema": (depthCounters["19"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockCoreSchema() : undefined,
+"$ref": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRef() : undefined,
+"$anchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnchor() : undefined,
+"$dynamicRef": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicRef() : undefined,
+"$dynamicAnchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicAnchor() : undefined,
+"$vocabulary": (depthCounters["26"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
+"$comment": (depthCounters["27"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockComment() : undefined,
+"$defs": (depthCounters["28"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefs() : undefined,
+"prefixItems": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPrefixItems() : undefined,
+"items": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorItems() : undefined,
+"contains": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContains() : undefined,
+"additionalProperties": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorAdditionalProperties() : undefined,
+"properties": (depthCounters["38"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
+"patternProperties": (depthCounters["39"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
+"dependentSchemas": (depthCounters["40"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
+"propertyNames": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorPropertyNames() : undefined,
+"if": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockIf() : undefined,
+"then": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockThen() : undefined,
+"else": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockElse() : undefined,
+"allOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
+"anyOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
+"oneOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
+"not": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
+"unevaluatedItems": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedItems() : undefined,
+"unevaluatedProperties": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedProperties() : undefined,
+"type": (depthCounters["62"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
+"const": (depthCounters["63"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockConst() : undefined,
+"enum": (depthCounters["64"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
+"multipleOf": (depthCounters["65"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
+"maximum": (depthCounters["66"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
+"exclusiveMaximum": (depthCounters["67"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
+"minimum": (depthCounters["68"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
+"exclusiveMinimum": (depthCounters["69"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
+"maxLength": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
+"minLength": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
+"pattern": (depthCounters["72"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
+"maxItems": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
+"minItems": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
+"uniqueItems": (depthCounters["75"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
+"maxContains": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxContains() : undefined,
+"minContains": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinContains() : undefined,
+"maxProperties": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
+"minProperties": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
+"required": (depthCounters["61"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
+"dependentRequired": (depthCounters["81"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
+"title": (depthCounters["89"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
+"description": (depthCounters["90"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
+"default": (depthCounters["91"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
+"deprecated": (depthCounters["92"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
+"readOnly": (depthCounters["93"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
+"writeOnly": (depthCounters["94"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
+"examples": (depthCounters["95"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExamples() : undefined,
+"format": (depthCounters["98"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
+"contentEncoding": (depthCounters["100"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
+"contentMediaType": (depthCounters["101"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
+"contentSchema": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentSchema() : undefined,
+"definitions": (depthCounters["1"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
+"dependencies": (depthCounters["2"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
+"$recursiveAnchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveAnchor() : undefined,
+"$recursiveRef": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveRef() : undefined,
+}
+));
+case 2:
+return ((Boolean(nextSeed() % 2)));
+}
+})()
 );
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
+finally {
+depthCounters["13"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
 export function mockDependencies0(): types.Dependencies0 {
+depthCounters["14"] ??= 0;
+try {
+depthCounters["14"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
+finally {
+depthCounters["14"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
 export function mockDependencies1(): types.Dependencies1 {
+depthCounters["15"] ??= 0;
+try {
+depthCounters["15"]++;
 return (mockStringArray());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString
+finally {
+depthCounters["15"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
+*/
 export function mockAnchorString(): types.AnchorString {
+depthCounters["16"] ??= 0;
+try {
+depthCounters["16"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString
+finally {
+depthCounters["16"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
+*/
 export function mockUriReferenceString(): types.UriReferenceString {
+depthCounters["17"] ??= 0;
+try {
+depthCounters["17"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/core
+finally {
+depthCounters["17"]--;
+}
+}
+/**
+* @summary Core vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/core}
+*/
 export function mockCore(): types.Core {
+depthCounters["18"] ??= 0;
+try {
+depthCounters["18"]++;
 return (
 (() => {
 switch (
@@ -593,15 +437,15 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"$id": Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": Boolean(nextSeed() % 2) ? mockUriString() : undefined,
-"$ref": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$anchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$dynamicRef": Boolean(nextSeed() % 2) ? mockUriReferenceString() : undefined,
-"$dynamicAnchor": Boolean(nextSeed() % 2) ? mockAnchorString() : undefined,
-"$vocabulary": Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": Boolean(nextSeed() % 2) ? mockDefs() : undefined,
+"$id": (depthCounters["20"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
+"$schema": (depthCounters["19"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockCoreSchema() : undefined,
+"$ref": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRef() : undefined,
+"$anchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnchor() : undefined,
+"$dynamicRef": (depthCounters["17"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicRef() : undefined,
+"$dynamicAnchor": (depthCounters["16"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicAnchor() : undefined,
+"$vocabulary": (depthCounters["26"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
+"$comment": (depthCounters["27"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockComment() : undefined,
+"$defs": (depthCounters["28"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefs() : undefined,
 }
 ));
 case 1:
@@ -610,76 +454,203 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString
+finally {
+depthCounters["18"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
+*/
 export function mockUriString(): types.UriString {
+depthCounters["19"] ??= 0;
+try {
+depthCounters["19"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$id
+finally {
+depthCounters["19"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
+*/
 export function mockId(): types.Id {
+depthCounters["20"] ??= 0;
+try {
+depthCounters["20"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
+finally {
+depthCounters["20"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
+*/
 export function mockCoreSchema(): types.CoreSchema {
+depthCounters["21"] ??= 0;
+try {
+depthCounters["21"]++;
 return (mockUriString());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
+finally {
+depthCounters["21"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
+*/
 export function mockRef(): types.Ref {
+depthCounters["22"] ??= 0;
+try {
+depthCounters["22"]++;
 return (mockUriReferenceString());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
+finally {
+depthCounters["22"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
+*/
 export function mockAnchor(): types.Anchor {
+depthCounters["23"] ??= 0;
+try {
+depthCounters["23"]++;
 return (mockAnchorString());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef
+finally {
+depthCounters["23"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
+*/
 export function mockDynamicRef(): types.DynamicRef {
+depthCounters["24"] ??= 0;
+try {
+depthCounters["24"]++;
 return (mockUriReferenceString());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor
+finally {
+depthCounters["24"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
+*/
 export function mockDynamicAnchor(): types.DynamicAnchor {
+depthCounters["25"] ??= 0;
+try {
+depthCounters["25"]++;
 return (mockAnchorString());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary
-export function mockVocabulary(): types.Vocabulary {
-return (
-{
-[(randomString(10))]: mockVocabularyAdditionalProperties(),
-[(randomString(10))]: mockVocabularyAdditionalProperties(),
-[(randomString(10))]: mockVocabularyAdditionalProperties(),
-[(randomString(10))]: mockVocabularyAdditionalProperties(),
-[(randomString(10))]: mockVocabularyAdditionalProperties(),
+finally {
+depthCounters["25"]--;
 }
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
+*/
+export function mockVocabulary(): types.Vocabulary {
+depthCounters["26"] ??= 0;
+try {
+depthCounters["26"]++;
+return (
+(depthCounters["29"] ?? 0) < maximumDepth ? {
+[mockVocabularyPropertyNames()]: mockVocabularyAdditionalProperties(),
+[mockVocabularyPropertyNames()]: mockVocabularyAdditionalProperties(),
+[mockVocabularyPropertyNames()]: mockVocabularyAdditionalProperties(),
+[mockVocabularyPropertyNames()]: mockVocabularyAdditionalProperties(),
+[mockVocabularyPropertyNames()]: mockVocabularyAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$comment
+finally {
+depthCounters["26"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
+*/
 export function mockComment(): types.Comment {
+depthCounters["27"] ??= 0;
+try {
+depthCounters["27"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs
-export function mockDefs(): types.Defs {
-return (
-{
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
+finally {
+depthCounters["27"]--;
 }
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
+*/
+export function mockDefs(): types.Defs {
+depthCounters["28"] ??= 0;
+try {
+depthCounters["28"]++;
+return (
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockDefsAdditionalProperties(),
+[(randomString(10))]: mockDefsAdditionalProperties(),
+[(randomString(10))]: mockDefsAdditionalProperties(),
+[(randomString(10))]: mockDefsAdditionalProperties(),
+[(randomString(10))]: mockDefsAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties
+finally {
+depthCounters["28"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties}
+*/
 export function mockVocabularyAdditionalProperties(): types.VocabularyAdditionalProperties {
+depthCounters["29"] ??= 0;
+try {
+depthCounters["29"]++;
 return (Boolean(nextSeed() % 2));
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
+finally {
+depthCounters["29"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
+*/
 export function mockVocabularyPropertyNames(): types.VocabularyPropertyNames {
+depthCounters["30"] ??= 0;
+try {
+depthCounters["30"]++;
 return (mockUriString());
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
+finally {
+depthCounters["30"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
+*/
 export function mockDefsAdditionalProperties(): types.DefsAdditionalProperties {
+depthCounters["31"] ??= 0;
+try {
+depthCounters["31"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator
+finally {
+depthCounters["31"]--;
+}
+}
+/**
+* @summary Applicator vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
+*/
 export function mockApplicator(): types.Applicator {
+depthCounters["32"] ??= 0;
+try {
+depthCounters["32"]++;
 return (
 (() => {
 switch (
@@ -690,21 +661,21 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"prefixItems": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"items": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"contains": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"additionalProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"properties": Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"if": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"then": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"else": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"allOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"anyOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"oneOf": Boolean(nextSeed() % 2) ? mockSchemaArray() : undefined,
-"not": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
+"prefixItems": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPrefixItems() : undefined,
+"items": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorItems() : undefined,
+"contains": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContains() : undefined,
+"additionalProperties": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorAdditionalProperties() : undefined,
+"properties": (depthCounters["38"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
+"patternProperties": (depthCounters["39"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
+"dependentSchemas": (depthCounters["40"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
+"propertyNames": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorPropertyNames() : undefined,
+"if": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockIf() : undefined,
+"then": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockThen() : undefined,
+"else": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockElse() : undefined,
+"allOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
+"anyOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
+"oneOf": (depthCounters["33"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
+"not": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
 }
 ));
 case 1:
@@ -713,124 +684,323 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray
+finally {
+depthCounters["32"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
+*/
 export function mockSchemaArray(): types.SchemaArray {
+depthCounters["33"] ??= 0;
+try {
+depthCounters["33"]++;
 return (
-[
-mockSchema(),
-mockSchema(),
-mockSchema(),
-mockSchema(),
-mockSchema(),
-]
+(depthCounters["0"] ?? 0) < maximumDepth ? [
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+mockSchemaArrayItems(),
+] : []
 );
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
+finally {
+depthCounters["33"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
+*/
 export function mockPrefixItems(): types.PrefixItems {
+depthCounters["34"] ??= 0;
+try {
+depthCounters["34"]++;
 return (mockSchemaArray());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
+finally {
+depthCounters["34"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
+*/
 export function mockApplicatorItems(): types.ApplicatorItems {
+depthCounters["35"] ??= 0;
+try {
+depthCounters["35"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
+finally {
+depthCounters["35"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
+*/
 export function mockContains(): types.Contains {
+depthCounters["36"] ??= 0;
+try {
+depthCounters["36"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
+finally {
+depthCounters["36"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
+*/
 export function mockApplicatorAdditionalProperties(): types.ApplicatorAdditionalProperties {
+depthCounters["37"] ??= 0;
+try {
+depthCounters["37"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties
+finally {
+depthCounters["37"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
+*/
 export function mockProperties(): types.Properties {
+depthCounters["38"] ??= 0;
+try {
+depthCounters["38"]++;
 return (
-{
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesAdditionalProperties(),
+[(randomString(10))]: mockPropertiesAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties
+finally {
+depthCounters["38"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
+*/
 export function mockPatternProperties(): types.PatternProperties {
+depthCounters["39"] ??= 0;
+try {
+depthCounters["39"]++;
 return (
-{
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[mockPatternPropertiesPropertyNames()]: mockPatternPropertiesAdditionalProperties(),
+[mockPatternPropertiesPropertyNames()]: mockPatternPropertiesAdditionalProperties(),
+[mockPatternPropertiesPropertyNames()]: mockPatternPropertiesAdditionalProperties(),
+[mockPatternPropertiesPropertyNames()]: mockPatternPropertiesAdditionalProperties(),
+[mockPatternPropertiesPropertyNames()]: mockPatternPropertiesAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas
+finally {
+depthCounters["39"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
+*/
 export function mockDependentSchemas(): types.DependentSchemas {
+depthCounters["40"] ??= 0;
+try {
+depthCounters["40"]++;
 return (
-{
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-[(randomString(10))]: mockSchema(),
-}
+(depthCounters["0"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
+finally {
+depthCounters["40"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
+*/
 export function mockApplicatorPropertyNames(): types.ApplicatorPropertyNames {
+depthCounters["41"] ??= 0;
+try {
+depthCounters["41"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
+finally {
+depthCounters["41"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
+*/
 export function mockIf(): types.If {
+depthCounters["42"] ??= 0;
+try {
+depthCounters["42"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
+finally {
+depthCounters["42"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
+*/
 export function mockThen(): types.Then {
+depthCounters["43"] ??= 0;
+try {
+depthCounters["43"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
+finally {
+depthCounters["43"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
+*/
 export function mockElse(): types.Else {
+depthCounters["44"] ??= 0;
+try {
+depthCounters["44"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
+finally {
+depthCounters["44"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
+*/
 export function mockAllOf(): types.AllOf {
+depthCounters["45"] ??= 0;
+try {
+depthCounters["45"]++;
 return (mockSchemaArray());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
+finally {
+depthCounters["45"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
+*/
 export function mockAnyOf(): types.AnyOf {
+depthCounters["46"] ??= 0;
+try {
+depthCounters["46"]++;
 return (mockSchemaArray());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
+finally {
+depthCounters["46"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
+*/
 export function mockOneOf(): types.OneOf {
+depthCounters["47"] ??= 0;
+try {
+depthCounters["47"]++;
 return (mockSchemaArray());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
+finally {
+depthCounters["47"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
+*/
 export function mockNot(): types.Not {
+depthCounters["48"] ??= 0;
+try {
+depthCounters["48"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
+finally {
+depthCounters["48"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
+*/
 export function mockSchemaArrayItems(): types.SchemaArrayItems {
+depthCounters["49"] ??= 0;
+try {
+depthCounters["49"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
+finally {
+depthCounters["49"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
+*/
 export function mockPropertiesAdditionalProperties(): types.PropertiesAdditionalProperties {
+depthCounters["50"] ??= 0;
+try {
+depthCounters["50"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
+finally {
+depthCounters["50"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
+*/
 export function mockPatternPropertiesAdditionalProperties(): types.PatternPropertiesAdditionalProperties {
+depthCounters["51"] ??= 0;
+try {
+depthCounters["51"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames
+finally {
+depthCounters["51"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
+*/
 export function mockPatternPropertiesPropertyNames(): types.PatternPropertiesPropertyNames {
+depthCounters["52"] ??= 0;
+try {
+depthCounters["52"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
+finally {
+depthCounters["52"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
+*/
 export function mockDependentSchemasAdditionalProperties(): types.DependentSchemasAdditionalProperties {
+depthCounters["53"] ??= 0;
+try {
+depthCounters["53"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated
+finally {
+depthCounters["53"]--;
+}
+}
+/**
+* @summary Unevaluated applicator vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
+*/
 export function mockUnevaluated(): types.Unevaluated {
+depthCounters["54"] ??= 0;
+try {
+depthCounters["54"]++;
 return (
 (() => {
 switch (
@@ -841,8 +1011,8 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"unevaluatedItems": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
-"unevaluatedProperties": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
+"unevaluatedItems": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedItems() : undefined,
+"unevaluatedProperties": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedProperties() : undefined,
 }
 ));
 case 1:
@@ -851,16 +1021,44 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
+finally {
+depthCounters["54"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
+*/
 export function mockUnevaluatedItems(): types.UnevaluatedItems {
+depthCounters["55"] ??= 0;
+try {
+depthCounters["55"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
+finally {
+depthCounters["55"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
+*/
 export function mockUnevaluatedProperties(): types.UnevaluatedProperties {
+depthCounters["56"] ??= 0;
+try {
+depthCounters["56"]++;
 return (mockSchema());
 }
-// https://json-schema.org/draft/2020-12/meta/validation
+finally {
+depthCounters["56"]--;
+}
+}
+/**
+* @summary Validation vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation}
+*/
 export function mockValidation(): types.Validation {
+depthCounters["57"] ??= 0;
+try {
+depthCounters["57"]++;
 return (
 (() => {
 switch (
@@ -871,26 +1069,26 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"type": Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minLength": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"pattern": Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minItems": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"uniqueItems": Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minContains": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"maxProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"minProperties": Boolean(nextSeed() % 2) ? mockNonNegativeInteger() : undefined,
-"required": Boolean(nextSeed() % 2) ? mockStringArray() : undefined,
-"dependentRequired": Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
+"type": (depthCounters["62"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
+"const": (depthCounters["63"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockConst() : undefined,
+"enum": (depthCounters["64"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
+"multipleOf": (depthCounters["65"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
+"maximum": (depthCounters["66"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
+"exclusiveMaximum": (depthCounters["67"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
+"minimum": (depthCounters["68"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
+"exclusiveMinimum": (depthCounters["69"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
+"maxLength": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
+"minLength": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
+"pattern": (depthCounters["72"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
+"maxItems": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
+"minItems": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
+"uniqueItems": (depthCounters["75"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
+"maxContains": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxContains() : undefined,
+"minContains": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinContains() : undefined,
+"maxProperties": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
+"minProperties": (depthCounters["58"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
+"required": (depthCounters["61"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
+"dependentRequired": (depthCounters["81"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
 }
 ));
 case 1:
@@ -899,32 +1097,77 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger
+finally {
+depthCounters["57"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
+*/
 export function mockNonNegativeInteger(): types.NonNegativeInteger {
+depthCounters["58"] ??= 0;
+try {
+depthCounters["58"]++;
 return (Number(nextSeed() % 1000));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0
+finally {
+depthCounters["58"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
+*/
 export function mockNonNegativeIntegerDefault0(): types.NonNegativeIntegerDefault0 {
+depthCounters["59"] ??= 0;
+try {
+depthCounters["59"]++;
 return (mockNonNegativeInteger());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes
+finally {
+depthCounters["59"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
+*/
 export function mockSimpleTypes(): types.SimpleTypes {
+depthCounters["60"] ??= 0;
+try {
+depthCounters["60"]++;
 return ((["array", "boolean", "integer", "null", "number", "object", "string"] as const)[nextSeed() % 7]);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray
+finally {
+depthCounters["60"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
+*/
 export function mockStringArray(): types.StringArray {
+depthCounters["61"] ??= 0;
+try {
+depthCounters["61"]++;
 return (
-[
+(depthCounters["82"] ?? 0) < maximumDepth ? [
 mockStringArrayItems(),
 mockStringArrayItems(),
 mockStringArrayItems(),
 mockStringArrayItems(),
 mockStringArrayItems(),
-]
+] : []
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type
+finally {
+depthCounters["61"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
+*/
 export function mockType(): types.Type {
+depthCounters["62"] ??= 0;
+try {
+depthCounters["62"]++;
 return (
 (() => {
 switch (
@@ -933,145 +1176,380 @@ nextSeed() % 2
 ) as 0 | 1
 ) {
 case 0:
-return (mockSimpleTypes());
+return (mockType0());
 case 1:
 return (mockType1());
 }
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/const
+finally {
+depthCounters["62"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
+*/
 export function mockConst(): types.Const {
+depthCounters["63"] ??= 0;
+try {
+depthCounters["63"]++;
 return (
 // any
 {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum
+finally {
+depthCounters["63"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
+*/
 export function mockEnum(): types.Enum {
+depthCounters["64"] ??= 0;
+try {
+depthCounters["64"]++;
 return (
-[
+(depthCounters["85"] ?? 0) < maximumDepth ? [
 mockEnumItems(),
 mockEnumItems(),
 mockEnumItems(),
 mockEnumItems(),
 mockEnumItems(),
-]
+] : []
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf
+finally {
+depthCounters["64"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
+*/
 export function mockMultipleOf(): types.MultipleOf {
+depthCounters["65"] ??= 0;
+try {
+depthCounters["65"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum
+finally {
+depthCounters["65"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}
+*/
 export function mockMaximum(): types.Maximum {
+depthCounters["66"] ??= 0;
+try {
+depthCounters["66"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum
+finally {
+depthCounters["66"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum}
+*/
 export function mockExclusiveMaximum(): types.ExclusiveMaximum {
+depthCounters["67"] ??= 0;
+try {
+depthCounters["67"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum
+finally {
+depthCounters["67"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum}
+*/
 export function mockMinimum(): types.Minimum {
+depthCounters["68"] ??= 0;
+try {
+depthCounters["68"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum
+finally {
+depthCounters["68"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum}
+*/
 export function mockExclusiveMinimum(): types.ExclusiveMinimum {
+depthCounters["69"] ??= 0;
+try {
+depthCounters["69"]++;
 return (Number(nextSeed() % 1000 * 10) / 10);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength
+finally {
+depthCounters["69"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength}
+*/
 export function mockMaxLength(): types.MaxLength {
+depthCounters["70"] ??= 0;
+try {
+depthCounters["70"]++;
 return (mockNonNegativeInteger());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength
+finally {
+depthCounters["70"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength}
+*/
 export function mockMinLength(): types.MinLength {
-return (mockNonNegativeInteger());
+depthCounters["71"] ??= 0;
+try {
+depthCounters["71"]++;
+return (mockNonNegativeIntegerDefault0());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern
+finally {
+depthCounters["71"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
+*/
 export function mockPattern(): types.Pattern {
+depthCounters["72"] ??= 0;
+try {
+depthCounters["72"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems
+finally {
+depthCounters["72"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems}
+*/
 export function mockMaxItems(): types.MaxItems {
+depthCounters["73"] ??= 0;
+try {
+depthCounters["73"]++;
 return (mockNonNegativeInteger());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems
+finally {
+depthCounters["73"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems}
+*/
 export function mockMinItems(): types.MinItems {
-return (mockNonNegativeInteger());
+depthCounters["74"] ??= 0;
+try {
+depthCounters["74"]++;
+return (mockNonNegativeIntegerDefault0());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems
+finally {
+depthCounters["74"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems}
+*/
 export function mockUniqueItems(): types.UniqueItems {
+depthCounters["75"] ??= 0;
+try {
+depthCounters["75"]++;
 return (Boolean(nextSeed() % 2));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains
+finally {
+depthCounters["75"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains}
+*/
 export function mockMaxContains(): types.MaxContains {
+depthCounters["76"] ??= 0;
+try {
+depthCounters["76"]++;
 return (mockNonNegativeInteger());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains
+finally {
+depthCounters["76"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains}
+*/
 export function mockMinContains(): types.MinContains {
+depthCounters["77"] ??= 0;
+try {
+depthCounters["77"]++;
 return (mockNonNegativeInteger());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties
+finally {
+depthCounters["77"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties}
+*/
 export function mockMaxProperties(): types.MaxProperties {
+depthCounters["78"] ??= 0;
+try {
+depthCounters["78"]++;
 return (mockNonNegativeInteger());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties
+finally {
+depthCounters["78"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties}
+*/
 export function mockMinProperties(): types.MinProperties {
-return (mockNonNegativeInteger());
+depthCounters["79"] ??= 0;
+try {
+depthCounters["79"]++;
+return (mockNonNegativeIntegerDefault0());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/required
+finally {
+depthCounters["79"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
+*/
 export function mockRequired(): types.Required {
+depthCounters["80"] ??= 0;
+try {
+depthCounters["80"]++;
 return (mockStringArray());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired
+finally {
+depthCounters["80"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
+*/
 export function mockDependentRequired(): types.DependentRequired {
+depthCounters["81"] ??= 0;
+try {
+depthCounters["81"]++;
 return (
-{
-[(randomString(10))]: mockStringArray(),
-[(randomString(10))]: mockStringArray(),
-[(randomString(10))]: mockStringArray(),
-[(randomString(10))]: mockStringArray(),
-[(randomString(10))]: mockStringArray(),
-}
+(depthCounters["61"] ?? 0) < maximumDepth ? {
+[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
+[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
+[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
+[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
+[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
+} : {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items
+finally {
+depthCounters["81"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items}
+*/
 export function mockStringArrayItems(): types.StringArrayItems {
+depthCounters["82"] ??= 0;
+try {
+depthCounters["82"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
+finally {
+depthCounters["82"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
+*/
 export function mockType0(): types.Type0 {
+depthCounters["83"] ??= 0;
+try {
+depthCounters["83"]++;
 return (mockSimpleTypes());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
+finally {
+depthCounters["83"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
+*/
 export function mockType1(): types.Type1 {
+depthCounters["84"] ??= 0;
+try {
+depthCounters["84"]++;
 return (
-[
-mockSimpleTypes(),
-mockSimpleTypes(),
-mockSimpleTypes(),
-mockSimpleTypes(),
-mockSimpleTypes(),
-]
+(depthCounters["60"] ?? 0) < maximumDepth ? [
+mockTypeItems(),
+mockTypeItems(),
+mockTypeItems(),
+mockTypeItems(),
+mockTypeItems(),
+] : []
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items
+finally {
+depthCounters["84"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
+*/
 export function mockEnumItems(): types.EnumItems {
+depthCounters["85"] ??= 0;
+try {
+depthCounters["85"]++;
 return (
 // any
 {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
+finally {
+depthCounters["85"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
+*/
 export function mockDependentRequiredAdditionalProperties(): types.DependentRequiredAdditionalProperties {
+depthCounters["86"] ??= 0;
+try {
+depthCounters["86"]++;
 return (mockStringArray());
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
+finally {
+depthCounters["86"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
+*/
 export function mockTypeItems(): types.TypeItems {
+depthCounters["87"] ??= 0;
+try {
+depthCounters["87"]++;
 return (mockSimpleTypes());
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data
+finally {
+depthCounters["87"]--;
+}
+}
+/**
+* @summary Meta-data vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
+*/
 export function mockMetaData(): types.MetaData {
+depthCounters["88"] ??= 0;
+try {
+depthCounters["88"]++;
 return (
 (() => {
 switch (
@@ -1082,13 +1560,13 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"title": Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": Boolean(nextSeed() % 2) ? mockExamples() : undefined,
+"title": (depthCounters["89"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
+"description": (depthCounters["90"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
+"default": (depthCounters["91"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
+"deprecated": (depthCounters["92"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
+"readOnly": (depthCounters["93"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
+"writeOnly": (depthCounters["94"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
+"examples": (depthCounters["95"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockExamples() : undefined,
 }
 ));
 case 1:
@@ -1097,54 +1575,136 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title
+finally {
+depthCounters["88"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
+*/
 export function mockTitle(): types.Title {
+depthCounters["89"] ??= 0;
+try {
+depthCounters["89"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description
+finally {
+depthCounters["89"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description}
+*/
 export function mockDescription(): types.Description {
+depthCounters["90"] ??= 0;
+try {
+depthCounters["90"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default
+finally {
+depthCounters["90"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
+*/
 export function mockDefault(): types.Default {
+depthCounters["91"] ??= 0;
+try {
+depthCounters["91"]++;
 return (
 // any
 {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated
+finally {
+depthCounters["91"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated}
+*/
 export function mockDeprecated(): types.Deprecated {
+depthCounters["92"] ??= 0;
+try {
+depthCounters["92"]++;
 return (Boolean(nextSeed() % 2));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly
+finally {
+depthCounters["92"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly}
+*/
 export function mockReadOnly(): types.ReadOnly {
+depthCounters["93"] ??= 0;
+try {
+depthCounters["93"]++;
 return (Boolean(nextSeed() % 2));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly
+finally {
+depthCounters["93"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly}
+*/
 export function mockWriteOnly(): types.WriteOnly {
+depthCounters["94"] ??= 0;
+try {
+depthCounters["94"]++;
 return (Boolean(nextSeed() % 2));
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples
+finally {
+depthCounters["94"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
+*/
 export function mockExamples(): types.Examples {
+depthCounters["95"] ??= 0;
+try {
+depthCounters["95"]++;
 return (
-[
+(depthCounters["96"] ?? 0) < maximumDepth ? [
 mockExamplesItems(),
 mockExamplesItems(),
 mockExamplesItems(),
 mockExamplesItems(),
 mockExamplesItems(),
-]
+] : []
 );
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items
+finally {
+depthCounters["95"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
+*/
 export function mockExamplesItems(): types.ExamplesItems {
+depthCounters["96"] ??= 0;
+try {
+depthCounters["96"]++;
 return (
 // any
 {}
 );
 }
-// https://json-schema.org/draft/2020-12/meta/format-annotation
+finally {
+depthCounters["96"]--;
+}
+}
+/**
+* @summary Format vocabulary meta-schema for annotation results
+* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
+*/
 export function mockFormatAnnotation(): types.FormatAnnotation {
+depthCounters["97"] ??= 0;
+try {
+depthCounters["97"]++;
 return (
 (() => {
 switch (
@@ -1155,7 +1715,7 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"format": Boolean(nextSeed() % 2) ? mockFormat() : undefined,
+"format": (depthCounters["98"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
 }
 ));
 case 1:
@@ -1164,12 +1724,31 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format
+finally {
+depthCounters["97"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
+*/
 export function mockFormat(): types.Format {
+depthCounters["98"] ??= 0;
+try {
+depthCounters["98"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/content
+finally {
+depthCounters["98"]--;
+}
+}
+/**
+* @summary Content vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/content}
+*/
 export function mockContent(): types.Content {
+depthCounters["99"] ??= 0;
+try {
+depthCounters["99"]++;
 return (
 (() => {
 switch (
@@ -1180,9 +1759,9 @@ nextSeed() % 2
 case 0:
 return ((
 {
-"contentEncoding": Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": Boolean(nextSeed() % 2) ? mockSchema() : undefined,
+"contentEncoding": (depthCounters["100"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
+"contentMediaType": (depthCounters["101"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
+"contentSchema": (depthCounters["0"] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? mockContentSchema() : undefined,
 }
 ));
 case 1:
@@ -1191,17 +1770,48 @@ return ((Boolean(nextSeed() % 2)));
 })()
 );
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding
+finally {
+depthCounters["99"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}
+*/
 export function mockContentEncoding(): types.ContentEncoding {
+depthCounters["100"] ??= 0;
+try {
+depthCounters["100"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType
+finally {
+depthCounters["100"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType}
+*/
 export function mockContentMediaType(): types.ContentMediaType {
+depthCounters["101"] ??= 0;
+try {
+depthCounters["101"]++;
 return (randomString(10));
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
+finally {
+depthCounters["101"]--;
+}
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
+*/
 export function mockContentSchema(): types.ContentSchema {
+depthCounters["102"] ??= 0;
+try {
+depthCounters["102"]++;
 return (mockSchema());
+}
+finally {
+depthCounters["102"]--;
+}
 }
 let seed = 1;
 function nextSeed() {

@@ -4,7 +4,11 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
-// http://json-schema.org/draft-04/schema#
+//
+/**
+* @description Core schema meta-schema
+* @see {@link http://json-schema.org/draft-04/schema#}
+*/
 export function parseSchemaDocument(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 {
@@ -44,13 +48,17 @@ return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 } :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/definitions/schemaArray
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
+*/
 export function parseSchemaArray(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseSchemaArrayItems(value)) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveInteger
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
+*/
 export function parsePositiveInteger(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -62,7 +70,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
+*/
 export function parsePositiveIntegerDefault0(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -74,7 +84,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/definitions/simpleTypes
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
+*/
 export function parseSimpleTypes(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -86,13 +98,17 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/definitions/stringArray
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
+*/
 export function parseStringArray(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseStringArrayItems(value)) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/id
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/id}
+*/
 export function parseId(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -104,7 +120,9 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/$schema
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
+*/
 export function parseSchema(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -116,7 +134,9 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/title
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/title}
+*/
 export function parseTitle(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -128,7 +148,9 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/description
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/description}
+*/
 export function parseDescription(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -140,11 +162,15 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/default
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/default}
+*/
 export function parseDefault(value: unknown): unknown {
 return value;
 }
-// http://json-schema.org/draft-04/schema#/properties/multipleOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
+*/
 export function parseMultipleOf(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -156,7 +182,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/maximum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
+*/
 export function parseMaximum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -168,7 +196,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
+*/
 export function parseExclusiveMaximum(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -192,7 +222,9 @@ return value;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/minimum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
+*/
 export function parseMinimum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -204,7 +236,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
+*/
 export function parseExclusiveMinimum(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -228,15 +262,21 @@ return value;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/maxLength
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
+*/
 export function parseMaxLength(value: unknown): unknown {
 return parsePositiveInteger(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/minLength
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
+*/
 export function parseMinLength(value: unknown): unknown {
 return parsePositiveIntegerDefault0(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/pattern
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/pattern}
+*/
 export function parsePattern(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -248,23 +288,33 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
+*/
 export function parseAdditionalItems(value: unknown): unknown {
 return parseAdditionalItems0(value) ?? parseAdditionalItems1(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items}
+*/
 export function parsePropertiesItems(value: unknown): unknown {
 return parseItems0(value) ?? parseItems1(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/maxItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
+*/
 export function parseMaxItems(value: unknown): unknown {
 return parsePositiveInteger(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/minItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
+*/
 export function parseMinItems(value: unknown): unknown {
 return parsePositiveIntegerDefault0(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/uniqueItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
+*/
 export function parseUniqueItems(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -288,23 +338,33 @@ return value;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/maxProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
+*/
 export function parseMaxProperties(value: unknown): unknown {
 return parsePositiveInteger(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/minProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
+*/
 export function parseMinProperties(value: unknown): unknown {
 return parsePositiveIntegerDefault0(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/required
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/required}
+*/
 export function parseRequired(value: unknown): unknown {
 return parseStringArray(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
+*/
 export function parsePropertiesAdditionalProperties(value: unknown): unknown {
 return parseAdditionalProperties0(value) ?? parseAdditionalProperties1(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/definitions
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
+*/
 export function parseDefinitions(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -325,7 +385,9 @@ parseDefinitionsAdditionalProperties(value),
 ) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/properties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
+*/
 export function parseProperties(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -346,7 +408,9 @@ parsePropertiesPropertiesAdditionalProperties(value),
 ) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/patternProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
+*/
 export function parsePatternProperties(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -367,7 +431,9 @@ parsePatternPropertiesAdditionalProperties(value),
 ) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
+*/
 export function parseDependencies(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -388,7 +454,9 @@ parseDependenciesAdditionalProperties(value),
 ) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/enum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
+*/
 export function parseEnum(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => ((value: unknown) => {
@@ -396,11 +464,15 @@ return value;
 })(value)) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/type
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type}
+*/
 export function parseType(value: unknown): unknown {
 return parseType0(value) ?? parseType1(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/format
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/format}
+*/
 export function parseFormat(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -412,35 +484,51 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/allOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
+*/
 export function parseAllOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/anyOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
+*/
 export function parseAnyOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/oneOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
+*/
 export function parseOneOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/not
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/not}
+*/
 export function parseNot(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/definitions/schemaArray/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
+*/
 export function parseSchemaArrayItems(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
+*/
 export function parsePositiveIntegerDefault00(value: unknown): unknown {
 return parsePositiveInteger(value);
 }
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
+*/
 export function parsePositiveIntegerDefault01(value: unknown): unknown {
 return value;
 }
-// http://json-schema.org/draft-04/schema#/definitions/stringArray/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
+*/
 export function parseStringArrayItems(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -452,7 +540,9 @@ default:
 return undefined;
 }
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0}
+*/
 export function parseAdditionalItems0(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -476,19 +566,27 @@ return value;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
+*/
 export function parseAdditionalItems1(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/items/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
+*/
 export function parseItems0(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/items/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
+*/
 export function parseItems1(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0}
+*/
 export function parseAdditionalProperties0(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -512,45 +610,65 @@ return value;
 }
 return undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
+*/
 export function parseAdditionalProperties1(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
+*/
 export function parseDefinitionsAdditionalProperties(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
+*/
 export function parsePropertiesPropertiesAdditionalProperties(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
+*/
 export function parsePatternPropertiesAdditionalProperties(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
+*/
 export function parseDependenciesAdditionalProperties(value: unknown): unknown {
 return parseDependencies0(value) ?? parseDependencies1(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
+*/
 export function parseType0(value: unknown): unknown {
 return parseSimpleTypes(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
+*/
 export function parseType1(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseTypeItems(value)) :
 undefined;
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
 export function parseDependencies0(value: unknown): unknown {
 return parseSchemaDocument(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
 export function parseDependencies1(value: unknown): unknown {
 return parseStringArray(value);
 }
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
+*/
 export function parseTypeItems(value: unknown): unknown {
 return parseSimpleTypes(value);
 }

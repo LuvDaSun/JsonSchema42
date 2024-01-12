@@ -4,7 +4,11 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
-// https://json-schema.org/draft/2020-12/schema
+//
+/**
+* @summary Core and Validation specifications meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/schema}
+*/
 export function parseSchema(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -94,447 +98,123 @@ case "boolean":
 return value;
 }
 return undefined;
-})(value) ?? ((value: unknown) => {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value]),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
-"$ref": parseRef(value["$ref" as keyof typeof value]),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
-"$comment": parseComment(value["$comment" as keyof typeof value]),
-"$defs": parseDefs(value["$defs" as keyof typeof value]),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
-"items": parseApplicatorItems(value["items" as keyof typeof value]),
-"contains": parseContains(value["contains" as keyof typeof value]),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
-"properties": parseProperties(value["properties" as keyof typeof value]),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
-"if": parseIf(value["if" as keyof typeof value]),
-"then": parseThen(value["then" as keyof typeof value]),
-"else": parseElse(value["else" as keyof typeof value]),
-"allOf": parseAllOf(value["allOf" as keyof typeof value]),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
-"not": parseNot(value["not" as keyof typeof value]),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
-"type": parseType(value["type" as keyof typeof value]),
-"const": parseConst(value["const" as keyof typeof value]),
-"enum": parseEnum(value["enum" as keyof typeof value]),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
-"maximum": parseMaximum(value["maximum" as keyof typeof value]),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
-"minimum": parseMinimum(value["minimum" as keyof typeof value]),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
-"minLength": parseMinLength(value["minLength" as keyof typeof value]),
-"pattern": parsePattern(value["pattern" as keyof typeof value]),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
-"minItems": parseMinItems(value["minItems" as keyof typeof value]),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
-"minContains": parseMinContains(value["minContains" as keyof typeof value]),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
-"required": parseRequired(value["required" as keyof typeof value]),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
-"title": parseTitle(value["title" as keyof typeof value]),
-"description": parseDescription(value["description" as keyof typeof value]),
-"default": parseDefault(value["default" as keyof typeof value]),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
-"examples": parseExamples(value["examples" as keyof typeof value]),
-"format": parseFormat(value["format" as keyof typeof value]),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
-} :
-undefined;
-})(value) ?? ((value: unknown) => {
-if(value == null) {
-return false;
+})(value);
 }
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
+* @deprecated
+*/
+export function parseDefinitions(value: unknown): unknown {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
 switch(typeof value) {
 case "string":
-switch(value.trim()) {
-case "":
-case "no":
-case "off":
-case "false":
-case "0":
-return false;
-default:
-return true;
-}
-case "number":
-return Boolean(value);
-case "boolean":
 return value;
-}
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
-})(value) ?? ((value: unknown) => {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value]),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
-"$ref": parseRef(value["$ref" as keyof typeof value]),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
-"$comment": parseComment(value["$comment" as keyof typeof value]),
-"$defs": parseDefs(value["$defs" as keyof typeof value]),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
-"items": parseApplicatorItems(value["items" as keyof typeof value]),
-"contains": parseContains(value["contains" as keyof typeof value]),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
-"properties": parseProperties(value["properties" as keyof typeof value]),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
-"if": parseIf(value["if" as keyof typeof value]),
-"then": parseThen(value["then" as keyof typeof value]),
-"else": parseElse(value["else" as keyof typeof value]),
-"allOf": parseAllOf(value["allOf" as keyof typeof value]),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
-"not": parseNot(value["not" as keyof typeof value]),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
-"type": parseType(value["type" as keyof typeof value]),
-"const": parseConst(value["const" as keyof typeof value]),
-"enum": parseEnum(value["enum" as keyof typeof value]),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
-"maximum": parseMaximum(value["maximum" as keyof typeof value]),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
-"minimum": parseMinimum(value["minimum" as keyof typeof value]),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
-"minLength": parseMinLength(value["minLength" as keyof typeof value]),
-"pattern": parsePattern(value["pattern" as keyof typeof value]),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
-"minItems": parseMinItems(value["minItems" as keyof typeof value]),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
-"minContains": parseMinContains(value["minContains" as keyof typeof value]),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
-"required": parseRequired(value["required" as keyof typeof value]),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
-"title": parseTitle(value["title" as keyof typeof value]),
-"description": parseDescription(value["description" as keyof typeof value]),
-"default": parseDefault(value["default" as keyof typeof value]),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
-"examples": parseExamples(value["examples" as keyof typeof value]),
-"format": parseFormat(value["format" as keyof typeof value]),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
-} :
-undefined;
-})(value) ?? ((value: unknown) => {
-if(value == null) {
-return false;
 }
+})(name),
+parseDefinitionsAdditionalProperties(value),
+])
+) :
+undefined;
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
+* @deprecated
+*/
+export function parseDependencies(value: unknown): unknown {
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
 switch(typeof value) {
 case "string":
-switch(value.trim()) {
-case "":
-case "no":
-case "off":
-case "false":
-case "0":
-return false;
-default:
-return true;
-}
-case "number":
-return Boolean(value);
-case "boolean":
 return value;
-}
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
-})(value) ?? ((value: unknown) => {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value]),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
-"$ref": parseRef(value["$ref" as keyof typeof value]),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
-"$comment": parseComment(value["$comment" as keyof typeof value]),
-"$defs": parseDefs(value["$defs" as keyof typeof value]),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
-"items": parseApplicatorItems(value["items" as keyof typeof value]),
-"contains": parseContains(value["contains" as keyof typeof value]),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
-"properties": parseProperties(value["properties" as keyof typeof value]),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
-"if": parseIf(value["if" as keyof typeof value]),
-"then": parseThen(value["then" as keyof typeof value]),
-"else": parseElse(value["else" as keyof typeof value]),
-"allOf": parseAllOf(value["allOf" as keyof typeof value]),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
-"not": parseNot(value["not" as keyof typeof value]),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
-"type": parseType(value["type" as keyof typeof value]),
-"const": parseConst(value["const" as keyof typeof value]),
-"enum": parseEnum(value["enum" as keyof typeof value]),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
-"maximum": parseMaximum(value["maximum" as keyof typeof value]),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
-"minimum": parseMinimum(value["minimum" as keyof typeof value]),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
-"minLength": parseMinLength(value["minLength" as keyof typeof value]),
-"pattern": parsePattern(value["pattern" as keyof typeof value]),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
-"minItems": parseMinItems(value["minItems" as keyof typeof value]),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
-"minContains": parseMinContains(value["minContains" as keyof typeof value]),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
-"required": parseRequired(value["required" as keyof typeof value]),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
-"title": parseTitle(value["title" as keyof typeof value]),
-"description": parseDescription(value["description" as keyof typeof value]),
-"default": parseDefault(value["default" as keyof typeof value]),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
-"examples": parseExamples(value["examples" as keyof typeof value]),
-"format": parseFormat(value["format" as keyof typeof value]),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
-} :
+}
+})(name),
+parseDependenciesAdditionalProperties(value),
+])
+) :
 undefined;
-})(value) ?? ((value: unknown) => {
-if(value == null) {
-return false;
 }
-switch(typeof value) {
-case "string":
-switch(value.trim()) {
-case "":
-case "no":
-case "off":
-case "false":
-case "0":
-return false;
-default:
-return true;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
+* @deprecated
+*/
+export function parseRecursiveAnchor(value: unknown): unknown {
+return parseAnchorString(value);
 }
-case "number":
-return Boolean(value);
-case "boolean":
-return value;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
+* @deprecated
+*/
+export function parseRecursiveRef(value: unknown): unknown {
+return parseUriReferenceString(value);
 }
-return undefined;
-})(value) ?? ((value: unknown) => {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value]),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
-"$ref": parseRef(value["$ref" as keyof typeof value]),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
-"$comment": parseComment(value["$comment" as keyof typeof value]),
-"$defs": parseDefs(value["$defs" as keyof typeof value]),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
-"items": parseApplicatorItems(value["items" as keyof typeof value]),
-"contains": parseContains(value["contains" as keyof typeof value]),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
-"properties": parseProperties(value["properties" as keyof typeof value]),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
-"if": parseIf(value["if" as keyof typeof value]),
-"then": parseThen(value["then" as keyof typeof value]),
-"else": parseElse(value["else" as keyof typeof value]),
-"allOf": parseAllOf(value["allOf" as keyof typeof value]),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
-"not": parseNot(value["not" as keyof typeof value]),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
-"type": parseType(value["type" as keyof typeof value]),
-"const": parseConst(value["const" as keyof typeof value]),
-"enum": parseEnum(value["enum" as keyof typeof value]),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
-"maximum": parseMaximum(value["maximum" as keyof typeof value]),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
-"minimum": parseMinimum(value["minimum" as keyof typeof value]),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
-"minLength": parseMinLength(value["minLength" as keyof typeof value]),
-"pattern": parsePattern(value["pattern" as keyof typeof value]),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
-"minItems": parseMinItems(value["minItems" as keyof typeof value]),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
-"minContains": parseMinContains(value["minContains" as keyof typeof value]),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
-"required": parseRequired(value["required" as keyof typeof value]),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
-"title": parseTitle(value["title" as keyof typeof value]),
-"description": parseDescription(value["description" as keyof typeof value]),
-"default": parseDefault(value["default" as keyof typeof value]),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
-"examples": parseExamples(value["examples" as keyof typeof value]),
-"format": parseFormat(value["format" as keyof typeof value]),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
-} :
-undefined;
-})(value) ?? ((value: unknown) => {
-if(value == null) {
-return false;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
+*/
+export function parseAllOf0(value: unknown): unknown {
+return parseCore(value);
 }
-switch(typeof value) {
-case "string":
-switch(value.trim()) {
-case "":
-case "no":
-case "off":
-case "false":
-case "0":
-return false;
-default:
-return true;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
+*/
+export function parseAllOf1(value: unknown): unknown {
+return parseApplicator(value);
 }
-case "number":
-return Boolean(value);
-case "boolean":
-return value;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
+*/
+export function parseAllOf2(value: unknown): unknown {
+return parseUnevaluated(value);
 }
-return undefined;
-})(value) ?? ((value: unknown) => {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value]),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value]),
-"$ref": parseRef(value["$ref" as keyof typeof value]),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value]),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value]),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value]),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value]),
-"$comment": parseComment(value["$comment" as keyof typeof value]),
-"$defs": parseDefs(value["$defs" as keyof typeof value]),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value]),
-"items": parseApplicatorItems(value["items" as keyof typeof value]),
-"contains": parseContains(value["contains" as keyof typeof value]),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value]),
-"properties": parseProperties(value["properties" as keyof typeof value]),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value]),
-"if": parseIf(value["if" as keyof typeof value]),
-"then": parseThen(value["then" as keyof typeof value]),
-"else": parseElse(value["else" as keyof typeof value]),
-"allOf": parseAllOf(value["allOf" as keyof typeof value]),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
-"not": parseNot(value["not" as keyof typeof value]),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value]),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value]),
-"type": parseType(value["type" as keyof typeof value]),
-"const": parseConst(value["const" as keyof typeof value]),
-"enum": parseEnum(value["enum" as keyof typeof value]),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
-"maximum": parseMaximum(value["maximum" as keyof typeof value]),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value]),
-"minimum": parseMinimum(value["minimum" as keyof typeof value]),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value]),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value]),
-"minLength": parseMinLength(value["minLength" as keyof typeof value]),
-"pattern": parsePattern(value["pattern" as keyof typeof value]),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value]),
-"minItems": parseMinItems(value["minItems" as keyof typeof value]),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value]),
-"minContains": parseMinContains(value["minContains" as keyof typeof value]),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value]),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value]),
-"required": parseRequired(value["required" as keyof typeof value]),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value]),
-"title": parseTitle(value["title" as keyof typeof value]),
-"description": parseDescription(value["description" as keyof typeof value]),
-"default": parseDefault(value["default" as keyof typeof value]),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value]),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value]),
-"examples": parseExamples(value["examples" as keyof typeof value]),
-"format": parseFormat(value["format" as keyof typeof value]),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value]),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value]),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value]),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value]),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value]),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value]),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value]),
-} :
-undefined;
-})(value) ?? ((value: unknown) => {
-if(value == null) {
-return false;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
+*/
+export function parseAllOf3(value: unknown): unknown {
+return parseValidation(value);
 }
-switch(typeof value) {
-case "string":
-switch(value.trim()) {
-case "":
-case "no":
-case "off":
-case "false":
-case "0":
-return false;
-default:
-return true;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
+*/
+export function parseAllOf4(value: unknown): unknown {
+return parseMetaData(value);
 }
-case "number":
-return Boolean(value);
-case "boolean":
-return value;
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
+*/
+export function parseAllOf5(value: unknown): unknown {
+return parseFormatAnnotation(value);
 }
-return undefined;
-})(value) ?? ((value: unknown) => {
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
+*/
+export function parseAllOf6(value: unknown): unknown {
+return parseContent(value);
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
+*/
+export function parseDefinitionsAdditionalProperties(value: unknown): unknown {
+return parseSchema(value);
+}
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
+*/
+export function parseDependenciesAdditionalProperties(value: unknown): unknown {
+return parseStringArray(value) ?? ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 {
 "$id": parseId(value["$id" as keyof typeof value]),
@@ -624,101 +304,21 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/definitions
-export function parseDefinitions(value: unknown): unknown {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-((value: unknown) => {
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name),
-parseDefinitionsAdditionalProperties(value),
-])
-) :
-undefined;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies
-export function parseDependencies(value: unknown): unknown {
-return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-((value: unknown) => {
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name),
-parseDependenciesAdditionalProperties(value),
-])
-) :
-undefined;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor
-export function parseRecursiveAnchor(value: unknown): unknown {
-return parseAnchorString(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef
-export function parseRecursiveRef(value: unknown): unknown {
-return parseUriReferenceString(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/0
-export function parseAllOf0(value: unknown): unknown {
-return parseCore(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/1
-export function parseAllOf1(value: unknown): unknown {
-return parseApplicator(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/2
-export function parseAllOf2(value: unknown): unknown {
-return parseUnevaluated(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/3
-export function parseAllOf3(value: unknown): unknown {
-return parseValidation(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/4
-export function parseAllOf4(value: unknown): unknown {
-return parseMetaData(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/5
-export function parseAllOf5(value: unknown): unknown {
-return parseFormatAnnotation(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/allOf/6
-export function parseAllOf6(value: unknown): unknown {
-return parseContent(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties
-export function parseDefinitionsAdditionalProperties(value: unknown): unknown {
-return parseSchema(value);
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties
-export function parseDependenciesAdditionalProperties(value: unknown): unknown {
-return value;
-}
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
 export function parseDependencies0(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1
+/**
+* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
 export function parseDependencies1(value: unknown): unknown {
 return parseStringArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
+*/
 export function parseAnchorString(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -730,7 +330,9 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
+*/
 export function parseUriReferenceString(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -742,7 +344,10 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/core
+/**
+* @summary Core vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/core}
+*/
 export function parseCore(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -782,7 +387,9 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
+*/
 export function parseUriString(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -794,7 +401,9 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$id
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
+*/
 export function parseId(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -806,48 +415,52 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$schema
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
+*/
 export function parseCoreSchema(value: unknown): unknown {
 return parseUriString(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$ref
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
+*/
 export function parseRef(value: unknown): unknown {
 return parseUriReferenceString(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
+*/
 export function parseAnchor(value: unknown): unknown {
 return parseAnchorString(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
+*/
 export function parseDynamicRef(value: unknown): unknown {
 return parseUriReferenceString(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
+*/
 export function parseDynamicAnchor(value: unknown): unknown {
 return parseAnchorString(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
+*/
 export function parseVocabulary(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
 Object.entries(value).map(([name, value]) => [
-((value: unknown) => {
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name),
+parseVocabularyPropertyNames(name),
 parseVocabularyAdditionalProperties(value),
 ])
 ) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$comment
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
+*/
 export function parseComment(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -859,7 +472,9 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
+*/
 export function parseDefs(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -880,7 +495,9 @@ parseDefsAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties}
+*/
 export function parseVocabularyAdditionalProperties(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -904,15 +521,22 @@ return value;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
+*/
 export function parseVocabularyPropertyNames(value: unknown): unknown {
 return parseUriString(value);
 }
-// https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
+*/
 export function parseDefsAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator
+/**
+* @summary Applicator vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
+*/
 export function parseApplicator(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -958,29 +582,41 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
+*/
 export function parseSchemaArray(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseSchemaArrayItems(value)) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
+*/
 export function parsePrefixItems(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
+*/
 export function parseApplicatorItems(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
+*/
 export function parseContains(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
+*/
 export function parseApplicatorAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
+*/
 export function parseProperties(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -1001,28 +637,22 @@ parsePropertiesAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
+*/
 export function parsePatternProperties(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
 Object.entries(value).map(([name, value]) => [
-((value: unknown) => {
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name),
+parsePatternPropertiesPropertyNames(name),
 parsePatternPropertiesAdditionalProperties(value),
 ])
 ) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
+*/
 export function parseDependentSchemas(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -1043,51 +673,75 @@ parseDependentSchemasAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
+*/
 export function parseApplicatorPropertyNames(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/if
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
+*/
 export function parseIf(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/then
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
+*/
 export function parseThen(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/else
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
+*/
 export function parseElse(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
+*/
 export function parseAllOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
+*/
 export function parseAnyOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
+*/
 export function parseOneOf(value: unknown): unknown {
 return parseSchemaArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/not
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
+*/
 export function parseNot(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
+*/
 export function parseSchemaArrayItems(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
+*/
 export function parsePropertiesAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
+*/
 export function parsePatternPropertiesAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
+*/
 export function parsePatternPropertiesPropertyNames(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1099,11 +753,16 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
+*/
 export function parseDependentSchemasAdditionalProperties(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated
+/**
+* @summary Unevaluated applicator vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
+*/
 export function parseUnevaluated(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -1136,15 +795,22 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
+*/
 export function parseUnevaluatedItems(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
+*/
 export function parseUnevaluatedProperties(value: unknown): unknown {
 return parseSchema(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation
+/**
+* @summary Validation vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation}
+*/
 export function parseValidation(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -1195,7 +861,9 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
+*/
 export function parseNonNegativeInteger(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1207,11 +875,15 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
+*/
 export function parseNonNegativeIntegerDefault0(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
+*/
 export function parseSimpleTypes(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1223,27 +895,37 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
+*/
 export function parseStringArray(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseStringArrayItems(value)) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
+*/
 export function parseType(value: unknown): unknown {
 return parseType0(value) ?? parseType1(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/const
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
+*/
 export function parseConst(value: unknown): unknown {
 return value;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
+*/
 export function parseEnum(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseEnumItems(value)) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
+*/
 export function parseMultipleOf(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1255,7 +937,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}
+*/
 export function parseMaximum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1267,7 +951,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum}
+*/
 export function parseExclusiveMaximum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1279,7 +965,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum}
+*/
 export function parseMinimum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1291,7 +979,9 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum}
+*/
 export function parseExclusiveMinimum(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1303,15 +993,21 @@ return value ? 1 : 0;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength}
+*/
 export function parseMaxLength(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength}
+*/
 export function parseMinLength(value: unknown): unknown {
 return parseNonNegativeIntegerDefault0(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
+*/
 export function parsePattern(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1323,15 +1019,21 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems}
+*/
 export function parseMaxItems(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems}
+*/
 export function parseMinItems(value: unknown): unknown {
 return parseNonNegativeIntegerDefault0(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems}
+*/
 export function parseUniqueItems(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -1355,27 +1057,39 @@ return value;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains}
+*/
 export function parseMaxContains(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains}
+*/
 export function parseMinContains(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties}
+*/
 export function parseMaxProperties(value: unknown): unknown {
 return parseNonNegativeInteger(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties}
+*/
 export function parseMinProperties(value: unknown): unknown {
 return parseNonNegativeIntegerDefault0(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/required
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
+*/
 export function parseRequired(value: unknown): unknown {
 return parseStringArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
+*/
 export function parseDependentRequired(value: unknown): unknown {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
@@ -1396,7 +1110,9 @@ parseDependentRequiredAdditionalProperties(value),
 ) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items}
+*/
 export function parseStringArrayItems(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1408,29 +1124,42 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
+*/
 export function parseType0(value: unknown): unknown {
 return parseSimpleTypes(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
+*/
 export function parseType1(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseTypeItems(value)) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
+*/
 export function parseEnumItems(value: unknown): unknown {
 return value;
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
+*/
 export function parseDependentRequiredAdditionalProperties(value: unknown): unknown {
 return parseStringArray(value);
 }
-// https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
+*/
 export function parseTypeItems(value: unknown): unknown {
 return parseSimpleTypes(value);
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data
+/**
+* @summary Meta-data vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
+*/
 export function parseMetaData(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -1468,7 +1197,9 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
+*/
 export function parseTitle(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1480,7 +1211,9 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description}
+*/
 export function parseDescription(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1492,11 +1225,15 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
+*/
 export function parseDefault(value: unknown): unknown {
 return value;
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated}
+*/
 export function parseDeprecated(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -1520,7 +1257,9 @@ return value;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly}
+*/
 export function parseReadOnly(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -1544,7 +1283,9 @@ return value;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly}
+*/
 export function parseWriteOnly(value: unknown): unknown {
 if(value == null) {
 return false;
@@ -1568,17 +1309,24 @@ return value;
 }
 return undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
+*/
 export function parseExamples(value: unknown): unknown {
 return Array.isArray(value) ?
 value.map(value => parseExamplesItems(value)) :
 undefined;
 }
-// https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
+*/
 export function parseExamplesItems(value: unknown): unknown {
 return value;
 }
-// https://json-schema.org/draft/2020-12/meta/format-annotation
+/**
+* @summary Format vocabulary meta-schema for annotation results
+* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
+*/
 export function parseFormatAnnotation(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -1610,7 +1358,9 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
+*/
 export function parseFormat(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1622,7 +1372,10 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/content
+/**
+* @summary Content vocabulary meta-schema
+* @see {@link https://json-schema.org/draft/2020-12/meta/content}
+*/
 export function parseContent(value: unknown): unknown {
 return ((value: unknown) => {
 return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
@@ -1656,7 +1409,9 @@ return value;
 return undefined;
 })(value);
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}
+*/
 export function parseContentEncoding(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1668,7 +1423,9 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType}
+*/
 export function parseContentMediaType(value: unknown): unknown {
 switch(typeof value) {
 case "string":
@@ -1680,7 +1437,9 @@ default:
 return undefined;
 }
 }
-// https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema
+/**
+* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
+*/
 export function parseContentSchema(value: unknown): unknown {
 return parseSchema(value);
 }

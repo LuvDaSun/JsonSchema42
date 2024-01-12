@@ -4,9 +4,10 @@
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
 // v0.9.6                          -- www.JsonSchema42.org
-// http://json-schema.org/draft-04/schema#
+//
 /**
-Core schema meta-schema
+* @description Core schema meta-schema
+* @see {@link http://json-schema.org/draft-04/schema#}
 */
 export type SchemaDocument = (
 {
@@ -20,17 +21,17 @@ export type SchemaDocument = (
 "exclusiveMaximum"?: ExclusiveMaximum,
 "minimum"?: Minimum,
 "exclusiveMinimum"?: ExclusiveMinimum,
-"maxLength"?: PositiveInteger,
-"minLength"?: PositiveIntegerDefault0,
+"maxLength"?: MaxLength,
+"minLength"?: MinLength,
 "pattern"?: Pattern,
 "additionalItems"?: AdditionalItems,
 "items"?: PropertiesItems,
-"maxItems"?: PositiveInteger,
-"minItems"?: PositiveIntegerDefault0,
+"maxItems"?: MaxItems,
+"minItems"?: MinItems,
 "uniqueItems"?: UniqueItems,
-"maxProperties"?: PositiveInteger,
-"minProperties"?: PositiveIntegerDefault0,
-"required"?: StringArray,
+"maxProperties"?: MaxProperties,
+"minProperties"?: MinProperties,
+"required"?: Required,
 "additionalProperties"?: PropertiesAdditionalProperties,
 "definitions"?: Definitions,
 "properties"?: Properties,
@@ -39,21 +40,29 @@ export type SchemaDocument = (
 "enum"?: Enum,
 "type"?: Type,
 "format"?: Format,
-"allOf"?: SchemaArray,
-"anyOf"?: SchemaArray,
-"oneOf"?: SchemaArray,
-"not"?: SchemaDocument,
+"allOf"?: AllOf,
+"anyOf"?: AnyOf,
+"oneOf"?: OneOf,
+"not"?: Not,
 }
 );
-// http://json-schema.org/draft-04/schema#/definitions/schemaArray
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
+*/
 export type SchemaArray = (
-SchemaDocument[]
+SchemaArrayItems[]
 );
-// http://json-schema.org/draft-04/schema#/definitions/positiveInteger
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
+*/
 export type PositiveInteger = (number);
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
+*/
 export type PositiveIntegerDefault0 = (number);
-// http://json-schema.org/draft-04/schema#/definitions/simpleTypes
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
+*/
 export type SimpleTypes = ("array" |
 "boolean" |
 "integer" |
@@ -61,151 +70,257 @@ export type SimpleTypes = ("array" |
 "number" |
 "object" |
 "string");
-// http://json-schema.org/draft-04/schema#/definitions/stringArray
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
+*/
 export type StringArray = (
 StringArrayItems[]
 );
-// http://json-schema.org/draft-04/schema#/properties/id
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/id}
+*/
 export type Id = (string);
-// http://json-schema.org/draft-04/schema#/properties/$schema
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
+*/
 export type Schema = (string);
-// http://json-schema.org/draft-04/schema#/properties/title
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/title}
+*/
 export type Title = (string);
-// http://json-schema.org/draft-04/schema#/properties/description
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/description}
+*/
 export type Description = (string);
-// http://json-schema.org/draft-04/schema#/properties/default
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/default}
+*/
 export type Default = (unknown);
-// http://json-schema.org/draft-04/schema#/properties/multipleOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
+*/
 export type MultipleOf = (number);
-// http://json-schema.org/draft-04/schema#/properties/maximum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
+*/
 export type Maximum = (number);
-// http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
+*/
 export type ExclusiveMaximum = (boolean);
-// http://json-schema.org/draft-04/schema#/properties/minimum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
+*/
 export type Minimum = (number);
-// http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
+*/
 export type ExclusiveMinimum = (boolean);
-// http://json-schema.org/draft-04/schema#/properties/maxLength
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
+*/
 export type MaxLength = (PositiveInteger);
-// http://json-schema.org/draft-04/schema#/properties/minLength
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
+*/
 export type MinLength = (PositiveIntegerDefault0);
-// http://json-schema.org/draft-04/schema#/properties/pattern
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/pattern}
+*/
 export type Pattern = (string);
-// http://json-schema.org/draft-04/schema#/properties/additionalItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
+*/
 export type AdditionalItems = (
 AdditionalItems0
 |
-SchemaDocument
+AdditionalItems1
 );
-// http://json-schema.org/draft-04/schema#/properties/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items}
+*/
 export type PropertiesItems = (
-SchemaDocument
+Items0
 |
-SchemaArray
+Items1
 );
-// http://json-schema.org/draft-04/schema#/properties/maxItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
+*/
 export type MaxItems = (PositiveInteger);
-// http://json-schema.org/draft-04/schema#/properties/minItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
+*/
 export type MinItems = (PositiveIntegerDefault0);
-// http://json-schema.org/draft-04/schema#/properties/uniqueItems
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
+*/
 export type UniqueItems = (boolean);
-// http://json-schema.org/draft-04/schema#/properties/maxProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
+*/
 export type MaxProperties = (PositiveInteger);
-// http://json-schema.org/draft-04/schema#/properties/minProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
+*/
 export type MinProperties = (PositiveIntegerDefault0);
-// http://json-schema.org/draft-04/schema#/properties/required
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/required}
+*/
 export type Required = (StringArray);
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
+*/
 export type PropertiesAdditionalProperties = (
 AdditionalProperties0
 |
-SchemaDocument
+AdditionalProperties1
 );
-// http://json-schema.org/draft-04/schema#/properties/definitions
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
+*/
 export type Definitions = (
 {
-[name: (string)]: SchemaDocument
+[name: (string)]: DefinitionsAdditionalProperties
 }
 );
-// http://json-schema.org/draft-04/schema#/properties/properties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
+*/
 export type Properties = (
 {
-[name: (string)]: SchemaDocument
+[name: (string)]: PropertiesPropertiesAdditionalProperties
 }
 );
-// http://json-schema.org/draft-04/schema#/properties/patternProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
+*/
 export type PatternProperties = (
 {
-[name: (string)]: SchemaDocument
+[name: (string)]: PatternPropertiesAdditionalProperties
 }
 );
-// http://json-schema.org/draft-04/schema#/properties/dependencies
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
+*/
 export type Dependencies = (
 {
 [name: (string)]: DependenciesAdditionalProperties
 }
 );
-// http://json-schema.org/draft-04/schema#/properties/enum
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
+*/
 export type Enum = (
-(unknown)[]
+(any)[]
 );
-// http://json-schema.org/draft-04/schema#/properties/type
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type}
+*/
 export type Type = (
-SimpleTypes
+Type0
 |
 Type1
 );
-// http://json-schema.org/draft-04/schema#/properties/format
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/format}
+*/
 export type Format = (string);
-// http://json-schema.org/draft-04/schema#/properties/allOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
+*/
 export type AllOf = (SchemaArray);
-// http://json-schema.org/draft-04/schema#/properties/anyOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
+*/
 export type AnyOf = (SchemaArray);
-// http://json-schema.org/draft-04/schema#/properties/oneOf
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
+*/
 export type OneOf = (SchemaArray);
-// http://json-schema.org/draft-04/schema#/properties/not
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/not}
+*/
 export type Not = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/definitions/schemaArray/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
+*/
 export type SchemaArrayItems = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
+*/
 export type PositiveIntegerDefault00 = (PositiveInteger);
-// http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
+*/
 export type PositiveIntegerDefault01 = (unknown);
-// http://json-schema.org/draft-04/schema#/definitions/stringArray/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
+*/
 export type StringArrayItems = (string);
-// http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0}
+*/
 export type AdditionalItems0 = (boolean);
-// http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
+*/
 export type AdditionalItems1 = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/items/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
+*/
 export type Items0 = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/items/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
+*/
 export type Items1 = (SchemaArray);
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0}
+*/
 export type AdditionalProperties0 = (boolean);
-// http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
+*/
 export type AdditionalProperties1 = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
+*/
 export type DefinitionsAdditionalProperties = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
+*/
 export type PropertiesPropertiesAdditionalProperties = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
+*/
 export type PatternPropertiesAdditionalProperties = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
+*/
 export type DependenciesAdditionalProperties = (
-SchemaDocument
+Dependencies0
 |
-StringArray
+Dependencies1
 );
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
+*/
 export type Type0 = (SimpleTypes);
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
+*/
 export type Type1 = (
-SimpleTypes[]
+TypeItems[]
 );
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
 export type Dependencies0 = (SchemaDocument);
-// http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
 export type Dependencies1 = (StringArray);
-// http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
+*/
 export type TypeItems = (SimpleTypes);
