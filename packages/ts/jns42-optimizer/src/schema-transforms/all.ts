@@ -10,15 +10,22 @@ import { resolveAnyOf } from "./resolve-any-of.js";
 import { resolveOneOf } from "./resolve-one-of.js";
 import { resolveParent } from "./resolve-parent.js";
 import { singleType } from "./single-type.js";
+import { unique } from "./unique.js";
 
 export const all: SchemaTransform = (arena, model, modelKey) => {
   /* 
   order matters here!
   */
-  // TODO make the order of these not matter
   model = explode(arena, model, modelKey);
   model = singleType(arena, model, modelKey);
-  /* */
+
+  model = flatten(arena, model, modelKey);
+  model = unique(arena, model, modelKey);
+  model = alias(arena, model, modelKey);
+
+  model = flipAllOfOneOf(arena, model, modelKey);
+  model = flipAnyOfOneOf(arena, model, modelKey);
+
   model = resolveAllOf(arena, model, modelKey);
   model = resolveAnyOf(arena, model, modelKey);
   model = resolveOneOf(arena, model, modelKey);
@@ -26,10 +33,5 @@ export const all: SchemaTransform = (arena, model, modelKey) => {
 
   model = flushParent(arena, model, modelKey);
 
-  model = flipAllOfOneOf(arena, model, modelKey);
-  model = flipAnyOfOneOf(arena, model, modelKey);
-
-  model = flatten(arena, model, modelKey);
-  model = alias(arena, model, modelKey);
   return model;
 };

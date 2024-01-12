@@ -7,19 +7,8 @@ import {
 } from "../schema/index.js";
 
 export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
-  if (!isOneOfSchemaModel(model)) {
-    return model;
-  }
-
-  const elementKeys = new Set(model.oneOf);
-  if (elementKeys.size < 1) {
-    return {
-      ...model,
-      oneOf: undefined,
-    };
-  }
-
-  if (elementKeys.size < 2) {
+  // we need at least two to merge
+  if (!isOneOfSchemaModel(model) || model.oneOf.length < 2) {
     return model;
   }
 
@@ -28,7 +17,7 @@ export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
     oneOf: [],
   };
 
-  for (const elementKey of elementKeys) {
+  for (const elementKey of model.oneOf) {
     const [, elementModel] = arena.resolveItem(elementKey);
 
     if (!isSingleTypeSchemaModel(elementModel)) {

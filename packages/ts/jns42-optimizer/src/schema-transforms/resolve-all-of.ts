@@ -36,23 +36,12 @@ import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "
  */
 export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (!isAllOfSchemaModel(model)) {
+  if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
     return model;
   }
 
-  const elementKeys = new Set(model.allOf);
-  if (elementKeys.size < 1) {
-    return {
-      ...model,
-      allOf: undefined,
-    };
-  }
-
-  if (elementKeys.size < 2) {
-    return model;
-  }
   let newModel!: SchemaModel;
-  for (const elementKey of elementKeys) {
+  for (const elementKey of model.allOf) {
     const [, elementModel] = arena.resolveItem(elementKey);
 
     if (!isSingleTypeSchemaModel(elementModel)) {

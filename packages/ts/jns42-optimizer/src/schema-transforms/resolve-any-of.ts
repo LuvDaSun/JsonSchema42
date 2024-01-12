@@ -9,19 +9,8 @@ import {
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
 
 export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
-  if (!isAnyOfSchemaModel(model)) {
-    return model;
-  }
-
-  const elementKeys = new Set(model.anyOf);
-  if (elementKeys.size < 1) {
-    return {
-      ...model,
-      anyOf: undefined,
-    };
-  }
-
-  if (elementKeys.size < 2) {
+  // we need at least two to merge
+  if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
     return model;
   }
 
@@ -33,7 +22,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
 
   // first we group elements by their type
   const groupedElements: { [type: string]: number[] } = {};
-  for (const elementKey of elementKeys) {
+  for (const elementKey of model.anyOf) {
     const [, elementModel] = arena.resolveItem(elementKey);
 
     if (!isSingleTypeSchemaModel(elementModel) || elementModel.types == null) {

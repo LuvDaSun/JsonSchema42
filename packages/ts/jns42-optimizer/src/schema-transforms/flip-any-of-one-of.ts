@@ -10,25 +10,13 @@ import {
 
 export const flipAnyOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (!isAnyOfSchemaModel(model)) {
-    return model;
-  }
-
-  const elementKeys = new Set(model.anyOf);
-  if (elementKeys.size < 1) {
-    return {
-      ...model,
-      anyOf: undefined,
-    };
-  }
-
-  if (elementKeys.size < 2) {
+  if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
     return model;
   }
 
   const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], anyOf: undefined };
 
-  const baseElementEntries = [...elementKeys]
+  const baseElementEntries = model.anyOf
     .map((element) => [element, arena.resolveItem(element)] as const)
     .filter(([element, [, item]]) => isOneOfSchemaModel(item))
     .map(([element, [, item]]) => [element, item as OneOfSchemaModel] as const);
