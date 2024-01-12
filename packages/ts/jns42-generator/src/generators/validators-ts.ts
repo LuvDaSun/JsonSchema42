@@ -191,17 +191,14 @@ function* generateRules(
         yield itt`value.length <= ${JSON.stringify(typeItem.maximumLength)}`;
       }
 
-      // TODO once the mocks suppport this
-      // for (const rulevalue of typeItem.valuePattern ?? []) {
-      //   yield itt`new RegExp(${JSON.stringify(rulevalue)}).test(${valueExpression})`;
-      // }
+      for (const rulevalue of typeItem.valuePattern ?? []) {
+        yield itt`new RegExp(${JSON.stringify(rulevalue)}).test(${valueExpression})`;
+      }
 
       break;
 
     case "tuple": {
-      // TODO enable once the mocks are also emitting unique values
-      //const unique = typeItem.uniqueItems ?? false;
-      const unique = false;
+      const unique = typeItem.uniqueItems ?? false;
 
       yield itt`Array.isArray(${valueExpression})`;
       yield itt`${valueExpression}.length === ${JSON.stringify(typeItem.elements.length)}`;
@@ -271,9 +268,7 @@ function* generateRules(
     }
 
     case "array": {
-      // TODO enable once the mocks are also emitting unique values
-      //const unique = typeItem.uniqueItems ?? false;
-      const unique = false;
+      const unique = typeItem.uniqueItems ?? false;
 
       yield itt`Array.isArray(${valueExpression})`;
 
@@ -538,9 +533,9 @@ function* generateRules(
           yield itt`
             if(${generateValidatorReference(specification, element, valueExpression)}) {
               count++;
-              if(count > 1) {
-                return false;
-              }
+              // if(count > 1) {
+              //   return false;
+              // }
             }
           `;
         }
