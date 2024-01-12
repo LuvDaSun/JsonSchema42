@@ -37,6 +37,7 @@
     "@types/node": "^20.11.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
+    "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
     "type-fest": "^4.6.0",
     "typescript": "^5.3.3",

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { choose } from "./choose.js";
 
-test("combinations", (t) => {
+test("combinations", () => {
   {
     const expected = [["a"], ["b"], ["c"], ["d"]];
     const actual = choose(["a", "b", "c", "d"], 1);

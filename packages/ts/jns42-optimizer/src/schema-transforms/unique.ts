@@ -1,14 +1,23 @@
+import assert from "assert";
 import {
+  SchemaModel,
   SchemaTransform,
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
   isOneOfSchemaModel,
 } from "../schema/index.js";
+import { deepUnique } from "../utils/index.js";
 
 export const unique: SchemaTransform = (arena, model, modelKey) => {
   if (isAllOfSchemaModel(model)) {
-    const set = new Set(model.allOf);
-    if (model.allOf.length > set.size) {
+    const set = [...makeUnique(model.allOf)];
+    if (set.length === 0) {
+      return {
+        ...model,
+        allOf: undefined,
+      };
+    }
+    if (model.allOf.length > set.length) {
       return {
         ...model,
         allOf: [...set],
@@ -17,8 +26,14 @@ export const unique: SchemaTransform = (arena, model, modelKey) => {
   }
 
   if (isAnyOfSchemaModel(model)) {
-    const set = new Set(model.anyOf);
-    if (model.anyOf.length > set.size) {
+    const set = [...makeUnique(model.anyOf)];
+    if (set.length === 0) {
+      return {
+        ...model,
+        anyOf: undefined,
+      };
+    }
+    if (model.anyOf.length > set.length) {
       return {
         ...model,
         anyOf: [...set],
@@ -27,8 +42,14 @@ export const unique: SchemaTransform = (arena, model, modelKey) => {
   }
 
   if (isOneOfSchemaModel(model)) {
-    const set = new Set(model.oneOf);
-    if (model.oneOf.length > set.size) {
+    const set = [...makeUnique(model.oneOf)];
+    if (set.length === 0) {
+      return {
+        ...model,
+        oneOf: undefined,
+      };
+    }
+    if (model.oneOf.length > set.length) {
       return {
         ...model,
         oneOf: [...set],
@@ -37,4 +58,16 @@ export const unique: SchemaTransform = (arena, model, modelKey) => {
   }
 
   return model;
+
+  function* makeUnique(keys: number[]) {
+    const modelToKey = new Map<SchemaModel, number>(
+      keys.map((key) => arena.resolveItem(key)).map(([key, value]) => [value, key]),
+    );
+    const uniqueModels = deepUnique(modelToKey.keys());
+    for (const model of uniqueModels) {
+      const key = modelToKey.get(model);
+      assert(key != null);
+      yield key;
+    }
+  }
 };

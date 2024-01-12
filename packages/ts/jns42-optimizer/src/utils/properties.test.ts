@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { hasProperties } from "./properties.js";
 
-test("has-properties", (t) => {
+test("has-properties", () => {
   {
     assert.equal(hasProperties({ a: 1 }, ["a"]), true);
     assert.equal(hasProperties({ a: 1, b: 2 }, ["a"]), false);
