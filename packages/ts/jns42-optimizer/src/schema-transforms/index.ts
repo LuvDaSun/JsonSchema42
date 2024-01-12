@@ -3,6 +3,7 @@ export * from "./all.js";
 export * from "./explode.js";
 export * from "./flatten.js";
 export * from "./flip-all-of-one-of.js";
+export * from "./flip-any-of-one-of.js";
 export * from "./flush-parent.js";
 export * from "./resolve-all-of.js";
 export * from "./resolve-any-of-choose.js";

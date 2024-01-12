@@ -1,31 +1,24 @@
 import {
-  AllOfSchemaModel,
+  AnyOfSchemaModel,
   OneOfSchemaModel,
   SchemaModel,
   SchemaTransform,
-  isAllOfSchemaModel,
+  isAnyOfSchemaModel,
   isOneOfSchemaModel,
   isSingleTypeSchemaModel,
 } from "../schema/index.js";
 
-/**
- * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
- * will flip em! It will become a oneOf with an allOf in it.
- *
- * We can generate code for a oneOf with some allOfs in it, but for an allOf with
- * a bunch of oneOfs, we cannot generate code.
- */
-export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
+export const flipAnyOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (!isAllOfSchemaModel(model)) {
+  if (!isAnyOfSchemaModel(model)) {
     return model;
   }
 
-  const elementKeys = new Set(model.allOf);
+  const elementKeys = new Set(model.anyOf);
   if (elementKeys.size < 1) {
     return {
       ...model,
-      allOf: undefined,
+      anyOf: undefined,
     };
   }
 
@@ -33,7 +26,7 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], allOf: undefined };
+  const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], anyOf: undefined };
 
   const baseElementEntries = [...elementKeys]
     .map((element) => [element, arena.resolveItem(element)] as const)
@@ -54,9 +47,9 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   }
 
   for (const leafElement of leafElements) {
-    const newLeafElements = [...model.allOf, leafElement].filter((key) => !baseElementSet.has(key));
-    const newLeafModel: AllOfSchemaModel = {
-      allOf: newLeafElements,
+    const newLeafElements = [...model.anyOf, leafElement].filter((key) => !baseElementSet.has(key));
+    const newLeafModel: AnyOfSchemaModel = {
+      anyOf: newLeafElements,
     };
     const newLeafKey = arena.addItem(newLeafModel);
     newModel.oneOf.push(newLeafKey);
