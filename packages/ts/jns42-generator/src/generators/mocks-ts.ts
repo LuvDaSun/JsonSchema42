@@ -20,6 +20,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
     import * as types from "./types.js";
   `;
 
+  yield itt`
+    const depthCounters: Record<string, number> = {};
+    const maximumDepth = 2;
+  `;
+
   for (const [typeKey, item] of Object.entries(types)) {
     const { id: nodeId } = item;
 
@@ -34,7 +39,16 @@ export function* generateMocksTsCode(specification: models.Specification) {
     yield itt`
       ${generateJsDocComments(item)}
       export function ${functionName}(): types.${typeName} {
-        return (${definition});
+        depthCounters[${JSON.stringify(typeKey)}] ??= 0;
+
+        try {
+          depthCounters[${JSON.stringify(typeKey)}]++;
+          
+          return (${definition});
+        }
+        finally {
+          depthCounters[${JSON.stringify(typeKey)}]--;
+        }
       }
     `;
   }
@@ -167,6 +181,7 @@ function* generateMockDefinition(
 
     case "array": {
       const { element } = typeItem;
+
       yield itt`
         [
           ${mapIterable(
