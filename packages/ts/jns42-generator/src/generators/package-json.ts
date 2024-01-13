@@ -29,7 +29,7 @@ export function getPackageJsonData(name: string, version?: string) {
       prepare: "tsc --build",
       build: "tsc --build",
       clean: "rm -rf ./out && tsc --build --clean",
-      test: "node --test ./out/**/*.test.js",
+      test: "node --test ./out/**.test.js",
     },
     author: "",
     license: "ISC",
