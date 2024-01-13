@@ -2,7 +2,7 @@
 There is one big model that is the SchemaModel. All properties of the schema are here. Then  there
 are quite a few states of the schema model. These states are a subset of the properties of the
 SchemaModel. The optimizer algorithms change the SchemaModel into another state until a state is
-reached that can be transormed into a generator model.
+reached that can be transformed into a generator model.
 */
 
 /**
@@ -10,7 +10,7 @@ reached that can be transormed into a generator model.
  */
 export type SchemaKey = number;
 /**
- * Type for the SchmaModel
+ * Type for the SchemaModel
  */
 export type SchemaType =
   | "never"
@@ -23,7 +23,7 @@ export type SchemaType =
   | "array"
   | "map";
 /**
- * the entire SchemaModel, everyting is optional!
+ * the entire SchemaModel, everything is optional!
  */
 export type SchemaModel = {
   alias?: SchemaKey;
