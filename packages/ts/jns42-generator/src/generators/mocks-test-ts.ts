@@ -23,12 +23,13 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     const typeName = names[nodeId];
     const validatorFunctionName = toCamel("is", names[nodeId]);
     const mockFunctionName = toCamel("mock", names[nodeId]);
+
     yield itt`
       test(${JSON.stringify(typeName)}, () => {
         const mock = mocks.${mockFunctionName}();
         const errors = new Array<validators.ValidationError>();
-        const isvalid = validators.${validatorFunctionName}(mock, errors);
-        assert.equal(isvalid, true);
+        const valid = validators.${validatorFunctionName}(mock, errors);
+        assert.equal(valid, true);
       });
     `;
   }

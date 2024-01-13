@@ -18,24 +18,20 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     if (nodeId == null) {
       continue;
     }
-    if ((typeItem.examples ?? []).length === 0) {
-      continue;
-    }
 
     const typeName = names[nodeId];
     const validatorFunctionName = toCamel("is", names[nodeId]);
 
-    yield itt`
-      test(${JSON.stringify(typeName)}, () => {
-        ${mapIterable(
-          typeItem.examples ?? [],
-          (example) => itt`
-            const errors = new Array<validators.ValidationError>();
-            const isvalid = validators.${validatorFunctionName}(${JSON.stringify(example)}, errors);
-            assert.equal(valid, true);
-          `,
-        )}
-      });
-    `;
+    yield mapIterable(
+      typeItem.examples ?? [],
+      (example) => itt`
+        test(${JSON.stringify(typeName)}, () => {
+          const example = ${JSON.stringify(example)};
+          const errors = new Array<validators.ValidationError>();
+          const valid = validators.${validatorFunctionName}(example, errors);
+          assert.equal(valid, true);
+        });
+      `,
+    );
   }
 }
