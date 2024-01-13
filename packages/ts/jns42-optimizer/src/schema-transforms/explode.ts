@@ -15,9 +15,9 @@ import {
 /**
  * Turns the model into a single all-of with various
  * sub compound models in it.
- * This is useful for the rare case in wich a schema defines different compounds on a single
+ * This is useful for the rare case in which a schema defines different compounds on a single
  * schema node. So if a schema has an allOf *and* a oneOf. This edge case is handled buy
- * exploding the schema into a schem of allOf with all of the compounds in it.
+ * exploding the schema into a schema of allOf with all of the compounds in it.
  *
  * this
  * ```yaml
