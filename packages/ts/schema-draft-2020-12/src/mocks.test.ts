@@ -11,619 +11,516 @@ import * as validators from "./validators.js";
 import * as mocks from "./mocks.js";
 test("Schema", () => {
 const mock = mocks.mockSchema();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isSchema(mock, errors);
+const valid = validators.isSchema(mock);
 assert.equal(valid, true);
 });
 test("Definitions", () => {
 const mock = mocks.mockDefinitions();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDefinitions(mock, errors);
+const valid = validators.isDefinitions(mock);
 assert.equal(valid, true);
 });
 test("Dependencies", () => {
 const mock = mocks.mockDependencies();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependencies(mock, errors);
+const valid = validators.isDependencies(mock);
 assert.equal(valid, true);
 });
 test("RecursiveAnchor", () => {
 const mock = mocks.mockRecursiveAnchor();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isRecursiveAnchor(mock, errors);
+const valid = validators.isRecursiveAnchor(mock);
 assert.equal(valid, true);
 });
 test("RecursiveRef", () => {
 const mock = mocks.mockRecursiveRef();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isRecursiveRef(mock, errors);
+const valid = validators.isRecursiveRef(mock);
 assert.equal(valid, true);
 });
 test("AllOf0", () => {
 const mock = mocks.mockAllOf0();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf0(mock, errors);
+const valid = validators.isAllOf0(mock);
 assert.equal(valid, true);
 });
 test("AllOf1", () => {
 const mock = mocks.mockAllOf1();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf1(mock, errors);
+const valid = validators.isAllOf1(mock);
 assert.equal(valid, true);
 });
 test("AllOf2", () => {
 const mock = mocks.mockAllOf2();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf2(mock, errors);
+const valid = validators.isAllOf2(mock);
 assert.equal(valid, true);
 });
 test("AllOf3", () => {
 const mock = mocks.mockAllOf3();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf3(mock, errors);
+const valid = validators.isAllOf3(mock);
 assert.equal(valid, true);
 });
 test("AllOf4", () => {
 const mock = mocks.mockAllOf4();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf4(mock, errors);
+const valid = validators.isAllOf4(mock);
 assert.equal(valid, true);
 });
 test("AllOf5", () => {
 const mock = mocks.mockAllOf5();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf5(mock, errors);
+const valid = validators.isAllOf5(mock);
 assert.equal(valid, true);
 });
 test("AllOf6", () => {
 const mock = mocks.mockAllOf6();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf6(mock, errors);
+const valid = validators.isAllOf6(mock);
 assert.equal(valid, true);
 });
 test("DefinitionsAdditionalProperties", () => {
 const mock = mocks.mockDefinitionsAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDefinitionsAdditionalProperties(mock, errors);
+const valid = validators.isDefinitionsAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("DependenciesAdditionalProperties", () => {
 const mock = mocks.mockDependenciesAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependenciesAdditionalProperties(mock, errors);
+const valid = validators.isDependenciesAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("Dependencies0", () => {
 const mock = mocks.mockDependencies0();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependencies0(mock, errors);
+const valid = validators.isDependencies0(mock);
 assert.equal(valid, true);
 });
 test("Dependencies1", () => {
 const mock = mocks.mockDependencies1();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependencies1(mock, errors);
+const valid = validators.isDependencies1(mock);
 assert.equal(valid, true);
 });
 test("AnchorString", () => {
 const mock = mocks.mockAnchorString();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAnchorString(mock, errors);
+const valid = validators.isAnchorString(mock);
 assert.equal(valid, true);
 });
 test("UriReferenceString", () => {
 const mock = mocks.mockUriReferenceString();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isUriReferenceString(mock, errors);
+const valid = validators.isUriReferenceString(mock);
 assert.equal(valid, true);
 });
 test("Core", () => {
 const mock = mocks.mockCore();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isCore(mock, errors);
+const valid = validators.isCore(mock);
 assert.equal(valid, true);
 });
 test("UriString", () => {
 const mock = mocks.mockUriString();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isUriString(mock, errors);
+const valid = validators.isUriString(mock);
 assert.equal(valid, true);
 });
 test("Id", () => {
 const mock = mocks.mockId();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isId(mock, errors);
+const valid = validators.isId(mock);
 assert.equal(valid, true);
 });
 test("CoreSchema", () => {
 const mock = mocks.mockCoreSchema();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isCoreSchema(mock, errors);
+const valid = validators.isCoreSchema(mock);
 assert.equal(valid, true);
 });
 test("Ref", () => {
 const mock = mocks.mockRef();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isRef(mock, errors);
+const valid = validators.isRef(mock);
 assert.equal(valid, true);
 });
 test("Anchor", () => {
 const mock = mocks.mockAnchor();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAnchor(mock, errors);
+const valid = validators.isAnchor(mock);
 assert.equal(valid, true);
 });
 test("DynamicRef", () => {
 const mock = mocks.mockDynamicRef();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDynamicRef(mock, errors);
+const valid = validators.isDynamicRef(mock);
 assert.equal(valid, true);
 });
 test("DynamicAnchor", () => {
 const mock = mocks.mockDynamicAnchor();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDynamicAnchor(mock, errors);
+const valid = validators.isDynamicAnchor(mock);
 assert.equal(valid, true);
 });
 test("Vocabulary", () => {
 const mock = mocks.mockVocabulary();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isVocabulary(mock, errors);
+const valid = validators.isVocabulary(mock);
 assert.equal(valid, true);
 });
 test("Comment", () => {
 const mock = mocks.mockComment();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isComment(mock, errors);
+const valid = validators.isComment(mock);
 assert.equal(valid, true);
 });
 test("Defs", () => {
 const mock = mocks.mockDefs();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDefs(mock, errors);
+const valid = validators.isDefs(mock);
 assert.equal(valid, true);
 });
 test("VocabularyAdditionalProperties", () => {
 const mock = mocks.mockVocabularyAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isVocabularyAdditionalProperties(mock, errors);
+const valid = validators.isVocabularyAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("VocabularyPropertyNames", () => {
 const mock = mocks.mockVocabularyPropertyNames();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isVocabularyPropertyNames(mock, errors);
+const valid = validators.isVocabularyPropertyNames(mock);
 assert.equal(valid, true);
 });
 test("DefsAdditionalProperties", () => {
 const mock = mocks.mockDefsAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDefsAdditionalProperties(mock, errors);
+const valid = validators.isDefsAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("Applicator", () => {
 const mock = mocks.mockApplicator();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isApplicator(mock, errors);
+const valid = validators.isApplicator(mock);
 assert.equal(valid, true);
 });
 test("SchemaArray", () => {
 const mock = mocks.mockSchemaArray();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isSchemaArray(mock, errors);
+const valid = validators.isSchemaArray(mock);
 assert.equal(valid, true);
 });
 test("PrefixItems", () => {
 const mock = mocks.mockPrefixItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isPrefixItems(mock, errors);
+const valid = validators.isPrefixItems(mock);
 assert.equal(valid, true);
 });
 test("ApplicatorItems", () => {
 const mock = mocks.mockApplicatorItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isApplicatorItems(mock, errors);
+const valid = validators.isApplicatorItems(mock);
 assert.equal(valid, true);
 });
 test("Contains", () => {
 const mock = mocks.mockContains();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isContains(mock, errors);
+const valid = validators.isContains(mock);
 assert.equal(valid, true);
 });
 test("ApplicatorAdditionalProperties", () => {
 const mock = mocks.mockApplicatorAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isApplicatorAdditionalProperties(mock, errors);
+const valid = validators.isApplicatorAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("Properties", () => {
 const mock = mocks.mockProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isProperties(mock, errors);
+const valid = validators.isProperties(mock);
 assert.equal(valid, true);
 });
 test("PatternProperties", () => {
 const mock = mocks.mockPatternProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isPatternProperties(mock, errors);
+const valid = validators.isPatternProperties(mock);
 assert.equal(valid, true);
 });
 test("DependentSchemas", () => {
 const mock = mocks.mockDependentSchemas();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependentSchemas(mock, errors);
+const valid = validators.isDependentSchemas(mock);
 assert.equal(valid, true);
 });
 test("ApplicatorPropertyNames", () => {
 const mock = mocks.mockApplicatorPropertyNames();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isApplicatorPropertyNames(mock, errors);
+const valid = validators.isApplicatorPropertyNames(mock);
 assert.equal(valid, true);
 });
 test("If", () => {
 const mock = mocks.mockIf();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isIf(mock, errors);
+const valid = validators.isIf(mock);
 assert.equal(valid, true);
 });
 test("Then", () => {
 const mock = mocks.mockThen();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isThen(mock, errors);
+const valid = validators.isThen(mock);
 assert.equal(valid, true);
 });
 test("Else", () => {
 const mock = mocks.mockElse();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isElse(mock, errors);
+const valid = validators.isElse(mock);
 assert.equal(valid, true);
 });
 test("AllOf", () => {
 const mock = mocks.mockAllOf();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAllOf(mock, errors);
+const valid = validators.isAllOf(mock);
 assert.equal(valid, true);
 });
 test("AnyOf", () => {
 const mock = mocks.mockAnyOf();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isAnyOf(mock, errors);
+const valid = validators.isAnyOf(mock);
 assert.equal(valid, true);
 });
 test("OneOf", () => {
 const mock = mocks.mockOneOf();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isOneOf(mock, errors);
+const valid = validators.isOneOf(mock);
 assert.equal(valid, true);
 });
 test("Not", () => {
 const mock = mocks.mockNot();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isNot(mock, errors);
+const valid = validators.isNot(mock);
 assert.equal(valid, true);
 });
 test("SchemaArrayItems", () => {
 const mock = mocks.mockSchemaArrayItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isSchemaArrayItems(mock, errors);
+const valid = validators.isSchemaArrayItems(mock);
 assert.equal(valid, true);
 });
 test("PropertiesAdditionalProperties", () => {
 const mock = mocks.mockPropertiesAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isPropertiesAdditionalProperties(mock, errors);
+const valid = validators.isPropertiesAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("PatternPropertiesAdditionalProperties", () => {
 const mock = mocks.mockPatternPropertiesAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isPatternPropertiesAdditionalProperties(mock, errors);
+const valid = validators.isPatternPropertiesAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("PatternPropertiesPropertyNames", () => {
 const mock = mocks.mockPatternPropertiesPropertyNames();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isPatternPropertiesPropertyNames(mock, errors);
+const valid = validators.isPatternPropertiesPropertyNames(mock);
 assert.equal(valid, true);
 });
 test("DependentSchemasAdditionalProperties", () => {
 const mock = mocks.mockDependentSchemasAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependentSchemasAdditionalProperties(mock, errors);
+const valid = validators.isDependentSchemasAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("Unevaluated", () => {
 const mock = mocks.mockUnevaluated();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isUnevaluated(mock, errors);
+const valid = validators.isUnevaluated(mock);
 assert.equal(valid, true);
 });
 test("UnevaluatedItems", () => {
 const mock = mocks.mockUnevaluatedItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isUnevaluatedItems(mock, errors);
+const valid = validators.isUnevaluatedItems(mock);
 assert.equal(valid, true);
 });
 test("UnevaluatedProperties", () => {
 const mock = mocks.mockUnevaluatedProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isUnevaluatedProperties(mock, errors);
+const valid = validators.isUnevaluatedProperties(mock);
 assert.equal(valid, true);
 });
 test("Validation", () => {
 const mock = mocks.mockValidation();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isValidation(mock, errors);
+const valid = validators.isValidation(mock);
 assert.equal(valid, true);
 });
 test("NonNegativeInteger", () => {
 const mock = mocks.mockNonNegativeInteger();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isNonNegativeInteger(mock, errors);
+const valid = validators.isNonNegativeInteger(mock);
 assert.equal(valid, true);
 });
 test("NonNegativeIntegerDefault0", () => {
 const mock = mocks.mockNonNegativeIntegerDefault0();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isNonNegativeIntegerDefault0(mock, errors);
+const valid = validators.isNonNegativeIntegerDefault0(mock);
 assert.equal(valid, true);
 });
 test("SimpleTypes", () => {
 const mock = mocks.mockSimpleTypes();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isSimpleTypes(mock, errors);
+const valid = validators.isSimpleTypes(mock);
 assert.equal(valid, true);
 });
 test("StringArray", () => {
 const mock = mocks.mockStringArray();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isStringArray(mock, errors);
+const valid = validators.isStringArray(mock);
 assert.equal(valid, true);
 });
 test("Type", () => {
 const mock = mocks.mockType();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isType(mock, errors);
+const valid = validators.isType(mock);
 assert.equal(valid, true);
 });
 test("Const", () => {
 const mock = mocks.mockConst();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isConst(mock, errors);
+const valid = validators.isConst(mock);
 assert.equal(valid, true);
 });
 test("Enum", () => {
 const mock = mocks.mockEnum();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isEnum(mock, errors);
+const valid = validators.isEnum(mock);
 assert.equal(valid, true);
 });
 test("MultipleOf", () => {
 const mock = mocks.mockMultipleOf();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMultipleOf(mock, errors);
+const valid = validators.isMultipleOf(mock);
 assert.equal(valid, true);
 });
 test("Maximum", () => {
 const mock = mocks.mockMaximum();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMaximum(mock, errors);
+const valid = validators.isMaximum(mock);
 assert.equal(valid, true);
 });
 test("ExclusiveMaximum", () => {
 const mock = mocks.mockExclusiveMaximum();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isExclusiveMaximum(mock, errors);
+const valid = validators.isExclusiveMaximum(mock);
 assert.equal(valid, true);
 });
 test("Minimum", () => {
 const mock = mocks.mockMinimum();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMinimum(mock, errors);
+const valid = validators.isMinimum(mock);
 assert.equal(valid, true);
 });
 test("ExclusiveMinimum", () => {
 const mock = mocks.mockExclusiveMinimum();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isExclusiveMinimum(mock, errors);
+const valid = validators.isExclusiveMinimum(mock);
 assert.equal(valid, true);
 });
 test("MaxLength", () => {
 const mock = mocks.mockMaxLength();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMaxLength(mock, errors);
+const valid = validators.isMaxLength(mock);
 assert.equal(valid, true);
 });
 test("MinLength", () => {
 const mock = mocks.mockMinLength();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMinLength(mock, errors);
+const valid = validators.isMinLength(mock);
 assert.equal(valid, true);
 });
 test("Pattern", () => {
 const mock = mocks.mockPattern();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isPattern(mock, errors);
+const valid = validators.isPattern(mock);
 assert.equal(valid, true);
 });
 test("MaxItems", () => {
 const mock = mocks.mockMaxItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMaxItems(mock, errors);
+const valid = validators.isMaxItems(mock);
 assert.equal(valid, true);
 });
 test("MinItems", () => {
 const mock = mocks.mockMinItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMinItems(mock, errors);
+const valid = validators.isMinItems(mock);
 assert.equal(valid, true);
 });
 test("UniqueItems", () => {
 const mock = mocks.mockUniqueItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isUniqueItems(mock, errors);
+const valid = validators.isUniqueItems(mock);
 assert.equal(valid, true);
 });
 test("MaxContains", () => {
 const mock = mocks.mockMaxContains();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMaxContains(mock, errors);
+const valid = validators.isMaxContains(mock);
 assert.equal(valid, true);
 });
 test("MinContains", () => {
 const mock = mocks.mockMinContains();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMinContains(mock, errors);
+const valid = validators.isMinContains(mock);
 assert.equal(valid, true);
 });
 test("MaxProperties", () => {
 const mock = mocks.mockMaxProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMaxProperties(mock, errors);
+const valid = validators.isMaxProperties(mock);
 assert.equal(valid, true);
 });
 test("MinProperties", () => {
 const mock = mocks.mockMinProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMinProperties(mock, errors);
+const valid = validators.isMinProperties(mock);
 assert.equal(valid, true);
 });
 test("Required", () => {
 const mock = mocks.mockRequired();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isRequired(mock, errors);
+const valid = validators.isRequired(mock);
 assert.equal(valid, true);
 });
 test("DependentRequired", () => {
 const mock = mocks.mockDependentRequired();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependentRequired(mock, errors);
+const valid = validators.isDependentRequired(mock);
 assert.equal(valid, true);
 });
 test("StringArrayItems", () => {
 const mock = mocks.mockStringArrayItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isStringArrayItems(mock, errors);
+const valid = validators.isStringArrayItems(mock);
 assert.equal(valid, true);
 });
 test("Type0", () => {
 const mock = mocks.mockType0();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isType0(mock, errors);
+const valid = validators.isType0(mock);
 assert.equal(valid, true);
 });
 test("Type1", () => {
 const mock = mocks.mockType1();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isType1(mock, errors);
+const valid = validators.isType1(mock);
 assert.equal(valid, true);
 });
 test("EnumItems", () => {
 const mock = mocks.mockEnumItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isEnumItems(mock, errors);
+const valid = validators.isEnumItems(mock);
 assert.equal(valid, true);
 });
 test("DependentRequiredAdditionalProperties", () => {
 const mock = mocks.mockDependentRequiredAdditionalProperties();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDependentRequiredAdditionalProperties(mock, errors);
+const valid = validators.isDependentRequiredAdditionalProperties(mock);
 assert.equal(valid, true);
 });
 test("TypeItems", () => {
 const mock = mocks.mockTypeItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isTypeItems(mock, errors);
+const valid = validators.isTypeItems(mock);
 assert.equal(valid, true);
 });
 test("MetaData", () => {
 const mock = mocks.mockMetaData();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isMetaData(mock, errors);
+const valid = validators.isMetaData(mock);
 assert.equal(valid, true);
 });
 test("Title", () => {
 const mock = mocks.mockTitle();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isTitle(mock, errors);
+const valid = validators.isTitle(mock);
 assert.equal(valid, true);
 });
 test("Description", () => {
 const mock = mocks.mockDescription();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDescription(mock, errors);
+const valid = validators.isDescription(mock);
 assert.equal(valid, true);
 });
 test("Default", () => {
 const mock = mocks.mockDefault();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDefault(mock, errors);
+const valid = validators.isDefault(mock);
 assert.equal(valid, true);
 });
 test("Deprecated", () => {
 const mock = mocks.mockDeprecated();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isDeprecated(mock, errors);
+const valid = validators.isDeprecated(mock);
 assert.equal(valid, true);
 });
 test("ReadOnly", () => {
 const mock = mocks.mockReadOnly();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isReadOnly(mock, errors);
+const valid = validators.isReadOnly(mock);
 assert.equal(valid, true);
 });
 test("WriteOnly", () => {
 const mock = mocks.mockWriteOnly();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isWriteOnly(mock, errors);
+const valid = validators.isWriteOnly(mock);
 assert.equal(valid, true);
 });
 test("Examples", () => {
 const mock = mocks.mockExamples();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isExamples(mock, errors);
+const valid = validators.isExamples(mock);
 assert.equal(valid, true);
 });
 test("ExamplesItems", () => {
 const mock = mocks.mockExamplesItems();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isExamplesItems(mock, errors);
+const valid = validators.isExamplesItems(mock);
 assert.equal(valid, true);
 });
 test("FormatAnnotation", () => {
 const mock = mocks.mockFormatAnnotation();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isFormatAnnotation(mock, errors);
+const valid = validators.isFormatAnnotation(mock);
 assert.equal(valid, true);
 });
 test("Format", () => {
 const mock = mocks.mockFormat();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isFormat(mock, errors);
+const valid = validators.isFormat(mock);
 assert.equal(valid, true);
 });
 test("Content", () => {
 const mock = mocks.mockContent();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isContent(mock, errors);
+const valid = validators.isContent(mock);
 assert.equal(valid, true);
 });
 test("ContentEncoding", () => {
 const mock = mocks.mockContentEncoding();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isContentEncoding(mock, errors);
+const valid = validators.isContentEncoding(mock);
 assert.equal(valid, true);
 });
 test("ContentMediaType", () => {
 const mock = mocks.mockContentMediaType();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isContentMediaType(mock, errors);
+const valid = validators.isContentMediaType(mock);
 assert.equal(valid, true);
 });
 test("ContentSchema", () => {
 const mock = mocks.mockContentSchema();
-const errors = new Array<validators.ValidationError>();
-const valid = validators.isContentSchema(mock, errors);
+const valid = validators.isContentSchema(mock);
 assert.equal(valid, true);
 });

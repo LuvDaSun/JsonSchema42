@@ -6,15 +6,12 @@
 // v0.9.6                          -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
-export interface ValidationError {
-typeName: string,
-}
 /**
 * @summary Core and Validation specifications meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/schema}
 */
-export function isSchema(value: unknown, errors = new Array<ValidationError>()): value is types.Schema {
-if (!((
+export function isSchema(value: unknown): value is types.Schema {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -29,307 +26,307 @@ continue;
 }
 switch(propertyName) {
 case "$id":
-if(!isId(propertyValue, errors)) {
+if(!isId(propertyValue)) {
 return false;
 }
 break;
 case "$schema":
-if(!isCoreSchema(propertyValue, errors)) {
+if(!isCoreSchema(propertyValue)) {
 return false;
 }
 break;
 case "$ref":
-if(!isRef(propertyValue, errors)) {
+if(!isRef(propertyValue)) {
 return false;
 }
 break;
 case "$anchor":
-if(!isAnchor(propertyValue, errors)) {
+if(!isAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$dynamicRef":
-if(!isDynamicRef(propertyValue, errors)) {
+if(!isDynamicRef(propertyValue)) {
 return false;
 }
 break;
 case "$dynamicAnchor":
-if(!isDynamicAnchor(propertyValue, errors)) {
+if(!isDynamicAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$vocabulary":
-if(!isVocabulary(propertyValue, errors)) {
+if(!isVocabulary(propertyValue)) {
 return false;
 }
 break;
 case "$comment":
-if(!isComment(propertyValue, errors)) {
+if(!isComment(propertyValue)) {
 return false;
 }
 break;
 case "$defs":
-if(!isDefs(propertyValue, errors)) {
+if(!isDefs(propertyValue)) {
 return false;
 }
 break;
 case "prefixItems":
-if(!isPrefixItems(propertyValue, errors)) {
+if(!isPrefixItems(propertyValue)) {
 return false;
 }
 break;
 case "items":
-if(!isApplicatorItems(propertyValue, errors)) {
+if(!isApplicatorItems(propertyValue)) {
 return false;
 }
 break;
 case "contains":
-if(!isContains(propertyValue, errors)) {
+if(!isContains(propertyValue)) {
 return false;
 }
 break;
 case "additionalProperties":
-if(!isApplicatorAdditionalProperties(propertyValue, errors)) {
+if(!isApplicatorAdditionalProperties(propertyValue)) {
 return false;
 }
 break;
 case "properties":
-if(!isProperties(propertyValue, errors)) {
+if(!isProperties(propertyValue)) {
 return false;
 }
 break;
 case "patternProperties":
-if(!isPatternProperties(propertyValue, errors)) {
+if(!isPatternProperties(propertyValue)) {
 return false;
 }
 break;
 case "dependentSchemas":
-if(!isDependentSchemas(propertyValue, errors)) {
+if(!isDependentSchemas(propertyValue)) {
 return false;
 }
 break;
 case "propertyNames":
-if(!isApplicatorPropertyNames(propertyValue, errors)) {
+if(!isApplicatorPropertyNames(propertyValue)) {
 return false;
 }
 break;
 case "if":
-if(!isIf(propertyValue, errors)) {
+if(!isIf(propertyValue)) {
 return false;
 }
 break;
 case "then":
-if(!isThen(propertyValue, errors)) {
+if(!isThen(propertyValue)) {
 return false;
 }
 break;
 case "else":
-if(!isElse(propertyValue, errors)) {
+if(!isElse(propertyValue)) {
 return false;
 }
 break;
 case "allOf":
-if(!isAllOf(propertyValue, errors)) {
+if(!isAllOf(propertyValue)) {
 return false;
 }
 break;
 case "anyOf":
-if(!isAnyOf(propertyValue, errors)) {
+if(!isAnyOf(propertyValue)) {
 return false;
 }
 break;
 case "oneOf":
-if(!isOneOf(propertyValue, errors)) {
+if(!isOneOf(propertyValue)) {
 return false;
 }
 break;
 case "not":
-if(!isNot(propertyValue, errors)) {
+if(!isNot(propertyValue)) {
 return false;
 }
 break;
 case "unevaluatedItems":
-if(!isUnevaluatedItems(propertyValue, errors)) {
+if(!isUnevaluatedItems(propertyValue)) {
 return false;
 }
 break;
 case "unevaluatedProperties":
-if(!isUnevaluatedProperties(propertyValue, errors)) {
+if(!isUnevaluatedProperties(propertyValue)) {
 return false;
 }
 break;
 case "type":
-if(!isType(propertyValue, errors)) {
+if(!isType(propertyValue)) {
 return false;
 }
 break;
 case "const":
-if(!isConst(propertyValue, errors)) {
+if(!isConst(propertyValue)) {
 return false;
 }
 break;
 case "enum":
-if(!isEnum(propertyValue, errors)) {
+if(!isEnum(propertyValue)) {
 return false;
 }
 break;
 case "multipleOf":
-if(!isMultipleOf(propertyValue, errors)) {
+if(!isMultipleOf(propertyValue)) {
 return false;
 }
 break;
 case "maximum":
-if(!isMaximum(propertyValue, errors)) {
+if(!isMaximum(propertyValue)) {
 return false;
 }
 break;
 case "exclusiveMaximum":
-if(!isExclusiveMaximum(propertyValue, errors)) {
+if(!isExclusiveMaximum(propertyValue)) {
 return false;
 }
 break;
 case "minimum":
-if(!isMinimum(propertyValue, errors)) {
+if(!isMinimum(propertyValue)) {
 return false;
 }
 break;
 case "exclusiveMinimum":
-if(!isExclusiveMinimum(propertyValue, errors)) {
+if(!isExclusiveMinimum(propertyValue)) {
 return false;
 }
 break;
 case "maxLength":
-if(!isMaxLength(propertyValue, errors)) {
+if(!isMaxLength(propertyValue)) {
 return false;
 }
 break;
 case "minLength":
-if(!isMinLength(propertyValue, errors)) {
+if(!isMinLength(propertyValue)) {
 return false;
 }
 break;
 case "pattern":
-if(!isPattern(propertyValue, errors)) {
+if(!isPattern(propertyValue)) {
 return false;
 }
 break;
 case "maxItems":
-if(!isMaxItems(propertyValue, errors)) {
+if(!isMaxItems(propertyValue)) {
 return false;
 }
 break;
 case "minItems":
-if(!isMinItems(propertyValue, errors)) {
+if(!isMinItems(propertyValue)) {
 return false;
 }
 break;
 case "uniqueItems":
-if(!isUniqueItems(propertyValue, errors)) {
+if(!isUniqueItems(propertyValue)) {
 return false;
 }
 break;
 case "maxContains":
-if(!isMaxContains(propertyValue, errors)) {
+if(!isMaxContains(propertyValue)) {
 return false;
 }
 break;
 case "minContains":
-if(!isMinContains(propertyValue, errors)) {
+if(!isMinContains(propertyValue)) {
 return false;
 }
 break;
 case "maxProperties":
-if(!isMaxProperties(propertyValue, errors)) {
+if(!isMaxProperties(propertyValue)) {
 return false;
 }
 break;
 case "minProperties":
-if(!isMinProperties(propertyValue, errors)) {
+if(!isMinProperties(propertyValue)) {
 return false;
 }
 break;
 case "required":
-if(!isRequired(propertyValue, errors)) {
+if(!isRequired(propertyValue)) {
 return false;
 }
 break;
 case "dependentRequired":
-if(!isDependentRequired(propertyValue, errors)) {
+if(!isDependentRequired(propertyValue)) {
 return false;
 }
 break;
 case "title":
-if(!isTitle(propertyValue, errors)) {
+if(!isTitle(propertyValue)) {
 return false;
 }
 break;
 case "description":
-if(!isDescription(propertyValue, errors)) {
+if(!isDescription(propertyValue)) {
 return false;
 }
 break;
 case "default":
-if(!isDefault(propertyValue, errors)) {
+if(!isDefault(propertyValue)) {
 return false;
 }
 break;
 case "deprecated":
-if(!isDeprecated(propertyValue, errors)) {
+if(!isDeprecated(propertyValue)) {
 return false;
 }
 break;
 case "readOnly":
-if(!isReadOnly(propertyValue, errors)) {
+if(!isReadOnly(propertyValue)) {
 return false;
 }
 break;
 case "writeOnly":
-if(!isWriteOnly(propertyValue, errors)) {
+if(!isWriteOnly(propertyValue)) {
 return false;
 }
 break;
 case "examples":
-if(!isExamples(propertyValue, errors)) {
+if(!isExamples(propertyValue)) {
 return false;
 }
 break;
 case "format":
-if(!isFormat(propertyValue, errors)) {
+if(!isFormat(propertyValue)) {
 return false;
 }
 break;
 case "contentEncoding":
-if(!isContentEncoding(propertyValue, errors)) {
+if(!isContentEncoding(propertyValue)) {
 return false;
 }
 break;
 case "contentMediaType":
-if(!isContentMediaType(propertyValue, errors)) {
+if(!isContentMediaType(propertyValue)) {
 return false;
 }
 break;
 case "contentSchema":
-if(!isContentSchema(propertyValue, errors)) {
+if(!isContentSchema(propertyValue)) {
 return false;
 }
 break;
 case "definitions":
-if(!isDefinitions(propertyValue, errors)) {
+if(!isDefinitions(propertyValue)) {
 return false;
 }
 break;
 case "dependencies":
-if(!isDependencies(propertyValue, errors)) {
+if(!isDependencies(propertyValue)) {
 return false;
 }
 break;
 case "$recursiveAnchor":
-if(!isRecursiveAnchor(propertyValue, errors)) {
+if(!isRecursiveAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$recursiveRef":
-if(!isRecursiveRef(propertyValue, errors)) {
+if(!isRecursiveRef(propertyValue)) {
 return false;
 }
 break;
@@ -351,18 +348,14 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Schema"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
 * @deprecated
 */
-export function isDefinitions(value: unknown, errors = new Array<ValidationError>()): value is types.Definitions {
-if (!((value !== null) &&
+export function isDefinitions(value: unknown): value is types.Definitions {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -375,24 +368,20 @@ continue;
 if(!(typeof propertyName === "string")) {
 return false;
 }
-if(!isDefinitionsAdditionalProperties(propertyValue, errors)) {
+if(!isDefinitionsAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Definitions"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
 * @deprecated
 */
-export function isDependencies(value: unknown, errors = new Array<ValidationError>()): value is types.Dependencies {
-if (!((value !== null) &&
+export function isDependencies(value: unknown): value is types.Dependencies {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -405,128 +394,84 @@ continue;
 if(!(typeof propertyName === "string")) {
 return false;
 }
-if(!isDependenciesAdditionalProperties(propertyValue, errors)) {
+if(!isDependenciesAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Dependencies"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
 * @deprecated
 */
-export function isRecursiveAnchor(value: unknown, errors = new Array<ValidationError>()): value is types.RecursiveAnchor {
-if (!((isAnchorString(value, errors)))) {
-errors.push({"typeName":"RecursiveAnchor"})
-return false;
-}
-return true;
+export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
+return ((isAnchorString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
 * @deprecated
 */
-export function isRecursiveRef(value: unknown, errors = new Array<ValidationError>()): value is types.RecursiveRef {
-if (!((isUriReferenceString(value, errors)))) {
-errors.push({"typeName":"RecursiveRef"})
-return false;
-}
-return true;
+export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
+return ((isUriReferenceString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
 */
-export function isAllOf0(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf0 {
-if (!((isCore(value, errors)))) {
-errors.push({"typeName":"AllOf0"})
-return false;
-}
-return true;
+export function isAllOf0(value: unknown): value is types.AllOf0 {
+return ((isCore(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
 */
-export function isAllOf1(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf1 {
-if (!((isApplicator(value, errors)))) {
-errors.push({"typeName":"AllOf1"})
-return false;
-}
-return true;
+export function isAllOf1(value: unknown): value is types.AllOf1 {
+return ((isApplicator(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
 */
-export function isAllOf2(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf2 {
-if (!((isUnevaluated(value, errors)))) {
-errors.push({"typeName":"AllOf2"})
-return false;
-}
-return true;
+export function isAllOf2(value: unknown): value is types.AllOf2 {
+return ((isUnevaluated(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
 */
-export function isAllOf3(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf3 {
-if (!((isValidation(value, errors)))) {
-errors.push({"typeName":"AllOf3"})
-return false;
-}
-return true;
+export function isAllOf3(value: unknown): value is types.AllOf3 {
+return ((isValidation(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
 */
-export function isAllOf4(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf4 {
-if (!((isMetaData(value, errors)))) {
-errors.push({"typeName":"AllOf4"})
-return false;
-}
-return true;
+export function isAllOf4(value: unknown): value is types.AllOf4 {
+return ((isMetaData(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
 */
-export function isAllOf5(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf5 {
-if (!((isFormatAnnotation(value, errors)))) {
-errors.push({"typeName":"AllOf5"})
-return false;
-}
-return true;
+export function isAllOf5(value: unknown): value is types.AllOf5 {
+return ((isFormatAnnotation(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
 */
-export function isAllOf6(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf6 {
-if (!((isContent(value, errors)))) {
-errors.push({"typeName":"AllOf6"})
-return false;
-}
-return true;
+export function isAllOf6(value: unknown): value is types.AllOf6 {
+return ((isContent(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
 */
-export function isDefinitionsAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.DefinitionsAdditionalProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"DefinitionsAdditionalProperties"})
-return false;
-}
-return true;
+export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
 */
-export function isDependenciesAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.DependenciesAdditionalProperties {
-if (!((
+export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
+return ((
 (()=>{
 let count = 0;
-if(isStringArray(value, errors)) {
+if(isStringArray(value)) {
 count++;
 // if(count > 1) {
 //   return false;
@@ -544,307 +489,307 @@ continue;
 }
 switch(propertyName) {
 case "$id":
-if(!isId(propertyValue, errors)) {
+if(!isId(propertyValue)) {
 return false;
 }
 break;
 case "$schema":
-if(!isCoreSchema(propertyValue, errors)) {
+if(!isCoreSchema(propertyValue)) {
 return false;
 }
 break;
 case "$ref":
-if(!isRef(propertyValue, errors)) {
+if(!isRef(propertyValue)) {
 return false;
 }
 break;
 case "$anchor":
-if(!isAnchor(propertyValue, errors)) {
+if(!isAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$dynamicRef":
-if(!isDynamicRef(propertyValue, errors)) {
+if(!isDynamicRef(propertyValue)) {
 return false;
 }
 break;
 case "$dynamicAnchor":
-if(!isDynamicAnchor(propertyValue, errors)) {
+if(!isDynamicAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$vocabulary":
-if(!isVocabulary(propertyValue, errors)) {
+if(!isVocabulary(propertyValue)) {
 return false;
 }
 break;
 case "$comment":
-if(!isComment(propertyValue, errors)) {
+if(!isComment(propertyValue)) {
 return false;
 }
 break;
 case "$defs":
-if(!isDefs(propertyValue, errors)) {
+if(!isDefs(propertyValue)) {
 return false;
 }
 break;
 case "prefixItems":
-if(!isPrefixItems(propertyValue, errors)) {
+if(!isPrefixItems(propertyValue)) {
 return false;
 }
 break;
 case "items":
-if(!isApplicatorItems(propertyValue, errors)) {
+if(!isApplicatorItems(propertyValue)) {
 return false;
 }
 break;
 case "contains":
-if(!isContains(propertyValue, errors)) {
+if(!isContains(propertyValue)) {
 return false;
 }
 break;
 case "additionalProperties":
-if(!isApplicatorAdditionalProperties(propertyValue, errors)) {
+if(!isApplicatorAdditionalProperties(propertyValue)) {
 return false;
 }
 break;
 case "properties":
-if(!isProperties(propertyValue, errors)) {
+if(!isProperties(propertyValue)) {
 return false;
 }
 break;
 case "patternProperties":
-if(!isPatternProperties(propertyValue, errors)) {
+if(!isPatternProperties(propertyValue)) {
 return false;
 }
 break;
 case "dependentSchemas":
-if(!isDependentSchemas(propertyValue, errors)) {
+if(!isDependentSchemas(propertyValue)) {
 return false;
 }
 break;
 case "propertyNames":
-if(!isApplicatorPropertyNames(propertyValue, errors)) {
+if(!isApplicatorPropertyNames(propertyValue)) {
 return false;
 }
 break;
 case "if":
-if(!isIf(propertyValue, errors)) {
+if(!isIf(propertyValue)) {
 return false;
 }
 break;
 case "then":
-if(!isThen(propertyValue, errors)) {
+if(!isThen(propertyValue)) {
 return false;
 }
 break;
 case "else":
-if(!isElse(propertyValue, errors)) {
+if(!isElse(propertyValue)) {
 return false;
 }
 break;
 case "allOf":
-if(!isAllOf(propertyValue, errors)) {
+if(!isAllOf(propertyValue)) {
 return false;
 }
 break;
 case "anyOf":
-if(!isAnyOf(propertyValue, errors)) {
+if(!isAnyOf(propertyValue)) {
 return false;
 }
 break;
 case "oneOf":
-if(!isOneOf(propertyValue, errors)) {
+if(!isOneOf(propertyValue)) {
 return false;
 }
 break;
 case "not":
-if(!isNot(propertyValue, errors)) {
+if(!isNot(propertyValue)) {
 return false;
 }
 break;
 case "unevaluatedItems":
-if(!isUnevaluatedItems(propertyValue, errors)) {
+if(!isUnevaluatedItems(propertyValue)) {
 return false;
 }
 break;
 case "unevaluatedProperties":
-if(!isUnevaluatedProperties(propertyValue, errors)) {
+if(!isUnevaluatedProperties(propertyValue)) {
 return false;
 }
 break;
 case "type":
-if(!isType(propertyValue, errors)) {
+if(!isType(propertyValue)) {
 return false;
 }
 break;
 case "const":
-if(!isConst(propertyValue, errors)) {
+if(!isConst(propertyValue)) {
 return false;
 }
 break;
 case "enum":
-if(!isEnum(propertyValue, errors)) {
+if(!isEnum(propertyValue)) {
 return false;
 }
 break;
 case "multipleOf":
-if(!isMultipleOf(propertyValue, errors)) {
+if(!isMultipleOf(propertyValue)) {
 return false;
 }
 break;
 case "maximum":
-if(!isMaximum(propertyValue, errors)) {
+if(!isMaximum(propertyValue)) {
 return false;
 }
 break;
 case "exclusiveMaximum":
-if(!isExclusiveMaximum(propertyValue, errors)) {
+if(!isExclusiveMaximum(propertyValue)) {
 return false;
 }
 break;
 case "minimum":
-if(!isMinimum(propertyValue, errors)) {
+if(!isMinimum(propertyValue)) {
 return false;
 }
 break;
 case "exclusiveMinimum":
-if(!isExclusiveMinimum(propertyValue, errors)) {
+if(!isExclusiveMinimum(propertyValue)) {
 return false;
 }
 break;
 case "maxLength":
-if(!isMaxLength(propertyValue, errors)) {
+if(!isMaxLength(propertyValue)) {
 return false;
 }
 break;
 case "minLength":
-if(!isMinLength(propertyValue, errors)) {
+if(!isMinLength(propertyValue)) {
 return false;
 }
 break;
 case "pattern":
-if(!isPattern(propertyValue, errors)) {
+if(!isPattern(propertyValue)) {
 return false;
 }
 break;
 case "maxItems":
-if(!isMaxItems(propertyValue, errors)) {
+if(!isMaxItems(propertyValue)) {
 return false;
 }
 break;
 case "minItems":
-if(!isMinItems(propertyValue, errors)) {
+if(!isMinItems(propertyValue)) {
 return false;
 }
 break;
 case "uniqueItems":
-if(!isUniqueItems(propertyValue, errors)) {
+if(!isUniqueItems(propertyValue)) {
 return false;
 }
 break;
 case "maxContains":
-if(!isMaxContains(propertyValue, errors)) {
+if(!isMaxContains(propertyValue)) {
 return false;
 }
 break;
 case "minContains":
-if(!isMinContains(propertyValue, errors)) {
+if(!isMinContains(propertyValue)) {
 return false;
 }
 break;
 case "maxProperties":
-if(!isMaxProperties(propertyValue, errors)) {
+if(!isMaxProperties(propertyValue)) {
 return false;
 }
 break;
 case "minProperties":
-if(!isMinProperties(propertyValue, errors)) {
+if(!isMinProperties(propertyValue)) {
 return false;
 }
 break;
 case "required":
-if(!isRequired(propertyValue, errors)) {
+if(!isRequired(propertyValue)) {
 return false;
 }
 break;
 case "dependentRequired":
-if(!isDependentRequired(propertyValue, errors)) {
+if(!isDependentRequired(propertyValue)) {
 return false;
 }
 break;
 case "title":
-if(!isTitle(propertyValue, errors)) {
+if(!isTitle(propertyValue)) {
 return false;
 }
 break;
 case "description":
-if(!isDescription(propertyValue, errors)) {
+if(!isDescription(propertyValue)) {
 return false;
 }
 break;
 case "default":
-if(!isDefault(propertyValue, errors)) {
+if(!isDefault(propertyValue)) {
 return false;
 }
 break;
 case "deprecated":
-if(!isDeprecated(propertyValue, errors)) {
+if(!isDeprecated(propertyValue)) {
 return false;
 }
 break;
 case "readOnly":
-if(!isReadOnly(propertyValue, errors)) {
+if(!isReadOnly(propertyValue)) {
 return false;
 }
 break;
 case "writeOnly":
-if(!isWriteOnly(propertyValue, errors)) {
+if(!isWriteOnly(propertyValue)) {
 return false;
 }
 break;
 case "examples":
-if(!isExamples(propertyValue, errors)) {
+if(!isExamples(propertyValue)) {
 return false;
 }
 break;
 case "format":
-if(!isFormat(propertyValue, errors)) {
+if(!isFormat(propertyValue)) {
 return false;
 }
 break;
 case "contentEncoding":
-if(!isContentEncoding(propertyValue, errors)) {
+if(!isContentEncoding(propertyValue)) {
 return false;
 }
 break;
 case "contentMediaType":
-if(!isContentMediaType(propertyValue, errors)) {
+if(!isContentMediaType(propertyValue)) {
 return false;
 }
 break;
 case "contentSchema":
-if(!isContentSchema(propertyValue, errors)) {
+if(!isContentSchema(propertyValue)) {
 return false;
 }
 break;
 case "definitions":
-if(!isDefinitions(propertyValue, errors)) {
+if(!isDefinitions(propertyValue)) {
 return false;
 }
 break;
 case "dependencies":
-if(!isDependencies(propertyValue, errors)) {
+if(!isDependencies(propertyValue)) {
 return false;
 }
 break;
 case "$recursiveAnchor":
-if(!isRecursiveAnchor(propertyValue, errors)) {
+if(!isRecursiveAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$recursiveRef":
-if(!isRecursiveRef(propertyValue, errors)) {
+if(!isRecursiveRef(propertyValue)) {
 return false;
 }
 break;
@@ -866,58 +811,38 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"DependenciesAdditionalProperties"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
 */
-export function isDependencies0(value: unknown, errors = new Array<ValidationError>()): value is types.Dependencies0 {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"Dependencies0"})
-return false;
-}
-return true;
+export function isDependencies0(value: unknown): value is types.Dependencies0 {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
 */
-export function isDependencies1(value: unknown, errors = new Array<ValidationError>()): value is types.Dependencies1 {
-if (!((isStringArray(value, errors)))) {
-errors.push({"typeName":"Dependencies1"})
-return false;
-}
-return true;
+export function isDependencies1(value: unknown): value is types.Dependencies1 {
+return ((isStringArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
 */
-export function isAnchorString(value: unknown, errors = new Array<ValidationError>()): value is types.AnchorString {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"AnchorString"})
-return false;
-}
-return true;
+export function isAnchorString(value: unknown): value is types.AnchorString {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
 */
-export function isUriReferenceString(value: unknown, errors = new Array<ValidationError>()): value is types.UriReferenceString {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"UriReferenceString"})
-return false;
-}
-return true;
+export function isUriReferenceString(value: unknown): value is types.UriReferenceString {
+return ((typeof value === "string"));
 }
 /**
 * @summary Core vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/core}
 */
-export function isCore(value: unknown, errors = new Array<ValidationError>()): value is types.Core {
-if (!((
+export function isCore(value: unknown): value is types.Core {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -932,47 +857,47 @@ continue;
 }
 switch(propertyName) {
 case "$id":
-if(!isId(propertyValue, errors)) {
+if(!isId(propertyValue)) {
 return false;
 }
 break;
 case "$schema":
-if(!isCoreSchema(propertyValue, errors)) {
+if(!isCoreSchema(propertyValue)) {
 return false;
 }
 break;
 case "$ref":
-if(!isRef(propertyValue, errors)) {
+if(!isRef(propertyValue)) {
 return false;
 }
 break;
 case "$anchor":
-if(!isAnchor(propertyValue, errors)) {
+if(!isAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$dynamicRef":
-if(!isDynamicRef(propertyValue, errors)) {
+if(!isDynamicRef(propertyValue)) {
 return false;
 }
 break;
 case "$dynamicAnchor":
-if(!isDynamicAnchor(propertyValue, errors)) {
+if(!isDynamicAnchor(propertyValue)) {
 return false;
 }
 break;
 case "$vocabulary":
-if(!isVocabulary(propertyValue, errors)) {
+if(!isVocabulary(propertyValue)) {
 return false;
 }
 break;
 case "$comment":
-if(!isComment(propertyValue, errors)) {
+if(!isComment(propertyValue)) {
 return false;
 }
 break;
 case "$defs":
-if(!isDefs(propertyValue, errors)) {
+if(!isDefs(propertyValue)) {
 return false;
 }
 break;
@@ -994,87 +919,55 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Core"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
 */
-export function isUriString(value: unknown, errors = new Array<ValidationError>()): value is types.UriString {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"UriString"})
-return false;
-}
-return true;
+export function isUriString(value: unknown): value is types.UriString {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
 */
-export function isId(value: unknown, errors = new Array<ValidationError>()): value is types.Id {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"Id"})
-return false;
-}
-return true;
+export function isId(value: unknown): value is types.Id {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
 */
-export function isCoreSchema(value: unknown, errors = new Array<ValidationError>()): value is types.CoreSchema {
-if (!((isUriString(value, errors)))) {
-errors.push({"typeName":"CoreSchema"})
-return false;
-}
-return true;
+export function isCoreSchema(value: unknown): value is types.CoreSchema {
+return ((isUriString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
 */
-export function isRef(value: unknown, errors = new Array<ValidationError>()): value is types.Ref {
-if (!((isUriReferenceString(value, errors)))) {
-errors.push({"typeName":"Ref"})
-return false;
-}
-return true;
+export function isRef(value: unknown): value is types.Ref {
+return ((isUriReferenceString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
 */
-export function isAnchor(value: unknown, errors = new Array<ValidationError>()): value is types.Anchor {
-if (!((isAnchorString(value, errors)))) {
-errors.push({"typeName":"Anchor"})
-return false;
-}
-return true;
+export function isAnchor(value: unknown): value is types.Anchor {
+return ((isAnchorString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
 */
-export function isDynamicRef(value: unknown, errors = new Array<ValidationError>()): value is types.DynamicRef {
-if (!((isUriReferenceString(value, errors)))) {
-errors.push({"typeName":"DynamicRef"})
-return false;
-}
-return true;
+export function isDynamicRef(value: unknown): value is types.DynamicRef {
+return ((isUriReferenceString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
 */
-export function isDynamicAnchor(value: unknown, errors = new Array<ValidationError>()): value is types.DynamicAnchor {
-if (!((isAnchorString(value, errors)))) {
-errors.push({"typeName":"DynamicAnchor"})
-return false;
-}
-return true;
+export function isDynamicAnchor(value: unknown): value is types.DynamicAnchor {
+return ((isAnchorString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
 */
-export function isVocabulary(value: unknown, errors = new Array<ValidationError>()): value is types.Vocabulary {
-if (!((value !== null) &&
+export function isVocabulary(value: unknown): value is types.Vocabulary {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -1084,36 +977,28 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!isVocabularyPropertyNames(propertyName, errors)) {
+if(!isVocabularyPropertyNames(propertyName)) {
 return false;
 }
-if(!isVocabularyAdditionalProperties(propertyValue, errors)) {
+if(!isVocabularyAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Vocabulary"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
 */
-export function isComment(value: unknown, errors = new Array<ValidationError>()): value is types.Comment {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"Comment"})
-return false;
-}
-return true;
+export function isComment(value: unknown): value is types.Comment {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
 */
-export function isDefs(value: unknown, errors = new Array<ValidationError>()): value is types.Defs {
-if (!((value !== null) &&
+export function isDefs(value: unknown): value is types.Defs {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -1126,54 +1011,38 @@ continue;
 if(!(typeof propertyName === "string")) {
 return false;
 }
-if(!isDefsAdditionalProperties(propertyValue, errors)) {
+if(!isDefsAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Defs"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties}
 */
-export function isVocabularyAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.VocabularyAdditionalProperties {
-if (!((typeof value === "boolean"))) {
-errors.push({"typeName":"VocabularyAdditionalProperties"})
-return false;
-}
-return true;
+export function isVocabularyAdditionalProperties(value: unknown): value is types.VocabularyAdditionalProperties {
+return ((typeof value === "boolean"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
 */
-export function isVocabularyPropertyNames(value: unknown, errors = new Array<ValidationError>()): value is types.VocabularyPropertyNames {
-if (!((isUriString(value, errors)))) {
-errors.push({"typeName":"VocabularyPropertyNames"})
-return false;
-}
-return true;
+export function isVocabularyPropertyNames(value: unknown): value is types.VocabularyPropertyNames {
+return ((isUriString(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
 */
-export function isDefsAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.DefsAdditionalProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"DefsAdditionalProperties"})
-return false;
-}
-return true;
+export function isDefsAdditionalProperties(value: unknown): value is types.DefsAdditionalProperties {
+return ((isSchema(value)));
 }
 /**
 * @summary Applicator vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
 */
-export function isApplicator(value: unknown, errors = new Array<ValidationError>()): value is types.Applicator {
-if (!((
+export function isApplicator(value: unknown): value is types.Applicator {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -1188,77 +1057,77 @@ continue;
 }
 switch(propertyName) {
 case "prefixItems":
-if(!isPrefixItems(propertyValue, errors)) {
+if(!isPrefixItems(propertyValue)) {
 return false;
 }
 break;
 case "items":
-if(!isApplicatorItems(propertyValue, errors)) {
+if(!isApplicatorItems(propertyValue)) {
 return false;
 }
 break;
 case "contains":
-if(!isContains(propertyValue, errors)) {
+if(!isContains(propertyValue)) {
 return false;
 }
 break;
 case "additionalProperties":
-if(!isApplicatorAdditionalProperties(propertyValue, errors)) {
+if(!isApplicatorAdditionalProperties(propertyValue)) {
 return false;
 }
 break;
 case "properties":
-if(!isProperties(propertyValue, errors)) {
+if(!isProperties(propertyValue)) {
 return false;
 }
 break;
 case "patternProperties":
-if(!isPatternProperties(propertyValue, errors)) {
+if(!isPatternProperties(propertyValue)) {
 return false;
 }
 break;
 case "dependentSchemas":
-if(!isDependentSchemas(propertyValue, errors)) {
+if(!isDependentSchemas(propertyValue)) {
 return false;
 }
 break;
 case "propertyNames":
-if(!isApplicatorPropertyNames(propertyValue, errors)) {
+if(!isApplicatorPropertyNames(propertyValue)) {
 return false;
 }
 break;
 case "if":
-if(!isIf(propertyValue, errors)) {
+if(!isIf(propertyValue)) {
 return false;
 }
 break;
 case "then":
-if(!isThen(propertyValue, errors)) {
+if(!isThen(propertyValue)) {
 return false;
 }
 break;
 case "else":
-if(!isElse(propertyValue, errors)) {
+if(!isElse(propertyValue)) {
 return false;
 }
 break;
 case "allOf":
-if(!isAllOf(propertyValue, errors)) {
+if(!isAllOf(propertyValue)) {
 return false;
 }
 break;
 case "anyOf":
-if(!isAnyOf(propertyValue, errors)) {
+if(!isAnyOf(propertyValue)) {
 return false;
 }
 break;
 case "oneOf":
-if(!isOneOf(propertyValue, errors)) {
+if(!isOneOf(propertyValue)) {
 return false;
 }
 break;
 case "not":
-if(!isNot(propertyValue, errors)) {
+if(!isNot(propertyValue)) {
 return false;
 }
 break;
@@ -1280,78 +1149,54 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Applicator"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
 */
-export function isSchemaArray(value: unknown, errors = new Array<ValidationError>()): value is types.SchemaArray {
-if (!((Array.isArray(value)) &&
+export function isSchemaArray(value: unknown): value is types.SchemaArray {
+return ((Array.isArray(value)) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!isSchemaArrayItems(elementValue, errors)) {
+if(!isSchemaArrayItems(elementValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"SchemaArray"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
 */
-export function isPrefixItems(value: unknown, errors = new Array<ValidationError>()): value is types.PrefixItems {
-if (!((isSchemaArray(value, errors)))) {
-errors.push({"typeName":"PrefixItems"})
-return false;
-}
-return true;
+export function isPrefixItems(value: unknown): value is types.PrefixItems {
+return ((isSchemaArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
 */
-export function isApplicatorItems(value: unknown, errors = new Array<ValidationError>()): value is types.ApplicatorItems {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"ApplicatorItems"})
-return false;
-}
-return true;
+export function isApplicatorItems(value: unknown): value is types.ApplicatorItems {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
 */
-export function isContains(value: unknown, errors = new Array<ValidationError>()): value is types.Contains {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"Contains"})
-return false;
-}
-return true;
+export function isContains(value: unknown): value is types.Contains {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
 */
-export function isApplicatorAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.ApplicatorAdditionalProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"ApplicatorAdditionalProperties"})
-return false;
-}
-return true;
+export function isApplicatorAdditionalProperties(value: unknown): value is types.ApplicatorAdditionalProperties {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
 */
-export function isProperties(value: unknown, errors = new Array<ValidationError>()): value is types.Properties {
-if (!((value !== null) &&
+export function isProperties(value: unknown): value is types.Properties {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -1364,23 +1209,19 @@ continue;
 if(!(typeof propertyName === "string")) {
 return false;
 }
-if(!isPropertiesAdditionalProperties(propertyValue, errors)) {
+if(!isPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Properties"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
 */
-export function isPatternProperties(value: unknown, errors = new Array<ValidationError>()): value is types.PatternProperties {
-if (!((value !== null) &&
+export function isPatternProperties(value: unknown): value is types.PatternProperties {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -1390,26 +1231,22 @@ const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!isPatternPropertiesPropertyNames(propertyName, errors)) {
+if(!isPatternPropertiesPropertyNames(propertyName)) {
 return false;
 }
-if(!isPatternPropertiesAdditionalProperties(propertyValue, errors)) {
+if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"PatternProperties"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
 */
-export function isDependentSchemas(value: unknown, errors = new Array<ValidationError>()): value is types.DependentSchemas {
-if (!((value !== null) &&
+export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -1422,154 +1259,98 @@ continue;
 if(!(typeof propertyName === "string")) {
 return false;
 }
-if(!isDependentSchemasAdditionalProperties(propertyValue, errors)) {
+if(!isDependentSchemasAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"DependentSchemas"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
 */
-export function isApplicatorPropertyNames(value: unknown, errors = new Array<ValidationError>()): value is types.ApplicatorPropertyNames {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"ApplicatorPropertyNames"})
-return false;
-}
-return true;
+export function isApplicatorPropertyNames(value: unknown): value is types.ApplicatorPropertyNames {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
 */
-export function isIf(value: unknown, errors = new Array<ValidationError>()): value is types.If {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"If"})
-return false;
-}
-return true;
+export function isIf(value: unknown): value is types.If {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
 */
-export function isThen(value: unknown, errors = new Array<ValidationError>()): value is types.Then {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"Then"})
-return false;
-}
-return true;
+export function isThen(value: unknown): value is types.Then {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
 */
-export function isElse(value: unknown, errors = new Array<ValidationError>()): value is types.Else {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"Else"})
-return false;
-}
-return true;
+export function isElse(value: unknown): value is types.Else {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
 */
-export function isAllOf(value: unknown, errors = new Array<ValidationError>()): value is types.AllOf {
-if (!((isSchemaArray(value, errors)))) {
-errors.push({"typeName":"AllOf"})
-return false;
-}
-return true;
+export function isAllOf(value: unknown): value is types.AllOf {
+return ((isSchemaArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
 */
-export function isAnyOf(value: unknown, errors = new Array<ValidationError>()): value is types.AnyOf {
-if (!((isSchemaArray(value, errors)))) {
-errors.push({"typeName":"AnyOf"})
-return false;
-}
-return true;
+export function isAnyOf(value: unknown): value is types.AnyOf {
+return ((isSchemaArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
 */
-export function isOneOf(value: unknown, errors = new Array<ValidationError>()): value is types.OneOf {
-if (!((isSchemaArray(value, errors)))) {
-errors.push({"typeName":"OneOf"})
-return false;
-}
-return true;
+export function isOneOf(value: unknown): value is types.OneOf {
+return ((isSchemaArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
 */
-export function isNot(value: unknown, errors = new Array<ValidationError>()): value is types.Not {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"Not"})
-return false;
-}
-return true;
+export function isNot(value: unknown): value is types.Not {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
 */
-export function isSchemaArrayItems(value: unknown, errors = new Array<ValidationError>()): value is types.SchemaArrayItems {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"SchemaArrayItems"})
-return false;
-}
-return true;
+export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
 */
-export function isPropertiesAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.PropertiesAdditionalProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"PropertiesAdditionalProperties"})
-return false;
-}
-return true;
+export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
 */
-export function isPatternPropertiesAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.PatternPropertiesAdditionalProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"PatternPropertiesAdditionalProperties"})
-return false;
-}
-return true;
+export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
 */
-export function isPatternPropertiesPropertyNames(value: unknown, errors = new Array<ValidationError>()): value is types.PatternPropertiesPropertyNames {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"PatternPropertiesPropertyNames"})
-return false;
-}
-return true;
+export function isPatternPropertiesPropertyNames(value: unknown): value is types.PatternPropertiesPropertyNames {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
 */
-export function isDependentSchemasAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.DependentSchemasAdditionalProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"DependentSchemasAdditionalProperties"})
-return false;
-}
-return true;
+export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
+return ((isSchema(value)));
 }
 /**
 * @summary Unevaluated applicator vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
 */
-export function isUnevaluated(value: unknown, errors = new Array<ValidationError>()): value is types.Unevaluated {
-if (!((
+export function isUnevaluated(value: unknown): value is types.Unevaluated {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -1584,12 +1365,12 @@ continue;
 }
 switch(propertyName) {
 case "unevaluatedItems":
-if(!isUnevaluatedItems(propertyValue, errors)) {
+if(!isUnevaluatedItems(propertyValue)) {
 return false;
 }
 break;
 case "unevaluatedProperties":
-if(!isUnevaluatedProperties(propertyValue, errors)) {
+if(!isUnevaluatedProperties(propertyValue)) {
 return false;
 }
 break;
@@ -1611,38 +1392,26 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Unevaluated"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
 */
-export function isUnevaluatedItems(value: unknown, errors = new Array<ValidationError>()): value is types.UnevaluatedItems {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"UnevaluatedItems"})
-return false;
-}
-return true;
+export function isUnevaluatedItems(value: unknown): value is types.UnevaluatedItems {
+return ((isSchema(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
 */
-export function isUnevaluatedProperties(value: unknown, errors = new Array<ValidationError>()): value is types.UnevaluatedProperties {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"UnevaluatedProperties"})
-return false;
-}
-return true;
+export function isUnevaluatedProperties(value: unknown): value is types.UnevaluatedProperties {
+return ((isSchema(value)));
 }
 /**
 * @summary Validation vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation}
 */
-export function isValidation(value: unknown, errors = new Array<ValidationError>()): value is types.Validation {
-if (!((
+export function isValidation(value: unknown): value is types.Validation {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -1657,102 +1426,102 @@ continue;
 }
 switch(propertyName) {
 case "type":
-if(!isType(propertyValue, errors)) {
+if(!isType(propertyValue)) {
 return false;
 }
 break;
 case "const":
-if(!isConst(propertyValue, errors)) {
+if(!isConst(propertyValue)) {
 return false;
 }
 break;
 case "enum":
-if(!isEnum(propertyValue, errors)) {
+if(!isEnum(propertyValue)) {
 return false;
 }
 break;
 case "multipleOf":
-if(!isMultipleOf(propertyValue, errors)) {
+if(!isMultipleOf(propertyValue)) {
 return false;
 }
 break;
 case "maximum":
-if(!isMaximum(propertyValue, errors)) {
+if(!isMaximum(propertyValue)) {
 return false;
 }
 break;
 case "exclusiveMaximum":
-if(!isExclusiveMaximum(propertyValue, errors)) {
+if(!isExclusiveMaximum(propertyValue)) {
 return false;
 }
 break;
 case "minimum":
-if(!isMinimum(propertyValue, errors)) {
+if(!isMinimum(propertyValue)) {
 return false;
 }
 break;
 case "exclusiveMinimum":
-if(!isExclusiveMinimum(propertyValue, errors)) {
+if(!isExclusiveMinimum(propertyValue)) {
 return false;
 }
 break;
 case "maxLength":
-if(!isMaxLength(propertyValue, errors)) {
+if(!isMaxLength(propertyValue)) {
 return false;
 }
 break;
 case "minLength":
-if(!isMinLength(propertyValue, errors)) {
+if(!isMinLength(propertyValue)) {
 return false;
 }
 break;
 case "pattern":
-if(!isPattern(propertyValue, errors)) {
+if(!isPattern(propertyValue)) {
 return false;
 }
 break;
 case "maxItems":
-if(!isMaxItems(propertyValue, errors)) {
+if(!isMaxItems(propertyValue)) {
 return false;
 }
 break;
 case "minItems":
-if(!isMinItems(propertyValue, errors)) {
+if(!isMinItems(propertyValue)) {
 return false;
 }
 break;
 case "uniqueItems":
-if(!isUniqueItems(propertyValue, errors)) {
+if(!isUniqueItems(propertyValue)) {
 return false;
 }
 break;
 case "maxContains":
-if(!isMaxContains(propertyValue, errors)) {
+if(!isMaxContains(propertyValue)) {
 return false;
 }
 break;
 case "minContains":
-if(!isMinContains(propertyValue, errors)) {
+if(!isMinContains(propertyValue)) {
 return false;
 }
 break;
 case "maxProperties":
-if(!isMaxProperties(propertyValue, errors)) {
+if(!isMaxProperties(propertyValue)) {
 return false;
 }
 break;
 case "minProperties":
-if(!isMinProperties(propertyValue, errors)) {
+if(!isMinProperties(propertyValue)) {
 return false;
 }
 break;
 case "required":
-if(!isRequired(propertyValue, errors)) {
+if(!isRequired(propertyValue)) {
 return false;
 }
 break;
 case "dependentRequired":
-if(!isDependentRequired(propertyValue, errors)) {
+if(!isDependentRequired(propertyValue)) {
 return false;
 }
 break;
@@ -1774,86 +1543,66 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Validation"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
 */
-export function isNonNegativeInteger(value: unknown, errors = new Array<ValidationError>()): value is types.NonNegativeInteger {
-if (!((typeof value === "number") &&
+export function isNonNegativeInteger(value: unknown): value is types.NonNegativeInteger {
+return ((typeof value === "number") &&
 (!isNaN(value)) &&
-(value % 1 === 0))) {
-errors.push({"typeName":"NonNegativeInteger"})
-return false;
-}
-return true;
+(value % 1 === 0));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
 */
-export function isNonNegativeIntegerDefault0(value: unknown, errors = new Array<ValidationError>()): value is types.NonNegativeIntegerDefault0 {
-if (!((isNonNegativeInteger(value, errors)))) {
-errors.push({"typeName":"NonNegativeIntegerDefault0"})
-return false;
-}
-return true;
+export function isNonNegativeIntegerDefault0(value: unknown): value is types.NonNegativeIntegerDefault0 {
+return ((isNonNegativeInteger(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
 */
-export function isSimpleTypes(value: unknown, errors = new Array<ValidationError>()): value is types.SimpleTypes {
-if (!((typeof value === "string") &&
+export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
+return ((typeof value === "string") &&
 (value === "array" ||
 value === "boolean" ||
 value === "integer" ||
 value === "null" ||
 value === "number" ||
 value === "object" ||
-value === "string"))) {
-errors.push({"typeName":"SimpleTypes"})
-return false;
-}
-return true;
+value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
 */
-export function isStringArray(value: unknown, errors = new Array<ValidationError>()): value is types.StringArray {
-if (!((Array.isArray(value)) &&
+export function isStringArray(value: unknown): value is types.StringArray {
+return ((Array.isArray(value)) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!isStringArrayItems(elementValue, errors)) {
+if(!isStringArrayItems(elementValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"StringArray"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
 */
-export function isType(value: unknown, errors = new Array<ValidationError>()): value is types.Type {
-if (!((
+export function isType(value: unknown): value is types.Type {
+return ((
 (()=>{
 let count = 0;
-if(isType0(value, errors)) {
+if(isType0(value)) {
 count++;
 // if(count > 1) {
 //   return false;
 // }
 }
-if(isType1(value, errors)) {
+if(isType1(value)) {
 count++;
 // if(count > 1) {
 //   return false;
@@ -1861,216 +1610,140 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Type"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
 */
-export function isConst(value: unknown, errors = new Array<ValidationError>()): value is types.Const {
-if (!((
+export function isConst(value: unknown): value is types.Const {
+return ((
 // any
 true
-))) {
-errors.push({"typeName":"Const"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
 */
-export function isEnum(value: unknown, errors = new Array<ValidationError>()): value is types.Enum {
-if (!((Array.isArray(value)) &&
+export function isEnum(value: unknown): value is types.Enum {
+return ((Array.isArray(value)) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!isEnumItems(elementValue, errors)) {
+if(!isEnumItems(elementValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Enum"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
 */
-export function isMultipleOf(value: unknown, errors = new Array<ValidationError>()): value is types.MultipleOf {
-if (!((typeof value === "number") &&
-(!isNaN(value)))) {
-errors.push({"typeName":"MultipleOf"})
-return false;
-}
-return true;
+export function isMultipleOf(value: unknown): value is types.MultipleOf {
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}
 */
-export function isMaximum(value: unknown, errors = new Array<ValidationError>()): value is types.Maximum {
-if (!((typeof value === "number") &&
-(!isNaN(value)))) {
-errors.push({"typeName":"Maximum"})
-return false;
-}
-return true;
+export function isMaximum(value: unknown): value is types.Maximum {
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum}
 */
-export function isExclusiveMaximum(value: unknown, errors = new Array<ValidationError>()): value is types.ExclusiveMaximum {
-if (!((typeof value === "number") &&
-(!isNaN(value)))) {
-errors.push({"typeName":"ExclusiveMaximum"})
-return false;
-}
-return true;
+export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum}
 */
-export function isMinimum(value: unknown, errors = new Array<ValidationError>()): value is types.Minimum {
-if (!((typeof value === "number") &&
-(!isNaN(value)))) {
-errors.push({"typeName":"Minimum"})
-return false;
-}
-return true;
+export function isMinimum(value: unknown): value is types.Minimum {
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum}
 */
-export function isExclusiveMinimum(value: unknown, errors = new Array<ValidationError>()): value is types.ExclusiveMinimum {
-if (!((typeof value === "number") &&
-(!isNaN(value)))) {
-errors.push({"typeName":"ExclusiveMinimum"})
-return false;
-}
-return true;
+export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
+return ((typeof value === "number") &&
+(!isNaN(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength}
 */
-export function isMaxLength(value: unknown, errors = new Array<ValidationError>()): value is types.MaxLength {
-if (!((isNonNegativeInteger(value, errors)))) {
-errors.push({"typeName":"MaxLength"})
-return false;
-}
-return true;
+export function isMaxLength(value: unknown): value is types.MaxLength {
+return ((isNonNegativeInteger(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength}
 */
-export function isMinLength(value: unknown, errors = new Array<ValidationError>()): value is types.MinLength {
-if (!((isNonNegativeIntegerDefault0(value, errors)))) {
-errors.push({"typeName":"MinLength"})
-return false;
-}
-return true;
+export function isMinLength(value: unknown): value is types.MinLength {
+return ((isNonNegativeIntegerDefault0(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
 */
-export function isPattern(value: unknown, errors = new Array<ValidationError>()): value is types.Pattern {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"Pattern"})
-return false;
-}
-return true;
+export function isPattern(value: unknown): value is types.Pattern {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems}
 */
-export function isMaxItems(value: unknown, errors = new Array<ValidationError>()): value is types.MaxItems {
-if (!((isNonNegativeInteger(value, errors)))) {
-errors.push({"typeName":"MaxItems"})
-return false;
-}
-return true;
+export function isMaxItems(value: unknown): value is types.MaxItems {
+return ((isNonNegativeInteger(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems}
 */
-export function isMinItems(value: unknown, errors = new Array<ValidationError>()): value is types.MinItems {
-if (!((isNonNegativeIntegerDefault0(value, errors)))) {
-errors.push({"typeName":"MinItems"})
-return false;
-}
-return true;
+export function isMinItems(value: unknown): value is types.MinItems {
+return ((isNonNegativeIntegerDefault0(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems}
 */
-export function isUniqueItems(value: unknown, errors = new Array<ValidationError>()): value is types.UniqueItems {
-if (!((typeof value === "boolean"))) {
-errors.push({"typeName":"UniqueItems"})
-return false;
-}
-return true;
+export function isUniqueItems(value: unknown): value is types.UniqueItems {
+return ((typeof value === "boolean"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains}
 */
-export function isMaxContains(value: unknown, errors = new Array<ValidationError>()): value is types.MaxContains {
-if (!((isNonNegativeInteger(value, errors)))) {
-errors.push({"typeName":"MaxContains"})
-return false;
-}
-return true;
+export function isMaxContains(value: unknown): value is types.MaxContains {
+return ((isNonNegativeInteger(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains}
 */
-export function isMinContains(value: unknown, errors = new Array<ValidationError>()): value is types.MinContains {
-if (!((isNonNegativeInteger(value, errors)))) {
-errors.push({"typeName":"MinContains"})
-return false;
-}
-return true;
+export function isMinContains(value: unknown): value is types.MinContains {
+return ((isNonNegativeInteger(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties}
 */
-export function isMaxProperties(value: unknown, errors = new Array<ValidationError>()): value is types.MaxProperties {
-if (!((isNonNegativeInteger(value, errors)))) {
-errors.push({"typeName":"MaxProperties"})
-return false;
-}
-return true;
+export function isMaxProperties(value: unknown): value is types.MaxProperties {
+return ((isNonNegativeInteger(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties}
 */
-export function isMinProperties(value: unknown, errors = new Array<ValidationError>()): value is types.MinProperties {
-if (!((isNonNegativeIntegerDefault0(value, errors)))) {
-errors.push({"typeName":"MinProperties"})
-return false;
-}
-return true;
+export function isMinProperties(value: unknown): value is types.MinProperties {
+return ((isNonNegativeIntegerDefault0(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
 */
-export function isRequired(value: unknown, errors = new Array<ValidationError>()): value is types.Required {
-if (!((isStringArray(value, errors)))) {
-errors.push({"typeName":"Required"})
-return false;
-}
-return true;
+export function isRequired(value: unknown): value is types.Required {
+return ((isStringArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
 */
-export function isDependentRequired(value: unknown, errors = new Array<ValidationError>()): value is types.DependentRequired {
-if (!((value !== null) &&
+export function isDependentRequired(value: unknown): value is types.DependentRequired {
+return ((value !== null) &&
 (typeof value === "object") &&
 (!Array.isArray(value)) &&
 (
@@ -2083,98 +1756,70 @@ continue;
 if(!(typeof propertyName === "string")) {
 return false;
 }
-if(!isDependentRequiredAdditionalProperties(propertyValue, errors)) {
+if(!isDependentRequiredAdditionalProperties(propertyValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"DependentRequired"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items}
 */
-export function isStringArrayItems(value: unknown, errors = new Array<ValidationError>()): value is types.StringArrayItems {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"StringArrayItems"})
-return false;
-}
-return true;
+export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
 */
-export function isType0(value: unknown, errors = new Array<ValidationError>()): value is types.Type0 {
-if (!((isSimpleTypes(value, errors)))) {
-errors.push({"typeName":"Type0"})
-return false;
-}
-return true;
+export function isType0(value: unknown): value is types.Type0 {
+return ((isSimpleTypes(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
 */
-export function isType1(value: unknown, errors = new Array<ValidationError>()): value is types.Type1 {
-if (!((Array.isArray(value)) &&
+export function isType1(value: unknown): value is types.Type1 {
+return ((Array.isArray(value)) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!isTypeItems(elementValue, errors)) {
+if(!isTypeItems(elementValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Type1"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
 */
-export function isEnumItems(value: unknown, errors = new Array<ValidationError>()): value is types.EnumItems {
-if (!((
+export function isEnumItems(value: unknown): value is types.EnumItems {
+return ((
 // any
 true
-))) {
-errors.push({"typeName":"EnumItems"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
 */
-export function isDependentRequiredAdditionalProperties(value: unknown, errors = new Array<ValidationError>()): value is types.DependentRequiredAdditionalProperties {
-if (!((isStringArray(value, errors)))) {
-errors.push({"typeName":"DependentRequiredAdditionalProperties"})
-return false;
-}
-return true;
+export function isDependentRequiredAdditionalProperties(value: unknown): value is types.DependentRequiredAdditionalProperties {
+return ((isStringArray(value)));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
 */
-export function isTypeItems(value: unknown, errors = new Array<ValidationError>()): value is types.TypeItems {
-if (!((isSimpleTypes(value, errors)))) {
-errors.push({"typeName":"TypeItems"})
-return false;
-}
-return true;
+export function isTypeItems(value: unknown): value is types.TypeItems {
+return ((isSimpleTypes(value)));
 }
 /**
 * @summary Meta-data vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
 */
-export function isMetaData(value: unknown, errors = new Array<ValidationError>()): value is types.MetaData {
-if (!((
+export function isMetaData(value: unknown): value is types.MetaData {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -2189,37 +1834,37 @@ continue;
 }
 switch(propertyName) {
 case "title":
-if(!isTitle(propertyValue, errors)) {
+if(!isTitle(propertyValue)) {
 return false;
 }
 break;
 case "description":
-if(!isDescription(propertyValue, errors)) {
+if(!isDescription(propertyValue)) {
 return false;
 }
 break;
 case "default":
-if(!isDefault(propertyValue, errors)) {
+if(!isDefault(propertyValue)) {
 return false;
 }
 break;
 case "deprecated":
-if(!isDeprecated(propertyValue, errors)) {
+if(!isDeprecated(propertyValue)) {
 return false;
 }
 break;
 case "readOnly":
-if(!isReadOnly(propertyValue, errors)) {
+if(!isReadOnly(propertyValue)) {
 return false;
 }
 break;
 case "writeOnly":
-if(!isWriteOnly(propertyValue, errors)) {
+if(!isWriteOnly(propertyValue)) {
 return false;
 }
 break;
 case "examples":
-if(!isExamples(propertyValue, errors)) {
+if(!isExamples(propertyValue)) {
 return false;
 }
 break;
@@ -2241,115 +1886,79 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"MetaData"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
 */
-export function isTitle(value: unknown, errors = new Array<ValidationError>()): value is types.Title {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"Title"})
-return false;
-}
-return true;
+export function isTitle(value: unknown): value is types.Title {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description}
 */
-export function isDescription(value: unknown, errors = new Array<ValidationError>()): value is types.Description {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"Description"})
-return false;
-}
-return true;
+export function isDescription(value: unknown): value is types.Description {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
 */
-export function isDefault(value: unknown, errors = new Array<ValidationError>()): value is types.Default {
-if (!((
+export function isDefault(value: unknown): value is types.Default {
+return ((
 // any
 true
-))) {
-errors.push({"typeName":"Default"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated}
 */
-export function isDeprecated(value: unknown, errors = new Array<ValidationError>()): value is types.Deprecated {
-if (!((typeof value === "boolean"))) {
-errors.push({"typeName":"Deprecated"})
-return false;
-}
-return true;
+export function isDeprecated(value: unknown): value is types.Deprecated {
+return ((typeof value === "boolean"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly}
 */
-export function isReadOnly(value: unknown, errors = new Array<ValidationError>()): value is types.ReadOnly {
-if (!((typeof value === "boolean"))) {
-errors.push({"typeName":"ReadOnly"})
-return false;
-}
-return true;
+export function isReadOnly(value: unknown): value is types.ReadOnly {
+return ((typeof value === "boolean"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly}
 */
-export function isWriteOnly(value: unknown, errors = new Array<ValidationError>()): value is types.WriteOnly {
-if (!((typeof value === "boolean"))) {
-errors.push({"typeName":"WriteOnly"})
-return false;
-}
-return true;
+export function isWriteOnly(value: unknown): value is types.WriteOnly {
+return ((typeof value === "boolean"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
 */
-export function isExamples(value: unknown, errors = new Array<ValidationError>()): value is types.Examples {
-if (!((Array.isArray(value)) &&
+export function isExamples(value: unknown): value is types.Examples {
+return ((Array.isArray(value)) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!isExamplesItems(elementValue, errors)) {
+if(!isExamplesItems(elementValue)) {
 return false;
 }
 }
 return true;
 })()
-))) {
-errors.push({"typeName":"Examples"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
 */
-export function isExamplesItems(value: unknown, errors = new Array<ValidationError>()): value is types.ExamplesItems {
-if (!((
+export function isExamplesItems(value: unknown): value is types.ExamplesItems {
+return ((
 // any
 true
-))) {
-errors.push({"typeName":"ExamplesItems"})
-return false;
-}
-return true;
+));
 }
 /**
 * @summary Format vocabulary meta-schema for annotation results
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
 */
-export function isFormatAnnotation(value: unknown, errors = new Array<ValidationError>()): value is types.FormatAnnotation {
-if (!((
+export function isFormatAnnotation(value: unknown): value is types.FormatAnnotation {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -2364,7 +1973,7 @@ continue;
 }
 switch(propertyName) {
 case "format":
-if(!isFormat(propertyValue, errors)) {
+if(!isFormat(propertyValue)) {
 return false;
 }
 break;
@@ -2386,28 +1995,20 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"FormatAnnotation"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
 */
-export function isFormat(value: unknown, errors = new Array<ValidationError>()): value is types.Format {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"Format"})
-return false;
-}
-return true;
+export function isFormat(value: unknown): value is types.Format {
+return ((typeof value === "string"));
 }
 /**
 * @summary Content vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/content}
 */
-export function isContent(value: unknown, errors = new Array<ValidationError>()): value is types.Content {
-if (!((
+export function isContent(value: unknown): value is types.Content {
+return ((
 (()=>{
 let count = 0;
 if((value !== null) &&
@@ -2422,17 +2023,17 @@ continue;
 }
 switch(propertyName) {
 case "contentEncoding":
-if(!isContentEncoding(propertyValue, errors)) {
+if(!isContentEncoding(propertyValue)) {
 return false;
 }
 break;
 case "contentMediaType":
-if(!isContentMediaType(propertyValue, errors)) {
+if(!isContentMediaType(propertyValue)) {
 return false;
 }
 break;
 case "contentSchema":
-if(!isContentSchema(propertyValue, errors)) {
+if(!isContentSchema(propertyValue)) {
 return false;
 }
 break;
@@ -2454,39 +2055,23 @@ count++;
 }
 return count === 1;
 })()
-))) {
-errors.push({"typeName":"Content"})
-return false;
-}
-return true;
+));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}
 */
-export function isContentEncoding(value: unknown, errors = new Array<ValidationError>()): value is types.ContentEncoding {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"ContentEncoding"})
-return false;
-}
-return true;
+export function isContentEncoding(value: unknown): value is types.ContentEncoding {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType}
 */
-export function isContentMediaType(value: unknown, errors = new Array<ValidationError>()): value is types.ContentMediaType {
-if (!((typeof value === "string"))) {
-errors.push({"typeName":"ContentMediaType"})
-return false;
-}
-return true;
+export function isContentMediaType(value: unknown): value is types.ContentMediaType {
+return ((typeof value === "string"));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
 */
-export function isContentSchema(value: unknown, errors = new Array<ValidationError>()): value is types.ContentSchema {
-if (!((isSchema(value, errors)))) {
-errors.push({"typeName":"ContentSchema"})
-return false;
-}
-return true;
+export function isContentSchema(value: unknown): value is types.ContentSchema {
+return ((isSchema(value)));
 }

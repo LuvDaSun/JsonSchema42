@@ -27,8 +27,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       (example) => itt`
         test(${JSON.stringify(typeName)}, () => {
           const example = ${JSON.stringify(example)};
-          const errors = new Array<validators.ValidationError>();
-          const valid = validators.${validatorFunctionName}(example, errors);
+          const valid = validators.${validatorFunctionName}(example);
           assert.equal(valid, true);
         });
       `,
