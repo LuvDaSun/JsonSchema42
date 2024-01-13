@@ -279,10 +279,10 @@ export function transformSchema(
               type: "integer",
               options: model.options,
 
-              // minimumInclusive: model.minimumInclusive,
-              // minimumExclusive: model.minimumExclusive,
-              // maximumInclusive: model.maximumInclusive,
-              // maximumExclusive: model.maximumExclusive,
+              minimumInclusive: model.minimumInclusive,
+              minimumExclusive: model.minimumExclusive,
+              maximumInclusive: model.maximumInclusive,
+              maximumExclusive: model.maximumExclusive,
               // multipleOf: model.multipleOf,
             },
           ];
@@ -296,10 +296,10 @@ export function transformSchema(
               type: "number",
               options: model.options,
 
-              // minimumInclusive: model.minimumInclusive,
-              // minimumExclusive: model.minimumExclusive,
-              // maximumInclusive: model.maximumInclusive,
-              // maximumExclusive: model.maximumExclusive,
+              minimumInclusive: model.minimumInclusive,
+              minimumExclusive: model.minimumExclusive,
+              maximumInclusive: model.maximumInclusive,
+              maximumExclusive: model.maximumExclusive,
               // multipleOf: model.multipleOf,
             },
           ];
@@ -313,8 +313,8 @@ export function transformSchema(
               type: "string",
               options: model.options,
 
-              // minimumLength: model.minimumLength,
-              // maximumLength: model.maximumLength,
+              minimumLength: model.minimumLength,
+              maximumLength: model.maximumLength,
               // valuePattern: model.valuePattern,
               // valueFormat: model.valueFormat,
             },

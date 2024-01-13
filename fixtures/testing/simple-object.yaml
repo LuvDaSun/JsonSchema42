@@ -39,14 +39,15 @@ valid:
   tiny:
     id: 1
     name: "hi"
-# invalid:
-#   invalid-child-id:
-#     id: 1
-#     child:
-#       id: 0
-#   invalid-id:
-#     id: 0
-#     name: "hi"
-#   invalid-name:
-#     id: 1
-#     name: "h"
+
+invalid:
+  invalid-child-id:
+    id: 1
+    child:
+      id: 0
+  invalid-id:
+    id: 0
+    name: "hi"
+  invalid-name:
+    id: 1
+    name: "h"

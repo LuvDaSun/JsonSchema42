@@ -216,7 +216,8 @@ return true;
 export function isPositiveInteger(value: unknown): value is types.PositiveInteger {
 return ((typeof value === "number") &&
 (!isNaN(value)) &&
-(value % 1 === 0));
+(value % 1 === 0) &&
+(value >= 0));
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
@@ -224,7 +225,8 @@ return ((typeof value === "number") &&
 export function isPositiveIntegerDefault0(value: unknown): value is types.PositiveIntegerDefault0 {
 return ((typeof value === "number") &&
 (!isNaN(value)) &&
-(value % 1 === 0));
+(value % 1 === 0) &&
+(value >= 0));
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
@@ -294,7 +296,8 @@ true
 */
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
 return ((typeof value === "number") &&
-(!isNaN(value)));
+(!isNaN(value)) &&
+(value > 0));
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}

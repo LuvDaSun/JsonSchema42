@@ -67,13 +67,49 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return seed;
     }
 
-    const chars = "abcdefghijklmnopqrstuvwxyz";
-    function randomString(length: number) {
-      let str = ""
-      while(str.length < length) {
-        str += chars[nextSeed() % chars.length];
+    interface RandomStringArguments {
+      lengthOffset: number,
+      lengthRange: number,
+      chars: string,
+    }
+    // TODO verify that this does exactly what we want it to do
+    function randomString({
+      lengthOffset,
+      lengthRange,
+      chars,
+    }: RandomStringArguments) {
+      const length = lengthOffset + nextSeed() % lengthRange;
+      let value = ""
+      while(value.length < length) {
+        value += chars[nextSeed() % chars.length];
       }
-      return str;
+      return value;
+    }
+
+    interface RandomNumberArguments {
+      isMinimumInclusive: boolean;
+      isMaximumInclusive: boolean;
+      minimumValue: number;
+      maximumValue: number;
+      precisionOffset: number,
+      precisionRange: number,
+    }
+    // TODO verify that this does exactly what we want it to do
+    function randomNumber({
+      isMinimumInclusive,
+      isMaximumInclusive,
+      minimumValue,
+      maximumValue,
+      precisionOffset,
+      precisionRange,
+    }: RandomNumberArguments) {
+      const precision = precisionOffset + nextSeed() % precisionRange;
+      const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
+      const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
+      const valueOffset = inclusiveMinimumValue * precision;
+      const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
+      const value = (valueOffset + nextSeed() % valueRange) / precision;
+      return value;
     }
   `;
 }
@@ -130,7 +166,7 @@ function* generateMockDefinition(
       break;
     }
 
-    case "integer":
+    case "integer": {
       if (typeItem.options != null) {
         yield itt`([${joinIterable(
           typeItem.options.map((option) => JSON.stringify(option)),
@@ -138,10 +174,26 @@ function* generateMockDefinition(
         )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
         break;
       }
-      yield `Number(nextSeed() % ${JSON.stringify(1000)})`;
-      break;
 
-    case "number":
+      const isMinimumInclusive = typeItem.minimumInclusive != null;
+      const isMaximumInclusive = typeItem.maximumInclusive != null;
+      const minimumValue = typeItem.minimumInclusive ?? typeItem.minimumExclusive ?? -100000;
+      const maximumValue = typeItem.maximumInclusive ?? typeItem.maximumExclusive ?? 100000;
+      const precisionOffset = 1;
+      const precisionRange = 1;
+
+      yield `randomNumber(${JSON.stringify({
+        isMinimumInclusive,
+        isMaximumInclusive,
+        minimumValue,
+        maximumValue,
+        precisionOffset,
+        precisionRange,
+      })})`;
+      break;
+    }
+
+    case "number": {
       if (typeItem.options != null) {
         yield itt`([${joinIterable(
           typeItem.options.map((option) => JSON.stringify(option)),
@@ -149,8 +201,24 @@ function* generateMockDefinition(
         )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
         break;
       }
-      yield `Number(nextSeed() % ${JSON.stringify(1000)} * 10) / 10`;
+
+      const isMinimumInclusive = typeItem.minimumInclusive != null;
+      const isMaximumInclusive = typeItem.maximumInclusive != null;
+      const minimumValue = typeItem.minimumInclusive ?? typeItem.minimumExclusive ?? -1000;
+      const maximumValue = typeItem.maximumInclusive ?? typeItem.maximumExclusive ?? 1000;
+      const precisionOffset = 100;
+      const precisionRange = 900;
+
+      yield `randomNumber(${JSON.stringify({
+        isMinimumInclusive,
+        isMaximumInclusive,
+        minimumValue,
+        maximumValue,
+        precisionOffset,
+        precisionRange,
+      })})`;
       break;
+    }
 
     case "string":
       if (typeItem.options != null) {
@@ -160,7 +228,18 @@ function* generateMockDefinition(
         )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
         break;
       }
-      yield `randomString(10)`;
+
+      const minimumLength = typeItem.minimumLength ?? 3;
+      const maximumLength = typeItem.maximumLength ?? 15;
+      const lengthOffset = minimumLength;
+      const lengthRange = maximumLength - minimumLength;
+      const chars = "abcdefghijklmnopqrstuvwxyz";
+
+      yield `randomString(${JSON.stringify({
+        lengthOffset,
+        lengthRange,
+        chars,
+      })})`;
       break;
 
     case "tuple": {

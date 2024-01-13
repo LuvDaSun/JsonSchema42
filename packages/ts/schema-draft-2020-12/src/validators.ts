@@ -1551,7 +1551,8 @@ return count === 1;
 export function isNonNegativeInteger(value: unknown): value is types.NonNegativeInteger {
 return ((typeof value === "number") &&
 (!isNaN(value)) &&
-(value % 1 === 0));
+(value % 1 === 0) &&
+(value >= 0));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
@@ -1643,7 +1644,8 @@ return true;
 */
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
 return ((typeof value === "number") &&
-(!isNaN(value)));
+(!isNaN(value)) &&
+(value > 0));
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}

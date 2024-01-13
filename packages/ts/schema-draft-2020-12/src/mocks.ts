@@ -109,11 +109,11 @@ try {
 depthCounters["1"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
 } : {}
 );
 }
@@ -131,11 +131,11 @@ try {
 depthCounters["2"]++;
 return (
 (depthCounters["13"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
 } : {}
 );
 }
@@ -400,7 +400,7 @@ export function mockAnchorString(): types.AnchorString {
 depthCounters["16"] ??= 0;
 try {
 depthCounters["16"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["16"]--;
@@ -413,7 +413,7 @@ export function mockUriReferenceString(): types.UriReferenceString {
 depthCounters["17"] ??= 0;
 try {
 depthCounters["17"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["17"]--;
@@ -465,7 +465,7 @@ export function mockUriString(): types.UriString {
 depthCounters["19"] ??= 0;
 try {
 depthCounters["19"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["19"]--;
@@ -478,7 +478,7 @@ export function mockId(): types.Id {
 depthCounters["20"] ??= 0;
 try {
 depthCounters["20"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["20"]--;
@@ -577,7 +577,7 @@ export function mockComment(): types.Comment {
 depthCounters["27"] ??= 0;
 try {
 depthCounters["27"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["27"]--;
@@ -592,11 +592,11 @@ try {
 depthCounters["28"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDefsAdditionalProperties(),
-[(randomString(10))]: mockDefsAdditionalProperties(),
-[(randomString(10))]: mockDefsAdditionalProperties(),
-[(randomString(10))]: mockDefsAdditionalProperties(),
-[(randomString(10))]: mockDefsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefsAdditionalProperties(),
 } : {}
 );
 }
@@ -770,11 +770,11 @@ try {
 depthCounters["38"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesAdditionalProperties(),
 } : {}
 );
 }
@@ -812,11 +812,11 @@ try {
 depthCounters["40"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
-[(randomString(10))]: mockDependentSchemasAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
 } : {}
 );
 }
@@ -974,7 +974,7 @@ export function mockPatternPropertiesPropertyNames(): types.PatternPropertiesPro
 depthCounters["52"] ??= 0;
 try {
 depthCounters["52"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["52"]--;
@@ -1108,7 +1108,7 @@ export function mockNonNegativeInteger(): types.NonNegativeInteger {
 depthCounters["58"] ??= 0;
 try {
 depthCounters["58"]++;
-return (Number(nextSeed() % 1000));
+return (randomNumber({"isMinimumInclusive":true,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":100000,"precisionOffset":1,"precisionRange":1}));
 }
 finally {
 depthCounters["58"]--;
@@ -1231,7 +1231,7 @@ export function mockMultipleOf(): types.MultipleOf {
 depthCounters["65"] ??= 0;
 try {
 depthCounters["65"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["65"]--;
@@ -1244,7 +1244,7 @@ export function mockMaximum(): types.Maximum {
 depthCounters["66"] ??= 0;
 try {
 depthCounters["66"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["66"]--;
@@ -1257,7 +1257,7 @@ export function mockExclusiveMaximum(): types.ExclusiveMaximum {
 depthCounters["67"] ??= 0;
 try {
 depthCounters["67"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["67"]--;
@@ -1270,7 +1270,7 @@ export function mockMinimum(): types.Minimum {
 depthCounters["68"] ??= 0;
 try {
 depthCounters["68"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["68"]--;
@@ -1283,7 +1283,7 @@ export function mockExclusiveMinimum(): types.ExclusiveMinimum {
 depthCounters["69"] ??= 0;
 try {
 depthCounters["69"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["69"]--;
@@ -1322,7 +1322,7 @@ export function mockPattern(): types.Pattern {
 depthCounters["72"] ??= 0;
 try {
 depthCounters["72"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["72"]--;
@@ -1441,11 +1441,11 @@ try {
 depthCounters["81"]++;
 return (
 (depthCounters["61"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
-[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
-[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
-[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
-[(randomString(10))]: mockDependentRequiredAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentRequiredAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentRequiredAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentRequiredAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentRequiredAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentRequiredAdditionalProperties(),
 } : {}
 );
 }
@@ -1460,7 +1460,7 @@ export function mockStringArrayItems(): types.StringArrayItems {
 depthCounters["82"] ??= 0;
 try {
 depthCounters["82"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["82"]--;
@@ -1586,7 +1586,7 @@ export function mockTitle(): types.Title {
 depthCounters["89"] ??= 0;
 try {
 depthCounters["89"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["89"]--;
@@ -1599,7 +1599,7 @@ export function mockDescription(): types.Description {
 depthCounters["90"] ??= 0;
 try {
 depthCounters["90"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["90"]--;
@@ -1735,7 +1735,7 @@ export function mockFormat(): types.Format {
 depthCounters["98"] ??= 0;
 try {
 depthCounters["98"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["98"]--;
@@ -1781,7 +1781,7 @@ export function mockContentEncoding(): types.ContentEncoding {
 depthCounters["100"] ??= 0;
 try {
 depthCounters["100"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["100"]--;
@@ -1794,7 +1794,7 @@ export function mockContentMediaType(): types.ContentMediaType {
 depthCounters["101"] ??= 0;
 try {
 depthCounters["101"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["101"]--;
@@ -1823,11 +1823,46 @@ const b = 0;
 seed = (a * seed + b) % p;
 return seed;
 }
-const chars = "abcdefghijklmnopqrstuvwxyz";
-function randomString(length: number) {
-let str = ""
-while(str.length < length) {
-str += chars[nextSeed() % chars.length];
+interface RandomStringArguments {
+lengthOffset: number,
+lengthRange: number,
+chars: string,
 }
-return str;
+// TODO verify that this does exactly what we want it to do
+function randomString({
+lengthOffset,
+lengthRange,
+chars,
+}: RandomStringArguments) {
+const length = lengthOffset + nextSeed() % lengthRange;
+let value = ""
+while(value.length < length) {
+value += chars[nextSeed() % chars.length];
+}
+return value;
+}
+interface RandomNumberArguments {
+isMinimumInclusive: boolean;
+isMaximumInclusive: boolean;
+minimumValue: number;
+maximumValue: number;
+precisionOffset: number,
+precisionRange: number,
+}
+// TODO verify that this does exactly what we want it to do
+function randomNumber({
+isMinimumInclusive,
+isMaximumInclusive,
+minimumValue,
+maximumValue,
+precisionOffset,
+precisionRange,
+}: RandomNumberArguments) {
+const precision = precisionOffset + nextSeed() % precisionRange;
+const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
+const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
+const valueOffset = inclusiveMinimumValue * precision;
+const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
+const value = (valueOffset + nextSeed() % valueRange) / precision;
+return value;
 }

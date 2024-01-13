@@ -86,7 +86,7 @@ export function mockPositiveInteger(): types.PositiveInteger {
 depthCounters["2"] ??= 0;
 try {
 depthCounters["2"]++;
-return (Number(nextSeed() % 1000));
+return (randomNumber({"isMinimumInclusive":true,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":100000,"precisionOffset":1,"precisionRange":1}));
 }
 finally {
 depthCounters["2"]--;
@@ -99,7 +99,7 @@ export function mockPositiveIntegerDefault0(): types.PositiveIntegerDefault0 {
 depthCounters["3"] ??= 0;
 try {
 depthCounters["3"]++;
-return (Number(nextSeed() % 1000));
+return (randomNumber({"isMinimumInclusive":true,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":100000,"precisionOffset":1,"precisionRange":1}));
 }
 finally {
 depthCounters["3"]--;
@@ -146,7 +146,7 @@ export function mockId(): types.Id {
 depthCounters["6"] ??= 0;
 try {
 depthCounters["6"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["6"]--;
@@ -159,7 +159,7 @@ export function mockSchema(): types.Schema {
 depthCounters["7"] ??= 0;
 try {
 depthCounters["7"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["7"]--;
@@ -172,7 +172,7 @@ export function mockTitle(): types.Title {
 depthCounters["8"] ??= 0;
 try {
 depthCounters["8"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["8"]--;
@@ -185,7 +185,7 @@ export function mockDescription(): types.Description {
 depthCounters["9"] ??= 0;
 try {
 depthCounters["9"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["9"]--;
@@ -214,7 +214,7 @@ export function mockMultipleOf(): types.MultipleOf {
 depthCounters["11"] ??= 0;
 try {
 depthCounters["11"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["11"]--;
@@ -227,7 +227,7 @@ export function mockMaximum(): types.Maximum {
 depthCounters["12"] ??= 0;
 try {
 depthCounters["12"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["12"]--;
@@ -253,7 +253,7 @@ export function mockMinimum(): types.Minimum {
 depthCounters["14"] ??= 0;
 try {
 depthCounters["14"]++;
-return (Number(nextSeed() % 1000 * 10) / 10);
+return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
 }
 finally {
 depthCounters["14"]--;
@@ -305,7 +305,7 @@ export function mockPattern(): types.Pattern {
 depthCounters["18"] ??= 0;
 try {
 depthCounters["18"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["18"]--;
@@ -476,11 +476,11 @@ try {
 depthCounters["28"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
-[(randomString(10))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDefinitionsAdditionalProperties(),
 } : {}
 );
 }
@@ -497,11 +497,11 @@ try {
 depthCounters["29"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPropertiesPropertiesAdditionalProperties(),
 } : {}
 );
 }
@@ -518,11 +518,11 @@ try {
 depthCounters["30"]++;
 return (
 (depthCounters["0"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString(10))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
 } : {}
 );
 }
@@ -539,11 +539,11 @@ try {
 depthCounters["31"]++;
 return (
 (depthCounters["52"] ?? 0) < maximumDepth ? {
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
-[(randomString(10))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
+[(randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependenciesAdditionalProperties(),
 } : {}
 );
 }
@@ -620,7 +620,7 @@ export function mockFormat(): types.Format {
 depthCounters["34"] ??= 0;
 try {
 depthCounters["34"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["34"]--;
@@ -727,7 +727,7 @@ export function mockStringArrayItems(): types.StringArrayItems {
 depthCounters["42"] ??= 0;
 try {
 depthCounters["42"]++;
-return (randomString(10));
+return (randomString({"lengthOffset":3,"lengthRange":12,"chars":"abcdefghijklmnopqrstuvwxyz"}));
 }
 finally {
 depthCounters["42"]--;
@@ -959,11 +959,46 @@ const b = 0;
 seed = (a * seed + b) % p;
 return seed;
 }
-const chars = "abcdefghijklmnopqrstuvwxyz";
-function randomString(length: number) {
-let str = ""
-while(str.length < length) {
-str += chars[nextSeed() % chars.length];
+interface RandomStringArguments {
+lengthOffset: number,
+lengthRange: number,
+chars: string,
 }
-return str;
+// TODO verify that this does exactly what we want it to do
+function randomString({
+lengthOffset,
+lengthRange,
+chars,
+}: RandomStringArguments) {
+const length = lengthOffset + nextSeed() % lengthRange;
+let value = ""
+while(value.length < length) {
+value += chars[nextSeed() % chars.length];
+}
+return value;
+}
+interface RandomNumberArguments {
+isMinimumInclusive: boolean;
+isMaximumInclusive: boolean;
+minimumValue: number;
+maximumValue: number;
+precisionOffset: number,
+precisionRange: number,
+}
+// TODO verify that this does exactly what we want it to do
+function randomNumber({
+isMinimumInclusive,
+isMaximumInclusive,
+minimumValue,
+maximumValue,
+precisionOffset,
+precisionRange,
+}: RandomNumberArguments) {
+const precision = precisionOffset + nextSeed() % precisionRange;
+const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
+const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
+const valueOffset = inclusiveMinimumValue * precision;
+const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
+const value = (valueOffset + nextSeed() % valueRange) / precision;
+return value;
 }
