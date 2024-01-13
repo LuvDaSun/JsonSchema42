@@ -151,9 +151,17 @@ async function main(options: MainOptions) {
       });
     }
 
-    // install (and implicitly build) package
+    // install package
     {
       cp.execSync("npm install", {
+        cwd: packageDirectoryPath,
+        env: process.env,
+      });
+    }
+
+    // build package
+    {
+      cp.execSync("npm run build", {
         cwd: packageDirectoryPath,
         env: process.env,
       });
