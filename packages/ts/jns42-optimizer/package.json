@@ -30,8 +30,7 @@
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
-    "typescript": "^5.3.3",
-    "yaml": "^2.3.4"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@types/node": "^20.11.0",
@@ -39,8 +38,6 @@
     "camelcase": "^8.0.0",
     "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
-    "type-fest": "^4.6.0",
-    "typescript": "^5.3.3",
-    "yargs": "^17.7.2"
+    "type-fest": "^4.9.0"
   }
 }
