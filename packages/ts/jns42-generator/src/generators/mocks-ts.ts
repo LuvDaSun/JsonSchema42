@@ -289,20 +289,31 @@ function* generateMockDefinition(
       const { element } = typeItem;
 
       const [resolvedElement] = unalias(types, element);
-      const minimumItems = typeItem.minimumItems ?? 2;
+      const minimumItems = typeItem.minimumItems ?? 0;
       const maximumItems = typeItem.maximumItems ?? 5;
       const itemsOffset = minimumItems;
       const itemsRange = maximumItems - minimumItems + 1;
 
-      yield itt`
-        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
+      if (minimumItems === 0) {
+        yield itt`
+          (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
+            randomArray({
+              lengthOffset: ${JSON.stringify(itemsOffset)},
+              lengthRange: ${JSON.stringify(itemsRange)},
+              elementFactory: () => ${generateMockReference(specification, element)},
+            }) :
+            []
+        `;
+      } else {
+        yield itt`
           randomArray({
             lengthOffset: ${JSON.stringify(itemsOffset)},
             lengthRange: ${JSON.stringify(itemsRange)},
             elementFactory: () => ${generateMockReference(specification, element)},
-          }) :
-          []
-      `;
+          })
+        `;
+      }
+
       break;
     }
 

@@ -1156,6 +1156,7 @@ return count === 1;
 */
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
 return ((Array.isArray(value)) &&
+(value.length >= 1) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
@@ -1783,6 +1784,7 @@ return ((isSimpleTypes(value)));
 */
 export function isType1(value: unknown): value is types.Type1 {
 return ((Array.isArray(value)) &&
+(value.length >= 1) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {

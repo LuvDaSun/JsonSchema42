@@ -198,6 +198,7 @@ return true;
 */
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
 return ((Array.isArray(value)) &&
+(value.length >= 1) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
@@ -246,6 +247,7 @@ value === "string"));
 */
 export function isStringArray(value: unknown): value is types.StringArray {
 return ((Array.isArray(value)) &&
+(value.length >= 1) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
@@ -553,6 +555,7 @@ return true;
 */
 export function isEnum(value: unknown): value is types.Enum {
 return ((Array.isArray(value)) &&
+(value.length >= 1) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
@@ -736,6 +739,7 @@ return ((isSimpleTypes(value)));
 */
 export function isType1(value: unknown): value is types.Type1 {
 return ((Array.isArray(value)) &&
+(value.length >= 1) &&
 (
 (()=>{
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
