@@ -5,8 +5,6 @@ import {
   generateJsDocComments,
   itt,
   joinIterable,
-  mapIterable,
-  repeat,
   toCamel,
   toPascal,
 } from "../utils/index.js";
@@ -27,7 +25,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       maximumDepth?: number;
     }
     const defaultMockGeneratorOptions = {
-      maximumDepth: 2,
+      maximumDepth: 1,
     }
 
   `;
@@ -294,7 +292,7 @@ function* generateMockDefinition(
       const itemsOffset = minimumItems;
       const itemsRange = maximumItems - minimumItems + 1;
 
-      if (minimumItems === 0) {
+      if (itemsOffset === 0) {
         yield itt`
           (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
             randomArray({
@@ -348,19 +346,40 @@ function* generateMockDefinition(
       const { name, element } = typeItem;
       const [resolvedElement] = unalias(types, element);
 
-      yield itt`
-        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ? {
-          ${mapIterable(
-            repeat(5),
-            () => itt`
-              [${generateMockReference(specification, name)}]: ${generateMockReference(
+      const minimumProperties = typeItem.minimumProperties ?? 0;
+      const maximumProperties = typeItem.maximumProperties ?? 5;
+      const propertiesOffset = minimumProperties;
+      const propertiesRange = maximumProperties - minimumProperties + 1;
+
+      if (propertiesOffset === 0) {
+        yield itt`
+          (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
+            Object.fromEntries(
+              randomArray({
+                lengthOffset: ${JSON.stringify(propertiesOffset)},
+                lengthRange: ${JSON.stringify(propertiesRange)},
+                elementFactory: () => [${generateMockReference(
+                  specification,
+                  name,
+                )}, ${generateMockReference(specification, element)}],
+              })
+            ) :
+            {}
+        `;
+      } else {
+        yield itt`
+          Object.fromEntries(
+            randomArray({
+              lengthOffset: ${JSON.stringify(propertiesOffset)},
+              lengthRange: ${JSON.stringify(propertiesRange)},
+              elementFactory: () => [${generateMockReference(
                 specification,
-                element,
-              )},
-            `,
-          )}
-        } : {}
-      `;
+                name,
+              )}, ${generateMockReference(specification, element)}],
+            })
+          )
+        `;
+      }
       break;
     }
 

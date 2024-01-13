@@ -11,7 +11,7 @@ export interface MockGeneratorOptions {
 maximumDepth?: number;
 }
 const defaultMockGeneratorOptions = {
-maximumDepth: 2,
+maximumDepth: 1,
 }
 /**
 * @summary JsonSchema42 intermediate schema
@@ -241,13 +241,15 @@ depthCounters["10"] ??= 0;
 try {
 depthCounters["10"]++;
 return (
-(depthCounters["1"] ?? 0) < configuration.maximumDepth ? {
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockSchemasAdditionalProperties(),
-} : {}
+(depthCounters["1"] ?? 0) < configuration.maximumDepth ?
+Object.fromEntries(
+randomArray({
+lengthOffset: 0,
+lengthRange: 6,
+elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockSchemasAdditionalProperties()],
+})
+) :
+{}
 );
 }
 finally {
@@ -528,13 +530,15 @@ depthCounters["24"] ??= 0;
 try {
 depthCounters["24"]++;
 return (
-(depthCounters["2"] ?? 0) < configuration.maximumDepth ? {
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockDependentSchemasAdditionalProperties(),
-} : {}
+(depthCounters["2"] ?? 0) < configuration.maximumDepth ?
+Object.fromEntries(
+randomArray({
+lengthOffset: 0,
+lengthRange: 6,
+elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockDependentSchemasAdditionalProperties()],
+})
+) :
+{}
 );
 }
 finally {
@@ -553,13 +557,15 @@ depthCounters["25"] ??= 0;
 try {
 depthCounters["25"]++;
 return (
-(depthCounters["2"] ?? 0) < configuration.maximumDepth ? {
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockObjectPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockObjectPropertiesAdditionalProperties(),
-} : {}
+(depthCounters["2"] ?? 0) < configuration.maximumDepth ?
+Object.fromEntries(
+randomArray({
+lengthOffset: 0,
+lengthRange: 6,
+elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockObjectPropertiesAdditionalProperties()],
+})
+) :
+{}
 );
 }
 finally {
@@ -595,13 +601,15 @@ depthCounters["27"] ??= 0;
 try {
 depthCounters["27"]++;
 return (
-(depthCounters["2"] ?? 0) < configuration.maximumDepth ? {
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
-[(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}))]: mockPatternPropertiesAdditionalProperties(),
-} : {}
+(depthCounters["2"] ?? 0) < configuration.maximumDepth ?
+Object.fromEntries(
+randomArray({
+lengthOffset: 0,
+lengthRange: 6,
+elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockPatternPropertiesAdditionalProperties()],
+})
+) :
+{}
 );
 }
 finally {
