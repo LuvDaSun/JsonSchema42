@@ -12,6 +12,8 @@ jobs:
   formatting:
     runs-on: ubuntu-latest
     container: node:20.9-alpine3.17
+    env:
+      npm_config_ignore_scripts: true
     steps:
       - uses: actions/checkout@v3
       - run: npm ci
@@ -20,6 +22,8 @@ jobs:
   spelling:
     runs-on: ubuntu-latest
     container: node:20.9-alpine3.17
+    env:
+      npm_config_ignore_scripts: true
     steps:
       - uses: actions/checkout@v3
       - run: npm ci
