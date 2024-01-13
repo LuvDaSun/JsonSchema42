@@ -1,4 +1,4 @@
-import * as schemaIntermediateB from "schema-intermediate";
+import * as schemaIntermediate from "schema-intermediate";
 
 export abstract class DocumentBase<N = unknown> {
   public abstract readonly documentNodeUrl: URL;
@@ -12,7 +12,7 @@ export abstract class DocumentBase<N = unknown> {
   }
 
   public abstract getIntermediateNodeEntries(): Iterable<
-    readonly [string, schemaIntermediateB.Node]
+    readonly [string, schemaIntermediate.Node]
   >;
 
   public pointerToNodeUrl(nodePointer: string): URL {

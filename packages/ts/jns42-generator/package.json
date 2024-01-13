@@ -16,10 +16,11 @@
   ],
   "scripts": {
     "prepack": "npm install --no-workspaces",
+    "pretest": "tsc --build",
     "prepare": "tsc --build",
     "build": "tsc --build",
     "clean": "rm -rf ./out && tsc --build --clean",
-    "test": "node --test ./out/**/*.test.js"
+    "test": "node --test ./out/**/*.test.js ; ./test-fixtures"
   },
   "repository": {
     "type": "git",
@@ -38,22 +39,30 @@
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
-    "typescript": "^5.3.2",
+    "typescript": "^5.3.3",
     "yaml": "^2.3.4"
   },
   "dependencies": {
-    "@types/node": "^20.10.0",
+    "@types/node": "^20.11.0",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
+    "jns42-optimizer": "file:../jns42-optimizer",
     "schema-draft-04": "file:../schema-draft-04",
     "schema-draft-2020-12": "file:../schema-draft-2020-12",
     "schema-intermediate": "file:../schema-intermediate",
     "tslib": "^2.6.2",
     "type-fest": "^4.6.0",
-    "typescript": "^5.3.2",
+    "typescript": "^5.3.3",
     "yargs": "^17.7.2"
   },
   "bundledDependencies": [
+    "jns42-optimizer",
+    "schema-draft-04",
+    "schema-draft-2020-12",
+    "schema-intermediate"
+  ],
+  "bundleDependencies": [
+    "jns42-optimizer",
     "schema-draft-04",
     "schema-draft-2020-12",
     "schema-intermediate"

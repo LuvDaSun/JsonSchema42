@@ -3,9 +3,9 @@ import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
-import * as schemaIntermediateB from "../documents/intermediate/index.js";
+import * as schemaIntermediate from "../documents/intermediate/index.js";
 import { generatePackage } from "../generators/index.js";
-import { Namer } from "../utils/index.js";
+import { Namer, transformSchema } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(
@@ -16,6 +16,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
         .positional("instance-schema-url", {
           description: "url to download schema from",
           type: "string",
+          demandOption: true,
         })
         .option("default-meta-schema-url", {
           description: "the default meta schema to use",
@@ -23,17 +24,19 @@ export function configurePackageProgram(argv: yargs.Argv) {
           choices: [
             schema202012.metaSchemaId,
             schemaDraft04.metaSchemaId,
-            schemaIntermediateB.metaSchemaId,
+            schemaIntermediate.metaSchemaId,
           ] as const,
           default: schema202012.metaSchemaId,
         })
         .option("package-directory", {
           description: "where to output the package",
           type: "string",
+          demandOption: true,
         })
         .option("package-name", {
           description: "name of the package",
           type: "string",
+          demandOption: true,
         })
         .option("package-version", {
           description: "version of the package",
@@ -49,12 +52,12 @@ export function configurePackageProgram(argv: yargs.Argv) {
           type: "number",
           default: 5,
         })
-        .option("any-of-hack", {
-          description: "quick-fix to make any of work with many types",
-          type: "boolean",
-          default: false,
+        .option("transform-maximum-iterations", {
+          description: "maximum number of iterations for transforming",
+          type: "number",
+          default: 1000,
         }),
-    (argv) => main(argv as MainOptions),
+    (argv) => main(argv),
   );
 }
 
@@ -63,14 +66,13 @@ interface MainOptions {
   defaultMetaSchemaUrl: string;
   packageDirectory: string;
   packageName: string;
-  packageVersion: string;
+  packageVersion?: string;
   defaultName: string;
   namerMaximumIterations: number;
-  anyOfHack: boolean;
+  transformMaximumIterations: number;
 }
 
 async function main(options: MainOptions) {
-  const { anyOfHack } = options;
   let instanceSchemaUrl: URL;
   if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
     instanceSchemaUrl = new URL(options.instanceSchemaUrl);
@@ -80,7 +82,13 @@ async function main(options: MainOptions) {
 
   const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
   const packageDirectoryPath = path.resolve(options.packageDirectory);
-  const { packageName, packageVersion, namerMaximumIterations, defaultName } = options;
+  const {
+    packageName,
+    packageVersion,
+    namerMaximumIterations,
+    transformMaximumIterations,
+    defaultName,
+  } = options;
 
   const context = new DocumentContext();
   context.registerFactory(
@@ -94,27 +102,33 @@ async function main(options: MainOptions) {
       new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
-    schemaIntermediateB.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediateB.Document(givenUrl, rootNode),
+    schemaIntermediate.metaSchemaId,
+    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
   await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
 
   const intermediateData = context.getIntermediateData();
 
+  const types = transformSchema(intermediateData, transformMaximumIterations);
+
   const namer = new Namer(defaultName, namerMaximumIterations);
-  for (const nodeId in intermediateData.schemas) {
+  for (const [typeKey, typeItem] of Object.entries(types)) {
+    const { id: nodeId } = typeItem;
+    if (nodeId == null) {
+      continue;
+    }
+
     const nodeUrl = new URL(nodeId);
     const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
     namer.registerPath(nodeId, path);
   }
 
-  const namesData = namer.getNames();
+  const names = namer.getNames();
 
-  generatePackage(intermediateData, namesData, {
+  generatePackage(intermediateData, names, types, {
     packageDirectoryPath,
     packageName,
     packageVersion,
-    anyOfHack,
   });
 }

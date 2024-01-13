@@ -1,10 +1,9 @@
 import { PackageJson } from "type-fest";
 import { packageInfo } from "../utils/index.js";
 
-export function getPackageJsonData(name: string, version: string) {
+export function getPackageJsonData(name: string, version?: string) {
   const content: PackageJson = {
     name: name,
-    version: version,
     sideEffects: false,
     type: "module",
     main: "./out/main.js",
@@ -25,15 +24,24 @@ export function getPackageJsonData(name: string, version: string) {
       },
     },
     scripts: {
+      prepack: "npm install --no-workspaces",
+      pretest: "tsc --build",
+      prepare: "tsc --build",
       build: "tsc --build",
       clean: "rm -rf ./out && tsc --build --clean",
-      test: "node --test ./out/*.test.js",
+      test: "node --test ./out/**/*.test.js",
     },
     author: "",
     license: "ISC",
     dependencies: withDependencies(["@types/node"]),
     devDependencies: withDependencies(["typescript", "@tsconfig/node20"]),
   };
+
+  if (version == null) {
+    content.private = true;
+  } else {
+    content.version = version;
+  }
 
   return content;
 }

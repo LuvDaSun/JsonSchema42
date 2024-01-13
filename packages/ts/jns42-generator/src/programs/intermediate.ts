@@ -3,7 +3,7 @@ import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/draft-04/index.js";
 import * as schema202012 from "../documents/draft-2020-12/index.js";
-import * as schemaIntermediateB from "../documents/intermediate/index.js";
+import * as schemaIntermediate from "../documents/intermediate/index.js";
 
 export function configureIntermediateProgram(argv: yargs.Argv) {
   return argv.command(
@@ -14,6 +14,7 @@ export function configureIntermediateProgram(argv: yargs.Argv) {
         .positional("instance-schema-url", {
           description: "url to download schema from",
           type: "string",
+          demandOption: true,
         })
         .option("default-meta-schema-url", {
           description: "the default meta schema to use",
@@ -21,11 +22,11 @@ export function configureIntermediateProgram(argv: yargs.Argv) {
           choices: [
             schema202012.metaSchemaId,
             schemaDraft04.metaSchemaId,
-            schemaIntermediateB.metaSchemaId,
+            schemaIntermediate.metaSchemaId,
           ] as const,
           default: schema202012.metaSchemaId,
         }),
-    (argv) => main(argv as MainOptions),
+    (argv) => main(argv),
   );
 }
 
@@ -56,8 +57,8 @@ async function main(options: MainOptions) {
       new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
-    schemaIntermediateB.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediateB.Document(givenUrl, rootNode),
+    schemaIntermediate.metaSchemaId,
+    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
   await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);

@@ -1,9 +1,9 @@
-import * as schemaIntermediateB from "schema-intermediate";
+import * as schemaIntermediate from "schema-intermediate";
+import * as models from "../models/index.js";
 
 export interface Specification {
   names: Record<string, string>;
-  nodes: Record<string, schemaIntermediateB.Node>;
-  options: {
-    anyOfHack: boolean;
-  };
+  types: Record<string, models.Item | models.Alias>;
+  nodes: Record<string, schemaIntermediate.Node>;
+  options: {};
 }

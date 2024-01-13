@@ -1,0 +1,23 @@
+$schema: "./schema.json"
+
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    type: "object"
+    properties:
+      a: { type: "string" }
+      b: { type: "string" }
+    not:
+      required: ["a", "b"]
+
+valid:
+  empty: {}
+  onlyA:
+    a: "A"
+  onlyB:
+    b: "B"
+
+invalid:
+  bothAandB:
+    a: "A"
+    b: "B"

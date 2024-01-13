@@ -1,0 +1,34 @@
+$schema: "./schema.json"
+
+schemas:
+  draft_2020-12_a:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    anyOf:
+      - oneOf:
+          - required: [a]
+          - required: [b]
+          - required: [c]
+      - required: [d]
+      - required: [e]
+
+  draft_2020-12_b:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    oneOf:
+      - anyOf:
+          - required: [a]
+          - required: [d]
+          - required: [e]
+      - anyOf:
+          - required: [b]
+          - required: [d]
+          - required: [e]
+      - anyOf:
+          - required: [c]
+          - required: [d]
+          - required: [e]
+
+    anyOf:
+      - oneOf:
+          - type: boolean
+          - type: object
+      - type: string

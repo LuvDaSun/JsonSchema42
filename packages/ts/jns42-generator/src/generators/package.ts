@@ -1,39 +1,41 @@
 import fs from "node:fs";
 import path from "node:path";
 import * as schemaIntermediate from "schema-intermediate";
+import * as models from "../models/index.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
+import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
+import { generateMocksTestTsCode } from "./mocks-test-ts.js";
+import { generateMocksTsCode } from "./mocks-ts.js";
 import { getPackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
 import { getTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
-import { generateValidatorsTestTsCode } from "./validators-test-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
 
 export interface PackageOptions {
   packageName: string;
-  packageVersion: string;
+  packageVersion?: string;
   packageDirectoryPath: string;
-  anyOfHack: boolean;
 }
 
 export function generatePackage(
   intermediateData: schemaIntermediate.SchemaDocument,
   namesData: Record<string, string>,
+  types: Record<string, models.Item | models.Alias>,
   options: PackageOptions,
 ) {
-  const { anyOfHack, packageDirectoryPath, packageName, packageVersion } = options;
+  const { packageDirectoryPath, packageName, packageVersion } = options;
 
   const specification = {
     names: namesData,
     nodes: intermediateData.schemas,
-    options: {
-      anyOfHack,
-    },
+    types,
+    options: {},
   };
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
-  fs.mkdirSync(path.join(packageDirectoryPath, "src"));
+  fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
 
   {
     const content = getPackageJsonData(packageName, packageVersion);
@@ -84,8 +86,20 @@ export function generatePackage(
   }
 
   {
-    const content = generateValidatorsTestTsCode(specification);
-    const filePath = path.join(packageDirectoryPath, "src", "validators.test.ts");
+    const content = generateMocksTsCode(specification);
+    const filePath = path.join(packageDirectoryPath, "src", "mocks.ts");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateExamplesTestTsCode(specification);
+    const filePath = path.join(packageDirectoryPath, "src", "examples.test.ts");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateMocksTestTsCode(specification);
+    const filePath = path.join(packageDirectoryPath, "src", "mocks.test.ts");
     writeContentToFile(filePath, content);
   }
 

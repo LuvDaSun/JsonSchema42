@@ -3,234 +3,70 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.8.21                         -- www.JsonSchema42.org
+// v0.9.6                          -- www.JsonSchema42.org
+//
+/**
+* @summary JsonSchema42 intermediate schema
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json}
+*/
 export function parseSchemaDocument(value: unknown): unknown {
-return _parseMapSchemaDocument(value);
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"$schema": parseSchema(value["$schema" as keyof typeof value]),
+"schemas": parseSchemas(value["schemas" as keyof typeof value]),
+} :
+undefined;
 }
-function _parseMapSchemaDocument(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "$schema": {
-const propertyValue = parseSchema(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "schemas": {
-const propertyValue = parseSchemas(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node}
+*/
 export function parseNode(value: unknown): unknown {
-return _parseMapNode(value);
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+{
+"title": parseTitle(value["title" as keyof typeof value]),
+"description": parseDescription(value["description" as keyof typeof value]),
+"examples": parseExamples(value["examples" as keyof typeof value]),
+"deprecated": parseDeprecated(value["deprecated" as keyof typeof value]),
+"types": parseTypes(value["types" as keyof typeof value]),
+"reference": parseReference(value["reference" as keyof typeof value]),
+"oneOf": parseOneOf(value["oneOf" as keyof typeof value]),
+"anyOf": parseAnyOf(value["anyOf" as keyof typeof value]),
+"allOf": parseAllOf(value["allOf" as keyof typeof value]),
+"if": parseIf(value["if" as keyof typeof value]),
+"then": parseThen(value["then" as keyof typeof value]),
+"else": parseElse(value["else" as keyof typeof value]),
+"not": parseNot(value["not" as keyof typeof value]),
+"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value]),
+"objectProperties": parseObjectProperties(value["objectProperties" as keyof typeof value]),
+"mapProperties": parseMapProperties(value["mapProperties" as keyof typeof value]),
+"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value]),
+"propertyNames": parsePropertyNames(value["propertyNames" as keyof typeof value]),
+"tupleItems": parseTupleItems(value["tupleItems" as keyof typeof value]),
+"arrayItems": parseArrayItems(value["arrayItems" as keyof typeof value]),
+"contains": parseContains(value["contains" as keyof typeof value]),
+"options": parseOptions(value["options" as keyof typeof value]),
+"minimumInclusive": parseMinimumInclusive(value["minimumInclusive" as keyof typeof value]),
+"minimumExclusive": parseMinimumExclusive(value["minimumExclusive" as keyof typeof value]),
+"maximumInclusive": parseMaximumInclusive(value["maximumInclusive" as keyof typeof value]),
+"maximumExclusive": parseMaximumExclusive(value["maximumExclusive" as keyof typeof value]),
+"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value]),
+"minimumLength": parseMinimumLength(value["minimumLength" as keyof typeof value]),
+"maximumLength": parseMaximumLength(value["maximumLength" as keyof typeof value]),
+"valuePattern": parseValuePattern(value["valuePattern" as keyof typeof value]),
+"valueFormat": parseValueFormat(value["valueFormat" as keyof typeof value]),
+"minimumItems": parseMinimumItems(value["minimumItems" as keyof typeof value]),
+"maximumItems": parseMaximumItems(value["maximumItems" as keyof typeof value]),
+"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value]),
+"required": parseRequired(value["required" as keyof typeof value]),
+"minimumProperties": parseMinimumProperties(value["minimumProperties" as keyof typeof value]),
+"maximumProperties": parseMaximumProperties(value["maximumProperties" as keyof typeof value]),
+} :
+undefined;
 }
-function _parseMapNode(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-switch(propertyName) {
-case "title": {
-const propertyValue = parseTitle(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "description": {
-const propertyValue = parseDescription(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "examples": {
-const propertyValue = parseExamples(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "deprecated": {
-const propertyValue = parseDeprecated(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "types": {
-const propertyValue = parseTypes(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "reference": {
-const propertyValue = parseReference(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "oneOf": {
-const propertyValue = parseOneOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "anyOf": {
-const propertyValue = parseAnyOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "allOf": {
-const propertyValue = parseAllOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "if": {
-const propertyValue = parseIf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "then": {
-const propertyValue = parseThen(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "else": {
-const propertyValue = parseElse(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "not": {
-const propertyValue = parseNot(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "dependentSchemas": {
-const propertyValue = parseDependentSchemas(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "objectProperties": {
-const propertyValue = parseObjectProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "mapProperties": {
-const propertyValue = parseMapProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "patternProperties": {
-const propertyValue = parsePatternProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "propertyNames": {
-const propertyValue = parsePropertyNames(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "tupleItems": {
-const propertyValue = parseTupleItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "arrayItems": {
-const propertyValue = parseArrayItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "contains": {
-const propertyValue = parseContains(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "options": {
-const propertyValue = parseOptions(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumInclusive": {
-const propertyValue = parseMinimumInclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumExclusive": {
-const propertyValue = parseMinimumExclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumInclusive": {
-const propertyValue = parseMaximumInclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumExclusive": {
-const propertyValue = parseMaximumExclusive(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "multipleOf": {
-const propertyValue = parseMultipleOf(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumLength": {
-const propertyValue = parseMinimumLength(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumLength": {
-const propertyValue = parseMaximumLength(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "valuePattern": {
-const propertyValue = parseValuePattern(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "valueFormat": {
-const propertyValue = parseValueFormat(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumItems": {
-const propertyValue = parseMinimumItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumItems": {
-const propertyValue = parseMaximumItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "uniqueItems": {
-const propertyValue = parseUniqueItems(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "required": {
-const propertyValue = parseRequired(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "minimumProperties": {
-const propertyValue = parseMinimumProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-case "maximumProperties": {
-const propertyValue = parseMaximumProperties(value[propertyName as keyof typeof value]);
-result[propertyName] = propertyValue;
-break;
-}
-}
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference}
+*/
 export function parseNodeReference(value: unknown): unknown {
-return _parseStringNodeReference(value);
-}
-function _parseStringNodeReference(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -241,10 +77,10 @@ default:
 return undefined;
 }
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/integer-value}
+*/
 export function parseIntegerValue(value: unknown): unknown {
-return _parseIntegerIntegerValue(value);
-}
-function _parseIntegerIntegerValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -255,10 +91,10 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value}
+*/
 export function parseNumberValue(value: unknown): unknown {
-return _parseNumberNumberValue(value);
-}
-function _parseNumberNumberValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -269,10 +105,10 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value}
+*/
 export function parseBooleanValue(value: unknown): unknown {
-return _parseBooleanBooleanValue(value);
-}
-function _parseBooleanBooleanValue(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -295,10 +131,10 @@ return value;
 }
 return undefined;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value}
+*/
 export function parseStringValue(value: unknown): unknown {
-return _parseStringStringValue(value);
-}
-function _parseStringStringValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -309,10 +145,10 @@ default:
 return undefined;
 }
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value}
+*/
 export function parseNonEmptyStringValue(value: unknown): unknown {
-return _parseStringNonEmptyStringValue(value);
-}
-function _parseStringNonEmptyStringValue(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -323,10 +159,10 @@ default:
 return undefined;
 }
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount}
+*/
 export function parseAmount(value: unknown): unknown {
-return _parseIntegerAmount(value);
-}
-function _parseIntegerAmount(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return Number(value);
@@ -337,10 +173,10 @@ return value ? 1 : 0;
 }
 return undefined;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema}
+*/
 export function parseSchema(value: unknown): unknown {
-return _parseStringSchema(value);
-}
-function _parseStringSchema(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -351,291 +187,297 @@ default:
 return undefined;
 }
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas}
+*/
 export function parseSchemas(value: unknown): unknown {
-return _parseMapSchemas(value);
-}
-function _parseMapSchemas(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseSchemasAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parseSchemasAdditionalProperties(value),
+])
+) :
+undefined;
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title}
+*/
 export function parseTitle(value: unknown): unknown {
-return _parseReferenceTitle(value);
-}
-function _parseReferenceTitle(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description}
+*/
 export function parseDescription(value: unknown): unknown {
-return _parseReferenceDescription(value);
-}
-function _parseReferenceDescription(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
+*/
 export function parseExamples(value: unknown): unknown {
-return _parseArrayExamples(value);
+return Array.isArray(value) ?
+value.map(value => parseExamplesItems(value)) :
+undefined;
 }
-function _parseArrayExamples(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseExamplesItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
+*/
 export function parseDeprecated(value: unknown): unknown {
-return _parseReferenceDeprecated(value);
-}
-function _parseReferenceDeprecated(value: unknown): unknown {
 return parseBooleanValue(value);
 }
+/**
+* @description What types does this schema describe<br />
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types}
+*/
 export function parseTypes(value: unknown): unknown {
-return _parseArrayTypes(value);
+return Array.isArray(value) ?
+value.map(value => parseTypesItems(value)) :
+undefined;
 }
-function _parseArrayTypes(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseTypesItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference}
+*/
 export function parseReference(value: unknown): unknown {
-return _parseReferenceReference(value);
-}
-function _parseReferenceReference(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf}
+*/
 export function parseOneOf(value: unknown): unknown {
-return _parseArrayOneOf(value);
+return Array.isArray(value) ?
+value.map(value => parseOneOfItems(value)) :
+undefined;
 }
-function _parseArrayOneOf(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseOneOfItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf}
+*/
 export function parseAnyOf(value: unknown): unknown {
-return _parseArrayAnyOf(value);
+return Array.isArray(value) ?
+value.map(value => parseAnyOfItems(value)) :
+undefined;
 }
-function _parseArrayAnyOf(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseAnyOfItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf}
+*/
 export function parseAllOf(value: unknown): unknown {
-return _parseArrayAllOf(value);
+return Array.isArray(value) ?
+value.map(value => parseAllOfItems(value)) :
+undefined;
 }
-function _parseArrayAllOf(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseAllOfItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if}
+*/
 export function parseIf(value: unknown): unknown {
-return _parseReferenceIf(value);
-}
-function _parseReferenceIf(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then}
+*/
 export function parseThen(value: unknown): unknown {
-return _parseReferenceThen(value);
-}
-function _parseReferenceThen(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else}
+*/
 export function parseElse(value: unknown): unknown {
-return _parseReferenceElse(value);
-}
-function _parseReferenceElse(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not}
+*/
 export function parseNot(value: unknown): unknown {
-return _parseReferenceNot(value);
-}
-function _parseReferenceNot(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas}
+*/
 export function parseDependentSchemas(value: unknown): unknown {
-return _parseMapDependentSchemas(value);
-}
-function _parseMapDependentSchemas(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseDependentSchemasAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parseDependentSchemasAdditionalProperties(value),
+])
+) :
+undefined;
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties}
+*/
 export function parseObjectProperties(value: unknown): unknown {
-return _parseMapObjectProperties(value);
-}
-function _parseMapObjectProperties(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parseObjectPropertiesAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parseObjectPropertiesAdditionalProperties(value),
+])
+) :
+undefined;
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties}
+*/
 export function parseMapProperties(value: unknown): unknown {
-return _parseReferenceMapProperties(value);
-}
-function _parseReferenceMapProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties}
+*/
 export function parsePatternProperties(value: unknown): unknown {
-return _parseMapPatternProperties(value);
-}
-function _parseMapPatternProperties(value: unknown): unknown {
-if(typeof value === "object" && value !== null && !Array.isArray(value)) {
-const result = {} as Record<string, unknown>;
-for(const propertyName in value) {
-result[propertyName] ??= parsePatternPropertiesAdditionalProperties(value[propertyName as keyof typeof value]);
-}
-return result;
-}
+return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => [
+((value: unknown) => {
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
 return undefined;
 }
+})(name),
+parsePatternPropertiesAdditionalProperties(value),
+])
+) :
+undefined;
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames}
+*/
 export function parsePropertyNames(value: unknown): unknown {
-return _parseReferencePropertyNames(value);
-}
-function _parseReferencePropertyNames(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems}
+*/
 export function parseTupleItems(value: unknown): unknown {
-return _parseArrayTupleItems(value);
+return Array.isArray(value) ?
+value.map(value => parseTupleItemsItems(value)) :
+undefined;
 }
-function _parseArrayTupleItems(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseTupleItemsItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems}
+*/
 export function parseArrayItems(value: unknown): unknown {
-return _parseReferenceArrayItems(value);
-}
-function _parseReferenceArrayItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains}
+*/
 export function parseContains(value: unknown): unknown {
-return _parseReferenceContains(value);
-}
-function _parseReferenceContains(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
+*/
 export function parseOptions(value: unknown): unknown {
-return _parseArrayOptions(value);
+return Array.isArray(value) ?
+value.map(value => parseOptionsItems(value)) :
+undefined;
 }
-function _parseArrayOptions(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseOptionsItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive}
+*/
 export function parseMinimumInclusive(value: unknown): unknown {
-return _parseReferenceMinimumInclusive(value);
-}
-function _parseReferenceMinimumInclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive}
+*/
 export function parseMinimumExclusive(value: unknown): unknown {
-return _parseReferenceMinimumExclusive(value);
-}
-function _parseReferenceMinimumExclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive}
+*/
 export function parseMaximumInclusive(value: unknown): unknown {
-return _parseReferenceMaximumInclusive(value);
-}
-function _parseReferenceMaximumInclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive}
+*/
 export function parseMaximumExclusive(value: unknown): unknown {
-return _parseReferenceMaximumExclusive(value);
-}
-function _parseReferenceMaximumExclusive(value: unknown): unknown {
 return parseNumberValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf}
+*/
 export function parseMultipleOf(value: unknown): unknown {
-return _parseReferenceMultipleOf(value);
-}
-function _parseReferenceMultipleOf(value: unknown): unknown {
 return parseNumberValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength}
+*/
 export function parseMinimumLength(value: unknown): unknown {
-return _parseReferenceMinimumLength(value);
-}
-function _parseReferenceMinimumLength(value: unknown): unknown {
 return parseAmount(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength}
+*/
 export function parseMaximumLength(value: unknown): unknown {
-return _parseReferenceMaximumLength(value);
-}
-function _parseReferenceMaximumLength(value: unknown): unknown {
 return parseAmount(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern}
+*/
 export function parseValuePattern(value: unknown): unknown {
-return _parseReferenceValuePattern(value);
-}
-function _parseReferenceValuePattern(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat}
+*/
 export function parseValueFormat(value: unknown): unknown {
-return _parseReferenceValueFormat(value);
-}
-function _parseReferenceValueFormat(value: unknown): unknown {
 return parseNonEmptyStringValue(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems}
+*/
 export function parseMinimumItems(value: unknown): unknown {
-return _parseReferenceMinimumItems(value);
-}
-function _parseReferenceMinimumItems(value: unknown): unknown {
 return parseAmount(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems}
+*/
 export function parseMaximumItems(value: unknown): unknown {
-return _parseReferenceMaximumItems(value);
-}
-function _parseReferenceMaximumItems(value: unknown): unknown {
 return parseAmount(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems}
+*/
 export function parseUniqueItems(value: unknown): unknown {
-return _parseBooleanUniqueItems(value);
-}
-function _parseBooleanUniqueItems(value: unknown): unknown {
 if(value == null) {
 return false;
 }
@@ -658,47 +500,42 @@ return value;
 }
 return undefined;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
+*/
 export function parseRequired(value: unknown): unknown {
-return _parseArrayRequired(value);
+return Array.isArray(value) ?
+value.map(value => parseRequiredItems(value)) :
+undefined;
 }
-function _parseArrayRequired(value: unknown): unknown {
-if(Array.isArray(value)) {
-const result = new Array<unknown>(value.length);
-for(let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-result[elementIndex] = parseRequiredItems(value[elementIndex]);
-}
-return result;
-}
-return undefined;
-}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties}
+*/
 export function parseMinimumProperties(value: unknown): unknown {
-return _parseReferenceMinimumProperties(value);
-}
-function _parseReferenceMinimumProperties(value: unknown): unknown {
 return parseAmount(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties}
+*/
 export function parseMaximumProperties(value: unknown): unknown {
-return _parseReferenceMaximumProperties(value);
-}
-function _parseReferenceMaximumProperties(value: unknown): unknown {
 return parseAmount(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties}
+*/
 export function parseSchemasAdditionalProperties(value: unknown): unknown {
-return _parseReferenceSchemasAdditionalProperties(value);
-}
-function _parseReferenceSchemasAdditionalProperties(value: unknown): unknown {
 return parseNode(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items}
+*/
 export function parseExamplesItems(value: unknown): unknown {
-return _parseAnyExamplesItems(value);
-}
-function _parseAnyExamplesItems(value: unknown): unknown {
 return value;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items}
+*/
 export function parseTypesItems(value: unknown): unknown {
-return _parseStringTypesItems(value);
-}
-function _parseStringTypesItems(value: unknown): unknown {
 switch(typeof value) {
 case "string":
 return value;
@@ -709,57 +546,57 @@ default:
 return undefined;
 }
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items}
+*/
 export function parseOneOfItems(value: unknown): unknown {
-return _parseReferenceOneOfItems(value);
-}
-function _parseReferenceOneOfItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items}
+*/
 export function parseAnyOfItems(value: unknown): unknown {
-return _parseReferenceAnyOfItems(value);
-}
-function _parseReferenceAnyOfItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items}
+*/
 export function parseAllOfItems(value: unknown): unknown {
-return _parseReferenceAllOfItems(value);
-}
-function _parseReferenceAllOfItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties}
+*/
 export function parseDependentSchemasAdditionalProperties(value: unknown): unknown {
-return _parseReferenceDependentSchemasAdditionalProperties(value);
-}
-function _parseReferenceDependentSchemasAdditionalProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties}
+*/
 export function parseObjectPropertiesAdditionalProperties(value: unknown): unknown {
-return _parseReferenceObjectPropertiesAdditionalProperties(value);
-}
-function _parseReferenceObjectPropertiesAdditionalProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties}
+*/
 export function parsePatternPropertiesAdditionalProperties(value: unknown): unknown {
-return _parseReferencePatternPropertiesAdditionalProperties(value);
-}
-function _parseReferencePatternPropertiesAdditionalProperties(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items}
+*/
 export function parseTupleItemsItems(value: unknown): unknown {
-return _parseReferenceTupleItemsItems(value);
-}
-function _parseReferenceTupleItemsItems(value: unknown): unknown {
 return parseNodeReference(value);
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items}
+*/
 export function parseOptionsItems(value: unknown): unknown {
-return _parseAnyOptionsItems(value);
-}
-function _parseAnyOptionsItems(value: unknown): unknown {
 return value;
 }
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items}
+*/
 export function parseRequiredItems(value: unknown): unknown {
-return _parseReferenceRequiredItems(value);
-}
-function _parseReferenceRequiredItems(value: unknown): unknown {
 return parseStringValue(value);
 }

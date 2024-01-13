@@ -1,0 +1,46 @@
+{
+  "name": "jns42-optimizer",
+  "private": true,
+  "sideEffects": false,
+  "description": "",
+  "type": "module",
+  "main": "out/main.js",
+  "types": "out/main.d.ts",
+  "files": [
+    "out/*",
+    "src/*"
+  ],
+  "scripts": {
+    "prepack": "npm install --no-workspaces",
+    "pretest": "tsc --build",
+    "prepare": "tsc --build",
+    "build": "tsc --build",
+    "clean": "rm -rf ./out && tsc --build --clean",
+    "test": "node --test ./out/**/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/LuvDaSun/JsonSchema42.git"
+  },
+  "author": "LuvDaSun Software B.V.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuvDaSun/JsonSchema42/issues"
+  },
+  "homepage": "https://www.JsonSchema42.org",
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.2",
+    "typescript": "^5.3.3",
+    "yaml": "^2.3.4"
+  },
+  "dependencies": {
+    "@types/node": "^20.11.0",
+    "@types/yargs": "^17.0.32",
+    "camelcase": "^8.0.0",
+    "hash.js": "^1.1.7",
+    "tslib": "^2.6.2",
+    "type-fest": "^4.6.0",
+    "typescript": "^5.3.3",
+    "yargs": "^17.7.2"
+  }
+}

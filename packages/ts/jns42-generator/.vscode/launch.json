@@ -7,9 +7,12 @@
       "name": "run file",
       "program": "${file}",
       "args": [],
+      "env": {
+        "NODE_ENV": "development"
+      },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
       "preLaunchTask": "build",
       "outputCapture": "std"
     },
@@ -22,116 +25,40 @@
         "package",
         "${file}",
         "--package-directory",
-        ".package/file",
+        ".package/file/${fileBasenameNoExtension}",
         "--package-name",
-        "file",
-        "--package-version",
-        "0.0.0"
+        "${fileBasenameNoExtension}"
       ],
+      "env": {
+        "NODE_ENV": "development"
+      },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
+      "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
+      "preLaunchTask": "build",
+      "outputCapture": "std"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "package JsonSchema draft-04",
+      "name": "test fixture",
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
-        "package",
-        "http://json-schema.org/draft-04/schema#",
-        "--package-directory",
-        ".package/schema/schema-draft-04",
+        "test",
+        "${file}",
+        "--output-directory",
+        ".package/test",
         "--package-name",
-        "schema-draft-04",
-        "--package-version",
-        "0.0.0"
+        "${fileBasenameNoExtension}"
       ],
+      "env": {
+        "NODE_ENV": "development"
+      },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package JsonSchema draft-2020-12",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "https://json-schema.org/draft/2020-12/schema",
-        "--package-directory",
-        ".package/schema/schema-draft-2020-12",
-        "--package-name",
-        "schema-draft-2020-12",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package swagger v2",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "http://swagger.io/v2/schema.json#",
-        "--package-directory",
-        ".package/schema/swagger-v2",
-        "--package-name",
-        "oas-v3.0",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package oas v3.0",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "https://spec.openapis.org/oas/3.0/schema/2021-09-28",
-        "--package-directory",
-        ".package/schema/oas-v3.0",
-        "--package-name",
-        "oas-v3.0",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "package oas v3.1",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "package",
-        "https://spec.openapis.org/oas/3.1/schema/2022-10-07",
-        "--package-directory",
-        ".package/schema/oas-v3.1",
-        "--package-name",
-        "oas-v3.1",
-        "--package-version",
-        "0.0.0"
-      ],
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
-      "preLaunchTask": "build"
+      "outFiles": ["${workspaceFolder}/../*/out/**/*.js"],
+      "preLaunchTask": "build",
+      "outputCapture": "std"
     }
   ]
 }

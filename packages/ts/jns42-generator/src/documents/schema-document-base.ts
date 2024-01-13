@@ -190,10 +190,10 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
   protected getIntermediateMetadataPart(nodePointer: string, node: N) {
-    const title = this.selectNodeTitle(node) ?? "";
-    const description = this.selectNodeDescription(node) ?? "";
-    const deprecated = this.selectNodeDeprecated(node) ?? false;
-    const examples = this.selectNodeExamples(node) ?? [];
+    const title = this.selectNodeTitle(node);
+    const description = this.selectNodeDescription(node);
+    const deprecated = this.selectNodeDeprecated(node);
+    const examples = this.selectNodeExamples(node);
 
     return {
       deprecated,
@@ -218,6 +218,10 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
     if (types.length === 0) {
       types = this.guessTypes(node);
+    }
+
+    if (types.length === 0) {
+      return {};
     }
 
     return { types };
@@ -247,11 +251,11 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
     const minimumItems = this.selectValidationMinimumItems(node);
     const maximumItems = this.selectValidationMaximumItems(node);
-    const uniqueItems = this.selectValidationUniqueItems(node) ?? false;
+    const uniqueItems = this.selectValidationUniqueItems(node);
 
     const minimumProperties = this.selectValidationMinimumProperties(node);
     const maximumProperties = this.selectValidationMaximumProperties(node);
-    const required = this.selectValidationRequired(node) ?? [];
+    const required = this.selectValidationRequired(node);
 
     return {
       options,
