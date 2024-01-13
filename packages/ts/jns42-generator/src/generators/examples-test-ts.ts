@@ -18,7 +18,6 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     if (nodeId == null) {
       continue;
     }
-
     if ((typeItem.examples ?? []).length === 0) {
       continue;
     }
@@ -31,10 +30,9 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
         ${mapIterable(
           typeItem.examples ?? [],
           (example) => itt`
-            assert.equal(
-              validators.${validatorFunctionName}(${JSON.stringify(example)}),
-              true,
-            )
+            const errors = new Array<validators.ValidationError>();
+            const isvalid = validators.${validatorFunctionName}(${JSON.stringify(example)}, errors);
+            assert.equal(valid, true);
           `,
         )}
       });

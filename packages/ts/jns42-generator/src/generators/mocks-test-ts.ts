@@ -26,10 +26,9 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     yield itt`
       test(${JSON.stringify(typeName)}, () => {
         const mock = mocks.${mockFunctionName}();
-        assert.equal(
-          validators.${validatorFunctionName}(mock),
-          true,
-        )
+        const errors = new Array<validators.ValidationError>();
+        const isvalid = validators.${validatorFunctionName}(mock, errors);
+        assert.equal(isvalid, true);
       });
     `;
   }

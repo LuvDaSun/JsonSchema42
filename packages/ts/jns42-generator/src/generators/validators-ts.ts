@@ -18,6 +18,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   yield itt`
     import * as types from "./types.js";
+
+    export interface ValidationError {
+      typeName: string,
+    }
   `;
 
   for (const [typeKey, item] of Object.entries(types)) {
@@ -33,8 +37,12 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown): value is types.${typeName} {
-        return (${definition});
+      export function ${functionName}(value: unknown, errors = new Array<ValidationError>()): value is types.${typeName} {
+        if (!(${definition})) {
+          errors.push(${JSON.stringify({ typeName })})
+          return false;
+        }
+        return true;
       }
     `;
   }
@@ -51,7 +59,7 @@ function* generateValidatorReference(
     yield itt`${generateValidatorDefinition(specification, typeKey, valueExpression)}`;
   } else {
     const functionName = toCamel("is", names[typeItem.id]);
-    yield itt`${functionName}(${valueExpression})`;
+    yield itt`${functionName}(${valueExpression}, errors)`;
   }
 }
 
