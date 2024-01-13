@@ -156,6 +156,7 @@ async function main(options: MainOptions) {
       cp.execSync("npm install", {
         cwd: packageDirectoryPath,
         env: process.env,
+        stdio: "pipe",
       });
     }
 
@@ -164,13 +165,15 @@ async function main(options: MainOptions) {
       cp.execSync("npm run build", {
         cwd: packageDirectoryPath,
         env: process.env,
+        stdio: "pipe",
       });
     }
 
-    await test("test package", () => {
+    test("test package", () => {
       cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,
+        stdio: "pipe",
       });
     });
 
