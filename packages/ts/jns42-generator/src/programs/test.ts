@@ -151,18 +151,29 @@ async function main(options: MainOptions) {
       });
     }
 
-    // install (and implicitly build) package
+    // install package
     {
       cp.execSync("npm install", {
         cwd: packageDirectoryPath,
         env: process.env,
+        stdio: "pipe",
       });
     }
 
-    await test("test package", () => {
+    // build package
+    {
+      cp.execSync("npm run build", {
+        cwd: packageDirectoryPath,
+        env: process.env,
+        stdio: "pipe",
+      });
+    }
+
+    test("test package", () => {
       cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,
+        stdio: "pipe",
       });
     });
 
@@ -174,7 +185,8 @@ async function main(options: MainOptions) {
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
-          assert.equal(packageMain[`is${rootTypeName}`](data), true);
+          const valid = packageMain[`is${rootTypeName}`](data);
+          assert.equal(valid, true);
         });
       }
     });
@@ -187,7 +199,8 @@ async function main(options: MainOptions) {
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
-          assert.equal(packageMain[`is${rootTypeName}`](data), false);
+          const valid = packageMain[`is${rootTypeName}`](data);
+          assert.equal(valid, false);
         });
       }
     });

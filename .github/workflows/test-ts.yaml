@@ -1,4 +1,5 @@
 on:
+  pull_request: {}
   push:
     branches:
       - "*"
@@ -11,16 +12,17 @@ on:
 jobs:
   unit:
     runs-on: ubuntu-latest
-    container: node:18
+    container: node:21.5.0-alpine3.19
     steps:
       - uses: actions/checkout@v3
       - run: npm ci
       - run: npm --workspaces run build
       - run: npm --workspaces test
+      - run: ./packages/ts/jns42-generator/test-fixtures
 
   audit:
     runs-on: ubuntu-latest
-    container: node:18
+    container: node:21.5.0-alpine3.19
     steps:
       - uses: actions/checkout@v3
       - run: npm ci

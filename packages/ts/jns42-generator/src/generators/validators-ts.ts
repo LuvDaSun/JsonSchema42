@@ -191,8 +191,8 @@ function* generateRules(
         yield itt`value.length <= ${JSON.stringify(typeItem.maximumLength)}`;
       }
 
-      for (const rulevalue of typeItem.valuePattern ?? []) {
-        yield itt`new RegExp(${JSON.stringify(rulevalue)}).test(${valueExpression})`;
+      for (const ruleValue of typeItem.valuePattern ?? []) {
+        yield itt`new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})`;
       }
 
       break;

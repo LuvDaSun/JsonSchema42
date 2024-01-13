@@ -9,7 +9,7 @@ export function getTsconfigJsonData() {
       composite: true,
       lib: ["ES2023"],
     },
-    include: ["src/**/*"],
+    include: ["src"],
   };
 
   return content;

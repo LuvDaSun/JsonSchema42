@@ -20,7 +20,7 @@
     "prepare": "tsc --build",
     "build": "tsc --build",
     "clean": "rm -rf ./out && tsc --build --clean",
-    "test": "node --test ./out/**/*.test.js ; ./test-fixtures"
+    "test": "node --test ./out/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -56,12 +56,6 @@
     "yargs": "^17.7.2"
   },
   "bundledDependencies": [
-    "jns42-optimizer",
-    "schema-draft-04",
-    "schema-draft-2020-12",
-    "schema-intermediate"
-  ],
-  "bundleDependencies": [
     "jns42-optimizer",
     "schema-draft-04",
     "schema-draft-2020-12",
