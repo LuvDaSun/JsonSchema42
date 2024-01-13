@@ -185,7 +185,8 @@ async function main(options: MainOptions) {
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
-          assert.equal(packageMain[`is${rootTypeName}`](data), true);
+          const valid = packageMain[`is${rootTypeName}`](data);
+          assert.equal(valid, true);
         });
       }
     });
@@ -198,7 +199,8 @@ async function main(options: MainOptions) {
           if (parseData) {
             data = packageMain[`parse${rootTypeName}`](data);
           }
-          assert.equal(packageMain[`is${rootTypeName}`](data), false);
+          const valid = packageMain[`is${rootTypeName}`](data);
+          assert.equal(valid, false);
         });
       }
     });
