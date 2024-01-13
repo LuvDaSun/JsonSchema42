@@ -18,6 +18,7 @@ jobs:
       - run: npm ci
       - run: npm --workspaces run build
       - run: npm --workspaces test
+      - run: ./packages/ts/jns42-generator/test-fixtures
 
   audit:
     runs-on: ubuntu-latest
