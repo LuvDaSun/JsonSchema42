@@ -533,9 +533,9 @@ function* generateRules(
           yield itt`
             if(${generateValidatorReference(specification, element, valueExpression)}) {
               count++;
-              // if(count > 1) {
-              //   return false;
-              // }
+              if(count > 1) {
+                return false;
+              }
             }
           `;
         }

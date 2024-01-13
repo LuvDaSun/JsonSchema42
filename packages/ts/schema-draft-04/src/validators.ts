@@ -354,15 +354,15 @@ return ((
 let count = 0;
 if(isAdditionalItems0(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if(isAdditionalItems1(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -377,15 +377,15 @@ return ((
 let count = 0;
 if(isItems0(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if(isItems1(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -436,15 +436,15 @@ return ((
 let count = 0;
 if(isAdditionalProperties0(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if(isAdditionalProperties1(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -580,15 +580,15 @@ return ((
 let count = 0;
 if(isType0(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if(isType1(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -714,15 +714,15 @@ return ((
 let count = 0;
 if(isDependencies0(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if(isDependencies1(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()

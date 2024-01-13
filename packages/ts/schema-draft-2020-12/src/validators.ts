@@ -336,15 +336,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -473,9 +473,9 @@ return ((
 let count = 0;
 if(isStringArray(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((value !== null) &&
 (typeof value === "object") &&
@@ -799,15 +799,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -907,15 +907,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -1137,15 +1137,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -1381,15 +1381,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -1532,15 +1532,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -1600,15 +1600,15 @@ return ((
 let count = 0;
 if(isType0(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if(isType1(value)) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -1878,15 +1878,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -1987,15 +1987,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
@@ -2047,15 +2047,15 @@ return true;
 })()
 )) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 if((typeof value === "boolean")) {
 count++;
-// if(count > 1) {
-//   return false;
-// }
+if(count > 1) {
+return false;
+}
 }
 return count === 1;
 })()
