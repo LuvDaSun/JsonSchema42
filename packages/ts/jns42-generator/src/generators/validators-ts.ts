@@ -276,8 +276,8 @@ function* generateRules(
         yield itt`${valueExpression}.length >= ${JSON.stringify(typeItem.minimumItems)}`;
       }
 
-      if (typeItem.minimumItems != null) {
-        yield itt`${valueExpression}.length <= ${JSON.stringify(typeItem.minimumItems)}`;
+      if (typeItem.maximumItems != null) {
+        yield itt`${valueExpression}.length <= ${JSON.stringify(typeItem.maximumItems)}`;
       }
 
       yield itt`
