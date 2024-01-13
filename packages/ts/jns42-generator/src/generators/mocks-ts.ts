@@ -22,7 +22,14 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
   yield itt`
     const depthCounters: Record<string, number> = {};
-    const maximumDepth = 2;
+
+    export interface MockGeneratorOptions {
+      maximumDepth?: number;
+    }
+    const defaultMockGeneratorOptions = {
+      maximumDepth: 2,
+    }
+
   `;
 
   for (const [typeKey, item] of Object.entries(types)) {
@@ -38,7 +45,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(): types.${typeName} {
+      export function ${functionName}(options: MockGeneratorOptions = {}): types.${typeName} {
+        const configuration = {
+          ...defaultMockGeneratorOptions,
+          ...options,
+        };
         depthCounters[${JSON.stringify(typeKey)}] ??= 0;
 
         try {
@@ -284,7 +295,7 @@ function* generateMockDefinition(
       const itemsRange = maximumItems - minimumItems + 1;
 
       yield itt`
-        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < maximumDepth ?
+        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
           randomArray({
             lengthOffset: ${JSON.stringify(itemsOffset)},
             lengthRange: ${JSON.stringify(itemsRange)},
@@ -309,7 +320,7 @@ function* generateMockDefinition(
                 : itt`
                   ${JSON.stringify(name)}: (depthCounters[${JSON.stringify(
                     resolvedElement,
-                  )}] ?? 0) < maximumDepth && Boolean(nextSeed() % 2) ? ${generateMockReference(
+                  )}] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? ${generateMockReference(
                     specification,
                     element,
                   )} : undefined,
@@ -327,7 +338,7 @@ function* generateMockDefinition(
       const [resolvedElement] = unalias(types, element);
 
       yield itt`
-        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < maximumDepth ? {
+        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ? {
           ${mapIterable(
             repeat(5),
             () => itt`
