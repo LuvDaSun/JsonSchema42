@@ -345,8 +345,8 @@ export function transformSchema(
                 element: mapKey(model.arrayItems),
 
                 // uniqueItems: model.uniqueItems,
-                // minimumItems: model.minimumItems,
-                // maximumItems: model.maximumItems,
+                minimumItems: model.minimumItems,
+                maximumItems: model.maximumItems,
               },
             ];
             return;
@@ -360,8 +360,8 @@ export function transformSchema(
               element: "any",
 
               // uniqueItems: model.uniqueItems,
-              // minimumItems: model.minimumItems,
-              // maximumItems: model.maximumItems,
+              minimumItems: model.minimumItems,
+              maximumItems: model.maximumItems,
             },
           ];
           return;

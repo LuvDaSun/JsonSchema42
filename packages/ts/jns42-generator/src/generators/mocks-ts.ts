@@ -72,7 +72,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
       lengthRange: number,
       chars: string,
     }
-    // TODO verify that this does exactly what we want it to do
     function randomString({
       lengthOffset,
       lengthRange,
@@ -94,7 +93,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
       precisionOffset: number,
       precisionRange: number,
     }
-    // TODO verify that this does exactly what we want it to do
     function randomNumber({
       isMinimumInclusive,
       isMaximumInclusive,
@@ -109,6 +107,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
       const valueOffset = inclusiveMinimumValue * precision;
       const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
       const value = (valueOffset + nextSeed() % valueRange) / precision;
+      return value;
+    }
+
+    interface RandomArrayArguments<T> {
+      elementFactory: () => T;
+      lengthOffset: number;
+      lengthRange: number;
+    }
+    function randomArray<T>({
+      elementFactory,
+      lengthOffset,
+      lengthRange,
+    }: RandomArrayArguments<T>) {
+      const length = lengthOffset + nextSeed() % lengthRange;
+      const value = new Array<T>();
+      while(value.length < length) {
+        value.push(elementFactory());
+      }
       return value;
     }
   `;
@@ -232,7 +248,7 @@ function* generateMockDefinition(
       const minimumLength = typeItem.minimumLength ?? 3;
       const maximumLength = typeItem.maximumLength ?? 15;
       const lengthOffset = minimumLength;
-      const lengthRange = maximumLength - minimumLength;
+      const lengthRange = maximumLength - minimumLength + 1;
       const chars = "abcdefghijklmnopqrstuvwxyz";
 
       yield `randomString(${JSON.stringify({
@@ -262,16 +278,19 @@ function* generateMockDefinition(
       const { element } = typeItem;
 
       const [resolvedElement] = unalias(types, element);
+      const minimumItems = typeItem.minimumItems ?? 2;
+      const maximumItems = typeItem.maximumItems ?? 5;
+      const itemsOffset = minimumItems;
+      const itemsRange = maximumItems - minimumItems + 1;
 
       yield itt`
-        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < maximumDepth ? [
-          ${mapIterable(
-            repeat(5),
-            () => itt`
-              ${generateMockReference(specification, element)},
-            `,
-          )}
-        ] : []
+        (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < maximumDepth ?
+          randomArray({
+            lengthOffset: ${JSON.stringify(itemsOffset)},
+            lengthRange: ${JSON.stringify(itemsRange)},
+            elementFactory: () => ${generateMockReference(specification, element)},
+          }) :
+          []
       `;
       break;
     }
