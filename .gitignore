@@ -1,6 +1,7 @@
 .*
 
 *.tsbuildinfo
+*.tgz
 
 !.gitignore
 !.prettierignore

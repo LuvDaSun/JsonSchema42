@@ -23,7 +23,6 @@
     }
   },
   "scripts": {
-    "prepack": "npm install --no-workspaces",
     "pretest": "tsc --build",
     "prepare": "tsc --build",
     "build": "tsc --build",
@@ -39,5 +38,5 @@
     "typescript": "^5.3.3",
     "@tsconfig/node20": "^20.1.2"
   },
-  "private": true
+  "version": "0.0.0"
 }

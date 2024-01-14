@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.10.0",
+  "version": "0.11.2",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -10,12 +10,12 @@
   "main": "out/main.js",
   "types": "out/main.d.ts",
   "files": [
-    "bin/*",
-    "out/*",
-    "src/*"
+    "bin/**",
+    "out/**",
+    "src/**"
   ],
   "scripts": {
-    "prepack": "npm install --no-workspaces",
+    "prepack": "./prepack",
     "pretest": "tsc --build",
     "prepare": "tsc --build",
     "build": "tsc --build",
@@ -46,10 +46,10 @@
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "entities": "^4.5.0",
-    "jns42-optimizer": "file:../jns42-optimizer",
-    "schema-draft-04": "file:../schema-draft-04",
-    "schema-draft-2020-12": "file:../schema-draft-2020-12",
-    "schema-intermediate": "file:../schema-intermediate",
+    "jns42-optimizer": "*",
+    "schema-draft-04": "*",
+    "schema-draft-2020-12": "*",
+    "schema-intermediate": "*",
     "tslib": "^2.6.2",
     "type-fest": "^4.9.0",
     "yaml": "^2.3.4",

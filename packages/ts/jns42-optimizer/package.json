@@ -1,5 +1,6 @@
 {
   "name": "jns42-optimizer",
+  "version": "0.0.0",
   "private": true,
   "sideEffects": false,
   "description": "",
@@ -7,11 +8,10 @@
   "main": "out/main.js",
   "types": "out/main.d.ts",
   "files": [
-    "out/*",
-    "src/*"
+    "out/**",
+    "src/**"
   ],
   "scripts": {
-    "prepack": "npm install --no-workspaces",
     "pretest": "tsc --build",
     "prepare": "tsc --build",
     "build": "tsc --build",
