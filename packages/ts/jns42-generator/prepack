@@ -4,27 +4,16 @@ set -e
 
 cd $(dirname $0)
 
+PACKAGES=$(cat package.json | jq --raw-output ".bundledDependencies[]")
+
 rm --recursive --force node_modules
 mkdir --parents node_modules
 
-mkdir --parents .bundle-tmp/jns42-optimizer
-mkdir --parents .bundle-tmp/schema-draft-04
-mkdir --parents .bundle-tmp/schema-draft-2020-12
-mkdir --parents .bundle-tmp/schema-intermediate
-
-npm --workspace jns42-optimizer pack --pack-destination .bundle-tmp/jns42-optimizer 
-npm --workspace schema-draft-04 pack --pack-destination .bundle-tmp/schema-draft-04
-npm --workspace schema-draft-2020-12 pack --pack-destination .bundle-tmp/schema-draft-2020-12
-npm --workspace schema-intermediate pack --pack-destination .bundle-tmp/schema-intermediate
-
-tar --extract --file .bundle-tmp/jns42-optimizer/jns42-optimizer-0.0.0.tgz --directory .bundle-tmp/jns42-optimizer
-tar --extract --file .bundle-tmp/schema-draft-04/schema-draft-04-0.0.0.tgz --directory .bundle-tmp/schema-draft-04
-tar --extract --file .bundle-tmp/schema-draft-2020-12/schema-draft-2020-12-0.0.0.tgz --directory .bundle-tmp/schema-draft-2020-12
-tar --extract --file .bundle-tmp/schema-intermediate/schema-intermediate-0.0.0.tgz --directory .bundle-tmp/schema-intermediate
-
-mv .bundle-tmp/jns42-optimizer/package node_modules/jns42-optimizer
-mv .bundle-tmp/schema-draft-04/package node_modules/schema-draft-04
-mv .bundle-tmp/schema-draft-2020-12/package node_modules/schema-draft-2020-12
-mv .bundle-tmp/schema-intermediate/package node_modules/schema-intermediate
+for PACKAGE in $PACKAGES; do
+  mkdir --parents .bundle-tmp/$PACKAGE
+  npm --workspace $PACKAGE pack --pack-destination .bundle-tmp/$PACKAGE
+  tar --extract --file .bundle-tmp/$PACKAGE/$PACKAGE-0.0.0.tgz --directory .bundle-tmp/$PACKAGE
+  mv .bundle-tmp/$PACKAGE/package node_modules/$PACKAGE
+done
 
 rm --recursive --force .bundle-tmp
