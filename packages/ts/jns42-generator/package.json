@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.10.0",
+  "version": "0.11.2",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -15,7 +15,7 @@
     "src/**"
   ],
   "scripts": {
-    "prepack": "bundle-dependencies",
+    "prepack": "./prepack",
     "pretest": "tsc --build",
     "prepare": "tsc --build",
     "build": "tsc --build",

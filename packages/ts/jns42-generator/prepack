@@ -4,17 +4,13 @@ set -e
 
 cd $(dirname $0)
 
+rm --recursive --force node_modules
 mkdir --parents node_modules
 
 mkdir --parents .bundle-tmp/jns42-optimizer
 mkdir --parents .bundle-tmp/schema-draft-04
 mkdir --parents .bundle-tmp/schema-draft-2020-12
 mkdir --parents .bundle-tmp/schema-intermediate
-
-rm --recursive --force node_modules/jns42-optimizer
-rm --recursive --force node_modules/schema-draft-04
-rm --recursive --force node_modules/schema-draft-2020-12
-rm --recursive --force node_modules/schema-intermediate
 
 npm --workspace jns42-optimizer pack --pack-destination .bundle-tmp/jns42-optimizer 
 npm --workspace schema-draft-04 pack --pack-destination .bundle-tmp/schema-draft-04
