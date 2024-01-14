@@ -14,16 +14,16 @@ jobs:
     container: node:21.5.0-alpine3.19
     steps:
       - uses: actions/checkout@v3
-      - run: npm ci
-      - run: npm run formatting
+      - run: yarn install --frozen-lockfile
+      - run: yarn run formatting
 
   spelling:
     runs-on: ubuntu-latest
     container: node:21.5.0-alpine3.19
     steps:
       - uses: actions/checkout@v3
-      - run: npm ci
-      - run: npm run spelling
+      - run: yarn install --frozen-lockfile
+      - run: yarn run spelling
 
   clippy:
     runs-on: ubuntu-latest

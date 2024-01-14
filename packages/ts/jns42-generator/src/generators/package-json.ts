@@ -24,7 +24,6 @@ export function getPackageJsonData(name: string, version?: string) {
       },
     },
     scripts: {
-      prepack: "npm install --no-workspaces",
       pretest: "tsc --build",
       prepare: "tsc --build",
       build: "tsc --build",
