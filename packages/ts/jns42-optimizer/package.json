@@ -1,6 +1,6 @@
 {
   "name": "jns42-optimizer",
-  "private": true,
+  "version": "0.0.0",
   "sideEffects": false,
   "description": "",
   "type": "module",
