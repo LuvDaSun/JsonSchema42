@@ -10,9 +10,9 @@
   "main": "out/main.js",
   "types": "out/main.d.ts",
   "files": [
-    "bin/*",
-    "out/*",
-    "src/*"
+    "bin/**",
+    "out/**",
+    "src/**"
   ],
   "scripts": {
     "pretest": "tsc --build",

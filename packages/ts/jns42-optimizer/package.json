@@ -7,8 +7,8 @@
   "main": "out/main.js",
   "types": "out/main.d.ts",
   "files": [
-    "out/*",
-    "src/*"
+    "out/**",
+    "src/**"
   ],
   "scripts": {
     "prepack": "npm install --no-workspaces",
