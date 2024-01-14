@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+cd $(dirname $0)
+
+npm --workspace jns42-optimizer pack
+npm --workspace schema-draft-04 pack
+npm --workspace schema-draft-2020-12 pack
+npm --workspace schema-intermediate pack
+
