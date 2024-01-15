@@ -1,3 +1,4 @@
+export * from "./examples-test-ts.js";
 export * from "./mocks-test-ts.js";
 export * from "./mocks-ts.js";
 export * from "./package.js";
