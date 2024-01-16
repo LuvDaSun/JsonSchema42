@@ -6,11 +6,16 @@
 // v0.11.5                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
+const currentPath = new Array<string>();
 /**
 * @summary JsonSchema42 intermediate schema
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json}
 */
-export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
+export function isSchemaDocument(value: unknown, pathPart?: string): value is types.SchemaDocument {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 value === null ||
 typeof value !== "object" ||
@@ -51,10 +56,20 @@ break;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node}
 */
-export function isNode(value: unknown): value is types.Node {
+export function isNode(value: unknown, pathPart?: string): value is types.Node {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 value === null ||
 typeof value !== "object" ||
@@ -258,10 +273,20 @@ break;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference}
 */
-export function isNodeReference(value: unknown): value is types.NodeReference {
+export function isNodeReference(value: unknown, pathPart?: string): value is types.NodeReference {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "string"
 ) {
@@ -270,10 +295,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/integer-value}
 */
-export function isIntegerValue(value: unknown): value is types.IntegerValue {
+export function isIntegerValue(value: unknown, pathPart?: string): value is types.IntegerValue {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "number" ||
 isNaN(value) ||
@@ -284,10 +319,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value}
 */
-export function isNumberValue(value: unknown): value is types.NumberValue {
+export function isNumberValue(value: unknown, pathPart?: string): value is types.NumberValue {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "number" ||
 isNaN(value)
@@ -297,20 +342,40 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value}
 */
-export function isBooleanValue(value: unknown): value is types.BooleanValue {
+export function isBooleanValue(value: unknown, pathPart?: string): value is types.BooleanValue {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(typeof value !== "boolean") {
 return false;
 }
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value}
 */
-export function isStringValue(value: unknown): value is types.StringValue {
+export function isStringValue(value: unknown, pathPart?: string): value is types.StringValue {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "string"
 ) {
@@ -318,11 +383,21 @@ return false;
 }
 return true;
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value}
 */
-export function isNonEmptyStringValue(value: unknown): value is types.NonEmptyStringValue {
+export function isNonEmptyStringValue(value: unknown, pathPart?: string): value is types.NonEmptyStringValue {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "string"
 ) {
@@ -331,10 +406,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount}
 */
-export function isAmount(value: unknown): value is types.Amount {
+export function isAmount(value: unknown, pathPart?: string): value is types.Amount {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "number" ||
 isNaN(value) ||
@@ -345,10 +430,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema}
 */
-export function isSchema(value: unknown): value is types.Schema {
+export function isSchema(value: unknown, pathPart?: string): value is types.Schema {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "string"
 ) {
@@ -360,10 +455,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas}
 */
-export function isSchemas(value: unknown): value is types.Schemas {
+export function isSchemas(value: unknown, pathPart?: string): value is types.Schemas {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 value === null ||
 typeof value !== "object" ||
@@ -377,14 +482,24 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-(() => {
+((value: unknown, pathPart?: string) => {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
-typeof propertyName !== "string"
+typeof value !== "string"
 ) {
 return false;
 }
 return true;
-})()
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+})(propertyName, undefined)
 ) {
 return false;
 }
@@ -395,24 +510,54 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title}
 */
-export function isTitle(value: unknown): value is types.Title {
+export function isTitle(value: unknown, pathPart?: string): value is types.Title {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNonEmptyStringValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description}
 */
-export function isDescription(value: unknown): value is types.Description {
+export function isDescription(value: unknown, pathPart?: string): value is types.Description {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNonEmptyStringValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
 */
-export function isExamples(value: unknown): value is types.Examples {
+export function isExamples(value: unknown, pathPart?: string): value is types.Examples {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -425,18 +570,38 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
 */
-export function isDeprecated(value: unknown): value is types.Deprecated {
+export function isDeprecated(value: unknown, pathPart?: string): value is types.Deprecated {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isBooleanValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @description What types does this schema describe<br />
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types}
 */
-export function isTypes(value: unknown): value is types.Types {
+export function isTypes(value: unknown, pathPart?: string): value is types.Types {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -449,17 +614,37 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference}
 */
-export function isReference(value: unknown): value is types.Reference {
+export function isReference(value: unknown, pathPart?: string): value is types.Reference {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf}
 */
-export function isOneOf(value: unknown): value is types.OneOf {
+export function isOneOf(value: unknown, pathPart?: string): value is types.OneOf {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -472,10 +657,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf}
 */
-export function isAnyOf(value: unknown): value is types.AnyOf {
+export function isAnyOf(value: unknown, pathPart?: string): value is types.AnyOf {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -488,10 +683,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf}
 */
-export function isAllOf(value: unknown): value is types.AllOf {
+export function isAllOf(value: unknown, pathPart?: string): value is types.AllOf {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -504,38 +709,88 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if}
 */
-export function isIf(value: unknown): value is types.If {
+export function isIf(value: unknown, pathPart?: string): value is types.If {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then}
 */
-export function isThen(value: unknown): value is types.Then {
+export function isThen(value: unknown, pathPart?: string): value is types.Then {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else}
 */
-export function isElse(value: unknown): value is types.Else {
+export function isElse(value: unknown, pathPart?: string): value is types.Else {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not}
 */
-export function isNot(value: unknown): value is types.Not {
+export function isNot(value: unknown, pathPart?: string): value is types.Not {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas}
 */
-export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
+export function isDependentSchemas(value: unknown, pathPart?: string): value is types.DependentSchemas {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 value === null ||
 typeof value !== "object" ||
@@ -549,14 +804,24 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-(() => {
+((value: unknown, pathPart?: string) => {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
-typeof propertyName !== "string"
+typeof value !== "string"
 ) {
 return false;
 }
 return true;
-})()
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+})(propertyName, undefined)
 ) {
 return false;
 }
@@ -567,10 +832,20 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties}
 */
-export function isObjectProperties(value: unknown): value is types.ObjectProperties {
+export function isObjectProperties(value: unknown, pathPart?: string): value is types.ObjectProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 value === null ||
 typeof value !== "object" ||
@@ -584,14 +859,24 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-(() => {
+((value: unknown, pathPart?: string) => {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
-typeof propertyName !== "string"
+typeof value !== "string"
 ) {
 return false;
 }
 return true;
-})()
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+})(propertyName, undefined)
 ) {
 return false;
 }
@@ -602,17 +887,37 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties}
 */
-export function isMapProperties(value: unknown): value is types.MapProperties {
+export function isMapProperties(value: unknown, pathPart?: string): value is types.MapProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties}
 */
-export function isPatternProperties(value: unknown): value is types.PatternProperties {
+export function isPatternProperties(value: unknown, pathPart?: string): value is types.PatternProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 value === null ||
 typeof value !== "object" ||
@@ -626,14 +931,24 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-(() => {
+((value: unknown, pathPart?: string) => {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
-typeof propertyName !== "string"
+typeof value !== "string"
 ) {
 return false;
 }
 return true;
-})()
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+})(propertyName, undefined)
 ) {
 return false;
 }
@@ -644,17 +959,37 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames}
 */
-export function isPropertyNames(value: unknown): value is types.PropertyNames {
+export function isPropertyNames(value: unknown, pathPart?: string): value is types.PropertyNames {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems}
 */
-export function isTupleItems(value: unknown): value is types.TupleItems {
+export function isTupleItems(value: unknown, pathPart?: string): value is types.TupleItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -667,24 +1002,54 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems}
 */
-export function isArrayItems(value: unknown): value is types.ArrayItems {
+export function isArrayItems(value: unknown, pathPart?: string): value is types.ArrayItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains}
 */
-export function isContains(value: unknown): value is types.Contains {
+export function isContains(value: unknown, pathPart?: string): value is types.Contains {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
 */
-export function isOptions(value: unknown): value is types.Options {
+export function isOptions(value: unknown, pathPart?: string): value is types.Options {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -697,97 +1062,227 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive}
 */
-export function isMinimumInclusive(value: unknown): value is types.MinimumInclusive {
+export function isMinimumInclusive(value: unknown, pathPart?: string): value is types.MinimumInclusive {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNumberValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive}
 */
-export function isMinimumExclusive(value: unknown): value is types.MinimumExclusive {
+export function isMinimumExclusive(value: unknown, pathPart?: string): value is types.MinimumExclusive {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNumberValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive}
 */
-export function isMaximumInclusive(value: unknown): value is types.MaximumInclusive {
+export function isMaximumInclusive(value: unknown, pathPart?: string): value is types.MaximumInclusive {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNumberValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive}
 */
-export function isMaximumExclusive(value: unknown): value is types.MaximumExclusive {
+export function isMaximumExclusive(value: unknown, pathPart?: string): value is types.MaximumExclusive {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNumberValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf}
 */
-export function isMultipleOf(value: unknown): value is types.MultipleOf {
+export function isMultipleOf(value: unknown, pathPart?: string): value is types.MultipleOf {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNumberValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength}
 */
-export function isMinimumLength(value: unknown): value is types.MinimumLength {
+export function isMinimumLength(value: unknown, pathPart?: string): value is types.MinimumLength {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isAmount(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength}
 */
-export function isMaximumLength(value: unknown): value is types.MaximumLength {
+export function isMaximumLength(value: unknown, pathPart?: string): value is types.MaximumLength {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isAmount(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern}
 */
-export function isValuePattern(value: unknown): value is types.ValuePattern {
+export function isValuePattern(value: unknown, pathPart?: string): value is types.ValuePattern {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNonEmptyStringValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat}
 */
-export function isValueFormat(value: unknown): value is types.ValueFormat {
+export function isValueFormat(value: unknown, pathPart?: string): value is types.ValueFormat {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNonEmptyStringValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems}
 */
-export function isMinimumItems(value: unknown): value is types.MinimumItems {
+export function isMinimumItems(value: unknown, pathPart?: string): value is types.MinimumItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isAmount(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems}
 */
-export function isMaximumItems(value: unknown): value is types.MaximumItems {
+export function isMaximumItems(value: unknown, pathPart?: string): value is types.MaximumItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isAmount(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems}
 */
-export function isUniqueItems(value: unknown): value is types.UniqueItems {
+export function isUniqueItems(value: unknown, pathPart?: string): value is types.UniqueItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(typeof value !== "boolean") {
 return false;
 }
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
 */
-export function isRequired(value: unknown): value is types.Required {
+export function isRequired(value: unknown, pathPart?: string): value is types.Required {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(!Array.isArray(value)) {
 return false;
 }
@@ -800,39 +1295,89 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties}
 */
-export function isMinimumProperties(value: unknown): value is types.MinimumProperties {
+export function isMinimumProperties(value: unknown, pathPart?: string): value is types.MinimumProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isAmount(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties}
 */
-export function isMaximumProperties(value: unknown): value is types.MaximumProperties {
+export function isMaximumProperties(value: unknown, pathPart?: string): value is types.MaximumProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isAmount(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties}
 */
-export function isSchemasAdditionalProperties(value: unknown): value is types.SchemasAdditionalProperties {
+export function isSchemasAdditionalProperties(value: unknown, pathPart?: string): value is types.SchemasAdditionalProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNode(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items}
 */
-export function isExamplesItems(value: unknown): value is types.ExamplesItems {
+export function isExamplesItems(value: unknown, pathPart?: string): value is types.ExamplesItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 // any
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items}
 */
-export function isTypesItems(value: unknown): value is types.TypesItems {
+export function isTypesItems(value: unknown, pathPart?: string): value is types.TypesItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 if(
 typeof value !== "string"
 ) {
@@ -852,67 +1397,163 @@ return false;
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items}
 */
-export function isOneOfItems(value: unknown): value is types.OneOfItems {
+export function isOneOfItems(value: unknown, pathPart?: string): value is types.OneOfItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items}
 */
-export function isAnyOfItems(value: unknown): value is types.AnyOfItems {
+export function isAnyOfItems(value: unknown, pathPart?: string): value is types.AnyOfItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items}
 */
-export function isAllOfItems(value: unknown): value is types.AllOfItems {
+export function isAllOfItems(value: unknown, pathPart?: string): value is types.AllOfItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties}
 */
-export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
+export function isDependentSchemasAdditionalProperties(value: unknown, pathPart?: string): value is types.DependentSchemasAdditionalProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties}
 */
-export function isObjectPropertiesAdditionalProperties(value: unknown): value is types.ObjectPropertiesAdditionalProperties {
+export function isObjectPropertiesAdditionalProperties(value: unknown, pathPart?: string): value is types.ObjectPropertiesAdditionalProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties}
 */
-export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
+export function isPatternPropertiesAdditionalProperties(value: unknown, pathPart?: string): value is types.PatternPropertiesAdditionalProperties {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items}
 */
-export function isTupleItemsItems(value: unknown): value is types.TupleItemsItems {
+export function isTupleItemsItems(value: unknown, pathPart?: string): value is types.TupleItemsItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isNodeReference(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items}
 */
-export function isOptionsItems(value: unknown): value is types.OptionsItems {
+export function isOptionsItems(value: unknown, pathPart?: string): value is types.OptionsItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 // any
 return true;
 ;
 }
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
+}
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items}
 */
-export function isRequiredItems(value: unknown): value is types.RequiredItems {
+export function isRequiredItems(value: unknown, pathPart?: string): value is types.RequiredItems {
+try {
+if(pathPart != null) {
+currentPath.push(pathPart);
+}
 return (isStringValue(value));
 ;
+}
+finally {
+if(pathPart != null) {
+currentPath.pop();
+}
+}
 }

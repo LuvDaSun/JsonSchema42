@@ -21,6 +21,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   yield itt`
     const currentPath = new Array<string>();
+    let currentPathPart: string | undefined = "";
   `;
 
   for (const [typeKey, item] of Object.entries(types)) {
@@ -36,7 +37,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown, pathPart?: string): value is types.${typeName} {
+      export function ${functionName}(value: unknown): value is types.${typeName} {
+        const pathPart = currentPathPart;
         try {
           if(pathPart != null) {
             currentPath.push(pathPart);
@@ -45,7 +47,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         }
         finally {
           if(pathPart != null) {
-            currentPath.pop();
+            currentPathPart = currentPath.pop();
           }
         }
       }
@@ -57,13 +59,13 @@ function* generateValidatorReference(
   specification: models.Specification,
   typeKey: string,
   valueExpression: string,
-  pathExpression: string = "undefined",
 ): Iterable<NestedText> {
   const { names, types } = specification;
   const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`
-      ((value: unknown, pathPart?: string) => {
+      ((value: unknown) => {
+        const pathPart = currentPathPart;
         try {
           if(pathPart != null) {
             currentPath.push(pathPart);
@@ -72,10 +74,10 @@ function* generateValidatorReference(
         }
         finally {
           if(pathPart != null) {
-            currentPath.pop();
+            currentPathPart = currentPath.pop();
           }
         }
-      })(${valueExpression}, ${pathExpression})
+      })(${valueExpression})
     `;
   } else {
     const functionName = toCamel("is", names[typeItem.id]);
@@ -407,12 +409,8 @@ function* generateValidatorStatements(
           const elementKey = typeItem.elements[elementIndex];
           yield itt`
             case ${JSON.stringify(Number(elementIndex))}:
-              if(!${generateValidatorReference(
-                specification,
-                elementKey,
-                `elementValue`,
-                JSON.stringify(elementKey),
-              )}) {
+              currentPathPart = ${JSON.stringify(elementKey)};
+              if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
                 return false;
               }
               break;
@@ -481,12 +479,8 @@ function* generateValidatorStatements(
         }
 
         yield itt`
-          if(!${generateValidatorReference(
-            specification,
-            typeItem.element,
-            `elementValue`,
-            "String(elementIndex)",
-          )}) {
+          currentPathPart = String(elementIndex);
+          if(!${generateValidatorReference(specification, typeItem.element, `elementValue`)}) {
             return false;
           }
         `;
@@ -586,11 +580,11 @@ function* generateValidatorStatements(
         for (const propertyName in typeItem.properties) {
           yield itt`
             case ${JSON.stringify(propertyName)}:
+              currentPathPart = propertyName;
               if(!${generateValidatorReference(
                 specification,
                 typeItem.properties[propertyName].element,
                 `propertyValue`,
-                "propertyName",
               )}) {
                 return false;
               }
@@ -672,12 +666,8 @@ function* generateValidatorStatements(
         `;
 
         yield itt`
-          if(!${generateValidatorReference(
-            specification,
-            typeItem.element,
-            `propertyValue`,
-            "propertyName",
-          )}) {
+          currentPath = propertyName;
+          if(!${generateValidatorReference(specification, typeItem.element, `propertyValue`)}) {
             return false;
           }
         `;
@@ -691,12 +681,8 @@ function* generateValidatorStatements(
       for (let elementIndex = 0; elementIndex < typeItem.elements.length; elementIndex++) {
         const element = typeItem.elements[elementIndex];
         yield itt`
-          if(${generateValidatorReference(
-            specification,
-            element,
-            valueExpression,
-            JSON.stringify(String(elementIndex)),
-          )}) {
+          currentPath = ${JSON.stringify(String(elementIndex))}
+          if(${generateValidatorReference(specification, element, valueExpression)}) {
             count++;
             if(count > 1) {
               return false;
