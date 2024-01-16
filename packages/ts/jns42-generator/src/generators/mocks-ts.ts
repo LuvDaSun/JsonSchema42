@@ -105,31 +105,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return value;
     }
 
-    interface RandomNumberArguments {
-      isMinimumInclusive: boolean;
-      isMaximumInclusive: boolean;
-      minimumValue: number;
-      maximumValue: number;
-      precisionOffset: number,
-      precisionRange: number,
-    }
-    function randomNumber({
-      isMinimumInclusive,
-      isMaximumInclusive,
-      minimumValue,
-      maximumValue,
-      precisionOffset,
-      precisionRange,
-    }: RandomNumberArguments) {
-      const precision = precisionOffset + nextSeed() % (precisionRange + 1);
-      const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
-      const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
-      const valueOffset = inclusiveMinimumValue * precision;
-      const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
-      const value = (valueOffset + nextSeed() % valueRange) / precision;
-      return value;
-    }
-
     interface RandomArrayArguments<T> {
       elementFactory: () => T;
       lengthOffset: number;
@@ -258,21 +233,46 @@ function* generateMockDefinition(
         break;
       }
 
-      const isMinimumInclusive = typeItem.minimumInclusive != null;
-      const isMaximumInclusive = typeItem.maximumInclusive != null;
-      const minimumValue = typeItem.minimumInclusive ?? typeItem.minimumExclusive ?? -1000;
-      const maximumValue = typeItem.maximumInclusive ?? typeItem.maximumExclusive ?? 1000;
-      const precisionOffset = 100;
-      const precisionRange = 900;
+      let minimumValue = Number.NEGATIVE_INFINITY;
+      let isMinimumExclusive: boolean | undefined;
+      if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
+        minimumValue = typeItem.minimumInclusive;
+        isMinimumExclusive = false;
+      }
+      if (typeItem.minimumExclusive != null && typeItem.minimumExclusive >= minimumValue) {
+        minimumValue = typeItem.minimumExclusive;
+        isMinimumExclusive = true;
+      }
+      const minimumValueInclusiveExpression =
+        isMinimumExclusive == null
+          ? "configuration.minimumValue * precision"
+          : isMinimumExclusive
+            ? itt`(${JSON.stringify(minimumValue)} * precision + 1)`
+            : itt`(${JSON.stringify(minimumValue)} * precision)`;
 
-      yield `randomNumber(${JSON.stringify({
-        isMinimumInclusive,
-        isMaximumInclusive,
-        minimumValue,
-        maximumValue,
-        precisionOffset,
-        precisionRange,
-      })})`;
+      let maximumValue = Number.POSITIVE_INFINITY;
+      let isMaximumExclusive: boolean | undefined;
+      if (typeItem.maximumInclusive != null && typeItem.maximumInclusive <= maximumValue) {
+        maximumValue = typeItem.maximumInclusive;
+        isMaximumExclusive = false;
+      }
+      if (typeItem.maximumExclusive != null && typeItem.maximumExclusive <= maximumValue) {
+        maximumValue = typeItem.maximumExclusive;
+        isMaximumExclusive = true;
+      }
+      const maximumValueInclusiveExpression =
+        isMaximumExclusive == null
+          ? "(configuration.maximumValue * precision)"
+          : isMaximumExclusive
+            ? itt`(${JSON.stringify(maximumValue)} * precision - 1)`
+            : itt`(${JSON.stringify(maximumValue)} * precision)`;
+
+      yield itt`
+        (() => {
+          const precision = configuration.minimumPrecision + nextSeed() % (configuration.maximumPrecision - configuration.minimumPrecision + 1);
+          return (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1) / precision;
+        })()
+      `;
       break;
     }
 
