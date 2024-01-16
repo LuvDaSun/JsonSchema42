@@ -10,8 +10,6 @@
   },
   "include": [
     "src",
-    "../jns42-optimizer/src/utils/math.test.ts",
-    "../jns42-optimizer/src/utils/math.ts"
   ],
   "references": [
     { "path": "../jns42-optimizer" },
