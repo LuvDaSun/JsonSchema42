@@ -6,33 +6,63 @@
 // v0.11.5                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
-const currentPath = new Array<string>();
+export interface ValidationError {
+path: string;
+rule: string;
+typeName?: string;
+}
+const pathPartStack = new Array<string>();
+let currentPathPart: string | undefined = "";
+let currentTypeName: string | undefined;
+let errors = new Array<ValidationError>();
+export function getValidationErrors() {
+return errors;
+}
+function resetErrors() {
+errors = [];
+}
+function recordError(rule: string) {
+errors.push({
+path: pathPartStack.join("/"),
+typeName: currentTypeName,
+rule,
+})
+}
 /**
 * @summary JsonSchema42 intermediate schema
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json}
 */
-export function isSchemaDocument(value: unknown, pathPart?: string): value is types.SchemaDocument {
+export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "SchemaDocument";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 value === null ||
 typeof value !== "object" ||
 Array.isArray(value)
 ) {
+recordError("object");
 return false;
 }
 if(
 !("$schema" in value) ||
 value["$schema"] === undefined
 ) {
+recordError("required");
 return false;
 }
 if(
 !("schemas" in value) ||
 value["schemas"] === undefined
 ) {
+recordError("required");
 return false;
 }
 for(const propertyName in value) {
@@ -42,12 +72,16 @@ continue;
 }
 switch(propertyName) {
 case "$schema":
+currentPathPart = propertyName;
 if(!isSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "schemas":
+currentPathPart = propertyName;
 if(!isSchemas(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
@@ -57,24 +91,32 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node}
 */
-export function isNode(value: unknown, pathPart?: string): value is types.Node {
+export function isNode(value: unknown): value is types.Node {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Node";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 value === null ||
 typeof value !== "object" ||
 Array.isArray(value)
 ) {
+recordError("object");
 return false;
 }
 for(const propertyName in value) {
@@ -84,187 +126,261 @@ continue;
 }
 switch(propertyName) {
 case "title":
+currentPathPart = propertyName;
 if(!isTitle(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "description":
+currentPathPart = propertyName;
 if(!isDescription(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "examples":
+currentPathPart = propertyName;
 if(!isExamples(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "deprecated":
+currentPathPart = propertyName;
 if(!isDeprecated(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "types":
+currentPathPart = propertyName;
 if(!isTypes(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "reference":
+currentPathPart = propertyName;
 if(!isReference(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "oneOf":
+currentPathPart = propertyName;
 if(!isOneOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "anyOf":
+currentPathPart = propertyName;
 if(!isAnyOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "allOf":
+currentPathPart = propertyName;
 if(!isAllOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "if":
+currentPathPart = propertyName;
 if(!isIf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "then":
+currentPathPart = propertyName;
 if(!isThen(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "else":
+currentPathPart = propertyName;
 if(!isElse(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "not":
+currentPathPart = propertyName;
 if(!isNot(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentSchemas":
+currentPathPart = propertyName;
 if(!isDependentSchemas(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "objectProperties":
+currentPathPart = propertyName;
 if(!isObjectProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "mapProperties":
+currentPathPart = propertyName;
 if(!isMapProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "patternProperties":
+currentPathPart = propertyName;
 if(!isPatternProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "propertyNames":
+currentPathPart = propertyName;
 if(!isPropertyNames(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "tupleItems":
+currentPathPart = propertyName;
 if(!isTupleItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "arrayItems":
+currentPathPart = propertyName;
 if(!isArrayItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contains":
+currentPathPart = propertyName;
 if(!isContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "options":
+currentPathPart = propertyName;
 if(!isOptions(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimumInclusive":
+currentPathPart = propertyName;
 if(!isMinimumInclusive(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimumExclusive":
+currentPathPart = propertyName;
 if(!isMinimumExclusive(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximumInclusive":
+currentPathPart = propertyName;
 if(!isMaximumInclusive(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximumExclusive":
+currentPathPart = propertyName;
 if(!isMaximumExclusive(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "multipleOf":
+currentPathPart = propertyName;
 if(!isMultipleOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimumLength":
+currentPathPart = propertyName;
 if(!isMinimumLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximumLength":
+currentPathPart = propertyName;
 if(!isMaximumLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "valuePattern":
+currentPathPart = propertyName;
 if(!isValuePattern(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "valueFormat":
+currentPathPart = propertyName;
 if(!isValueFormat(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimumItems":
+currentPathPart = propertyName;
 if(!isMinimumItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximumItems":
+currentPathPart = propertyName;
 if(!isMaximumItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "uniqueItems":
+currentPathPart = propertyName;
 if(!isUniqueItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "required":
+currentPathPart = propertyName;
 if(!isRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimumProperties":
+currentPathPart = propertyName;
 if(!isMinimumProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximumProperties":
+currentPathPart = propertyName;
 if(!isMaximumProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
@@ -274,206 +390,279 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference}
 */
-export function isNodeReference(value: unknown, pathPart?: string): value is types.NodeReference {
+export function isNodeReference(value: unknown): value is types.NodeReference {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "NodeReference";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/integer-value}
 */
-export function isIntegerValue(value: unknown, pathPart?: string): value is types.IntegerValue {
+export function isIntegerValue(value: unknown): value is types.IntegerValue {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "IntegerValue";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "number" ||
 isNaN(value) ||
 value % 1 !== 0
 ) {
+recordError("integer");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/number-value}
 */
-export function isNumberValue(value: unknown, pathPart?: string): value is types.NumberValue {
+export function isNumberValue(value: unknown): value is types.NumberValue {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "NumberValue";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "number" ||
 isNaN(value)
 ) {
+recordError("number");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/boolean-value}
 */
-export function isBooleanValue(value: unknown, pathPart?: string): value is types.BooleanValue {
+export function isBooleanValue(value: unknown): value is types.BooleanValue {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "BooleanValue";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(typeof value !== "boolean") {
+recordError("boolean");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/string-value}
 */
-export function isStringValue(value: unknown, pathPart?: string): value is types.StringValue {
+export function isStringValue(value: unknown): value is types.StringValue {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "StringValue";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/non-empty-string-value}
 */
-export function isNonEmptyStringValue(value: unknown, pathPart?: string): value is types.NonEmptyStringValue {
+export function isNonEmptyStringValue(value: unknown): value is types.NonEmptyStringValue {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "NonEmptyStringValue";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/amount}
 */
-export function isAmount(value: unknown, pathPart?: string): value is types.Amount {
+export function isAmount(value: unknown): value is types.Amount {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Amount";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "number" ||
 isNaN(value) ||
 value % 1 !== 0
 ) {
+recordError("integer");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/$schema}
 */
-export function isSchema(value: unknown, pathPart?: string): value is types.Schema {
+export function isSchema(value: unknown): value is types.Schema {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Schema";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 if(value !== "https://schema.JsonSchema42.org/jns42-intermediate/schema.json") {
+recordError("options");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas}
 */
-export function isSchemas(value: unknown, pathPart?: string): value is types.Schemas {
+export function isSchemas(value: unknown): value is types.Schemas {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Schemas";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 value === null ||
 typeof value !== "object" ||
 Array.isArray(value)
 ) {
+recordError("map");
 return false;
 }
 for(const propertyName in value) {
@@ -482,28 +671,36 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-((value: unknown, pathPart?: string) => {
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = undefined;
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
-})(propertyName, undefined)
+})(propertyName)
 ) {
+recordError("propertyName");
 return false;
 }
+currentPathPart = propertyName;
 if(!isSchemasAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
@@ -511,59 +708,85 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title}
 */
-export function isTitle(value: unknown, pathPart?: string): value is types.Title {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isTitle(value: unknown): value is types.Title {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Title";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNonEmptyStringValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description}
 */
-export function isDescription(value: unknown, pathPart?: string): value is types.Description {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isDescription(value: unknown): value is types.Description {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Description";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNonEmptyStringValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
 */
-export function isExamples(value: unknown, pathPart?: string): value is types.Examples {
+export function isExamples(value: unknown): value is types.Examples {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Examples";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isExamplesItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -571,25 +794,34 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
 */
-export function isDeprecated(value: unknown, pathPart?: string): value is types.Deprecated {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isDeprecated(value: unknown): value is types.Deprecated {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Deprecated";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isBooleanValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
@@ -597,17 +829,26 @@ currentPath.pop();
 * @description What types does this schema describe<br />
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types}
 */
-export function isTypes(value: unknown, pathPart?: string): value is types.Types {
+export function isTypes(value: unknown): value is types.Types {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Types";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isTypesItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -615,42 +856,60 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference}
 */
-export function isReference(value: unknown, pathPart?: string): value is types.Reference {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isReference(value: unknown): value is types.Reference {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Reference";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf}
 */
-export function isOneOf(value: unknown, pathPart?: string): value is types.OneOf {
+export function isOneOf(value: unknown): value is types.OneOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "OneOf";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isOneOfItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -658,25 +917,35 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf}
 */
-export function isAnyOf(value: unknown, pathPart?: string): value is types.AnyOf {
+export function isAnyOf(value: unknown): value is types.AnyOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "AnyOf";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isAnyOfItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -684,25 +953,35 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf}
 */
-export function isAllOf(value: unknown, pathPart?: string): value is types.AllOf {
+export function isAllOf(value: unknown): value is types.AllOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "AllOf";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isAllOfItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -710,92 +989,132 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if}
 */
-export function isIf(value: unknown, pathPart?: string): value is types.If {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isIf(value: unknown): value is types.If {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "If";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then}
 */
-export function isThen(value: unknown, pathPart?: string): value is types.Then {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isThen(value: unknown): value is types.Then {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Then";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else}
 */
-export function isElse(value: unknown, pathPart?: string): value is types.Else {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isElse(value: unknown): value is types.Else {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Else";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not}
 */
-export function isNot(value: unknown, pathPart?: string): value is types.Not {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isNot(value: unknown): value is types.Not {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Not";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas}
 */
-export function isDependentSchemas(value: unknown, pathPart?: string): value is types.DependentSchemas {
+export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "DependentSchemas";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 value === null ||
 typeof value !== "object" ||
 Array.isArray(value)
 ) {
+recordError("map");
 return false;
 }
 for(const propertyName in value) {
@@ -804,28 +1123,36 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-((value: unknown, pathPart?: string) => {
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = undefined;
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
-})(propertyName, undefined)
+})(propertyName)
 ) {
+recordError("propertyName");
 return false;
 }
+currentPathPart = propertyName;
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
@@ -833,24 +1160,32 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties}
 */
-export function isObjectProperties(value: unknown, pathPart?: string): value is types.ObjectProperties {
+export function isObjectProperties(value: unknown): value is types.ObjectProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "ObjectProperties";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 value === null ||
 typeof value !== "object" ||
 Array.isArray(value)
 ) {
+recordError("map");
 return false;
 }
 for(const propertyName in value) {
@@ -859,28 +1194,36 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-((value: unknown, pathPart?: string) => {
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = undefined;
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
-})(propertyName, undefined)
+})(propertyName)
 ) {
+recordError("propertyName");
 return false;
 }
+currentPathPart = propertyName;
 if(!isObjectPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
@@ -888,41 +1231,57 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties}
 */
-export function isMapProperties(value: unknown, pathPart?: string): value is types.MapProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMapProperties(value: unknown): value is types.MapProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MapProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties}
 */
-export function isPatternProperties(value: unknown, pathPart?: string): value is types.PatternProperties {
+export function isPatternProperties(value: unknown): value is types.PatternProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "PatternProperties";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 value === null ||
 typeof value !== "object" ||
 Array.isArray(value)
 ) {
+recordError("map");
 return false;
 }
 for(const propertyName in value) {
@@ -931,28 +1290,36 @@ if(propertyValue === undefined) {
 continue;
 }
 if(!
-((value: unknown, pathPart?: string) => {
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = undefined;
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 return true;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
-})(propertyName, undefined)
+})(propertyName)
 ) {
+recordError("propertyName");
 return false;
 }
+currentPathPart = propertyName;
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
@@ -960,42 +1327,60 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames}
 */
-export function isPropertyNames(value: unknown, pathPart?: string): value is types.PropertyNames {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isPropertyNames(value: unknown): value is types.PropertyNames {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PropertyNames";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems}
 */
-export function isTupleItems(value: unknown, pathPart?: string): value is types.TupleItems {
+export function isTupleItems(value: unknown): value is types.TupleItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "TupleItems";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isTupleItemsItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -1003,59 +1388,85 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems}
 */
-export function isArrayItems(value: unknown, pathPart?: string): value is types.ArrayItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isArrayItems(value: unknown): value is types.ArrayItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ArrayItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains}
 */
-export function isContains(value: unknown, pathPart?: string): value is types.Contains {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isContains(value: unknown): value is types.Contains {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Contains";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
 */
-export function isOptions(value: unknown, pathPart?: string): value is types.Options {
+export function isOptions(value: unknown): value is types.Options {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Options";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isOptionsItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -1063,232 +1474,338 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive}
 */
-export function isMinimumInclusive(value: unknown, pathPart?: string): value is types.MinimumInclusive {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMinimumInclusive(value: unknown): value is types.MinimumInclusive {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinimumInclusive";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNumberValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive}
 */
-export function isMinimumExclusive(value: unknown, pathPart?: string): value is types.MinimumExclusive {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMinimumExclusive(value: unknown): value is types.MinimumExclusive {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinimumExclusive";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNumberValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive}
 */
-export function isMaximumInclusive(value: unknown, pathPart?: string): value is types.MaximumInclusive {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMaximumInclusive(value: unknown): value is types.MaximumInclusive {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaximumInclusive";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNumberValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive}
 */
-export function isMaximumExclusive(value: unknown, pathPart?: string): value is types.MaximumExclusive {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMaximumExclusive(value: unknown): value is types.MaximumExclusive {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaximumExclusive";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNumberValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf}
 */
-export function isMultipleOf(value: unknown, pathPart?: string): value is types.MultipleOf {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMultipleOf(value: unknown): value is types.MultipleOf {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MultipleOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNumberValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength}
 */
-export function isMinimumLength(value: unknown, pathPart?: string): value is types.MinimumLength {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMinimumLength(value: unknown): value is types.MinimumLength {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinimumLength";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isAmount(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength}
 */
-export function isMaximumLength(value: unknown, pathPart?: string): value is types.MaximumLength {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMaximumLength(value: unknown): value is types.MaximumLength {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaximumLength";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isAmount(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern}
 */
-export function isValuePattern(value: unknown, pathPart?: string): value is types.ValuePattern {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isValuePattern(value: unknown): value is types.ValuePattern {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ValuePattern";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNonEmptyStringValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat}
 */
-export function isValueFormat(value: unknown, pathPart?: string): value is types.ValueFormat {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isValueFormat(value: unknown): value is types.ValueFormat {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ValueFormat";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNonEmptyStringValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems}
 */
-export function isMinimumItems(value: unknown, pathPart?: string): value is types.MinimumItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMinimumItems(value: unknown): value is types.MinimumItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinimumItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isAmount(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems}
 */
-export function isMaximumItems(value: unknown, pathPart?: string): value is types.MaximumItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMaximumItems(value: unknown): value is types.MaximumItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaximumItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isAmount(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/uniqueItems}
 */
-export function isUniqueItems(value: unknown, pathPart?: string): value is types.UniqueItems {
+export function isUniqueItems(value: unknown): value is types.UniqueItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "UniqueItems";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(typeof value !== "boolean") {
+recordError("boolean");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
 */
-export function isRequired(value: unknown, pathPart?: string): value is types.Required {
+export function isRequired(value: unknown): value is types.Required {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "Required";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(!Array.isArray(value)) {
+recordError("array");
 return false;
 }
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isRequiredItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
@@ -1296,91 +1813,130 @@ return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties}
 */
-export function isMinimumProperties(value: unknown, pathPart?: string): value is types.MinimumProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMinimumProperties(value: unknown): value is types.MinimumProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinimumProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isAmount(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties}
 */
-export function isMaximumProperties(value: unknown, pathPart?: string): value is types.MaximumProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isMaximumProperties(value: unknown): value is types.MaximumProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaximumProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isAmount(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties}
 */
-export function isSchemasAdditionalProperties(value: unknown, pathPart?: string): value is types.SchemasAdditionalProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isSchemasAdditionalProperties(value: unknown): value is types.SchemasAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SchemasAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNode(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items}
 */
-export function isExamplesItems(value: unknown, pathPart?: string): value is types.ExamplesItems {
+export function isExamplesItems(value: unknown): value is types.ExamplesItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "ExamplesItems";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 // any
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items}
 */
-export function isTypesItems(value: unknown, pathPart?: string): value is types.TypesItems {
+export function isTypesItems(value: unknown): value is types.TypesItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "TypesItems";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 if(
 typeof value !== "string"
 ) {
+recordError("string");
 return false;
 }
 if(value !== "never" &&
@@ -1392,168 +1948,241 @@ value !== "number" &&
 value !== "string" &&
 value !== "array" &&
 value !== "map") {
+recordError("options");
 return false;
 }
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items}
 */
-export function isOneOfItems(value: unknown, pathPart?: string): value is types.OneOfItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isOneOfItems(value: unknown): value is types.OneOfItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "OneOfItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items}
 */
-export function isAnyOfItems(value: unknown, pathPart?: string): value is types.AnyOfItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isAnyOfItems(value: unknown): value is types.AnyOfItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AnyOfItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items}
 */
-export function isAllOfItems(value: unknown, pathPart?: string): value is types.AllOfItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isAllOfItems(value: unknown): value is types.AllOfItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOfItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties}
 */
-export function isDependentSchemasAdditionalProperties(value: unknown, pathPart?: string): value is types.DependentSchemasAdditionalProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependentSchemasAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties}
 */
-export function isObjectPropertiesAdditionalProperties(value: unknown, pathPart?: string): value is types.ObjectPropertiesAdditionalProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isObjectPropertiesAdditionalProperties(value: unknown): value is types.ObjectPropertiesAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ObjectPropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties}
 */
-export function isPatternPropertiesAdditionalProperties(value: unknown, pathPart?: string): value is types.PatternPropertiesAdditionalProperties {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PatternPropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items}
 */
-export function isTupleItemsItems(value: unknown, pathPart?: string): value is types.TupleItemsItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isTupleItemsItems(value: unknown): value is types.TupleItemsItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "TupleItemsItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isNodeReference(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items}
 */
-export function isOptionsItems(value: unknown, pathPart?: string): value is types.OptionsItems {
+export function isOptionsItems(value: unknown): value is types.OptionsItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
 try {
+currentTypeName = "OptionsItems";
 if(pathPart != null) {
-currentPath.push(pathPart);
+pathPartStack.push(pathPart);
 }
 // any
 return true;
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items}
 */
-export function isRequiredItems(value: unknown, pathPart?: string): value is types.RequiredItems {
-try {
-if(pathPart != null) {
-currentPath.push(pathPart);
+export function isRequiredItems(value: unknown): value is types.RequiredItems {
+if(pathPartStack.length === 0) {
+resetErrors();
 }
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "RequiredItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
 return (isStringValue(value));
 ;
 }
 finally {
+currentTypeName = typeName;
 if(pathPart != null) {
-currentPath.pop();
+currentPathPart = pathPartStack.pop();
 }
 }
 }

@@ -6,1438 +6,2200 @@
 // v0.11.5                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
-const currentPath = new Array<string>();
-/**
- * @description Core schema meta-schema
- * @see {@link http://json-schema.org/draft-04/schema#}
- */
-export function isSchemaDocument(value: unknown, pathPart?: string): value is types.SchemaDocument {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    for (const propertyName in value) {
-      const propertyValue = value[propertyName as keyof typeof value];
-      if (propertyValue === undefined) {
-        continue;
-      }
-      switch (propertyName) {
-        case "id":
-          if (!isId(propertyValue)) {
-            return false;
-          }
-          break;
-        case "$schema":
-          if (!isSchema(propertyValue)) {
-            return false;
-          }
-          break;
-        case "title":
-          if (!isTitle(propertyValue)) {
-            return false;
-          }
-          break;
-        case "description":
-          if (!isDescription(propertyValue)) {
-            return false;
-          }
-          break;
-        case "default":
-          if (!isDefault(propertyValue)) {
-            return false;
-          }
-          break;
-        case "multipleOf":
-          if (!isMultipleOf(propertyValue)) {
-            return false;
-          }
-          break;
-        case "maximum":
-          if (!isMaximum(propertyValue)) {
-            return false;
-          }
-          break;
-        case "exclusiveMaximum":
-          if (!isExclusiveMaximum(propertyValue)) {
-            return false;
-          }
-          break;
-        case "minimum":
-          if (!isMinimum(propertyValue)) {
-            return false;
-          }
-          break;
-        case "exclusiveMinimum":
-          if (!isExclusiveMinimum(propertyValue)) {
-            return false;
-          }
-          break;
-        case "maxLength":
-          if (!isMaxLength(propertyValue)) {
-            return false;
-          }
-          break;
-        case "minLength":
-          if (!isMinLength(propertyValue)) {
-            return false;
-          }
-          break;
-        case "pattern":
-          if (!isPattern(propertyValue)) {
-            return false;
-          }
-          break;
-        case "additionalItems":
-          if (!isAdditionalItems(propertyValue)) {
-            return false;
-          }
-          break;
-        case "items":
-          if (!isPropertiesItems(propertyValue)) {
-            return false;
-          }
-          break;
-        case "maxItems":
-          if (!isMaxItems(propertyValue)) {
-            return false;
-          }
-          break;
-        case "minItems":
-          if (!isMinItems(propertyValue)) {
-            return false;
-          }
-          break;
-        case "uniqueItems":
-          if (!isUniqueItems(propertyValue)) {
-            return false;
-          }
-          break;
-        case "maxProperties":
-          if (!isMaxProperties(propertyValue)) {
-            return false;
-          }
-          break;
-        case "minProperties":
-          if (!isMinProperties(propertyValue)) {
-            return false;
-          }
-          break;
-        case "required":
-          if (!isRequired(propertyValue)) {
-            return false;
-          }
-          break;
-        case "additionalProperties":
-          if (!isPropertiesAdditionalProperties(propertyValue)) {
-            return false;
-          }
-          break;
-        case "definitions":
-          if (!isDefinitions(propertyValue)) {
-            return false;
-          }
-          break;
-        case "properties":
-          if (!isProperties(propertyValue)) {
-            return false;
-          }
-          break;
-        case "patternProperties":
-          if (!isPatternProperties(propertyValue)) {
-            return false;
-          }
-          break;
-        case "dependencies":
-          if (!isDependencies(propertyValue)) {
-            return false;
-          }
-          break;
-        case "enum":
-          if (!isEnum(propertyValue)) {
-            return false;
-          }
-          break;
-        case "type":
-          if (!isType(propertyValue)) {
-            return false;
-          }
-          break;
-        case "format":
-          if (!isFormat(propertyValue)) {
-            return false;
-          }
-          break;
-        case "allOf":
-          if (!isAllOf(propertyValue)) {
-            return false;
-          }
-          break;
-        case "anyOf":
-          if (!isAnyOf(propertyValue)) {
-            return false;
-          }
-          break;
-        case "oneOf":
-          if (!isOneOf(propertyValue)) {
-            return false;
-          }
-          break;
-        case "not":
-          if (!isNot(propertyValue)) {
-            return false;
-          }
-          break;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+export interface ValidationError {
+path: string;
+rule: string;
+typeName?: string;
+}
+const pathPartStack = new Array<string>();
+let currentPathPart: string | undefined = "";
+let currentTypeName: string | undefined;
+let errors = new Array<ValidationError>();
+export function getValidationErrors() {
+return errors;
+}
+function resetErrors() {
+errors = [];
+}
+function recordError(rule: string) {
+errors.push({
+path: pathPartStack.join("/"),
+typeName: currentTypeName,
+rule,
+})
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
- */
-export function isSchemaArray(value: unknown, pathPart?: string): value is types.SchemaArray {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (!Array.isArray(value)) {
-      return false;
-    }
-    if (value.length < 1) {
-      return false;
-    }
-    for (let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-      const elementValue = value[elementIndex];
-      if (!isSchemaArrayItems(elementValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @description Core schema meta-schema
+* @see {@link http://json-schema.org/draft-04/schema#}
+*/
+export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SchemaDocument";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+switch(propertyName) {
+case "id":
+currentPathPart = propertyName;
+if(!isId(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "$schema":
+currentPathPart = propertyName;
+if(!isSchema(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "title":
+currentPathPart = propertyName;
+if(!isTitle(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "description":
+currentPathPart = propertyName;
+if(!isDescription(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "default":
+currentPathPart = propertyName;
+if(!isDefault(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "multipleOf":
+currentPathPart = propertyName;
+if(!isMultipleOf(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "maximum":
+currentPathPart = propertyName;
+if(!isMaximum(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "exclusiveMaximum":
+currentPathPart = propertyName;
+if(!isExclusiveMaximum(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "minimum":
+currentPathPart = propertyName;
+if(!isMinimum(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "exclusiveMinimum":
+currentPathPart = propertyName;
+if(!isExclusiveMinimum(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "maxLength":
+currentPathPart = propertyName;
+if(!isMaxLength(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "minLength":
+currentPathPart = propertyName;
+if(!isMinLength(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "pattern":
+currentPathPart = propertyName;
+if(!isPattern(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "additionalItems":
+currentPathPart = propertyName;
+if(!isAdditionalItems(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "items":
+currentPathPart = propertyName;
+if(!isPropertiesItems(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "maxItems":
+currentPathPart = propertyName;
+if(!isMaxItems(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "minItems":
+currentPathPart = propertyName;
+if(!isMinItems(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "uniqueItems":
+currentPathPart = propertyName;
+if(!isUniqueItems(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "maxProperties":
+currentPathPart = propertyName;
+if(!isMaxProperties(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "minProperties":
+currentPathPart = propertyName;
+if(!isMinProperties(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "required":
+currentPathPart = propertyName;
+if(!isRequired(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "additionalProperties":
+currentPathPart = propertyName;
+if(!isPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "definitions":
+currentPathPart = propertyName;
+if(!isDefinitions(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "properties":
+currentPathPart = propertyName;
+if(!isProperties(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "patternProperties":
+currentPathPart = propertyName;
+if(!isPatternProperties(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "dependencies":
+currentPathPart = propertyName;
+if(!isDependencies(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "enum":
+currentPathPart = propertyName;
+if(!isEnum(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "type":
+currentPathPart = propertyName;
+if(!isType(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "format":
+currentPathPart = propertyName;
+if(!isFormat(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "allOf":
+currentPathPart = propertyName;
+if(!isAllOf(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "anyOf":
+currentPathPart = propertyName;
+if(!isAnyOf(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "oneOf":
+currentPathPart = propertyName;
+if(!isOneOf(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+case "not":
+currentPathPart = propertyName;
+if(!isNot(propertyValue)) {
+recordError("propertyName");
+return false;
+}
+break;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
- */
-export function isPositiveInteger(
-  value: unknown,
-  pathPart?: string,
-): value is types.PositiveInteger {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-      return false;
-    }
-    if (value < 0) {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
+*/
+export function isSchemaArray(value: unknown): value is types.SchemaArray {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SchemaArray";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
+if(value.length < 1) {
+recordError("minimumItems");
+return false;
+}
+for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
+const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
+if(!isSchemaArrayItems(elementValue)) {
+recordError("elementValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
- */
-export function isPositiveIntegerDefault0(
-  value: unknown,
-  pathPart?: string,
-): value is types.PositiveIntegerDefault0 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "number" || isNaN(value) || value % 1 !== 0) {
-      return false;
-    }
-    if (value < 0) {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
+*/
+export function isPositiveInteger(value: unknown): value is types.PositiveInteger {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PositiveInteger";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value) ||
+value % 1 !== 0
+) {
+recordError("integer");
+return false;
+}
+if(
+value < 0
+) {
+recordError("minimumInclusive");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
- */
-export function isSimpleTypes(value: unknown, pathPart?: string): value is types.SimpleTypes {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    if (
-      value !== "array" &&
-      value !== "boolean" &&
-      value !== "integer" &&
-      value !== "null" &&
-      value !== "number" &&
-      value !== "object" &&
-      value !== "string"
-    ) {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
+*/
+export function isPositiveIntegerDefault0(value: unknown): value is types.PositiveIntegerDefault0 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PositiveIntegerDefault0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value) ||
+value % 1 !== 0
+) {
+recordError("integer");
+return false;
+}
+if(
+value < 0
+) {
+recordError("minimumInclusive");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
- */
-export function isStringArray(value: unknown, pathPart?: string): value is types.StringArray {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (!Array.isArray(value)) {
-      return false;
-    }
-    if (value.length < 1) {
-      return false;
-    }
-    for (let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-      const elementValue = value[elementIndex];
-      if (!isStringArrayItems(elementValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
+*/
+export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SimpleTypes";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+if(value !== "array" &&
+value !== "boolean" &&
+value !== "integer" &&
+value !== "null" &&
+value !== "number" &&
+value !== "object" &&
+value !== "string") {
+recordError("options");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/id}
- */
-export function isId(value: unknown, pathPart?: string): value is types.Id {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
+*/
+export function isStringArray(value: unknown): value is types.StringArray {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "StringArray";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
+if(value.length < 1) {
+recordError("minimumItems");
+return false;
+}
+for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
+const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
+if(!isStringArrayItems(elementValue)) {
+recordError("elementValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
- */
-export function isSchema(value: unknown, pathPart?: string): value is types.Schema {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/id}
+*/
+export function isId(value: unknown): value is types.Id {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Id";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/title}
- */
-export function isTitle(value: unknown, pathPart?: string): value is types.Title {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
+*/
+export function isSchema(value: unknown): value is types.Schema {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Schema";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/description}
- */
-export function isDescription(value: unknown, pathPart?: string): value is types.Description {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/title}
+*/
+export function isTitle(value: unknown): value is types.Title {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Title";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/default}
- */
-export function isDefault(value: unknown, pathPart?: string): value is types.Default {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    // unknown
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/description}
+*/
+export function isDescription(value: unknown): value is types.Description {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Description";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
- */
-export function isMultipleOf(value: unknown, pathPart?: string): value is types.MultipleOf {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "number" || isNaN(value)) {
-      return false;
-    }
-    if (value <= 0) {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/default}
+*/
+export function isDefault(value: unknown): value is types.Default {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Default";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+// unknown
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
- */
-export function isMaximum(value: unknown, pathPart?: string): value is types.Maximum {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "number" || isNaN(value)) {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
+*/
+export function isMultipleOf(value: unknown): value is types.MultipleOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MultipleOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+if(
+value <= 0
+) {
+recordError("minimumExclusive");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
- */
-export function isExclusiveMaximum(
-  value: unknown,
-  pathPart?: string,
-): value is types.ExclusiveMaximum {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "boolean") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
+*/
+export function isMaximum(value: unknown): value is types.Maximum {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Maximum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
- */
-export function isMinimum(value: unknown, pathPart?: string): value is types.Minimum {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "number" || isNaN(value)) {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
+*/
+export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ExclusiveMaximum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
- */
-export function isExclusiveMinimum(
-  value: unknown,
-  pathPart?: string,
-): value is types.ExclusiveMinimum {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "boolean") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
+*/
+export function isMinimum(value: unknown): value is types.Minimum {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Minimum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
- */
-export function isMaxLength(value: unknown, pathPart?: string): value is types.MaxLength {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveInteger(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
+*/
+export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ExclusiveMinimum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
- */
-export function isMinLength(value: unknown, pathPart?: string): value is types.MinLength {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveIntegerDefault0(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
+*/
+export function isMaxLength(value: unknown): value is types.MaxLength {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxLength";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/pattern}
- */
-export function isPattern(value: unknown, pathPart?: string): value is types.Pattern {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
+*/
+export function isMinLength(value: unknown): value is types.MinLength {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinLength";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveIntegerDefault0(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
- */
-export function isAdditionalItems(
-  value: unknown,
-  pathPart?: string,
-): value is types.AdditionalItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    let count = 0;
-    if (isAdditionalItems0(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    if (isAdditionalItems1(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    return count === 1;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/pattern}
+*/
+export function isPattern(value: unknown): value is types.Pattern {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Pattern";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/items}
- */
-export function isPropertiesItems(
-  value: unknown,
-  pathPart?: string,
-): value is types.PropertiesItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    let count = 0;
-    if (isItems0(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    if (isItems1(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    return count === 1;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
+*/
+export function isAdditionalItems(value: unknown): value is types.AdditionalItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AdditionalItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+let count = 0;
+currentPathPart = "0"
+if(isAdditionalItems0(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+currentPathPart = "1"
+if(isAdditionalItems1(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
- */
-export function isMaxItems(value: unknown, pathPart?: string): value is types.MaxItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveInteger(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items}
+*/
+export function isPropertiesItems(value: unknown): value is types.PropertiesItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PropertiesItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+let count = 0;
+currentPathPart = "0"
+if(isItems0(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+currentPathPart = "1"
+if(isItems1(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
- */
-export function isMinItems(value: unknown, pathPart?: string): value is types.MinItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveIntegerDefault0(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
+*/
+export function isMaxItems(value: unknown): value is types.MaxItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
- */
-export function isUniqueItems(value: unknown, pathPart?: string): value is types.UniqueItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "boolean") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
+*/
+export function isMinItems(value: unknown): value is types.MinItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveIntegerDefault0(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
- */
-export function isMaxProperties(value: unknown, pathPart?: string): value is types.MaxProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveInteger(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
+*/
+export function isUniqueItems(value: unknown): value is types.UniqueItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "UniqueItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
- */
-export function isMinProperties(value: unknown, pathPart?: string): value is types.MinProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveIntegerDefault0(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
+*/
+export function isMaxProperties(value: unknown): value is types.MaxProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/required}
- */
-export function isRequired(value: unknown, pathPart?: string): value is types.Required {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isStringArray(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
+*/
+export function isMinProperties(value: unknown): value is types.MinProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveIntegerDefault0(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
- */
-export function isPropertiesAdditionalProperties(
-  value: unknown,
-  pathPart?: string,
-): value is types.PropertiesAdditionalProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    let count = 0;
-    if (isAdditionalProperties0(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    if (isAdditionalProperties1(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    return count === 1;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/required}
+*/
+export function isRequired(value: unknown): value is types.Required {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Required";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isStringArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
- */
-export function isDefinitions(value: unknown, pathPart?: string): value is types.Definitions {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    for (const propertyName in value) {
-      const propertyValue = value[propertyName as keyof typeof value];
-      if (propertyValue === undefined) {
-        continue;
-      }
-      if (
-        !((value: unknown, pathPart?: string) => {
-          try {
-            if (pathPart != null) {
-              currentPath.push(pathPart);
-            }
-            if (typeof value !== "string") {
-              return false;
-            }
-            return true;
-          } finally {
-            if (pathPart != null) {
-              currentPath.pop();
-            }
-          }
-        })(propertyName, undefined)
-      ) {
-        return false;
-      }
-      if (!isDefinitionsAdditionalProperties(propertyValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
+*/
+export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+let count = 0;
+currentPathPart = "0"
+if(isAdditionalProperties0(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+currentPathPart = "1"
+if(isAdditionalProperties1(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
- */
-export function isProperties(value: unknown, pathPart?: string): value is types.Properties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    for (const propertyName in value) {
-      const propertyValue = value[propertyName as keyof typeof value];
-      if (propertyValue === undefined) {
-        continue;
-      }
-      if (
-        !((value: unknown, pathPart?: string) => {
-          try {
-            if (pathPart != null) {
-              currentPath.push(pathPart);
-            }
-            if (typeof value !== "string") {
-              return false;
-            }
-            return true;
-          } finally {
-            if (pathPart != null) {
-              currentPath.pop();
-            }
-          }
-        })(propertyName, undefined)
-      ) {
-        return false;
-      }
-      if (!isPropertiesPropertiesAdditionalProperties(propertyValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
+*/
+export function isDefinitions(value: unknown): value is types.Definitions {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Definitions";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
+if(!isDefinitionsAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
- */
-export function isPatternProperties(
-  value: unknown,
-  pathPart?: string,
-): value is types.PatternProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    for (const propertyName in value) {
-      const propertyValue = value[propertyName as keyof typeof value];
-      if (propertyValue === undefined) {
-        continue;
-      }
-      if (
-        !((value: unknown, pathPart?: string) => {
-          try {
-            if (pathPart != null) {
-              currentPath.push(pathPart);
-            }
-            if (typeof value !== "string") {
-              return false;
-            }
-            return true;
-          } finally {
-            if (pathPart != null) {
-              currentPath.pop();
-            }
-          }
-        })(propertyName, undefined)
-      ) {
-        return false;
-      }
-      if (!isPatternPropertiesAdditionalProperties(propertyValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
+*/
+export function isProperties(value: unknown): value is types.Properties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Properties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
+if(!isPropertiesPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
- */
-export function isDependencies(value: unknown, pathPart?: string): value is types.Dependencies {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (value === null || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    for (const propertyName in value) {
-      const propertyValue = value[propertyName as keyof typeof value];
-      if (propertyValue === undefined) {
-        continue;
-      }
-      if (
-        !((value: unknown, pathPart?: string) => {
-          try {
-            if (pathPart != null) {
-              currentPath.push(pathPart);
-            }
-            if (typeof value !== "string") {
-              return false;
-            }
-            return true;
-          } finally {
-            if (pathPart != null) {
-              currentPath.pop();
-            }
-          }
-        })(propertyName, undefined)
-      ) {
-        return false;
-      }
-      if (!isDependenciesAdditionalProperties(propertyValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
+*/
+export function isPatternProperties(value: unknown): value is types.PatternProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PatternProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
+if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
- */
-export function isEnum(value: unknown, pathPart?: string): value is types.Enum {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (!Array.isArray(value)) {
-      return false;
-    }
-    if (value.length < 1) {
-      return false;
-    }
-    for (let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-      const elementValue = value[elementIndex];
-      if (
-        !((value: unknown, pathPart?: string) => {
-          try {
-            if (pathPart != null) {
-              currentPath.push(pathPart);
-            }
-            // any
-            return true;
-          } finally {
-            if (pathPart != null) {
-              currentPath.pop();
-            }
-          }
-        })(elementValue, String(elementIndex))
-      ) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
+*/
+export function isDependencies(value: unknown): value is types.Dependencies {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Dependencies";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
+for(const propertyName in value) {
+const propertyValue = value[propertyName as keyof typeof value];
+if(propertyValue === undefined) {
+continue;
+}
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
+if(!isDependenciesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/type}
- */
-export function isType(value: unknown, pathPart?: string): value is types.Type {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    let count = 0;
-    if (isType0(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    if (isType1(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    return count === 1;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
+*/
+export function isEnum(value: unknown): value is types.Enum {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Enum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
+if(value.length < 1) {
+recordError("minimumItems");
+return false;
+}
+for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
+const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+// any
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(elementValue)
+) {
+recordError("elementValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/format}
- */
-export function isFormat(value: unknown, pathPart?: string): value is types.Format {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type}
+*/
+export function isType(value: unknown): value is types.Type {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Type";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+let count = 0;
+currentPathPart = "0"
+if(isType0(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+currentPathPart = "1"
+if(isType1(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
- */
-export function isAllOf(value: unknown, pathPart?: string): value is types.AllOf {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaArray(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/format}
+*/
+export function isFormat(value: unknown): value is types.Format {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Format";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
- */
-export function isAnyOf(value: unknown, pathPart?: string): value is types.AnyOf {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaArray(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
+*/
+export function isAllOf(value: unknown): value is types.AllOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
- */
-export function isOneOf(value: unknown, pathPart?: string): value is types.OneOf {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaArray(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
+*/
+export function isAnyOf(value: unknown): value is types.AnyOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AnyOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/not}
- */
-export function isNot(value: unknown, pathPart?: string): value is types.Not {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
+*/
+export function isOneOf(value: unknown): value is types.OneOf {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "OneOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
- */
-export function isSchemaArrayItems(
-  value: unknown,
-  pathPart?: string,
-): value is types.SchemaArrayItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/not}
+*/
+export function isNot(value: unknown): value is types.Not {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Not";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
- */
-export function isPositiveIntegerDefault00(
-  value: unknown,
-  pathPart?: string,
-): value is types.PositiveIntegerDefault00 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isPositiveInteger(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
+*/
+export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SchemaArrayItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
- */
-export function isPositiveIntegerDefault01(
-  value: unknown,
-  pathPart?: string,
-): value is types.PositiveIntegerDefault01 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    // unknown
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
+*/
+export function isPositiveIntegerDefault00(value: unknown): value is types.PositiveIntegerDefault00 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PositiveIntegerDefault00";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isPositiveInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
- */
-export function isStringArrayItems(
-  value: unknown,
-  pathPart?: string,
-): value is types.StringArrayItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "string") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
+*/
+export function isPositiveIntegerDefault01(value: unknown): value is types.PositiveIntegerDefault01 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PositiveIntegerDefault01";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+// unknown
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0}
- */
-export function isAdditionalItems0(
-  value: unknown,
-  pathPart?: string,
-): value is types.AdditionalItems0 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "boolean") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
+*/
+export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "StringArrayItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
- */
-export function isAdditionalItems1(
-  value: unknown,
-  pathPart?: string,
-): value is types.AdditionalItems1 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0}
+*/
+export function isAdditionalItems0(value: unknown): value is types.AdditionalItems0 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AdditionalItems0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
- */
-export function isItems0(value: unknown, pathPart?: string): value is types.Items0 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
+*/
+export function isAdditionalItems1(value: unknown): value is types.AdditionalItems1 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AdditionalItems1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
- */
-export function isItems1(value: unknown, pathPart?: string): value is types.Items1 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaArray(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
+*/
+export function isItems0(value: unknown): value is types.Items0 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Items0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0}
- */
-export function isAdditionalProperties0(
-  value: unknown,
-  pathPart?: string,
-): value is types.AdditionalProperties0 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (typeof value !== "boolean") {
-      return false;
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
+*/
+export function isItems1(value: unknown): value is types.Items1 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Items1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
- */
-export function isAdditionalProperties1(
-  value: unknown,
-  pathPart?: string,
-): value is types.AdditionalProperties1 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0}
+*/
+export function isAdditionalProperties0(value: unknown): value is types.AdditionalProperties0 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AdditionalProperties0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
- */
-export function isDefinitionsAdditionalProperties(
-  value: unknown,
-  pathPart?: string,
-): value is types.DefinitionsAdditionalProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
+*/
+export function isAdditionalProperties1(value: unknown): value is types.AdditionalProperties1 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AdditionalProperties1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
- */
-export function isPropertiesPropertiesAdditionalProperties(
-  value: unknown,
-  pathPart?: string,
-): value is types.PropertiesPropertiesAdditionalProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
+*/
+export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DefinitionsAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
- */
-export function isPatternPropertiesAdditionalProperties(
-  value: unknown,
-  pathPart?: string,
-): value is types.PatternPropertiesAdditionalProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
+*/
+export function isPropertiesPropertiesAdditionalProperties(value: unknown): value is types.PropertiesPropertiesAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PropertiesPropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
- */
-export function isDependenciesAdditionalProperties(
-  value: unknown,
-  pathPart?: string,
-): value is types.DependenciesAdditionalProperties {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    let count = 0;
-    if (isDependencies0(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    if (isDependencies1(value)) {
-      count++;
-      if (count > 1) {
-        return false;
-      }
-    }
-    return count === 1;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
+*/
+export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PatternPropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
- */
-export function isType0(value: unknown, pathPart?: string): value is types.Type0 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSimpleTypes(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
+*/
+export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependenciesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+let count = 0;
+currentPathPart = "0"
+if(isDependencies0(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+currentPathPart = "1"
+if(isDependencies1(value)) {
+count++;
+if(count > 1) {
+recordError("union");
+return false;
+}
+}
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
- */
-export function isType1(value: unknown, pathPart?: string): value is types.Type1 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    if (!Array.isArray(value)) {
-      return false;
-    }
-    if (value.length < 1) {
-      return false;
-    }
-    for (let elementIndex = 0; elementIndex < value.length; elementIndex++) {
-      const elementValue = value[elementIndex];
-      if (!isTypeItems(elementValue)) {
-        return false;
-      }
-    }
-    return true;
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
+*/
+export function isType0(value: unknown): value is types.Type0 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Type0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSimpleTypes(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
- */
-export function isDependencies0(value: unknown, pathPart?: string): value is types.Dependencies0 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSchemaDocument(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
+*/
+export function isType1(value: unknown): value is types.Type1 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Type1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
+if(value.length < 1) {
+recordError("minimumItems");
+return false;
+}
+for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
+const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
+if(!isTypeItems(elementValue)) {
+recordError("elementValue");
+return false;
+}
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
- */
-export function isDependencies1(value: unknown, pathPart?: string): value is types.Dependencies1 {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isStringArray(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
+export function isDependencies0(value: unknown): value is types.Dependencies0 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Dependencies0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaDocument(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
- * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
- */
-export function isTypeItems(value: unknown, pathPart?: string): value is types.TypeItems {
-  try {
-    if (pathPart != null) {
-      currentPath.push(pathPart);
-    }
-    return isSimpleTypes(value);
-  } finally {
-    if (pathPart != null) {
-      currentPath.pop();
-    }
-  }
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
+export function isDependencies1(value: unknown): value is types.Dependencies1 {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Dependencies1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isStringArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
+*/
+export function isTypeItems(value: unknown): value is types.TypeItems {
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "TypeItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSimpleTypes(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
