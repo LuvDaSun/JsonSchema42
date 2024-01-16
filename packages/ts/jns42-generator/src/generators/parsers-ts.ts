@@ -56,16 +56,17 @@ export function* generateParsersTsCode(specification: models.Specification) {
 function* generateParserReference(
   specification: models.Specification,
   typeKey: string,
+  valueExpression: string,
 ): Iterable<NestedText> {
   const { names, types } = specification;
   const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`((value: unknown) => {
       ${generateParserDefinition(specification, typeKey)}
-    })`;
+    })(${valueExpression})`;
   } else {
     const functionName = toCamel("parse", names[typeItem.id]);
-    yield functionName;
+    yield itt`${functionName}(${valueExpression}, configuration)`;
   }
 }
 
@@ -239,7 +240,11 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
           [
             ${typeItem.elements.map(
               (element, index) => itt`
-                ${generateParserReference(specification, element)}(value[${JSON.stringify(index)}]),
+                ${generateParserReference(
+                  specification,
+                  element,
+                  `value[${JSON.stringify(index)}]`,
+                )},
               `,
             )}
           ] :
@@ -252,7 +257,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
       const { element } = typeItem;
       yield itt`
         return Array.isArray(value) ?
-          value.map(value => ${generateParserReference(specification, element)}(value)) :
+          value.map(value => ${generateParserReference(specification, element, "value")}) :
           undefined;
         `;
       break;
@@ -267,7 +272,8 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
                 ${JSON.stringify(name)}: ${generateParserReference(
                   specification,
                   element,
-                )}(value[${JSON.stringify(name)} as keyof typeof value]),
+                  `value[${JSON.stringify(name)} as keyof typeof value]`,
+                )},
               `,
             )}
           } :
@@ -282,8 +288,8 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
         return (typeof value === "object" && value !== null && !Array.isArray(value)) ?
           Object.fromEntries(
             Object.entries(value).map(([name, value]) => [
-              ${generateParserReference(specification, name)}(name),
-              ${generateParserReference(specification, element)}(value),
+              ${generateParserReference(specification, name, "name")},
+              ${generateParserReference(specification, element, "value")},
             ])
           ) :
           undefined;
@@ -294,7 +300,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
     case "union": {
       yield itt`return ${joinIterable(
         typeItem.elements.map(
-          (element) => itt`${generateParserReference(specification, element)}(value)`,
+          (element) => itt`${generateParserReference(specification, element, "value")}`,
         ),
         " ?? ",
       )};`;
@@ -302,7 +308,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
     }
 
     case "alias": {
-      yield itt`return ${generateParserReference(specification, typeItem.target)}(value);`;
+      yield itt`return ${generateParserReference(specification, typeItem.target, "value")};`;
       break;
     }
   }
