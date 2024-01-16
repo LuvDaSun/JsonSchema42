@@ -23,11 +23,22 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     export interface MockGeneratorOptions {
       maximumDepth?: number;
+      
+      minimumValue?: number;
+      maximumValue?: number;
+      
+      minimumPrecision?:number;
+      maximumPrecision?:number;
     }
     const defaultMockGeneratorOptions = {
       maximumDepth: 1,
+      
+      minimumValue: -1000,
+      maximumValue: 1000,
+      
+      minimumPrecision: 100,
+      maximumPrecision: 1000,
     }
-
   `;
 
   for (const [typeKey, item] of Object.entries(types)) {
@@ -86,7 +97,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       lengthRange,
       chars,
     }: RandomStringArguments) {
-      const length = lengthOffset + nextSeed() % lengthRange;
+      const length = lengthOffset + nextSeed() % (lengthRange + 1);
       let value = ""
       while(value.length < length) {
         value += chars[nextSeed() % chars.length];
@@ -110,7 +121,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       precisionOffset,
       precisionRange,
     }: RandomNumberArguments) {
-      const precision = precisionOffset + nextSeed() % precisionRange;
+      const precision = precisionOffset + nextSeed() % (precisionRange + 1);
       const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
       const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
       const valueOffset = inclusiveMinimumValue * precision;
@@ -128,13 +139,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
       elementFactory,
       lengthOffset,
       lengthRange,
-    }: RandomArrayArguments<T>) {
-      const length = lengthOffset + nextSeed() % lengthRange;
-      const value = new Array<T>();
-      while(value.length < length) {
-        value.push(elementFactory());
+    }: RandomArrayArguments<T>): Iterable<T> {
+      const length = lengthOffset + nextSeed() % (lengthRange + 1);
+      for(let count = 0; count < length; count++) {
+        yield elementFactory();
       }
-      return value;
     }
   `;
 }
@@ -200,21 +209,43 @@ function* generateMockDefinition(
         break;
       }
 
-      const isMinimumInclusive = typeItem.minimumInclusive != null;
-      const isMaximumInclusive = typeItem.maximumInclusive != null;
-      const minimumValue = typeItem.minimumInclusive ?? typeItem.minimumExclusive ?? -100000;
-      const maximumValue = typeItem.maximumInclusive ?? typeItem.maximumExclusive ?? 100000;
-      const precisionOffset = 1;
-      const precisionRange = 1;
+      let minimumValue = Number.NEGATIVE_INFINITY;
+      let isMinimumExclusive: boolean | undefined;
+      if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
+        minimumValue = typeItem.minimumInclusive;
+        isMinimumExclusive = false;
+      }
+      if (typeItem.minimumExclusive != null && typeItem.minimumExclusive >= minimumValue) {
+        minimumValue = typeItem.minimumExclusive;
+        isMinimumExclusive = true;
+      }
+      const minimumValueInclusiveExpression =
+        isMinimumExclusive == null
+          ? "configuration.minimumValue"
+          : isMinimumExclusive
+            ? itt`(${JSON.stringify(minimumValue)} + 1)`
+            : JSON.stringify(minimumValue);
 
-      yield `randomNumber(${JSON.stringify({
-        isMinimumInclusive,
-        isMaximumInclusive,
-        minimumValue,
-        maximumValue,
-        precisionOffset,
-        precisionRange,
-      })})`;
+      let maximumValue = Number.POSITIVE_INFINITY;
+      let isMaximumExclusive: boolean | undefined;
+      if (typeItem.maximumInclusive != null && typeItem.maximumInclusive <= maximumValue) {
+        maximumValue = typeItem.maximumInclusive;
+        isMaximumExclusive = false;
+      }
+      if (typeItem.maximumExclusive != null && typeItem.maximumExclusive <= maximumValue) {
+        maximumValue = typeItem.maximumExclusive;
+        isMaximumExclusive = true;
+      }
+      const maximumValueInclusiveExpression =
+        isMaximumExclusive == null
+          ? "configuration.maximumValue"
+          : isMaximumExclusive
+            ? itt`(${JSON.stringify(maximumValue)} - 1)`
+            : JSON.stringify(maximumValue);
+
+      yield itt`
+        ${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)
+      `;
       break;
     }
 
@@ -295,20 +326,20 @@ function* generateMockDefinition(
       if (itemsOffset === 0) {
         yield itt`
           (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
-            randomArray({
+            [...randomArray({
               lengthOffset: ${JSON.stringify(itemsOffset)},
               lengthRange: ${JSON.stringify(itemsRange)},
               elementFactory: () => ${generateMockReference(specification, element)},
-            }) :
+            })] :
             []
         `;
       } else {
         yield itt`
-          randomArray({
+          [...randomArray({
             lengthOffset: ${JSON.stringify(itemsOffset)},
             lengthRange: ${JSON.stringify(itemsRange)},
             elementFactory: () => ${generateMockReference(specification, element)},
-          })
+          })]
         `;
       }
 
