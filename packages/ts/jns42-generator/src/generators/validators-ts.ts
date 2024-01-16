@@ -35,6 +35,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       return errors;
     }
 
+    export function getLastValidationErrors() {
+      if(errors.length === 0) {
+        return;
+      }
+      return errors[errors.length - 1];
+    }
+
     function resetErrors() {
       errors = [];
     }
