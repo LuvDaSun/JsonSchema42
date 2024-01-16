@@ -34,6 +34,9 @@ schemas:
         type: "integer"
         minimum: 1
         maximum: 1
+      even:
+        type: "integer"
+        multipleOf: 2
 
 valid:
   numbers:
@@ -48,6 +51,10 @@ valid:
     positiveOrZero: 0
   one:
     one: 1
+  twoEven:
+    even: 2
+  fourEven:
+    even: -4
 
 invalid:
   numbers:
@@ -62,3 +69,7 @@ invalid:
     positiveIntegerOrZero: -1
   two:
     one: 2
+  threeEven:
+    even: 3
+  fiveEven:
+    even: -5
