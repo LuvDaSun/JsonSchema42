@@ -269,12 +269,14 @@ function* generateParserDefinition(
       const { element } = typeItem;
       yield itt`
         Array.isArray(${valueExpression}) ?
-        ${valueExpression}.map(value => ${generateParserReference(
-          specification,
-          element,
-          "value",
-        )}) :
-          undefined
+          ${valueExpression}.map(value => ${generateParserReference(
+            specification,
+            element,
+            "value",
+          )}) :
+            ${valueExpression} == null ?
+            undefined :
+            [${generateParserReference(specification, element, valueExpression)}]
       `;
       break;
     }
