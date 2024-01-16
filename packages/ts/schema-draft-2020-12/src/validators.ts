@@ -6,19 +6,62 @@
 // v0.11.5                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
+export interface ValidationError {
+path: string;
+rule: string;
+typeName?: string;
+}
+const pathPartStack = new Array<string>();
+let currentPathPart: string | undefined = "";
+let currentTypeName: string | undefined;
+let errors = new Array<ValidationError>();
+export function getValidationErrors() {
+return errors;
+}
+function resetErrors() {
+errors = [];
+}
+function recordError(rule: string) {
+errors.push({
+path: pathPartStack.join("/"),
+typeName: currentTypeName,
+rule,
+})
+}
 /**
 * @summary Core and Validation specifications meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/schema}
 */
 export function isSchema(value: unknown): value is types.Schema {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Schema";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -26,462 +69,931 @@ continue;
 }
 switch(propertyName) {
 case "$id":
+currentPathPart = propertyName;
 if(!isId(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$schema":
+currentPathPart = propertyName;
 if(!isCoreSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$ref":
+currentPathPart = propertyName;
 if(!isRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$anchor":
+currentPathPart = propertyName;
 if(!isAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$dynamicRef":
+currentPathPart = propertyName;
 if(!isDynamicRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$dynamicAnchor":
+currentPathPart = propertyName;
 if(!isDynamicAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$vocabulary":
+currentPathPart = propertyName;
 if(!isVocabulary(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$comment":
+currentPathPart = propertyName;
 if(!isComment(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$defs":
+currentPathPart = propertyName;
 if(!isDefs(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "prefixItems":
+currentPathPart = propertyName;
 if(!isPrefixItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "items":
+currentPathPart = propertyName;
 if(!isApplicatorItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contains":
+currentPathPart = propertyName;
 if(!isContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "additionalProperties":
+currentPathPart = propertyName;
 if(!isApplicatorAdditionalProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "properties":
+currentPathPart = propertyName;
 if(!isProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "patternProperties":
+currentPathPart = propertyName;
 if(!isPatternProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentSchemas":
+currentPathPart = propertyName;
 if(!isDependentSchemas(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "propertyNames":
+currentPathPart = propertyName;
 if(!isApplicatorPropertyNames(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "if":
+currentPathPart = propertyName;
 if(!isIf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "then":
+currentPathPart = propertyName;
 if(!isThen(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "else":
+currentPathPart = propertyName;
 if(!isElse(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "allOf":
+currentPathPart = propertyName;
 if(!isAllOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "anyOf":
+currentPathPart = propertyName;
 if(!isAnyOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "oneOf":
+currentPathPart = propertyName;
 if(!isOneOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "not":
+currentPathPart = propertyName;
 if(!isNot(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "unevaluatedItems":
+currentPathPart = propertyName;
 if(!isUnevaluatedItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "unevaluatedProperties":
+currentPathPart = propertyName;
 if(!isUnevaluatedProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "type":
+currentPathPart = propertyName;
 if(!isType(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "const":
+currentPathPart = propertyName;
 if(!isConst(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "enum":
+currentPathPart = propertyName;
 if(!isEnum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "multipleOf":
+currentPathPart = propertyName;
 if(!isMultipleOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximum":
+currentPathPart = propertyName;
 if(!isMaximum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "exclusiveMaximum":
+currentPathPart = propertyName;
 if(!isExclusiveMaximum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimum":
+currentPathPart = propertyName;
 if(!isMinimum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "exclusiveMinimum":
+currentPathPart = propertyName;
 if(!isExclusiveMinimum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxLength":
+currentPathPart = propertyName;
 if(!isMaxLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minLength":
+currentPathPart = propertyName;
 if(!isMinLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "pattern":
+currentPathPart = propertyName;
 if(!isPattern(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxItems":
+currentPathPart = propertyName;
 if(!isMaxItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minItems":
+currentPathPart = propertyName;
 if(!isMinItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "uniqueItems":
+currentPathPart = propertyName;
 if(!isUniqueItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxContains":
+currentPathPart = propertyName;
 if(!isMaxContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minContains":
+currentPathPart = propertyName;
 if(!isMinContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxProperties":
+currentPathPart = propertyName;
 if(!isMaxProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minProperties":
+currentPathPart = propertyName;
 if(!isMinProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "required":
+currentPathPart = propertyName;
 if(!isRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentRequired":
+currentPathPart = propertyName;
 if(!isDependentRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "title":
+currentPathPart = propertyName;
 if(!isTitle(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "description":
+currentPathPart = propertyName;
 if(!isDescription(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "default":
+currentPathPart = propertyName;
 if(!isDefault(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "deprecated":
+currentPathPart = propertyName;
 if(!isDeprecated(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "readOnly":
+currentPathPart = propertyName;
 if(!isReadOnly(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "writeOnly":
+currentPathPart = propertyName;
 if(!isWriteOnly(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "examples":
+currentPathPart = propertyName;
 if(!isExamples(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "format":
+currentPathPart = propertyName;
 if(!isFormat(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentEncoding":
+currentPathPart = propertyName;
 if(!isContentEncoding(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentMediaType":
+currentPathPart = propertyName;
 if(!isContentMediaType(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentSchema":
+currentPathPart = propertyName;
 if(!isContentSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "definitions":
+currentPathPart = propertyName;
 if(!isDefinitions(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependencies":
+currentPathPart = propertyName;
 if(!isDependencies(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$recursiveAnchor":
+currentPathPart = propertyName;
 if(!isRecursiveAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$recursiveRef":
+currentPathPart = propertyName;
 if(!isRecursiveRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
 * @deprecated
 */
 export function isDefinitions(value: unknown): value is types.Definitions {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Definitions";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
 return false;
 }
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
 if(!isDefinitionsAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
 * @deprecated
 */
 export function isDependencies(value: unknown): value is types.Dependencies {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Dependencies";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
 return false;
 }
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
 if(!isDependenciesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
 * @deprecated
 */
 export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
-return ((isAnchorString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "RecursiveAnchor";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isAnchorString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
 * @deprecated
 */
 export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
-return ((isUriReferenceString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "RecursiveRef";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isUriReferenceString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
 */
 export function isAllOf0(value: unknown): value is types.AllOf0 {
-return ((isCore(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isCore(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
 */
 export function isAllOf1(value: unknown): value is types.AllOf1 {
-return ((isApplicator(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isApplicator(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
 */
 export function isAllOf2(value: unknown): value is types.AllOf2 {
-return ((isUnevaluated(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf2";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isUnevaluated(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
 */
 export function isAllOf3(value: unknown): value is types.AllOf3 {
-return ((isValidation(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf3";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isValidation(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
 */
 export function isAllOf4(value: unknown): value is types.AllOf4 {
-return ((isMetaData(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf4";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isMetaData(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
 */
 export function isAllOf5(value: unknown): value is types.AllOf5 {
-return ((isFormatAnnotation(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf5";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isFormatAnnotation(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
 */
 export function isAllOf6(value: unknown): value is types.AllOf6 {
-return ((isContent(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf6";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isContent(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
 */
 export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DefinitionsAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
 */
 export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependenciesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
+currentPathPart = "0"
 if(isStringArray(value)) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -489,367 +1001,638 @@ continue;
 }
 switch(propertyName) {
 case "$id":
+currentPathPart = propertyName;
 if(!isId(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$schema":
+currentPathPart = propertyName;
 if(!isCoreSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$ref":
+currentPathPart = propertyName;
 if(!isRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$anchor":
+currentPathPart = propertyName;
 if(!isAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$dynamicRef":
+currentPathPart = propertyName;
 if(!isDynamicRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$dynamicAnchor":
+currentPathPart = propertyName;
 if(!isDynamicAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$vocabulary":
+currentPathPart = propertyName;
 if(!isVocabulary(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$comment":
+currentPathPart = propertyName;
 if(!isComment(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$defs":
+currentPathPart = propertyName;
 if(!isDefs(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "prefixItems":
+currentPathPart = propertyName;
 if(!isPrefixItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "items":
+currentPathPart = propertyName;
 if(!isApplicatorItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contains":
+currentPathPart = propertyName;
 if(!isContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "additionalProperties":
+currentPathPart = propertyName;
 if(!isApplicatorAdditionalProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "properties":
+currentPathPart = propertyName;
 if(!isProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "patternProperties":
+currentPathPart = propertyName;
 if(!isPatternProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentSchemas":
+currentPathPart = propertyName;
 if(!isDependentSchemas(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "propertyNames":
+currentPathPart = propertyName;
 if(!isApplicatorPropertyNames(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "if":
+currentPathPart = propertyName;
 if(!isIf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "then":
+currentPathPart = propertyName;
 if(!isThen(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "else":
+currentPathPart = propertyName;
 if(!isElse(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "allOf":
+currentPathPart = propertyName;
 if(!isAllOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "anyOf":
+currentPathPart = propertyName;
 if(!isAnyOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "oneOf":
+currentPathPart = propertyName;
 if(!isOneOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "not":
+currentPathPart = propertyName;
 if(!isNot(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "unevaluatedItems":
+currentPathPart = propertyName;
 if(!isUnevaluatedItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "unevaluatedProperties":
+currentPathPart = propertyName;
 if(!isUnevaluatedProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "type":
+currentPathPart = propertyName;
 if(!isType(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "const":
+currentPathPart = propertyName;
 if(!isConst(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "enum":
+currentPathPart = propertyName;
 if(!isEnum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "multipleOf":
+currentPathPart = propertyName;
 if(!isMultipleOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximum":
+currentPathPart = propertyName;
 if(!isMaximum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "exclusiveMaximum":
+currentPathPart = propertyName;
 if(!isExclusiveMaximum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimum":
+currentPathPart = propertyName;
 if(!isMinimum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "exclusiveMinimum":
+currentPathPart = propertyName;
 if(!isExclusiveMinimum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxLength":
+currentPathPart = propertyName;
 if(!isMaxLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minLength":
+currentPathPart = propertyName;
 if(!isMinLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "pattern":
+currentPathPart = propertyName;
 if(!isPattern(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxItems":
+currentPathPart = propertyName;
 if(!isMaxItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minItems":
+currentPathPart = propertyName;
 if(!isMinItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "uniqueItems":
+currentPathPart = propertyName;
 if(!isUniqueItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxContains":
+currentPathPart = propertyName;
 if(!isMaxContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minContains":
+currentPathPart = propertyName;
 if(!isMinContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxProperties":
+currentPathPart = propertyName;
 if(!isMaxProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minProperties":
+currentPathPart = propertyName;
 if(!isMinProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "required":
+currentPathPart = propertyName;
 if(!isRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentRequired":
+currentPathPart = propertyName;
 if(!isDependentRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "title":
+currentPathPart = propertyName;
 if(!isTitle(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "description":
+currentPathPart = propertyName;
 if(!isDescription(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "default":
+currentPathPart = propertyName;
 if(!isDefault(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "deprecated":
+currentPathPart = propertyName;
 if(!isDeprecated(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "readOnly":
+currentPathPart = propertyName;
 if(!isReadOnly(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "writeOnly":
+currentPathPart = propertyName;
 if(!isWriteOnly(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "examples":
+currentPathPart = propertyName;
 if(!isExamples(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "format":
+currentPathPart = propertyName;
 if(!isFormat(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentEncoding":
+currentPathPart = propertyName;
 if(!isContentEncoding(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentMediaType":
+currentPathPart = propertyName;
 if(!isContentMediaType(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentSchema":
+currentPathPart = propertyName;
 if(!isContentSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "definitions":
+currentPathPart = propertyName;
 if(!isDefinitions(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependencies":
+currentPathPart = propertyName;
 if(!isDependencies(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$recursiveAnchor":
+currentPathPart = propertyName;
 if(!isRecursiveAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$recursiveRef":
+currentPathPart = propertyName;
 if(!isRecursiveRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "2"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
 */
 export function isDependencies0(value: unknown): value is types.Dependencies0 {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Dependencies0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
 */
 export function isDependencies1(value: unknown): value is types.Dependencies1 {
-return ((isStringArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Dependencies1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isStringArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
 */
 export function isAnchorString(value: unknown): value is types.AnchorString {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AnchorString";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
 */
 export function isUriReferenceString(value: unknown): value is types.UriReferenceString {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "UriReferenceString";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Core vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/core}
 */
 export function isCore(value: unknown): value is types.Core {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Core";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -857,199 +1640,575 @@ continue;
 }
 switch(propertyName) {
 case "$id":
+currentPathPart = propertyName;
 if(!isId(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$schema":
+currentPathPart = propertyName;
 if(!isCoreSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$ref":
+currentPathPart = propertyName;
 if(!isRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$anchor":
+currentPathPart = propertyName;
 if(!isAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$dynamicRef":
+currentPathPart = propertyName;
 if(!isDynamicRef(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$dynamicAnchor":
+currentPathPart = propertyName;
 if(!isDynamicAnchor(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$vocabulary":
+currentPathPart = propertyName;
 if(!isVocabulary(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$comment":
+currentPathPart = propertyName;
 if(!isComment(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "$defs":
+currentPathPart = propertyName;
 if(!isDefs(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
 */
 export function isUriString(value: unknown): value is types.UriString {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "UriString";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
 */
 export function isId(value: unknown): value is types.Id {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Id";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
 */
 export function isCoreSchema(value: unknown): value is types.CoreSchema {
-return ((isUriString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "CoreSchema";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isUriString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
 */
 export function isRef(value: unknown): value is types.Ref {
-return ((isUriReferenceString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Ref";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isUriReferenceString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
 */
 export function isAnchor(value: unknown): value is types.Anchor {
-return ((isAnchorString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Anchor";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isAnchorString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
 */
 export function isDynamicRef(value: unknown): value is types.DynamicRef {
-return ((isUriReferenceString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DynamicRef";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isUriReferenceString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
 */
 export function isDynamicAnchor(value: unknown): value is types.DynamicAnchor {
-return ((isAnchorString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DynamicAnchor";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isAnchorString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
 */
 export function isVocabulary(value: unknown): value is types.Vocabulary {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Vocabulary";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
 if(!isVocabularyPropertyNames(propertyName)) {
+recordError("propertyName");
 return false;
 }
+currentPathPart = propertyName;
 if(!isVocabularyAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
 */
 export function isComment(value: unknown): value is types.Comment {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Comment";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
 */
 export function isDefs(value: unknown): value is types.Defs {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Defs";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
 return false;
 }
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
 if(!isDefsAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties}
 */
 export function isVocabularyAdditionalProperties(value: unknown): value is types.VocabularyAdditionalProperties {
-return ((typeof value === "boolean"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "VocabularyAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
 */
 export function isVocabularyPropertyNames(value: unknown): value is types.VocabularyPropertyNames {
-return ((isUriString(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "VocabularyPropertyNames";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isUriString(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
 */
 export function isDefsAdditionalProperties(value: unknown): value is types.DefsAdditionalProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DefsAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Applicator vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
 */
 export function isApplicator(value: unknown): value is types.Applicator {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Applicator";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1057,308 +2216,865 @@ continue;
 }
 switch(propertyName) {
 case "prefixItems":
+currentPathPart = propertyName;
 if(!isPrefixItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "items":
+currentPathPart = propertyName;
 if(!isApplicatorItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contains":
+currentPathPart = propertyName;
 if(!isContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "additionalProperties":
+currentPathPart = propertyName;
 if(!isApplicatorAdditionalProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "properties":
+currentPathPart = propertyName;
 if(!isProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "patternProperties":
+currentPathPart = propertyName;
 if(!isPatternProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentSchemas":
+currentPathPart = propertyName;
 if(!isDependentSchemas(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "propertyNames":
+currentPathPart = propertyName;
 if(!isApplicatorPropertyNames(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "if":
+currentPathPart = propertyName;
 if(!isIf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "then":
+currentPathPart = propertyName;
 if(!isThen(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "else":
+currentPathPart = propertyName;
 if(!isElse(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "allOf":
+currentPathPart = propertyName;
 if(!isAllOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "anyOf":
+currentPathPart = propertyName;
 if(!isAnyOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "oneOf":
+currentPathPart = propertyName;
 if(!isOneOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "not":
+currentPathPart = propertyName;
 if(!isNot(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
 */
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SchemaArray";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
+if(value.length < 1) {
+recordError("minimumItems");
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isSchemaArrayItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
 */
 export function isPrefixItems(value: unknown): value is types.PrefixItems {
-return ((isSchemaArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PrefixItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
 */
 export function isApplicatorItems(value: unknown): value is types.ApplicatorItems {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ApplicatorItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
 */
 export function isContains(value: unknown): value is types.Contains {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Contains";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
 */
 export function isApplicatorAdditionalProperties(value: unknown): value is types.ApplicatorAdditionalProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ApplicatorAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
 */
 export function isProperties(value: unknown): value is types.Properties {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Properties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
 return false;
 }
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
 if(!isPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
 */
 export function isPatternProperties(value: unknown): value is types.PatternProperties {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PatternProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
 if(!isPatternPropertiesPropertyNames(propertyName)) {
+recordError("propertyName");
 return false;
 }
+currentPathPart = propertyName;
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
 */
 export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependentSchemas";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
 return false;
 }
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
 */
 export function isApplicatorPropertyNames(value: unknown): value is types.ApplicatorPropertyNames {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ApplicatorPropertyNames";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
 */
 export function isIf(value: unknown): value is types.If {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "If";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
 */
 export function isThen(value: unknown): value is types.Then {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Then";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
 */
 export function isElse(value: unknown): value is types.Else {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Else";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
 */
 export function isAllOf(value: unknown): value is types.AllOf {
-return ((isSchemaArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AllOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
 */
 export function isAnyOf(value: unknown): value is types.AnyOf {
-return ((isSchemaArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "AnyOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
 */
 export function isOneOf(value: unknown): value is types.OneOf {
-return ((isSchemaArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "OneOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchemaArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
 */
 export function isNot(value: unknown): value is types.Not {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Not";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
 */
 export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SchemaArrayItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
 */
 export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
 */
 export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PatternPropertiesAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
 */
 export function isPatternPropertiesPropertyNames(value: unknown): value is types.PatternPropertiesPropertyNames {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "PatternPropertiesPropertyNames";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
 */
 export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependentSchemasAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Unevaluated applicator vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
 */
 export function isUnevaluated(value: unknown): value is types.Unevaluated {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Unevaluated";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1366,60 +3082,165 @@ continue;
 }
 switch(propertyName) {
 case "unevaluatedItems":
+currentPathPart = propertyName;
 if(!isUnevaluatedItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "unevaluatedProperties":
+currentPathPart = propertyName;
 if(!isUnevaluatedProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
 */
 export function isUnevaluatedItems(value: unknown): value is types.UnevaluatedItems {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "UnevaluatedItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
 */
 export function isUnevaluatedProperties(value: unknown): value is types.UnevaluatedProperties {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "UnevaluatedProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Validation vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation}
 */
 export function isValidation(value: unknown): value is types.Validation {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Validation";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1427,413 +3248,1171 @@ continue;
 }
 switch(propertyName) {
 case "type":
+currentPathPart = propertyName;
 if(!isType(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "const":
+currentPathPart = propertyName;
 if(!isConst(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "enum":
+currentPathPart = propertyName;
 if(!isEnum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "multipleOf":
+currentPathPart = propertyName;
 if(!isMultipleOf(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maximum":
+currentPathPart = propertyName;
 if(!isMaximum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "exclusiveMaximum":
+currentPathPart = propertyName;
 if(!isExclusiveMaximum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minimum":
+currentPathPart = propertyName;
 if(!isMinimum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "exclusiveMinimum":
+currentPathPart = propertyName;
 if(!isExclusiveMinimum(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxLength":
+currentPathPart = propertyName;
 if(!isMaxLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minLength":
+currentPathPart = propertyName;
 if(!isMinLength(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "pattern":
+currentPathPart = propertyName;
 if(!isPattern(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxItems":
+currentPathPart = propertyName;
 if(!isMaxItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minItems":
+currentPathPart = propertyName;
 if(!isMinItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "uniqueItems":
+currentPathPart = propertyName;
 if(!isUniqueItems(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxContains":
+currentPathPart = propertyName;
 if(!isMaxContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minContains":
+currentPathPart = propertyName;
 if(!isMinContains(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "maxProperties":
+currentPathPart = propertyName;
 if(!isMaxProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "minProperties":
+currentPathPart = propertyName;
 if(!isMinProperties(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "required":
+currentPathPart = propertyName;
 if(!isRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "dependentRequired":
+currentPathPart = propertyName;
 if(!isDependentRequired(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
 */
 export function isNonNegativeInteger(value: unknown): value is types.NonNegativeInteger {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value % 1 === 0) &&
-(value >= 0) &&
-(typeof value === "number") &&
-(!isNaN(value)) &&
-(value >= 0));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "NonNegativeInteger";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value) ||
+value % 1 !== 0
+) {
+recordError("integer");
+return false;
+}
+if(
+value < 0
+) {
+recordError("minimumInclusive");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
 */
 export function isNonNegativeIntegerDefault0(value: unknown): value is types.NonNegativeIntegerDefault0 {
-return ((isNonNegativeInteger(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "NonNegativeIntegerDefault0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
 */
 export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
-return ((typeof value === "string") &&
-(value === "array" ||
-value === "boolean" ||
-value === "integer" ||
-value === "null" ||
-value === "number" ||
-value === "object" ||
-value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "SimpleTypes";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+if(value !== "array" &&
+value !== "boolean" &&
+value !== "integer" &&
+value !== "null" &&
+value !== "number" &&
+value !== "object" &&
+value !== "string") {
+recordError("options");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
 */
 export function isStringArray(value: unknown): value is types.StringArray {
-return ((Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "StringArray";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isStringArrayItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
 */
 export function isType(value: unknown): value is types.Type {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Type";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
+currentPathPart = "0"
 if(isType0(value)) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
+currentPathPart = "1"
 if(isType1(value)) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
 */
 export function isConst(value: unknown): value is types.Const {
-return ((
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Const";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 // any
-true
-));
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
 */
 export function isEnum(value: unknown): value is types.Enum {
-return ((Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Enum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isEnumItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
 */
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value > 0));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MultipleOf";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+if(
+value <= 0
+) {
+recordError("minimumExclusive");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}
 */
 export function isMaximum(value: unknown): value is types.Maximum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Maximum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum}
 */
 export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ExclusiveMaximum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum}
 */
 export function isMinimum(value: unknown): value is types.Minimum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Minimum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum}
 */
 export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ExclusiveMinimum";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+recordError("number");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength}
 */
 export function isMaxLength(value: unknown): value is types.MaxLength {
-return ((isNonNegativeInteger(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxLength";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength}
 */
 export function isMinLength(value: unknown): value is types.MinLength {
-return ((isNonNegativeIntegerDefault0(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinLength";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeIntegerDefault0(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
 */
 export function isPattern(value: unknown): value is types.Pattern {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Pattern";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems}
 */
 export function isMaxItems(value: unknown): value is types.MaxItems {
-return ((isNonNegativeInteger(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems}
 */
 export function isMinItems(value: unknown): value is types.MinItems {
-return ((isNonNegativeIntegerDefault0(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeIntegerDefault0(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems}
 */
 export function isUniqueItems(value: unknown): value is types.UniqueItems {
-return ((typeof value === "boolean"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "UniqueItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains}
 */
 export function isMaxContains(value: unknown): value is types.MaxContains {
-return ((isNonNegativeInteger(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxContains";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains}
 */
 export function isMinContains(value: unknown): value is types.MinContains {
-return ((isNonNegativeInteger(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinContains";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties}
 */
 export function isMaxProperties(value: unknown): value is types.MaxProperties {
-return ((isNonNegativeInteger(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MaxProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeInteger(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties}
 */
 export function isMinProperties(value: unknown): value is types.MinProperties {
-return ((isNonNegativeIntegerDefault0(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MinProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isNonNegativeIntegerDefault0(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
 */
 export function isRequired(value: unknown): value is types.Required {
-return ((isStringArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Required";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isStringArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
 */
 export function isDependentRequired(value: unknown): value is types.DependentRequired {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependentRequired";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("map");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
 return false;
 }
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(propertyName)
+) {
+recordError("propertyName");
+return false;
+}
+currentPathPart = propertyName;
 if(!isDependentRequiredAdditionalProperties(propertyValue)) {
+recordError("propertyValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items}
 */
 export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "StringArrayItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
 */
 export function isType0(value: unknown): value is types.Type0 {
-return ((isSimpleTypes(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Type0";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSimpleTypes(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
 */
 export function isType1(value: unknown): value is types.Type1 {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Type1";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
+if(value.length < 1) {
+recordError("minimumItems");
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isTypeItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
 */
 export function isEnumItems(value: unknown): value is types.EnumItems {
-return ((
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "EnumItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 // any
-true
-));
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
 */
 export function isDependentRequiredAdditionalProperties(value: unknown): value is types.DependentRequiredAdditionalProperties {
-return ((isStringArray(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "DependentRequiredAdditionalProperties";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isStringArray(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
 */
 export function isTypeItems(value: unknown): value is types.TypeItems {
-return ((isSimpleTypes(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "TypeItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSimpleTypes(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Meta-data vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
 */
 export function isMetaData(value: unknown): value is types.MetaData {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "MetaData";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1841,138 +4420,380 @@ continue;
 }
 switch(propertyName) {
 case "title":
+currentPathPart = propertyName;
 if(!isTitle(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "description":
+currentPathPart = propertyName;
 if(!isDescription(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "default":
+currentPathPart = propertyName;
 if(!isDefault(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "deprecated":
+currentPathPart = propertyName;
 if(!isDeprecated(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "readOnly":
+currentPathPart = propertyName;
 if(!isReadOnly(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "writeOnly":
+currentPathPart = propertyName;
 if(!isWriteOnly(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "examples":
+currentPathPart = propertyName;
 if(!isExamples(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
 */
 export function isTitle(value: unknown): value is types.Title {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Title";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description}
 */
 export function isDescription(value: unknown): value is types.Description {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Description";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
 */
 export function isDefault(value: unknown): value is types.Default {
-return ((
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Default";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 // any
-true
-));
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated}
 */
 export function isDeprecated(value: unknown): value is types.Deprecated {
-return ((typeof value === "boolean"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Deprecated";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly}
 */
 export function isReadOnly(value: unknown): value is types.ReadOnly {
-return ((typeof value === "boolean"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ReadOnly";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly}
 */
 export function isWriteOnly(value: unknown): value is types.WriteOnly {
-return ((typeof value === "boolean"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "WriteOnly";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
 */
 export function isExamples(value: unknown): value is types.Examples {
-return ((Array.isArray(value)) &&
-(
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Examples";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(!Array.isArray(value)) {
+recordError("array");
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
+currentPathPart = String(elementIndex);
 if(!isExamplesItems(elementValue)) {
+recordError("elementValue");
 return false;
 }
 }
 return true;
-})()
-));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
 */
 export function isExamplesItems(value: unknown): value is types.ExamplesItems {
-return ((
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ExamplesItems";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 // any
-true
-));
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Format vocabulary meta-schema for annotation results
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
 */
 export function isFormatAnnotation(value: unknown): value is types.FormatAnnotation {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "FormatAnnotation";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1980,49 +4801,138 @@ continue;
 }
 switch(propertyName) {
 case "format":
+currentPathPart = propertyName;
 if(!isFormat(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
 */
 export function isFormat(value: unknown): value is types.Format {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Format";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @summary Content vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/content}
 */
 export function isContent(value: unknown): value is types.Content {
-return ((
-(()=>{
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "Content";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+currentPathPart = "0"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+recordError("object");
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2030,55 +4940,170 @@ continue;
 }
 switch(propertyName) {
 case "contentEncoding":
+currentPathPart = propertyName;
 if(!isContentEncoding(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentMediaType":
+currentPathPart = propertyName;
 if(!isContentMediaType(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 case "contentSchema":
+currentPathPart = propertyName;
 if(!isContentSchema(propertyValue)) {
+recordError("propertyName");
 return false;
 }
 break;
 }
 }
 return true;
-})()
-)) {
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-if((typeof value === "boolean")) {
+currentPathPart = "1"
+if(
+((value: unknown) => {
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = undefined;
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(typeof value !== "boolean") {
+recordError("boolean");
+return false;
+}
+return true;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
+})(value)
+) {
 count++;
 if(count > 1) {
+recordError("union");
 return false;
 }
 }
-return count === 1;
-})()
-));
+if(count < 1) {
+recordError("union");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}
 */
 export function isContentEncoding(value: unknown): value is types.ContentEncoding {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ContentEncoding";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType}
 */
 export function isContentMediaType(value: unknown): value is types.ContentMediaType {
-return ((typeof value === "string"));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ContentMediaType";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
 */
 export function isContentSchema(value: unknown): value is types.ContentSchema {
-return ((isSchema(value)));
+if(pathPartStack.length === 0) {
+resetErrors();
+}
+const typeName: string | undefined = currentTypeName;
+const pathPart = currentPathPart;
+try {
+currentTypeName = "ContentSchema";
+if(pathPart != null) {
+pathPartStack.push(pathPart);
+}
+currentPathPart = undefined;
+return (isSchema(value));
+;
+}
+finally {
+currentTypeName = typeName;
+if(pathPart != null) {
+currentPathPart = pathPartStack.pop();
+}
+}
 }

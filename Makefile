@@ -7,6 +7,15 @@ build: \
 
 	npm install
 
+rebuild: \
+	clean build
+
+clean: \
+
+	rm --recursive --force packages/ts/schema-intermediate
+	rm --recursive --force packages/ts/schema-draft-04
+	rm --recursive --force packages/ts/schema-draft-2020-12
+
 out/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	packages/ts/jns42-generator/bin/jns42-generator package file://${PWD}/$< \
 		--package-directory $@ \

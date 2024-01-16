@@ -419,7 +419,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseExamplesItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseExamplesItems(value, configuration)]
 );
 }
 /**
@@ -444,7 +446,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseTypesItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseTypesItems(value, configuration)]
 );
 }
 /**
@@ -468,7 +472,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseOneOfItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseOneOfItems(value, configuration)]
 );
 }
 /**
@@ -482,7 +488,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseAnyOfItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseAnyOfItems(value, configuration)]
 );
 }
 /**
@@ -496,7 +504,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseAllOfItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseAllOfItems(value, configuration)]
 );
 }
 /**
@@ -690,7 +700,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseTupleItemsItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseTupleItemsItems(value, configuration)]
 );
 }
 /**
@@ -724,7 +736,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseOptionsItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseOptionsItems(value, configuration)]
 );
 }
 /**
@@ -895,7 +909,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseRequiredItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseRequiredItems(value, configuration)]
 );
 }
 /**
