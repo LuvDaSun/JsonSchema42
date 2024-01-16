@@ -21,13 +21,36 @@ export function* generateMocksTsCode(specification: models.Specification) {
   yield itt`
     const depthCounters: Record<string, number> = {};
 
+    export const unknownValue = {};
+    export const anyValue = {};
+    export const neverValue = {};
+
     export interface MockGeneratorOptions {
       maximumDepth?: number;
+      numberPrecision?: number;
+      stringCharacters?: string;
+      defaultMinimumValue?: number;
+      defaultMaximumValue?: number;
+      defaultMinimumItems?: number;
+      defaultMaximumItems?: number;
+      defaultMinimumProperties?: number;
+      defaultMaximumProperties?: number;
+      defaultMinimumStringLength?: number;
+      defaultMaximumStringLength?: number;
     }
     const defaultMockGeneratorOptions = {
       maximumDepth: 1,
+      numberPrecision: 1000,
+      stringCharacters: "abcdefghijklmnopqrstuvwxyz",
+      defaultMinimumValue: -1000,
+      defaultMaximumValue: 1000,
+      defaultMinimumItems: 1,
+      defaultMaximumItems: 5,
+      defaultMinimumProperties: 1,
+      defaultMaximumProperties: 5,
+      defaultMinimumStringLength: 5,
+      defaultMaximumStringLength: 20,
     }
-
   `;
 
   for (const [typeKey, item] of Object.entries(types)) {
@@ -75,67 +98,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
       return seed;
     }
-
-    interface RandomStringArguments {
-      lengthOffset: number,
-      lengthRange: number,
-      chars: string,
-    }
-    function randomString({
-      lengthOffset,
-      lengthRange,
-      chars,
-    }: RandomStringArguments) {
-      const length = lengthOffset + nextSeed() % lengthRange;
-      let value = ""
-      while(value.length < length) {
-        value += chars[nextSeed() % chars.length];
-      }
-      return value;
-    }
-
-    interface RandomNumberArguments {
-      isMinimumInclusive: boolean;
-      isMaximumInclusive: boolean;
-      minimumValue: number;
-      maximumValue: number;
-      precisionOffset: number,
-      precisionRange: number,
-    }
-    function randomNumber({
-      isMinimumInclusive,
-      isMaximumInclusive,
-      minimumValue,
-      maximumValue,
-      precisionOffset,
-      precisionRange,
-    }: RandomNumberArguments) {
-      const precision = precisionOffset + nextSeed() % precisionRange;
-      const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
-      const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
-      const valueOffset = inclusiveMinimumValue * precision;
-      const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
-      const value = (valueOffset + nextSeed() % valueRange) / precision;
-      return value;
-    }
-
-    interface RandomArrayArguments<T> {
-      elementFactory: () => T;
-      lengthOffset: number;
-      lengthRange: number;
-    }
-    function randomArray<T>({
-      elementFactory,
-      lengthOffset,
-      lengthRange,
-    }: RandomArrayArguments<T>) {
-      const length = lengthOffset + nextSeed() % lengthRange;
-      const value = new Array<T>();
-      while(value.length < length) {
-        value.push(elementFactory());
-      }
-      return value;
-    }
   `;
 }
 
@@ -162,17 +124,15 @@ function* generateMockDefinition(
 
   switch (typeItem.type) {
     case "unknown":
-      yield itt`
-        // unknown
-        ${JSON.stringify({})}
-      `;
+      yield `unknownValue`;
       break;
 
     case "any":
-      yield itt`
-        // any
-        ${JSON.stringify({})}
-      `;
+      yield `anyValue`;
+      break;
+
+    case "never":
+      yield `neverValue`;
       break;
 
     case "null":
@@ -200,21 +160,43 @@ function* generateMockDefinition(
         break;
       }
 
-      const isMinimumInclusive = typeItem.minimumInclusive != null;
-      const isMaximumInclusive = typeItem.maximumInclusive != null;
-      const minimumValue = typeItem.minimumInclusive ?? typeItem.minimumExclusive ?? -100000;
-      const maximumValue = typeItem.maximumInclusive ?? typeItem.maximumExclusive ?? 100000;
-      const precisionOffset = 1;
-      const precisionRange = 1;
+      let minimumValue = Number.NEGATIVE_INFINITY;
+      let isMinimumExclusive: boolean | undefined;
+      if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
+        minimumValue = typeItem.minimumInclusive;
+        isMinimumExclusive = false;
+      }
+      if (typeItem.minimumExclusive != null && typeItem.minimumExclusive >= minimumValue) {
+        minimumValue = typeItem.minimumExclusive;
+        isMinimumExclusive = true;
+      }
+      const minimumValueInclusiveExpression =
+        isMinimumExclusive == null
+          ? "configuration.defaultMinimumValue"
+          : isMinimumExclusive
+            ? `(${JSON.stringify(minimumValue)} + 1)`
+            : JSON.stringify(minimumValue);
 
-      yield `randomNumber(${JSON.stringify({
-        isMinimumInclusive,
-        isMaximumInclusive,
-        minimumValue,
-        maximumValue,
-        precisionOffset,
-        precisionRange,
-      })})`;
+      let maximumValue = Number.POSITIVE_INFINITY;
+      let isMaximumExclusive: boolean | undefined;
+      if (typeItem.maximumInclusive != null && typeItem.maximumInclusive <= maximumValue) {
+        maximumValue = typeItem.maximumInclusive;
+        isMaximumExclusive = false;
+      }
+      if (typeItem.maximumExclusive != null && typeItem.maximumExclusive <= maximumValue) {
+        maximumValue = typeItem.maximumExclusive;
+        isMaximumExclusive = true;
+      }
+      const maximumValueInclusiveExpression =
+        isMaximumExclusive == null
+          ? "configuration.defaultMaximumValue"
+          : isMaximumExclusive
+            ? `(${JSON.stringify(maximumValue)} - 1)`
+            : JSON.stringify(maximumValue);
+
+      yield `
+        ${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)
+      `;
       break;
     }
 
@@ -227,21 +209,43 @@ function* generateMockDefinition(
         break;
       }
 
-      const isMinimumInclusive = typeItem.minimumInclusive != null;
-      const isMaximumInclusive = typeItem.maximumInclusive != null;
-      const minimumValue = typeItem.minimumInclusive ?? typeItem.minimumExclusive ?? -1000;
-      const maximumValue = typeItem.maximumInclusive ?? typeItem.maximumExclusive ?? 1000;
-      const precisionOffset = 100;
-      const precisionRange = 900;
+      let minimumValue = Number.NEGATIVE_INFINITY;
+      let isMinimumExclusive: boolean | undefined;
+      if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
+        minimumValue = typeItem.minimumInclusive;
+        isMinimumExclusive = false;
+      }
+      if (typeItem.minimumExclusive != null && typeItem.minimumExclusive >= minimumValue) {
+        minimumValue = typeItem.minimumExclusive;
+        isMinimumExclusive = true;
+      }
+      const minimumValueInclusiveExpression =
+        isMinimumExclusive == null
+          ? `configuration.defaultMinimumValue * configuration.numberPrecision`
+          : isMinimumExclusive
+            ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
+            : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
 
-      yield `randomNumber(${JSON.stringify({
-        isMinimumInclusive,
-        isMaximumInclusive,
-        minimumValue,
-        maximumValue,
-        precisionOffset,
-        precisionRange,
-      })})`;
+      let maximumValue = Number.POSITIVE_INFINITY;
+      let isMaximumExclusive: boolean | undefined;
+      if (typeItem.maximumInclusive != null && typeItem.maximumInclusive <= maximumValue) {
+        maximumValue = typeItem.maximumInclusive;
+        isMaximumExclusive = false;
+      }
+      if (typeItem.maximumExclusive != null && typeItem.maximumExclusive <= maximumValue) {
+        maximumValue = typeItem.maximumExclusive;
+        isMaximumExclusive = true;
+      }
+      const maximumValueInclusiveExpression =
+        isMaximumExclusive == null
+          ? `(configuration.defaultMaximumValue * configuration.numberPrecision)`
+          : isMaximumExclusive
+            ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
+            : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
+
+      yield `
+        (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1) / configuration.numberPrecision)
+      `;
       break;
     }
 
@@ -254,17 +258,23 @@ function* generateMockDefinition(
         break;
       }
 
-      const minimumLength = typeItem.minimumLength ?? 3;
-      const maximumLength = typeItem.maximumLength ?? 15;
-      const lengthOffset = minimumLength;
-      const lengthRange = maximumLength - minimumLength + 1;
-      const chars = "abcdefghijklmnopqrstuvwxyz";
+      const minimumStringLengthExpression =
+        typeItem.minimumLength == null
+          ? "configuration.defaultMinimumStringLength"
+          : JSON.stringify(typeItem.minimumLength);
+      const maximumStringLengthExpression =
+        typeItem.maximumLength == null
+          ? "configuration.defaultMaximumStringLength"
+          : JSON.stringify(typeItem.maximumLength);
 
-      yield `randomString(${JSON.stringify({
-        lengthOffset,
-        lengthRange,
-        chars,
-      })})`;
+      yield `
+        new Array(
+          ${minimumStringLengthExpression} + nextSeed() % (${maximumStringLengthExpression} - ${minimumStringLengthExpression} + 1)
+        ).
+          fill(undefined).
+          map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+          join("")
+      `;
       break;
 
     case "tuple": {
@@ -285,30 +295,34 @@ function* generateMockDefinition(
 
     case "array": {
       const { element } = typeItem;
-
       const [resolvedElement] = unalias(types, element);
-      const minimumItems = typeItem.minimumItems ?? 0;
-      const maximumItems = typeItem.maximumItems ?? 5;
-      const itemsOffset = minimumItems;
-      const itemsRange = maximumItems - minimumItems + 1;
 
-      if (itemsOffset === 0) {
+      const minimumItemsExpression =
+        typeItem.minimumItems == null
+          ? "configuration.defaultMinimumItems"
+          : JSON.stringify(typeItem.minimumItems);
+      const maximumItemsExpression =
+        typeItem.maximumItems == null
+          ? "configuration.defaultMaximumItems"
+          : JSON.stringify(typeItem.maximumItems);
+
+      if (typeItem.minimumItems == null || typeItem.minimumItems === 0) {
         yield itt`
           (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
-            randomArray({
-              lengthOffset: ${JSON.stringify(itemsOffset)},
-              lengthRange: ${JSON.stringify(itemsRange)},
-              elementFactory: () => ${generateMockReference(specification, element)},
-            }) :
+            new Array(
+              ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
+            )
+              .fill(undefined)
+              .map(() => ${generateMockReference(specification, element)}) :
             []
         `;
       } else {
         yield itt`
-          randomArray({
-            lengthOffset: ${JSON.stringify(itemsOffset)},
-            lengthRange: ${JSON.stringify(itemsRange)},
-            elementFactory: () => ${generateMockReference(specification, element)},
-          })
+          new Array(
+            ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
+          )
+            .fill(undefined)
+            .map(() => ${generateMockReference(specification, element)})
         `;
       }
 
@@ -346,37 +360,41 @@ function* generateMockDefinition(
       const { name, element } = typeItem;
       const [resolvedElement] = unalias(types, element);
 
-      const minimumProperties = typeItem.minimumProperties ?? 0;
-      const maximumProperties = typeItem.maximumProperties ?? 5;
-      const propertiesOffset = minimumProperties;
-      const propertiesRange = maximumProperties - minimumProperties + 1;
+      const minimumPropertiesExpression =
+        typeItem.minimumProperties == null
+          ? "configuration.defaultMinimumProperties"
+          : JSON.stringify(typeItem.minimumProperties);
+      const maximumPropertiesExpression =
+        typeItem.maximumProperties == null
+          ? "configuration.defaultMaximumProperties"
+          : JSON.stringify(typeItem.maximumProperties);
 
-      if (propertiesOffset === 0) {
+      if (typeItem.minimumProperties == null || typeItem.minimumProperties === 0) {
         yield itt`
           (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
             Object.fromEntries(
-              randomArray({
-                lengthOffset: ${JSON.stringify(propertiesOffset)},
-                lengthRange: ${JSON.stringify(propertiesRange)},
-                elementFactory: () => [${generateMockReference(
+              new Array(
+                ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
+              )
+                .fill(undefined)
+                .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
                   specification,
-                  name,
-                )}, ${generateMockReference(specification, element)}],
-              })
+                  element,
+                )}])
             ) :
             {}
         `;
       } else {
         yield itt`
           Object.fromEntries(
-            randomArray({
-              lengthOffset: ${JSON.stringify(propertiesOffset)},
-              lengthRange: ${JSON.stringify(propertiesRange)},
-              elementFactory: () => [${generateMockReference(
+            new Array(
+              ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
+            )
+              .fill(undefined)
+              .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
                 specification,
-                name,
-              )}, ${generateMockReference(specification, element)}],
-            })
+                element,
+              )}])
           )
         `;
       }
@@ -412,7 +430,7 @@ function* generateMockDefinition(
     }
 
     default:
-      throw new TypeError(`${typeItem.type} not supported`);
+      throw new TypeError(`type not supported`);
   }
 }
 

@@ -1,0 +1,64 @@
+$schema: "./schema.json"
+
+schemas:
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    description: "Object with numbers"
+    type: "object"
+    properties:
+      negative:
+        type: "number"
+        exclusiveMaximum: 0
+      negativeOrZero:
+        type: "number"
+        maximum: 0
+      positive:
+        type: "number"
+        exclusiveMinimum: 0
+      positiveOrZero:
+        type: "number"
+        minimum: 0
+      negativeInteger:
+        type: "integer"
+        exclusiveMaximum: 0
+      negativeIntegerOrZero:
+        type: "integer"
+        maximum: 0
+      positiveInteger:
+        type: "integer"
+        exclusiveMinimum: 0
+      positiveIntegerOrZero:
+        type: "integer"
+        minimum: 0
+      one:
+        type: "integer"
+        minimum: 1
+        maximum: 1
+
+valid:
+  numbers:
+    negative: -1.1
+    negativeOrZero: 0
+    positive: 1.1
+    positiveOrZero: 0
+  integers:
+    negative: -1
+    negativeOrZero: 0
+    positive: 1
+    positiveOrZero: 0
+  one:
+    one: 1
+
+invalid:
+  numbers:
+    negative: 0
+    negativeOrZero: 1.1
+    positive: 0
+    positiveOrZero: -1.1
+  integers:
+    negativeInteger: 0
+    negativeIntegerOrZero: 1
+    positiveInteger: 0
+    positiveIntegerOrZero: -1
+  two:
+    one: 2
