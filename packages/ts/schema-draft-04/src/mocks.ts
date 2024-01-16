@@ -7,11 +7,34 @@
 //
 import * as types from "./types.js";
 const depthCounters: Record<string, number> = {};
+export const unknownValue = {};
+export const anyValue = {};
+export const neverValue = {};
 export interface MockGeneratorOptions {
 maximumDepth?: number;
+numberPrecision?: number;
+stringCharacters?: string;
+defaultMinimumValue?: number;
+defaultMaximumValue?: number;
+defaultMinimumItems?: number;
+defaultMaximumItems?: number;
+defaultMinimumProperties?: number;
+defaultMaximumProperties?: number;
+defaultMinimumStringLength?: number;
+defaultMaximumStringLength?: number;
 }
 const defaultMockGeneratorOptions = {
 maximumDepth: 1,
+numberPrecision: 1000,
+stringCharacters: "abcdefghijklmnopqrstuvwxyz",
+defaultMinimumValue: -1000,
+defaultMaximumValue: 1000,
+defaultMinimumItems: 1,
+defaultMaximumItems: 5,
+defaultMinimumProperties: 1,
+defaultMaximumProperties: 5,
+defaultMinimumStringLength: 5,
+defaultMaximumStringLength: 20,
 }
 /**
 * @description Core schema meta-schema
@@ -79,11 +102,11 @@ depthCounters["1"] ??= 0;
 try {
 depthCounters["1"]++;
 return (
-randomArray({
-lengthOffset: 1,
-lengthRange: 5,
-elementFactory: () => mockSchemaArrayItems(),
-})
+new Array(
+1 + nextSeed() % (configuration.defaultMaximumItems - 1 + 1)
+)
+.fill(undefined)
+.map(() => mockSchemaArrayItems())
 );
 }
 finally {
@@ -101,7 +124,9 @@ const configuration = {
 depthCounters["2"] ??= 0;
 try {
 depthCounters["2"]++;
-return (randomNumber({"isMinimumInclusive":true,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":100000,"precisionOffset":1,"precisionRange":1}));
+return (
+0 + nextSeed() % (configuration.defaultMaximumValue - 0 + 1)
+);
 }
 finally {
 depthCounters["2"]--;
@@ -118,7 +143,9 @@ const configuration = {
 depthCounters["3"] ??= 0;
 try {
 depthCounters["3"]++;
-return (randomNumber({"isMinimumInclusive":true,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":100000,"precisionOffset":1,"precisionRange":1}));
+return (
+0 + nextSeed() % (configuration.defaultMaximumValue - 0 + 1)
+);
 }
 finally {
 depthCounters["3"]--;
@@ -153,11 +180,11 @@ depthCounters["5"] ??= 0;
 try {
 depthCounters["5"]++;
 return (
-randomArray({
-lengthOffset: 1,
-lengthRange: 5,
-elementFactory: () => mockStringArrayItems(),
-})
+new Array(
+1 + nextSeed() % (configuration.defaultMaximumItems - 1 + 1)
+)
+.fill(undefined)
+.map(() => mockStringArrayItems())
 );
 }
 finally {
@@ -175,7 +202,14 @@ const configuration = {
 depthCounters["6"] ??= 0;
 try {
 depthCounters["6"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["6"]--;
@@ -192,7 +226,14 @@ const configuration = {
 depthCounters["7"] ??= 0;
 try {
 depthCounters["7"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["7"]--;
@@ -209,7 +250,14 @@ const configuration = {
 depthCounters["8"] ??= 0;
 try {
 depthCounters["8"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["8"]--;
@@ -226,7 +274,14 @@ const configuration = {
 depthCounters["9"] ??= 0;
 try {
 depthCounters["9"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["9"]--;
@@ -243,10 +298,7 @@ const configuration = {
 depthCounters["10"] ??= 0;
 try {
 depthCounters["10"]++;
-return (
-// unknown
-{}
-);
+return (unknownValue);
 }
 finally {
 depthCounters["10"]--;
@@ -263,7 +315,9 @@ const configuration = {
 depthCounters["11"] ??= 0;
 try {
 depthCounters["11"]++;
-return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":0,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
+return (
+((0 * configuration.numberPrecision + 1) + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - (0 * configuration.numberPrecision + 1) + 1) / configuration.numberPrecision)
+);
 }
 finally {
 depthCounters["11"]--;
@@ -280,7 +334,9 @@ const configuration = {
 depthCounters["12"] ??= 0;
 try {
 depthCounters["12"]++;
-return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
+return (
+(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
+);
 }
 finally {
 depthCounters["12"]--;
@@ -314,7 +370,9 @@ const configuration = {
 depthCounters["14"] ??= 0;
 try {
 depthCounters["14"]++;
-return (randomNumber({"isMinimumInclusive":false,"isMaximumInclusive":false,"minimumValue":-1000,"maximumValue":1000,"precisionOffset":100,"precisionRange":900}));
+return (
+(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
+);
 }
 finally {
 depthCounters["14"]--;
@@ -382,7 +440,14 @@ const configuration = {
 depthCounters["18"] ??= 0;
 try {
 depthCounters["18"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["18"]--;
@@ -594,11 +659,18 @@ depthCounters["28"]++;
 return (
 (depthCounters["0"] ?? 0) < configuration.maximumDepth ?
 Object.fromEntries(
-randomArray({
-lengthOffset: 0,
-lengthRange: 6,
-elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockDefinitionsAdditionalProperties()],
-})
+new Array(
+configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
+)
+.fill(undefined)
+.map(() => [(
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+), mockDefinitionsAdditionalProperties()])
 ) :
 {}
 );
@@ -621,11 +693,18 @@ depthCounters["29"]++;
 return (
 (depthCounters["0"] ?? 0) < configuration.maximumDepth ?
 Object.fromEntries(
-randomArray({
-lengthOffset: 0,
-lengthRange: 6,
-elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockPropertiesPropertiesAdditionalProperties()],
-})
+new Array(
+configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
+)
+.fill(undefined)
+.map(() => [(
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+), mockPropertiesPropertiesAdditionalProperties()])
 ) :
 {}
 );
@@ -648,11 +727,18 @@ depthCounters["30"]++;
 return (
 (depthCounters["0"] ?? 0) < configuration.maximumDepth ?
 Object.fromEntries(
-randomArray({
-lengthOffset: 0,
-lengthRange: 6,
-elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockPatternPropertiesAdditionalProperties()],
-})
+new Array(
+configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
+)
+.fill(undefined)
+.map(() => [(
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+), mockPatternPropertiesAdditionalProperties()])
 ) :
 {}
 );
@@ -675,11 +761,18 @@ depthCounters["31"]++;
 return (
 (depthCounters["52"] ?? 0) < configuration.maximumDepth ?
 Object.fromEntries(
-randomArray({
-lengthOffset: 0,
-lengthRange: 6,
-elementFactory: () => [(randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"})), mockDependenciesAdditionalProperties()],
-})
+new Array(
+configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
+)
+.fill(undefined)
+.map(() => [(
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+), mockDependenciesAdditionalProperties()])
 ) :
 {}
 );
@@ -700,14 +793,11 @@ depthCounters["32"] ??= 0;
 try {
 depthCounters["32"]++;
 return (
-randomArray({
-lengthOffset: 1,
-lengthRange: 5,
-elementFactory: () => (
-// any
-{}
-),
-})
+new Array(
+1 + nextSeed() % (configuration.defaultMaximumItems - 1 + 1)
+)
+.fill(undefined)
+.map(() => (anyValue))
 );
 }
 finally {
@@ -755,7 +845,14 @@ const configuration = {
 depthCounters["34"] ??= 0;
 try {
 depthCounters["34"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["34"]--;
@@ -874,10 +971,7 @@ const configuration = {
 depthCounters["41"] ??= 0;
 try {
 depthCounters["41"]++;
-return (
-// unknown
-{}
-);
+return (unknownValue);
 }
 finally {
 depthCounters["41"]--;
@@ -894,7 +988,14 @@ const configuration = {
 depthCounters["42"] ??= 0;
 try {
 depthCounters["42"]++;
-return (randomString({"lengthOffset":3,"lengthRange":13,"chars":"abcdefghijklmnopqrstuvwxyz"}));
+return (
+new Array(
+configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters["42"]--;
@@ -1112,11 +1213,11 @@ depthCounters["54"] ??= 0;
 try {
 depthCounters["54"]++;
 return (
-randomArray({
-lengthOffset: 1,
-lengthRange: 5,
-elementFactory: () => mockTypeItems(),
-})
+new Array(
+1 + nextSeed() % (configuration.defaultMaximumItems - 1 + 1)
+)
+.fill(undefined)
+.map(() => mockTypeItems())
 );
 }
 finally {
@@ -1183,62 +1284,4 @@ const a = 950706376;
 const b = 0;
 seed = (a * seed + b) % p;
 return seed;
-}
-interface RandomStringArguments {
-lengthOffset: number,
-lengthRange: number,
-chars: string,
-}
-function randomString({
-lengthOffset,
-lengthRange,
-chars,
-}: RandomStringArguments) {
-const length = lengthOffset + nextSeed() % lengthRange;
-let value = ""
-while(value.length < length) {
-value += chars[nextSeed() % chars.length];
-}
-return value;
-}
-interface RandomNumberArguments {
-isMinimumInclusive: boolean;
-isMaximumInclusive: boolean;
-minimumValue: number;
-maximumValue: number;
-precisionOffset: number,
-precisionRange: number,
-}
-function randomNumber({
-isMinimumInclusive,
-isMaximumInclusive,
-minimumValue,
-maximumValue,
-precisionOffset,
-precisionRange,
-}: RandomNumberArguments) {
-const precision = precisionOffset + nextSeed() % precisionRange;
-const inclusiveMinimumValue = isMinimumInclusive ? minimumValue : minimumValue + (1 / precision);
-const inclusiveMaximumValue = isMaximumInclusive ? maximumValue : maximumValue - (1 / precision);
-const valueOffset = inclusiveMinimumValue * precision;
-const valueRange = (inclusiveMaximumValue - inclusiveMinimumValue) * precision;
-const value = (valueOffset + nextSeed() % valueRange) / precision;
-return value;
-}
-interface RandomArrayArguments<T> {
-elementFactory: () => T;
-lengthOffset: number;
-lengthRange: number;
-}
-function randomArray<T>({
-elementFactory,
-lengthOffset,
-lengthRange,
-}: RandomArrayArguments<T>) {
-const length = lengthOffset + nextSeed() % lengthRange;
-const value = new Array<T>();
-while(value.length < length) {
-value.push(elementFactory());
-}
-return value;
 }
