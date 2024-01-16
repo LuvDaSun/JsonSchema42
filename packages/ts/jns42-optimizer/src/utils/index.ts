@@ -4,6 +4,7 @@ export * from "./choose.js";
 export * from "./deep-equal.js";
 export * from "./deep-unique.js";
 export * from "./empty.js";
+export * from "./math.js";
 export * from "./merge.js";
 export * from "./normalize-object.js";
 export * from "./properties.js";

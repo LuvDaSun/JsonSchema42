@@ -41,7 +41,7 @@ export interface Integer extends Base<"integer"> {
   minimumExclusive?: number;
   maximumInclusive?: number;
   maximumExclusive?: number;
-  multipleOf?: number[];
+  multipleOf?: number;
 }
 
 export interface Number extends Base<"number"> {
@@ -51,7 +51,7 @@ export interface Number extends Base<"number"> {
   minimumExclusive?: number;
   maximumInclusive?: number;
   maximumExclusive?: number;
-  multipleOf?: number[];
+  multipleOf?: number;
 }
 
 export interface String extends Base<"string"> {

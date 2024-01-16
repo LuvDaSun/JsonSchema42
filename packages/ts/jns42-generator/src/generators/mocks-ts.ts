@@ -160,6 +160,8 @@ function* generateMockDefinition(
         break;
       }
 
+      let multipleOf = typeItem.multipleOf ?? 1;
+
       let minimumValue = Number.NEGATIVE_INFINITY;
       let isMinimumExclusive: boolean | undefined;
       if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
@@ -172,10 +174,10 @@ function* generateMockDefinition(
       }
       const minimumValueInclusiveExpression =
         isMinimumExclusive == null
-          ? "configuration.defaultMinimumValue"
+          ? `Math.ceil(configuration.defaultMinimumValue / ${JSON.stringify(multipleOf)})`
           : isMinimumExclusive
-            ? `(${JSON.stringify(minimumValue)} + 1)`
-            : JSON.stringify(minimumValue);
+            ? `(Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)}) + 1)`
+            : `Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)})`;
 
       let maximumValue = Number.POSITIVE_INFINITY;
       let isMaximumExclusive: boolean | undefined;
@@ -189,13 +191,13 @@ function* generateMockDefinition(
       }
       const maximumValueInclusiveExpression =
         isMaximumExclusive == null
-          ? "configuration.defaultMaximumValue"
+          ? `Math.floor(configuration.defaultMaximumValue / ${JSON.stringify(multipleOf)})`
           : isMaximumExclusive
-            ? `(${JSON.stringify(maximumValue)} - 1)`
-            : JSON.stringify(maximumValue);
+            ? `(Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)}) - 1)`
+            : `Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)})`;
 
       yield `
-        ${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)
+        (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)) * ${multipleOf}
       `;
       break;
     }

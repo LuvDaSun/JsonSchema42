@@ -98,8 +98,8 @@ export function transformSchema(
     model.maximumItems = schema.maximumItems;
     model.minimumProperties = schema.minimumProperties;
     model.maximumProperties = schema.maximumProperties;
+    model.multipleOf = schema.multipleOf;
 
-    model.multipleOf = schema.multipleOf == null ? undefined : [schema.multipleOf];
     model.valuePattern = schema.valuePattern == null ? undefined : [schema.valuePattern];
     model.valueFormat = schema.valueFormat == null ? undefined : [schema.valueFormat];
 
@@ -283,7 +283,7 @@ export function transformSchema(
               minimumExclusive: model.minimumExclusive,
               maximumInclusive: model.maximumInclusive,
               maximumExclusive: model.maximumExclusive,
-              // multipleOf: model.multipleOf,
+              multipleOf: model.multipleOf,
             },
           ];
           return;
@@ -300,7 +300,7 @@ export function transformSchema(
               minimumExclusive: model.minimumExclusive,
               maximumInclusive: model.maximumInclusive,
               maximumExclusive: model.maximumExclusive,
-              // multipleOf: model.multipleOf,
+              multipleOf: model.multipleOf,
             },
           ];
           return;

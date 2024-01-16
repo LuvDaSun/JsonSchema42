@@ -133,11 +133,9 @@ function* generateRules(
         yield itt`${valueExpression} < ${JSON.stringify(typeItem.maximumExclusive)}`;
       }
 
-      for (const ruleValue of typeItem.multipleOf ?? []) {
-        yield itt`${valueExpression} % ${JSON.stringify(ruleValue)} === 0`;
+      if (typeItem.multipleOf != null) {
+        yield itt`${valueExpression} % ${JSON.stringify(typeItem.multipleOf)} === 0`;
       }
-
-      break;
 
     case "number": {
       yield itt`typeof ${valueExpression} === "number"`;
@@ -166,9 +164,10 @@ function* generateRules(
         yield itt`${valueExpression} < ${JSON.stringify(typeItem.maximumExclusive)}`;
       }
 
-      for (const ruleValue of typeItem.multipleOf ?? []) {
-        yield itt`${valueExpression} % ${JSON.stringify(ruleValue)} === 0`;
-      }
+      // TODO support numbers
+      // if (typeItem.multipleOf != null) {
+      //   yield itt`${valueExpression} % ${JSON.stringify(typeItem.multipleOf)} === 0`;
+      // }
 
       break;
     }

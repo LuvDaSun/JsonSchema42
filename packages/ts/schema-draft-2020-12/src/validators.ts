@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.11.4                         -- www.JsonSchema42.org
+// v0.11.5                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
 /**
@@ -1553,6 +1553,9 @@ export function isNonNegativeInteger(value: unknown): value is types.NonNegative
 return ((typeof value === "number") &&
 (!isNaN(value)) &&
 (value % 1 === 0) &&
+(value >= 0) &&
+(typeof value === "number") &&
+(!isNaN(value)) &&
 (value >= 0));
 }
 /**
