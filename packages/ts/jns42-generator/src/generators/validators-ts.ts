@@ -19,6 +19,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     import * as types from "./types.js";
   `;
 
+  yield itt`
+    const currentPath = new Array<string>();
+  `;
+
   for (const [typeKey, item] of Object.entries(types)) {
     const { id: nodeId } = item;
 
@@ -32,8 +36,18 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown): value is types.${typeName} {
-        ${statements};
+      export function ${functionName}(value: unknown, pathPart?: string): value is types.${typeName} {
+        try {
+          if(pathPart != null) {
+            currentPath.push(pathPart);
+          }
+          ${statements};
+        }
+        finally {
+          if(pathPart != null) {
+            currentPath.pop();
+          }
+        }
       }
     `;
   }
@@ -43,13 +57,24 @@ function* generateValidatorReference(
   specification: models.Specification,
   typeKey: string,
   valueExpression: string,
+  pathExpression: string = "null",
 ): Iterable<NestedText> {
   const { names, types } = specification;
   const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`
       (() => {
-        ${generateValidatorStatements(specification, typeKey, valueExpression)}
+        try {
+          if(${pathExpression} != null) {
+            currentPath.push(${pathExpression});
+          }
+          ${generateValidatorStatements(specification, typeKey, valueExpression)}
+        }
+        finally {
+          if(${pathExpression} != null) {
+            currentPath.pop();
+          }
+        }
       })()
     `;
   } else {
@@ -382,7 +407,12 @@ function* generateValidatorStatements(
           const elementKey = typeItem.elements[elementIndex];
           yield itt`
             case ${JSON.stringify(Number(elementIndex))}:
-              if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
+              if(!${generateValidatorReference(
+                specification,
+                elementKey,
+                `elementValue`,
+                JSON.stringify(elementKey),
+              )}) {
                 return false;
               }
               break;
@@ -451,7 +481,12 @@ function* generateValidatorStatements(
         }
 
         yield itt`
-          if(!${generateValidatorReference(specification, typeItem.element, `elementValue`)}) {
+          if(!${generateValidatorReference(
+            specification,
+            typeItem.element,
+            `elementValue`,
+            "String(elementIndex)",
+          )}) {
             return false;
           }
         `;
@@ -555,6 +590,7 @@ function* generateValidatorStatements(
                 specification,
                 typeItem.properties[propertyName].element,
                 `propertyValue`,
+                "propertyName",
               )}) {
                 return false;
               }
@@ -636,7 +672,12 @@ function* generateValidatorStatements(
         `;
 
         yield itt`
-          if(!${generateValidatorReference(specification, typeItem.element, `propertyValue`)}) {
+          if(!${generateValidatorReference(
+            specification,
+            typeItem.element,
+            `propertyValue`,
+            "propertyName",
+          )}) {
             return false;
           }
         `;
@@ -647,9 +688,15 @@ function* generateValidatorStatements(
       yield itt`
         let count = 0;
       `;
-      for (const element of typeItem.elements) {
+      for (let elementIndex = 0; elementIndex < typeItem.elements.length; elementIndex++) {
+        const element = typeItem.elements[elementIndex];
         yield itt`
-          if(${generateValidatorReference(specification, element, valueExpression)}) {
+          if(${generateValidatorReference(
+            specification,
+            element,
+            valueExpression,
+            JSON.stringify(String(elementIndex)),
+          )}) {
             count++;
             if(count > 1) {
               return false;
