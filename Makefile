@@ -1,5 +1,12 @@
 SHELL:=$(PREFIX)/bin/sh
 
+build: \
+	packages/ts/schema-intermediate \
+	packages/ts/schema-draft-04 \
+	packages/ts/schema-draft-2020-12 \
+
+	npm install
+
 rebuild: \
 	clean build
 
@@ -8,13 +15,6 @@ clean: \
 	rm --recursive --force packages/ts/schema-intermediate
 	rm --recursive --force packages/ts/schema-draft-04
 	rm --recursive --force packages/ts/schema-draft-2020-12
-
-build: \
-	packages/ts/schema-intermediate \
-	packages/ts/schema-draft-04 \
-	packages/ts/schema-draft-2020-12 \
-
-	npm install
 
 out/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	packages/ts/jns42-generator/bin/jns42-generator package file://${PWD}/$< \
