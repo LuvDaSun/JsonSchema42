@@ -6,7 +6,6 @@ import {
   generateJsDocComments,
   itt,
   joinIterable,
-  mapIterable,
   toCamel,
   toPascal,
 } from "../utils/index.js";
@@ -64,17 +63,6 @@ function* generateValidatorStatements(
   typeKey: string,
   valueExpression: string,
 ): Iterable<NestedText> {
-  yield itt`return ${joinIterable(
-    mapIterable(generateRules(specification, typeKey, valueExpression), (text) => itt`(${text})`),
-    " &&\n",
-  )}`;
-}
-
-function* generateRules(
-  specification: models.Specification,
-  typeKey: string,
-  valueExpression: string,
-): Iterable<NestedText> {
   const { names, types } = specification;
   const typeItem = types[typeKey];
 
@@ -82,94 +70,192 @@ function* generateRules(
     case "unknown":
       yield itt`
         // unknown
-        true
+        return true;
       `;
       break;
 
     case "any":
       yield itt`
-        // any
-        true
+          // any
+          return true;
+        `;
+      break;
+
+    case "never":
+      yield itt`
+        // never
+        return false;
       `;
       break;
 
     case "null":
-      yield itt`${valueExpression} === null`;
+      yield itt`
+        return ${valueExpression} === null;
+      `;
       break;
 
     case "boolean": {
-      yield itt`typeof ${valueExpression} === "boolean"`;
+      yield itt`
+        if(typeof ${valueExpression} !== "boolean") {
+          return false;
+        }
+      `;
 
       if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
-          " ||\n",
-        );
+        yield itt`
+          if(${joinIterable(
+            typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
+            " &&\n",
+          )}) {
+            return false;
+          }
+        `;
       }
+
+      yield itt`
+        return true;
+      `;
       break;
     }
 
     case "integer":
-      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression}) && ${valueExpression} % 1 === 0`;
+      yield itt`
+        if(
+          typeof ${valueExpression} !== "number" ||
+          isNaN(${valueExpression}) ||
+          ${valueExpression} % 1 !== 0
+        ) {
+          return false;
+        }
+      `;
 
       if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
-          " ||\n",
-        );
+        yield itt`
+          if(${joinIterable(
+            typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
+            " &&\n",
+          )}) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.minimumInclusive != null) {
-        yield itt`${valueExpression} >= ${JSON.stringify(typeItem.minimumInclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} < ${JSON.stringify(typeItem.minimumInclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.minimumExclusive != null) {
-        yield itt`${valueExpression} > ${JSON.stringify(typeItem.minimumExclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} <= ${JSON.stringify(typeItem.minimumExclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.maximumInclusive != null) {
-        yield itt`${valueExpression} <= ${JSON.stringify(typeItem.maximumInclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} > ${JSON.stringify(typeItem.maximumInclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.maximumExclusive != null) {
-        yield itt`${valueExpression} < ${JSON.stringify(typeItem.maximumExclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} >= ${JSON.stringify(typeItem.maximumExclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.multipleOf != null) {
-        yield itt`${valueExpression} % ${JSON.stringify(typeItem.multipleOf)} === 0`;
+        yield itt`
+          if(
+            ${valueExpression} % ${JSON.stringify(typeItem.multipleOf)} !== 0
+          ) {
+            return false;
+          }
+        `;
       }
+
+      yield itt`
+        return true;
+      `;
+      break;
 
     case "number": {
       yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression})`;
 
       if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
-          " ||\n",
-        );
+        yield itt`
+          if(${joinIterable(
+            typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
+            " &&\n",
+          )}) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.minimumInclusive != null) {
-        yield itt`${valueExpression} >= ${JSON.stringify(typeItem.minimumInclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} < ${JSON.stringify(typeItem.minimumInclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.minimumExclusive != null) {
-        yield itt`${valueExpression} > ${JSON.stringify(typeItem.minimumExclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} <= ${JSON.stringify(typeItem.minimumExclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.maximumInclusive != null) {
-        yield itt`${valueExpression} <= ${JSON.stringify(typeItem.maximumInclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} > ${JSON.stringify(typeItem.maximumInclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.maximumExclusive != null) {
-        yield itt`${valueExpression} < ${JSON.stringify(typeItem.maximumExclusive)}`;
+        yield itt`
+          if(
+            ${valueExpression} >= ${JSON.stringify(typeItem.maximumExclusive)}
+          ) {
+            return false;
+          }
+        `;
       }
 
-      // TODO support numbers
-      // if (typeItem.multipleOf != null) {
-      //   yield itt`${valueExpression} % ${JSON.stringify(typeItem.multipleOf)} === 0`;
-      // }
+      if (typeItem.multipleOf != null) {
+        // TODO implement me!
+      }
 
+      yield itt`
+        return true;
+      `;
       break;
     }
 
@@ -177,58 +263,83 @@ function* generateRules(
       yield itt`typeof ${valueExpression} === "string"`;
 
       if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => itt`${valueExpression} === ${JSON.stringify(option)}`),
-          " ||\n",
-        );
+        yield itt`
+          if(${joinIterable(
+            typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
+            " &&\n",
+          )}) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.minimumLength != null) {
-        yield itt`${valueExpression}.length >= ${JSON.stringify(typeItem.minimumLength)}`;
+        yield itt`
+          if(
+            ${valueExpression}.length < ${JSON.stringify(typeItem.minimumLength)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.maximumLength != null) {
-        yield itt`value.length <= ${JSON.stringify(typeItem.maximumLength)}`;
+        yield itt`
+          if(
+            value.length > ${JSON.stringify(typeItem.maximumLength)}
+          ) {
+            return false;
+          }
+        `;
       }
 
       for (const ruleValue of typeItem.valuePattern ?? []) {
-        yield itt`new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})`;
+        yield itt`
+          if(
+            !new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})
+          ) {
+            return false;
+          }
+        `;
       }
 
+      yield itt`
+        return true;
+      `;
       break;
 
     case "tuple": {
       const unique = typeItem.uniqueItems ?? false;
 
-      yield itt`Array.isArray(${valueExpression})`;
-      yield itt`${valueExpression}.length === ${JSON.stringify(typeItem.elements.length)}`;
-
       yield itt`
-        (()=>{
-          ${generateAdvancedRules()}
-        })()
-      `;
-      break;
-
-      function* generateAdvancedRules() {
-        if (unique) {
-          yield itt`
-            const elementValueSeen = new Set<unknown>();
-          `;
+        if(!Array.isArray(${valueExpression})) {
+          return false;
         }
+      `;
+      yield itt`
+        if(${valueExpression}.length !== ${JSON.stringify(typeItem.elements.length)}) {
+          return false;
+        }
+      `;
 
+      if (unique) {
         yield itt`
-          for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
-            const elementValue = ${valueExpression}[elementIndex];
-
-            ${generateAdvancedElementRules()}
-          }
-        `;
-
-        yield itt`
-          return true;
+          const elementValueSeen = new Set<unknown>();
         `;
       }
+
+      yield itt`
+        for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
+          const elementValue = ${valueExpression}[elementIndex];
+
+          ${generateAdvancedElementRules()}
+        }
+      `;
+
+      yield itt`
+        return true;
+      `;
+      break;
 
       function* generateAdvancedElementRules() {
         if (unique) {
@@ -270,40 +381,45 @@ function* generateRules(
     case "array": {
       const unique = typeItem.uniqueItems ?? false;
 
-      yield itt`Array.isArray(${valueExpression})`;
+      yield itt`
+        if(!Array.isArray(${valueExpression})) {
+          return false;
+        }
+      `;
 
       if (typeItem.minimumItems != null) {
-        yield itt`${valueExpression}.length >= ${JSON.stringify(typeItem.minimumItems)}`;
+        yield itt`
+          if(${valueExpression}.length < ${JSON.stringify(typeItem.minimumItems)}) {
+            return false;
+          }
+        `;
       }
 
       if (typeItem.maximumItems != null) {
-        yield itt`${valueExpression}.length <= ${JSON.stringify(typeItem.maximumItems)}`;
+        yield itt`
+          if(${valueExpression}.length > ${JSON.stringify(typeItem.maximumItems)}) {
+            return false;
+          }
+        `;
+      }
+
+      if (unique) {
+        yield itt`
+          const elementValueSeen = new Set<unknown>();
+        `;
       }
 
       yield itt`
-        (()=>{
-          ${generateAdvancedRules()}
-        })()
-      `;
-      break;
-
-      function* generateAdvancedRules() {
-        if (unique) {
-          yield itt`
-            const elementValueSeen = new Set<unknown>();
-          `;
+        for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
+          ${generateAdvancedElementRules()}
         }
+      `;
 
-        yield itt`
-          for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
-            ${generateAdvancedElementRules()}
-          }
-        `;
+      yield itt`
+        return true;
+      `;
 
-        yield itt`
-          return true;
-        `;
-      }
+      break;
 
       function* generateAdvancedElementRules() {
         assert(typeItem.type === "array");
@@ -333,7 +449,15 @@ function* generateRules(
       const countProperties =
         typeItem.minimumProperties != null || typeItem.maximumProperties != null;
 
-      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
+      yield itt`
+        if(
+          ${valueExpression} === null ||
+          typeof ${valueExpression} !== "object" ||
+          Array.isArray(${valueExpression})
+        ) {
+          return false;
+        }
+      `;
 
       /**
        * check if all the required properties are present
@@ -342,54 +466,50 @@ function* generateRules(
         if (!typeItem.properties[propertyName].required) {
           continue;
         }
-        yield itt`${JSON.stringify(propertyName)} in ${valueExpression}`;
-        yield itt`${valueExpression}[${JSON.stringify(propertyName)}] !== undefined`;
+        yield itt`
+          if(
+            !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
+            ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
+          ) {
+            return false;
+          }
+        `;
+      }
+
+      if (countProperties) {
+        yield itt`
+          let propertyCount = 0;
+        `;
       }
 
       yield itt`
-        (()=>{
-          ${generateAdvancedRules()}
-        })()
+        for(const propertyName in ${valueExpression}) {
+          ${generateAdvancedPropertyRules()}
+        }
       `;
-      break;
 
-      function* generateAdvancedRules() {
-        assert(typeItem.type === "object");
-
-        if (countProperties) {
+      if (countProperties) {
+        if (typeItem.minimumProperties != null) {
           yield itt`
-            let propertyCount = 0;
+            if(propertyCount < ${JSON.stringify(typeItem.minimumProperties)}) {
+              return false;
+            }
           `;
         }
 
-        yield itt`
-          for(const propertyName in ${valueExpression}) {
-            ${generateAdvancedPropertyRules()}
-          }
-        `;
-
-        if (countProperties) {
-          if (typeItem.minimumProperties != null) {
-            yield itt`
-              if(propertyCount < ${JSON.stringify(typeItem.minimumProperties)}) {
-                return false;
-              }
-            `;
-          }
-
-          if (typeItem.maximumProperties != null) {
-            yield itt`
-              if(propertyCount > ${JSON.stringify(typeItem.maximumProperties)}) {
-                return false;
-              }
-            `;
-          }
+        if (typeItem.maximumProperties != null) {
+          yield itt`
+            if(propertyCount > ${JSON.stringify(typeItem.maximumProperties)}) {
+              return false;
+            }
+          `;
         }
-
-        yield itt`
-          return true;
-        `;
       }
+
+      yield itt`
+        return true;
+      `;
+      break;
 
       function* generateAdvancedPropertyRules() {
         yield itt`
@@ -435,51 +555,50 @@ function* generateRules(
       const countProperties =
         typeItem.minimumProperties != null || typeItem.maximumProperties != null;
 
-      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
+      yield itt`
+        if(
+          ${valueExpression} === null ||
+          typeof ${valueExpression} !== "object" ||
+          Array.isArray(${valueExpression})
+        ) {
+          return false;
+        }
+      `;
+
+      if (countProperties) {
+        yield itt`
+          let propertyCount = 0;
+        `;
+      }
 
       yield itt`
-        (()=>{
-          ${generateAdvancedRules()}
-        })()
+        for(const propertyName in ${valueExpression}) {
+          ${generateAdvancedPropertyRules()}
+        }
       `;
-      break;
 
-      function* generateAdvancedRules() {
-        assert(typeItem.type === "map");
-        if (countProperties) {
+      if (countProperties) {
+        if (typeItem.minimumProperties != null) {
           yield itt`
-            let propertyCount = 0;
+            if(propertyCount < ${JSON.stringify(typeItem.minimumProperties)}) {
+              return false;
+            }
           `;
         }
 
-        yield itt`
-          for(const propertyName in ${valueExpression}) {
-            ${generateAdvancedPropertyRules()}
-          }
-        `;
-
-        if (countProperties) {
-          if (typeItem.minimumProperties != null) {
-            yield itt`
-              if(propertyCount < ${JSON.stringify(typeItem.minimumProperties)}) {
-                return false;
-              }
-            `;
-          }
-
-          if (typeItem.maximumProperties != null) {
-            yield itt`
-              if(propertyCount > ${JSON.stringify(typeItem.maximumProperties)}) {
-                return false;
-              }
-            `;
-          }
+        if (typeItem.maximumProperties != null) {
+          yield itt`
+            if(propertyCount > ${JSON.stringify(typeItem.maximumProperties)}) {
+              return false;
+            }
+          `;
         }
-
-        yield itt`
-          return true;
-        `;
       }
+
+      yield itt`
+        return true;
+      `;
+      break;
 
       function* generateAdvancedPropertyRules() {
         assert(typeItem.type === "map");
@@ -513,40 +632,32 @@ function* generateRules(
 
     case "union": {
       yield itt`
-        (()=>{
-          ${generateAdvancedRules()}
-        })()
+        let count = 0;
       `;
-      break;
-
-      function* generateAdvancedRules() {
-        assert(typeItem.type === "union");
-
+      for (const element of typeItem.elements) {
         yield itt`
-          let count = 0;
-        `;
-        for (const element of typeItem.elements) {
-          yield itt`
-            if(${generateValidatorReference(specification, element, valueExpression)}) {
-              count++;
-              if(count > 1) {
-                return false;
-              }
+          if(${generateValidatorReference(specification, element, valueExpression)}) {
+            count++;
+            if(count > 1) {
+              return false;
             }
-          `;
-        }
-        yield itt`
-          return count === 1;
+          }
         `;
       }
+      yield itt`
+        return count === 1;
+      `;
+      break;
     }
 
     case "alias": {
-      yield generateValidatorReference(specification, typeItem.target, valueExpression);
+      yield itt`
+        return ${generateValidatorReference(specification, typeItem.target, valueExpression)};
+      `;
       break;
     }
 
     default:
-      throw new TypeError(`${typeItem.type} not supported`);
+      throw new TypeError(`type not supported`);
   }
 }
