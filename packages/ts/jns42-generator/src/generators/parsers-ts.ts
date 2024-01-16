@@ -70,6 +70,19 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
         if(value == null) {
           return null;
         }
+        
+        if(Array.isArray(value)) {
+          switch(value.length) {
+            case 0:
+              return null;
+            case 1:
+              [value] = value              
+              break;
+            default:
+              return undefined;
+          }
+        }
+        
         switch(typeof value) {
           case "string":
             if(value.trim() === "") {
@@ -81,6 +94,7 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
           case "boolean":
             return value;
         }
+        
         return undefined;
       `;
       break;
@@ -90,6 +104,19 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
         if(value == null) {
           return false;
         }
+
+        if(Array.isArray(value)) {
+          switch(value.length) {
+            case 0:
+              return false;
+            case 1:
+              [value] = value              
+              break;
+            default:
+              return undefined;
+          }
+        }
+
         switch(typeof value) {
           case "string":
             switch(value.trim()) {
@@ -113,6 +140,16 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
 
     case "integer":
       yield `
+        if(Array.isArray(value)) {
+          switch(value.length) {
+            case 1:
+              [value] = value              
+              break;
+            default:
+              return undefined;
+          }
+        }
+
         switch(typeof value) {
           case "string":
             return Number(value);
@@ -127,6 +164,16 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
 
     case "number":
       yield `
+        if(Array.isArray(value)) {
+          switch(value.length) {
+            case 1:
+              [value] = value              
+              break;
+            default:
+              return undefined;
+          }
+        }
+  
         switch(typeof value) {
           case "string":
             return Number(value);
@@ -141,6 +188,16 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
 
     case "string":
       yield `
+        if(Array.isArray(value)) {
+          switch(value.length) {
+            case 1:
+              [value] = value              
+              break;
+            default:
+              return undefined;
+          }
+        }
+
         switch(typeof value) {
           case "string":
             return value;
