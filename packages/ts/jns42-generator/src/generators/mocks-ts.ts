@@ -269,8 +269,8 @@ function* generateMockDefinition(
         new Array(
           ${minimumStringLengthExpression} + nextSeed() % (${maximumStringLengthExpression} - ${minimumStringLengthExpression} + 1)
         ).
-          fill().
-          map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters]).
+          fill(undefined).
+          map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
           join()
       `;
       break;
@@ -310,7 +310,7 @@ function* generateMockDefinition(
             new Array(
               ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
             )
-              .fill()
+              .fill(undefined)
               .map(() => ${generateMockReference(specification, element)}) :
             []
         `;
@@ -319,7 +319,7 @@ function* generateMockDefinition(
           new Array(
             ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
           )
-            .fill()
+            .fill(undefined)
             .map(() => ${generateMockReference(specification, element)})
         `;
       }
@@ -374,7 +374,7 @@ function* generateMockDefinition(
               new Array(
                 ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
               )
-                .fill()
+                .fill(undefined)
                 .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
                   specification,
                   element,
@@ -389,7 +389,7 @@ function* generateMockDefinition(
             new Array(
               ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
             )
-              .fill()
+              .fill(undefined)
               .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
                 specification,
                 element,
