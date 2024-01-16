@@ -13,6 +13,22 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   const { names, types } = specification;
 
+  yield itt`
+    import * as types from "./types.js";
+  `;
+
+  yield itt`
+    export interface ParserGeneratorOptions {
+      trueStringValues?: string[];
+      falseStringValues?: string[];
+    }
+    const defaultParserGeneratorOptions = {
+      trueStringValues: ["", "true", "yes", "on", "1"],
+      falseStringValues: ["false", "no", "off", "0"],
+    }
+
+  `;
+
   for (const [typeKey, item] of Object.entries(types)) {
     const { id: nodeId } = item;
 
@@ -25,7 +41,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown): unknown {
+      export function ${functionName}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
+        const configuration = {
+          ...defaultParserGeneratorOptions,
+          ...options,
+        };
+
         ${definition}
       }
     `;
@@ -119,16 +140,18 @@ function* generateParserDefinition(specification: models.Specification, typeKey:
 
         switch(typeof value) {
           case "string":
-            switch(value.trim()) {
-              case "":
-              case "no":
-              case "off":
-              case "false":
-              case "0":
-                 return false;
-              default:
-                  return true;            
+            value = value.trim();
+            for(const trueStringValue of configuration.trueStringValues) {
+              if(value === trueStringValue) {
+                return true;
+              }
             }
+            for(const falseStringValue of configuration.falseStringValues) {
+              if(value === falseStringValue) {
+                return false;
+              }
+            }
+            return undefined;
           case "number":
             return Boolean(value);
           case "boolean":
