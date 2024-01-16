@@ -196,7 +196,14 @@ function* generateValidatorStatements(
       break;
 
     case "number": {
-      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression})`;
+      yield itt`
+      if(
+        typeof ${valueExpression} !== "number" ||
+        isNaN(${valueExpression})
+      ) {
+        return false;
+      }
+    `;
 
       if (typeItem.options != null) {
         yield itt`
@@ -260,7 +267,13 @@ function* generateValidatorStatements(
     }
 
     case "string":
-      yield itt`typeof ${valueExpression} === "string"`;
+      yield itt`
+        if(
+          typeof ${valueExpression} !== "string"
+        ) {
+          return false;
+        }
+      `;
 
       if (typeItem.options != null) {
         yield itt`
@@ -652,7 +665,7 @@ function* generateValidatorStatements(
 
     case "alias": {
       yield itt`
-        return ${generateValidatorReference(specification, typeItem.target, valueExpression)};
+        return (${generateValidatorReference(specification, typeItem.target, valueExpression)});
       `;
       break;
     }
