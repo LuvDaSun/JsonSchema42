@@ -30,7 +30,15 @@
     }
   ],
   "settings": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "always",
+      "source.organizeImports": "always"
+    },
+    "editor.rulers": [100],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "typescript.tsdk": "./node_modules/typescript/lib",
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "npm.packageManager": "npm",
+    "rust-analyzer.check.command": "clippy"
   }
 }
