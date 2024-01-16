@@ -23,19 +23,15 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     export interface MockGeneratorOptions {
       maximumDepth?: number;
-      
-      minimumValue?: number;
-      maximumValue?: number;
-      
       numberPrecision?: number;
+      defaultMinimumValue?: number;
+      defaultMaximumValue?: number;
     }
     const defaultMockGeneratorOptions = {
       maximumDepth: 1,
-      
-      minimumValue: -1000,
-      maximumValue: 1000,
-      
       numberPrecision: 1000,
+      defaultMinimumValue: -1000,
+      defaultMaximumValue: 1000,
     }
   `;
 
@@ -194,7 +190,7 @@ function* generateMockDefinition(
       }
       const minimumValueInclusiveExpression =
         isMinimumExclusive == null
-          ? "configuration.minimumValue"
+          ? "configuration.defaultMinimumValue"
           : isMinimumExclusive
             ? `(${JSON.stringify(minimumValue)} + 1)`
             : JSON.stringify(minimumValue);
@@ -211,7 +207,7 @@ function* generateMockDefinition(
       }
       const maximumValueInclusiveExpression =
         isMaximumExclusive == null
-          ? "configuration.maximumValue"
+          ? "configuration.defaultMaximumValue"
           : isMaximumExclusive
             ? `(${JSON.stringify(maximumValue)} - 1)`
             : JSON.stringify(maximumValue);
@@ -243,7 +239,7 @@ function* generateMockDefinition(
       }
       const minimumValueInclusiveExpression =
         isMinimumExclusive == null
-          ? `configuration.minimumValue * configuration.numberPrecision`
+          ? `configuration.defaultMinimumValue * configuration.numberPrecision`
           : isMinimumExclusive
             ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
             : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
@@ -260,7 +256,7 @@ function* generateMockDefinition(
       }
       const maximumValueInclusiveExpression =
         isMaximumExclusive == null
-          ? `(configuration.maximumValue * configuration.numberPrecision)`
+          ? `(configuration.defaultMaximumValue * configuration.numberPrecision)`
           : isMaximumExclusive
             ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
             : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
