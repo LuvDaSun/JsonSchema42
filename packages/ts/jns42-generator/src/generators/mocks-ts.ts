@@ -44,8 +44,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       defaultMaximumItems: 5,
       defaultMinimumProperties: 1,
       defaultMaximumProperties: 5,
-      defaultMinimumStringLength: 5;
-      defaultMaximumStringLength: 20;
+      defaultMinimumStringLength: 5,
+      defaultMaximumStringLength: 20,
     }
   `;
 
