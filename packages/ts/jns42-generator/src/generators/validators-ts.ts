@@ -29,12 +29,12 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     const typeName = toPascal(names[nodeId]);
     const functionName = toCamel("is", names[nodeId]);
-    const definition = generateValidatorDefinition(specification, typeKey, "value");
+    const statements = generateValidatorStatements(specification, typeKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
       export function ${functionName}(value: unknown): value is types.${typeName} {
-        return (${definition});
+        ${statements};
       }
     `;
   }
@@ -48,22 +48,26 @@ function* generateValidatorReference(
   const { names, types } = specification;
   const typeItem = types[typeKey];
   if (typeItem.id == null) {
-    yield itt`${generateValidatorDefinition(specification, typeKey, valueExpression)}`;
+    yield itt`
+      (() => {
+        ${generateValidatorStatements(specification, typeKey, valueExpression)}
+      })()
+    `;
   } else {
     const functionName = toCamel("is", names[typeItem.id]);
     yield itt`${functionName}(${valueExpression})`;
   }
 }
 
-function* generateValidatorDefinition(
+function* generateValidatorStatements(
   specification: models.Specification,
   typeKey: string,
   valueExpression: string,
 ): Iterable<NestedText> {
-  yield* joinIterable(
+  yield itt`return ${joinIterable(
     mapIterable(generateRules(specification, typeKey, valueExpression), (text) => itt`(${text})`),
     " &&\n",
-  );
+  )}`;
 }
 
 function* generateRules(
@@ -106,9 +110,7 @@ function* generateRules(
     }
 
     case "integer":
-      yield itt`typeof ${valueExpression} === "number"`;
-      yield itt`!isNaN(${valueExpression})`;
-      yield itt`${valueExpression} % 1 === 0`;
+      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression}) && ${valueExpression} % 1 === 0`;
 
       if (typeItem.options != null) {
         yield joinIterable(
@@ -138,8 +140,7 @@ function* generateRules(
       }
 
     case "number": {
-      yield itt`typeof ${valueExpression} === "number"`;
-      yield itt`!isNaN(${valueExpression})`;
+      yield itt`typeof ${valueExpression} === "number" && !isNaN(${valueExpression})`;
 
       if (typeItem.options != null) {
         yield joinIterable(
@@ -332,9 +333,7 @@ function* generateRules(
       const countProperties =
         typeItem.minimumProperties != null || typeItem.maximumProperties != null;
 
-      yield itt`${valueExpression} !== null`;
-      yield itt`typeof ${valueExpression} === "object"`;
-      yield itt`!Array.isArray(${valueExpression})`;
+      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
 
       /**
        * check if all the required properties are present
@@ -436,9 +435,7 @@ function* generateRules(
       const countProperties =
         typeItem.minimumProperties != null || typeItem.maximumProperties != null;
 
-      yield itt`${valueExpression} !== null`;
-      yield itt`typeof ${valueExpression} === "object"`;
-      yield itt`!Array.isArray(${valueExpression})`;
+      yield itt`${valueExpression} !== null && typeof ${valueExpression} === "object" && !Array.isArray(${valueExpression})`;
 
       yield itt`
         (()=>{
