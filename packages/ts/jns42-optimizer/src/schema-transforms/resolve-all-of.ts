@@ -12,6 +12,7 @@ import {
   mergeKeysRecord,
   numericMergeMaximum,
   numericMergeMinimum,
+  numericMergeMultipleOf,
   unionMerge,
 } from "../utils/index.js";
 
@@ -105,7 +106,7 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
         newModel.maximumExclusive,
         elementModel.maximumExclusive,
       ),
-      multipleOf: unionMerge(newModel.multipleOf, elementModel.multipleOf),
+      multipleOf: numericMergeMultipleOf(newModel.multipleOf, elementModel.multipleOf),
       minimumLength: numericMergeMinimum(newModel.minimumLength, elementModel.minimumLength),
       maximumLength: numericMergeMaximum(newModel.maximumLength, elementModel.maximumLength),
       valuePattern: unionMerge(newModel.valuePattern, elementModel.valuePattern),

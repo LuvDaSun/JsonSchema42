@@ -1,3 +1,5 @@
+import { findMultipleOf } from "./math.js";
+
 export function intersectionMerge<T>(
   values: T[] | undefined,
   otherValues: T[] | undefined,
@@ -162,4 +164,19 @@ export function numericMergeMaximum(
   if (otherValue > value) {
     return otherValue;
   }
+}
+
+export function numericMergeMultipleOf(
+  value: number | undefined,
+  otherValue: number | undefined,
+): number | undefined {
+  if (value == null) {
+    return otherValue;
+  }
+
+  if (otherValue == null) {
+    return value;
+  }
+
+  return findMultipleOf(value, otherValue);
 }

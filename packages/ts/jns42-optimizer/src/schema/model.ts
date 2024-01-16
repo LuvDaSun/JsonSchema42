@@ -61,7 +61,7 @@ export type SchemaModel = {
   minimumExclusive?: number;
   maximumInclusive?: number;
   maximumExclusive?: number;
-  multipleOf?: number[];
+  multipleOf?: number;
   minimumLength?: number;
   maximumLength?: number;
   valuePattern?: string[];
@@ -102,7 +102,7 @@ export type TypeSchemaModel = {
   minimumExclusive?: number;
   maximumInclusive?: number;
   maximumExclusive?: number;
-  multipleOf?: number[];
+  multipleOf?: number;
   minimumLength?: number;
   maximumLength?: number;
   valuePattern?: string[];
