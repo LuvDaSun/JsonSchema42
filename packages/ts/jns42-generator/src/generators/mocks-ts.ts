@@ -271,7 +271,7 @@ function* generateMockDefinition(
         ).
           fill(undefined).
           map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-          join()
+          join("")
       `;
       break;
 
@@ -379,7 +379,6 @@ function* generateMockDefinition(
                   specification,
                   element,
                 )}])
-              })
             ) :
             {}
         `;
@@ -394,7 +393,6 @@ function* generateMockDefinition(
                 specification,
                 element,
               )}])
-            })
           )
         `;
       }
