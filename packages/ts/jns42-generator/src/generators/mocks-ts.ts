@@ -27,8 +27,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       minimumValue?: number;
       maximumValue?: number;
       
-      minimumPrecision?:number;
-      maximumPrecision?:number;
+      numberPrecision?: number;
     }
     const defaultMockGeneratorOptions = {
       maximumDepth: 1,
@@ -36,8 +35,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       minimumValue: -1000,
       maximumValue: 1000,
       
-      minimumPrecision: 100,
-      maximumPrecision: 1000,
+      numberPrecision: 1000,
     }
   `;
 
@@ -110,7 +108,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       lengthOffset: number;
       lengthRange: number;
     }
-    function randomArray<T>({
+    function *randomArray<T>({
       elementFactory,
       lengthOffset,
       lengthRange,
@@ -198,7 +196,7 @@ function* generateMockDefinition(
         isMinimumExclusive == null
           ? "configuration.minimumValue"
           : isMinimumExclusive
-            ? itt`(${JSON.stringify(minimumValue)} + 1)`
+            ? `(${JSON.stringify(minimumValue)} + 1)`
             : JSON.stringify(minimumValue);
 
       let maximumValue = Number.POSITIVE_INFINITY;
@@ -215,10 +213,10 @@ function* generateMockDefinition(
         isMaximumExclusive == null
           ? "configuration.maximumValue"
           : isMaximumExclusive
-            ? itt`(${JSON.stringify(maximumValue)} - 1)`
+            ? `(${JSON.stringify(maximumValue)} - 1)`
             : JSON.stringify(maximumValue);
 
-      yield itt`
+      yield `
         ${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)
       `;
       break;
@@ -245,10 +243,10 @@ function* generateMockDefinition(
       }
       const minimumValueInclusiveExpression =
         isMinimumExclusive == null
-          ? "configuration.minimumValue * precision"
+          ? `configuration.minimumValue * configuration.numberPrecision`
           : isMinimumExclusive
-            ? itt`(${JSON.stringify(minimumValue)} * precision + 1)`
-            : itt`(${JSON.stringify(minimumValue)} * precision)`;
+            ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
+            : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
 
       let maximumValue = Number.POSITIVE_INFINITY;
       let isMaximumExclusive: boolean | undefined;
@@ -262,16 +260,13 @@ function* generateMockDefinition(
       }
       const maximumValueInclusiveExpression =
         isMaximumExclusive == null
-          ? "(configuration.maximumValue * precision)"
+          ? `(configuration.maximumValue * configuration.numberPrecision)`
           : isMaximumExclusive
-            ? itt`(${JSON.stringify(maximumValue)} * precision - 1)`
-            : itt`(${JSON.stringify(maximumValue)} * precision)`;
+            ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
+            : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
 
-      yield itt`
-        (() => {
-          const precision = configuration.minimumPrecision + nextSeed() % (configuration.maximumPrecision - configuration.minimumPrecision + 1);
-          return (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1) / precision;
-        })()
+      yield `
+        (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1) / configuration.numberPrecision)
       `;
       break;
     }

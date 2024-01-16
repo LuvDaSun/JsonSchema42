@@ -8,32 +8,32 @@ schemas:
     properties:
       negative:
         type: "number"
-        maxExclusive: 0
+        exclusiveMaximum: 0
       negativeOrZero:
         type: "number"
-        maxInclusive: 0
+        maximum: 0
       positive:
         type: "number"
-        minExclusive: 0
+        exclusiveMinimum: 0
       positiveOrZero:
-        type: "integer"
-        minInclusive: 0
+        type: "number"
+        minimum: 0
       negativeInteger:
         type: "integer"
-        maxExclusive: 0
+        exclusiveMaximum: 0
       negativeIntegerOrZero:
         type: "integer"
-        maxInclusive: 0
+        maximum: 0
       positiveInteger:
         type: "integer"
-        minExclusive: 0
+        exclusiveMinimum: 0
       positiveIntegerOrZero:
         type: "integer"
-        minInclusive: 0
+        minimum: 0
       one:
         type: "integer"
-        minInclusive: 1
-        maxInclusive: 1
+        minimum: 1
+        maximum: 1
 
 valid:
   numbers:
@@ -56,9 +56,9 @@ invalid:
     positive: 0
     positiveOrZero: -1.1
   integers:
-    negative: 0
-    negativeOrZero: 1
-    positive: 0
-    positiveOrZero: -1
+    negativeInteger: 0
+    negativeIntegerOrZero: 1
+    positiveInteger: 0
+    positiveIntegerOrZero: -1
   two:
     one: 2
