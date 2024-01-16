@@ -57,7 +57,7 @@ function* generateValidatorReference(
   specification: models.Specification,
   typeKey: string,
   valueExpression: string,
-  pathExpression: string = "null",
+  pathExpression: string = "undefined",
 ): Iterable<NestedText> {
   const { names, types } = specification;
   const typeItem = types[typeKey];
