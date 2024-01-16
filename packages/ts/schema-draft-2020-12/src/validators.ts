@@ -11,14 +11,16 @@ import * as types from "./types.js";
 * @see {@link https://json-schema.org/draft/2020-12/schema}
 */
 export function isSchema(value: unknown): value is types.Schema {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -334,38 +336,55 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
 * @deprecated
 */
 export function isDefinitions(value: unknown): value is types.Definitions {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDefinitionsAdditionalProperties(propertyValue)) {
@@ -373,25 +392,35 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
 * @deprecated
 */
 export function isDependencies(value: unknown): value is types.Dependencies {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDependenciesAdditionalProperties(propertyValue)) {
@@ -399,77 +428,84 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
 * @deprecated
 */
 export function isRecursiveAnchor(value: unknown): value is types.RecursiveAnchor {
-return ((isAnchorString(value)));
+return (isAnchorString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
 * @deprecated
 */
 export function isRecursiveRef(value: unknown): value is types.RecursiveRef {
-return ((isUriReferenceString(value)));
+return (isUriReferenceString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
 */
 export function isAllOf0(value: unknown): value is types.AllOf0 {
-return ((isCore(value)));
+return (isCore(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
 */
 export function isAllOf1(value: unknown): value is types.AllOf1 {
-return ((isApplicator(value)));
+return (isApplicator(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
 */
 export function isAllOf2(value: unknown): value is types.AllOf2 {
-return ((isUnevaluated(value)));
+return (isUnevaluated(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
 */
 export function isAllOf3(value: unknown): value is types.AllOf3 {
-return ((isValidation(value)));
+return (isValidation(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
 */
 export function isAllOf4(value: unknown): value is types.AllOf4 {
-return ((isMetaData(value)));
+return (isMetaData(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
 */
 export function isAllOf5(value: unknown): value is types.AllOf5 {
-return ((isFormatAnnotation(value)));
+return (isFormatAnnotation(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
 */
 export function isAllOf6(value: unknown): value is types.AllOf6 {
-return ((isContent(value)));
+return (isContent(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
 */
 export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
 */
 export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
-return ((
-(()=>{
 let count = 0;
 if(isStringArray(value)) {
 count++;
@@ -477,11 +513,15 @@ if(count > 1) {
 return false;
 }
 }
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -797,59 +837,81 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
 */
 export function isDependencies0(value: unknown): value is types.Dependencies0 {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
 */
 export function isDependencies1(value: unknown): value is types.Dependencies1 {
-return ((isStringArray(value)));
+return (isStringArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
 */
 export function isAnchorString(value: unknown): value is types.AnchorString {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
 */
 export function isUriReferenceString(value: unknown): value is types.UriReferenceString {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @summary Core vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/core}
 */
 export function isCore(value: unknown): value is types.Core {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -905,73 +967,98 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
 */
 export function isUriString(value: unknown): value is types.UriString {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
 */
 export function isId(value: unknown): value is types.Id {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
 */
 export function isCoreSchema(value: unknown): value is types.CoreSchema {
-return ((isUriString(value)));
+return (isUriString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
 */
 export function isRef(value: unknown): value is types.Ref {
-return ((isUriReferenceString(value)));
+return (isUriReferenceString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
 */
 export function isAnchor(value: unknown): value is types.Anchor {
-return ((isAnchorString(value)));
+return (isAnchorString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
 */
 export function isDynamicRef(value: unknown): value is types.DynamicRef {
-return ((isUriReferenceString(value)));
+return (isUriReferenceString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
 */
 export function isDynamicAnchor(value: unknown): value is types.DynamicAnchor {
-return ((isAnchorString(value)));
+return (isAnchorString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
 */
 export function isVocabulary(value: unknown): value is types.Vocabulary {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -985,30 +1072,46 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
 */
 export function isComment(value: unknown): value is types.Comment {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
 */
 export function isDefs(value: unknown): value is types.Defs {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDefsAdditionalProperties(propertyValue)) {
@@ -1016,40 +1119,47 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/additionalProperties}
 */
 export function isVocabularyAdditionalProperties(value: unknown): value is types.VocabularyAdditionalProperties {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
 */
 export function isVocabularyPropertyNames(value: unknown): value is types.VocabularyPropertyNames {
-return ((isUriString(value)));
+return (isUriString(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
 */
 export function isDefsAdditionalProperties(value: unknown): value is types.DefsAdditionalProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @summary Applicator vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
 */
 export function isApplicator(value: unknown): value is types.Applicator {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1135,30 +1245,38 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
 */
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
+if(value.length < 1) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isSchemaArrayItems(elementValue)) {
@@ -1166,48 +1284,62 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
 */
 export function isPrefixItems(value: unknown): value is types.PrefixItems {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
 */
 export function isApplicatorItems(value: unknown): value is types.ApplicatorItems {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
 */
 export function isContains(value: unknown): value is types.Contains {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
 */
 export function isApplicatorAdditionalProperties(value: unknown): value is types.ApplicatorAdditionalProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
 */
 export function isProperties(value: unknown): value is types.Properties {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isPropertiesAdditionalProperties(propertyValue)) {
@@ -1215,18 +1347,19 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
 */
 export function isPatternProperties(value: unknown): value is types.PatternProperties {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1240,24 +1373,34 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
 */
 export function isDependentSchemas(value: unknown): value is types.DependentSchemas {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDependentSchemasAdditionalProperties(propertyValue)) {
@@ -1265,100 +1408,119 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
 */
 export function isApplicatorPropertyNames(value: unknown): value is types.ApplicatorPropertyNames {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
 */
 export function isIf(value: unknown): value is types.If {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
 */
 export function isThen(value: unknown): value is types.Then {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
 */
 export function isElse(value: unknown): value is types.Else {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
 */
 export function isAllOf(value: unknown): value is types.AllOf {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
 */
 export function isAnyOf(value: unknown): value is types.AnyOf {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
 */
 export function isOneOf(value: unknown): value is types.OneOf {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
 */
 export function isNot(value: unknown): value is types.Not {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
 */
 export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
 */
 export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
 */
 export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
 */
 export function isPatternPropertiesPropertyNames(value: unknown): value is types.PatternPropertiesPropertyNames {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
 */
 export function isDependentSchemasAdditionalProperties(value: unknown): value is types.DependentSchemasAdditionalProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @summary Unevaluated applicator vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
 */
 export function isUnevaluated(value: unknown): value is types.Unevaluated {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1379,47 +1541,57 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
 */
 export function isUnevaluatedItems(value: unknown): value is types.UnevaluatedItems {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
 */
 export function isUnevaluatedProperties(value: unknown): value is types.UnevaluatedProperties {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }
 /**
 * @summary Validation vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation}
 */
 export function isValidation(value: unknown): value is types.Validation {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1530,60 +1702,82 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
 */
 export function isNonNegativeInteger(value: unknown): value is types.NonNegativeInteger {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value % 1 === 0) &&
-(value >= 0) &&
-(typeof value === "number") &&
-(!isNaN(value)) &&
-(value >= 0));
+if(
+typeof value !== "number" ||
+isNaN(value) ||
+value % 1 !== 0
+) {
+return false;
+}
+if(
+value < 0
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeIntegerDefault0}
 */
 export function isNonNegativeIntegerDefault0(value: unknown): value is types.NonNegativeIntegerDefault0 {
-return ((isNonNegativeInteger(value)));
+return (isNonNegativeInteger(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
 */
 export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
-return ((typeof value === "string") &&
-(value === "array" ||
-value === "boolean" ||
-value === "integer" ||
-value === "null" ||
-value === "number" ||
-value === "object" ||
-value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+if(value !== "array" &&
+value !== "boolean" &&
+value !== "integer" &&
+value !== "null" &&
+value !== "number" &&
+value !== "object" &&
+value !== "string") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
 */
 export function isStringArray(value: unknown): value is types.StringArray {
-return ((Array.isArray(value)) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isStringArrayItems(elementValue)) {
@@ -1591,15 +1785,12 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
 */
 export function isType(value: unknown): value is types.Type {
-return ((
-(()=>{
 let count = 0;
 if(isType0(value)) {
 count++;
@@ -1614,25 +1805,23 @@ return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
 */
 export function isConst(value: unknown): value is types.Const {
-return ((
 // any
-true
-));
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
 */
 export function isEnum(value: unknown): value is types.Enum {
-return ((Array.isArray(value)) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isEnumItems(elementValue)) {
@@ -1640,126 +1829,189 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
 */
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value > 0));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+if(
+value <= 0
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maximum}
 */
 export function isMaximum(value: unknown): value is types.Maximum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMaximum}
 */
 export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum}
 */
 export function isMinimum(value: unknown): value is types.Minimum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/exclusiveMinimum}
 */
 export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxLength}
 */
 export function isMaxLength(value: unknown): value is types.MaxLength {
-return ((isNonNegativeInteger(value)));
+return (isNonNegativeInteger(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minLength}
 */
 export function isMinLength(value: unknown): value is types.MinLength {
-return ((isNonNegativeIntegerDefault0(value)));
+return (isNonNegativeIntegerDefault0(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
 */
 export function isPattern(value: unknown): value is types.Pattern {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxItems}
 */
 export function isMaxItems(value: unknown): value is types.MaxItems {
-return ((isNonNegativeInteger(value)));
+return (isNonNegativeInteger(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minItems}
 */
 export function isMinItems(value: unknown): value is types.MinItems {
-return ((isNonNegativeIntegerDefault0(value)));
+return (isNonNegativeIntegerDefault0(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/uniqueItems}
 */
 export function isUniqueItems(value: unknown): value is types.UniqueItems {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxContains}
 */
 export function isMaxContains(value: unknown): value is types.MaxContains {
-return ((isNonNegativeInteger(value)));
+return (isNonNegativeInteger(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minContains}
 */
 export function isMinContains(value: unknown): value is types.MinContains {
-return ((isNonNegativeInteger(value)));
+return (isNonNegativeInteger(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/maxProperties}
 */
 export function isMaxProperties(value: unknown): value is types.MaxProperties {
-return ((isNonNegativeInteger(value)));
+return (isNonNegativeInteger(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/minProperties}
 */
 export function isMinProperties(value: unknown): value is types.MinProperties {
-return ((isNonNegativeIntegerDefault0(value)));
+return (isNonNegativeIntegerDefault0(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
 */
 export function isRequired(value: unknown): value is types.Required {
-return ((isStringArray(value)));
+return (isStringArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
 */
 export function isDependentRequired(value: unknown): value is types.DependentRequired {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDependentRequiredAdditionalProperties(propertyValue)) {
@@ -1767,29 +2019,37 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray/items}
 */
 export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
 */
 export function isType0(value: unknown): value is types.Type0 {
-return ((isSimpleTypes(value)));
+return (isSimpleTypes(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
 */
 export function isType1(value: unknown): value is types.Type1 {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
+if(value.length < 1) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isTypeItems(elementValue)) {
@@ -1797,43 +2057,45 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
 */
 export function isEnumItems(value: unknown): value is types.EnumItems {
-return ((
 // any
-true
-));
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
 */
 export function isDependentRequiredAdditionalProperties(value: unknown): value is types.DependentRequiredAdditionalProperties {
-return ((isStringArray(value)));
+return (isStringArray(value));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
 */
 export function isTypeItems(value: unknown): value is types.TypeItems {
-return ((isSimpleTypes(value)));
+return (isSimpleTypes(value));
+;
 }
 /**
 * @summary Meta-data vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
 */
 export function isMetaData(value: unknown): value is types.MetaData {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1879,68 +2141,97 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
 */
 export function isTitle(value: unknown): value is types.Title {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/description}
 */
 export function isDescription(value: unknown): value is types.Description {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
 */
 export function isDefault(value: unknown): value is types.Default {
-return ((
 // any
-true
-));
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/deprecated}
 */
 export function isDeprecated(value: unknown): value is types.Deprecated {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/readOnly}
 */
 export function isReadOnly(value: unknown): value is types.ReadOnly {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/writeOnly}
 */
 export function isWriteOnly(value: unknown): value is types.WriteOnly {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
 */
 export function isExamples(value: unknown): value is types.Examples {
-return ((Array.isArray(value)) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isExamplesItems(elementValue)) {
@@ -1948,31 +2239,31 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
 */
 export function isExamplesItems(value: unknown): value is types.ExamplesItems {
-return ((
 // any
-true
-));
+return true;
+;
 }
 /**
 * @summary Format vocabulary meta-schema for annotation results
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
 */
 export function isFormatAnnotation(value: unknown): value is types.FormatAnnotation {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1988,41 +2279,55 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
 */
 export function isFormat(value: unknown): value is types.Format {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @summary Content vocabulary meta-schema
 * @see {@link https://json-schema.org/draft/2020-12/meta/content}
 */
 export function isContent(value: unknown): value is types.Content {
-return ((
-(()=>{
 let count = 0;
-if((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+(() => {
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2048,37 +2353,56 @@ break;
 }
 return true;
 })()
-)) {
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
-if((typeof value === "boolean")) {
+if(
+(() => {
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+})()
+) {
 count++;
 if(count > 1) {
 return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}
 */
 export function isContentEncoding(value: unknown): value is types.ContentEncoding {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentMediaType}
 */
 export function isContentMediaType(value: unknown): value is types.ContentMediaType {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
 */
 export function isContentSchema(value: unknown): value is types.ContentSchema {
-return ((isSchema(value)));
+return (isSchema(value));
+;
 }

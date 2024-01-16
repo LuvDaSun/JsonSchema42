@@ -74,7 +74,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseSchemaArrayItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseSchemaArrayItems(value, configuration)]
 );
 }
 /**
@@ -181,7 +183,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseStringArrayItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseStringArrayItems(value, configuration)]
 );
 }
 /**
@@ -854,7 +858,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => (value)) :
-undefined
+value == null ?
+undefined :
+[(value)]
 );
 }
 /**
@@ -1194,7 +1200,9 @@ const configuration = {
 return (
 Array.isArray(value) ?
 value.map(value => parseTypeItems(value, configuration)) :
-undefined
+value == null ?
+undefined :
+[parseTypeItems(value, configuration)]
 );
 }
 /**

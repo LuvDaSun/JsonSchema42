@@ -11,11 +11,13 @@ import * as types from "./types.js";
 * @see {@link http://json-schema.org/draft-04/schema#}
 */
 export function isSchemaDocument(value: unknown): value is types.SchemaDocument {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -190,17 +192,18 @@ break;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
 */
 export function isSchemaArray(value: unknown): value is types.SchemaArray {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
+if(value.length < 1) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isSchemaArrayItems(elementValue)) {
@@ -208,54 +211,77 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
 */
 export function isPositiveInteger(value: unknown): value is types.PositiveInteger {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value % 1 === 0) &&
-(value >= 0) &&
-(typeof value === "number") &&
-(!isNaN(value)) &&
-(value >= 0));
+if(
+typeof value !== "number" ||
+isNaN(value) ||
+value % 1 !== 0
+) {
+return false;
+}
+if(
+value < 0
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
 */
 export function isPositiveIntegerDefault0(value: unknown): value is types.PositiveIntegerDefault0 {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value % 1 === 0) &&
-(value >= 0) &&
-(typeof value === "number") &&
-(!isNaN(value)) &&
-(value >= 0));
+if(
+typeof value !== "number" ||
+isNaN(value) ||
+value % 1 !== 0
+) {
+return false;
+}
+if(
+value < 0
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
 */
 export function isSimpleTypes(value: unknown): value is types.SimpleTypes {
-return ((typeof value === "string") &&
-(value === "array" ||
-value === "boolean" ||
-value === "integer" ||
-value === "null" ||
-value === "number" ||
-value === "object" ||
-value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+if(value !== "array" &&
+value !== "boolean" &&
+value !== "integer" &&
+value !== "null" &&
+value !== "number" &&
+value !== "object" &&
+value !== "string") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
 */
 export function isStringArray(value: unknown): value is types.StringArray {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
+if(value.length < 1) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isStringArrayItems(elementValue)) {
@@ -263,100 +289,158 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/id}
 */
 export function isId(value: unknown): value is types.Id {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
 */
 export function isSchema(value: unknown): value is types.Schema {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/title}
 */
 export function isTitle(value: unknown): value is types.Title {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/description}
 */
 export function isDescription(value: unknown): value is types.Description {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/default}
 */
 export function isDefault(value: unknown): value is types.Default {
-return ((
 // unknown
-true
-));
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
 */
 export function isMultipleOf(value: unknown): value is types.MultipleOf {
-return ((typeof value === "number") &&
-(!isNaN(value)) &&
-(value > 0));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+if(
+value <= 0
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
 */
 export function isMaximum(value: unknown): value is types.Maximum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
 */
 export function isExclusiveMaximum(value: unknown): value is types.ExclusiveMaximum {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
 */
 export function isMinimum(value: unknown): value is types.Minimum {
-return ((typeof value === "number") &&
-(!isNaN(value)));
+if(
+typeof value !== "number" ||
+isNaN(value)
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
 */
 export function isExclusiveMinimum(value: unknown): value is types.ExclusiveMinimum {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
 */
 export function isMaxLength(value: unknown): value is types.MaxLength {
-return ((isPositiveInteger(value)));
+return (isPositiveInteger(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
 */
 export function isMinLength(value: unknown): value is types.MinLength {
-return ((isPositiveIntegerDefault0(value)));
+return (isPositiveIntegerDefault0(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/pattern}
 */
 export function isPattern(value: unknown): value is types.Pattern {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
 */
 export function isAdditionalItems(value: unknown): value is types.AdditionalItems {
-return ((
-(()=>{
 let count = 0;
 if(isAdditionalItems0(value)) {
 count++;
@@ -371,15 +455,12 @@ return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/items}
 */
 export function isPropertiesItems(value: unknown): value is types.PropertiesItems {
-return ((
-(()=>{
 let count = 0;
 if(isItems0(value)) {
 count++;
@@ -394,51 +475,57 @@ return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
 */
 export function isMaxItems(value: unknown): value is types.MaxItems {
-return ((isPositiveInteger(value)));
+return (isPositiveInteger(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
 */
 export function isMinItems(value: unknown): value is types.MinItems {
-return ((isPositiveIntegerDefault0(value)));
+return (isPositiveIntegerDefault0(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
 */
 export function isUniqueItems(value: unknown): value is types.UniqueItems {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
 */
 export function isMaxProperties(value: unknown): value is types.MaxProperties {
-return ((isPositiveInteger(value)));
+return (isPositiveInteger(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
 */
 export function isMinProperties(value: unknown): value is types.MinProperties {
-return ((isPositiveIntegerDefault0(value)));
+return (isPositiveIntegerDefault0(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/required}
 */
 export function isRequired(value: unknown): value is types.Required {
-return ((isStringArray(value)));
+return (isStringArray(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
 */
 export function isPropertiesAdditionalProperties(value: unknown): value is types.PropertiesAdditionalProperties {
-return ((
-(()=>{
 let count = 0;
 if(isAdditionalProperties0(value)) {
 count++;
@@ -453,24 +540,34 @@ return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
 */
 export function isDefinitions(value: unknown): value is types.Definitions {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDefinitionsAdditionalProperties(propertyValue)) {
@@ -478,24 +575,34 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
 */
 export function isProperties(value: unknown): value is types.Properties {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isPropertiesPropertiesAdditionalProperties(propertyValue)) {
@@ -503,24 +610,34 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
 */
 export function isPatternProperties(value: unknown): value is types.PatternProperties {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isPatternPropertiesAdditionalProperties(propertyValue)) {
@@ -528,24 +645,34 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
 */
 export function isDependencies(value: unknown): value is types.Dependencies {
-return ((value !== null) &&
-(typeof value === "object") &&
-(!Array.isArray(value)) &&
-(
-(()=>{
+if(
+value === null ||
+typeof value !== "object" ||
+Array.isArray(value)
+) {
+return false;
+}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
 continue;
 }
-if(!(typeof propertyName === "string")) {
+if(!
+(() => {
+if(
+typeof propertyName !== "string"
+) {
+return false;
+}
+return true;
+})()
+) {
 return false;
 }
 if(!isDependenciesAdditionalProperties(propertyValue)) {
@@ -553,36 +680,36 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
 */
 export function isEnum(value: unknown): value is types.Enum {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
+if(value.length < 1) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
-if(!(
+if(!
+(() => {
 // any
-true
-)) {
+return true;
+})()
+) {
 return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type}
 */
 export function isType(value: unknown): value is types.Type {
-return ((
-(()=>{
 let count = 0;
 if(isType0(value)) {
 count++;
@@ -597,126 +724,155 @@ return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/format}
 */
 export function isFormat(value: unknown): value is types.Format {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
 */
 export function isAllOf(value: unknown): value is types.AllOf {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
 */
 export function isAnyOf(value: unknown): value is types.AnyOf {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
 */
 export function isOneOf(value: unknown): value is types.OneOf {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/not}
 */
 export function isNot(value: unknown): value is types.Not {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
 */
 export function isSchemaArrayItems(value: unknown): value is types.SchemaArrayItems {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
 */
 export function isPositiveIntegerDefault00(value: unknown): value is types.PositiveIntegerDefault00 {
-return ((isPositiveInteger(value)));
+return (isPositiveInteger(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
 */
 export function isPositiveIntegerDefault01(value: unknown): value is types.PositiveIntegerDefault01 {
-return ((
 // unknown
-true
-));
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
 */
 export function isStringArrayItems(value: unknown): value is types.StringArrayItems {
-return ((typeof value === "string"));
+if(
+typeof value !== "string"
+) {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/0}
 */
 export function isAdditionalItems0(value: unknown): value is types.AdditionalItems0 {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
 */
 export function isAdditionalItems1(value: unknown): value is types.AdditionalItems1 {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
 */
 export function isItems0(value: unknown): value is types.Items0 {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
 */
 export function isItems1(value: unknown): value is types.Items1 {
-return ((isSchemaArray(value)));
+return (isSchemaArray(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/0}
 */
 export function isAdditionalProperties0(value: unknown): value is types.AdditionalProperties0 {
-return ((typeof value === "boolean"));
+if(typeof value !== "boolean") {
+return false;
+}
+return true;
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
 */
 export function isAdditionalProperties1(value: unknown): value is types.AdditionalProperties1 {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
 */
 export function isDefinitionsAdditionalProperties(value: unknown): value is types.DefinitionsAdditionalProperties {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
 */
 export function isPropertiesPropertiesAdditionalProperties(value: unknown): value is types.PropertiesPropertiesAdditionalProperties {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
 */
 export function isPatternPropertiesAdditionalProperties(value: unknown): value is types.PatternPropertiesAdditionalProperties {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
 */
 export function isDependenciesAdditionalProperties(value: unknown): value is types.DependenciesAdditionalProperties {
-return ((
-(()=>{
 let count = 0;
 if(isDependencies0(value)) {
 count++;
@@ -731,23 +887,25 @@ return false;
 }
 }
 return count === 1;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
 */
 export function isType0(value: unknown): value is types.Type0 {
-return ((isSimpleTypes(value)));
+return (isSimpleTypes(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
 */
 export function isType1(value: unknown): value is types.Type1 {
-return ((Array.isArray(value)) &&
-(value.length >= 1) &&
-(
-(()=>{
+if(!Array.isArray(value)) {
+return false;
+}
+if(value.length < 1) {
+return false;
+}
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 if(!isTypeItems(elementValue)) {
@@ -755,24 +913,26 @@ return false;
 }
 }
 return true;
-})()
-));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
 */
 export function isDependencies0(value: unknown): value is types.Dependencies0 {
-return ((isSchemaDocument(value)));
+return (isSchemaDocument(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
 */
 export function isDependencies1(value: unknown): value is types.Dependencies1 {
-return ((isStringArray(value)));
+return (isStringArray(value));
+;
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
 */
 export function isTypeItems(value: unknown): value is types.TypeItems {
-return ((isSimpleTypes(value)));
+return (isSimpleTypes(value));
+;
 }
