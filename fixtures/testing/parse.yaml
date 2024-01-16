@@ -19,7 +19,8 @@ parse: true
 
 valid:
   one: "1"
-  two: "2"
+  two:
+    - "2"
   "true": true
   "false": false
   "obj1":
@@ -29,7 +30,8 @@ valid:
 
 invalid:
   a: "a"
-  b: "b"
+  b:
+    - "b"
   c: "c"
   "obj1":
     boolean: "true"
