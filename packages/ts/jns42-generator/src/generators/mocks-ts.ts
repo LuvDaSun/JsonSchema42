@@ -21,6 +21,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
   yield itt`
     const depthCounters: Record<string, number> = {};
 
+    export const unknownValue = {};
+    export const anyValue = {};
+    export const neverValue = {};
+
     export interface MockGeneratorOptions {
       maximumDepth?: number;
       numberPrecision?: number;
@@ -120,17 +124,15 @@ function* generateMockDefinition(
 
   switch (typeItem.type) {
     case "unknown":
-      yield itt`
-        // unknown
-        ${JSON.stringify({})}
-      `;
+      yield `unknownValue`;
       break;
 
     case "any":
-      yield itt`
-        // any
-        ${JSON.stringify({})}
-      `;
+      yield `anyValue`;
+      break;
+
+    case "never":
+      yield `neverValue`;
       break;
 
     case "null":
@@ -428,7 +430,7 @@ function* generateMockDefinition(
     }
 
     default:
-      throw new TypeError(`${typeItem.type} not supported`);
+      throw new TypeError(`type not supported`);
   }
 }
 
