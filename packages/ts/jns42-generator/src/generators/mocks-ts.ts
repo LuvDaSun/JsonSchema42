@@ -24,14 +24,28 @@ export function* generateMocksTsCode(specification: models.Specification) {
     export interface MockGeneratorOptions {
       maximumDepth?: number;
       numberPrecision?: number;
+      stringCharacters?: string;
       defaultMinimumValue?: number;
       defaultMaximumValue?: number;
+      defaultMinimumItems?: number;
+      defaultMaximumItems?: number;
+      defaultMinimumProperties?: number;
+      defaultMaximumProperties?: number;
+      defaultMinimumStringLength?: number;
+      defaultMaximumStringLength?: number;
     }
     const defaultMockGeneratorOptions = {
       maximumDepth: 1,
       numberPrecision: 1000,
+      stringCharacters: "abcdefghijklmnopqrstuvwxyz",
       defaultMinimumValue: -1000,
       defaultMaximumValue: 1000,
+      defaultMinimumItems: 1,
+      defaultMaximumItems: 5,
+      defaultMinimumProperties: 1,
+      defaultMaximumProperties: 5,
+      defaultMinimumStringLength: 5;
+      defaultMaximumStringLength: 20;
     }
   `;
 
@@ -79,40 +93,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
       seed = (a * seed + b) % p;
 
       return seed;
-    }
-
-    interface RandomStringArguments {
-      lengthOffset: number,
-      lengthRange: number,
-      chars: string,
-    }
-    function randomString({
-      lengthOffset,
-      lengthRange,
-      chars,
-    }: RandomStringArguments) {
-      const length = lengthOffset + nextSeed() % (lengthRange + 1);
-      let value = ""
-      while(value.length < length) {
-        value += chars[nextSeed() % chars.length];
-      }
-      return value;
-    }
-
-    interface RandomArrayArguments<T> {
-      elementFactory: () => T;
-      lengthOffset: number;
-      lengthRange: number;
-    }
-    function *randomArray<T>({
-      elementFactory,
-      lengthOffset,
-      lengthRange,
-    }: RandomArrayArguments<T>): Iterable<T> {
-      const length = lengthOffset + nextSeed() % (lengthRange + 1);
-      for(let count = 0; count < length; count++) {
-        yield elementFactory();
-      }
     }
   `;
 }
@@ -276,17 +256,23 @@ function* generateMockDefinition(
         break;
       }
 
-      const minimumLength = typeItem.minimumLength ?? 3;
-      const maximumLength = typeItem.maximumLength ?? 15;
-      const lengthOffset = minimumLength;
-      const lengthRange = maximumLength - minimumLength + 1;
-      const chars = "abcdefghijklmnopqrstuvwxyz";
+      const minimumStringLengthExpression =
+        typeItem.minimumLength == null
+          ? "configuration.defaultMinimumStringLength"
+          : JSON.stringify(typeItem.minimumLength);
+      const maximumStringLengthExpression =
+        typeItem.maximumLength == null
+          ? "configuration.defaultMaximumStringLength"
+          : JSON.stringify(typeItem.maximumLength);
 
-      yield `randomString(${JSON.stringify({
-        lengthOffset,
-        lengthRange,
-        chars,
-      })})`;
+      yield `
+        new Array(
+          ${minimumStringLengthExpression} + nextSeed() % (${maximumStringLengthExpression} - ${minimumStringLengthExpression} + 1)
+        ).
+          fill().
+          map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters]).
+          join()
+      `;
       break;
 
     case "tuple": {
@@ -307,30 +293,34 @@ function* generateMockDefinition(
 
     case "array": {
       const { element } = typeItem;
-
       const [resolvedElement] = unalias(types, element);
-      const minimumItems = typeItem.minimumItems ?? 0;
-      const maximumItems = typeItem.maximumItems ?? 5;
-      const itemsOffset = minimumItems;
-      const itemsRange = maximumItems - minimumItems + 1;
 
-      if (itemsOffset === 0) {
+      const minimumItemsExpression =
+        typeItem.minimumItems == null
+          ? "configuration.defaultMinimumItems"
+          : JSON.stringify(typeItem.minimumItems);
+      const maximumItemsExpression =
+        typeItem.maximumItems == null
+          ? "configuration.defaultMaximumItems"
+          : JSON.stringify(typeItem.maximumItems);
+
+      if (typeItem.minimumItems == null || typeItem.minimumItems === 0) {
         yield itt`
           (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
-            [...randomArray({
-              lengthOffset: ${JSON.stringify(itemsOffset)},
-              lengthRange: ${JSON.stringify(itemsRange)},
-              elementFactory: () => ${generateMockReference(specification, element)},
-            })] :
+            new Array(
+              ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
+            )
+              .fill()
+              .map(() => ${generateMockReference(specification, element)}) :
             []
         `;
       } else {
         yield itt`
-          [...randomArray({
-            lengthOffset: ${JSON.stringify(itemsOffset)},
-            lengthRange: ${JSON.stringify(itemsRange)},
-            elementFactory: () => ${generateMockReference(specification, element)},
-          })]
+          new Array(
+            ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
+          )
+            .fill()
+            .map(() => ${generateMockReference(specification, element)})
         `;
       }
 
@@ -368,22 +358,27 @@ function* generateMockDefinition(
       const { name, element } = typeItem;
       const [resolvedElement] = unalias(types, element);
 
-      const minimumProperties = typeItem.minimumProperties ?? 0;
-      const maximumProperties = typeItem.maximumProperties ?? 5;
-      const propertiesOffset = minimumProperties;
-      const propertiesRange = maximumProperties - minimumProperties + 1;
+      const minimumPropertiesExpression =
+        typeItem.minimumProperties == null
+          ? "configuration.defaultMinimumProperties"
+          : JSON.stringify(typeItem.minimumProperties);
+      const maximumPropertiesExpression =
+        typeItem.maximumProperties == null
+          ? "configuration.defaultMaximumProperties"
+          : JSON.stringify(typeItem.maximumProperties);
 
-      if (propertiesOffset === 0) {
+      if (typeItem.minimumProperties == null || typeItem.minimumProperties === 0) {
         yield itt`
           (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
             Object.fromEntries(
-              randomArray({
-                lengthOffset: ${JSON.stringify(propertiesOffset)},
-                lengthRange: ${JSON.stringify(propertiesRange)},
-                elementFactory: () => [${generateMockReference(
+              new Array(
+                ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
+              )
+                .fill()
+                .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
                   specification,
-                  name,
-                )}, ${generateMockReference(specification, element)}],
+                  element,
+                )}])
               })
             ) :
             {}
@@ -391,13 +386,14 @@ function* generateMockDefinition(
       } else {
         yield itt`
           Object.fromEntries(
-            randomArray({
-              lengthOffset: ${JSON.stringify(propertiesOffset)},
-              lengthRange: ${JSON.stringify(propertiesRange)},
-              elementFactory: () => [${generateMockReference(
+            new Array(
+              ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
+            )
+              .fill()
+              .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
                 specification,
-                name,
-              )}, ${generateMockReference(specification, element)}],
+                element,
+              )}])
             })
           )
         `;
