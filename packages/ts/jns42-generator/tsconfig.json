@@ -8,9 +8,7 @@
     "composite": true,
     "lib": ["ES2023", "DOM"]
   },
-  "include": [
-    "src",
-  ],
+  "include": ["src"],
   "references": [
     { "path": "../jns42-optimizer" },
     { "path": "../schema-intermediate" },
