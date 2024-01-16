@@ -66,7 +66,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           resetErrors();
         }
 
-        const typeName = currentTypeName;
+        const typeName: string | undefined = currentTypeName;
         const pathPart = currentPathPart;
         try {
           currentTypeName = ${JSON.stringify(typeName)};
@@ -96,7 +96,7 @@ function* generateValidatorReference(
   if (typeItem.id == null) {
     yield itt`
       ((value: unknown) => {
-        const typeName = currentTypeName;
+        const typeName: string | undefined = currentTypeName;
         const pathPart = currentPathPart;
         try {
           currentTypeName = undefined;
