@@ -63,19 +63,19 @@ function* generateValidatorReference(
   const typeItem = types[typeKey];
   if (typeItem.id == null) {
     yield itt`
-      (() => {
+      ((value: unknown, pathPart?: string) => {
         try {
-          if(${pathExpression} != null) {
-            currentPath.push(${pathExpression});
+          if(pathPart != null) {
+            currentPath.push(pathPart);
           }
-          ${generateValidatorStatements(specification, typeKey, valueExpression)}
+          ${generateValidatorStatements(specification, typeKey, "value")}
         }
         finally {
-          if(${pathExpression} != null) {
+          if(pathPart != null) {
             currentPath.pop();
           }
         }
-      })()
+      })(${valueExpression}, ${pathExpression})
     `;
   } else {
     const functionName = toCamel("is", names[typeItem.id]);
