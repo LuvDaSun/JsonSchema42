@@ -20,8 +20,32 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
   `;
 
   yield itt`
-    const currentPath = new Array<string>();
+    export interface ValidationError {
+      path: string;
+      rule: string;
+      typeName?: string;
+    }
+
+    const pathPartStack = new Array<string>();
     let currentPathPart: string | undefined = "";
+    let currentTypeName: string | undefined;
+    let errors = new Array<ValidationError>();
+
+    export function getValidationErrors() {
+      return errors;
+    }
+
+    function resetErrors() {
+      errors = [];
+    }
+
+    function recordError(rule: string) {
+      errors.push({
+        path: pathPartStack.join("/"),
+        typeName: currentTypeName,
+        rule,
+      })
+    }
   `;
 
   for (const [typeKey, item] of Object.entries(types)) {
@@ -38,16 +62,23 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     yield itt`
       ${generateJsDocComments(item)}
       export function ${functionName}(value: unknown): value is types.${typeName} {
+        if(pathPartStack.length === 0) {
+          resetErrors();
+        }
+
+        const typeName = currentTypeName;
         const pathPart = currentPathPart;
         try {
+          currentTypeName = ${JSON.stringify(typeName)};
           if(pathPart != null) {
-            currentPath.push(pathPart);
+            pathPartStack.push(pathPart);
           }
           ${statements};
         }
         finally {
+          currentTypeName = typeName;
           if(pathPart != null) {
-            currentPathPart = currentPath.pop();
+            currentPathPart = pathPartStack.pop();
           }
         }
       }
@@ -65,16 +96,19 @@ function* generateValidatorReference(
   if (typeItem.id == null) {
     yield itt`
       ((value: unknown) => {
+        const typeName = currentTypeName;
         const pathPart = currentPathPart;
         try {
+          currentTypeName = undefined;
           if(pathPart != null) {
-            currentPath.push(pathPart);
+            pathPartStack.push(pathPart);
           }
           ${generateValidatorStatements(specification, typeKey, "value")}
         }
         finally {
+          currentTypeName = typeName;
           if(pathPart != null) {
-            currentPathPart = currentPath.pop();
+            currentPathPart = pathPartStack.pop();
           }
         }
       })(${valueExpression})
@@ -110,6 +144,7 @@ function* generateValidatorStatements(
 
     case "never":
       yield itt`
+        recordError("never");
         // never
         return false;
       `;
@@ -117,13 +152,18 @@ function* generateValidatorStatements(
 
     case "null":
       yield itt`
-        return ${valueExpression} === null;
+        if(${valueExpression} !== null) {
+          recordError("null");
+          return false;
+        }
+        return true;
       `;
       break;
 
     case "boolean": {
       yield itt`
         if(typeof ${valueExpression} !== "boolean") {
+          recordError("boolean");
           return false;
         }
       `;
@@ -134,6 +174,7 @@ function* generateValidatorStatements(
             typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
             " &&\n",
           )}) {
+            recordError("options");
             return false;
           }
         `;
@@ -152,6 +193,7 @@ function* generateValidatorStatements(
           isNaN(${valueExpression}) ||
           ${valueExpression} % 1 !== 0
         ) {
+          recordError("integer");
           return false;
         }
       `;
@@ -162,6 +204,7 @@ function* generateValidatorStatements(
             typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
             " &&\n",
           )}) {
+            recordError("options");
             return false;
           }
         `;
@@ -172,6 +215,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} < ${JSON.stringify(typeItem.minimumInclusive)}
           ) {
+            recordError("minimumInclusive");
             return false;
           }
         `;
@@ -182,6 +226,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} <= ${JSON.stringify(typeItem.minimumExclusive)}
           ) {
+            recordError("minimumExclusive");
             return false;
           }
         `;
@@ -192,6 +237,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} > ${JSON.stringify(typeItem.maximumInclusive)}
           ) {
+            recordError("maximumInclusive");
             return false;
           }
         `;
@@ -202,6 +248,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} >= ${JSON.stringify(typeItem.maximumExclusive)}
           ) {
+            recordError("maximumExclusive");
             return false;
           }
         `;
@@ -212,6 +259,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} % ${JSON.stringify(typeItem.multipleOf)} !== 0
           ) {
+            recordError("multipleOf");
             return false;
           }
         `;
@@ -228,8 +276,9 @@ function* generateValidatorStatements(
         typeof ${valueExpression} !== "number" ||
         isNaN(${valueExpression})
       ) {
+        recordError("number");
         return false;
-      }
+  }
     `;
 
       if (typeItem.options != null) {
@@ -238,6 +287,7 @@ function* generateValidatorStatements(
             typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
             " &&\n",
           )}) {
+            recordError("options");
             return false;
           }
         `;
@@ -248,6 +298,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} < ${JSON.stringify(typeItem.minimumInclusive)}
           ) {
+            recordError("minimumInclusive");
             return false;
           }
         `;
@@ -258,6 +309,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} <= ${JSON.stringify(typeItem.minimumExclusive)}
           ) {
+            recordError("minimumExclusive");
             return false;
           }
         `;
@@ -268,6 +320,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} > ${JSON.stringify(typeItem.maximumInclusive)}
           ) {
+            recordError("maximumInclusive");
             return false;
           }
         `;
@@ -278,6 +331,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression} >= ${JSON.stringify(typeItem.maximumExclusive)}
           ) {
+            recordError("maximumExclusive");
             return false;
           }
         `;
@@ -298,8 +352,9 @@ function* generateValidatorStatements(
         if(
           typeof ${valueExpression} !== "string"
         ) {
+          recordError("string");
           return false;
-        }
+      }
       `;
 
       if (typeItem.options != null) {
@@ -308,6 +363,7 @@ function* generateValidatorStatements(
             typeItem.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
             " &&\n",
           )}) {
+            recordError("options");
             return false;
           }
         `;
@@ -318,6 +374,7 @@ function* generateValidatorStatements(
           if(
             ${valueExpression}.length < ${JSON.stringify(typeItem.minimumLength)}
           ) {
+            recordError("minimumLength");
             return false;
           }
         `;
@@ -328,6 +385,7 @@ function* generateValidatorStatements(
           if(
             value.length > ${JSON.stringify(typeItem.maximumLength)}
           ) {
+            recordError("maximumLength");
             return false;
           }
         `;
@@ -338,6 +396,7 @@ function* generateValidatorStatements(
           if(
             !new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})
           ) {
+            recordError("valuePattern");
             return false;
           }
         `;
@@ -352,14 +411,13 @@ function* generateValidatorStatements(
       const unique = typeItem.uniqueItems ?? false;
 
       yield itt`
-        if(!Array.isArray(${valueExpression})) {
+        if(
+          !Array.isArray(${valueExpression}) ||
+          ${valueExpression}.length !== ${JSON.stringify(typeItem.elements.length)}
+        ) {
+          recordError("tuple");
           return false;
-        }
-      `;
-      yield itt`
-        if(${valueExpression}.length !== ${JSON.stringify(typeItem.elements.length)}) {
-          return false;
-        }
+      }
       `;
 
       if (unique) {
@@ -385,8 +443,9 @@ function* generateValidatorStatements(
         if (unique) {
           yield itt`
             if(elementValueSeen.has(elementValue)) {
+              recordError("uniqueItems");
               return false;
-            }
+              }
           `;
         }
 
@@ -411,6 +470,7 @@ function* generateValidatorStatements(
             case ${JSON.stringify(Number(elementIndex))}:
               currentPathPart = ${JSON.stringify(elementKey)};
               if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
+                recordError("elementValue");
                 return false;
               }
               break;
@@ -424,13 +484,15 @@ function* generateValidatorStatements(
 
       yield itt`
         if(!Array.isArray(${valueExpression})) {
+          recordError("array");
           return false;
-        }
+      }
       `;
 
       if (typeItem.minimumItems != null) {
         yield itt`
           if(${valueExpression}.length < ${JSON.stringify(typeItem.minimumItems)}) {
+            recordError("minimumItems");
             return false;
           }
         `;
@@ -439,6 +501,7 @@ function* generateValidatorStatements(
       if (typeItem.maximumItems != null) {
         yield itt`
           if(${valueExpression}.length > ${JSON.stringify(typeItem.maximumItems)}) {
+            recordError("maximumItems");
             return false;
           }
         `;
@@ -472,8 +535,9 @@ function* generateValidatorStatements(
         if (unique) {
           yield itt`
             if(elementValueSeen.has(elementValue)) {
+              recordError("uniqueItems");
               return false;
-            }
+              }
             elementValueSeen.add(elementValue);
           `;
         }
@@ -481,6 +545,7 @@ function* generateValidatorStatements(
         yield itt`
           currentPathPart = String(elementIndex);
           if(!${generateValidatorReference(specification, typeItem.element, `elementValue`)}) {
+            recordError("elementValue");
             return false;
           }
         `;
@@ -497,8 +562,9 @@ function* generateValidatorStatements(
           typeof ${valueExpression} !== "object" ||
           Array.isArray(${valueExpression})
         ) {
+          recordError("object");
           return false;
-        }
+      }
       `;
 
       /**
@@ -513,6 +579,7 @@ function* generateValidatorStatements(
             !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
             ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
           ) {
+            recordError("required");
             return false;
           }
         `;
@@ -534,14 +601,16 @@ function* generateValidatorStatements(
         if (typeItem.minimumProperties != null) {
           yield itt`
             if(propertyCount < ${JSON.stringify(typeItem.minimumProperties)}) {
+              recordError("minimumProperties");
               return false;
-            }
+              }
           `;
         }
 
         if (typeItem.maximumProperties != null) {
           yield itt`
             if(propertyCount > ${JSON.stringify(typeItem.maximumProperties)}) {
+              recordError("maximumProperties");
               return false;
             }
           `;
@@ -586,6 +655,7 @@ function* generateValidatorStatements(
                 typeItem.properties[propertyName].element,
                 `propertyValue`,
               )}) {
+                recordError("propertyName");
                 return false;
               }
               break;
@@ -604,6 +674,7 @@ function* generateValidatorStatements(
           typeof ${valueExpression} !== "object" ||
           Array.isArray(${valueExpression})
         ) {
+          recordError("map");
           return false;
         }
       `;
@@ -624,6 +695,7 @@ function* generateValidatorStatements(
         if (typeItem.minimumProperties != null) {
           yield itt`
             if(propertyCount < ${JSON.stringify(typeItem.minimumProperties)}) {
+              recordError("minimumProperties");
               return false;
             }
           `;
@@ -632,6 +704,7 @@ function* generateValidatorStatements(
         if (typeItem.maximumProperties != null) {
           yield itt`
             if(propertyCount > ${JSON.stringify(typeItem.maximumProperties)}) {
+              recordError("maximumProperties");
               return false;
             }
           `;
@@ -661,13 +734,15 @@ function* generateValidatorStatements(
 
         yield itt`
           if(!${generateValidatorReference(specification, typeItem.name, `propertyName`)}) {
+            recordError("propertyName");
             return false;
           }
         `;
 
         yield itt`
-          currentPath = propertyName;
+          currentPathPart = propertyName;
           if(!${generateValidatorReference(specification, typeItem.element, `propertyValue`)}) {
+            recordError("propertyValue");
             return false;
           }
         `;
@@ -681,23 +756,29 @@ function* generateValidatorStatements(
       for (let elementIndex = 0; elementIndex < typeItem.elements.length; elementIndex++) {
         const element = typeItem.elements[elementIndex];
         yield itt`
-          currentPath = ${JSON.stringify(String(elementIndex))}
+          currentPathPart = ${JSON.stringify(String(elementIndex))}
           if(${generateValidatorReference(specification, element, valueExpression)}) {
             count++;
             if(count > 1) {
+              recordError("union");
               return false;
             }
           }
         `;
       }
       yield itt`
-        return count === 1;
+        if(count < 1) {
+          recordError("union");
+          return false;
+        }
+        return true;
       `;
       break;
     }
 
     case "alias": {
       yield itt`
+        currentPathPart = undefined;
         return (${generateValidatorReference(specification, typeItem.target, valueExpression)});
       `;
       break;
