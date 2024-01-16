@@ -1,5 +1,14 @@
 SHELL:=$(PREFIX)/bin/sh
 
+rebuild: \
+	clean build
+
+clean: \
+
+	rm --recursive --force packages/ts/schema-intermediate
+	rm --recursive --force packages/ts/schema-draft-04
+	rm --recursive --force packages/ts/schema-draft-2020-12
+
 build: \
 	packages/ts/schema-intermediate \
 	packages/ts/schema-draft-04 \
