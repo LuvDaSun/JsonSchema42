@@ -283,7 +283,7 @@ export function transformSchema(
               minimumExclusive: model.minimumExclusive,
               maximumInclusive: model.maximumInclusive,
               maximumExclusive: model.maximumExclusive,
-              // multipleOf: model.multipleOf,
+              multipleOf: model.multipleOf,
             },
           ];
           return;
@@ -300,7 +300,7 @@ export function transformSchema(
               minimumExclusive: model.minimumExclusive,
               maximumInclusive: model.maximumInclusive,
               maximumExclusive: model.maximumExclusive,
-              // multipleOf: model.multipleOf,
+              multipleOf: model.multipleOf,
             },
           ];
           return;
