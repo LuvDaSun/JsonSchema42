@@ -563,7 +563,7 @@ const configuration = {
 depthCounters[30] ??= 0;
 try {
 depthCounters[30]++;
-return (mockUriString());
+return (unknownValue);
 }
 finally {
 depthCounters[30]--;

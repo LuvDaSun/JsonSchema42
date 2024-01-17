@@ -1865,12 +1865,6 @@ counter += 1;
 }
 if(counter === 1 &&
 ((value: unknown) => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
-return false;
-}
 return true;
 })(value)
 ) {
@@ -2142,9 +2136,36 @@ resetErrors();
 depth += 1;
 try{
 return withType("VocabularyPropertyNames", () => {
+{
+let counter = 0;
+if(counter === 0 &&
+((value: unknown) => {
 if(!isUriString(value)) {
 return false;
 };
+return true;
+})(value)
+) {
+counter += 1;
+}
+if(counter === 1 &&
+((value: unknown) => {
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
+return true;
+})(value)
+) {
+counter += 1;
+}
+if(counter < 2) {
+recordError("allOf");
+return false;
+}
+}
 return true;
 ;
 });

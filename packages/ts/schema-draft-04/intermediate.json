@@ -62,9 +62,6 @@
       ]
     },
     "http://json-schema.org/draft-04/schema#/definitions/simpleTypes": {
-      "types": [
-        "string"
-      ],
       "options": [
         "array",
         "boolean",

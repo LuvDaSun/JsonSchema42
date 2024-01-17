@@ -11,46 +11,51 @@
 */
 export type SchemaDocument = (
 {
-"id"?: Id,
-"$schema"?: Schema,
-"title"?: Title,
-"description"?: Description,
-"default"?: Default,
-"multipleOf"?: MultipleOf,
-"maximum"?: Maximum,
-"exclusiveMaximum"?: ExclusiveMaximum,
-"minimum"?: Minimum,
-"exclusiveMinimum"?: ExclusiveMinimum,
-"maxLength"?: MaxLength,
-"minLength"?: MinLength,
-"pattern"?: Pattern,
-"additionalItems"?: AdditionalItems,
-"items"?: PropertiesItems,
-"maxItems"?: MaxItems,
-"minItems"?: MinItems,
-"uniqueItems"?: UniqueItems,
-"maxProperties"?: MaxProperties,
-"minProperties"?: MinProperties,
-"required"?: Required,
-"additionalProperties"?: PropertiesAdditionalProperties,
-"definitions"?: Definitions,
-"properties"?: Properties,
-"patternProperties"?: PatternProperties,
-"dependencies"?: Dependencies,
-"enum"?: Enum,
-"type"?: Type,
-"format"?: Format,
-"allOf"?: AllOf,
-"anyOf"?: AnyOf,
-"oneOf"?: OneOf,
-"not"?: Not,
+["id"]?: Id,
+["$schema"]?: Schema,
+["title"]?: Title,
+["description"]?: Description,
+["default"]?: Default,
+["multipleOf"]?: MultipleOf,
+["maximum"]?: Maximum,
+["exclusiveMaximum"]?: ExclusiveMaximum,
+["minimum"]?: Minimum,
+["exclusiveMinimum"]?: ExclusiveMinimum,
+["maxLength"]?: MaxLength,
+["minLength"]?: MinLength,
+["pattern"]?: Pattern,
+["additionalItems"]?: AdditionalItems,
+["items"]?: PropertiesItems,
+["maxItems"]?: MaxItems,
+["minItems"]?: MinItems,
+["uniqueItems"]?: UniqueItems,
+["maxProperties"]?: MaxProperties,
+["minProperties"]?: MinProperties,
+["required"]?: Required,
+["additionalProperties"]?: PropertiesAdditionalProperties,
+["definitions"]?: Definitions,
+["properties"]?: Properties,
+["patternProperties"]?: PatternProperties,
+["dependencies"]?: Dependencies,
+["enum"]?: Enum,
+["type"]?: Type,
+["format"]?: Format,
+["allOf"]?: AllOf,
+["anyOf"]?: AnyOf,
+["oneOf"]?: OneOf,
+["not"]?: Not,
+[
+name: string
+]: any
 }
 );
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
 */
 export type SchemaArray = (
-SchemaArrayItems[]
+[
+...(SchemaArrayItems)[]
+]
 );
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
@@ -74,7 +79,9 @@ export type SimpleTypes = ("array" |
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
 */
 export type StringArray = (
-StringArrayItems[]
+[
+...(StringArrayItems)[]
+]
 );
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/id}
@@ -181,7 +188,9 @@ AdditionalProperties1
 */
 export type Definitions = (
 {
-[name: (string)]: DefinitionsAdditionalProperties
+[
+name: string
+]: DefinitionsAdditionalProperties
 }
 );
 /**
@@ -189,7 +198,9 @@ export type Definitions = (
 */
 export type Properties = (
 {
-[name: (string)]: PropertiesPropertiesAdditionalProperties
+[
+name: string
+]: PropertiesPropertiesAdditionalProperties
 }
 );
 /**
@@ -197,7 +208,9 @@ export type Properties = (
 */
 export type PatternProperties = (
 {
-[name: (string)]: PatternPropertiesAdditionalProperties
+[
+name: string
+]: PatternPropertiesAdditionalProperties
 }
 );
 /**
@@ -205,14 +218,18 @@ export type PatternProperties = (
 */
 export type Dependencies = (
 {
-[name: (string)]: DependenciesAdditionalProperties
+[
+name: string
+]: DependenciesAdditionalProperties
 }
 );
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
 */
 export type Enum = (
-(any)[]
+[
+...any
+]
 );
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type}
@@ -310,7 +327,9 @@ export type Type0 = (SimpleTypes);
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
 */
 export type Type1 = (
-TypeItems[]
+[
+...(TypeItems)[]
+]
 );
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}

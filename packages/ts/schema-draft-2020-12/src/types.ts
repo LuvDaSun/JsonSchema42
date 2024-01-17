@@ -12,67 +12,70 @@
 export type Schema = (
 (
 {
-"$id"?: Id,
-"$schema"?: CoreSchema,
-"$ref"?: Ref,
-"$anchor"?: Anchor,
-"$dynamicRef"?: DynamicRef,
-"$dynamicAnchor"?: DynamicAnchor,
-"$vocabulary"?: Vocabulary,
-"$comment"?: Comment,
-"$defs"?: Defs,
-"prefixItems"?: PrefixItems,
-"items"?: ApplicatorItems,
-"contains"?: Contains,
-"additionalProperties"?: ApplicatorAdditionalProperties,
-"properties"?: Properties,
-"patternProperties"?: PatternProperties,
-"dependentSchemas"?: DependentSchemas,
-"propertyNames"?: ApplicatorPropertyNames,
-"if"?: If,
-"then"?: Then,
-"else"?: Else,
-"allOf"?: AllOf,
-"anyOf"?: AnyOf,
-"oneOf"?: OneOf,
-"not"?: Not,
-"unevaluatedItems"?: UnevaluatedItems,
-"unevaluatedProperties"?: UnevaluatedProperties,
-"type"?: Type,
-"const"?: Const,
-"enum"?: Enum,
-"multipleOf"?: MultipleOf,
-"maximum"?: Maximum,
-"exclusiveMaximum"?: ExclusiveMaximum,
-"minimum"?: Minimum,
-"exclusiveMinimum"?: ExclusiveMinimum,
-"maxLength"?: MaxLength,
-"minLength"?: MinLength,
-"pattern"?: Pattern,
-"maxItems"?: MaxItems,
-"minItems"?: MinItems,
-"uniqueItems"?: UniqueItems,
-"maxContains"?: MaxContains,
-"minContains"?: MinContains,
-"maxProperties"?: MaxProperties,
-"minProperties"?: MinProperties,
-"required"?: Required,
-"dependentRequired"?: DependentRequired,
-"title"?: Title,
-"description"?: Description,
-"default"?: Default,
-"deprecated"?: Deprecated,
-"readOnly"?: ReadOnly,
-"writeOnly"?: WriteOnly,
-"examples"?: Examples,
-"format"?: Format,
-"contentEncoding"?: ContentEncoding,
-"contentMediaType"?: ContentMediaType,
-"contentSchema"?: ContentSchema,
-"definitions"?: Definitions,
-"dependencies"?: Dependencies,
-"$recursiveAnchor"?: RecursiveAnchor,
-"$recursiveRef"?: RecursiveRef,
+["$id"]?: Id,
+["$schema"]?: CoreSchema,
+["$ref"]?: Ref,
+["$anchor"]?: Anchor,
+["$dynamicRef"]?: DynamicRef,
+["$dynamicAnchor"]?: DynamicAnchor,
+["$vocabulary"]?: Vocabulary,
+["$comment"]?: Comment,
+["$defs"]?: Defs,
+["prefixItems"]?: PrefixItems,
+["items"]?: ApplicatorItems,
+["contains"]?: Contains,
+["additionalProperties"]?: ApplicatorAdditionalProperties,
+["properties"]?: Properties,
+["patternProperties"]?: PatternProperties,
+["dependentSchemas"]?: DependentSchemas,
+["propertyNames"]?: ApplicatorPropertyNames,
+["if"]?: If,
+["then"]?: Then,
+["else"]?: Else,
+["allOf"]?: AllOf,
+["anyOf"]?: AnyOf,
+["oneOf"]?: OneOf,
+["not"]?: Not,
+["unevaluatedItems"]?: UnevaluatedItems,
+["unevaluatedProperties"]?: UnevaluatedProperties,
+["type"]?: Type,
+["const"]?: Const,
+["enum"]?: Enum,
+["multipleOf"]?: MultipleOf,
+["maximum"]?: Maximum,
+["exclusiveMaximum"]?: ExclusiveMaximum,
+["minimum"]?: Minimum,
+["exclusiveMinimum"]?: ExclusiveMinimum,
+["maxLength"]?: MaxLength,
+["minLength"]?: MinLength,
+["pattern"]?: Pattern,
+["maxItems"]?: MaxItems,
+["minItems"]?: MinItems,
+["uniqueItems"]?: UniqueItems,
+["maxContains"]?: MaxContains,
+["minContains"]?: MinContains,
+["maxProperties"]?: MaxProperties,
+["minProperties"]?: MinProperties,
+["required"]?: Required,
+["dependentRequired"]?: DependentRequired,
+["title"]?: Title,
+["description"]?: Description,
+["default"]?: Default,
+["deprecated"]?: Deprecated,
+["readOnly"]?: ReadOnly,
+["writeOnly"]?: WriteOnly,
+["examples"]?: Examples,
+["format"]?: Format,
+["contentEncoding"]?: ContentEncoding,
+["contentMediaType"]?: ContentMediaType,
+["contentSchema"]?: ContentSchema,
+["definitions"]?: Definitions,
+["dependencies"]?: Dependencies,
+["$recursiveAnchor"]?: RecursiveAnchor,
+["$recursiveRef"]?: RecursiveRef,
+[
+name: string
+]: any
 }
 )
 |
@@ -84,7 +87,9 @@ export type Schema = (
 */
 export type Definitions = (
 {
-[name: (string)]: DefinitionsAdditionalProperties
+[
+name: string
+]: DefinitionsAdditionalProperties
 }
 );
 /**
@@ -93,7 +98,9 @@ export type Definitions = (
 */
 export type Dependencies = (
 {
-[name: (string)]: DependenciesAdditionalProperties
+[
+name: string
+]: DependenciesAdditionalProperties
 }
 );
 /**
@@ -146,67 +153,70 @@ StringArray
 |
 (
 {
-"$id"?: Id,
-"$schema"?: CoreSchema,
-"$ref"?: Ref,
-"$anchor"?: Anchor,
-"$dynamicRef"?: DynamicRef,
-"$dynamicAnchor"?: DynamicAnchor,
-"$vocabulary"?: Vocabulary,
-"$comment"?: Comment,
-"$defs"?: Defs,
-"prefixItems"?: PrefixItems,
-"items"?: ApplicatorItems,
-"contains"?: Contains,
-"additionalProperties"?: ApplicatorAdditionalProperties,
-"properties"?: Properties,
-"patternProperties"?: PatternProperties,
-"dependentSchemas"?: DependentSchemas,
-"propertyNames"?: ApplicatorPropertyNames,
-"if"?: If,
-"then"?: Then,
-"else"?: Else,
-"allOf"?: AllOf,
-"anyOf"?: AnyOf,
-"oneOf"?: OneOf,
-"not"?: Not,
-"unevaluatedItems"?: UnevaluatedItems,
-"unevaluatedProperties"?: UnevaluatedProperties,
-"type"?: Type,
-"const"?: Const,
-"enum"?: Enum,
-"multipleOf"?: MultipleOf,
-"maximum"?: Maximum,
-"exclusiveMaximum"?: ExclusiveMaximum,
-"minimum"?: Minimum,
-"exclusiveMinimum"?: ExclusiveMinimum,
-"maxLength"?: MaxLength,
-"minLength"?: MinLength,
-"pattern"?: Pattern,
-"maxItems"?: MaxItems,
-"minItems"?: MinItems,
-"uniqueItems"?: UniqueItems,
-"maxContains"?: MaxContains,
-"minContains"?: MinContains,
-"maxProperties"?: MaxProperties,
-"minProperties"?: MinProperties,
-"required"?: Required,
-"dependentRequired"?: DependentRequired,
-"title"?: Title,
-"description"?: Description,
-"default"?: Default,
-"deprecated"?: Deprecated,
-"readOnly"?: ReadOnly,
-"writeOnly"?: WriteOnly,
-"examples"?: Examples,
-"format"?: Format,
-"contentEncoding"?: ContentEncoding,
-"contentMediaType"?: ContentMediaType,
-"contentSchema"?: ContentSchema,
-"definitions"?: Definitions,
-"dependencies"?: Dependencies,
-"$recursiveAnchor"?: RecursiveAnchor,
-"$recursiveRef"?: RecursiveRef,
+["$id"]?: Id,
+["$schema"]?: CoreSchema,
+["$ref"]?: Ref,
+["$anchor"]?: Anchor,
+["$dynamicRef"]?: DynamicRef,
+["$dynamicAnchor"]?: DynamicAnchor,
+["$vocabulary"]?: Vocabulary,
+["$comment"]?: Comment,
+["$defs"]?: Defs,
+["prefixItems"]?: PrefixItems,
+["items"]?: ApplicatorItems,
+["contains"]?: Contains,
+["additionalProperties"]?: ApplicatorAdditionalProperties,
+["properties"]?: Properties,
+["patternProperties"]?: PatternProperties,
+["dependentSchemas"]?: DependentSchemas,
+["propertyNames"]?: ApplicatorPropertyNames,
+["if"]?: If,
+["then"]?: Then,
+["else"]?: Else,
+["allOf"]?: AllOf,
+["anyOf"]?: AnyOf,
+["oneOf"]?: OneOf,
+["not"]?: Not,
+["unevaluatedItems"]?: UnevaluatedItems,
+["unevaluatedProperties"]?: UnevaluatedProperties,
+["type"]?: Type,
+["const"]?: Const,
+["enum"]?: Enum,
+["multipleOf"]?: MultipleOf,
+["maximum"]?: Maximum,
+["exclusiveMaximum"]?: ExclusiveMaximum,
+["minimum"]?: Minimum,
+["exclusiveMinimum"]?: ExclusiveMinimum,
+["maxLength"]?: MaxLength,
+["minLength"]?: MinLength,
+["pattern"]?: Pattern,
+["maxItems"]?: MaxItems,
+["minItems"]?: MinItems,
+["uniqueItems"]?: UniqueItems,
+["maxContains"]?: MaxContains,
+["minContains"]?: MinContains,
+["maxProperties"]?: MaxProperties,
+["minProperties"]?: MinProperties,
+["required"]?: Required,
+["dependentRequired"]?: DependentRequired,
+["title"]?: Title,
+["description"]?: Description,
+["default"]?: Default,
+["deprecated"]?: Deprecated,
+["readOnly"]?: ReadOnly,
+["writeOnly"]?: WriteOnly,
+["examples"]?: Examples,
+["format"]?: Format,
+["contentEncoding"]?: ContentEncoding,
+["contentMediaType"]?: ContentMediaType,
+["contentSchema"]?: ContentSchema,
+["definitions"]?: Definitions,
+["dependencies"]?: Dependencies,
+["$recursiveAnchor"]?: RecursiveAnchor,
+["$recursiveRef"]?: RecursiveRef,
+[
+name: string
+]: any
 }
 )
 |
@@ -235,15 +245,18 @@ export type UriReferenceString = (string);
 export type Core = (
 (
 {
-"$id"?: Id,
-"$schema"?: CoreSchema,
-"$ref"?: Ref,
-"$anchor"?: Anchor,
-"$dynamicRef"?: DynamicRef,
-"$dynamicAnchor"?: DynamicAnchor,
-"$vocabulary"?: Vocabulary,
-"$comment"?: Comment,
-"$defs"?: Defs,
+["$id"]?: Id,
+["$schema"]?: CoreSchema,
+["$ref"]?: Ref,
+["$anchor"]?: Anchor,
+["$dynamicRef"]?: DynamicRef,
+["$dynamicAnchor"]?: DynamicAnchor,
+["$vocabulary"]?: Vocabulary,
+["$comment"]?: Comment,
+["$defs"]?: Defs,
+[
+name: string
+]: any
 }
 )
 |
@@ -282,7 +295,9 @@ export type DynamicAnchor = (AnchorString);
 */
 export type Vocabulary = (
 {
-[name: VocabularyPropertyNames]: VocabularyAdditionalProperties
+[
+name: VocabularyPropertyNames
+]: VocabularyAdditionalProperties
 }
 );
 /**
@@ -294,7 +309,9 @@ export type Comment = (string);
 */
 export type Defs = (
 {
-[name: (string)]: DefsAdditionalProperties
+[
+name: string
+]: DefsAdditionalProperties
 }
 );
 /**
@@ -304,7 +321,7 @@ export type VocabularyAdditionalProperties = (boolean);
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
 */
-export type VocabularyPropertyNames = (UriString);
+export type VocabularyPropertyNames = (string);
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
 */
@@ -316,21 +333,24 @@ export type DefsAdditionalProperties = (Schema);
 export type Applicator = (
 (
 {
-"prefixItems"?: PrefixItems,
-"items"?: ApplicatorItems,
-"contains"?: Contains,
-"additionalProperties"?: ApplicatorAdditionalProperties,
-"properties"?: Properties,
-"patternProperties"?: PatternProperties,
-"dependentSchemas"?: DependentSchemas,
-"propertyNames"?: ApplicatorPropertyNames,
-"if"?: If,
-"then"?: Then,
-"else"?: Else,
-"allOf"?: AllOf,
-"anyOf"?: AnyOf,
-"oneOf"?: OneOf,
-"not"?: Not,
+["prefixItems"]?: PrefixItems,
+["items"]?: ApplicatorItems,
+["contains"]?: Contains,
+["additionalProperties"]?: ApplicatorAdditionalProperties,
+["properties"]?: Properties,
+["patternProperties"]?: PatternProperties,
+["dependentSchemas"]?: DependentSchemas,
+["propertyNames"]?: ApplicatorPropertyNames,
+["if"]?: If,
+["then"]?: Then,
+["else"]?: Else,
+["allOf"]?: AllOf,
+["anyOf"]?: AnyOf,
+["oneOf"]?: OneOf,
+["not"]?: Not,
+[
+name: string
+]: any
 }
 )
 |
@@ -340,7 +360,9 @@ export type Applicator = (
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
 */
 export type SchemaArray = (
-SchemaArrayItems[]
+[
+...(SchemaArrayItems)[]
+]
 );
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
@@ -363,7 +385,9 @@ export type ApplicatorAdditionalProperties = (Schema);
 */
 export type Properties = (
 {
-[name: (string)]: PropertiesAdditionalProperties
+[
+name: string
+]: PropertiesAdditionalProperties
 }
 );
 /**
@@ -371,7 +395,9 @@ export type Properties = (
 */
 export type PatternProperties = (
 {
-[name: PatternPropertiesPropertyNames]: PatternPropertiesAdditionalProperties
+[
+name: PatternPropertiesPropertyNames
+]: PatternPropertiesAdditionalProperties
 }
 );
 /**
@@ -379,7 +405,9 @@ export type PatternProperties = (
 */
 export type DependentSchemas = (
 {
-[name: (string)]: DependentSchemasAdditionalProperties
+[
+name: string
+]: DependentSchemasAdditionalProperties
 }
 );
 /**
@@ -441,8 +469,11 @@ export type DependentSchemasAdditionalProperties = (Schema);
 export type Unevaluated = (
 (
 {
-"unevaluatedItems"?: UnevaluatedItems,
-"unevaluatedProperties"?: UnevaluatedProperties,
+["unevaluatedItems"]?: UnevaluatedItems,
+["unevaluatedProperties"]?: UnevaluatedProperties,
+[
+name: string
+]: any
 }
 )
 |
@@ -463,26 +494,29 @@ export type UnevaluatedProperties = (Schema);
 export type Validation = (
 (
 {
-"type"?: Type,
-"const"?: Const,
-"enum"?: Enum,
-"multipleOf"?: MultipleOf,
-"maximum"?: Maximum,
-"exclusiveMaximum"?: ExclusiveMaximum,
-"minimum"?: Minimum,
-"exclusiveMinimum"?: ExclusiveMinimum,
-"maxLength"?: MaxLength,
-"minLength"?: MinLength,
-"pattern"?: Pattern,
-"maxItems"?: MaxItems,
-"minItems"?: MinItems,
-"uniqueItems"?: UniqueItems,
-"maxContains"?: MaxContains,
-"minContains"?: MinContains,
-"maxProperties"?: MaxProperties,
-"minProperties"?: MinProperties,
-"required"?: Required,
-"dependentRequired"?: DependentRequired,
+["type"]?: Type,
+["const"]?: Const,
+["enum"]?: Enum,
+["multipleOf"]?: MultipleOf,
+["maximum"]?: Maximum,
+["exclusiveMaximum"]?: ExclusiveMaximum,
+["minimum"]?: Minimum,
+["exclusiveMinimum"]?: ExclusiveMinimum,
+["maxLength"]?: MaxLength,
+["minLength"]?: MinLength,
+["pattern"]?: Pattern,
+["maxItems"]?: MaxItems,
+["minItems"]?: MinItems,
+["uniqueItems"]?: UniqueItems,
+["maxContains"]?: MaxContains,
+["minContains"]?: MinContains,
+["maxProperties"]?: MaxProperties,
+["minProperties"]?: MinProperties,
+["required"]?: Required,
+["dependentRequired"]?: DependentRequired,
+[
+name: string
+]: any
 }
 )
 |
@@ -510,7 +544,9 @@ export type SimpleTypes = ("array" |
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
 */
 export type StringArray = (
-StringArrayItems[]
+[
+...(StringArrayItems)[]
+]
 );
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
@@ -528,7 +564,9 @@ export type Const = (any);
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
 */
 export type Enum = (
-EnumItems[]
+[
+...(EnumItems)[]
+]
 );
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
@@ -599,7 +637,9 @@ export type Required = (StringArray);
 */
 export type DependentRequired = (
 {
-[name: (string)]: DependentRequiredAdditionalProperties
+[
+name: string
+]: DependentRequiredAdditionalProperties
 }
 );
 /**
@@ -614,7 +654,9 @@ export type Type0 = (SimpleTypes);
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
 */
 export type Type1 = (
-TypeItems[]
+[
+...(TypeItems)[]
+]
 );
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
@@ -635,13 +677,16 @@ export type TypeItems = (SimpleTypes);
 export type MetaData = (
 (
 {
-"title"?: Title,
-"description"?: Description,
-"default"?: Default,
-"deprecated"?: Deprecated,
-"readOnly"?: ReadOnly,
-"writeOnly"?: WriteOnly,
-"examples"?: Examples,
+["title"]?: Title,
+["description"]?: Description,
+["default"]?: Default,
+["deprecated"]?: Deprecated,
+["readOnly"]?: ReadOnly,
+["writeOnly"]?: WriteOnly,
+["examples"]?: Examples,
+[
+name: string
+]: any
 }
 )
 |
@@ -675,7 +720,9 @@ export type WriteOnly = (boolean);
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
 */
 export type Examples = (
-ExamplesItems[]
+[
+...(ExamplesItems)[]
+]
 );
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
@@ -688,7 +735,10 @@ export type ExamplesItems = (any);
 export type FormatAnnotation = (
 (
 {
-"format"?: Format,
+["format"]?: Format,
+[
+name: string
+]: any
 }
 )
 |
@@ -705,9 +755,12 @@ export type Format = (string);
 export type Content = (
 (
 {
-"contentEncoding"?: ContentEncoding,
-"contentMediaType"?: ContentMediaType,
-"contentSchema"?: ContentSchema,
+["contentEncoding"]?: ContentEncoding,
+["contentMediaType"]?: ContentMediaType,
+["contentSchema"]?: ContentSchema,
+[
+name: string
+]: any
 }
 )
 |

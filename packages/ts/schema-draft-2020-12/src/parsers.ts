@@ -23,73 +23,326 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value], configuration),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value], configuration),
-"$ref": parseRef(value["$ref" as keyof typeof value], configuration),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value], configuration),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value], configuration),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value], configuration),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value], configuration),
-"$comment": parseComment(value["$comment" as keyof typeof value], configuration),
-"$defs": parseDefs(value["$defs" as keyof typeof value], configuration),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value], configuration),
-"items": parseApplicatorItems(value["items" as keyof typeof value], configuration),
-"contains": parseContains(value["contains" as keyof typeof value], configuration),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value], configuration),
-"properties": parseProperties(value["properties" as keyof typeof value], configuration),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value], configuration),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value], configuration),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value], configuration),
-"if": parseIf(value["if" as keyof typeof value], configuration),
-"then": parseThen(value["then" as keyof typeof value], configuration),
-"else": parseElse(value["else" as keyof typeof value], configuration),
-"allOf": parseAllOf(value["allOf" as keyof typeof value], configuration),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value], configuration),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value], configuration),
-"not": parseNot(value["not" as keyof typeof value], configuration),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value], configuration),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value], configuration),
-"type": parseType(value["type" as keyof typeof value], configuration),
-"const": parseConst(value["const" as keyof typeof value], configuration),
-"enum": parseEnum(value["enum" as keyof typeof value], configuration),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value], configuration),
-"maximum": parseMaximum(value["maximum" as keyof typeof value], configuration),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value], configuration),
-"minimum": parseMinimum(value["minimum" as keyof typeof value], configuration),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value], configuration),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value], configuration),
-"minLength": parseMinLength(value["minLength" as keyof typeof value], configuration),
-"pattern": parsePattern(value["pattern" as keyof typeof value], configuration),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value], configuration),
-"minItems": parseMinItems(value["minItems" as keyof typeof value], configuration),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value], configuration),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value], configuration),
-"minContains": parseMinContains(value["minContains" as keyof typeof value], configuration),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value], configuration),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value], configuration),
-"required": parseRequired(value["required" as keyof typeof value], configuration),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value], configuration),
-"title": parseTitle(value["title" as keyof typeof value], configuration),
-"description": parseDescription(value["description" as keyof typeof value], configuration),
-"default": parseDefault(value["default" as keyof typeof value], configuration),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value], configuration),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value], configuration),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value], configuration),
-"examples": parseExamples(value["examples" as keyof typeof value], configuration),
-"format": parseFormat(value["format" as keyof typeof value], configuration),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value], configuration),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value], configuration),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value], configuration),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value], configuration),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value], configuration),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value], configuration),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "$id":
+return [
+name,
+parseId(value, configuration),
+]
+case "$schema":
+return [
+name,
+parseCoreSchema(value, configuration),
+]
+case "$ref":
+return [
+name,
+parseRef(value, configuration),
+]
+case "$anchor":
+return [
+name,
+parseAnchor(value, configuration),
+]
+case "$dynamicRef":
+return [
+name,
+parseDynamicRef(value, configuration),
+]
+case "$dynamicAnchor":
+return [
+name,
+parseDynamicAnchor(value, configuration),
+]
+case "$vocabulary":
+return [
+name,
+parseVocabulary(value, configuration),
+]
+case "$comment":
+return [
+name,
+parseComment(value, configuration),
+]
+case "$defs":
+return [
+name,
+parseDefs(value, configuration),
+]
+case "prefixItems":
+return [
+name,
+parsePrefixItems(value, configuration),
+]
+case "items":
+return [
+name,
+parseApplicatorItems(value, configuration),
+]
+case "contains":
+return [
+name,
+parseContains(value, configuration),
+]
+case "additionalProperties":
+return [
+name,
+parseApplicatorAdditionalProperties(value, configuration),
+]
+case "properties":
+return [
+name,
+parseProperties(value, configuration),
+]
+case "patternProperties":
+return [
+name,
+parsePatternProperties(value, configuration),
+]
+case "dependentSchemas":
+return [
+name,
+parseDependentSchemas(value, configuration),
+]
+case "propertyNames":
+return [
+name,
+parseApplicatorPropertyNames(value, configuration),
+]
+case "if":
+return [
+name,
+parseIf(value, configuration),
+]
+case "then":
+return [
+name,
+parseThen(value, configuration),
+]
+case "else":
+return [
+name,
+parseElse(value, configuration),
+]
+case "allOf":
+return [
+name,
+parseAllOf(value, configuration),
+]
+case "anyOf":
+return [
+name,
+parseAnyOf(value, configuration),
+]
+case "oneOf":
+return [
+name,
+parseOneOf(value, configuration),
+]
+case "not":
+return [
+name,
+parseNot(value, configuration),
+]
+case "unevaluatedItems":
+return [
+name,
+parseUnevaluatedItems(value, configuration),
+]
+case "unevaluatedProperties":
+return [
+name,
+parseUnevaluatedProperties(value, configuration),
+]
+case "type":
+return [
+name,
+parseType(value, configuration),
+]
+case "const":
+return [
+name,
+parseConst(value, configuration),
+]
+case "enum":
+return [
+name,
+parseEnum(value, configuration),
+]
+case "multipleOf":
+return [
+name,
+parseMultipleOf(value, configuration),
+]
+case "maximum":
+return [
+name,
+parseMaximum(value, configuration),
+]
+case "exclusiveMaximum":
+return [
+name,
+parseExclusiveMaximum(value, configuration),
+]
+case "minimum":
+return [
+name,
+parseMinimum(value, configuration),
+]
+case "exclusiveMinimum":
+return [
+name,
+parseExclusiveMinimum(value, configuration),
+]
+case "maxLength":
+return [
+name,
+parseMaxLength(value, configuration),
+]
+case "minLength":
+return [
+name,
+parseMinLength(value, configuration),
+]
+case "pattern":
+return [
+name,
+parsePattern(value, configuration),
+]
+case "maxItems":
+return [
+name,
+parseMaxItems(value, configuration),
+]
+case "minItems":
+return [
+name,
+parseMinItems(value, configuration),
+]
+case "uniqueItems":
+return [
+name,
+parseUniqueItems(value, configuration),
+]
+case "maxContains":
+return [
+name,
+parseMaxContains(value, configuration),
+]
+case "minContains":
+return [
+name,
+parseMinContains(value, configuration),
+]
+case "maxProperties":
+return [
+name,
+parseMaxProperties(value, configuration),
+]
+case "minProperties":
+return [
+name,
+parseMinProperties(value, configuration),
+]
+case "required":
+return [
+name,
+parseRequired(value, configuration),
+]
+case "dependentRequired":
+return [
+name,
+parseDependentRequired(value, configuration),
+]
+case "title":
+return [
+name,
+parseTitle(value, configuration),
+]
+case "description":
+return [
+name,
+parseDescription(value, configuration),
+]
+case "default":
+return [
+name,
+parseDefault(value, configuration),
+]
+case "deprecated":
+return [
+name,
+parseDeprecated(value, configuration),
+]
+case "readOnly":
+return [
+name,
+parseReadOnly(value, configuration),
+]
+case "writeOnly":
+return [
+name,
+parseWriteOnly(value, configuration),
+]
+case "examples":
+return [
+name,
+parseExamples(value, configuration),
+]
+case "format":
+return [
+name,
+parseFormat(value, configuration),
+]
+case "contentEncoding":
+return [
+name,
+parseContentEncoding(value, configuration),
+]
+case "contentMediaType":
+return [
+name,
+parseContentMediaType(value, configuration),
+]
+case "contentSchema":
+return [
+name,
+parseContentSchema(value, configuration),
+]
+case "definitions":
+return [
+name,
+parseDefinitions(value, configuration),
+]
+case "dependencies":
+return [
+name,
+parseDependencies(value, configuration),
+]
+case "$recursiveAnchor":
+return [
+name,
+parseRecursiveAnchor(value, configuration),
+]
+case "$recursiveRef":
+return [
+name,
+parseRecursiveRef(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -126,7 +379,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
@@ -140,31 +394,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDefinitionsAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDefinitionsAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -181,31 +419,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDependenciesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDependenciesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -320,73 +542,328 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseStringArray(value, configuration) ?? (
+return (
+parseStringArray(value, configuration)
+??
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value], configuration),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value], configuration),
-"$ref": parseRef(value["$ref" as keyof typeof value], configuration),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value], configuration),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value], configuration),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value], configuration),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value], configuration),
-"$comment": parseComment(value["$comment" as keyof typeof value], configuration),
-"$defs": parseDefs(value["$defs" as keyof typeof value], configuration),
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value], configuration),
-"items": parseApplicatorItems(value["items" as keyof typeof value], configuration),
-"contains": parseContains(value["contains" as keyof typeof value], configuration),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value], configuration),
-"properties": parseProperties(value["properties" as keyof typeof value], configuration),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value], configuration),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value], configuration),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value], configuration),
-"if": parseIf(value["if" as keyof typeof value], configuration),
-"then": parseThen(value["then" as keyof typeof value], configuration),
-"else": parseElse(value["else" as keyof typeof value], configuration),
-"allOf": parseAllOf(value["allOf" as keyof typeof value], configuration),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value], configuration),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value], configuration),
-"not": parseNot(value["not" as keyof typeof value], configuration),
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value], configuration),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value], configuration),
-"type": parseType(value["type" as keyof typeof value], configuration),
-"const": parseConst(value["const" as keyof typeof value], configuration),
-"enum": parseEnum(value["enum" as keyof typeof value], configuration),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value], configuration),
-"maximum": parseMaximum(value["maximum" as keyof typeof value], configuration),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value], configuration),
-"minimum": parseMinimum(value["minimum" as keyof typeof value], configuration),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value], configuration),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value], configuration),
-"minLength": parseMinLength(value["minLength" as keyof typeof value], configuration),
-"pattern": parsePattern(value["pattern" as keyof typeof value], configuration),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value], configuration),
-"minItems": parseMinItems(value["minItems" as keyof typeof value], configuration),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value], configuration),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value], configuration),
-"minContains": parseMinContains(value["minContains" as keyof typeof value], configuration),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value], configuration),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value], configuration),
-"required": parseRequired(value["required" as keyof typeof value], configuration),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value], configuration),
-"title": parseTitle(value["title" as keyof typeof value], configuration),
-"description": parseDescription(value["description" as keyof typeof value], configuration),
-"default": parseDefault(value["default" as keyof typeof value], configuration),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value], configuration),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value], configuration),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value], configuration),
-"examples": parseExamples(value["examples" as keyof typeof value], configuration),
-"format": parseFormat(value["format" as keyof typeof value], configuration),
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value], configuration),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value], configuration),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value], configuration),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value], configuration),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value], configuration),
-"$recursiveAnchor": parseRecursiveAnchor(value["$recursiveAnchor" as keyof typeof value], configuration),
-"$recursiveRef": parseRecursiveRef(value["$recursiveRef" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "$id":
+return [
+name,
+parseId(value, configuration),
+]
+case "$schema":
+return [
+name,
+parseCoreSchema(value, configuration),
+]
+case "$ref":
+return [
+name,
+parseRef(value, configuration),
+]
+case "$anchor":
+return [
+name,
+parseAnchor(value, configuration),
+]
+case "$dynamicRef":
+return [
+name,
+parseDynamicRef(value, configuration),
+]
+case "$dynamicAnchor":
+return [
+name,
+parseDynamicAnchor(value, configuration),
+]
+case "$vocabulary":
+return [
+name,
+parseVocabulary(value, configuration),
+]
+case "$comment":
+return [
+name,
+parseComment(value, configuration),
+]
+case "$defs":
+return [
+name,
+parseDefs(value, configuration),
+]
+case "prefixItems":
+return [
+name,
+parsePrefixItems(value, configuration),
+]
+case "items":
+return [
+name,
+parseApplicatorItems(value, configuration),
+]
+case "contains":
+return [
+name,
+parseContains(value, configuration),
+]
+case "additionalProperties":
+return [
+name,
+parseApplicatorAdditionalProperties(value, configuration),
+]
+case "properties":
+return [
+name,
+parseProperties(value, configuration),
+]
+case "patternProperties":
+return [
+name,
+parsePatternProperties(value, configuration),
+]
+case "dependentSchemas":
+return [
+name,
+parseDependentSchemas(value, configuration),
+]
+case "propertyNames":
+return [
+name,
+parseApplicatorPropertyNames(value, configuration),
+]
+case "if":
+return [
+name,
+parseIf(value, configuration),
+]
+case "then":
+return [
+name,
+parseThen(value, configuration),
+]
+case "else":
+return [
+name,
+parseElse(value, configuration),
+]
+case "allOf":
+return [
+name,
+parseAllOf(value, configuration),
+]
+case "anyOf":
+return [
+name,
+parseAnyOf(value, configuration),
+]
+case "oneOf":
+return [
+name,
+parseOneOf(value, configuration),
+]
+case "not":
+return [
+name,
+parseNot(value, configuration),
+]
+case "unevaluatedItems":
+return [
+name,
+parseUnevaluatedItems(value, configuration),
+]
+case "unevaluatedProperties":
+return [
+name,
+parseUnevaluatedProperties(value, configuration),
+]
+case "type":
+return [
+name,
+parseType(value, configuration),
+]
+case "const":
+return [
+name,
+parseConst(value, configuration),
+]
+case "enum":
+return [
+name,
+parseEnum(value, configuration),
+]
+case "multipleOf":
+return [
+name,
+parseMultipleOf(value, configuration),
+]
+case "maximum":
+return [
+name,
+parseMaximum(value, configuration),
+]
+case "exclusiveMaximum":
+return [
+name,
+parseExclusiveMaximum(value, configuration),
+]
+case "minimum":
+return [
+name,
+parseMinimum(value, configuration),
+]
+case "exclusiveMinimum":
+return [
+name,
+parseExclusiveMinimum(value, configuration),
+]
+case "maxLength":
+return [
+name,
+parseMaxLength(value, configuration),
+]
+case "minLength":
+return [
+name,
+parseMinLength(value, configuration),
+]
+case "pattern":
+return [
+name,
+parsePattern(value, configuration),
+]
+case "maxItems":
+return [
+name,
+parseMaxItems(value, configuration),
+]
+case "minItems":
+return [
+name,
+parseMinItems(value, configuration),
+]
+case "uniqueItems":
+return [
+name,
+parseUniqueItems(value, configuration),
+]
+case "maxContains":
+return [
+name,
+parseMaxContains(value, configuration),
+]
+case "minContains":
+return [
+name,
+parseMinContains(value, configuration),
+]
+case "maxProperties":
+return [
+name,
+parseMaxProperties(value, configuration),
+]
+case "minProperties":
+return [
+name,
+parseMinProperties(value, configuration),
+]
+case "required":
+return [
+name,
+parseRequired(value, configuration),
+]
+case "dependentRequired":
+return [
+name,
+parseDependentRequired(value, configuration),
+]
+case "title":
+return [
+name,
+parseTitle(value, configuration),
+]
+case "description":
+return [
+name,
+parseDescription(value, configuration),
+]
+case "default":
+return [
+name,
+parseDefault(value, configuration),
+]
+case "deprecated":
+return [
+name,
+parseDeprecated(value, configuration),
+]
+case "readOnly":
+return [
+name,
+parseReadOnly(value, configuration),
+]
+case "writeOnly":
+return [
+name,
+parseWriteOnly(value, configuration),
+]
+case "examples":
+return [
+name,
+parseExamples(value, configuration),
+]
+case "format":
+return [
+name,
+parseFormat(value, configuration),
+]
+case "contentEncoding":
+return [
+name,
+parseContentEncoding(value, configuration),
+]
+case "contentMediaType":
+return [
+name,
+parseContentMediaType(value, configuration),
+]
+case "contentSchema":
+return [
+name,
+parseContentSchema(value, configuration),
+]
+case "definitions":
+return [
+name,
+parseDefinitions(value, configuration),
+]
+case "dependencies":
+return [
+name,
+parseDependencies(value, configuration),
+]
+case "$recursiveAnchor":
+return [
+name,
+parseRecursiveAnchor(value, configuration),
+]
+case "$recursiveRef":
+return [
+name,
+parseRecursiveRef(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -423,7 +900,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
@@ -516,21 +994,66 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$id": parseId(value["$id" as keyof typeof value], configuration),
-"$schema": parseCoreSchema(value["$schema" as keyof typeof value], configuration),
-"$ref": parseRef(value["$ref" as keyof typeof value], configuration),
-"$anchor": parseAnchor(value["$anchor" as keyof typeof value], configuration),
-"$dynamicRef": parseDynamicRef(value["$dynamicRef" as keyof typeof value], configuration),
-"$dynamicAnchor": parseDynamicAnchor(value["$dynamicAnchor" as keyof typeof value], configuration),
-"$vocabulary": parseVocabulary(value["$vocabulary" as keyof typeof value], configuration),
-"$comment": parseComment(value["$comment" as keyof typeof value], configuration),
-"$defs": parseDefs(value["$defs" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "$id":
+return [
+name,
+parseId(value, configuration),
+]
+case "$schema":
+return [
+name,
+parseCoreSchema(value, configuration),
+]
+case "$ref":
+return [
+name,
+parseRef(value, configuration),
+]
+case "$anchor":
+return [
+name,
+parseAnchor(value, configuration),
+]
+case "$dynamicRef":
+return [
+name,
+parseDynamicRef(value, configuration),
+]
+case "$dynamicAnchor":
+return [
+name,
+parseDynamicAnchor(value, configuration),
+]
+case "$vocabulary":
+return [
+name,
+parseVocabulary(value, configuration),
+]
+case "$comment":
+return [
+name,
+parseComment(value, configuration),
+]
+case "$defs":
+return [
+name,
+parseDefs(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -567,7 +1090,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
@@ -692,10 +1216,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-parseVocabularyPropertyNames(name, configuration),
-parseVocabularyAdditionalProperties(value, configuration),
-])
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+default:
+return [
+name,
+(parseVocabularyAdditionalProperties(value, configuration)),
+]
+}
+})
 ) :
 undefined
 );
@@ -742,31 +1271,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDefsAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDefsAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -826,7 +1339,28 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseUriString(value, configuration));
+return (
+((value: unknown) => {
+if(Array.isArray(value)) {
+switch(value.length) {
+case 1:
+[value] = value
+break;
+default:
+return undefined;
+}
+}
+switch(typeof value) {
+case "string":
+return value;
+case "number":
+case "boolean":
+return String(value);
+default:
+return undefined;
+}
+})(value)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
@@ -847,27 +1381,96 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"prefixItems": parsePrefixItems(value["prefixItems" as keyof typeof value], configuration),
-"items": parseApplicatorItems(value["items" as keyof typeof value], configuration),
-"contains": parseContains(value["contains" as keyof typeof value], configuration),
-"additionalProperties": parseApplicatorAdditionalProperties(value["additionalProperties" as keyof typeof value], configuration),
-"properties": parseProperties(value["properties" as keyof typeof value], configuration),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value], configuration),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value], configuration),
-"propertyNames": parseApplicatorPropertyNames(value["propertyNames" as keyof typeof value], configuration),
-"if": parseIf(value["if" as keyof typeof value], configuration),
-"then": parseThen(value["then" as keyof typeof value], configuration),
-"else": parseElse(value["else" as keyof typeof value], configuration),
-"allOf": parseAllOf(value["allOf" as keyof typeof value], configuration),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value], configuration),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value], configuration),
-"not": parseNot(value["not" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "prefixItems":
+return [
+name,
+parsePrefixItems(value, configuration),
+]
+case "items":
+return [
+name,
+parseApplicatorItems(value, configuration),
+]
+case "contains":
+return [
+name,
+parseContains(value, configuration),
+]
+case "additionalProperties":
+return [
+name,
+parseApplicatorAdditionalProperties(value, configuration),
+]
+case "properties":
+return [
+name,
+parseProperties(value, configuration),
+]
+case "patternProperties":
+return [
+name,
+parsePatternProperties(value, configuration),
+]
+case "dependentSchemas":
+return [
+name,
+parseDependentSchemas(value, configuration),
+]
+case "propertyNames":
+return [
+name,
+parseApplicatorPropertyNames(value, configuration),
+]
+case "if":
+return [
+name,
+parseIf(value, configuration),
+]
+case "then":
+return [
+name,
+parseThen(value, configuration),
+]
+case "else":
+return [
+name,
+parseElse(value, configuration),
+]
+case "allOf":
+return [
+name,
+parseAllOf(value, configuration),
+]
+case "anyOf":
+return [
+name,
+parseAnyOf(value, configuration),
+]
+case "oneOf":
+return [
+name,
+parseOneOf(value, configuration),
+]
+case "not":
+return [
+name,
+parseNot(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -904,7 +1507,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
@@ -916,10 +1520,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseSchemaArrayItems(value, configuration)) :
-value == null ?
-undefined :
-[parseSchemaArrayItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseSchemaArrayItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -973,31 +1580,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parsePropertiesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parsePropertiesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -1013,10 +1604,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-parsePatternPropertiesPropertyNames(name, configuration),
-parsePatternPropertiesAdditionalProperties(value, configuration),
-])
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+default:
+return [
+name,
+(parsePatternPropertiesAdditionalProperties(value, configuration)),
+]
+}
+})
 ) :
 undefined
 );
@@ -1032,31 +1628,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDependentSchemasAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDependentSchemasAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -1221,14 +1801,31 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"unevaluatedItems": parseUnevaluatedItems(value["unevaluatedItems" as keyof typeof value], configuration),
-"unevaluatedProperties": parseUnevaluatedProperties(value["unevaluatedProperties" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "unevaluatedItems":
+return [
+name,
+parseUnevaluatedItems(value, configuration),
+]
+case "unevaluatedProperties":
+return [
+name,
+parseUnevaluatedProperties(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -1265,7 +1862,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
@@ -1296,32 +1894,121 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"type": parseType(value["type" as keyof typeof value], configuration),
-"const": parseConst(value["const" as keyof typeof value], configuration),
-"enum": parseEnum(value["enum" as keyof typeof value], configuration),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value], configuration),
-"maximum": parseMaximum(value["maximum" as keyof typeof value], configuration),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value], configuration),
-"minimum": parseMinimum(value["minimum" as keyof typeof value], configuration),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value], configuration),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value], configuration),
-"minLength": parseMinLength(value["minLength" as keyof typeof value], configuration),
-"pattern": parsePattern(value["pattern" as keyof typeof value], configuration),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value], configuration),
-"minItems": parseMinItems(value["minItems" as keyof typeof value], configuration),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value], configuration),
-"maxContains": parseMaxContains(value["maxContains" as keyof typeof value], configuration),
-"minContains": parseMinContains(value["minContains" as keyof typeof value], configuration),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value], configuration),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value], configuration),
-"required": parseRequired(value["required" as keyof typeof value], configuration),
-"dependentRequired": parseDependentRequired(value["dependentRequired" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "type":
+return [
+name,
+parseType(value, configuration),
+]
+case "const":
+return [
+name,
+parseConst(value, configuration),
+]
+case "enum":
+return [
+name,
+parseEnum(value, configuration),
+]
+case "multipleOf":
+return [
+name,
+parseMultipleOf(value, configuration),
+]
+case "maximum":
+return [
+name,
+parseMaximum(value, configuration),
+]
+case "exclusiveMaximum":
+return [
+name,
+parseExclusiveMaximum(value, configuration),
+]
+case "minimum":
+return [
+name,
+parseMinimum(value, configuration),
+]
+case "exclusiveMinimum":
+return [
+name,
+parseExclusiveMinimum(value, configuration),
+]
+case "maxLength":
+return [
+name,
+parseMaxLength(value, configuration),
+]
+case "minLength":
+return [
+name,
+parseMinLength(value, configuration),
+]
+case "pattern":
+return [
+name,
+parsePattern(value, configuration),
+]
+case "maxItems":
+return [
+name,
+parseMaxItems(value, configuration),
+]
+case "minItems":
+return [
+name,
+parseMinItems(value, configuration),
+]
+case "uniqueItems":
+return [
+name,
+parseUniqueItems(value, configuration),
+]
+case "maxContains":
+return [
+name,
+parseMaxContains(value, configuration),
+]
+case "minContains":
+return [
+name,
+parseMinContains(value, configuration),
+]
+case "maxProperties":
+return [
+name,
+parseMaxProperties(value, configuration),
+]
+case "minProperties":
+return [
+name,
+parseMinProperties(value, configuration),
+]
+case "required":
+return [
+name,
+parseRequired(value, configuration),
+]
+case "dependentRequired":
+return [
+name,
+parseDependentRequired(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -1358,7 +2045,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/nonNegativeInteger}
@@ -1442,10 +2130,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseStringArrayItems(value, configuration)) :
-value == null ?
-undefined :
-[parseStringArrayItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseStringArrayItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -1456,7 +2147,11 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseType0(value, configuration) ?? parseType1(value, configuration));
+return (
+parseType0(value, configuration)
+??
+parseType1(value, configuration)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
@@ -1478,10 +2173,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseEnumItems(value, configuration)) :
-value == null ?
-undefined :
-[parseEnumItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseEnumItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -1818,31 +2516,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDependentRequiredAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDependentRequiredAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -1898,10 +2580,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseTypeItems(value, configuration)) :
-value == null ?
-undefined :
-[parseTypeItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseTypeItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -1943,19 +2628,56 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"title": parseTitle(value["title" as keyof typeof value], configuration),
-"description": parseDescription(value["description" as keyof typeof value], configuration),
-"default": parseDefault(value["default" as keyof typeof value], configuration),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value], configuration),
-"readOnly": parseReadOnly(value["readOnly" as keyof typeof value], configuration),
-"writeOnly": parseWriteOnly(value["writeOnly" as keyof typeof value], configuration),
-"examples": parseExamples(value["examples" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "title":
+return [
+name,
+parseTitle(value, configuration),
+]
+case "description":
+return [
+name,
+parseDescription(value, configuration),
+]
+case "default":
+return [
+name,
+parseDefault(value, configuration),
+]
+case "deprecated":
+return [
+name,
+parseDeprecated(value, configuration),
+]
+case "readOnly":
+return [
+name,
+parseReadOnly(value, configuration),
+]
+case "writeOnly":
+return [
+name,
+parseWriteOnly(value, configuration),
+]
+case "examples":
+return [
+name,
+parseExamples(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -1992,7 +2714,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/title}
@@ -2217,10 +2940,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseExamplesItems(value, configuration)) :
-value == null ?
-undefined :
-[parseExamplesItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseExamplesItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -2242,13 +2968,26 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"format": parseFormat(value["format" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "format":
+return [
+name,
+parseFormat(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -2285,7 +3024,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation#/properties/format}
@@ -2327,15 +3067,36 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return ((
+return (
+(
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"contentEncoding": parseContentEncoding(value["contentEncoding" as keyof typeof value], configuration),
-"contentMediaType": parseContentMediaType(value["contentMediaType" as keyof typeof value], configuration),
-"contentSchema": parseContentSchema(value["contentSchema" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "contentEncoding":
+return [
+name,
+parseContentEncoding(value, configuration),
+]
+case "contentMediaType":
+return [
+name,
+parseContentMediaType(value, configuration),
+]
+case "contentSchema":
+return [
+name,
+parseContentSchema(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
-) ?? (
+)
+??
+(
 ((value: unknown) => {
 if(value == null) {
 return false;
@@ -2372,7 +3133,8 @@ return value;
 }
 return undefined;
 })(value)
-));
+)
+);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentEncoding}

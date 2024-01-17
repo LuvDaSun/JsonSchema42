@@ -25,10 +25,24 @@ const configuration = {
 };
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"$schema": parseSchema(value["$schema" as keyof typeof value], configuration),
-"schemas": parseSchemas(value["schemas" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "$schema":
+return [
+name,
+parseSchema(value, configuration),
+]
+case "schemas":
+return [
+name,
+parseSchemas(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
 );
 }
@@ -42,45 +56,199 @@ const configuration = {
 };
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"title": parseTitle(value["title" as keyof typeof value], configuration),
-"description": parseDescription(value["description" as keyof typeof value], configuration),
-"examples": parseExamples(value["examples" as keyof typeof value], configuration),
-"deprecated": parseDeprecated(value["deprecated" as keyof typeof value], configuration),
-"types": parseTypes(value["types" as keyof typeof value], configuration),
-"reference": parseReference(value["reference" as keyof typeof value], configuration),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value], configuration),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value], configuration),
-"allOf": parseAllOf(value["allOf" as keyof typeof value], configuration),
-"if": parseIf(value["if" as keyof typeof value], configuration),
-"then": parseThen(value["then" as keyof typeof value], configuration),
-"else": parseElse(value["else" as keyof typeof value], configuration),
-"not": parseNot(value["not" as keyof typeof value], configuration),
-"dependentSchemas": parseDependentSchemas(value["dependentSchemas" as keyof typeof value], configuration),
-"objectProperties": parseObjectProperties(value["objectProperties" as keyof typeof value], configuration),
-"mapProperties": parseMapProperties(value["mapProperties" as keyof typeof value], configuration),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value], configuration),
-"propertyNames": parsePropertyNames(value["propertyNames" as keyof typeof value], configuration),
-"tupleItems": parseTupleItems(value["tupleItems" as keyof typeof value], configuration),
-"arrayItems": parseArrayItems(value["arrayItems" as keyof typeof value], configuration),
-"contains": parseContains(value["contains" as keyof typeof value], configuration),
-"options": parseOptions(value["options" as keyof typeof value], configuration),
-"minimumInclusive": parseMinimumInclusive(value["minimumInclusive" as keyof typeof value], configuration),
-"minimumExclusive": parseMinimumExclusive(value["minimumExclusive" as keyof typeof value], configuration),
-"maximumInclusive": parseMaximumInclusive(value["maximumInclusive" as keyof typeof value], configuration),
-"maximumExclusive": parseMaximumExclusive(value["maximumExclusive" as keyof typeof value], configuration),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value], configuration),
-"minimumLength": parseMinimumLength(value["minimumLength" as keyof typeof value], configuration),
-"maximumLength": parseMaximumLength(value["maximumLength" as keyof typeof value], configuration),
-"valuePattern": parseValuePattern(value["valuePattern" as keyof typeof value], configuration),
-"valueFormat": parseValueFormat(value["valueFormat" as keyof typeof value], configuration),
-"minimumItems": parseMinimumItems(value["minimumItems" as keyof typeof value], configuration),
-"maximumItems": parseMaximumItems(value["maximumItems" as keyof typeof value], configuration),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value], configuration),
-"required": parseRequired(value["required" as keyof typeof value], configuration),
-"minimumProperties": parseMinimumProperties(value["minimumProperties" as keyof typeof value], configuration),
-"maximumProperties": parseMaximumProperties(value["maximumProperties" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "title":
+return [
+name,
+parseTitle(value, configuration),
+]
+case "description":
+return [
+name,
+parseDescription(value, configuration),
+]
+case "examples":
+return [
+name,
+parseExamples(value, configuration),
+]
+case "deprecated":
+return [
+name,
+parseDeprecated(value, configuration),
+]
+case "types":
+return [
+name,
+parseTypes(value, configuration),
+]
+case "reference":
+return [
+name,
+parseReference(value, configuration),
+]
+case "oneOf":
+return [
+name,
+parseOneOf(value, configuration),
+]
+case "anyOf":
+return [
+name,
+parseAnyOf(value, configuration),
+]
+case "allOf":
+return [
+name,
+parseAllOf(value, configuration),
+]
+case "if":
+return [
+name,
+parseIf(value, configuration),
+]
+case "then":
+return [
+name,
+parseThen(value, configuration),
+]
+case "else":
+return [
+name,
+parseElse(value, configuration),
+]
+case "not":
+return [
+name,
+parseNot(value, configuration),
+]
+case "dependentSchemas":
+return [
+name,
+parseDependentSchemas(value, configuration),
+]
+case "objectProperties":
+return [
+name,
+parseObjectProperties(value, configuration),
+]
+case "mapProperties":
+return [
+name,
+parseMapProperties(value, configuration),
+]
+case "patternProperties":
+return [
+name,
+parsePatternProperties(value, configuration),
+]
+case "propertyNames":
+return [
+name,
+parsePropertyNames(value, configuration),
+]
+case "tupleItems":
+return [
+name,
+parseTupleItems(value, configuration),
+]
+case "arrayItems":
+return [
+name,
+parseArrayItems(value, configuration),
+]
+case "contains":
+return [
+name,
+parseContains(value, configuration),
+]
+case "options":
+return [
+name,
+parseOptions(value, configuration),
+]
+case "minimumInclusive":
+return [
+name,
+parseMinimumInclusive(value, configuration),
+]
+case "minimumExclusive":
+return [
+name,
+parseMinimumExclusive(value, configuration),
+]
+case "maximumInclusive":
+return [
+name,
+parseMaximumInclusive(value, configuration),
+]
+case "maximumExclusive":
+return [
+name,
+parseMaximumExclusive(value, configuration),
+]
+case "multipleOf":
+return [
+name,
+parseMultipleOf(value, configuration),
+]
+case "minimumLength":
+return [
+name,
+parseMinimumLength(value, configuration),
+]
+case "maximumLength":
+return [
+name,
+parseMaximumLength(value, configuration),
+]
+case "valuePattern":
+return [
+name,
+parseValuePattern(value, configuration),
+]
+case "valueFormat":
+return [
+name,
+parseValueFormat(value, configuration),
+]
+case "minimumItems":
+return [
+name,
+parseMinimumItems(value, configuration),
+]
+case "maximumItems":
+return [
+name,
+parseMaximumItems(value, configuration),
+]
+case "uniqueItems":
+return [
+name,
+parseUniqueItems(value, configuration),
+]
+case "required":
+return [
+name,
+parseRequired(value, configuration),
+]
+case "minimumProperties":
+return [
+name,
+parseMinimumProperties(value, configuration),
+]
+case "maximumProperties":
+return [
+name,
+parseMaximumProperties(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
 );
 }
@@ -359,31 +527,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseSchemasAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseSchemasAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -418,10 +570,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseExamplesItems(value, configuration)) :
-value == null ?
-undefined :
-[parseExamplesItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseExamplesItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -445,10 +600,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseTypesItems(value, configuration)) :
-value == null ?
-undefined :
-[parseTypesItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseTypesItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -471,10 +629,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseOneOfItems(value, configuration)) :
-value == null ?
-undefined :
-[parseOneOfItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseOneOfItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -487,10 +648,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseAnyOfItems(value, configuration)) :
-value == null ?
-undefined :
-[parseAnyOfItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseAnyOfItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -503,10 +667,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseAllOfItems(value, configuration)) :
-value == null ?
-undefined :
-[parseAllOfItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseAllOfItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -560,31 +727,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDependentSchemasAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDependentSchemasAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -600,31 +751,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseObjectPropertiesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseObjectPropertiesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -650,31 +785,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parsePatternPropertiesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parsePatternPropertiesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -699,10 +818,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseTupleItemsItems(value, configuration)) :
-value == null ?
-undefined :
-[parseTupleItemsItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseTupleItemsItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -735,10 +857,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseOptionsItems(value, configuration)) :
-value == null ?
-undefined :
-[parseOptionsItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseOptionsItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -908,10 +1033,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseRequiredItems(value, configuration)) :
-value == null ?
-undefined :
-[parseRequiredItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseRequiredItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
