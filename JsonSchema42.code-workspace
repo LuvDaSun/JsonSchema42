@@ -2,43 +2,43 @@
   "folders": [
     {
       "name": "fixtures",
-      "path": "fixtures"
+      "path": "fixtures",
     },
     {
       "name": "schema-intermediate",
-      "path": "packages/oas/schema-intermediate"
+      "path": "packages/oas/schema-intermediate",
     },
     {
       "name": "ts/jns42-generator",
-      "path": "packages/ts/jns42-generator"
+      "path": "packages/ts/jns42-generator",
     },
     {
       "name": "ts/jns42-optimizer",
-      "path": "packages/ts/jns42-optimizer"
+      "path": "packages/ts/jns42-optimizer",
     },
     {
       "name": "schema-draft-04 (generated)",
-      "path": "packages/ts/schema-draft-04"
+      "path": "packages/ts/schema-draft-04",
     },
     {
       "name": "schema-draft-2020-12 (generated)",
-      "path": "packages/ts/schema-draft-2020-12"
+      "path": "packages/ts/schema-draft-2020-12",
     },
     {
       "name": "schema-intermediate (generated)",
-      "path": "packages/ts/schema-intermediate"
-    }
+      "path": "packages/ts/schema-intermediate",
+    },
   ],
   "settings": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "always",
-      "source.organizeImports": "always"
+      "source.organizeImports": "always",
     },
     "editor.rulers": [100],
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "typescript.tsdk": "./node_modules/typescript/lib",
     "npm.packageManager": "npm",
-    "rust-analyzer.check.command": "clippy"
-  }
+    "rust-analyzer.check.command": "clippy",
+  },
 }
