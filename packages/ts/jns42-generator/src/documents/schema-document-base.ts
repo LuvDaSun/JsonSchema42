@@ -217,7 +217,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
 
     if (types.length === 0) {
-      types = this.guessTypes(node);
+      // types = this.guessTypes(node);
     }
 
     if (types.length === 0) {

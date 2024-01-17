@@ -1,7 +1,7 @@
 import assert from "assert";
 import * as schemaIntermediate from "schema-intermediate";
 import { Arena, ArenaTransform } from "../utils/arena.js";
-import { SchemaModel, isAliasSchemaModel } from "./model.js";
+import { SchemaModel, SchemaType, isAliasSchemaModel } from "./model.js";
 
 export type SchemaTransform = ArenaTransform<SchemaModel, SchemaArena>;
 
@@ -32,6 +32,7 @@ export class SchemaArena extends Arena<SchemaModel> {
     */
     const idMap: Record<string, number> = {};
     const parents: Record<string, string> = {};
+    const implicitTypes: Record<string, SchemaType> = {};
 
     for (const id in document.schemas) {
       const schema = document.schemas[id];
@@ -73,6 +74,10 @@ export class SchemaArena extends Arena<SchemaModel> {
       if (schema.not != null) {
         parents[schema.not] = id;
       }
+
+      if (schema.propertyNames != null) {
+        implicitTypes[schema.propertyNames] = "string";
+      }
     }
 
     /*
@@ -97,7 +102,6 @@ export class SchemaArena extends Arena<SchemaModel> {
       model.examples = schema.examples;
       model.deprecated = schema.deprecated;
 
-      model.types = schema.types;
       model.required = schema.required;
       model.options = schema.options;
 
@@ -151,6 +155,13 @@ export class SchemaArena extends Arena<SchemaModel> {
           : Object.fromEntries(
               Object.entries(schema.patternProperties).map(([name, id]) => [name, idMap[id]]),
             );
+
+      model.types =
+        schema.types == null
+          ? implicitTypes[id] == null
+            ? undefined
+            : [implicitTypes[id]]
+          : schema.types;
 
       return model;
     });
