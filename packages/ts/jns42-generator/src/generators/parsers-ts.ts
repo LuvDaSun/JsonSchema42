@@ -295,11 +295,12 @@ function* generateParserDefinition(
             yield itt`
               return ${generateParserReference(specification, item.arrayItems, `value`)}
             `;
-          } else {
-            yield itt`
-              return value;
-            `;
+            return;
           }
+
+          yield itt`
+            return value;
+          `;
         }
       }
 
@@ -325,7 +326,7 @@ function* generateParserDefinition(
               yield itt`
                 case ${JSON.stringify(name)}:
                   return [
-                    ${JSON.stringify(name)},
+                    name,
                     ${generateParserReference(specification, elementKey, `value`)},
                   ]
               `;
@@ -339,21 +340,34 @@ function* generateParserDefinition(
         }
 
         function* generateDefaultClauseContent() {
-          if (item.mapProperties != null || item.patternProperties != null) {
-            yield itt`
-              return (${joinIterable(
-                [item.mapProperties, ...Object.values(item.patternProperties ?? {})]
-                  .filter((value) => value != null)
-                  .map((elementKey) => elementKey!)
-                  .map((elementKey) => generateParserReference(specification, elementKey, `value`)),
-                " ??\n",
-              )})
-            `;
-          } else {
-            yield itt`
-              return value;
-            `;
+          const elementKeys = new Array<number>();
+          if (item.mapProperties != null) {
+            elementKeys.push(item.mapProperties);
           }
+          if (item.patternProperties != null) {
+            for (const elementKey of Object.values(item.patternProperties)) {
+              elementKeys.push(elementKey);
+            }
+          }
+
+          if (elementKeys.length > 0) {
+            yield itt`
+              return [
+                name,
+                (${joinIterable(
+                  elementKeys.map((elementKey) =>
+                    generateParserReference(specification, elementKey, `value`),
+                  ),
+                  " ??\n",
+                )}),
+                ]
+            `;
+            return;
+          }
+
+          yield itt`
+            return value;
+          `;
         }
       }
     }

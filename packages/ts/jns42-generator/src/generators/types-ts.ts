@@ -6,7 +6,6 @@ import {
   generateJsDocComments,
   itt,
   joinIterable,
-  mapIterable,
   toCamel,
   toPascal,
 } from "../utils/index.js";
@@ -98,54 +97,97 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
         return;
 
       case "array": {
-        if (item.tupleItems != null) {
-          yield itt`
-            [
-              ${mapIterable(item.tupleItems, (elementKey) => itt`${generateTypeReference(specification, elementKey)},\n`)}
-            ]
-          `;
-          return;
-        }
-
-        if (item.arrayItems != null) {
-          yield itt`
-            ${generateTypeReference(specification, item.arrayItems)}[]
-          `;
-          return;
-        }
-
         yield itt`
-          Array<unknown>();
+          [
+            ${generateInterfaceContent()}
+          ]
         `;
 
         return;
+
+        function* generateInterfaceContent() {
+          if (item.tupleItems != null) {
+            for (const elementKey of item.tupleItems) {
+              yield itt`
+                ${generateTypeReference(specification, elementKey)},
+              `;
+            }
+          }
+
+          if (item.arrayItems != null) {
+            yield itt`
+              ...(${generateTypeReference(specification, item.arrayItems)})[]
+            `;
+          }
+
+          if (item.tupleItems == null && item.arrayItems == null) {
+            yield itt`
+              ...any
+            `;
+          }
+        }
       }
 
       case "map": {
-        if (item.objectProperties != null || item.required != null) {
-          const required = new Set(item.required);
-          const objectProperties = item.objectProperties ?? {};
-          const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
-
-          yield itt`
-            {
-              ${mapIterable(
-                propertyNames,
-                (name) => itt`
-                  ${toCamel(name)}${required.has(name) ? "" : "?"}: ${objectProperties[name] == null ? "any" : generateTypeReference(specification, objectProperties[name])}[]
-                `,
-              )}
-            }
-          `;
-          return;
-        }
-
         yield itt`
           {
-            [name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}]: ${item.mapProperties == null ? "unknown" : generateTypeReference(specification, item.mapProperties)},
+            ${generateInterfaceContent()}
           }
         `;
+
         return;
+
+        function* generateInterfaceContent() {
+          if (item.objectProperties != null || item.required != null) {
+            const required = new Set(item.required);
+            const objectProperties = item.objectProperties ?? {};
+            const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
+
+            for (const name of propertyNames) {
+              if (objectProperties[name] == null) {
+                yield itt`
+                ${toCamel(name)}${required.has(name) ? "" : "?"}: any,
+              `;
+              } else {
+                yield itt`
+                ${toCamel(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
+              `;
+              }
+            }
+          }
+
+          {
+            const elementKeys = new Array<number>();
+            if (item.mapProperties != null) {
+              elementKeys.push(item.mapProperties);
+            }
+            if (item.patternProperties != null) {
+              for (const elementKey of Object.values(item.patternProperties)) {
+                elementKeys.push(elementKey);
+              }
+            }
+
+            if (elementKeys.length > 0) {
+              yield itt`
+                [
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
+                ]: ${joinIterable(
+                  [...elementKeys, ...Object.values(item.objectProperties ?? {})].map(
+                    (elementKey) => generateTypeReference(specification, elementKey),
+                  ),
+                  " |\n",
+                )}
+              `;
+              return;
+            }
+
+            yield itt`
+              [
+                name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
+              ]: any
+            `;
+          }
+        }
       }
     }
   }
