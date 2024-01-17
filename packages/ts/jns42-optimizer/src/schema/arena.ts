@@ -159,7 +159,7 @@ export class SchemaArena extends Arena<SchemaModel> {
       model.types =
         schema.types == null
           ? implicitTypes[id] == null
-            ? undefined
+            ? guessTypes(schema)
             : [implicitTypes[id]]
           : schema.types;
 
@@ -168,4 +168,47 @@ export class SchemaArena extends Arena<SchemaModel> {
 
     return arena;
   }
+}
+
+function guessTypes(node: schemaIntermediate.Node) {
+  const types = new Set<schemaIntermediate.TypesItems>();
+
+  if (node.options != null) {
+    for (const option of node.options) {
+      switch (typeof option) {
+        case "number":
+          types.add("number");
+          break;
+        case "boolean":
+          types.add("boolean");
+          break;
+        case "string":
+          types.add("string");
+          break;
+        case "bigint":
+          types.add("integer");
+          break;
+      }
+    }
+  }
+
+  if ((node.tupleItems != null && node.tupleItems.length > 0) || node.arrayItems != null) {
+    types.add("array");
+  }
+
+  if (
+    node.propertyNames != null ||
+    node.mapProperties != null ||
+    (node.patternProperties != null && Object.keys(node.patternProperties).length > 0) ||
+    (node.objectProperties != null && Object.keys(node.objectProperties).length > 0) ||
+    (node.required != null && node.required.length > 0)
+  ) {
+    types.add("map");
+  }
+
+  if (types.size === 0) {
+    return undefined;
+  }
+
+  return [...types];
 }
