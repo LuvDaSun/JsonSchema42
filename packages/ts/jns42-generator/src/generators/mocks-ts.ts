@@ -105,12 +105,12 @@ function* generateMockReference(
   specification: models.Specification,
   itemKey: number,
 ): Iterable<NestedText> {
-  const { names, typeModels } = specification;
-  const typeItem = typeModels[itemKey];
-  if (typeItem.id == null) {
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
+  if (item.id == null) {
     yield itt`(${generateMockDefinition(specification, itemKey)})`;
   } else {
-    const functionName = toCamel("mock", names[typeItem.id]);
+    const functionName = toCamel("mock", names[item.id]);
     yield itt`${functionName}()`;
   }
 }

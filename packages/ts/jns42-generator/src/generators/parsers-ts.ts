@@ -1,3 +1,4 @@
+import { isAliasSchemaModel, isOneOfSchemaModel, isSingleTypeSchemaModel } from "jns42-optimizer";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -11,7 +12,7 @@ import {
 export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, typeModels } = specification;
+  const { names, typesArena } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -29,7 +30,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   `;
 
-  for (const [typeKey, item] of Object.entries(typeModels)) {
+  for (const [itemKey, item] of typesArena) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -37,7 +38,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     }
 
     const functionName = toCamel("parse", names[nodeId]);
-    const definition = generateParserDefinition(specification, typeKey, "value");
+    const definition = generateParserDefinition(specification, itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
@@ -55,42 +56,54 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
 function* generateParserReference(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
   valueExpression: string,
 ): Iterable<NestedText> {
-  const { names, typeModels } = specification;
-  const typeItem = typeModels[typeKey];
-  if (typeItem.id == null) {
-    yield itt`(${generateParserDefinition(specification, typeKey, valueExpression)})`;
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
+  if (item.id == null) {
+    yield itt`(${generateParserDefinition(specification, itemKey, valueExpression)})`;
   } else {
-    const functionName = toCamel("parse", names[typeItem.id]);
+    const functionName = toCamel("parse", names[item.id]);
     yield itt`${functionName}(${valueExpression}, configuration)`;
   }
 }
 
 function* generateParserDefinition(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
   valueExpression: string,
 ) {
-  const { names, typeModels } = specification;
-  const typeItem = typeModels[typeKey];
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
 
-  switch (typeItem.type) {
-    case "unknown":
-      yield valueExpression;
-      break;
+  if (isAliasSchemaModel(item)) {
+    yield generateParserReference(specification, item.alias, valueExpression);
+    return;
+  }
 
-    case "never":
-      yield "undefined";
-      break;
+  if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    yield itt`
+      ${joinIterable(
+        item.oneOf.map(
+          (element) => itt`
+            ${generateParserReference(specification, element, valueExpression)}
+          `,
+        ),
+        " ??",
+      )}
+    `;
+    return;
+  }
 
-    case "any":
-      yield valueExpression;
-      break;
+  if (isSingleTypeSchemaModel(item) && item.types != null) {
+    switch (item.types[0]) {
+      case "any":
+        yield valueExpression;
+        break;
 
-    case "null":
-      yield `
+      case "null":
+        yield `
         ((value: unknown) => {
           if(value == null) {
             return null;
@@ -123,10 +136,10 @@ function* generateParserDefinition(
           return undefined;
         })(${valueExpression})
       `;
-      break;
+        break;
 
-    case "boolean":
-      yield `
+      case "boolean":
+        yield `
         ((value: unknown) => {
           if(value == null) {
             return false;
@@ -166,10 +179,10 @@ function* generateParserDefinition(
           return undefined;
           })(${valueExpression})
       `;
-      break;
+        break;
 
-    case "integer":
-      yield `
+      case "integer":
+        yield `
         ((value: unknown) => {
           if(Array.isArray(value)) {
             switch(value.length) {
@@ -192,10 +205,10 @@ function* generateParserDefinition(
           return undefined;
         })(${valueExpression})
       `;
-      break;
+        break;
 
-    case "number":
-      yield `
+      case "number":
+        yield `
         ((value: unknown) => {
           if(Array.isArray(value)) {
             switch(value.length) {
@@ -218,10 +231,10 @@ function* generateParserDefinition(
           return undefined;
         })(${valueExpression})
       `;
-      break;
+        break;
 
-    case "string":
-      yield `
+      case "string":
+        yield `
         ((value: unknown) => {
           if(Array.isArray(value)) {
             switch(value.length) {
@@ -244,90 +257,105 @@ function* generateParserDefinition(
           }
         })(${valueExpression})
       `;
-      break;
+        break;
 
-    case "tuple": {
-      yield itt`
-        Array.isArray(${valueExpression}) ?
-          [
-            ${typeItem.elements.map(
-              (element, index) => itt`
-                ${generateParserReference(
-                  specification,
-                  element,
-                  `${valueExpression}[${JSON.stringify(index)}]`,
-                )},
-              `,
-            )}
-          ] :
-          undefined
-      `;
-      break;
-    }
+      case "array": {
+        yield itt`
+          Array.isArray(${valueExpression}) ?
+            ${valueExpression}.map((value, index) => {
+              switch(index) {
+                ${generateCaseClauses()}
+              }
+            }) :
+            undefined
+        `;
 
-    case "array": {
-      const { element } = typeItem;
-      yield itt`
-        Array.isArray(${valueExpression}) ?
-          ${valueExpression}.map(value => ${generateParserReference(
-            specification,
-            element,
-            "value",
-          )}) :
-            ${valueExpression} == null ?
-            undefined :
-            [${generateParserReference(specification, element, valueExpression)}]
-      `;
-      break;
-    }
+        break;
 
-    case "object": {
-      yield itt`
-        (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
-          {
-            ${Object.entries(typeItem.properties).map(
-              ([name, { required, element }]) => itt`
-                ${JSON.stringify(name)}: ${generateParserReference(
-                  specification,
-                  element,
-                  `${valueExpression}[${JSON.stringify(name)} as keyof typeof ${valueExpression}]`,
-                )},
-              `,
-            )}
-          } :
-          undefined
-      `;
-      break;
-    }
+        function* generateCaseClauses() {
+          if (item.tupleItems != null) {
+            for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+              const elementKey = item.tupleItems[elementIndex];
 
-    case "map": {
-      const { name, element } = typeItem;
-      yield itt`
-        (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
-          Object.fromEntries(
-            Object.entries(${valueExpression}).map(([name, value]) => [
-              ${generateParserReference(specification, name, "name")},
-              ${generateParserReference(specification, element, "value")},
-            ])
-          ) :
-          undefined
-      `;
-      break;
-    }
+              yield itt`
+                case ${JSON.stringify(elementIndex)}:
+                  return ${generateParserReference(specification, elementKey, `value`)}
+              `;
+            }
+          }
 
-    case "union": {
-      yield joinIterable(
-        typeItem.elements.map(
-          (element) => itt`${generateParserReference(specification, element, "value")}`,
-        ),
-        " ?? ",
-      );
-      break;
-    }
+          yield itt`
+            default:
+              ${generateDefaultClauseContent()}
+          `;
+        }
 
-    case "alias": {
-      yield generateParserReference(specification, typeItem.target, "value");
-      break;
+        function* generateDefaultClauseContent() {
+          if (item.arrayItems != null) {
+            yield itt`
+              return ${generateParserReference(specification, item.arrayItems, `value`)}
+            `;
+          } else {
+            yield itt`
+              return value;
+            `;
+          }
+        }
+      }
+
+      case "map": {
+        yield itt`
+          (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
+            Object.fromEntries(
+              Object.entries(${valueExpression}).map(([name, value]) => {
+                switch(name) {
+                  ${generateCaseClauses()}
+                }
+              })
+            ) :
+            undefined
+        `;
+        break;
+
+        function* generateCaseClauses() {
+          if (item.objectProperties != null) {
+            for (const name in item.objectProperties) {
+              const elementKey = item.objectProperties[name];
+
+              yield itt`
+                case ${JSON.stringify(name)}:
+                  return [
+                    ${JSON.stringify(name)},
+                    ${generateParserReference(specification, elementKey, `value`)},
+                  ]
+              `;
+            }
+          }
+
+          yield itt`
+            default:
+              ${generateDefaultClauseContent()}
+          `;
+        }
+
+        function* generateDefaultClauseContent() {
+          if (item.mapProperties != null || item.patternProperties != null) {
+            yield itt`
+              return (${joinIterable(
+                [item.mapProperties, ...Object.values(item.patternProperties ?? {})]
+                  .filter((value) => value != null)
+                  .map((elementKey) => elementKey!)
+                  .map((elementKey) => generateParserReference(specification, elementKey, `value`)),
+                " ??\n",
+              )})
+            `;
+          } else {
+            yield itt`
+              return value;
+            `;
+          }
+        }
+      }
     }
   }
 }
