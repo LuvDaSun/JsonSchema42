@@ -30,41 +30,56 @@ export function loadSpecification(
 
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
-
-  // initial, single transforms
-  typesArena.applyTransform(
-    // order matters!
-    schemaTransforms.explode,
-    schemaTransforms.singleType,
-  );
-
-  // fork a validators arena
   const validatorsArena = typesArena.clone();
 
-  // transform the typesArena
-  let transformIterations = 0;
-  while (
-    typesArena.applyTransform(
-      schemaTransforms.flatten,
-      schemaTransforms.unique,
-      schemaTransforms.alias,
-
-      schemaTransforms.flipAllOfOneOf,
-      schemaTransforms.flipAnyOfOneOf,
-
-      schemaTransforms.resolveAllOf,
-      schemaTransforms.resolveAnyOf,
-      schemaTransforms.resolveOneOf,
-      schemaTransforms.resolveParent,
-
-      schemaTransforms.flushParent,
-    ) > 0
-  ) {
-    transformIterations++;
-    if (transformIterations < transformMaximumIterations) {
-      continue;
+  // tranform the validatorsArena
+  {
+    let transformIterations = 0;
+    while (
+      validatorsArena.applyTransform(
+        // order matters!
+        schemaTransforms.explode,
+        schemaTransforms.singleType,
+      ) > 0
+    ) {
+      transformIterations++;
+      if (transformIterations < transformMaximumIterations) {
+        continue;
+      }
+      throw new Error("maximum number of iterations reached");
     }
-    throw new Error("maximum number of iterations reached");
+  }
+
+  // transform the typesArena
+  {
+    let transformIterations = 0;
+    while (
+      typesArena.applyTransform(
+        // order matters!
+        schemaTransforms.explode,
+        schemaTransforms.singleType,
+
+        schemaTransforms.flatten,
+        schemaTransforms.unique,
+        schemaTransforms.alias,
+
+        schemaTransforms.flipAllOfOneOf,
+        schemaTransforms.flipAnyOfOneOf,
+
+        schemaTransforms.resolveAllOf,
+        schemaTransforms.resolveAnyOf,
+        schemaTransforms.resolveOneOf,
+        schemaTransforms.resolveParent,
+
+        schemaTransforms.flushParent,
+      ) > 0
+    ) {
+      transformIterations++;
+      if (transformIterations < transformMaximumIterations) {
+        continue;
+      }
+      throw new Error("maximum number of iterations reached");
+    }
   }
 
   // figure out wich keys are actually in use
