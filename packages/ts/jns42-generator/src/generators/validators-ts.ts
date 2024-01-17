@@ -27,8 +27,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
 
     const pathPartStack = new Array<string>();
-    let currentPathPart: string | undefined = "";
-    let currentTypeName: string | undefined;
+    const typeNameStack = new Array<string>();
     let errors = new Array<ValidationError>();
 
     export function getValidationErrors() {
@@ -42,6 +41,34 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       return errors[errors.length - 1];
     }
 
+    function withPath<T>(pathPart: string, job: () => T): T {
+      if(pathPartStack.length === 0) {
+        resetErrors();
+      }
+  
+      pathPartStack.push(pathPart);
+      try {
+        return job();
+      }
+      finally {
+        pathPartStack.pop();
+      }
+    }
+
+    function withType<T>(typeName: string, job: () => T): T {
+      if(typeNameStack.length === 0) {
+        resetErrors();
+      }
+  
+      typeNameStack.push(typeName);
+      try {
+        return job();
+      }
+      finally {
+        typeNameStack.pop();
+      }
+    }
+
     function resetErrors() {
       errors = [];
     }
@@ -49,7 +76,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     function recordError(rule: string) {
       errors.push({
         path: pathPartStack.join("/"),
-        typeName: currentTypeName,
+        typeName: typeNameStack[typeNameStack.length - 1],
         rule,
       })
     }
@@ -69,25 +96,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     yield itt`
       ${generateJsDocComments(item)}
       export function ${functionName}(value: unknown): value is types.${typeName} {
-        if(pathPartStack.length === 0) {
-          resetErrors();
-        }
-
-        const typeName: string | undefined = currentTypeName;
-        const pathPart = currentPathPart;
-        try {
-          currentTypeName = ${JSON.stringify(typeName)};
-          if(pathPart != null) {
-            pathPartStack.push(pathPart);
-          }
+        return withType(${JSON.stringify(typeName)}, () => {
           ${statements};
-        }
-        finally {
-          currentTypeName = typeName;
-          if(pathPart != null) {
-            currentPathPart = pathPartStack.pop();
-          }
-        }
+        });
       }
     `;
   }
@@ -103,21 +114,7 @@ function* generateValidatorReference(
   if (typeItem.id == null) {
     yield itt`
       ((value: unknown) => {
-        const typeName: string | undefined = currentTypeName;
-        const pathPart = currentPathPart;
-        try {
-          currentTypeName = undefined;
-          if(pathPart != null) {
-            pathPartStack.push(pathPart);
-          }
           ${generateValidatorStatements(specification, typeKey, "value")}
-        }
-        finally {
-          currentTypeName = typeName;
-          if(pathPart != null) {
-            currentPathPart = pathPartStack.pop();
-          }
-        }
       })(${valueExpression})
     `;
   } else {
@@ -136,7 +133,6 @@ function* generateValidatorStatements(
 
   if (item.alias != null) {
     yield itt`
-      currentPathPart = undefined;
       if(!${generateValidatorReference(specification, item.alias, valueExpression)}) {
         return false;
       };
@@ -453,9 +449,13 @@ function* generateValidatorStatements(
               const elementKey = item.tupleItems[elementIndex];
               yield itt`
                 case ${JSON.stringify(elementIndex)}:
-                  currentPathPart = String(elementIndex);
-                  if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
-                    recordError("elementValue");
+                  if(withPath(String(elementIndex), () => {
+                    if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
+                      recordError("elementValue");
+                      return false;
+                    }
+                    return true;
+                  })) {
                     return false;
                   }
                   break;
@@ -473,9 +473,13 @@ function* generateValidatorStatements(
         function* generateDefaultCaseContent() {
           if (item.arrayItems != null) {
             yield itt`
-              currentPathPart = String(elementIndex);
-              if(!${generateValidatorReference(specification, item.arrayItems, `elementValue`)}) {
-                recordError("elementValue");
+              if(withPath(String(elementIndex), () => {
+                if(!${generateValidatorReference(specification, item.arrayItems, `elementValue`)}) {
+                  recordError("elementValue");
+                  return false;
+                }
+                return true;
+              })) {
                 return false;
               }
               break;
@@ -571,14 +575,18 @@ function* generateValidatorStatements(
             for (const propertyName in item.objectProperties) {
               yield itt`
                 case ${JSON.stringify(propertyName)}:
-                  currentPathPart = propertyName;
-                  if(!${generateValidatorReference(
-                    specification,
-                    item.objectProperties[propertyName],
-                    `propertyValue`,
-                  )}) {
-                    recordError("objectProperties");
-                    return false;
+                  if(withPath(propertyName, () => {
+                    if(!${generateValidatorReference(
+                      specification,
+                      item.objectProperties[propertyName],
+                      `propertyValue`,
+                    )}) {
+                      recordError("objectProperties");
+                      return false;
+                    }
+                    return true;
+                  })) {
+                    return false
                   }
                   break;
               `;
@@ -596,27 +604,37 @@ function* generateValidatorStatements(
           if (item.patternProperties != null) {
             for (const propertyPattern in item.patternProperties) {
               yield itt`
-                if(
-                  new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName) &&
-                  !${generateValidatorReference(
-                    specification,
-                    item.patternProperties[propertyPattern],
-                    `propertyValue`,
-                  )}
-                ) {
-                  return false;
-                }  
+                if(withPath(propertyName, () => {
+                  if(
+                    new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName) &&
+                    !${generateValidatorReference(
+                      specification,
+                      item.patternProperties[propertyPattern],
+                      `propertyValue`,
+                    )}
+                  ) {
+                    return false;
+                  }  
+                  return true;
+                })) {
+                  return false
+                }
               `;
             }
           }
 
           if (item.mapProperties != null) {
             yield itt`
-              if(
-                !${generateValidatorReference(specification, item.mapProperties, `propertyValue`)}
-              ) {
-                return false;
-              }  
+              if(withPath(propertyName, () => {
+                if(
+                  !${generateValidatorReference(specification, item.mapProperties, `propertyValue`)}
+                ) {
+                  return false;
+                }  
+                return true;
+              })) {
+                return false
+              }
             `;
           }
         }
@@ -653,7 +671,6 @@ function* generateValidatorStatements(
       for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
         const element = item.allOf[elementIndex];
         yield itt`
-          currentPathPart = ${JSON.stringify(String(elementIndex))}
           if(counter === ${JSON.stringify(elementIndex)} && ${generateValidatorReference(
             specification,
             element,
@@ -686,7 +703,6 @@ function* generateValidatorStatements(
       for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
         const element = item.anyOf[elementIndex];
         yield itt`
-          currentPathPart = ${JSON.stringify(String(elementIndex))}
           if(counter < 1 && ${generateValidatorReference(
             specification,
             element,
@@ -719,7 +735,6 @@ function* generateValidatorStatements(
       for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
         const element = item.oneOf[elementIndex];
         yield itt`
-          currentPathPart = ${JSON.stringify(String(elementIndex))}
           if(!${generateValidatorReference(specification, element, valueExpression)}) {
             counter += 1;
           }
