@@ -373,11 +373,11 @@ function* generateMockDefinition(
             for (const name of propertyNames) {
               if (objectProperties[name] == null) {
                 yield itt`
-                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: anyValue,
+                [${JSON.stringify(name)}]: anyValue,
               `;
               } else {
                 yield itt`
-                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateMockReference(specification, objectProperties[name])},
+                [${JSON.stringify(name)}]: ${generateMockReference(specification, objectProperties[name])},
               `;
               }
             }
