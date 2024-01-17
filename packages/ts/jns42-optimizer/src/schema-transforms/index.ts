@@ -1,5 +1,4 @@
 export * from "./alias.js";
-export * from "./all.js";
 export * from "./explode.js";
 export * from "./flatten.js";
 export * from "./flip-all-of-one-of.js";
