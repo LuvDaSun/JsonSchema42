@@ -29,6 +29,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     const pathPartStack = new Array<string>();
     const typeNameStack = new Array<string>();
     let errors = new Array<ValidationError>();
+    let depth = 0;
 
     export function getValidationErrors() {
       return errors;
@@ -42,10 +43,6 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
 
     function withPath<T>(pathPart: string, job: () => T): T {
-      if(pathPartStack.length === 0) {
-        resetErrors();
-      }
-  
       pathPartStack.push(pathPart);
       try {
         return job();
@@ -96,9 +93,19 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     yield itt`
       ${generateJsDocComments(item)}
       export function ${functionName}(value: unknown): value is types.${typeName} {
-        return withType(${JSON.stringify(typeName)}, () => {
-          ${statements};
-        });
+        if(depth === 0) {
+          resetErrors();
+        }
+  
+        depth += 1;
+        try{
+          return withType(${JSON.stringify(typeName)}, () => {
+            ${statements};
+          });
+        }
+        finally {
+          depth -= 1;
+        }
       }
     `;
   }
@@ -449,7 +456,7 @@ function* generateValidatorStatements(
               const elementKey = item.tupleItems[elementIndex];
               yield itt`
                 case ${JSON.stringify(elementIndex)}:
-                  if(withPath(String(elementIndex), () => {
+                  if(!withPath(String(elementIndex), () => {
                     if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
                       recordError("elementValue");
                       return false;
@@ -473,7 +480,7 @@ function* generateValidatorStatements(
         function* generateDefaultCaseContent() {
           if (item.arrayItems != null) {
             yield itt`
-              if(withPath(String(elementIndex), () => {
+              if(!withPath(String(elementIndex), () => {
                 if(!${generateValidatorReference(specification, item.arrayItems, `elementValue`)}) {
                   recordError("elementValue");
                   return false;
@@ -575,7 +582,7 @@ function* generateValidatorStatements(
             for (const propertyName in item.objectProperties) {
               yield itt`
                 case ${JSON.stringify(propertyName)}:
-                  if(withPath(propertyName, () => {
+                  if(!withPath(propertyName, () => {
                     if(!${generateValidatorReference(
                       specification,
                       item.objectProperties[propertyName],
@@ -604,7 +611,7 @@ function* generateValidatorStatements(
           if (item.patternProperties != null) {
             for (const propertyPattern in item.patternProperties) {
               yield itt`
-                if(withPath(propertyName, () => {
+                if(!withPath(propertyName, () => {
                   if(
                     new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName) &&
                     !${generateValidatorReference(
@@ -625,7 +632,7 @@ function* generateValidatorStatements(
 
           if (item.mapProperties != null) {
             yield itt`
-              if(withPath(propertyName, () => {
+              if(!withPath(propertyName, () => {
                 if(
                   !${generateValidatorReference(specification, item.mapProperties, `propertyValue`)}
                 ) {

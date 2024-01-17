@@ -1,7 +1,7 @@
 $schema: "./schema.json"
 
 schemas:
-  draft_2020-12_a:
+  original:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     anyOf:
       - oneOf:
@@ -11,7 +11,7 @@ schemas:
       - required: [d]
       - required: [e]
 
-  draft_2020-12_b:
+  flipped:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     oneOf:
       - anyOf:
@@ -26,9 +26,3 @@ schemas:
           - required: [c]
           - required: [d]
           - required: [e]
-
-    anyOf:
-      - oneOf:
-          - type: boolean
-          - type: object
-      - type: string
