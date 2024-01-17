@@ -90,7 +90,7 @@ function* generateParserDefinition(
             ${generateParserReference(specification, element, valueExpression)}
           `,
         ),
-        " ??",
+        " ??\n",
       )}
     `;
     return;
@@ -100,164 +100,164 @@ function* generateParserDefinition(
     switch (item.types[0]) {
       case "any":
         yield valueExpression;
-        break;
+        return;
 
       case "null":
         yield `
-        ((value: unknown) => {
-          if(value == null) {
-            return null;
-          }
-          
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 0:
-                return null;
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
+          ((value: unknown) => {
+            if(value == null) {
+              return null;
             }
-          }
-          
-          switch(typeof value) {
-            case "string":
-              if(value.trim() === "") {
-                return null;
+            
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 0:
+                  return null;
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
               }
-              break;
-            case "number":
-              return Boolean(value);
-            case "boolean":
-              return value;
-          }
-          
-          return undefined;
-        })(${valueExpression})
-      `;
-        break;
+            }
+            
+            switch(typeof value) {
+              case "string":
+                if(value.trim() === "") {
+                  return null;
+                }
+                break;
+              case "number":
+                return Boolean(value);
+              case "boolean":
+                return value;
+            }
+            
+            return undefined;
+          })(${valueExpression})
+        `;
+        return;
 
       case "boolean":
         yield `
-        ((value: unknown) => {
-          if(value == null) {
-            return false;
-          }
-
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 0:
-                return false;
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
+          ((value: unknown) => {
+            if(value == null) {
+              return false;
             }
-          }
 
-          switch(typeof value) {
-            case "string":
-              value = value.trim();
-              for(const trueStringValue of configuration.trueStringValues) {
-                if(value === trueStringValue) {
-                  return true;
-                }
-              }
-              for(const falseStringValue of configuration.falseStringValues) {
-                if(value === falseStringValue) {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 0:
                   return false;
-                }
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
               }
-              return undefined;
-            case "number":
-              return Boolean(value);
-            case "boolean":
-              return value;
-          }
-          return undefined;
-          })(${valueExpression})
-      `;
-        break;
+            }
+
+            switch(typeof value) {
+              case "string":
+                value = value.trim();
+                for(const trueStringValue of configuration.trueStringValues) {
+                  if(value === trueStringValue) {
+                    return true;
+                  }
+                }
+                for(const falseStringValue of configuration.falseStringValues) {
+                  if(value === falseStringValue) {
+                    return false;
+                  }
+                }
+                return undefined;
+              case "number":
+                return Boolean(value);
+              case "boolean":
+                return value;
+            }
+            return undefined;
+            })(${valueExpression})
+        `;
+        return;
 
       case "integer":
         yield `
-        ((value: unknown) => {
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
+          ((value: unknown) => {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
             }
-          }
 
-          switch(typeof value) {
-            case "string":
-              return Number(value);
-            case "number":
-              return value;
-            case "boolean":
-              return value ? 1 : 0;
-          }
-          return undefined;
-        })(${valueExpression})
-      `;
-        break;
+            switch(typeof value) {
+              case "string":
+                return Number(value);
+              case "number":
+                return value;
+              case "boolean":
+                return value ? 1 : 0;
+            }
+            return undefined;
+          })(${valueExpression})
+        `;
+        return;
 
       case "number":
         yield `
-        ((value: unknown) => {
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
+          ((value: unknown) => {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
             }
-          }
-    
-          switch(typeof value) {
-            case "string":
-              return Number(value);
-            case "number":
-              return value;
-            case "boolean":
-              return value ? 1 : 0;
-          }
-          return undefined;
-        })(${valueExpression})
-      `;
-        break;
+      
+            switch(typeof value) {
+              case "string":
+                return Number(value);
+              case "number":
+                return value;
+              case "boolean":
+                return value ? 1 : 0;
+            }
+            return undefined;
+          })(${valueExpression})
+        `;
+        return;
 
       case "string":
         yield `
-        ((value: unknown) => {
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 1:
-                [value] = value              
-                break;
+          ((value: unknown) => {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
+            }
+
+            switch(typeof value) {
+              case "string":
+                return value;
+              case "number":
+              case "boolean":
+                return String(value);
               default:
                 return undefined;
             }
-          }
-
-          switch(typeof value) {
-            case "string":
-              return value;
-            case "number":
-            case "boolean":
-              return String(value);
-            default:
-              return undefined;
-          }
-        })(${valueExpression})
-      `;
-        break;
+          })(${valueExpression})
+        `;
+        return;
 
       case "array": {
         yield itt`
@@ -269,8 +269,7 @@ function* generateParserDefinition(
             }) :
             undefined
         `;
-
-        break;
+        return;
 
         function* generateCaseClauses() {
           if (item.tupleItems != null) {
@@ -316,7 +315,7 @@ function* generateParserDefinition(
             ) :
             undefined
         `;
-        break;
+        return;
 
         function* generateCaseClauses() {
           if (item.objectProperties != null) {
@@ -372,4 +371,6 @@ function* generateParserDefinition(
       }
     }
   }
+
+  yield valueExpression;
 }
