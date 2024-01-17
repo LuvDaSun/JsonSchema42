@@ -32,7 +32,7 @@ export function loadSpecification(
   const typesArena = SchemaArena.fromIntermediate(document);
   const validatorsArena = typesArena.clone();
 
-  // tranform the validatorsArena
+  // transform the validatorsArena
   {
     let transformIterations = 0;
     while (
@@ -82,7 +82,7 @@ export function loadSpecification(
     }
   }
 
-  // figure out wich keys are actually in use
+  // figure out which keys are actually in use
   const usedKeys = new Set<number>();
   for (const [key, item] of typesArena) {
     if (item.id != null) {
