@@ -148,10 +148,12 @@ function* generateValidatorStatements(
 
   if (item.options != null) {
     yield itt`
-      if(${joinIterable(
-        item.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
-        " &&\n",
-      )}) {
+      if(
+        ${joinIterable(
+          item.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
+          " &&\n",
+        )}
+      ) {
         recordError("options");
         return false;
       }
@@ -742,7 +744,11 @@ function* generateValidatorStatements(
       for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
         const element = item.oneOf[elementIndex];
         yield itt`
-          if(!${generateValidatorReference(specification, element, valueExpression)}) {
+          if(counter < 2 && ${generateValidatorReference(
+            specification,
+            element,
+            valueExpression,
+          )}) {
             counter += 1;
           }
         `;
