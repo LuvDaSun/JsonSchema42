@@ -11,8 +11,7 @@ import {
   generateJsDocComments,
   itt,
   joinIterable,
-  toCamel,
-  toPascal,
+  toPascal
 } from "../utils/index.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
@@ -161,11 +160,11 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
             for (const name of propertyNames) {
               if (objectProperties[name] == null) {
                 yield itt`
-                ${toCamel(name)}${required.has(name) ? "" : "?"}: any,
+                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: any,
               `;
               } else {
                 yield itt`
-                ${toCamel(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
+                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
               `;
               }
             }
