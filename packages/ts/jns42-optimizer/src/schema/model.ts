@@ -29,6 +29,7 @@ export type SchemaType =
 export type SchemaModel = {
   alias?: SchemaKey;
   parent?: SchemaKey;
+  mockable?: boolean;
 
   id?: string;
   title?: string;

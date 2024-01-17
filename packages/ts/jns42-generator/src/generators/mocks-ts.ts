@@ -60,6 +60,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
+    if (item.mockable !== true) {
+      continue;
+    }
+
     const typeName = toPascal(names[nodeId]);
     const functionName = toCamel("mock", names[nodeId]);
     const definition = generateMockDefinition(specification, itemKey);

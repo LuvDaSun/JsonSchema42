@@ -20,6 +20,10 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
+    if (item.mockable !== true) {
+      continue;
+    }
+
     const typeName = names[nodeId];
     const validatorFunctionName = toCamel("is", names[nodeId]);
     const mockFunctionName = toCamel("mock", names[nodeId]);
