@@ -10,23 +10,27 @@ import * as models from "../models/index.js";
 export function transformSchema(
   document: schemaIntermediate.SchemaDocument,
   maximumIterations: number,
-): { typeModels: Record<string, models.Item | models.Alias>; validatorsArena: SchemaArena } {
-  const arena = SchemaArena.fromIntermediate(document);
+): {
+  typeModels: Record<string, models.Item | models.Alias>;
+  typesArena: SchemaArena;
+  validatorsArena: SchemaArena;
+} {
+  const typesArena = SchemaArena.fromIntermediate(document);
   /*
   then transform the schema
   */
 
-  arena.applyTransform(
+  typesArena.applyTransform(
     // order matters!
     schemaTransforms.explode,
     schemaTransforms.singleType,
   );
 
-  const validatorsArena = arena.clone();
+  const validatorsArena = typesArena.clone();
 
   let iterations = 0;
   while (
-    arena.applyTransform(
+    typesArena.applyTransform(
       schemaTransforms.flatten,
       schemaTransforms.unique,
       schemaTransforms.alias,
@@ -50,7 +54,7 @@ export function transformSchema(
   }
 
   const usedKeys = new Set<number>();
-  for (const [key, item] of arena) {
+  for (const [key, item] of typesArena) {
     if (item.id != null) {
       usedKeys.add(key);
     }
@@ -72,7 +76,7 @@ export function transformSchema(
     },
   };
 
-  for (const [key, model] of arena) {
+  for (const [key, model] of typesArena) {
     if (!usedKeys.has(key)) {
       continue;
     }
@@ -82,7 +86,7 @@ export function transformSchema(
     }
   }
 
-  return { typeModels, validatorsArena };
+  return { typeModels, typesArena, validatorsArena };
 
   function* convertEntry(
     entry: [key: number, model: SchemaModel],
