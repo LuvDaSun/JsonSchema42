@@ -23,6 +23,10 @@ export type SchemaType =
   | "array"
   | "map";
 /**
+ * Type for the SchemaModel
+ */
+export type PrimitiveSchemaType = "null" | "boolean" | "integer" | "number" | "string";
+/**
  * the entire SchemaModel, everything is optional!
  */
 export type SchemaModel = {
@@ -152,6 +156,22 @@ export function isSingleTypeSchemaModel(model: SchemaModel): model is SingleType
   return (
     hasMembers(model, [], [...typeSchemaOptional, ...metaSchemaOptional]) &&
     (model.types == null || model.types.length === 1)
+  );
+}
+
+export type PrimitiveTypeSchemaModel = Partial<TypeSchemaModel & MetaSchemaModel> & {
+  types: [PrimitiveSchemaType];
+};
+export function isPrimitiveTypeSchemaModel(model: SchemaModel): model is PrimitiveTypeSchemaModel {
+  return (
+    hasMembers(model, [], [...typeSchemaOptional, ...metaSchemaOptional]) &&
+    model.types != null &&
+    model.types.length === 1 &&
+    (model.types[0] === "null" ||
+      model.types[0] === "boolean" ||
+      model.types[0] === "integer" ||
+      model.types[0] === "number" ||
+      model.types[0] === "string")
   );
 }
 

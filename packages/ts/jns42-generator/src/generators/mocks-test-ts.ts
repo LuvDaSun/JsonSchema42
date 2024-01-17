@@ -1,10 +1,11 @@
+import { isPrimitiveTypeSchemaModel } from "jns42-optimizer";
 import * as models from "../models/index.js";
 import { banner, itt, toCamel } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, typeModels } = specification;
+  const { names, validatorsArena } = specification;
 
   yield itt`
     import assert from "node:assert/strict";
@@ -13,10 +14,14 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (const [typeKey, typeItem] of Object.entries(typeModels)) {
-    const { id: nodeId } = typeItem;
+  for (const [itemKey, item] of validatorsArena) {
+    const { id: nodeId } = item;
 
     if (nodeId == null) {
+      continue;
+    }
+
+    if (!isPrimitiveTypeSchemaModel(item)) {
       continue;
     }
 
