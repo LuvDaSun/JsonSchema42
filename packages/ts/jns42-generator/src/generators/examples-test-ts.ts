@@ -4,7 +4,7 @@ import { banner, itt, mapIterable, toCamel } from "../utils/index.js";
 export function* generateExamplesTestTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import assert from "node:assert/strict";
@@ -12,7 +12,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     import * as validators from "./validators.js";
   `;
 
-  for (const [typeKey, typeItem] of Object.entries(types)) {
+  for (const [typeKey, typeItem] of Object.entries(typeModels)) {
     const { id: nodeId } = typeItem;
 
     if (nodeId == null) {

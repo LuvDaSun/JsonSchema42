@@ -12,7 +12,7 @@ import {
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -53,7 +53,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
   `;
 
-  for (const [typeKey, item] of Object.entries(types)) {
+  for (const [typeKey, item] of Object.entries(typeModels)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -105,8 +105,8 @@ function* generateMockReference(
   specification: models.Specification,
   typeKey: string,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+  const { names, typeModels } = specification;
+  const typeItem = typeModels[typeKey];
   if (typeItem.id == null) {
     yield itt`(${generateMockDefinition(specification, typeKey)})`;
   } else {
@@ -119,8 +119,8 @@ function* generateMockDefinition(
   specification: models.Specification,
   typeKey: string,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+  const { names, typeModels } = specification;
+  const typeItem = typeModels[typeKey];
 
   switch (typeItem.type) {
     case "unknown":
@@ -297,7 +297,7 @@ function* generateMockDefinition(
 
     case "array": {
       const { element } = typeItem;
-      const [resolvedElement] = unalias(types, element);
+      const [resolvedElement] = unalias(typeModels, element);
 
       const minimumItemsExpression =
         typeItem.minimumItems == null
@@ -336,7 +336,7 @@ function* generateMockDefinition(
         {
           ${joinIterable(
             Object.entries(typeItem.properties).map(([name, { required, element }]) => {
-              const [resolvedElement] = unalias(types, element);
+              const [resolvedElement] = unalias(typeModels, element);
 
               return required
                 ? itt`
@@ -360,7 +360,7 @@ function* generateMockDefinition(
 
     case "map": {
       const { name, element } = typeItem;
-      const [resolvedElement] = unalias(types, element);
+      const [resolvedElement] = unalias(typeModels, element);
 
       const minimumPropertiesExpression =
         typeItem.minimumProperties == null

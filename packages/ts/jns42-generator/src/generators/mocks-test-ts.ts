@@ -4,7 +4,7 @@ import { banner, itt, toCamel } from "../utils/index.js";
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import assert from "node:assert/strict";
@@ -13,7 +13,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (const [typeKey, typeItem] of Object.entries(types)) {
+  for (const [typeKey, typeItem] of Object.entries(typeModels)) {
     const { id: nodeId } = typeItem;
 
     if (nodeId == null) {

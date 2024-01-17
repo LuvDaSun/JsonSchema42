@@ -11,9 +11,9 @@ import {
 export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typeModels } = specification;
 
-  for (const [typeKey, item] of Object.entries(types)) {
+  for (const [typeKey, item] of Object.entries(typeModels)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -34,8 +34,8 @@ function* generateTypeReference(
   specification: models.Specification,
   typeKey: string,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+  const { names, typeModels } = specification;
+  const typeItem = typeModels[typeKey];
   if (typeItem.id == null) {
     yield itt`(${generateTypeDefinition(specification, typeKey)})`;
   } else {
@@ -45,8 +45,8 @@ function* generateTypeReference(
 }
 
 function* generateTypeDefinition(specification: models.Specification, typeKey: string) {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+  const { names, typeModels } = specification;
+  const typeItem = typeModels[typeKey];
 
   switch (typeItem.type) {
     case "unknown":
