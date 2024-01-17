@@ -600,13 +600,13 @@ function* generateValidatorStatements(
                   break;
               `;
             }
-
-            yield itt`
-              default:
-                ${generateDefaultCaseContent()}
-                break;
-            `;
           }
+
+          yield itt`
+            default:
+              ${generateDefaultCaseContent()}
+              break;
+          `;
         }
 
         function* generateDefaultCaseContent() {
