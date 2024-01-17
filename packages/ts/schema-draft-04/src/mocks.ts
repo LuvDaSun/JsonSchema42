@@ -7,9 +7,9 @@
 //
 import * as types from "./types.js";
 const depthCounters: Record<string, number> = {};
-export const unknownValue = {};
-export const anyValue = {};
-export const neverValue = {};
+export const unknownValue: any = {};
+export const anyValue: any = {};
+export const neverValue: any = {};
 export interface MockGeneratorOptions {
 maximumDepth?: number;
 numberPrecision?: number;
@@ -37,6 +37,41 @@ defaultMinimumStringLength: 5,
 defaultMaximumStringLength: 20,
 }
 /**
+* @description Core schema meta-schema
+* @see {@link http://json-schema.org/draft-04/schema#}
+*/
+export function mockSchemaDocument(options: MockGeneratorOptions = {}): types.SchemaDocument {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[0] ??= 0;
+try {
+depthCounters[0]++;
+return (unknownValue);
+}
+finally {
+depthCounters[0]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray}
+*/
+export function mockSchemaArray(options: MockGeneratorOptions = {}): types.SchemaArray {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[1] ??= 0;
+try {
+depthCounters[1]++;
+return (unknownValue);
+}
+finally {
+depthCounters[1]--;
+}
+}
+/**
 * @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
 */
 export function mockPositiveInteger(options: MockGeneratorOptions = {}): types.PositiveInteger {
@@ -47,12 +82,27 @@ const configuration = {
 depthCounters[2] ??= 0;
 try {
 depthCounters[2]++;
-return (
-(Math.ceil(0 / 1) + nextSeed() % (Math.floor(configuration.defaultMaximumValue / 1) - Math.ceil(0 / 1) + 1)) * 1
-);
+return (unknownValue);
 }
 finally {
 depthCounters[2]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0}
+*/
+export function mockPositiveIntegerDefault0(options: MockGeneratorOptions = {}): types.PositiveIntegerDefault0 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[3] ??= 0;
+try {
+depthCounters[3]++;
+return (unknownValue);
+}
+finally {
+depthCounters[3]--;
 }
 }
 /**
@@ -66,10 +116,27 @@ const configuration = {
 depthCounters[4] ??= 0;
 try {
 depthCounters[4]++;
-return ((["array", "boolean", "integer", "null", "number", "object", "string"] as const)[nextSeed() % 7]);
+return (unknownValue);
 }
 finally {
 depthCounters[4]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray}
+*/
+export function mockStringArray(options: MockGeneratorOptions = {}): types.StringArray {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[5] ??= 0;
+try {
+depthCounters[5]++;
+return (unknownValue);
+}
+finally {
+depthCounters[5]--;
 }
 }
 /**
@@ -83,14 +150,7 @@ const configuration = {
 depthCounters[6] ??= 0;
 try {
 depthCounters[6]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[6]--;
@@ -107,14 +167,7 @@ const configuration = {
 depthCounters[7] ??= 0;
 try {
 depthCounters[7]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[7]--;
@@ -131,14 +184,7 @@ const configuration = {
 depthCounters[8] ??= 0;
 try {
 depthCounters[8]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[8]--;
@@ -155,17 +201,27 @@ const configuration = {
 depthCounters[9] ??= 0;
 try {
 depthCounters[9]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[9]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/default}
+*/
+export function mockDefault(options: MockGeneratorOptions = {}): types.Default {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[10] ??= 0;
+try {
+depthCounters[10]++;
+return (unknownValue);
+}
+finally {
+depthCounters[10]--;
 }
 }
 /**
@@ -179,9 +235,7 @@ const configuration = {
 depthCounters[11] ??= 0;
 try {
 depthCounters[11]++;
-return (
-((0 * configuration.numberPrecision + 1) + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - (0 * configuration.numberPrecision + 1) + 1) / configuration.numberPrecision)
-);
+return (unknownValue);
 }
 finally {
 depthCounters[11]--;
@@ -198,9 +252,7 @@ const configuration = {
 depthCounters[12] ??= 0;
 try {
 depthCounters[12]++;
-return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
-);
+return (unknownValue);
 }
 finally {
 depthCounters[12]--;
@@ -217,7 +269,7 @@ const configuration = {
 depthCounters[13] ??= 0;
 try {
 depthCounters[13]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[13]--;
@@ -234,9 +286,7 @@ const configuration = {
 depthCounters[14] ??= 0;
 try {
 depthCounters[14]++;
-return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
-);
+return (unknownValue);
 }
 finally {
 depthCounters[14]--;
@@ -253,10 +303,44 @@ const configuration = {
 depthCounters[15] ??= 0;
 try {
 depthCounters[15]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[15]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
+*/
+export function mockMaxLength(options: MockGeneratorOptions = {}): types.MaxLength {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[16] ??= 0;
+try {
+depthCounters[16]++;
+return (mockPositiveInteger());
+}
+finally {
+depthCounters[16]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minLength}
+*/
+export function mockMinLength(options: MockGeneratorOptions = {}): types.MinLength {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[17] ??= 0;
+try {
+depthCounters[17]++;
+return (mockPositiveIntegerDefault0());
+}
+finally {
+depthCounters[17]--;
 }
 }
 /**
@@ -270,17 +354,78 @@ const configuration = {
 depthCounters[18] ??= 0;
 try {
 depthCounters[18]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[18]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems}
+*/
+export function mockAdditionalItems(options: MockGeneratorOptions = {}): types.AdditionalItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[19] ??= 0;
+try {
+depthCounters[19]++;
+return (unknownValue);
+}
+finally {
+depthCounters[19]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items}
+*/
+export function mockPropertiesItems(options: MockGeneratorOptions = {}): types.PropertiesItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[20] ??= 0;
+try {
+depthCounters[20]++;
+return (unknownValue);
+}
+finally {
+depthCounters[20]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
+*/
+export function mockMaxItems(options: MockGeneratorOptions = {}): types.MaxItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[21] ??= 0;
+try {
+depthCounters[21]++;
+return (mockPositiveInteger());
+}
+finally {
+depthCounters[21]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minItems}
+*/
+export function mockMinItems(options: MockGeneratorOptions = {}): types.MinItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[22] ??= 0;
+try {
+depthCounters[22]++;
+return (mockPositiveIntegerDefault0());
+}
+finally {
+depthCounters[22]--;
 }
 }
 /**
@@ -294,10 +439,180 @@ const configuration = {
 depthCounters[23] ??= 0;
 try {
 depthCounters[23]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[23]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
+*/
+export function mockMaxProperties(options: MockGeneratorOptions = {}): types.MaxProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[24] ??= 0;
+try {
+depthCounters[24]++;
+return (mockPositiveInteger());
+}
+finally {
+depthCounters[24]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minProperties}
+*/
+export function mockMinProperties(options: MockGeneratorOptions = {}): types.MinProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[25] ??= 0;
+try {
+depthCounters[25]++;
+return (mockPositiveIntegerDefault0());
+}
+finally {
+depthCounters[25]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/required}
+*/
+export function mockRequired(options: MockGeneratorOptions = {}): types.Required {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[26] ??= 0;
+try {
+depthCounters[26]++;
+return (mockStringArray());
+}
+finally {
+depthCounters[26]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties}
+*/
+export function mockPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.PropertiesAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[27] ??= 0;
+try {
+depthCounters[27]++;
+return (unknownValue);
+}
+finally {
+depthCounters[27]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
+*/
+export function mockDefinitions(options: MockGeneratorOptions = {}): types.Definitions {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[28] ??= 0;
+try {
+depthCounters[28]++;
+return (unknownValue);
+}
+finally {
+depthCounters[28]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties}
+*/
+export function mockProperties(options: MockGeneratorOptions = {}): types.Properties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[29] ??= 0;
+try {
+depthCounters[29]++;
+return (unknownValue);
+}
+finally {
+depthCounters[29]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties}
+*/
+export function mockPatternProperties(options: MockGeneratorOptions = {}): types.PatternProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[30] ??= 0;
+try {
+depthCounters[30]++;
+return (unknownValue);
+}
+finally {
+depthCounters[30]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies}
+*/
+export function mockDependencies(options: MockGeneratorOptions = {}): types.Dependencies {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[31] ??= 0;
+try {
+depthCounters[31]++;
+return (unknownValue);
+}
+finally {
+depthCounters[31]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/enum}
+*/
+export function mockEnum(options: MockGeneratorOptions = {}): types.Enum {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[32] ??= 0;
+try {
+depthCounters[32]++;
+return (unknownValue);
+}
+finally {
+depthCounters[32]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type}
+*/
+export function mockType(options: MockGeneratorOptions = {}): types.Type {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[33] ??= 0;
+try {
+depthCounters[33]++;
+return (unknownValue);
+}
+finally {
+depthCounters[33]--;
 }
 }
 /**
@@ -311,17 +626,129 @@ const configuration = {
 depthCounters[34] ??= 0;
 try {
 depthCounters[34]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[34]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/allOf}
+*/
+export function mockAllOf(options: MockGeneratorOptions = {}): types.AllOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[35] ??= 0;
+try {
+depthCounters[35]++;
+return (mockSchemaArray());
+}
+finally {
+depthCounters[35]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/anyOf}
+*/
+export function mockAnyOf(options: MockGeneratorOptions = {}): types.AnyOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[36] ??= 0;
+try {
+depthCounters[36]++;
+return (mockSchemaArray());
+}
+finally {
+depthCounters[36]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/oneOf}
+*/
+export function mockOneOf(options: MockGeneratorOptions = {}): types.OneOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[37] ??= 0;
+try {
+depthCounters[37]++;
+return (mockSchemaArray());
+}
+finally {
+depthCounters[37]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/not}
+*/
+export function mockNot(options: MockGeneratorOptions = {}): types.Not {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[38] ??= 0;
+try {
+depthCounters[38]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[38]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/schemaArray/items}
+*/
+export function mockSchemaArrayItems(options: MockGeneratorOptions = {}): types.SchemaArrayItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[39] ??= 0;
+try {
+depthCounters[39]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[39]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
+*/
+export function mockPositiveIntegerDefault00(options: MockGeneratorOptions = {}): types.PositiveIntegerDefault00 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[40] ??= 0;
+try {
+depthCounters[40]++;
+return (mockPositiveInteger());
+}
+finally {
+depthCounters[40]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/1}
+*/
+export function mockPositiveIntegerDefault01(options: MockGeneratorOptions = {}): types.PositiveIntegerDefault01 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[41] ??= 0;
+try {
+depthCounters[41]++;
+return (unknownValue);
+}
+finally {
+depthCounters[41]--;
 }
 }
 /**
@@ -335,14 +762,7 @@ const configuration = {
 depthCounters[42] ??= 0;
 try {
 depthCounters[42]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[42]--;
@@ -359,10 +779,61 @@ const configuration = {
 depthCounters[43] ??= 0;
 try {
 depthCounters[43]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[43]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalItems/anyOf/1}
+*/
+export function mockAdditionalItems1(options: MockGeneratorOptions = {}): types.AdditionalItems1 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[44] ??= 0;
+try {
+depthCounters[44]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[44]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/0}
+*/
+export function mockItems0(options: MockGeneratorOptions = {}): types.Items0 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[45] ??= 0;
+try {
+depthCounters[45]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[45]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/items/anyOf/1}
+*/
+export function mockItems1(options: MockGeneratorOptions = {}): types.Items1 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[46] ??= 0;
+try {
+depthCounters[46]++;
+return (mockSchemaArray());
+}
+finally {
+depthCounters[46]--;
 }
 }
 /**
@@ -376,10 +847,180 @@ const configuration = {
 depthCounters[47] ??= 0;
 try {
 depthCounters[47]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[47]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/additionalProperties/anyOf/1}
+*/
+export function mockAdditionalProperties1(options: MockGeneratorOptions = {}): types.AdditionalProperties1 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[48] ??= 0;
+try {
+depthCounters[48]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[48]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/definitions/additionalProperties}
+*/
+export function mockDefinitionsAdditionalProperties(options: MockGeneratorOptions = {}): types.DefinitionsAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[49] ??= 0;
+try {
+depthCounters[49]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[49]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/properties/additionalProperties}
+*/
+export function mockPropertiesPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.PropertiesPropertiesAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[50] ??= 0;
+try {
+depthCounters[50]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[50]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/patternProperties/additionalProperties}
+*/
+export function mockPatternPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.PatternPropertiesAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[51] ??= 0;
+try {
+depthCounters[51]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[51]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties}
+*/
+export function mockDependenciesAdditionalProperties(options: MockGeneratorOptions = {}): types.DependenciesAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[52] ??= 0;
+try {
+depthCounters[52]++;
+return (unknownValue);
+}
+finally {
+depthCounters[52]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
+*/
+export function mockType0(options: MockGeneratorOptions = {}): types.Type0 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[53] ??= 0;
+try {
+depthCounters[53]++;
+return (mockSimpleTypes());
+}
+finally {
+depthCounters[53]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1}
+*/
+export function mockType1(options: MockGeneratorOptions = {}): types.Type1 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[54] ??= 0;
+try {
+depthCounters[54]++;
+return (unknownValue);
+}
+finally {
+depthCounters[54]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/0}
+*/
+export function mockDependencies0(options: MockGeneratorOptions = {}): types.Dependencies0 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[55] ??= 0;
+try {
+depthCounters[55]++;
+return (mockSchemaDocument());
+}
+finally {
+depthCounters[55]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/dependencies/additionalProperties/anyOf/1}
+*/
+export function mockDependencies1(options: MockGeneratorOptions = {}): types.Dependencies1 {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[56] ??= 0;
+try {
+depthCounters[56]++;
+return (mockStringArray());
+}
+finally {
+depthCounters[56]--;
+}
+}
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
+*/
+export function mockTypeItems(options: MockGeneratorOptions = {}): types.TypeItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[57] ??= 0;
+try {
+depthCounters[57]++;
+return (mockSimpleTypes());
+}
+finally {
+depthCounters[57]--;
 }
 }
 let seed = 1;

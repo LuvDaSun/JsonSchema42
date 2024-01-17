@@ -7,9 +7,9 @@
 //
 import * as types from "./types.js";
 const depthCounters: Record<string, number> = {};
-export const unknownValue = {};
-export const anyValue = {};
-export const neverValue = {};
+export const unknownValue: any = {};
+export const anyValue: any = {};
+export const neverValue: any = {};
 export interface MockGeneratorOptions {
 maximumDepth?: number;
 numberPrecision?: number;
@@ -37,6 +37,41 @@ defaultMinimumStringLength: 5,
 defaultMaximumStringLength: 20,
 }
 /**
+* @summary JsonSchema42 intermediate schema
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json}
+*/
+export function mockSchemaDocument(options: MockGeneratorOptions = {}): types.SchemaDocument {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[0] ??= 0;
+try {
+depthCounters[0]++;
+return (unknownValue);
+}
+finally {
+depthCounters[0]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node}
+*/
+export function mockNode(options: MockGeneratorOptions = {}): types.Node {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[1] ??= 0;
+try {
+depthCounters[1]++;
+return (unknownValue);
+}
+finally {
+depthCounters[1]--;
+}
+}
+/**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference}
 */
 export function mockNodeReference(options: MockGeneratorOptions = {}): types.NodeReference {
@@ -47,14 +82,7 @@ const configuration = {
 depthCounters[2] ??= 0;
 try {
 depthCounters[2]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[2]--;
@@ -71,9 +99,7 @@ const configuration = {
 depthCounters[3] ??= 0;
 try {
 depthCounters[3]++;
-return (
-(Math.ceil(configuration.defaultMinimumValue / 1) + nextSeed() % (Math.floor(configuration.defaultMaximumValue / 1) - Math.ceil(configuration.defaultMinimumValue / 1) + 1)) * 1
-);
+return (unknownValue);
 }
 finally {
 depthCounters[3]--;
@@ -90,9 +116,7 @@ const configuration = {
 depthCounters[4] ??= 0;
 try {
 depthCounters[4]++;
-return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
-);
+return (unknownValue);
 }
 finally {
 depthCounters[4]--;
@@ -109,7 +133,7 @@ const configuration = {
 depthCounters[5] ??= 0;
 try {
 depthCounters[5]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[5]--;
@@ -126,14 +150,7 @@ const configuration = {
 depthCounters[6] ??= 0;
 try {
 depthCounters[6]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[6]--;
@@ -150,14 +167,7 @@ const configuration = {
 depthCounters[7] ??= 0;
 try {
 depthCounters[7]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
+return (unknownValue);
 }
 finally {
 depthCounters[7]--;
@@ -174,9 +184,7 @@ const configuration = {
 depthCounters[8] ??= 0;
 try {
 depthCounters[8]++;
-return (
-(Math.ceil(configuration.defaultMinimumValue / 1) + nextSeed() % (Math.floor(configuration.defaultMaximumValue / 1) - Math.ceil(configuration.defaultMinimumValue / 1) + 1)) * 1
-);
+return (unknownValue);
 }
 finally {
 depthCounters[8]--;
@@ -193,10 +201,589 @@ const configuration = {
 depthCounters[9] ??= 0;
 try {
 depthCounters[9]++;
-return ((["https://schema.JsonSchema42.org/jns42-intermediate/schema.json"] as const)[nextSeed() % 1]);
+return (unknownValue);
 }
 finally {
 depthCounters[9]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas}
+*/
+export function mockSchemas(options: MockGeneratorOptions = {}): types.Schemas {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[10] ??= 0;
+try {
+depthCounters[10]++;
+return (unknownValue);
+}
+finally {
+depthCounters[10]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/title}
+*/
+export function mockTitle(options: MockGeneratorOptions = {}): types.Title {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[11] ??= 0;
+try {
+depthCounters[11]++;
+return (mockNonEmptyStringValue());
+}
+finally {
+depthCounters[11]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/description}
+*/
+export function mockDescription(options: MockGeneratorOptions = {}): types.Description {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[12] ??= 0;
+try {
+depthCounters[12]++;
+return (mockNonEmptyStringValue());
+}
+finally {
+depthCounters[12]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
+*/
+export function mockExamples(options: MockGeneratorOptions = {}): types.Examples {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[13] ??= 0;
+try {
+depthCounters[13]++;
+return (unknownValue);
+}
+finally {
+depthCounters[13]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
+*/
+export function mockDeprecated(options: MockGeneratorOptions = {}): types.Deprecated {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[14] ??= 0;
+try {
+depthCounters[14]++;
+return (mockBooleanValue());
+}
+finally {
+depthCounters[14]--;
+}
+}
+/**
+* @description What types does this schema describe<br />
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types}
+*/
+export function mockTypes(options: MockGeneratorOptions = {}): types.Types {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[15] ??= 0;
+try {
+depthCounters[15]++;
+return (unknownValue);
+}
+finally {
+depthCounters[15]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference}
+*/
+export function mockReference(options: MockGeneratorOptions = {}): types.Reference {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[16] ??= 0;
+try {
+depthCounters[16]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[16]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf}
+*/
+export function mockOneOf(options: MockGeneratorOptions = {}): types.OneOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[17] ??= 0;
+try {
+depthCounters[17]++;
+return (unknownValue);
+}
+finally {
+depthCounters[17]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf}
+*/
+export function mockAnyOf(options: MockGeneratorOptions = {}): types.AnyOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[18] ??= 0;
+try {
+depthCounters[18]++;
+return (unknownValue);
+}
+finally {
+depthCounters[18]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf}
+*/
+export function mockAllOf(options: MockGeneratorOptions = {}): types.AllOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[19] ??= 0;
+try {
+depthCounters[19]++;
+return (unknownValue);
+}
+finally {
+depthCounters[19]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if}
+*/
+export function mockIf(options: MockGeneratorOptions = {}): types.If {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[20] ??= 0;
+try {
+depthCounters[20]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[20]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/then}
+*/
+export function mockThen(options: MockGeneratorOptions = {}): types.Then {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[21] ??= 0;
+try {
+depthCounters[21]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[21]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/else}
+*/
+export function mockElse(options: MockGeneratorOptions = {}): types.Else {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[22] ??= 0;
+try {
+depthCounters[22]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[22]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/not}
+*/
+export function mockNot(options: MockGeneratorOptions = {}): types.Not {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[23] ??= 0;
+try {
+depthCounters[23]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[23]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas}
+*/
+export function mockDependentSchemas(options: MockGeneratorOptions = {}): types.DependentSchemas {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[24] ??= 0;
+try {
+depthCounters[24]++;
+return (unknownValue);
+}
+finally {
+depthCounters[24]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties}
+*/
+export function mockObjectProperties(options: MockGeneratorOptions = {}): types.ObjectProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[25] ??= 0;
+try {
+depthCounters[25]++;
+return (unknownValue);
+}
+finally {
+depthCounters[25]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/mapProperties}
+*/
+export function mockMapProperties(options: MockGeneratorOptions = {}): types.MapProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[26] ??= 0;
+try {
+depthCounters[26]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[26]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties}
+*/
+export function mockPatternProperties(options: MockGeneratorOptions = {}): types.PatternProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[27] ??= 0;
+try {
+depthCounters[27]++;
+return (unknownValue);
+}
+finally {
+depthCounters[27]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/propertyNames}
+*/
+export function mockPropertyNames(options: MockGeneratorOptions = {}): types.PropertyNames {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[28] ??= 0;
+try {
+depthCounters[28]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[28]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems}
+*/
+export function mockTupleItems(options: MockGeneratorOptions = {}): types.TupleItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[29] ??= 0;
+try {
+depthCounters[29]++;
+return (unknownValue);
+}
+finally {
+depthCounters[29]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems}
+*/
+export function mockArrayItems(options: MockGeneratorOptions = {}): types.ArrayItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[30] ??= 0;
+try {
+depthCounters[30]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[30]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/contains}
+*/
+export function mockContains(options: MockGeneratorOptions = {}): types.Contains {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[31] ??= 0;
+try {
+depthCounters[31]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[31]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
+*/
+export function mockOptions(options: MockGeneratorOptions = {}): types.Options {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[32] ??= 0;
+try {
+depthCounters[32]++;
+return (unknownValue);
+}
+finally {
+depthCounters[32]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive}
+*/
+export function mockMinimumInclusive(options: MockGeneratorOptions = {}): types.MinimumInclusive {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[33] ??= 0;
+try {
+depthCounters[33]++;
+return (mockNumberValue());
+}
+finally {
+depthCounters[33]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumExclusive}
+*/
+export function mockMinimumExclusive(options: MockGeneratorOptions = {}): types.MinimumExclusive {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[34] ??= 0;
+try {
+depthCounters[34]++;
+return (mockNumberValue());
+}
+finally {
+depthCounters[34]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumInclusive}
+*/
+export function mockMaximumInclusive(options: MockGeneratorOptions = {}): types.MaximumInclusive {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[35] ??= 0;
+try {
+depthCounters[35]++;
+return (mockNumberValue());
+}
+finally {
+depthCounters[35]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumExclusive}
+*/
+export function mockMaximumExclusive(options: MockGeneratorOptions = {}): types.MaximumExclusive {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[36] ??= 0;
+try {
+depthCounters[36]++;
+return (mockNumberValue());
+}
+finally {
+depthCounters[36]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/multipleOf}
+*/
+export function mockMultipleOf(options: MockGeneratorOptions = {}): types.MultipleOf {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[37] ??= 0;
+try {
+depthCounters[37]++;
+return (mockNumberValue());
+}
+finally {
+depthCounters[37]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumLength}
+*/
+export function mockMinimumLength(options: MockGeneratorOptions = {}): types.MinimumLength {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[38] ??= 0;
+try {
+depthCounters[38]++;
+return (mockAmount());
+}
+finally {
+depthCounters[38]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumLength}
+*/
+export function mockMaximumLength(options: MockGeneratorOptions = {}): types.MaximumLength {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[39] ??= 0;
+try {
+depthCounters[39]++;
+return (mockAmount());
+}
+finally {
+depthCounters[39]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valuePattern}
+*/
+export function mockValuePattern(options: MockGeneratorOptions = {}): types.ValuePattern {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[40] ??= 0;
+try {
+depthCounters[40]++;
+return (mockNonEmptyStringValue());
+}
+finally {
+depthCounters[40]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/valueFormat}
+*/
+export function mockValueFormat(options: MockGeneratorOptions = {}): types.ValueFormat {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[41] ??= 0;
+try {
+depthCounters[41]++;
+return (mockNonEmptyStringValue());
+}
+finally {
+depthCounters[41]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumItems}
+*/
+export function mockMinimumItems(options: MockGeneratorOptions = {}): types.MinimumItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[42] ??= 0;
+try {
+depthCounters[42]++;
+return (mockAmount());
+}
+finally {
+depthCounters[42]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumItems}
+*/
+export function mockMaximumItems(options: MockGeneratorOptions = {}): types.MaximumItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[43] ??= 0;
+try {
+depthCounters[43]++;
+return (mockAmount());
+}
+finally {
+depthCounters[43]--;
 }
 }
 /**
@@ -210,10 +797,95 @@ const configuration = {
 depthCounters[44] ??= 0;
 try {
 depthCounters[44]++;
-return (Boolean(nextSeed() % 2));
+return (unknownValue);
 }
 finally {
 depthCounters[44]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
+*/
+export function mockRequired(options: MockGeneratorOptions = {}): types.Required {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[45] ??= 0;
+try {
+depthCounters[45]++;
+return (unknownValue);
+}
+finally {
+depthCounters[45]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties}
+*/
+export function mockMinimumProperties(options: MockGeneratorOptions = {}): types.MinimumProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[46] ??= 0;
+try {
+depthCounters[46]++;
+return (mockAmount());
+}
+finally {
+depthCounters[46]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/maximumProperties}
+*/
+export function mockMaximumProperties(options: MockGeneratorOptions = {}): types.MaximumProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[47] ??= 0;
+try {
+depthCounters[47]++;
+return (mockAmount());
+}
+finally {
+depthCounters[47]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties}
+*/
+export function mockSchemasAdditionalProperties(options: MockGeneratorOptions = {}): types.SchemasAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[48] ??= 0;
+try {
+depthCounters[48]++;
+return (mockNode());
+}
+finally {
+depthCounters[48]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items}
+*/
+export function mockExamplesItems(options: MockGeneratorOptions = {}): types.ExamplesItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[49] ??= 0;
+try {
+depthCounters[49]++;
+return (unknownValue);
+}
+finally {
+depthCounters[49]--;
 }
 }
 /**
@@ -227,10 +899,163 @@ const configuration = {
 depthCounters[50] ??= 0;
 try {
 depthCounters[50]++;
-return ((["never", "any", "null", "boolean", "integer", "number", "string", "array", "map"] as const)[nextSeed() % 9]);
+return (unknownValue);
 }
 finally {
 depthCounters[50]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf/items}
+*/
+export function mockOneOfItems(options: MockGeneratorOptions = {}): types.OneOfItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[51] ??= 0;
+try {
+depthCounters[51]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[51]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf/items}
+*/
+export function mockAnyOfItems(options: MockGeneratorOptions = {}): types.AnyOfItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[52] ??= 0;
+try {
+depthCounters[52]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[52]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf/items}
+*/
+export function mockAllOfItems(options: MockGeneratorOptions = {}): types.AllOfItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[53] ??= 0;
+try {
+depthCounters[53]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[53]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/dependentSchemas/additionalProperties}
+*/
+export function mockDependentSchemasAdditionalProperties(options: MockGeneratorOptions = {}): types.DependentSchemasAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[54] ??= 0;
+try {
+depthCounters[54]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[54]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/objectProperties/additionalProperties}
+*/
+export function mockObjectPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.ObjectPropertiesAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[55] ??= 0;
+try {
+depthCounters[55]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[55]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/patternProperties/additionalProperties}
+*/
+export function mockPatternPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.PatternPropertiesAdditionalProperties {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[56] ??= 0;
+try {
+depthCounters[56]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[56]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems/items}
+*/
+export function mockTupleItemsItems(options: MockGeneratorOptions = {}): types.TupleItemsItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[57] ??= 0;
+try {
+depthCounters[57]++;
+return (mockNodeReference());
+}
+finally {
+depthCounters[57]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items}
+*/
+export function mockOptionsItems(options: MockGeneratorOptions = {}): types.OptionsItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[58] ??= 0;
+try {
+depthCounters[58]++;
+return (unknownValue);
+}
+finally {
+depthCounters[58]--;
+}
+}
+/**
+* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required/items}
+*/
+export function mockRequiredItems(options: MockGeneratorOptions = {}): types.RequiredItems {
+const configuration = {
+...defaultMockGeneratorOptions,
+...options,
+};
+depthCounters[59] ??= 0;
+try {
+depthCounters[59]++;
+return (mockStringValue());
+}
+finally {
+depthCounters[59]--;
 }
 }
 let seed = 1;

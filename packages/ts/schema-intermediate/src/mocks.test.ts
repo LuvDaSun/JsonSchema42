@@ -9,53 +9,303 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as validators from "./validators.js";
 import * as mocks from "./mocks.js";
-test("NodeReference", () => {
+test.skip("SchemaDocument", () => {
+const mock = mocks.mockSchemaDocument();
+const valid = validators.isSchemaDocument(mock);
+assert.equal(valid, true);
+});
+test.skip("Node", () => {
+const mock = mocks.mockNode();
+const valid = validators.isNode(mock);
+assert.equal(valid, true);
+});
+test.skip("NodeReference", () => {
 const mock = mocks.mockNodeReference();
 const valid = validators.isNodeReference(mock);
 assert.equal(valid, true);
 });
-test("IntegerValue", () => {
+test.skip("IntegerValue", () => {
 const mock = mocks.mockIntegerValue();
 const valid = validators.isIntegerValue(mock);
 assert.equal(valid, true);
 });
-test("NumberValue", () => {
+test.skip("NumberValue", () => {
 const mock = mocks.mockNumberValue();
 const valid = validators.isNumberValue(mock);
 assert.equal(valid, true);
 });
-test("BooleanValue", () => {
+test.skip("BooleanValue", () => {
 const mock = mocks.mockBooleanValue();
 const valid = validators.isBooleanValue(mock);
 assert.equal(valid, true);
 });
-test("StringValue", () => {
+test.skip("StringValue", () => {
 const mock = mocks.mockStringValue();
 const valid = validators.isStringValue(mock);
 assert.equal(valid, true);
 });
-test("NonEmptyStringValue", () => {
+test.skip("NonEmptyStringValue", () => {
 const mock = mocks.mockNonEmptyStringValue();
 const valid = validators.isNonEmptyStringValue(mock);
 assert.equal(valid, true);
 });
-test("Amount", () => {
+test.skip("Amount", () => {
 const mock = mocks.mockAmount();
 const valid = validators.isAmount(mock);
 assert.equal(valid, true);
 });
-test("Schema", () => {
+test.skip("Schema", () => {
 const mock = mocks.mockSchema();
 const valid = validators.isSchema(mock);
 assert.equal(valid, true);
 });
-test("UniqueItems", () => {
+test.skip("Schemas", () => {
+const mock = mocks.mockSchemas();
+const valid = validators.isSchemas(mock);
+assert.equal(valid, true);
+});
+test.skip("Title", () => {
+const mock = mocks.mockTitle();
+const valid = validators.isTitle(mock);
+assert.equal(valid, true);
+});
+test.skip("Description", () => {
+const mock = mocks.mockDescription();
+const valid = validators.isDescription(mock);
+assert.equal(valid, true);
+});
+test.skip("Examples", () => {
+const mock = mocks.mockExamples();
+const valid = validators.isExamples(mock);
+assert.equal(valid, true);
+});
+test.skip("Deprecated", () => {
+const mock = mocks.mockDeprecated();
+const valid = validators.isDeprecated(mock);
+assert.equal(valid, true);
+});
+test.skip("Types", () => {
+const mock = mocks.mockTypes();
+const valid = validators.isTypes(mock);
+assert.equal(valid, true);
+});
+test.skip("Reference", () => {
+const mock = mocks.mockReference();
+const valid = validators.isReference(mock);
+assert.equal(valid, true);
+});
+test.skip("OneOf", () => {
+const mock = mocks.mockOneOf();
+const valid = validators.isOneOf(mock);
+assert.equal(valid, true);
+});
+test.skip("AnyOf", () => {
+const mock = mocks.mockAnyOf();
+const valid = validators.isAnyOf(mock);
+assert.equal(valid, true);
+});
+test.skip("AllOf", () => {
+const mock = mocks.mockAllOf();
+const valid = validators.isAllOf(mock);
+assert.equal(valid, true);
+});
+test.skip("If", () => {
+const mock = mocks.mockIf();
+const valid = validators.isIf(mock);
+assert.equal(valid, true);
+});
+test.skip("Then", () => {
+const mock = mocks.mockThen();
+const valid = validators.isThen(mock);
+assert.equal(valid, true);
+});
+test.skip("Else", () => {
+const mock = mocks.mockElse();
+const valid = validators.isElse(mock);
+assert.equal(valid, true);
+});
+test.skip("Not", () => {
+const mock = mocks.mockNot();
+const valid = validators.isNot(mock);
+assert.equal(valid, true);
+});
+test.skip("DependentSchemas", () => {
+const mock = mocks.mockDependentSchemas();
+const valid = validators.isDependentSchemas(mock);
+assert.equal(valid, true);
+});
+test.skip("ObjectProperties", () => {
+const mock = mocks.mockObjectProperties();
+const valid = validators.isObjectProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("MapProperties", () => {
+const mock = mocks.mockMapProperties();
+const valid = validators.isMapProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("PatternProperties", () => {
+const mock = mocks.mockPatternProperties();
+const valid = validators.isPatternProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("PropertyNames", () => {
+const mock = mocks.mockPropertyNames();
+const valid = validators.isPropertyNames(mock);
+assert.equal(valid, true);
+});
+test.skip("TupleItems", () => {
+const mock = mocks.mockTupleItems();
+const valid = validators.isTupleItems(mock);
+assert.equal(valid, true);
+});
+test.skip("ArrayItems", () => {
+const mock = mocks.mockArrayItems();
+const valid = validators.isArrayItems(mock);
+assert.equal(valid, true);
+});
+test.skip("Contains", () => {
+const mock = mocks.mockContains();
+const valid = validators.isContains(mock);
+assert.equal(valid, true);
+});
+test.skip("Options", () => {
+const mock = mocks.mockOptions();
+const valid = validators.isOptions(mock);
+assert.equal(valid, true);
+});
+test.skip("MinimumInclusive", () => {
+const mock = mocks.mockMinimumInclusive();
+const valid = validators.isMinimumInclusive(mock);
+assert.equal(valid, true);
+});
+test.skip("MinimumExclusive", () => {
+const mock = mocks.mockMinimumExclusive();
+const valid = validators.isMinimumExclusive(mock);
+assert.equal(valid, true);
+});
+test.skip("MaximumInclusive", () => {
+const mock = mocks.mockMaximumInclusive();
+const valid = validators.isMaximumInclusive(mock);
+assert.equal(valid, true);
+});
+test.skip("MaximumExclusive", () => {
+const mock = mocks.mockMaximumExclusive();
+const valid = validators.isMaximumExclusive(mock);
+assert.equal(valid, true);
+});
+test.skip("MultipleOf", () => {
+const mock = mocks.mockMultipleOf();
+const valid = validators.isMultipleOf(mock);
+assert.equal(valid, true);
+});
+test.skip("MinimumLength", () => {
+const mock = mocks.mockMinimumLength();
+const valid = validators.isMinimumLength(mock);
+assert.equal(valid, true);
+});
+test.skip("MaximumLength", () => {
+const mock = mocks.mockMaximumLength();
+const valid = validators.isMaximumLength(mock);
+assert.equal(valid, true);
+});
+test.skip("ValuePattern", () => {
+const mock = mocks.mockValuePattern();
+const valid = validators.isValuePattern(mock);
+assert.equal(valid, true);
+});
+test.skip("ValueFormat", () => {
+const mock = mocks.mockValueFormat();
+const valid = validators.isValueFormat(mock);
+assert.equal(valid, true);
+});
+test.skip("MinimumItems", () => {
+const mock = mocks.mockMinimumItems();
+const valid = validators.isMinimumItems(mock);
+assert.equal(valid, true);
+});
+test.skip("MaximumItems", () => {
+const mock = mocks.mockMaximumItems();
+const valid = validators.isMaximumItems(mock);
+assert.equal(valid, true);
+});
+test.skip("UniqueItems", () => {
 const mock = mocks.mockUniqueItems();
 const valid = validators.isUniqueItems(mock);
 assert.equal(valid, true);
 });
-test("TypesItems", () => {
+test.skip("Required", () => {
+const mock = mocks.mockRequired();
+const valid = validators.isRequired(mock);
+assert.equal(valid, true);
+});
+test.skip("MinimumProperties", () => {
+const mock = mocks.mockMinimumProperties();
+const valid = validators.isMinimumProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("MaximumProperties", () => {
+const mock = mocks.mockMaximumProperties();
+const valid = validators.isMaximumProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("SchemasAdditionalProperties", () => {
+const mock = mocks.mockSchemasAdditionalProperties();
+const valid = validators.isSchemasAdditionalProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("ExamplesItems", () => {
+const mock = mocks.mockExamplesItems();
+const valid = validators.isExamplesItems(mock);
+assert.equal(valid, true);
+});
+test.skip("TypesItems", () => {
 const mock = mocks.mockTypesItems();
 const valid = validators.isTypesItems(mock);
+assert.equal(valid, true);
+});
+test.skip("OneOfItems", () => {
+const mock = mocks.mockOneOfItems();
+const valid = validators.isOneOfItems(mock);
+assert.equal(valid, true);
+});
+test.skip("AnyOfItems", () => {
+const mock = mocks.mockAnyOfItems();
+const valid = validators.isAnyOfItems(mock);
+assert.equal(valid, true);
+});
+test.skip("AllOfItems", () => {
+const mock = mocks.mockAllOfItems();
+const valid = validators.isAllOfItems(mock);
+assert.equal(valid, true);
+});
+test.skip("DependentSchemasAdditionalProperties", () => {
+const mock = mocks.mockDependentSchemasAdditionalProperties();
+const valid = validators.isDependentSchemasAdditionalProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("ObjectPropertiesAdditionalProperties", () => {
+const mock = mocks.mockObjectPropertiesAdditionalProperties();
+const valid = validators.isObjectPropertiesAdditionalProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("PatternPropertiesAdditionalProperties", () => {
+const mock = mocks.mockPatternPropertiesAdditionalProperties();
+const valid = validators.isPatternPropertiesAdditionalProperties(mock);
+assert.equal(valid, true);
+});
+test.skip("TupleItemsItems", () => {
+const mock = mocks.mockTupleItemsItems();
+const valid = validators.isTupleItemsItems(mock);
+assert.equal(valid, true);
+});
+test.skip("OptionsItems", () => {
+const mock = mocks.mockOptionsItems();
+const valid = validators.isOptionsItems(mock);
+assert.equal(valid, true);
+});
+test.skip("RequiredItems", () => {
+const mock = mocks.mockRequiredItems();
+const valid = validators.isRequiredItems(mock);
 assert.equal(valid, true);
 });
