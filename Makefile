@@ -39,6 +39,7 @@ packages/ts/%: out/%
 	mv $< $@
 
 	npm install --workspace $(notdir $(basename $@))
+	npm run clean --workspace $(notdir $(basename $@))
 	npm run build --workspace $(notdir $(basename $@))
 
 .PHONY: \

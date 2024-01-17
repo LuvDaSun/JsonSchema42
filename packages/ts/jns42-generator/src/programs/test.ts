@@ -160,7 +160,7 @@ async function main(options: MainOptions) {
       });
     }
 
-    test.skip("test package", () => {
+    test("test package", () => {
       cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,

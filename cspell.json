@@ -6,12 +6,17 @@
     "clippy",
     "endregion",
     "esbenp",
+    "notdir",
     "serde",
     "structs",
     "unalias",
     "urlencoding"
   ],
   "useGitignore": true,
-  "files": ["**"],
-  "enableFiletypes": ["*"]
+  "files": [
+    "**"
+  ],
+  "enableFiletypes": [
+    "*"
+  ]
 }
