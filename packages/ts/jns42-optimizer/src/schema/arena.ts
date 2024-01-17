@@ -18,7 +18,7 @@ export class SchemaArena extends Arena<SchemaModel> {
 
   public clone(): SchemaArena {
     const arena = new SchemaArena();
-    for (const [key, item] of arena) {
+    for (const [key, item] of this) {
       const newKey = arena.addItem(item);
       assert.equal(newKey, key);
     }

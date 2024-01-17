@@ -40,6 +40,14 @@ export function loadSpecification(
         // order matters!
         schemaTransforms.explode,
         schemaTransforms.singleType,
+
+        schemaTransforms.flatten,
+        schemaTransforms.unique,
+        schemaTransforms.alias,
+
+        schemaTransforms.resolveParent,
+
+        schemaTransforms.flushParent,
       ) > 0
     ) {
       transformIterations++;

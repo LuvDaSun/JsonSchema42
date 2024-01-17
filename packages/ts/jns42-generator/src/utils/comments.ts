@@ -1,8 +1,11 @@
 import { encode } from "entities";
+import { SchemaModel } from "jns42-optimizer";
 import * as models from "../models/index.js";
 import { NestedText } from "./iterable-text-template.js";
 
-export function* generateJsDocComments(typeItem: models.Item | models.Alias): Iterable<NestedText> {
+export function* generateJsDocComments(
+  typeItem: models.Item | models.Alias | SchemaModel,
+): Iterable<NestedText> {
   const { id: nodeId } = typeItem;
 
   yield `/**\n`;
