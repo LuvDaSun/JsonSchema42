@@ -12,10 +12,6 @@
     "urlencoding"
   ],
   "useGitignore": true,
-  "files": [
-    "**"
-  ],
-  "enableFiletypes": [
-    "toml"
-  ]
+  "files": ["**"],
+  "enableFiletypes": ["*"]
 }
