@@ -110,10 +110,10 @@ async function main(options: MainOptions) {
 
   const intermediateData = context.getIntermediateData();
 
-  const types = transformSchema(intermediateData, transformMaximumIterations);
+  const { typeModels } = transformSchema(intermediateData, transformMaximumIterations);
 
   const namer = new Namer(defaultName, namerMaximumIterations);
-  for (const [typeKey, typeItem] of Object.entries(types)) {
+  for (const [typeKey, typeItem] of Object.entries(typeModels)) {
     const { id: nodeId } = typeItem;
     if (nodeId == null) {
       continue;
@@ -126,7 +126,7 @@ async function main(options: MainOptions) {
 
   const names = namer.getNames();
 
-  generatePackage(intermediateData, names, types, {
+  generatePackage(intermediateData, names, typeModels, {
     packageDirectoryPath,
     packageName,
     packageVersion,

@@ -10,7 +10,7 @@ import * as models from "../models/index.js";
 export function transformSchema(
   document: schemaIntermediate.SchemaDocument,
   maximumIterations: number,
-): Record<string, models.Item | models.Alias> {
+): { typeModels: Record<string, models.Item | models.Alias>; validatorsArena: SchemaArena } {
   const arena = SchemaArena.fromIntermediate(document);
   /*
   then transform the schema
@@ -21,6 +21,8 @@ export function transformSchema(
     schemaTransforms.explode,
     schemaTransforms.singleType,
   );
+
+  const validatorsArena = arena.clone();
 
   let iterations = 0;
   while (
@@ -58,7 +60,7 @@ export function transformSchema(
     }
   }
 
-  const result: Record<string, models.Item | models.Alias> = {
+  const typeModels: Record<string, models.Item | models.Alias> = {
     unknown: {
       type: "unknown",
     },
@@ -76,11 +78,11 @@ export function transformSchema(
     }
 
     for (const [newKey, newItem] of convertEntry([key, model])) {
-      result[newKey] = newItem;
+      typeModels[newKey] = newItem;
     }
   }
 
-  return result;
+  return { typeModels, validatorsArena };
 
   function* convertEntry(
     entry: [key: number, model: SchemaModel],
