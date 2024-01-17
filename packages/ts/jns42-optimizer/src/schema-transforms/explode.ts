@@ -7,6 +7,7 @@ import {
   ifSchemaOptional,
   ifSchemaRequired,
   isAliasSchemaModel,
+  notSchemaRequired,
   oneOfSchemaRequired,
   referenceSchemaRequired,
   typeSchemaOptional,
@@ -34,6 +35,7 @@ import {
  * - if: 700
  *   then: 800
  *   else: 900
+ * - not: 10
  * ```
  *
  * will become
@@ -63,7 +65,9 @@ import {
  *   if: 700
  *   then: 800
  *   else: 900
-
+ * - parent: 0
+ *   not: 10
+ *
  * ```
  *
  */
@@ -78,6 +82,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     anyOf: anyOfSchemaRequired,
     oneOf: oneOfSchemaRequired,
     if: [...ifSchemaRequired, ...ifSchemaOptional],
+    not: notSchemaRequired,
     type: typeSchemaOptional,
   };
 
@@ -104,6 +109,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     if: undefined,
     then: undefined,
     else: undefined,
+    not: undefined,
 
     types: undefined,
     dependentSchemas: undefined,
@@ -174,6 +180,15 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
       if: model.if,
       then: model.then,
       else: model.else,
+    };
+    const newSubKey = arena.addItem(newSubModel);
+    newModel.allOf.push(newSubKey);
+  }
+
+  if (schemaModels.not) {
+    const newSubModel: SchemaModel = {
+      parent: modelKey,
+      not: model.not,
     };
     const newSubKey = arena.addItem(newSubModel);
     newModel.allOf.push(newSubKey);
