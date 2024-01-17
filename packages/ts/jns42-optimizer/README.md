@@ -4,7 +4,7 @@ Optimize json schema types into TypeScript types.
 
 ## `anyOf`
 
-The weirdeset type in JsonSchema is the `anyOf` type. This type needs one of it's elements to be valid to be valid, just like the oneOf type. But more elements also may be valid, and this is kind of similar to the allOf type.
+The weirdest type in JsonSchema is the `anyOf` type. This type needs one of it's elements to be valid to be valid, just like the oneOf type. But more elements also may be valid, and this is kind of similar to the allOf type.
 
 `anyOf` can be presented as a `oneOf` and a few `allOf`'s. this is how:
 
