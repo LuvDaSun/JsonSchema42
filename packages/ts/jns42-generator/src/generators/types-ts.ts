@@ -1,4 +1,9 @@
-import { isAliasSchemaModel, isOneOfSchemaModel, isSingleTypeSchemaModel } from "jns42-optimizer";
+import {
+  isAliasSchemaModel,
+  isOneOfSchemaModel,
+  isSingleTypeSchemaModel,
+  isTypeSchemaModel,
+} from "jns42-optimizer";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -67,6 +72,16 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
       )}
     `;
     return;
+  }
+
+  if (isTypeSchemaModel(item)) {
+    if (item.options != null && item.options.length > 0) {
+      yield joinIterable(
+        item.options.map((option) => JSON.stringify(option)),
+        " |\n",
+      );
+      return;
+    }
   }
 
   if (isSingleTypeSchemaModel(item) && item.types != null) {
