@@ -337,18 +337,20 @@ function* generateMockDefinition(
             }
           }
 
-          yield itt`
-            new Array(
+          if (item.arrayItems != null) {
+            yield itt`
+            ...new Array(
               Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
               nextSeed() % (
-                Math.max(0, ${maximumItemsExpression} - ${JSON.stringify(tupleItemsLength)} -
-                Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)} +
+                Math.max(0, ${maximumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) -
+                Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
                 1
               )
             )
               .fill(undefined)
-              .map(() => ${item.arrayItems == null ? "anyValue" : generateMockReference(specification, item.arrayItems)})
+              .map(() => ${generateMockReference(specification, item.arrayItems)})
           `;
+          }
         }
       }
 
