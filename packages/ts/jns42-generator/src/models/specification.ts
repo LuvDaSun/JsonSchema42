@@ -3,7 +3,6 @@ import * as schemaIntermediate from "schema-intermediate";
 import { Namer } from "../utils/namer.js";
 
 export interface Specification {
-  document: schemaIntermediate.SchemaDocument;
   typesArena: SchemaArena;
   validatorsArena: SchemaArena;
   names: Record<string, string>;
@@ -107,5 +106,5 @@ export function loadSpecification(
   }
   const names = namer.getNames();
 
-  return { document, typesArena, validatorsArena, names };
+  return { typesArena, validatorsArena, names };
 }

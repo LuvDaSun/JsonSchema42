@@ -117,7 +117,7 @@ async function main(options: MainOptions) {
     defaultTypeName,
   });
 
-  generatePackage(specification, {
+  generatePackage(intermediateDocument, specification, {
     packageDirectoryPath,
     packageName,
     packageVersion,
