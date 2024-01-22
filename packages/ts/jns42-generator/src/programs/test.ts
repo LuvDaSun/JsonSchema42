@@ -147,7 +147,7 @@ async function main(options: MainOptions) {
       cp.execSync("npm install", {
         cwd: packageDirectoryPath,
         env: process.env,
-        stdio: "pipe",
+        stdio: "inherit",
       });
     }
 
@@ -156,7 +156,7 @@ async function main(options: MainOptions) {
       cp.execSync("npm run build", {
         cwd: packageDirectoryPath,
         env: process.env,
-        stdio: "pipe",
+        stdio: "inherit",
       });
     }
 
@@ -164,7 +164,7 @@ async function main(options: MainOptions) {
       cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,
-        stdio: "pipe",
+        stdio: "inherit",
       });
     });
 

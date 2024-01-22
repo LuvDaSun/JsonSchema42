@@ -192,11 +192,19 @@ function guessTypes(node: schemaIntermediate.Node) {
     }
   }
 
-  if ((node.tupleItems != null && node.tupleItems.length > 0) || node.arrayItems != null) {
+  if (
+    node.minimumItems != null ||
+    node.maximumItems != null ||
+    node.uniqueItems != null ||
+    (node.tupleItems != null && node.tupleItems.length > 0) ||
+    node.arrayItems != null
+  ) {
     types.add("array");
   }
 
   if (
+    node.minimumProperties != null ||
+    node.maximumProperties != null ||
     node.propertyNames != null ||
     node.mapProperties != null ||
     (node.patternProperties != null && Object.keys(node.patternProperties).length > 0) ||
@@ -204,6 +212,25 @@ function guessTypes(node: schemaIntermediate.Node) {
     (node.required != null && node.required.length > 0)
   ) {
     types.add("map");
+  }
+
+  if (
+    node.minimumInclusive != null ||
+    node.minimumExclusive != null ||
+    node.maximumInclusive != null ||
+    node.maximumExclusive != null ||
+    node.multipleOf != null
+  ) {
+    types.add("number");
+  }
+
+  if (
+    node.minimumLength != null ||
+    node.maximumLength != null ||
+    node.valuePattern != null ||
+    node.valueFormat != null
+  ) {
+    types.add("string");
   }
 
   if (types.size === 0) {
