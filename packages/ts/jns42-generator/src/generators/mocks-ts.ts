@@ -129,8 +129,8 @@ function* generateMockDefinition(
   specification: models.Specification,
   itemKey: number,
 ): Iterable<NestedText> {
-  const { validatorsArena } = specification;
-  const item = validatorsArena.getItem(itemKey);
+  const { typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
 
   if (isAliasSchemaModel(item)) {
     yield generateMockReference(specification, item.alias);
@@ -375,12 +375,22 @@ function* generateMockDefinition(
             for (const name of propertyNames) {
               if (objectProperties[name] == null) {
                 yield itt`
-                [${JSON.stringify(name)}]: anyValue,
-              `;
+                  [${JSON.stringify(name)}]: anyValue,
+                `;
               } else {
-                yield itt`
-                [${JSON.stringify(name)}]: ${generateMockReference(specification, objectProperties[name])},
-              `;
+                const [resolvedKey] = typesArena.resolveItem(objectProperties[name]);
+                if (required.has(name)) {
+                  yield itt`
+                    [${JSON.stringify(name)}]: ${generateMockReference(specification, objectProperties[name])},
+                  `;
+                } else {
+                  yield itt`
+                    [${JSON.stringify(name)}]:
+                      (depthCounters[${JSON.stringify(resolvedKey)}] ?? 0) < configuration.maximumDepth ?
+                      ${generateMockReference(specification, objectProperties[name])} :
+                      undefined,
+                  `;
+                }
               }
             }
           }
