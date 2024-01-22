@@ -60,12 +60,15 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
           description: undefined,
           examples: undefined,
           deprecated: undefined,
+          mockable: false,
         };
         continue;
       }
 
       newSubModel = {
         ...newSubModel,
+        mockable: false,
+
         options: intersectionMerge(newSubModel.options, subModel.options),
         required: intersectionMerge(newSubModel.required, subModel.required),
         propertyNames: mergeKey(newSubModel.propertyNames, subModel.propertyNames),

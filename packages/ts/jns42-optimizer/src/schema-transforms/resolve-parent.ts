@@ -5,6 +5,7 @@ import {
   isChildSchemaModel,
 } from "../schema/index.js";
 import {
+  booleanMergeAnd,
   booleanMergeOr,
   intersectionMerge,
   mergeKeysArray,
@@ -38,6 +39,8 @@ export const resolveParent: SchemaTransform = (arena, model, modelKey) => {
   const newModel: SchemaModel = {
     ...model,
     parent: undefined,
+    mockable: booleanMergeAnd(model.mockable, parentModel.mockable),
+
     types: intersectionMergeTypes(model.types, parentModel.types),
     options: intersectionMerge(model.options, parentModel.options),
     required: unionMerge(model.required, parentModel.required),

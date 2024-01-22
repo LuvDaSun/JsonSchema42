@@ -61,6 +61,7 @@ export const singleType: SchemaTransform = (arena, model, modelKey) => {
   for (const type of model.types) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
+      mockable: model.mockable,
       types: [type],
     };
     const newSubKey = arena.addItem(newSubModel);

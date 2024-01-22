@@ -57,6 +57,8 @@ export function loadSpecification(
     while (
       typesArena.applyTransform(
         // order matters!
+        schemaTransforms.mockable,
+
         schemaTransforms.explode,
         schemaTransforms.singleType,
 
