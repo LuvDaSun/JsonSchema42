@@ -152,20 +152,24 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
         return;
 
         function* generateInterfaceContent() {
+          let undefinedProperty = false;
+
           if (item.objectProperties != null || item.required != null) {
             const required = new Set(item.required);
             const objectProperties = item.objectProperties ?? {};
             const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
 
             for (const name of propertyNames) {
+              undefinedProperty ||= !required.has(name);
+
               if (objectProperties[name] == null) {
                 yield itt`
-                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: any,
-              `;
+                  [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: any,
+                `;
               } else {
                 yield itt`
-                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
-              `;
+                  [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
+                `;
               }
             }
           }
@@ -182,15 +186,18 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
             }
 
             if (elementKeys.length > 0) {
+              const typeNames = [...elementKeys, ...Object.values(item.objectProperties ?? {})].map(
+                (elementKey) => generateTypeReference(specification, elementKey),
+              );
+
+              if (undefinedProperty) {
+                typeNames.push("undefined");
+              }
+
               yield itt`
                 [
                   name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
-                ]: ${joinIterable(
-                  [...elementKeys, ...Object.values(item.objectProperties ?? {})].map(
-                    (elementKey) => generateTypeReference(specification, elementKey),
-                  ),
-                  " |\n",
-                )}
+                ]: ${joinIterable(typeNames, " |\n")}
               `;
               return;
             }
