@@ -1,0 +1,21 @@
+$schema: "./schema.json"
+
+schemas:
+  draft-04:
+    $schema: "http://json-schema.org/draft-04/schema#"
+    $ref: "#/definitions/positiveIntegerDefault0"
+    definitions:
+      positiveInteger:
+        type: "integer"
+        minimum: 0
+      positiveIntegerDefault0:
+        allOf:
+          - $ref: "#/definitions/positiveInteger"
+          - default: 0
+
+valid:
+  - zero: 0
+  - one: 1
+
+invalid:
+  - minus-one: -1
