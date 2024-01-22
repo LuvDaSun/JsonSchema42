@@ -1865,6 +1865,12 @@ counter += 1;
 }
 if(counter === 1 &&
 ((value: unknown) => {
+if(
+typeof value !== "string"
+) {
+recordError("string");
+return false;
+}
 return true;
 })(value)
 ) {

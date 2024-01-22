@@ -9,292 +9,154 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as validators from "./validators.js";
 import * as mocks from "./mocks.js";
-test.skip("SchemaDocument", () => {
-const mock = mocks.mockSchemaDocument();
-const valid = validators.isSchemaDocument(mock);
-assert.equal(valid, true);
-});
-test.skip("SchemaArray", () => {
-const mock = mocks.mockSchemaArray();
-const valid = validators.isSchemaArray(mock);
-assert.equal(valid, true);
-});
-test.skip("PositiveInteger", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveInteger}
+*/
+test("PositiveInteger", () => {
 const mock = mocks.mockPositiveInteger();
 const valid = validators.isPositiveInteger(mock);
 assert.equal(valid, true);
 });
-test.skip("PositiveIntegerDefault0", () => {
-const mock = mocks.mockPositiveIntegerDefault0();
-const valid = validators.isPositiveIntegerDefault0(mock);
-assert.equal(valid, true);
-});
-test.skip("SimpleTypes", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
+*/
+test("SimpleTypes", () => {
 const mock = mocks.mockSimpleTypes();
 const valid = validators.isSimpleTypes(mock);
 assert.equal(valid, true);
 });
-test.skip("StringArray", () => {
-const mock = mocks.mockStringArray();
-const valid = validators.isStringArray(mock);
-assert.equal(valid, true);
-});
-test.skip("Id", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/id}
+*/
+test("Id", () => {
 const mock = mocks.mockId();
 const valid = validators.isId(mock);
 assert.equal(valid, true);
 });
-test.skip("Schema", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/$schema}
+*/
+test("Schema", () => {
 const mock = mocks.mockSchema();
 const valid = validators.isSchema(mock);
 assert.equal(valid, true);
 });
-test.skip("Title", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/title}
+*/
+test("Title", () => {
 const mock = mocks.mockTitle();
 const valid = validators.isTitle(mock);
 assert.equal(valid, true);
 });
-test.skip("Description", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/description}
+*/
+test("Description", () => {
 const mock = mocks.mockDescription();
 const valid = validators.isDescription(mock);
 assert.equal(valid, true);
 });
-test.skip("Default", () => {
-const mock = mocks.mockDefault();
-const valid = validators.isDefault(mock);
-assert.equal(valid, true);
-});
-test.skip("MultipleOf", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/multipleOf}
+*/
+test("MultipleOf", () => {
 const mock = mocks.mockMultipleOf();
 const valid = validators.isMultipleOf(mock);
 assert.equal(valid, true);
 });
-test.skip("Maximum", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maximum}
+*/
+test("Maximum", () => {
 const mock = mocks.mockMaximum();
 const valid = validators.isMaximum(mock);
 assert.equal(valid, true);
 });
-test.skip("ExclusiveMaximum", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMaximum}
+*/
+test("ExclusiveMaximum", () => {
 const mock = mocks.mockExclusiveMaximum();
 const valid = validators.isExclusiveMaximum(mock);
 assert.equal(valid, true);
 });
-test.skip("Minimum", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/minimum}
+*/
+test("Minimum", () => {
 const mock = mocks.mockMinimum();
 const valid = validators.isMinimum(mock);
 assert.equal(valid, true);
 });
-test.skip("ExclusiveMinimum", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/exclusiveMinimum}
+*/
+test("ExclusiveMinimum", () => {
 const mock = mocks.mockExclusiveMinimum();
 const valid = validators.isExclusiveMinimum(mock);
 assert.equal(valid, true);
 });
-test.skip("MaxLength", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxLength}
+*/
+test("MaxLength", () => {
 const mock = mocks.mockMaxLength();
 const valid = validators.isMaxLength(mock);
 assert.equal(valid, true);
 });
-test.skip("MinLength", () => {
-const mock = mocks.mockMinLength();
-const valid = validators.isMinLength(mock);
-assert.equal(valid, true);
-});
-test.skip("Pattern", () => {
-const mock = mocks.mockPattern();
-const valid = validators.isPattern(mock);
-assert.equal(valid, true);
-});
-test.skip("AdditionalItems", () => {
-const mock = mocks.mockAdditionalItems();
-const valid = validators.isAdditionalItems(mock);
-assert.equal(valid, true);
-});
-test.skip("PropertiesItems", () => {
-const mock = mocks.mockPropertiesItems();
-const valid = validators.isPropertiesItems(mock);
-assert.equal(valid, true);
-});
-test.skip("MaxItems", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
+*/
+test("MaxItems", () => {
 const mock = mocks.mockMaxItems();
 const valid = validators.isMaxItems(mock);
 assert.equal(valid, true);
 });
-test.skip("MinItems", () => {
-const mock = mocks.mockMinItems();
-const valid = validators.isMinItems(mock);
-assert.equal(valid, true);
-});
-test.skip("UniqueItems", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/uniqueItems}
+*/
+test("UniqueItems", () => {
 const mock = mocks.mockUniqueItems();
 const valid = validators.isUniqueItems(mock);
 assert.equal(valid, true);
 });
-test.skip("MaxProperties", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/maxProperties}
+*/
+test("MaxProperties", () => {
 const mock = mocks.mockMaxProperties();
 const valid = validators.isMaxProperties(mock);
 assert.equal(valid, true);
 });
-test.skip("MinProperties", () => {
-const mock = mocks.mockMinProperties();
-const valid = validators.isMinProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("Required", () => {
-const mock = mocks.mockRequired();
-const valid = validators.isRequired(mock);
-assert.equal(valid, true);
-});
-test.skip("PropertiesAdditionalProperties", () => {
-const mock = mocks.mockPropertiesAdditionalProperties();
-const valid = validators.isPropertiesAdditionalProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("Definitions", () => {
-const mock = mocks.mockDefinitions();
-const valid = validators.isDefinitions(mock);
-assert.equal(valid, true);
-});
-test.skip("Properties", () => {
-const mock = mocks.mockProperties();
-const valid = validators.isProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("PatternProperties", () => {
-const mock = mocks.mockPatternProperties();
-const valid = validators.isPatternProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("Dependencies", () => {
-const mock = mocks.mockDependencies();
-const valid = validators.isDependencies(mock);
-assert.equal(valid, true);
-});
-test.skip("Enum", () => {
-const mock = mocks.mockEnum();
-const valid = validators.isEnum(mock);
-assert.equal(valid, true);
-});
-test.skip("Type", () => {
-const mock = mocks.mockType();
-const valid = validators.isType(mock);
-assert.equal(valid, true);
-});
-test.skip("Format", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/format}
+*/
+test("Format", () => {
 const mock = mocks.mockFormat();
 const valid = validators.isFormat(mock);
 assert.equal(valid, true);
 });
-test.skip("AllOf", () => {
-const mock = mocks.mockAllOf();
-const valid = validators.isAllOf(mock);
-assert.equal(valid, true);
-});
-test.skip("AnyOf", () => {
-const mock = mocks.mockAnyOf();
-const valid = validators.isAnyOf(mock);
-assert.equal(valid, true);
-});
-test.skip("OneOf", () => {
-const mock = mocks.mockOneOf();
-const valid = validators.isOneOf(mock);
-assert.equal(valid, true);
-});
-test.skip("Not", () => {
-const mock = mocks.mockNot();
-const valid = validators.isNot(mock);
-assert.equal(valid, true);
-});
-test.skip("SchemaArrayItems", () => {
-const mock = mocks.mockSchemaArrayItems();
-const valid = validators.isSchemaArrayItems(mock);
-assert.equal(valid, true);
-});
-test.skip("PositiveIntegerDefault00", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/positiveIntegerDefault0/allOf/0}
+*/
+test("PositiveIntegerDefault00", () => {
 const mock = mocks.mockPositiveIntegerDefault00();
 const valid = validators.isPositiveIntegerDefault00(mock);
 assert.equal(valid, true);
 });
-test.skip("PositiveIntegerDefault01", () => {
-const mock = mocks.mockPositiveIntegerDefault01();
-const valid = validators.isPositiveIntegerDefault01(mock);
-assert.equal(valid, true);
-});
-test.skip("StringArrayItems", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/definitions/stringArray/items}
+*/
+test("StringArrayItems", () => {
 const mock = mocks.mockStringArrayItems();
 const valid = validators.isStringArrayItems(mock);
 assert.equal(valid, true);
 });
-test.skip("AdditionalItems0", () => {
-const mock = mocks.mockAdditionalItems0();
-const valid = validators.isAdditionalItems0(mock);
-assert.equal(valid, true);
-});
-test.skip("AdditionalItems1", () => {
-const mock = mocks.mockAdditionalItems1();
-const valid = validators.isAdditionalItems1(mock);
-assert.equal(valid, true);
-});
-test.skip("Items0", () => {
-const mock = mocks.mockItems0();
-const valid = validators.isItems0(mock);
-assert.equal(valid, true);
-});
-test.skip("Items1", () => {
-const mock = mocks.mockItems1();
-const valid = validators.isItems1(mock);
-assert.equal(valid, true);
-});
-test.skip("AdditionalProperties0", () => {
-const mock = mocks.mockAdditionalProperties0();
-const valid = validators.isAdditionalProperties0(mock);
-assert.equal(valid, true);
-});
-test.skip("AdditionalProperties1", () => {
-const mock = mocks.mockAdditionalProperties1();
-const valid = validators.isAdditionalProperties1(mock);
-assert.equal(valid, true);
-});
-test.skip("DefinitionsAdditionalProperties", () => {
-const mock = mocks.mockDefinitionsAdditionalProperties();
-const valid = validators.isDefinitionsAdditionalProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("PropertiesPropertiesAdditionalProperties", () => {
-const mock = mocks.mockPropertiesPropertiesAdditionalProperties();
-const valid = validators.isPropertiesPropertiesAdditionalProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("PatternPropertiesAdditionalProperties", () => {
-const mock = mocks.mockPatternPropertiesAdditionalProperties();
-const valid = validators.isPatternPropertiesAdditionalProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("DependenciesAdditionalProperties", () => {
-const mock = mocks.mockDependenciesAdditionalProperties();
-const valid = validators.isDependenciesAdditionalProperties(mock);
-assert.equal(valid, true);
-});
-test.skip("Type0", () => {
-const mock = mocks.mockType0();
-const valid = validators.isType0(mock);
-assert.equal(valid, true);
-});
-test.skip("Type1", () => {
-const mock = mocks.mockType1();
-const valid = validators.isType1(mock);
-assert.equal(valid, true);
-});
-test.skip("Dependencies0", () => {
-const mock = mocks.mockDependencies0();
-const valid = validators.isDependencies0(mock);
-assert.equal(valid, true);
-});
-test.skip("Dependencies1", () => {
-const mock = mocks.mockDependencies1();
-const valid = validators.isDependencies1(mock);
-assert.equal(valid, true);
-});
-test.skip("TypeItems", () => {
+/**
+* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
+*/
+test("TypeItems", () => {
 const mock = mocks.mockTypeItems();
 const valid = validators.isTypeItems(mock);
 assert.equal(valid, true);

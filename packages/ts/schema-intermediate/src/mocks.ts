@@ -37,41 +37,6 @@ defaultMinimumStringLength: 5,
 defaultMaximumStringLength: 20,
 }
 /**
-* @summary JsonSchema42 intermediate schema
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json}
-*/
-export function mockSchemaDocument(options: MockGeneratorOptions = {}): types.SchemaDocument {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[0] ??= 0;
-try {
-depthCounters[0]++;
-return (unknownValue);
-}
-finally {
-depthCounters[0]--;
-}
-}
-/**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node}
-*/
-export function mockNode(options: MockGeneratorOptions = {}): types.Node {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[1] ??= 0;
-try {
-depthCounters[1]++;
-return (unknownValue);
-}
-finally {
-depthCounters[1]--;
-}
-}
-/**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node-reference}
 */
 export function mockNodeReference(options: MockGeneratorOptions = {}): types.NodeReference {
@@ -82,7 +47,17 @@ const configuration = {
 depthCounters[2] ??= 0;
 try {
 depthCounters[2]++;
-return (unknownValue);
+return (
+new Array(
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters[2]--;
@@ -99,7 +74,9 @@ const configuration = {
 depthCounters[3] ??= 0;
 try {
 depthCounters[3]++;
-return (unknownValue);
+return (
+(Math.ceil(configuration.defaultMinimumValue / 1) + nextSeed() % (Math.floor(configuration.defaultMaximumValue / 1) - Math.ceil(configuration.defaultMinimumValue / 1) + 1)) * 1
+);
 }
 finally {
 depthCounters[3]--;
@@ -116,7 +93,14 @@ const configuration = {
 depthCounters[4] ??= 0;
 try {
 depthCounters[4]++;
-return (unknownValue);
+return (
+(
+configuration.defaultMinimumValue * configuration.numberPrecision +
+nextSeed() % (
+(configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1
+) / configuration.numberPrecision
+)
+);
 }
 finally {
 depthCounters[4]--;
@@ -133,7 +117,7 @@ const configuration = {
 depthCounters[5] ??= 0;
 try {
 depthCounters[5]++;
-return (unknownValue);
+return (Boolean(nextSeed() % 2));
 }
 finally {
 depthCounters[5]--;
@@ -150,7 +134,17 @@ const configuration = {
 depthCounters[6] ??= 0;
 try {
 depthCounters[6]++;
-return (unknownValue);
+return (
+new Array(
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters[6]--;
@@ -167,7 +161,17 @@ const configuration = {
 depthCounters[7] ??= 0;
 try {
 depthCounters[7]++;
-return (unknownValue);
+return (
+new Array(
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+);
 }
 finally {
 depthCounters[7]--;
@@ -184,7 +188,9 @@ const configuration = {
 depthCounters[8] ??= 0;
 try {
 depthCounters[8]++;
-return (unknownValue);
+return (
+(Math.ceil(configuration.defaultMinimumValue / 1) + nextSeed() % (Math.floor(configuration.defaultMaximumValue / 1) - Math.ceil(configuration.defaultMinimumValue / 1) + 1)) * 1
+);
 }
 finally {
 depthCounters[8]--;
@@ -201,27 +207,18 @@ const configuration = {
 depthCounters[9] ??= 0;
 try {
 depthCounters[9]++;
-return (unknownValue);
+return (
+(
+[
+"https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
+] as const
+)[
+nextSeed() % 1
+]
+);
 }
 finally {
 depthCounters[9]--;
-}
-}
-/**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas}
-*/
-export function mockSchemas(options: MockGeneratorOptions = {}): types.Schemas {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[10] ??= 0;
-try {
-depthCounters[10]++;
-return (unknownValue);
-}
-finally {
-depthCounters[10]--;
 }
 }
 /**
@@ -259,23 +256,6 @@ depthCounters[12]--;
 }
 }
 /**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
-*/
-export function mockExamples(options: MockGeneratorOptions = {}): types.Examples {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[13] ??= 0;
-try {
-depthCounters[13]++;
-return (unknownValue);
-}
-finally {
-depthCounters[13]--;
-}
-}
-/**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
 */
 export function mockDeprecated(options: MockGeneratorOptions = {}): types.Deprecated {
@@ -304,7 +284,20 @@ const configuration = {
 depthCounters[15] ??= 0;
 try {
 depthCounters[15]++;
-return (unknownValue);
+return (
+[
+...new Array(
+Math.max(0, configuration.defaultMinimumItems - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumItems - 0) -
+Math.max(0, configuration.defaultMinimumItems - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => mockTypesItems())
+]
+);
 }
 finally {
 depthCounters[15]--;
@@ -338,7 +331,20 @@ const configuration = {
 depthCounters[17] ??= 0;
 try {
 depthCounters[17]++;
-return (unknownValue);
+return (
+[
+...new Array(
+Math.max(0, configuration.defaultMinimumItems - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumItems - 0) -
+Math.max(0, configuration.defaultMinimumItems - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => mockOneOfItems())
+]
+);
 }
 finally {
 depthCounters[17]--;
@@ -355,7 +361,20 @@ const configuration = {
 depthCounters[18] ??= 0;
 try {
 depthCounters[18]++;
-return (unknownValue);
+return (
+[
+...new Array(
+Math.max(0, configuration.defaultMinimumItems - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumItems - 0) -
+Math.max(0, configuration.defaultMinimumItems - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => mockAnyOfItems())
+]
+);
 }
 finally {
 depthCounters[18]--;
@@ -372,7 +391,20 @@ const configuration = {
 depthCounters[19] ??= 0;
 try {
 depthCounters[19]++;
-return (unknownValue);
+return (
+[
+...new Array(
+Math.max(0, configuration.defaultMinimumItems - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumItems - 0) -
+Math.max(0, configuration.defaultMinimumItems - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => mockAllOfItems())
+]
+);
 }
 finally {
 depthCounters[19]--;
@@ -457,7 +489,44 @@ const configuration = {
 depthCounters[24] ??= 0;
 try {
 depthCounters[24]++;
-return (unknownValue);
+return (
+{
+...Object.fromEntries(
+new Array(
+Math.max(0, configuration.defaultMinimumProperties - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumProperties - 0) -
+Math.max(0, configuration.defaultMinimumProperties - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => [
+new Array(
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+,
+(() => {
+switch (
+(
+nextSeed() % 1
+) as 0
+) {
+case 0:
+return (mockDependentSchemasAdditionalProperties());
+}
+})(),
+]
+)
+)
+}
+);
 }
 finally {
 depthCounters[24]--;
@@ -474,7 +543,44 @@ const configuration = {
 depthCounters[25] ??= 0;
 try {
 depthCounters[25]++;
-return (unknownValue);
+return (
+{
+...Object.fromEntries(
+new Array(
+Math.max(0, configuration.defaultMinimumProperties - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumProperties - 0) -
+Math.max(0, configuration.defaultMinimumProperties - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => [
+new Array(
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+,
+(() => {
+switch (
+(
+nextSeed() % 1
+) as 0
+) {
+case 0:
+return (mockObjectPropertiesAdditionalProperties());
+}
+})(),
+]
+)
+)
+}
+);
 }
 finally {
 depthCounters[25]--;
@@ -508,7 +614,44 @@ const configuration = {
 depthCounters[27] ??= 0;
 try {
 depthCounters[27]++;
-return (unknownValue);
+return (
+{
+...Object.fromEntries(
+new Array(
+Math.max(0, configuration.defaultMinimumProperties - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumProperties - 0) -
+Math.max(0, configuration.defaultMinimumProperties - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => [
+new Array(
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
+).
+fill(undefined).
+map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+join("")
+,
+(() => {
+switch (
+(
+nextSeed() % 1
+) as 0
+) {
+case 0:
+return (mockPatternPropertiesAdditionalProperties());
+}
+})(),
+]
+)
+)
+}
+);
 }
 finally {
 depthCounters[27]--;
@@ -542,7 +685,20 @@ const configuration = {
 depthCounters[29] ??= 0;
 try {
 depthCounters[29]++;
-return (unknownValue);
+return (
+[
+...new Array(
+Math.max(0, configuration.defaultMinimumItems - 0) +
+nextSeed() % (
+Math.max(0, configuration.defaultMaximumItems - 0) -
+Math.max(0, configuration.defaultMinimumItems - 0) +
+1
+)
+)
+.fill(undefined)
+.map(() => mockTupleItemsItems())
+]
+);
 }
 finally {
 depthCounters[29]--;
@@ -580,23 +736,6 @@ return (mockNodeReference());
 }
 finally {
 depthCounters[31]--;
-}
-}
-/**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
-*/
-export function mockOptions(options: MockGeneratorOptions = {}): types.Options {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[32] ??= 0;
-try {
-depthCounters[32]++;
-return (unknownValue);
-}
-finally {
-depthCounters[32]--;
 }
 }
 /**
@@ -797,27 +936,10 @@ const configuration = {
 depthCounters[44] ??= 0;
 try {
 depthCounters[44]++;
-return (unknownValue);
+return (Boolean(nextSeed() % 2));
 }
 finally {
 depthCounters[44]--;
-}
-}
-/**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
-*/
-export function mockRequired(options: MockGeneratorOptions = {}): types.Required {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[45] ??= 0;
-try {
-depthCounters[45]++;
-return (unknownValue);
-}
-finally {
-depthCounters[45]--;
 }
 }
 /**
@@ -855,40 +977,6 @@ depthCounters[47]--;
 }
 }
 /**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/properties/schemas/additionalProperties}
-*/
-export function mockSchemasAdditionalProperties(options: MockGeneratorOptions = {}): types.SchemasAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[48] ??= 0;
-try {
-depthCounters[48]++;
-return (mockNode());
-}
-finally {
-depthCounters[48]--;
-}
-}
-/**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples/items}
-*/
-export function mockExamplesItems(options: MockGeneratorOptions = {}): types.ExamplesItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[49] ??= 0;
-try {
-depthCounters[49]++;
-return (unknownValue);
-}
-finally {
-depthCounters[49]--;
-}
-}
-/**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types/items}
 */
 export function mockTypesItems(options: MockGeneratorOptions = {}): types.TypesItems {
@@ -899,7 +987,15 @@ const configuration = {
 depthCounters[50] ??= 0;
 try {
 depthCounters[50]++;
-return (unknownValue);
+return (
+(
+[
+"never", "any", "null", "boolean", "integer", "number", "string", "array", "map"
+] as const
+)[
+nextSeed() % 9
+]
+);
 }
 finally {
 depthCounters[50]--;
@@ -1022,23 +1118,6 @@ return (mockNodeReference());
 }
 finally {
 depthCounters[57]--;
-}
-}
-/**
-* @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options/items}
-*/
-export function mockOptionsItems(options: MockGeneratorOptions = {}): types.OptionsItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[58] ??= 0;
-try {
-depthCounters[58]++;
-return (unknownValue);
-}
-finally {
-depthCounters[58]--;
 }
 }
 /**
