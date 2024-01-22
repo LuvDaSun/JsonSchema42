@@ -1,3 +1,9 @@
+import {
+  isAliasSchemaModel,
+  isOneOfSchemaModel,
+  isSingleTypeSchemaModel,
+  isTypeSchemaModel,
+} from "jns42-optimizer";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -12,7 +18,7 @@ import {
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typesArena } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -21,9 +27,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
   yield itt`
     const depthCounters: Record<string, number> = {};
 
-    export const unknownValue = {};
-    export const anyValue = {};
-    export const neverValue = {};
+    export const unknownValue: any = {};
+    export const anyValue: any = {};
+    export const neverValue: any = {};
 
     export interface MockGeneratorOptions {
       maximumDepth?: number;
@@ -53,16 +59,20 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
   `;
 
-  for (const [typeKey, item] of Object.entries(types)) {
+  for (const [itemKey, item] of typesArena) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
+    if (item.mockable !== true) {
+      continue;
+    }
+
     const typeName = toPascal(names[nodeId]);
     const functionName = toCamel("mock", names[nodeId]);
-    const definition = generateMockDefinition(specification, typeKey);
+    const definition = generateMockDefinition(specification, itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
@@ -71,15 +81,15 @@ export function* generateMocksTsCode(specification: models.Specification) {
           ...defaultMockGeneratorOptions,
           ...options,
         };
-        depthCounters[${JSON.stringify(typeKey)}] ??= 0;
+        depthCounters[${JSON.stringify(itemKey)}] ??= 0;
 
         try {
-          depthCounters[${JSON.stringify(typeKey)}]++;
+          depthCounters[${JSON.stringify(itemKey)}]++;
           
           return (${definition});
         }
         finally {
-          depthCounters[${JSON.stringify(typeKey)}]--;
+          depthCounters[${JSON.stringify(itemKey)}]--;
         }
       }
     `;
@@ -103,347 +113,364 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
 function* generateMockReference(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
-  if (typeItem.id == null) {
-    yield itt`(${generateMockDefinition(specification, typeKey)})`;
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
+  if (item.id == null) {
+    yield itt`(${generateMockDefinition(specification, itemKey)})`;
   } else {
-    const functionName = toCamel("mock", names[typeItem.id]);
+    const functionName = toCamel("mock", names[item.id]);
     yield itt`${functionName}()`;
   }
 }
 
 function* generateMockDefinition(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+  const { typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
 
-  switch (typeItem.type) {
-    case "unknown":
-      yield `unknownValue`;
-      break;
+  if (isAliasSchemaModel(item)) {
+    yield generateMockReference(specification, item.alias);
+    return;
+  }
 
-    case "any":
-      yield `anyValue`;
-      break;
-
-    case "never":
-      yield `neverValue`;
-      break;
-
-    case "null":
-      yield JSON.stringify(null);
-      break;
-
-    case "boolean": {
-      if (typeItem.options != null) {
-        yield itt`([${joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          ", ",
-        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
-        break;
-      }
-      yield `Boolean(nextSeed() % 2)`;
-      break;
-    }
-
-    case "integer": {
-      if (typeItem.options != null) {
-        yield itt`([${joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          ", ",
-        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
-        break;
-      }
-
-      let multipleOf = typeItem.multipleOf ?? 1;
-
-      let minimumValue = Number.NEGATIVE_INFINITY;
-      let isMinimumExclusive: boolean | undefined;
-      if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
-        minimumValue = typeItem.minimumInclusive;
-        isMinimumExclusive = false;
-      }
-      if (typeItem.minimumExclusive != null && typeItem.minimumExclusive >= minimumValue) {
-        minimumValue = typeItem.minimumExclusive;
-        isMinimumExclusive = true;
-      }
-      const minimumValueInclusiveExpression =
-        isMinimumExclusive == null
-          ? `Math.ceil(configuration.defaultMinimumValue / ${JSON.stringify(multipleOf)})`
-          : isMinimumExclusive
-            ? `(Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)}) + 1)`
-            : `Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)})`;
-
-      let maximumValue = Number.POSITIVE_INFINITY;
-      let isMaximumExclusive: boolean | undefined;
-      if (typeItem.maximumInclusive != null && typeItem.maximumInclusive <= maximumValue) {
-        maximumValue = typeItem.maximumInclusive;
-        isMaximumExclusive = false;
-      }
-      if (typeItem.maximumExclusive != null && typeItem.maximumExclusive <= maximumValue) {
-        maximumValue = typeItem.maximumExclusive;
-        isMaximumExclusive = true;
-      }
-      const maximumValueInclusiveExpression =
-        isMaximumExclusive == null
-          ? `Math.floor(configuration.defaultMaximumValue / ${JSON.stringify(multipleOf)})`
-          : isMaximumExclusive
-            ? `(Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)}) - 1)`
-            : `Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)})`;
-
-      yield `
-        (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)) * ${multipleOf}
-      `;
-      break;
-    }
-
-    case "number": {
-      if (typeItem.options != null) {
-        yield itt`([${joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          ", ",
-        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
-        break;
-      }
-
-      let minimumValue = Number.NEGATIVE_INFINITY;
-      let isMinimumExclusive: boolean | undefined;
-      if (typeItem.minimumInclusive != null && typeItem.minimumInclusive >= minimumValue) {
-        minimumValue = typeItem.minimumInclusive;
-        isMinimumExclusive = false;
-      }
-      if (typeItem.minimumExclusive != null && typeItem.minimumExclusive >= minimumValue) {
-        minimumValue = typeItem.minimumExclusive;
-        isMinimumExclusive = true;
-      }
-      const minimumValueInclusiveExpression =
-        isMinimumExclusive == null
-          ? `configuration.defaultMinimumValue * configuration.numberPrecision`
-          : isMinimumExclusive
-            ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
-            : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
-
-      let maximumValue = Number.POSITIVE_INFINITY;
-      let isMaximumExclusive: boolean | undefined;
-      if (typeItem.maximumInclusive != null && typeItem.maximumInclusive <= maximumValue) {
-        maximumValue = typeItem.maximumInclusive;
-        isMaximumExclusive = false;
-      }
-      if (typeItem.maximumExclusive != null && typeItem.maximumExclusive <= maximumValue) {
-        maximumValue = typeItem.maximumExclusive;
-        isMaximumExclusive = true;
-      }
-      const maximumValueInclusiveExpression =
-        isMaximumExclusive == null
-          ? `(configuration.defaultMaximumValue * configuration.numberPrecision)`
-          : isMaximumExclusive
-            ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
-            : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
-
-      yield `
-        (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1) / configuration.numberPrecision)
-      `;
-      break;
-    }
-
-    case "string":
-      if (typeItem.options != null) {
-        yield itt`([${joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          ", ",
-        )}] as const)[nextSeed() % ${JSON.stringify(typeItem.options.length)}]`;
-        break;
-      }
-
-      const minimumStringLengthExpression =
-        typeItem.minimumLength == null
-          ? "configuration.defaultMinimumStringLength"
-          : JSON.stringify(typeItem.minimumLength);
-      const maximumStringLengthExpression =
-        typeItem.maximumLength == null
-          ? "configuration.defaultMaximumStringLength"
-          : JSON.stringify(typeItem.maximumLength);
-
-      yield `
-        new Array(
-          ${minimumStringLengthExpression} + nextSeed() % (${maximumStringLengthExpression} - ${minimumStringLengthExpression} + 1)
-        ).
-          fill(undefined).
-          map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-          join("")
-      `;
-      break;
-
-    case "tuple": {
-      yield itt`
-        [
-          ${joinIterable(
-            typeItem.elements.map(
-              (element) => itt`
-                ${generateMockReference(specification, element)},
-              `,
-            ),
-            "",
+  if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    yield itt`
+      (() => {
+        switch (
+          (
+            nextSeed() % ${JSON.stringify(item.oneOf.length)}
+          ) as ${joinIterable(
+            item.oneOf.map((element, index) => JSON.stringify(index)),
+            " | ",
           )}
+        ) {
+          ${item.oneOf.map(
+            (element, index) => itt`
+              case ${JSON.stringify(index)}:
+                return (${generateMockReference(specification, element)});
+            `,
+          )}              
+        }
+      })()
+    `;
+    return;
+  }
+
+  if (isTypeSchemaModel(item)) {
+    if (item.options != null && item.options.length > 0) {
+      yield itt`
+        (
+          [
+            ${joinIterable(
+              item.options.map((option) => JSON.stringify(option)),
+              ", ",
+            )}
+          ] as const
+        )[
+          nextSeed() % ${JSON.stringify(item.options.length)}
         ]
       `;
-      break;
+      return;
     }
+  }
 
-    case "array": {
-      const { element } = typeItem;
-      const [resolvedElement] = unalias(types, element);
+  if (isSingleTypeSchemaModel(item) && item.types != null) {
+    switch (item.types[0]) {
+      case "never":
+        yield "neverValue";
+        return;
 
-      const minimumItemsExpression =
-        typeItem.minimumItems == null
-          ? "configuration.defaultMinimumItems"
-          : JSON.stringify(typeItem.minimumItems);
-      const maximumItemsExpression =
-        typeItem.maximumItems == null
-          ? "configuration.defaultMaximumItems"
-          : JSON.stringify(typeItem.maximumItems);
+      case "any":
+        yield "anyValue";
+        return;
 
-      if (typeItem.minimumItems == null || typeItem.minimumItems === 0) {
-        yield itt`
-          (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
-            new Array(
-              ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
-            )
-              .fill(undefined)
-              .map(() => ${generateMockReference(specification, element)}) :
-            []
-        `;
-      } else {
-        yield itt`
-          new Array(
-            ${minimumItemsExpression} + nextSeed() % (${maximumItemsExpression} - ${minimumItemsExpression} + 1)
-          )
-            .fill(undefined)
-            .map(() => ${generateMockReference(specification, element)})
-        `;
-      }
+      case "null":
+        yield JSON.stringify(null);
+        return;
 
-      break;
-    }
+      case "boolean":
+        yield `Boolean(nextSeed() % 2)`;
+        return;
 
-    case "object": {
-      yield itt`
-        {
-          ${joinIterable(
-            Object.entries(typeItem.properties).map(([name, { required, element }]) => {
-              const [resolvedElement] = unalias(types, element);
+      case "integer": {
+        let multipleOf = item.multipleOf ?? 1;
 
-              return required
-                ? itt`
-                  ${JSON.stringify(name)}: ${generateMockReference(specification, element)},
-                `
-                : itt`
-                  ${JSON.stringify(name)}: (depthCounters[${JSON.stringify(
-                    resolvedElement,
-                  )}] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? ${generateMockReference(
-                    specification,
-                    element,
-                  )} : undefined,
-            `;
-            }),
-            "",
-          )}
+        let minimumValue = Number.NEGATIVE_INFINITY;
+        let isMinimumExclusive: boolean | undefined;
+        if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
+          minimumValue = item.minimumInclusive;
+          isMinimumExclusive = false;
         }
-      `;
-      break;
-    }
+        if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
+          minimumValue = item.minimumExclusive;
+          isMinimumExclusive = true;
+        }
+        const minimumValueInclusiveExpression =
+          isMinimumExclusive == null
+            ? `Math.ceil(configuration.defaultMinimumValue / ${JSON.stringify(multipleOf)})`
+            : isMinimumExclusive
+              ? `(Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)}) + 1)`
+              : `Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)})`;
 
-    case "map": {
-      const { name, element } = typeItem;
-      const [resolvedElement] = unalias(types, element);
+        let maximumValue = Number.POSITIVE_INFINITY;
+        let isMaximumExclusive: boolean | undefined;
+        if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
+          maximumValue = item.maximumInclusive;
+          isMaximumExclusive = false;
+        }
+        if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
+          maximumValue = item.maximumExclusive;
+          isMaximumExclusive = true;
+        }
+        const maximumValueInclusiveExpression =
+          isMaximumExclusive == null
+            ? `Math.floor(configuration.defaultMaximumValue / ${JSON.stringify(multipleOf)})`
+            : isMaximumExclusive
+              ? `(Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)}) - 1)`
+              : `Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)})`;
 
-      const minimumPropertiesExpression =
-        typeItem.minimumProperties == null
-          ? "configuration.defaultMinimumProperties"
-          : JSON.stringify(typeItem.minimumProperties);
-      const maximumPropertiesExpression =
-        typeItem.maximumProperties == null
-          ? "configuration.defaultMaximumProperties"
-          : JSON.stringify(typeItem.maximumProperties);
-
-      if (typeItem.minimumProperties == null || typeItem.minimumProperties === 0) {
-        yield itt`
-          (depthCounters[${JSON.stringify(resolvedElement)}] ?? 0) < configuration.maximumDepth ?
-            Object.fromEntries(
-              new Array(
-                ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
-              )
-                .fill(undefined)
-                .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
-                  specification,
-                  element,
-                )}])
-            ) :
-            {}
+        yield `
+          (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)) * ${multipleOf}
         `;
-      } else {
-        yield itt`
-          Object.fromEntries(
-            new Array(
-              ${minimumPropertiesExpression} + nextSeed() % (${maximumPropertiesExpression} - ${minimumPropertiesExpression} + 1)
-            )
-              .fill(undefined)
-              .map(() => [${generateMockReference(specification, name)}, ${generateMockReference(
-                specification,
-                element,
-              )}])
+        return;
+      }
+
+      case "number": {
+        let minimumValue = Number.NEGATIVE_INFINITY;
+        let isMinimumExclusive: boolean | undefined;
+        if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
+          minimumValue = item.minimumInclusive;
+          isMinimumExclusive = false;
+        }
+        if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
+          minimumValue = item.minimumExclusive;
+          isMinimumExclusive = true;
+        }
+        const minimumValueInclusiveExpression =
+          isMinimumExclusive == null
+            ? `configuration.defaultMinimumValue * configuration.numberPrecision`
+            : isMinimumExclusive
+              ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
+              : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
+
+        let maximumValue = Number.POSITIVE_INFINITY;
+        let isMaximumExclusive: boolean | undefined;
+        if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
+          maximumValue = item.maximumInclusive;
+          isMaximumExclusive = false;
+        }
+        if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
+          maximumValue = item.maximumExclusive;
+          isMaximumExclusive = true;
+        }
+        const maximumValueInclusiveExpression =
+          isMaximumExclusive == null
+            ? `(configuration.defaultMaximumValue * configuration.numberPrecision)`
+            : isMaximumExclusive
+              ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
+              : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
+
+        yield `
+          (
+            ${minimumValueInclusiveExpression} + 
+            nextSeed() % (
+              ${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1
+            ) / configuration.numberPrecision
           )
         `;
+        return;
       }
-      break;
-    }
 
-    case "union": {
-      yield itt`
-        (() => {
-          switch (
-            (
-              nextSeed() % ${JSON.stringify(typeItem.elements.length)}
-            ) as ${joinIterable(
-              typeItem.elements.map((element, index) => JSON.stringify(index)),
-              " | ",
-            )}
-          ) {
-            ${typeItem.elements.map(
-              (element, index) => itt`
-                case ${JSON.stringify(index)}:
-                  return (${generateMockReference(specification, element)});
-              `,
-            )}              
+      case "string": {
+        const minimumStringLengthExpression =
+          item.minimumLength == null
+            ? "configuration.defaultMinimumStringLength"
+            : JSON.stringify(item.minimumLength);
+        const maximumStringLengthExpression =
+          item.maximumLength == null
+            ? "configuration.defaultMaximumStringLength"
+            : JSON.stringify(item.maximumLength);
+
+        yield `
+          new Array(
+            ${minimumStringLengthExpression} +
+            nextSeed() % (
+              ${maximumStringLengthExpression} - ${minimumStringLengthExpression} + 1
+            )
+          ).
+            fill(undefined).
+            map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+            join("")
+        `;
+        return;
+      }
+
+      case "array": {
+        yield itt`
+          [
+            ${generateInterfaceContent()}
+          ]
+        `;
+
+        return;
+
+        function* generateInterfaceContent() {
+          const minimumItemsExpression =
+            item.minimumItems == null
+              ? "configuration.defaultMinimumItems"
+              : JSON.stringify(item.minimumItems);
+          const maximumItemsExpression =
+            item.maximumItems == null
+              ? "configuration.defaultMaximumItems"
+              : JSON.stringify(item.maximumItems);
+          const tupleItemsLength = item.tupleItems?.length ?? 0;
+
+          if (item.tupleItems != null) {
+            for (const elementKey of item.tupleItems) {
+              yield itt`
+                ${generateMockReference(specification, elementKey)},
+              `;
+            }
           }
-        })()
-      `;
-      break;
+
+          if (item.arrayItems != null) {
+            yield itt`
+            ...new Array(
+              Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
+              nextSeed() % (
+                Math.max(0, ${maximumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) -
+                Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
+                1
+              )
+            )
+              .fill(undefined)
+              .map(() => ${generateMockReference(specification, item.arrayItems)})
+          `;
+          }
+        }
+      }
+
+      case "map": {
+        yield itt`
+          {
+            ${generateInterfaceContent()}
+          }
+        `;
+
+        return;
+
+        function* generateInterfaceContent() {
+          let propertiesCount = 0;
+
+          if (item.objectProperties != null || item.required != null) {
+            const required = new Set(item.required);
+            const objectProperties = item.objectProperties ?? {};
+            const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
+            propertiesCount = propertyNames.size;
+
+            for (const name of propertyNames) {
+              if (objectProperties[name] == null) {
+                yield itt`
+                  [${JSON.stringify(name)}]: anyValue,
+                `;
+              } else {
+                const [resolvedKey] = typesArena.resolveItem(objectProperties[name]);
+                if (required.has(name)) {
+                  yield itt`
+                    [${JSON.stringify(name)}]: ${generateMockReference(specification, objectProperties[name])},
+                  `;
+                } else {
+                  yield itt`
+                    [${JSON.stringify(name)}]:
+                      (depthCounters[${JSON.stringify(resolvedKey)}] ?? 0) < configuration.maximumDepth ?
+                      ${generateMockReference(specification, objectProperties[name])} :
+                      undefined,
+                  `;
+                }
+              }
+            }
+          }
+
+          {
+            const minimumPropertiesExpression =
+              item.minimumProperties == null
+                ? "configuration.defaultMinimumProperties"
+                : JSON.stringify(item.minimumProperties);
+            const maximumPropertiesExpression =
+              item.maximumProperties == null
+                ? "configuration.defaultMaximumProperties"
+                : JSON.stringify(item.maximumProperties);
+
+            const elementKeys = new Array<number>();
+            if (item.mapProperties != null) {
+              elementKeys.push(item.mapProperties);
+            }
+            if (item.patternProperties != null) {
+              for (const elementKey of Object.values(item.patternProperties)) {
+                elementKeys.push(elementKey);
+              }
+            }
+
+            if (elementKeys.length > 0) {
+              yield itt`
+                ...Object.fromEntries(
+                  new Array(
+                    Math.max(0, ${minimumPropertiesExpression} - ${JSON.stringify(propertiesCount)}) + 
+                    nextSeed() % (
+                      Math.max(0, ${maximumPropertiesExpression} - ${JSON.stringify(propertiesCount)}) -
+                      Math.max(0, ${minimumPropertiesExpression} - ${JSON.stringify(propertiesCount)}) +
+                      1
+                    )
+                  )
+                  .fill(undefined)
+                  .map(() => [
+                    ${
+                      item.propertyNames == null
+                        ? itt`
+                          new Array(
+                            configuration.defaultMinimumStringLength +
+                            nextSeed() % (
+                              configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+                            )
+                          ).
+                            fill(undefined).
+                            map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
+                            join("")
+                        `
+                        : generateMockReference(specification, item.propertyNames)
+                    },
+                    (() => {
+                      switch (
+                        (
+                          nextSeed() % ${JSON.stringify(elementKeys.length)}
+                        ) as ${joinIterable(
+                          elementKeys.map((element, index) => JSON.stringify(index)),
+                          " | ",
+                        )}
+                        ) {
+                          ${elementKeys.map(
+                            (element, index) => itt`
+                              case ${JSON.stringify(index)}:
+                                return (${generateMockReference(specification, element)});
+                            `,
+                          )}              
+                        }
+                      })(),
+                    ]
+                  )
+                )
+              `;
+              return;
+            }
+          }
+        }
+      }
     }
-
-    case "alias": {
-      yield generateMockReference(specification, typeItem.target);
-      break;
-    }
-
-    default:
-      throw new TypeError(`type not supported`);
   }
-}
 
-function unalias(
-  types: Record<string, models.Item | models.Alias>,
-  key: string,
-): [string, models.Item] {
-  let item = types[key];
-  while (item.type === "alias") {
-    key = item.target;
-    item = types[key];
-  }
-  return [key, item];
+  yield itt`unknownValue`;
 }

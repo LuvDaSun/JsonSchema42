@@ -1,3 +1,4 @@
+import { isAliasSchemaModel, isOneOfSchemaModel, isSingleTypeSchemaModel } from "jns42-optimizer";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -11,7 +12,7 @@ import {
 export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typesArena } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -29,7 +30,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   `;
 
-  for (const [typeKey, item] of Object.entries(types)) {
+  for (const [itemKey, item] of typesArena) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -37,7 +38,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     }
 
     const functionName = toCamel("parse", names[nodeId]);
-    const definition = generateParserDefinition(specification, typeKey, "value");
+    const definition = generateParserDefinition(specification, itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
@@ -55,279 +56,321 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
 function* generateParserReference(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
   valueExpression: string,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
-  if (typeItem.id == null) {
-    yield itt`(${generateParserDefinition(specification, typeKey, valueExpression)})`;
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
+  if (item.id == null) {
+    yield itt`(${generateParserDefinition(specification, itemKey, valueExpression)})`;
   } else {
-    const functionName = toCamel("parse", names[typeItem.id]);
+    const functionName = toCamel("parse", names[item.id]);
     yield itt`${functionName}(${valueExpression}, configuration)`;
   }
 }
 
 function* generateParserDefinition(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
   valueExpression: string,
 ) {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
 
-  switch (typeItem.type) {
-    case "unknown":
-      yield valueExpression;
-      break;
+  if (isAliasSchemaModel(item)) {
+    yield generateParserReference(specification, item.alias, valueExpression);
+    return;
+  }
 
-    case "never":
-      yield "undefined";
-      break;
-
-    case "any":
-      yield valueExpression;
-      break;
-
-    case "null":
-      yield `
-        ((value: unknown) => {
-          if(value == null) {
-            return null;
-          }
-          
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 0:
-                return null;
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
-            }
-          }
-          
-          switch(typeof value) {
-            case "string":
-              if(value.trim() === "") {
-                return null;
-              }
-              break;
-            case "number":
-              return Boolean(value);
-            case "boolean":
-              return value;
-          }
-          
-          return undefined;
-        })(${valueExpression})
-      `;
-      break;
-
-    case "boolean":
-      yield `
-        ((value: unknown) => {
-          if(value == null) {
-            return false;
-          }
-
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 0:
-                return false;
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
-            }
-          }
-
-          switch(typeof value) {
-            case "string":
-              value = value.trim();
-              for(const trueStringValue of configuration.trueStringValues) {
-                if(value === trueStringValue) {
-                  return true;
-                }
-              }
-              for(const falseStringValue of configuration.falseStringValues) {
-                if(value === falseStringValue) {
-                  return false;
-                }
-              }
-              return undefined;
-            case "number":
-              return Boolean(value);
-            case "boolean":
-              return value;
-          }
-          return undefined;
-          })(${valueExpression})
-      `;
-      break;
-
-    case "integer":
-      yield `
-        ((value: unknown) => {
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
-            }
-          }
-
-          switch(typeof value) {
-            case "string":
-              return Number(value);
-            case "number":
-              return value;
-            case "boolean":
-              return value ? 1 : 0;
-          }
-          return undefined;
-        })(${valueExpression})
-      `;
-      break;
-
-    case "number":
-      yield `
-        ((value: unknown) => {
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
-            }
-          }
-    
-          switch(typeof value) {
-            case "string":
-              return Number(value);
-            case "number":
-              return value;
-            case "boolean":
-              return value ? 1 : 0;
-          }
-          return undefined;
-        })(${valueExpression})
-      `;
-      break;
-
-    case "string":
-      yield `
-        ((value: unknown) => {
-          if(Array.isArray(value)) {
-            switch(value.length) {
-              case 1:
-                [value] = value              
-                break;
-              default:
-                return undefined;
-            }
-          }
-
-          switch(typeof value) {
-            case "string":
-              return value;
-            case "number":
-            case "boolean":
-              return String(value);
-            default:
-              return undefined;
-          }
-        })(${valueExpression})
-      `;
-      break;
-
-    case "tuple": {
-      yield itt`
-        Array.isArray(${valueExpression}) ?
-          [
-            ${typeItem.elements.map(
-              (element, index) => itt`
-                ${generateParserReference(
-                  specification,
-                  element,
-                  `${valueExpression}[${JSON.stringify(index)}]`,
-                )},
-              `,
-            )}
-          ] :
-          undefined
-      `;
-      break;
-    }
-
-    case "array": {
-      const { element } = typeItem;
-      yield itt`
-        Array.isArray(${valueExpression}) ?
-          ${valueExpression}.map(value => ${generateParserReference(
-            specification,
-            element,
-            "value",
-          )}) :
-            ${valueExpression} == null ?
-            undefined :
-            [${generateParserReference(specification, element, valueExpression)}]
-      `;
-      break;
-    }
-
-    case "object": {
-      yield itt`
-        (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
-          {
-            ${Object.entries(typeItem.properties).map(
-              ([name, { required, element }]) => itt`
-                ${JSON.stringify(name)}: ${generateParserReference(
-                  specification,
-                  element,
-                  `${valueExpression}[${JSON.stringify(name)} as keyof typeof ${valueExpression}]`,
-                )},
-              `,
-            )}
-          } :
-          undefined
-      `;
-      break;
-    }
-
-    case "map": {
-      const { name, element } = typeItem;
-      yield itt`
-        (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
-          Object.fromEntries(
-            Object.entries(${valueExpression}).map(([name, value]) => [
-              ${generateParserReference(specification, name, "name")},
-              ${generateParserReference(specification, element, "value")},
-            ])
-          ) :
-          undefined
-      `;
-      break;
-    }
-
-    case "union": {
-      yield joinIterable(
-        typeItem.elements.map(
-          (element) => itt`${generateParserReference(specification, element, "value")}`,
+  if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    yield itt`
+      ${joinIterable(
+        item.oneOf.map(
+          (element) => itt`
+            ${generateParserReference(specification, element, valueExpression)}
+          `,
         ),
-        " ?? ",
-      );
-      break;
-    }
+        " ??\n",
+      )}
+    `;
+    return;
+  }
 
-    case "alias": {
-      yield generateParserReference(specification, typeItem.target, "value");
-      break;
+  if (isSingleTypeSchemaModel(item) && item.types != null) {
+    switch (item.types[0]) {
+      case "any":
+        yield valueExpression;
+        return;
+
+      case "null":
+        yield `
+          ((value: unknown) => {
+            if(value == null) {
+              return null;
+            }
+            
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 0:
+                  return null;
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
+            }
+            
+            switch(typeof value) {
+              case "string":
+                if(value.trim() === "") {
+                  return null;
+                }
+                break;
+              case "number":
+                return Boolean(value);
+              case "boolean":
+                return value;
+            }
+            
+            return undefined;
+          })(${valueExpression})
+        `;
+        return;
+
+      case "boolean":
+        yield `
+          ((value: unknown) => {
+            if(value == null) {
+              return false;
+            }
+
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 0:
+                  return false;
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
+            }
+
+            switch(typeof value) {
+              case "string":
+                value = value.trim();
+                for(const trueStringValue of configuration.trueStringValues) {
+                  if(value === trueStringValue) {
+                    return true;
+                  }
+                }
+                for(const falseStringValue of configuration.falseStringValues) {
+                  if(value === falseStringValue) {
+                    return false;
+                  }
+                }
+                return undefined;
+              case "number":
+                return Boolean(value);
+              case "boolean":
+                return value;
+            }
+            return undefined;
+            })(${valueExpression})
+        `;
+        return;
+
+      case "integer":
+        yield `
+          ((value: unknown) => {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
+            }
+
+            switch(typeof value) {
+              case "string":
+                return Number(value);
+              case "number":
+                return value;
+              case "boolean":
+                return value ? 1 : 0;
+            }
+            return undefined;
+          })(${valueExpression})
+        `;
+        return;
+
+      case "number":
+        yield `
+          ((value: unknown) => {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
+            }
+      
+            switch(typeof value) {
+              case "string":
+                return Number(value);
+              case "number":
+                return value;
+              case "boolean":
+                return value ? 1 : 0;
+            }
+            return undefined;
+          })(${valueExpression})
+        `;
+        return;
+
+      case "string":
+        yield `
+          ((value: unknown) => {
+            if(Array.isArray(value)) {
+              switch(value.length) {
+                case 1:
+                  [value] = value              
+                  break;
+                default:
+                  return undefined;
+              }
+            }
+
+            switch(typeof value) {
+              case "string":
+                return value;
+              case "number":
+              case "boolean":
+                return String(value);
+              default:
+                return undefined;
+            }
+          })(${valueExpression})
+        `;
+        return;
+
+      case "array": {
+        yield itt`
+          Array.isArray(${valueExpression}) ?
+            ${valueExpression}.map((value, index) => {
+              switch(index) {
+                ${generateCaseClauses()}
+              }
+            }) :
+            undefined
+        `;
+        return;
+
+        function* generateCaseClauses() {
+          if (item.tupleItems != null) {
+            for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+              const elementKey = item.tupleItems[elementIndex];
+
+              yield itt`
+                case ${JSON.stringify(elementIndex)}:
+                  return ${generateParserReference(specification, elementKey, `value`)}
+              `;
+            }
+          }
+
+          yield itt`
+            default:
+              ${generateDefaultClauseContent()}
+          `;
+        }
+
+        function* generateDefaultClauseContent() {
+          if (item.arrayItems != null) {
+            yield itt`
+              return ${generateParserReference(specification, item.arrayItems, `value`)}
+            `;
+            return;
+          }
+
+          yield itt`
+            return value;
+          `;
+        }
+      }
+
+      case "map": {
+        yield itt`
+          (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
+            Object.fromEntries(
+              Object.entries(${valueExpression}).map(([name, value]) => {
+                switch(name) {
+                  ${generateCaseClauses()}
+                }
+              })
+            ) :
+            undefined
+        `;
+        return;
+
+        function* generateCaseClauses() {
+          if (item.objectProperties != null) {
+            for (const name in item.objectProperties) {
+              const elementKey = item.objectProperties[name];
+
+              yield itt`
+                case ${JSON.stringify(name)}:
+                  return [
+                    name,
+                    ${generateParserReference(specification, elementKey, `value`)},
+                  ]
+              `;
+            }
+          }
+
+          yield itt`
+            default:
+              ${generateDefaultClauseContent()}
+          `;
+        }
+
+        function* generateDefaultClauseContent() {
+          const elementKeys = new Array<number>();
+          if (item.mapProperties != null) {
+            elementKeys.push(item.mapProperties);
+          }
+          if (item.patternProperties != null) {
+            for (const elementKey of Object.values(item.patternProperties)) {
+              elementKeys.push(elementKey);
+            }
+          }
+
+          if (elementKeys.length > 0) {
+            yield itt`
+              return [
+                name,
+                (${joinIterable(
+                  elementKeys.map((elementKey) =>
+                    generateParserReference(specification, elementKey, `value`),
+                  ),
+                  " ??\n",
+                )}),
+                ]
+            `;
+            return;
+          }
+
+          yield itt`
+            return value;
+          `;
+        }
+      }
     }
   }
+
+  yield valueExpression;
 }

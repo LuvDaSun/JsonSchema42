@@ -16,6 +16,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
 
   const newModel: SchemaModel & OneOfSchemaModel = {
     ...model,
+    mockable: false,
     oneOf: [],
     anyOf: undefined,
   };
@@ -60,6 +61,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
           description: undefined,
           examples: undefined,
           deprecated: undefined,
+          mockable: false,
         };
         continue;
       }

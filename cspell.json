@@ -1,6 +1,18 @@
 {
   "version": "0.2",
-  "words": ["camelcase", "endregion", "urlencoding", "unalias"],
+  "words": [
+    "Bulthuis",
+    "camelcase",
+    "clippy",
+    "endregion",
+    "esbenp",
+    "notdir",
+    "serde",
+    "structs",
+    "unalias",
+    "urlencoding"
+  ],
   "useGitignore": true,
-  "files": ["packages/rs/*/src/**", "packages/ts/*/src/**", "packages/oas/*/src/**"]
+  "files": ["**"],
+  "enableFiletypes": ["*"]
 }

@@ -9,5 +9,4 @@ export * from "./package.js";
 export * from "./read-node.js";
 export * from "./root.js";
 export * from "./schema.js";
-export * from "./transform-schema.js";
 export * from "./url.js";

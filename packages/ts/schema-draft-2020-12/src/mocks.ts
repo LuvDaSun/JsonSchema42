@@ -3,13 +3,13 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.11.6                         -- www.JsonSchema42.org
+// v0.11.8                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
 const depthCounters: Record<string, number> = {};
-export const unknownValue = {};
-export const anyValue = {};
-export const neverValue = {};
+export const unknownValue: any = {};
+export const anyValue: any = {};
+export const neverValue: any = {};
 export interface MockGeneratorOptions {
 maximumDepth?: number;
 numberPrecision?: number;
@@ -37,724 +37,6 @@ defaultMinimumStringLength: 5,
 defaultMaximumStringLength: 20,
 }
 /**
-* @summary Core and Validation specifications meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/schema}
-*/
-export function mockSchema(options: MockGeneratorOptions = {}): types.Schema {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["0"] ??= 0;
-try {
-depthCounters["0"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"$id": (depthCounters["20"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": (depthCounters["19"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockCoreSchema() : undefined,
-"$ref": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRef() : undefined,
-"$anchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAnchor() : undefined,
-"$dynamicRef": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicRef() : undefined,
-"$dynamicAnchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicAnchor() : undefined,
-"$vocabulary": (depthCounters["26"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": (depthCounters["27"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": (depthCounters["28"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPrefixItems() : undefined,
-"items": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorItems() : undefined,
-"contains": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContains() : undefined,
-"additionalProperties": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorAdditionalProperties() : undefined,
-"properties": (depthCounters["38"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": (depthCounters["39"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": (depthCounters["40"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorPropertyNames() : undefined,
-"if": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockIf() : undefined,
-"then": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockThen() : undefined,
-"else": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockElse() : undefined,
-"allOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
-"anyOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
-"oneOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
-"not": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
-"unevaluatedItems": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedItems() : undefined,
-"unevaluatedProperties": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedProperties() : undefined,
-"type": (depthCounters["62"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": (depthCounters["63"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": (depthCounters["64"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": (depthCounters["65"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": (depthCounters["66"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": (depthCounters["67"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": (depthCounters["68"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": (depthCounters["69"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
-"minLength": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
-"pattern": (depthCounters["72"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
-"minItems": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
-"uniqueItems": (depthCounters["75"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxContains() : undefined,
-"minContains": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinContains() : undefined,
-"maxProperties": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
-"minProperties": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
-"required": (depthCounters["61"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
-"dependentRequired": (depthCounters["81"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": (depthCounters["89"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": (depthCounters["90"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": (depthCounters["91"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": (depthCounters["92"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": (depthCounters["93"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": (depthCounters["94"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": (depthCounters["95"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": (depthCounters["98"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": (depthCounters["100"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": (depthCounters["101"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentSchema() : undefined,
-"definitions": (depthCounters["1"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": (depthCounters["2"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveAnchor() : undefined,
-"$recursiveRef": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveRef() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["0"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions}
-* @deprecated
-*/
-export function mockDefinitions(options: MockGeneratorOptions = {}): types.Definitions {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["1"] ??= 0;
-try {
-depthCounters["1"]++;
-return (
-(depthCounters["0"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [(
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-), mockDefinitionsAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["1"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies}
-* @deprecated
-*/
-export function mockDependencies(options: MockGeneratorOptions = {}): types.Dependencies {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["2"] ??= 0;
-try {
-depthCounters["2"]++;
-return (
-(depthCounters["13"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [(
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-), mockDependenciesAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["2"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveAnchor}
-* @deprecated
-*/
-export function mockRecursiveAnchor(options: MockGeneratorOptions = {}): types.RecursiveAnchor {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["3"] ??= 0;
-try {
-depthCounters["3"]++;
-return (mockAnchorString());
-}
-finally {
-depthCounters["3"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/$recursiveRef}
-* @deprecated
-*/
-export function mockRecursiveRef(options: MockGeneratorOptions = {}): types.RecursiveRef {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["4"] ??= 0;
-try {
-depthCounters["4"]++;
-return (mockUriReferenceString());
-}
-finally {
-depthCounters["4"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/0}
-*/
-export function mockAllOf0(options: MockGeneratorOptions = {}): types.AllOf0 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["5"] ??= 0;
-try {
-depthCounters["5"]++;
-return (mockCore());
-}
-finally {
-depthCounters["5"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/1}
-*/
-export function mockAllOf1(options: MockGeneratorOptions = {}): types.AllOf1 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["6"] ??= 0;
-try {
-depthCounters["6"]++;
-return (mockApplicator());
-}
-finally {
-depthCounters["6"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/2}
-*/
-export function mockAllOf2(options: MockGeneratorOptions = {}): types.AllOf2 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["7"] ??= 0;
-try {
-depthCounters["7"]++;
-return (mockUnevaluated());
-}
-finally {
-depthCounters["7"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/3}
-*/
-export function mockAllOf3(options: MockGeneratorOptions = {}): types.AllOf3 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["8"] ??= 0;
-try {
-depthCounters["8"]++;
-return (mockValidation());
-}
-finally {
-depthCounters["8"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/4}
-*/
-export function mockAllOf4(options: MockGeneratorOptions = {}): types.AllOf4 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["9"] ??= 0;
-try {
-depthCounters["9"]++;
-return (mockMetaData());
-}
-finally {
-depthCounters["9"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/5}
-*/
-export function mockAllOf5(options: MockGeneratorOptions = {}): types.AllOf5 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["10"] ??= 0;
-try {
-depthCounters["10"]++;
-return (mockFormatAnnotation());
-}
-finally {
-depthCounters["10"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/allOf/6}
-*/
-export function mockAllOf6(options: MockGeneratorOptions = {}): types.AllOf6 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["11"] ??= 0;
-try {
-depthCounters["11"]++;
-return (mockContent());
-}
-finally {
-depthCounters["11"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/definitions/additionalProperties}
-*/
-export function mockDefinitionsAdditionalProperties(options: MockGeneratorOptions = {}): types.DefinitionsAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["12"] ??= 0;
-try {
-depthCounters["12"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["12"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties}
-*/
-export function mockDependenciesAdditionalProperties(options: MockGeneratorOptions = {}): types.DependenciesAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["13"] ??= 0;
-try {
-depthCounters["13"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 3
-) as 0 | 1 | 2
-) {
-case 0:
-return (mockStringArray());
-case 1:
-return ((
-{
-"$id": (depthCounters["20"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": (depthCounters["19"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockCoreSchema() : undefined,
-"$ref": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRef() : undefined,
-"$anchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAnchor() : undefined,
-"$dynamicRef": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicRef() : undefined,
-"$dynamicAnchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicAnchor() : undefined,
-"$vocabulary": (depthCounters["26"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": (depthCounters["27"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": (depthCounters["28"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-"prefixItems": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPrefixItems() : undefined,
-"items": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorItems() : undefined,
-"contains": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContains() : undefined,
-"additionalProperties": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorAdditionalProperties() : undefined,
-"properties": (depthCounters["38"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": (depthCounters["39"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": (depthCounters["40"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorPropertyNames() : undefined,
-"if": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockIf() : undefined,
-"then": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockThen() : undefined,
-"else": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockElse() : undefined,
-"allOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
-"anyOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
-"oneOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
-"not": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
-"unevaluatedItems": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedItems() : undefined,
-"unevaluatedProperties": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedProperties() : undefined,
-"type": (depthCounters["62"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": (depthCounters["63"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": (depthCounters["64"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": (depthCounters["65"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": (depthCounters["66"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": (depthCounters["67"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": (depthCounters["68"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": (depthCounters["69"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
-"minLength": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
-"pattern": (depthCounters["72"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
-"minItems": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
-"uniqueItems": (depthCounters["75"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxContains() : undefined,
-"minContains": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinContains() : undefined,
-"maxProperties": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
-"minProperties": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
-"required": (depthCounters["61"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
-"dependentRequired": (depthCounters["81"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-"title": (depthCounters["89"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": (depthCounters["90"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": (depthCounters["91"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": (depthCounters["92"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": (depthCounters["93"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": (depthCounters["94"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": (depthCounters["95"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-"format": (depthCounters["98"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-"contentEncoding": (depthCounters["100"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": (depthCounters["101"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentSchema() : undefined,
-"definitions": (depthCounters["1"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefinitions() : undefined,
-"dependencies": (depthCounters["2"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependencies() : undefined,
-"$recursiveAnchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveAnchor() : undefined,
-"$recursiveRef": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRecursiveRef() : undefined,
-}
-));
-case 2:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["13"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/0}
-*/
-export function mockDependencies0(options: MockGeneratorOptions = {}): types.Dependencies0 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["14"] ??= 0;
-try {
-depthCounters["14"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["14"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/schema#/properties/dependencies/additionalProperties/anyOf/1}
-*/
-export function mockDependencies1(options: MockGeneratorOptions = {}): types.Dependencies1 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["15"] ??= 0;
-try {
-depthCounters["15"]++;
-return (mockStringArray());
-}
-finally {
-depthCounters["15"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/anchorString}
-*/
-export function mockAnchorString(options: MockGeneratorOptions = {}): types.AnchorString {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["16"] ??= 0;
-try {
-depthCounters["16"]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["16"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriReferenceString}
-*/
-export function mockUriReferenceString(options: MockGeneratorOptions = {}): types.UriReferenceString {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["17"] ??= 0;
-try {
-depthCounters["17"]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["17"]--;
-}
-}
-/**
-* @summary Core vocabulary meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/meta/core}
-*/
-export function mockCore(options: MockGeneratorOptions = {}): types.Core {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["18"] ??= 0;
-try {
-depthCounters["18"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"$id": (depthCounters["20"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockId() : undefined,
-"$schema": (depthCounters["19"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockCoreSchema() : undefined,
-"$ref": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRef() : undefined,
-"$anchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAnchor() : undefined,
-"$dynamicRef": (depthCounters["17"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicRef() : undefined,
-"$dynamicAnchor": (depthCounters["16"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDynamicAnchor() : undefined,
-"$vocabulary": (depthCounters["26"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockVocabulary() : undefined,
-"$comment": (depthCounters["27"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockComment() : undefined,
-"$defs": (depthCounters["28"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefs() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["18"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/$defs/uriString}
-*/
-export function mockUriString(options: MockGeneratorOptions = {}): types.UriString {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["19"] ??= 0;
-try {
-depthCounters["19"]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["19"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$id}
-*/
-export function mockId(options: MockGeneratorOptions = {}): types.Id {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["20"] ??= 0;
-try {
-depthCounters["20"]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["20"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$schema}
-*/
-export function mockCoreSchema(options: MockGeneratorOptions = {}): types.CoreSchema {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["21"] ??= 0;
-try {
-depthCounters["21"]++;
-return (mockUriString());
-}
-finally {
-depthCounters["21"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$ref}
-*/
-export function mockRef(options: MockGeneratorOptions = {}): types.Ref {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["22"] ??= 0;
-try {
-depthCounters["22"]++;
-return (mockUriReferenceString());
-}
-finally {
-depthCounters["22"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$anchor}
-*/
-export function mockAnchor(options: MockGeneratorOptions = {}): types.Anchor {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["23"] ??= 0;
-try {
-depthCounters["23"]++;
-return (mockAnchorString());
-}
-finally {
-depthCounters["23"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicRef}
-*/
-export function mockDynamicRef(options: MockGeneratorOptions = {}): types.DynamicRef {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["24"] ??= 0;
-try {
-depthCounters["24"]++;
-return (mockUriReferenceString());
-}
-finally {
-depthCounters["24"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$dynamicAnchor}
-*/
-export function mockDynamicAnchor(options: MockGeneratorOptions = {}): types.DynamicAnchor {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["25"] ??= 0;
-try {
-depthCounters["25"]++;
-return (mockAnchorString());
-}
-finally {
-depthCounters["25"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary}
-*/
-export function mockVocabulary(options: MockGeneratorOptions = {}): types.Vocabulary {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["26"] ??= 0;
-try {
-depthCounters["26"]++;
-return (
-(depthCounters["29"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [mockVocabularyPropertyNames(), mockVocabularyAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["26"]--;
-}
-}
-/**
 * @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$comment}
 */
 export function mockComment(options: MockGeneratorOptions = {}): types.Comment {
@@ -762,54 +44,23 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["27"] ??= 0;
+depthCounters[27] ??= 0;
 try {
-depthCounters["27"]++;
+depthCounters[27]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["27"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs}
-*/
-export function mockDefs(options: MockGeneratorOptions = {}): types.Defs {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["28"] ??= 0;
-try {
-depthCounters["28"]++;
-return (
-(depthCounters["0"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
 )
-.fill(undefined)
-.map(() => [(
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
 join("")
-), mockDefsAdditionalProperties()])
-) :
-{}
 );
 }
 finally {
-depthCounters["28"]--;
+depthCounters[27]--;
 }
 }
 /**
@@ -820,634 +71,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["29"] ??= 0;
+depthCounters[29] ??= 0;
 try {
-depthCounters["29"]++;
+depthCounters[29]++;
 return (Boolean(nextSeed() % 2));
 }
 finally {
-depthCounters["29"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$vocabulary/propertyNames}
-*/
-export function mockVocabularyPropertyNames(options: MockGeneratorOptions = {}): types.VocabularyPropertyNames {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["30"] ??= 0;
-try {
-depthCounters["30"]++;
-return (mockUriString());
-}
-finally {
-depthCounters["30"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/core#/properties/$defs/additionalProperties}
-*/
-export function mockDefsAdditionalProperties(options: MockGeneratorOptions = {}): types.DefsAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["31"] ??= 0;
-try {
-depthCounters["31"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["31"]--;
-}
-}
-/**
-* @summary Applicator vocabulary meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator}
-*/
-export function mockApplicator(options: MockGeneratorOptions = {}): types.Applicator {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["32"] ??= 0;
-try {
-depthCounters["32"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"prefixItems": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPrefixItems() : undefined,
-"items": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorItems() : undefined,
-"contains": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContains() : undefined,
-"additionalProperties": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorAdditionalProperties() : undefined,
-"properties": (depthCounters["38"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockProperties() : undefined,
-"patternProperties": (depthCounters["39"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPatternProperties() : undefined,
-"dependentSchemas": (depthCounters["40"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependentSchemas() : undefined,
-"propertyNames": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockApplicatorPropertyNames() : undefined,
-"if": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockIf() : undefined,
-"then": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockThen() : undefined,
-"else": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockElse() : undefined,
-"allOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAllOf() : undefined,
-"anyOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockAnyOf() : undefined,
-"oneOf": (depthCounters["33"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockOneOf() : undefined,
-"not": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockNot() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["32"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray}
-*/
-export function mockSchemaArray(options: MockGeneratorOptions = {}): types.SchemaArray {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["33"] ??= 0;
-try {
-depthCounters["33"]++;
-return (
-new Array(
-1 + nextSeed() % (configuration.defaultMaximumItems - 1 + 1)
-)
-.fill(undefined)
-.map(() => mockSchemaArrayItems())
-);
-}
-finally {
-depthCounters["33"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/prefixItems}
-*/
-export function mockPrefixItems(options: MockGeneratorOptions = {}): types.PrefixItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["34"] ??= 0;
-try {
-depthCounters["34"]++;
-return (mockSchemaArray());
-}
-finally {
-depthCounters["34"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/items}
-*/
-export function mockApplicatorItems(options: MockGeneratorOptions = {}): types.ApplicatorItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["35"] ??= 0;
-try {
-depthCounters["35"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["35"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/contains}
-*/
-export function mockContains(options: MockGeneratorOptions = {}): types.Contains {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["36"] ??= 0;
-try {
-depthCounters["36"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["36"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/additionalProperties}
-*/
-export function mockApplicatorAdditionalProperties(options: MockGeneratorOptions = {}): types.ApplicatorAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["37"] ??= 0;
-try {
-depthCounters["37"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["37"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties}
-*/
-export function mockProperties(options: MockGeneratorOptions = {}): types.Properties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["38"] ??= 0;
-try {
-depthCounters["38"]++;
-return (
-(depthCounters["0"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [(
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-), mockPropertiesAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["38"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties}
-*/
-export function mockPatternProperties(options: MockGeneratorOptions = {}): types.PatternProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["39"] ??= 0;
-try {
-depthCounters["39"]++;
-return (
-(depthCounters["0"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [mockPatternPropertiesPropertyNames(), mockPatternPropertiesAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["39"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas}
-*/
-export function mockDependentSchemas(options: MockGeneratorOptions = {}): types.DependentSchemas {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["40"] ??= 0;
-try {
-depthCounters["40"]++;
-return (
-(depthCounters["0"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [(
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-), mockDependentSchemasAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["40"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/propertyNames}
-*/
-export function mockApplicatorPropertyNames(options: MockGeneratorOptions = {}): types.ApplicatorPropertyNames {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["41"] ??= 0;
-try {
-depthCounters["41"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["41"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/if}
-*/
-export function mockIf(options: MockGeneratorOptions = {}): types.If {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["42"] ??= 0;
-try {
-depthCounters["42"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["42"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/then}
-*/
-export function mockThen(options: MockGeneratorOptions = {}): types.Then {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["43"] ??= 0;
-try {
-depthCounters["43"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["43"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/else}
-*/
-export function mockElse(options: MockGeneratorOptions = {}): types.Else {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["44"] ??= 0;
-try {
-depthCounters["44"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["44"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/allOf}
-*/
-export function mockAllOf(options: MockGeneratorOptions = {}): types.AllOf {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["45"] ??= 0;
-try {
-depthCounters["45"]++;
-return (mockSchemaArray());
-}
-finally {
-depthCounters["45"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/anyOf}
-*/
-export function mockAnyOf(options: MockGeneratorOptions = {}): types.AnyOf {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["46"] ??= 0;
-try {
-depthCounters["46"]++;
-return (mockSchemaArray());
-}
-finally {
-depthCounters["46"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/oneOf}
-*/
-export function mockOneOf(options: MockGeneratorOptions = {}): types.OneOf {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["47"] ??= 0;
-try {
-depthCounters["47"]++;
-return (mockSchemaArray());
-}
-finally {
-depthCounters["47"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/not}
-*/
-export function mockNot(options: MockGeneratorOptions = {}): types.Not {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["48"] ??= 0;
-try {
-depthCounters["48"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["48"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/$defs/schemaArray/items}
-*/
-export function mockSchemaArrayItems(options: MockGeneratorOptions = {}): types.SchemaArrayItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["49"] ??= 0;
-try {
-depthCounters["49"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["49"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/properties/additionalProperties}
-*/
-export function mockPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.PropertiesAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["50"] ??= 0;
-try {
-depthCounters["50"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["50"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/additionalProperties}
-*/
-export function mockPatternPropertiesAdditionalProperties(options: MockGeneratorOptions = {}): types.PatternPropertiesAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["51"] ??= 0;
-try {
-depthCounters["51"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["51"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/patternProperties/propertyNames}
-*/
-export function mockPatternPropertiesPropertyNames(options: MockGeneratorOptions = {}): types.PatternPropertiesPropertyNames {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["52"] ??= 0;
-try {
-depthCounters["52"]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["52"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/applicator#/properties/dependentSchemas/additionalProperties}
-*/
-export function mockDependentSchemasAdditionalProperties(options: MockGeneratorOptions = {}): types.DependentSchemasAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["53"] ??= 0;
-try {
-depthCounters["53"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["53"]--;
-}
-}
-/**
-* @summary Unevaluated applicator vocabulary meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated}
-*/
-export function mockUnevaluated(options: MockGeneratorOptions = {}): types.Unevaluated {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["54"] ??= 0;
-try {
-depthCounters["54"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"unevaluatedItems": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedItems() : undefined,
-"unevaluatedProperties": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUnevaluatedProperties() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["54"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedItems}
-*/
-export function mockUnevaluatedItems(options: MockGeneratorOptions = {}): types.UnevaluatedItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["55"] ??= 0;
-try {
-depthCounters["55"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["55"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/unevaluated#/properties/unevaluatedProperties}
-*/
-export function mockUnevaluatedProperties(options: MockGeneratorOptions = {}): types.UnevaluatedProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["56"] ??= 0;
-try {
-depthCounters["56"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["56"]--;
-}
-}
-/**
-* @summary Validation vocabulary meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation}
-*/
-export function mockValidation(options: MockGeneratorOptions = {}): types.Validation {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["57"] ??= 0;
-try {
-depthCounters["57"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"type": (depthCounters["62"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockType() : undefined,
-"const": (depthCounters["63"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockConst() : undefined,
-"enum": (depthCounters["64"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockEnum() : undefined,
-"multipleOf": (depthCounters["65"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMultipleOf() : undefined,
-"maximum": (depthCounters["66"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaximum() : undefined,
-"exclusiveMaximum": (depthCounters["67"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMaximum() : undefined,
-"minimum": (depthCounters["68"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinimum() : undefined,
-"exclusiveMinimum": (depthCounters["69"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExclusiveMinimum() : undefined,
-"maxLength": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxLength() : undefined,
-"minLength": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinLength() : undefined,
-"pattern": (depthCounters["72"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockPattern() : undefined,
-"maxItems": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxItems() : undefined,
-"minItems": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinItems() : undefined,
-"uniqueItems": (depthCounters["75"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockUniqueItems() : undefined,
-"maxContains": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxContains() : undefined,
-"minContains": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinContains() : undefined,
-"maxProperties": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMaxProperties() : undefined,
-"minProperties": (depthCounters["58"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockMinProperties() : undefined,
-"required": (depthCounters["61"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockRequired() : undefined,
-"dependentRequired": (depthCounters["81"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDependentRequired() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["57"]--;
+depthCounters[29]--;
 }
 }
 /**
@@ -1458,15 +88,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["58"] ??= 0;
+depthCounters[58] ??= 0;
 try {
-depthCounters["58"]++;
+depthCounters[58]++;
 return (
 (Math.ceil(0 / 1) + nextSeed() % (Math.floor(configuration.defaultMaximumValue / 1) - Math.ceil(0 / 1) + 1)) * 1
 );
 }
 finally {
-depthCounters["58"]--;
+depthCounters[58]--;
 }
 }
 /**
@@ -1477,13 +107,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["59"] ??= 0;
+depthCounters[59] ??= 0;
 try {
-depthCounters["59"]++;
+depthCounters[59]++;
 return (mockNonNegativeInteger());
 }
 finally {
-depthCounters["59"]--;
+depthCounters[59]--;
 }
 }
 /**
@@ -1494,110 +124,21 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["60"] ??= 0;
+depthCounters[60] ??= 0;
 try {
-depthCounters["60"]++;
-return ((["array", "boolean", "integer", "null", "number", "object", "string"] as const)[nextSeed() % 7]);
-}
-finally {
-depthCounters["60"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
-*/
-export function mockStringArray(options: MockGeneratorOptions = {}): types.StringArray {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["61"] ??= 0;
-try {
-depthCounters["61"]++;
+depthCounters[60]++;
 return (
-(depthCounters["82"] ?? 0) < configuration.maximumDepth ?
-new Array(
-configuration.defaultMinimumItems + nextSeed() % (configuration.defaultMaximumItems - configuration.defaultMinimumItems + 1)
-)
-.fill(undefined)
-.map(() => mockStringArrayItems()) :
-[]
-);
-}
-finally {
-depthCounters["61"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
-*/
-export function mockType(options: MockGeneratorOptions = {}): types.Type {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["62"] ??= 0;
-try {
-depthCounters["62"]++;
-return (
-(() => {
-switch (
 (
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return (mockType0());
-case 1:
-return (mockType1());
-}
-})()
+[
+"array", "boolean", "integer", "null", "number", "object", "string"
+] as const
+)[
+nextSeed() % 7
+]
 );
 }
 finally {
-depthCounters["62"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
-*/
-export function mockConst(options: MockGeneratorOptions = {}): types.Const {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["63"] ??= 0;
-try {
-depthCounters["63"]++;
-return (anyValue);
-}
-finally {
-depthCounters["63"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum}
-*/
-export function mockEnum(options: MockGeneratorOptions = {}): types.Enum {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["64"] ??= 0;
-try {
-depthCounters["64"]++;
-return (
-(depthCounters["85"] ?? 0) < configuration.maximumDepth ?
-new Array(
-configuration.defaultMinimumItems + nextSeed() % (configuration.defaultMaximumItems - configuration.defaultMinimumItems + 1)
-)
-.fill(undefined)
-.map(() => mockEnumItems()) :
-[]
-);
-}
-finally {
-depthCounters["64"]--;
+depthCounters[60]--;
 }
 }
 /**
@@ -1608,15 +149,20 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["65"] ??= 0;
+depthCounters[65] ??= 0;
 try {
-depthCounters["65"]++;
+depthCounters[65]++;
 return (
-((0 * configuration.numberPrecision + 1) + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - (0 * configuration.numberPrecision + 1) + 1) / configuration.numberPrecision)
+(
+(0 * configuration.numberPrecision + 1) +
+nextSeed() % (
+(configuration.defaultMaximumValue * configuration.numberPrecision) - (0 * configuration.numberPrecision + 1) + 1
+) / configuration.numberPrecision
+)
 );
 }
 finally {
-depthCounters["65"]--;
+depthCounters[65]--;
 }
 }
 /**
@@ -1627,15 +173,20 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["66"] ??= 0;
+depthCounters[66] ??= 0;
 try {
-depthCounters["66"]++;
+depthCounters[66]++;
 return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
+(
+configuration.defaultMinimumValue * configuration.numberPrecision +
+nextSeed() % (
+(configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1
+) / configuration.numberPrecision
+)
 );
 }
 finally {
-depthCounters["66"]--;
+depthCounters[66]--;
 }
 }
 /**
@@ -1646,15 +197,20 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["67"] ??= 0;
+depthCounters[67] ??= 0;
 try {
-depthCounters["67"]++;
+depthCounters[67]++;
 return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
+(
+configuration.defaultMinimumValue * configuration.numberPrecision +
+nextSeed() % (
+(configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1
+) / configuration.numberPrecision
+)
 );
 }
 finally {
-depthCounters["67"]--;
+depthCounters[67]--;
 }
 }
 /**
@@ -1665,15 +221,20 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["68"] ??= 0;
+depthCounters[68] ??= 0;
 try {
-depthCounters["68"]++;
+depthCounters[68]++;
 return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
+(
+configuration.defaultMinimumValue * configuration.numberPrecision +
+nextSeed() % (
+(configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1
+) / configuration.numberPrecision
+)
 );
 }
 finally {
-depthCounters["68"]--;
+depthCounters[68]--;
 }
 }
 /**
@@ -1684,15 +245,20 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["69"] ??= 0;
+depthCounters[69] ??= 0;
 try {
-depthCounters["69"]++;
+depthCounters[69]++;
 return (
-(configuration.defaultMinimumValue * configuration.numberPrecision + nextSeed() % ((configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1) / configuration.numberPrecision)
+(
+configuration.defaultMinimumValue * configuration.numberPrecision +
+nextSeed() % (
+(configuration.defaultMaximumValue * configuration.numberPrecision) - configuration.defaultMinimumValue * configuration.numberPrecision + 1
+) / configuration.numberPrecision
+)
 );
 }
 finally {
-depthCounters["69"]--;
+depthCounters[69]--;
 }
 }
 /**
@@ -1703,13 +269,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["70"] ??= 0;
+depthCounters[70] ??= 0;
 try {
-depthCounters["70"]++;
+depthCounters[70]++;
 return (mockNonNegativeInteger());
 }
 finally {
-depthCounters["70"]--;
+depthCounters[70]--;
 }
 }
 /**
@@ -1720,37 +286,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["71"] ??= 0;
+depthCounters[71] ??= 0;
 try {
-depthCounters["71"]++;
+depthCounters[71]++;
 return (mockNonNegativeIntegerDefault0());
 }
 finally {
-depthCounters["71"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/pattern}
-*/
-export function mockPattern(options: MockGeneratorOptions = {}): types.Pattern {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["72"] ??= 0;
-try {
-depthCounters["72"]++;
-return (
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-);
-}
-finally {
-depthCounters["72"]--;
+depthCounters[71]--;
 }
 }
 /**
@@ -1761,13 +303,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["73"] ??= 0;
+depthCounters[73] ??= 0;
 try {
-depthCounters["73"]++;
+depthCounters[73]++;
 return (mockNonNegativeInteger());
 }
 finally {
-depthCounters["73"]--;
+depthCounters[73]--;
 }
 }
 /**
@@ -1778,13 +320,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["74"] ??= 0;
+depthCounters[74] ??= 0;
 try {
-depthCounters["74"]++;
+depthCounters[74]++;
 return (mockNonNegativeIntegerDefault0());
 }
 finally {
-depthCounters["74"]--;
+depthCounters[74]--;
 }
 }
 /**
@@ -1795,13 +337,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["75"] ??= 0;
+depthCounters[75] ??= 0;
 try {
-depthCounters["75"]++;
+depthCounters[75]++;
 return (Boolean(nextSeed() % 2));
 }
 finally {
-depthCounters["75"]--;
+depthCounters[75]--;
 }
 }
 /**
@@ -1812,13 +354,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["76"] ??= 0;
+depthCounters[76] ??= 0;
 try {
-depthCounters["76"]++;
+depthCounters[76]++;
 return (mockNonNegativeInteger());
 }
 finally {
-depthCounters["76"]--;
+depthCounters[76]--;
 }
 }
 /**
@@ -1829,13 +371,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["77"] ??= 0;
+depthCounters[77] ??= 0;
 try {
-depthCounters["77"]++;
+depthCounters[77]++;
 return (mockNonNegativeInteger());
 }
 finally {
-depthCounters["77"]--;
+depthCounters[77]--;
 }
 }
 /**
@@ -1846,13 +388,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["78"] ??= 0;
+depthCounters[78] ??= 0;
 try {
-depthCounters["78"]++;
+depthCounters[78]++;
 return (mockNonNegativeInteger());
 }
 finally {
-depthCounters["78"]--;
+depthCounters[78]--;
 }
 }
 /**
@@ -1863,64 +405,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["79"] ??= 0;
+depthCounters[79] ??= 0;
 try {
-depthCounters["79"]++;
+depthCounters[79]++;
 return (mockNonNegativeIntegerDefault0());
 }
 finally {
-depthCounters["79"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/required}
-*/
-export function mockRequired(options: MockGeneratorOptions = {}): types.Required {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["80"] ??= 0;
-try {
-depthCounters["80"]++;
-return (mockStringArray());
-}
-finally {
-depthCounters["80"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired}
-*/
-export function mockDependentRequired(options: MockGeneratorOptions = {}): types.DependentRequired {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["81"] ??= 0;
-try {
-depthCounters["81"]++;
-return (
-(depthCounters["61"] ?? 0) < configuration.maximumDepth ?
-Object.fromEntries(
-new Array(
-configuration.defaultMinimumProperties + nextSeed() % (configuration.defaultMaximumProperties - configuration.defaultMinimumProperties + 1)
-)
-.fill(undefined)
-.map(() => [(
-new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
-).
-fill(undefined).
-map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
-join("")
-), mockDependentRequiredAdditionalProperties()])
-) :
-{}
-);
-}
-finally {
-depthCounters["81"]--;
+depthCounters[79]--;
 }
 }
 /**
@@ -1931,12 +422,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["82"] ??= 0;
+depthCounters[82] ??= 0;
 try {
-depthCounters["82"]++;
+depthCounters[82]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
@@ -1944,81 +438,7 @@ join("")
 );
 }
 finally {
-depthCounters["82"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/0}
-*/
-export function mockType0(options: MockGeneratorOptions = {}): types.Type0 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["83"] ??= 0;
-try {
-depthCounters["83"]++;
-return (mockSimpleTypes());
-}
-finally {
-depthCounters["83"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1}
-*/
-export function mockType1(options: MockGeneratorOptions = {}): types.Type1 {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["84"] ??= 0;
-try {
-depthCounters["84"]++;
-return (
-new Array(
-1 + nextSeed() % (configuration.defaultMaximumItems - 1 + 1)
-)
-.fill(undefined)
-.map(() => mockTypeItems())
-);
-}
-finally {
-depthCounters["84"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/enum/items}
-*/
-export function mockEnumItems(options: MockGeneratorOptions = {}): types.EnumItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["85"] ??= 0;
-try {
-depthCounters["85"]++;
-return (anyValue);
-}
-finally {
-depthCounters["85"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/dependentRequired/additionalProperties}
-*/
-export function mockDependentRequiredAdditionalProperties(options: MockGeneratorOptions = {}): types.DependentRequiredAdditionalProperties {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["86"] ??= 0;
-try {
-depthCounters["86"]++;
-return (mockStringArray());
-}
-finally {
-depthCounters["86"]--;
+depthCounters[82]--;
 }
 }
 /**
@@ -2029,54 +449,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["87"] ??= 0;
+depthCounters[87] ??= 0;
 try {
-depthCounters["87"]++;
+depthCounters[87]++;
 return (mockSimpleTypes());
 }
 finally {
-depthCounters["87"]--;
-}
-}
-/**
-* @summary Meta-data vocabulary meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data}
-*/
-export function mockMetaData(options: MockGeneratorOptions = {}): types.MetaData {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["88"] ??= 0;
-try {
-depthCounters["88"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"title": (depthCounters["89"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockTitle() : undefined,
-"description": (depthCounters["90"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDescription() : undefined,
-"default": (depthCounters["91"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDefault() : undefined,
-"deprecated": (depthCounters["92"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockDeprecated() : undefined,
-"readOnly": (depthCounters["93"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockReadOnly() : undefined,
-"writeOnly": (depthCounters["94"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockWriteOnly() : undefined,
-"examples": (depthCounters["95"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockExamples() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["88"]--;
+depthCounters[87]--;
 }
 }
 /**
@@ -2087,12 +466,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["89"] ??= 0;
+depthCounters[89] ??= 0;
 try {
-depthCounters["89"]++;
+depthCounters[89]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
@@ -2100,7 +482,7 @@ join("")
 );
 }
 finally {
-depthCounters["89"]--;
+depthCounters[89]--;
 }
 }
 /**
@@ -2111,12 +493,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["90"] ??= 0;
+depthCounters[90] ??= 0;
 try {
-depthCounters["90"]++;
+depthCounters[90]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
@@ -2124,24 +509,7 @@ join("")
 );
 }
 finally {
-depthCounters["90"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/default}
-*/
-export function mockDefault(options: MockGeneratorOptions = {}): types.Default {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["91"] ??= 0;
-try {
-depthCounters["91"]++;
-return (anyValue);
-}
-finally {
-depthCounters["91"]--;
+depthCounters[90]--;
 }
 }
 /**
@@ -2152,13 +520,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["92"] ??= 0;
+depthCounters[92] ??= 0;
 try {
-depthCounters["92"]++;
+depthCounters[92]++;
 return (Boolean(nextSeed() % 2));
 }
 finally {
-depthCounters["92"]--;
+depthCounters[92]--;
 }
 }
 /**
@@ -2169,13 +537,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["93"] ??= 0;
+depthCounters[93] ??= 0;
 try {
-depthCounters["93"]++;
+depthCounters[93]++;
 return (Boolean(nextSeed() % 2));
 }
 finally {
-depthCounters["93"]--;
+depthCounters[93]--;
 }
 }
 /**
@@ -2186,90 +554,13 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["94"] ??= 0;
+depthCounters[94] ??= 0;
 try {
-depthCounters["94"]++;
+depthCounters[94]++;
 return (Boolean(nextSeed() % 2));
 }
 finally {
-depthCounters["94"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples}
-*/
-export function mockExamples(options: MockGeneratorOptions = {}): types.Examples {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["95"] ??= 0;
-try {
-depthCounters["95"]++;
-return (
-(depthCounters["96"] ?? 0) < configuration.maximumDepth ?
-new Array(
-configuration.defaultMinimumItems + nextSeed() % (configuration.defaultMaximumItems - configuration.defaultMinimumItems + 1)
-)
-.fill(undefined)
-.map(() => mockExamplesItems()) :
-[]
-);
-}
-finally {
-depthCounters["95"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/meta-data#/properties/examples/items}
-*/
-export function mockExamplesItems(options: MockGeneratorOptions = {}): types.ExamplesItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["96"] ??= 0;
-try {
-depthCounters["96"]++;
-return (anyValue);
-}
-finally {
-depthCounters["96"]--;
-}
-}
-/**
-* @summary Format vocabulary meta-schema for annotation results
-* @see {@link https://json-schema.org/draft/2020-12/meta/format-annotation}
-*/
-export function mockFormatAnnotation(options: MockGeneratorOptions = {}): types.FormatAnnotation {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["97"] ??= 0;
-try {
-depthCounters["97"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"format": (depthCounters["98"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockFormat() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["97"]--;
+depthCounters[94]--;
 }
 }
 /**
@@ -2280,12 +571,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["98"] ??= 0;
+depthCounters[98] ??= 0;
 try {
-depthCounters["98"]++;
+depthCounters[98]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
@@ -2293,44 +587,7 @@ join("")
 );
 }
 finally {
-depthCounters["98"]--;
-}
-}
-/**
-* @summary Content vocabulary meta-schema
-* @see {@link https://json-schema.org/draft/2020-12/meta/content}
-*/
-export function mockContent(options: MockGeneratorOptions = {}): types.Content {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["99"] ??= 0;
-try {
-depthCounters["99"]++;
-return (
-(() => {
-switch (
-(
-nextSeed() % 2
-) as 0 | 1
-) {
-case 0:
-return ((
-{
-"contentEncoding": (depthCounters["100"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentEncoding() : undefined,
-"contentMediaType": (depthCounters["101"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentMediaType() : undefined,
-"contentSchema": (depthCounters["0"] ?? 0) < configuration.maximumDepth && Boolean(nextSeed() % 2) ? mockContentSchema() : undefined,
-}
-));
-case 1:
-return ((Boolean(nextSeed() % 2)));
-}
-})()
-);
-}
-finally {
-depthCounters["99"]--;
+depthCounters[98]--;
 }
 }
 /**
@@ -2341,12 +598,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["100"] ??= 0;
+depthCounters[100] ??= 0;
 try {
-depthCounters["100"]++;
+depthCounters[100]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
@@ -2354,7 +614,7 @@ join("")
 );
 }
 finally {
-depthCounters["100"]--;
+depthCounters[100]--;
 }
 }
 /**
@@ -2365,12 +625,15 @@ const configuration = {
 ...defaultMockGeneratorOptions,
 ...options,
 };
-depthCounters["101"] ??= 0;
+depthCounters[101] ??= 0;
 try {
-depthCounters["101"]++;
+depthCounters[101]++;
 return (
 new Array(
-configuration.defaultMinimumStringLength + nextSeed() % (configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1)
+configuration.defaultMinimumStringLength +
+nextSeed() % (
+configuration.defaultMaximumStringLength - configuration.defaultMinimumStringLength + 1
+)
 ).
 fill(undefined).
 map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
@@ -2378,24 +641,7 @@ join("")
 );
 }
 finally {
-depthCounters["101"]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/content#/properties/contentSchema}
-*/
-export function mockContentSchema(options: MockGeneratorOptions = {}): types.ContentSchema {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters["102"] ??= 0;
-try {
-depthCounters["102"]++;
-return (mockSchema());
-}
-finally {
-depthCounters["102"]--;
+depthCounters[101]--;
 }
 }
 let seed = 1;

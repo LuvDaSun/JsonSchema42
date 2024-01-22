@@ -34,6 +34,7 @@ import {
  * - if: 700
  *   then: 800
  *   else: 900
+ * - not: 10
  * ```
  *
  * will become
@@ -63,7 +64,9 @@ import {
  *   if: 700
  *   then: 800
  *   else: 900
-
+ * - parent: 0
+ *   not: 10
+ *
  * ```
  *
  */
@@ -78,6 +81,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     anyOf: anyOfSchemaRequired,
     oneOf: oneOfSchemaRequired,
     if: [...ifSchemaRequired, ...ifSchemaOptional],
+    // not: notSchemaRequired,
     type: typeSchemaOptional,
   };
 
@@ -104,6 +108,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     if: undefined,
     then: undefined,
     else: undefined,
+    // not: undefined,
 
     types: undefined,
     dependentSchemas: undefined,
@@ -135,6 +140,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
 
   if (schemaModels.reference) {
     const newSubModel: SchemaModel = {
+      mockable: model.mockable,
       reference: model.reference,
     };
     const newSubKey = arena.addItem(newSubModel);
@@ -144,6 +150,8 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
   if (schemaModels.allOf) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
+      mockable: model.mockable,
+
       allOf: model.allOf,
     };
     const newSubKey = arena.addItem(newSubModel);
@@ -153,6 +161,8 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
   if (schemaModels.anyOf) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
+      mockable: model.mockable,
+
       anyOf: model.anyOf,
     };
     const newSubKey = arena.addItem(newSubModel);
@@ -162,6 +172,8 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
   if (schemaModels.oneOf) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
+      mockable: model.mockable,
+
       oneOf: model.oneOf,
     };
     const newSubKey = arena.addItem(newSubModel);
@@ -171,6 +183,8 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
   if (schemaModels.if) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
+      mockable: model.mockable,
+
       if: model.if,
       then: model.then,
       else: model.else,
@@ -179,9 +193,21 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     newModel.allOf.push(newSubKey);
   }
 
+  // if (schemaModels.not) {
+  //   const newSubModel: SchemaModel = {
+  //     parent: modelKey,
+  //     mockable: model.mockable,
+  //
+  //     not: model.not,
+  //   };
+  //   const newSubKey = arena.addItem(newSubModel);
+  //   newModel.allOf.push(newSubKey);
+  // }
+
   if (schemaModels.type) {
     const newSubModel: SchemaModel = {
       parent: modelKey,
+      mockable: model.mockable,
 
       types: model.types,
       dependentSchemas: model.dependentSchemas,

@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.11.6                         -- www.JsonSchema42.org
+// v0.11.8                         -- www.JsonSchema42.org
 //
 /**
 * @summary JsonSchema42 intermediate schema
@@ -11,8 +11,11 @@
 */
 export type SchemaDocument = (
 {
-"$schema": Schema,
-"schemas": Schemas,
+["$schema"]: Schema,
+["schemas"]: Schemas,
+[
+name: string
+]: any
 }
 );
 /**
@@ -20,43 +23,46 @@ export type SchemaDocument = (
 */
 export type Node = (
 {
-"title"?: Title,
-"description"?: Description,
-"examples"?: Examples,
-"deprecated"?: Deprecated,
-"types"?: Types,
-"reference"?: Reference,
-"oneOf"?: OneOf,
-"anyOf"?: AnyOf,
-"allOf"?: AllOf,
-"if"?: If,
-"then"?: Then,
-"else"?: Else,
-"not"?: Not,
-"dependentSchemas"?: DependentSchemas,
-"objectProperties"?: ObjectProperties,
-"mapProperties"?: MapProperties,
-"patternProperties"?: PatternProperties,
-"propertyNames"?: PropertyNames,
-"tupleItems"?: TupleItems,
-"arrayItems"?: ArrayItems,
-"contains"?: Contains,
-"options"?: Options,
-"minimumInclusive"?: MinimumInclusive,
-"minimumExclusive"?: MinimumExclusive,
-"maximumInclusive"?: MaximumInclusive,
-"maximumExclusive"?: MaximumExclusive,
-"multipleOf"?: MultipleOf,
-"minimumLength"?: MinimumLength,
-"maximumLength"?: MaximumLength,
-"valuePattern"?: ValuePattern,
-"valueFormat"?: ValueFormat,
-"minimumItems"?: MinimumItems,
-"maximumItems"?: MaximumItems,
-"uniqueItems"?: UniqueItems,
-"required"?: Required,
-"minimumProperties"?: MinimumProperties,
-"maximumProperties"?: MaximumProperties,
+["title"]?: Title,
+["description"]?: Description,
+["examples"]?: Examples,
+["deprecated"]?: Deprecated,
+["types"]?: Types,
+["reference"]?: Reference,
+["oneOf"]?: OneOf,
+["anyOf"]?: AnyOf,
+["allOf"]?: AllOf,
+["if"]?: If,
+["then"]?: Then,
+["else"]?: Else,
+["not"]?: Not,
+["dependentSchemas"]?: DependentSchemas,
+["objectProperties"]?: ObjectProperties,
+["mapProperties"]?: MapProperties,
+["patternProperties"]?: PatternProperties,
+["propertyNames"]?: PropertyNames,
+["tupleItems"]?: TupleItems,
+["arrayItems"]?: ArrayItems,
+["contains"]?: Contains,
+["options"]?: Options,
+["minimumInclusive"]?: MinimumInclusive,
+["minimumExclusive"]?: MinimumExclusive,
+["maximumInclusive"]?: MaximumInclusive,
+["maximumExclusive"]?: MaximumExclusive,
+["multipleOf"]?: MultipleOf,
+["minimumLength"]?: MinimumLength,
+["maximumLength"]?: MaximumLength,
+["valuePattern"]?: ValuePattern,
+["valueFormat"]?: ValueFormat,
+["minimumItems"]?: MinimumItems,
+["maximumItems"]?: MaximumItems,
+["uniqueItems"]?: UniqueItems,
+["required"]?: Required,
+["minimumProperties"]?: MinimumProperties,
+["maximumProperties"]?: MaximumProperties,
+[
+name: string
+]: any
 }
 );
 /**
@@ -96,7 +102,9 @@ export type Schema = ("https://schema.JsonSchema42.org/jns42-intermediate/schema
 */
 export type Schemas = (
 {
-[name: (string)]: SchemasAdditionalProperties
+[
+name: string
+]: SchemasAdditionalProperties
 }
 );
 /**
@@ -111,7 +119,9 @@ export type Description = (NonEmptyStringValue);
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/examples}
 */
 export type Examples = (
-ExamplesItems[]
+[
+...(ExamplesItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/deprecated}
@@ -122,7 +132,9 @@ export type Deprecated = (BooleanValue);
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/types}
 */
 export type Types = (
-TypesItems[]
+[
+...(TypesItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/reference}
@@ -132,19 +144,25 @@ export type Reference = (NodeReference);
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/oneOf}
 */
 export type OneOf = (
-OneOfItems[]
+[
+...(OneOfItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/anyOf}
 */
 export type AnyOf = (
-AnyOfItems[]
+[
+...(AnyOfItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/allOf}
 */
 export type AllOf = (
-AllOfItems[]
+[
+...(AllOfItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/if}
@@ -167,7 +185,9 @@ export type Not = (NodeReference);
 */
 export type DependentSchemas = (
 {
-[name: (string)]: DependentSchemasAdditionalProperties
+[
+name: string
+]: DependentSchemasAdditionalProperties
 }
 );
 /**
@@ -175,7 +195,9 @@ export type DependentSchemas = (
 */
 export type ObjectProperties = (
 {
-[name: (string)]: ObjectPropertiesAdditionalProperties
+[
+name: string
+]: ObjectPropertiesAdditionalProperties
 }
 );
 /**
@@ -187,7 +209,9 @@ export type MapProperties = (NodeReference);
 */
 export type PatternProperties = (
 {
-[name: (string)]: PatternPropertiesAdditionalProperties
+[
+name: string
+]: PatternPropertiesAdditionalProperties
 }
 );
 /**
@@ -198,7 +222,9 @@ export type PropertyNames = (NodeReference);
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/tupleItems}
 */
 export type TupleItems = (
-TupleItemsItems[]
+[
+...(TupleItemsItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/arrayItems}
@@ -212,7 +238,9 @@ export type Contains = (NodeReference);
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/options}
 */
 export type Options = (
-OptionsItems[]
+[
+...(OptionsItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumInclusive}
@@ -266,7 +294,9 @@ export type UniqueItems = (boolean);
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/required}
 */
 export type Required = (
-RequiredItems[]
+[
+...(RequiredItems)[]
+]
 );
 /**
 * @see {@link https://schema.jsonschema42.org/jns42-intermediate/schema.json#/$defs/node/properties/minimumProperties}

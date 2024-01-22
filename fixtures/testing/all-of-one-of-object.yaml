@@ -1,7 +1,7 @@
 $schema: "./schema.json"
 
 schemas:
-  draft_2020-12:
+  original:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     allOf:
       - type: object
@@ -15,6 +15,32 @@ schemas:
             properties:
               c: { type: string }
               d: { type: string }
+          - type: object
+            required: [e, f]
+            properties:
+              e: { type: string }
+              f: { type: string }
+
+  flipped:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    oneOf:
+      - allOf:
+          - type: object
+            required: [a, b]
+            properties:
+              a: { type: string }
+              b: { type: string }
+          - type: object
+            required: [c, d]
+            properties:
+              c: { type: string }
+              d: { type: string }
+      - allOf:
+          - type: object
+            required: [a, b]
+            properties:
+              a: { type: string }
+              b: { type: string }
           - type: object
             required: [e, f]
             properties:

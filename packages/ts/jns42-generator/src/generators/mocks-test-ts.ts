@@ -1,10 +1,10 @@
 import * as models from "../models/index.js";
-import { banner, itt, toCamel } from "../utils/index.js";
+import { banner, generateJsDocComments, itt, toCamel } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typesArena } = specification;
 
   yield itt`
     import assert from "node:assert/strict";
@@ -13,10 +13,14 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (const [typeKey, typeItem] of Object.entries(types)) {
-    const { id: nodeId } = typeItem;
+  for (const [itemKey, item] of typesArena) {
+    const { id: nodeId } = item;
 
     if (nodeId == null) {
+      continue;
+    }
+
+    if (item.mockable !== true) {
       continue;
     }
 
@@ -25,6 +29,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     const mockFunctionName = toCamel("mock", names[nodeId]);
 
     yield itt`
+      ${generateJsDocComments(item)}
       test(${JSON.stringify(typeName)}, () => {
         const mock = mocks.${mockFunctionName}();
         const valid = validators.${validatorFunctionName}(mock);

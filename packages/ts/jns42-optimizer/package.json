@@ -38,6 +38,7 @@
     "camelcase": "^8.0.0",
     "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
-    "type-fest": "^4.9.0"
+    "type-fest": "^4.9.0",
+    "schema-intermediate": "*"
   }
 }

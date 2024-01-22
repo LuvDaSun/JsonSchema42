@@ -1,3 +1,9 @@
+import {
+  isAliasSchemaModel,
+  isOneOfSchemaModel,
+  isSingleTypeSchemaModel,
+  isTypeSchemaModel,
+} from "jns42-optimizer";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -11,9 +17,9 @@ import {
 export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;
 
-  const { names, types } = specification;
+  const { names, typesArena } = specification;
 
-  for (const [typeKey, item] of Object.entries(types)) {
+  for (const [itemKey, item] of typesArena) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -21,7 +27,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     }
 
     const typeName = toPascal(names[nodeId]);
-    const definition = generateTypeDefinition(specification, typeKey);
+    const definition = generateTypeDefinition(specification, itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
@@ -32,147 +38,173 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
 function* generateTypeReference(
   specification: models.Specification,
-  typeKey: string,
+  itemKey: number,
 ): Iterable<NestedText> {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
-  if (typeItem.id == null) {
-    yield itt`(${generateTypeDefinition(specification, typeKey)})`;
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
+  if (item.id == null) {
+    yield itt`(${generateTypeDefinition(specification, itemKey)})`;
   } else {
-    const typeName = toPascal(names[typeItem.id]);
+    const typeName = toPascal(names[item.id]);
     yield typeName;
   }
 }
 
-function* generateTypeDefinition(specification: models.Specification, typeKey: string) {
-  const { names, types } = specification;
-  const typeItem = types[typeKey];
+function* generateTypeDefinition(specification: models.Specification, itemKey: number) {
+  const { names, typesArena } = specification;
+  const item = typesArena.getItem(itemKey);
 
-  switch (typeItem.type) {
-    case "unknown":
-      yield "unknown";
-      break;
+  if (isAliasSchemaModel(item)) {
+    yield generateTypeReference(specification, item.alias);
+    return;
+  }
 
-    case "never":
-      yield "never";
-      break;
+  if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    yield itt`
+      ${joinIterable(
+        item.oneOf.map(
+          (element) => itt`
+            ${generateTypeReference(specification, element)}
+          `,
+        ),
+        " |\n",
+      )}
+    `;
+    return;
+  }
 
-    case "any":
-      yield "any";
-      break;
-
-    case "null":
-      yield "null";
-      break;
-
-    case "boolean": {
-      if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          " |\n",
-        );
-        break;
-      }
-
-      yield "boolean";
-      break;
-    }
-
-    case "integer":
-    case "number": {
-      if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          " |\n",
-        );
-        break;
-      }
-
-      yield "number";
-      break;
-    }
-
-    case "string": {
-      if (typeItem.options != null) {
-        yield joinIterable(
-          typeItem.options.map((option) => JSON.stringify(option)),
-          " |\n",
-        );
-        break;
-      }
-
-      yield "string";
-      break;
-    }
-
-    case "tuple": {
-      yield itt`
-        [
-          ${typeItem.elements.map(
-            (element) => itt`
-              ${generateTypeReference(specification, element)},
-            `,
-          )}
-        ]
-      `;
-      break;
-    }
-
-    case "array": {
-      const { element } = typeItem;
-      yield itt`
-        ${generateTypeReference(specification, element)}[]
-      `;
-      break;
-    }
-
-    case "object": {
-      yield itt`
-        {
-          ${Object.entries(typeItem.properties).map(([name, { required, element }]) =>
-            required
-              ? itt`
-                ${JSON.stringify(name)}: ${generateTypeReference(specification, element)},
-              `
-              : itt`
-                ${JSON.stringify(name)}?: ${generateTypeReference(specification, element)},
-              `,
-          )}
-        }
-      `;
-      break;
-    }
-
-    case "map": {
-      const { name, element } = typeItem;
-      yield itt`
-        {
-          [name: ${generateTypeReference(specification, name)}]: ${generateTypeReference(
-            specification,
-            element,
-          )}
-        }
-      `;
-      break;
-    }
-
-    case "union": {
-      yield itt`
-        ${joinIterable(
-          typeItem.elements.map(
-            (element) => itt`
-              ${generateTypeReference(specification, element)}
-            `,
-          ),
-          " | ",
-        )}
-      `;
-      break;
-    }
-
-    case "alias": {
-      yield generateTypeReference(specification, typeItem.target);
-      break;
+  if (isTypeSchemaModel(item)) {
+    if (item.options != null && item.options.length > 0) {
+      yield joinIterable(
+        item.options.map((option) => JSON.stringify(option)),
+        " |\n",
+      );
+      return;
     }
   }
+
+  if (isSingleTypeSchemaModel(item) && item.types != null) {
+    switch (item.types[0]) {
+      case "never":
+        yield "never";
+        return;
+
+      case "any":
+        yield "any";
+        return;
+
+      case "null":
+        yield "null";
+        return;
+
+      case "boolean":
+        yield "boolean";
+        return;
+
+      case "integer":
+      case "number":
+        yield "number";
+        return;
+
+      case "string":
+        yield "string";
+        return;
+
+      case "array": {
+        yield itt`
+          [
+            ${generateInterfaceContent()}
+          ]
+        `;
+
+        return;
+
+        function* generateInterfaceContent() {
+          if (item.tupleItems != null) {
+            for (const elementKey of item.tupleItems) {
+              yield itt`
+                ${generateTypeReference(specification, elementKey)},
+              `;
+            }
+          }
+
+          if (item.arrayItems != null) {
+            yield itt`
+              ...(${generateTypeReference(specification, item.arrayItems)})[]
+            `;
+          }
+
+          if (item.tupleItems == null && item.arrayItems == null) {
+            yield itt`
+              ...any
+            `;
+          }
+        }
+      }
+
+      case "map": {
+        yield itt`
+          {
+            ${generateInterfaceContent()}
+          }
+        `;
+
+        return;
+
+        function* generateInterfaceContent() {
+          if (item.objectProperties != null || item.required != null) {
+            const required = new Set(item.required);
+            const objectProperties = item.objectProperties ?? {};
+            const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
+
+            for (const name of propertyNames) {
+              if (objectProperties[name] == null) {
+                yield itt`
+                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: any,
+              `;
+              } else {
+                yield itt`
+                [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
+              `;
+              }
+            }
+          }
+
+          {
+            const elementKeys = new Array<number>();
+            if (item.mapProperties != null) {
+              elementKeys.push(item.mapProperties);
+            }
+            if (item.patternProperties != null) {
+              for (const elementKey of Object.values(item.patternProperties)) {
+                elementKeys.push(elementKey);
+              }
+            }
+
+            if (elementKeys.length > 0) {
+              yield itt`
+                [
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
+                ]: ${joinIterable(
+                  [...elementKeys, ...Object.values(item.objectProperties ?? {})].map(
+                    (elementKey) => generateTypeReference(specification, elementKey),
+                  ),
+                  " |\n",
+                )}
+              `;
+              return;
+            }
+
+            yield itt`
+              [
+                name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
+              ]: any
+            `;
+          }
+        }
+      }
+    }
+  }
+
+  yield "unknown";
 }

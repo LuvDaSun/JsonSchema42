@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.11.6                         -- www.JsonSchema42.org
+// v0.11.8                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
 export interface ParserGeneratorOptions {
@@ -25,41 +25,179 @@ const configuration = {
 };
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
-{
-"id": parseId(value["id" as keyof typeof value], configuration),
-"$schema": parseSchema(value["$schema" as keyof typeof value], configuration),
-"title": parseTitle(value["title" as keyof typeof value], configuration),
-"description": parseDescription(value["description" as keyof typeof value], configuration),
-"default": parseDefault(value["default" as keyof typeof value], configuration),
-"multipleOf": parseMultipleOf(value["multipleOf" as keyof typeof value], configuration),
-"maximum": parseMaximum(value["maximum" as keyof typeof value], configuration),
-"exclusiveMaximum": parseExclusiveMaximum(value["exclusiveMaximum" as keyof typeof value], configuration),
-"minimum": parseMinimum(value["minimum" as keyof typeof value], configuration),
-"exclusiveMinimum": parseExclusiveMinimum(value["exclusiveMinimum" as keyof typeof value], configuration),
-"maxLength": parseMaxLength(value["maxLength" as keyof typeof value], configuration),
-"minLength": parseMinLength(value["minLength" as keyof typeof value], configuration),
-"pattern": parsePattern(value["pattern" as keyof typeof value], configuration),
-"additionalItems": parseAdditionalItems(value["additionalItems" as keyof typeof value], configuration),
-"items": parsePropertiesItems(value["items" as keyof typeof value], configuration),
-"maxItems": parseMaxItems(value["maxItems" as keyof typeof value], configuration),
-"minItems": parseMinItems(value["minItems" as keyof typeof value], configuration),
-"uniqueItems": parseUniqueItems(value["uniqueItems" as keyof typeof value], configuration),
-"maxProperties": parseMaxProperties(value["maxProperties" as keyof typeof value], configuration),
-"minProperties": parseMinProperties(value["minProperties" as keyof typeof value], configuration),
-"required": parseRequired(value["required" as keyof typeof value], configuration),
-"additionalProperties": parsePropertiesAdditionalProperties(value["additionalProperties" as keyof typeof value], configuration),
-"definitions": parseDefinitions(value["definitions" as keyof typeof value], configuration),
-"properties": parseProperties(value["properties" as keyof typeof value], configuration),
-"patternProperties": parsePatternProperties(value["patternProperties" as keyof typeof value], configuration),
-"dependencies": parseDependencies(value["dependencies" as keyof typeof value], configuration),
-"enum": parseEnum(value["enum" as keyof typeof value], configuration),
-"type": parseType(value["type" as keyof typeof value], configuration),
-"format": parseFormat(value["format" as keyof typeof value], configuration),
-"allOf": parseAllOf(value["allOf" as keyof typeof value], configuration),
-"anyOf": parseAnyOf(value["anyOf" as keyof typeof value], configuration),
-"oneOf": parseOneOf(value["oneOf" as keyof typeof value], configuration),
-"not": parseNot(value["not" as keyof typeof value], configuration),
-} :
+Object.fromEntries(
+Object.entries(value).map(([name, value]) => {
+switch(name) {
+case "id":
+return [
+name,
+parseId(value, configuration),
+]
+case "$schema":
+return [
+name,
+parseSchema(value, configuration),
+]
+case "title":
+return [
+name,
+parseTitle(value, configuration),
+]
+case "description":
+return [
+name,
+parseDescription(value, configuration),
+]
+case "default":
+return [
+name,
+parseDefault(value, configuration),
+]
+case "multipleOf":
+return [
+name,
+parseMultipleOf(value, configuration),
+]
+case "maximum":
+return [
+name,
+parseMaximum(value, configuration),
+]
+case "exclusiveMaximum":
+return [
+name,
+parseExclusiveMaximum(value, configuration),
+]
+case "minimum":
+return [
+name,
+parseMinimum(value, configuration),
+]
+case "exclusiveMinimum":
+return [
+name,
+parseExclusiveMinimum(value, configuration),
+]
+case "maxLength":
+return [
+name,
+parseMaxLength(value, configuration),
+]
+case "minLength":
+return [
+name,
+parseMinLength(value, configuration),
+]
+case "pattern":
+return [
+name,
+parsePattern(value, configuration),
+]
+case "additionalItems":
+return [
+name,
+parseAdditionalItems(value, configuration),
+]
+case "items":
+return [
+name,
+parsePropertiesItems(value, configuration),
+]
+case "maxItems":
+return [
+name,
+parseMaxItems(value, configuration),
+]
+case "minItems":
+return [
+name,
+parseMinItems(value, configuration),
+]
+case "uniqueItems":
+return [
+name,
+parseUniqueItems(value, configuration),
+]
+case "maxProperties":
+return [
+name,
+parseMaxProperties(value, configuration),
+]
+case "minProperties":
+return [
+name,
+parseMinProperties(value, configuration),
+]
+case "required":
+return [
+name,
+parseRequired(value, configuration),
+]
+case "additionalProperties":
+return [
+name,
+parsePropertiesAdditionalProperties(value, configuration),
+]
+case "definitions":
+return [
+name,
+parseDefinitions(value, configuration),
+]
+case "properties":
+return [
+name,
+parseProperties(value, configuration),
+]
+case "patternProperties":
+return [
+name,
+parsePatternProperties(value, configuration),
+]
+case "dependencies":
+return [
+name,
+parseDependencies(value, configuration),
+]
+case "enum":
+return [
+name,
+parseEnum(value, configuration),
+]
+case "type":
+return [
+name,
+parseType(value, configuration),
+]
+case "format":
+return [
+name,
+parseFormat(value, configuration),
+]
+case "allOf":
+return [
+name,
+parseAllOf(value, configuration),
+]
+case "anyOf":
+return [
+name,
+parseAnyOf(value, configuration),
+]
+case "oneOf":
+return [
+name,
+parseOneOf(value, configuration),
+]
+case "not":
+return [
+name,
+parseNot(value, configuration),
+]
+default:
+return value;
+}
+})
+) :
 undefined
 );
 }
@@ -73,10 +211,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseSchemaArrayItems(value, configuration)) :
-value == null ?
-undefined :
-[parseSchemaArrayItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseSchemaArrayItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -182,10 +323,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseStringArrayItems(value, configuration)) :
-value == null ?
-undefined :
-[parseStringArrayItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseStringArrayItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**
@@ -568,7 +712,11 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseAdditionalItems0(value, configuration) ?? parseAdditionalItems1(value, configuration));
+return (
+parseAdditionalItems0(value, configuration)
+??
+parseAdditionalItems1(value, configuration)
+);
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/items}
@@ -578,7 +726,11 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseItems0(value, configuration) ?? parseItems1(value, configuration));
+return (
+parseItems0(value, configuration)
+??
+parseItems1(value, configuration)
+);
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/maxItems}
@@ -685,7 +837,11 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseAdditionalProperties0(value, configuration) ?? parseAdditionalProperties1(value, configuration));
+return (
+parseAdditionalProperties0(value, configuration)
+??
+parseAdditionalProperties1(value, configuration)
+);
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/definitions}
@@ -698,31 +854,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDefinitionsAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDefinitionsAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -738,31 +878,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parsePropertiesPropertiesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parsePropertiesPropertiesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -778,31 +902,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parsePatternPropertiesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parsePatternPropertiesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -818,31 +926,15 @@ const configuration = {
 return (
 (typeof value === "object" && value !== null && !Array.isArray(value)) ?
 Object.fromEntries(
-Object.entries(value).map(([name, value]) => [
-(
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
+Object.entries(value).map(([name, value]) => {
+switch(name) {
 default:
-return undefined;
+return [
+name,
+(parseDependenciesAdditionalProperties(value, configuration)),
+]
 }
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(name)
-),
-parseDependenciesAdditionalProperties(value, configuration),
-])
+})
 ) :
 undefined
 );
@@ -857,10 +949,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => (value)) :
-value == null ?
-undefined :
-[(value)]
+value.map((value, index) => {
+switch(index) {
+default:
+return value;
+}
+}) :
+undefined
 );
 }
 /**
@@ -871,7 +966,11 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseType0(value, configuration) ?? parseType1(value, configuration));
+return (
+parseType0(value, configuration)
+??
+parseType1(value, configuration)
+);
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/format}
@@ -1177,7 +1276,11 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (parseDependencies0(value, configuration) ?? parseDependencies1(value, configuration));
+return (
+parseDependencies0(value, configuration)
+??
+parseDependencies1(value, configuration)
+);
 }
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/0}
@@ -1199,10 +1302,13 @@ const configuration = {
 };
 return (
 Array.isArray(value) ?
-value.map(value => parseTypeItems(value, configuration)) :
-value == null ?
-undefined :
-[parseTypeItems(value, configuration)]
+value.map((value, index) => {
+switch(index) {
+default:
+return parseTypeItems(value, configuration)
+}
+}) :
+undefined
 );
 }
 /**

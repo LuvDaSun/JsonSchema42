@@ -37,6 +37,7 @@ export const flipAnyOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   for (const leafElement of leafElements) {
     const newLeafElements = [...model.anyOf, leafElement].filter((key) => !baseElementSet.has(key));
     const newLeafModel: AnyOfSchemaModel = {
+      mockable: false,
       anyOf: newLeafElements,
     };
     const newLeafKey = arena.addItem(newLeafModel);

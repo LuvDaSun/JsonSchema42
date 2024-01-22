@@ -217,10 +217,6 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
 
     if (types.length === 0) {
-      types = this.guessTypes(node);
-    }
-
-    if (types.length === 0) {
       return {};
     }
 
@@ -555,101 +551,6 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       default:
         throw new Error("unexpected type");
     }
-  }
-
-  protected guessTypes(node: N) {
-    const nodeConst = this.selectValidationConst(node);
-    const nodeEnums = this.selectValidationEnum(node);
-    const types = new Set<schemaIntermediate.TypesItems>();
-
-    if (nodeConst != null) {
-      switch (typeof nodeConst) {
-        case "number":
-          types.add("number");
-          break;
-        case "boolean":
-          types.add("boolean");
-          break;
-        case "string":
-          types.add("string");
-          break;
-        case "bigint":
-          types.add("integer");
-          break;
-
-        default:
-          throw new Error("unexpected const type");
-      }
-    }
-
-    if (nodeEnums != null) {
-      for (const nodeEnum of nodeEnums) {
-        switch (typeof nodeEnum) {
-          case "number":
-            types.add("number");
-            break;
-          case "boolean":
-            types.add("boolean");
-            break;
-          case "string":
-            types.add("string");
-            break;
-          case "bigint":
-            types.add("integer");
-            break;
-
-          default:
-            throw new Error("unexpected enum type");
-        }
-      }
-    }
-
-    if (
-      this.selectValidationMinimumInclusive(node) != null ||
-      this.selectValidationMinimumExclusive(node) != null ||
-      this.selectValidationMaximumInclusive(node) != null ||
-      this.selectValidationMaximumExclusive(node) != null ||
-      this.selectValidationMultipleOf(node) != null
-    ) {
-      types.add("number");
-    }
-
-    if (
-      this.selectValidationMinimumLength(node) != null ||
-      this.selectValidationMaximumLength(node) != null ||
-      this.selectValidationValuePattern(node) != null ||
-      this.selectValidationValueFormat(node) != null
-    ) {
-      types.add("string");
-    }
-
-    if (
-      this.selectValidationMinimumItems(node) != null ||
-      this.selectValidationMaximumItems(node) != null ||
-      this.selectValidationUniqueItems(node) != null
-    ) {
-      types.add("array");
-    }
-
-    if (
-      this.selectValidationMinimumItems(node) != null ||
-      this.selectValidationMaximumItems(node) != null ||
-      this.selectValidationUniqueItems(node) != null ||
-      [...this.selectSubNodeTupleItemsEntries("", node)].length > 0
-    ) {
-      types.add("array");
-    }
-
-    if (
-      this.selectValidationMinimumProperties(node) != null ||
-      this.selectValidationMaximumProperties(node) != null ||
-      this.selectValidationRequired(node) != null ||
-      [...this.selectSubNodeObjectPropertyEntries("", node)].length > 0
-    ) {
-      types.add("map");
-    }
-
-    return [...types];
   }
 
   //#endregion
