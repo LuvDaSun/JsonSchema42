@@ -1,5 +1,5 @@
 import * as models from "../models/index.js";
-import { banner, itt, toCamel } from "../utils/index.js";
+import { banner, generateJsDocComments, itt, toCamel } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
@@ -29,6 +29,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     const mockFunctionName = toCamel("mock", names[nodeId]);
 
     yield itt`
+      ${generateJsDocComments(item)}
       test(${JSON.stringify(typeName)}, () => {
         const mock = mocks.${mockFunctionName}();
         const valid = validators.${validatorFunctionName}(mock);
