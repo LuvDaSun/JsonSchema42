@@ -14,8 +14,8 @@ schemas:
           - default: 0
 
 valid:
-  - zero: 0
-  - one: 1
+  zero: 0
+  one: 1
 
 invalid:
-  - minus-one: -1
+  minus-one: -1
