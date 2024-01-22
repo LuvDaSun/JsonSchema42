@@ -169,13 +169,13 @@ export class SchemaArena extends Arena<SchemaModel> {
         schema.if == null &&
         schema.then == null &&
         schema.else == null &&
+        (schema.anyOf == null || schema.anyOf.length === 0) &&
         // maybe in the future...
         schema.format == null &&
         schema.uniqueItems == null &&
         // anything with a regex
         schema.valuePattern == null &&
         schema.propertyNames == null &&
-        (schema.anyOf == null || schema.anyOf.length === 0) &&
         (schema.patternProperties == null || Object.keys(schema.patternProperties).length === 0);
 
       return model;
