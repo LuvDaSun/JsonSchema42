@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
@@ -18,7 +19,11 @@ export interface PackageOptions {
   packageDirectoryPath: string;
 }
 
-export function generatePackage(specification: models.Specification, options: PackageOptions) {
+export function generatePackage(
+  document: schemaIntermediate.SchemaDocument,
+  specification: models.Specification,
+  options: PackageOptions,
+) {
   const { packageDirectoryPath, packageName, packageVersion } = options;
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
@@ -37,7 +42,7 @@ export function generatePackage(specification: models.Specification, options: Pa
   }
 
   {
-    const content = specification.document;
+    const content = document;
     const filePath = path.join(packageDirectoryPath, "intermediate.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
