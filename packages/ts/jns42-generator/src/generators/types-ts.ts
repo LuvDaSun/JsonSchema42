@@ -11,7 +11,7 @@ import {
   generateJsDocComments,
   itt,
   joinIterable,
-  toPascal
+  toPascal,
 } from "../utils/index.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
