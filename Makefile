@@ -19,7 +19,7 @@ clean: \
 out/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir --parents $(@D)
 
-	packages/ts/jns42-generator/bin/jns42-generator package file://${PWD}/$< \
+	npx jns42-generator package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
@@ -27,7 +27,7 @@ out/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 out/schema-draft-04:
 	mkdir --parents $(@D)
 
-	packages/ts/jns42-generator/bin/jns42-generator package http://json-schema.org/draft-04/schema\# \
+	npx jns42-generator package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
@@ -35,7 +35,7 @@ out/schema-draft-04:
 out/schema-draft-2020-12:
 	mkdir --parents $(@D)
 
-	packages/ts/jns42-generator/bin/jns42-generator package https://json-schema.org/draft/2020-12/schema \
+	npx jns42-generator package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
 		--package-name $(notdir $(basename $@)) \
 		--package-version 0.0.0 \
@@ -46,9 +46,9 @@ packages/ts/%: out/%
 	rm -rf $@
 	mv $< $@
 
-	npm install --workspace $(notdir $(basename $@))
-	npm run clean --workspace $(notdir $(basename $@))
-	npm run build --workspace $(notdir $(basename $@))
+	npm install --workspace $@
+	npm run clean --workspace $@
+	npm run build --workspace $@
 
 .PHONY: \
 	build \
