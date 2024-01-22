@@ -16,6 +16,7 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
 
   const newModel: SchemaModel & OneOfSchemaModel = {
     ...model,
+    mockable: false,
     oneOf: [],
     anyOf: undefined,
   };
@@ -67,8 +68,6 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
 
       newSubModel = {
         ...newSubModel,
-        mockable: false,
-
         options: intersectionMerge(newSubModel.options, subModel.options),
         required: intersectionMerge(newSubModel.required, subModel.required),
         propertyNames: mergeKey(newSubModel.propertyNames, subModel.propertyNames),
