@@ -1603,6 +1603,12 @@ typeof value !== "string"
 recordError("string");
 return false;
 }
+if(
+!new RegExp("^[A-Za-z_][-A-Za-z0-9._]*$").test(value)
+) {
+recordError("valuePattern");
+return false;
+}
 return true;
 ;
 });
@@ -1869,6 +1875,12 @@ if(
 typeof value !== "string"
 ) {
 recordError("string");
+return false;
+}
+if(
+!new RegExp("^[^#]*#?$").test(value)
+) {
+recordError("valuePattern");
 return false;
 }
 return true;
