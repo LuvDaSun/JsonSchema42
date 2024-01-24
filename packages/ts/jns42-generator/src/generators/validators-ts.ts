@@ -358,17 +358,16 @@ function* generateValidatorStatements(
           `;
         }
 
-        // TODO switch on when supported by mocks!
-        // for (const ruleValue of item.valuePattern ?? []) {
-        //   yield itt`
-        //     if(
-        //       !new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})
-        //     ) {
-        //       recordError("valuePattern");
-        //       return false;
-        //     }
-        //   `;
-        // }
+        for (const ruleValue of item.valuePattern ?? []) {
+          yield itt`
+            if(
+              !new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})
+            ) {
+              recordError("valuePattern");
+              return false;
+            }
+          `;
+        }
 
         break;
       }
