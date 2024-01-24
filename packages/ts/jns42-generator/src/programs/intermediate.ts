@@ -30,20 +30,22 @@ export function configureIntermediateProgram(argv: yargs.Argv) {
   );
 }
 
-interface MainOptions {
+interface MainConfiguration {
   instanceSchemaUrl: string;
   defaultMetaSchemaUrl: string;
 }
 
-async function main(options: MainOptions) {
+async function main(configuration: MainConfiguration) {
   let instanceSchemaUrl: URL;
-  if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
-    instanceSchemaUrl = new URL(options.instanceSchemaUrl);
+  if (/^\w+\:\/\//.test(configuration.instanceSchemaUrl)) {
+    instanceSchemaUrl = new URL(configuration.instanceSchemaUrl);
   } else {
-    instanceSchemaUrl = new URL("file://" + path.resolve(process.cwd(), options.instanceSchemaUrl));
+    instanceSchemaUrl = new URL(
+      "file://" + path.resolve(process.cwd(), configuration.instanceSchemaUrl),
+    );
   }
 
-  const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
 
   const context = new DocumentContext();
   context.registerFactory(

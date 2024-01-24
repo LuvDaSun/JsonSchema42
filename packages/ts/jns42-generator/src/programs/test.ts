@@ -68,7 +68,7 @@ export function configureTestProgram(argv: yargs.Argv) {
   );
 }
 
-interface MainOptions {
+interface MainConfiguration {
   pathToTest: string;
   defaultMetaSchemaUrl: string;
   outputDirectory: string;
@@ -79,18 +79,18 @@ interface MainOptions {
   transformMaximumIterations: number;
 }
 
-async function main(options: MainOptions) {
-  const pathToTest = path.resolve(options.pathToTest);
+async function main(configuration: MainConfiguration) {
+  const pathToTest = path.resolve(configuration.pathToTest);
 
-  const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-  const packageDirectoryRoot = path.resolve(options.outputDirectory);
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const packageDirectoryRoot = path.resolve(configuration.outputDirectory);
   const {
     packageName,
     packageVersion,
     nameMaximumIterations,
     transformMaximumIterations,
     defaultName,
-  } = options;
+  } = configuration;
 
   const testUrl = new URL(`file://${pathToTest}`);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
