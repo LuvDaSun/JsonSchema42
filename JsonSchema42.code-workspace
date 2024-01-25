@@ -41,6 +41,21 @@
     "npm.packageManager": "npm",
     "rust-analyzer.check.command": "clippy",
   },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "type": "npm",
+        "label": "build",
+        "script": "build",
+        "problemMatcher": ["$tsc"],
+        "group": {
+          "kind": "build",
+          "isDefault": true,
+        },
+      },
+    ],
+  },
   "extensions": {
     "recommendations": [
       "ryanluker.vscode-coverage-gutters",
