@@ -6,6 +6,7 @@
     "clippy",
     "endregion",
     "esbenp",
+    "lcov",
     "notdir",
     "ryanluker",
     "serde",

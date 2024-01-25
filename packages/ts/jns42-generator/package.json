@@ -61,11 +61,5 @@
     "schema-draft-04",
     "schema-draft-2020-12",
     "schema-intermediate"
-  ],
-  "bundleDependencies": [
-    "jns42-optimizer",
-    "schema-draft-04",
-    "schema-draft-2020-12",
-    "schema-intermediate"
   ]
 }

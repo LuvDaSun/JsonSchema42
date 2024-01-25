@@ -6,7 +6,8 @@
   ],
   "scripts": {
     "spelling": "cspell",
-    "formatting": "prettier --check *"
+    "formatting": "prettier --check *",
+    "build": "tsc --build"
   },
   "devDependencies": {
     "cspell": "^8.3.2",

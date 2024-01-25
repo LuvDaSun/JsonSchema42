@@ -9,5 +9,8 @@
     "lib": ["ES2023", "DOM"],
   },
   "include": ["src"],
-  "references": [{ "path": "packages/ts/*" }],
+  "references": [
+    { "path": "packages/ts/jns42-generator" },
+    { "path": "packages/ts/jns42-optimizer" },
+  ],
 }
