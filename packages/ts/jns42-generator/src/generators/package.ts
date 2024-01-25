@@ -13,18 +13,19 @@ import { getTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
 
-export interface PackageOptions {
+export interface PackageConfiguration {
   packageName: string;
-  packageVersion?: string;
+  packageVersion: string;
   packageDirectoryPath: string;
+  unionObjectAndMap: boolean;
 }
 
 export function generatePackage(
   document: schemaIntermediate.SchemaDocument,
   specification: models.Specification,
-  options: PackageOptions,
+  configuration: PackageConfiguration,
 ) {
-  const { packageDirectoryPath, packageName, packageVersion } = options;
+  const { packageDirectoryPath, packageName, packageVersion } = configuration;
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
@@ -54,43 +55,43 @@ export function generatePackage(
   }
 
   {
-    const content = generateMainTsCode(specification);
+    const content = generateMainTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "main.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateValidatorsTsCode(specification);
+    const content = generateValidatorsTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "validators.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateTypesTsCode(specification);
+    const content = generateTypesTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "types.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateParsersTsCode(specification);
+    const content = generateParsersTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "parsers.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateMocksTsCode(specification);
+    const content = generateMocksTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "mocks.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateExamplesTestTsCode(specification);
+    const content = generateExamplesTestTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "examples.test.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateMocksTestTsCode(specification);
+    const content = generateMocksTestTsCode(specification, configuration);
     const filePath = path.join(packageDirectoryPath, "src", "mocks.test.ts");
     writeContentToFile(filePath, content);
   }

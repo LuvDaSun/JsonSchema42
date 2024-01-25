@@ -57,12 +57,18 @@ export function configurePackageProgram(argv: yargs.Argv) {
           description: "maximum number of iterations for transforming",
           type: "number",
           default: 1000,
+        })
+        .option("union-object-and-map", {
+          description:
+            "If a type is both a map and an object, add index with a union type of all the properties",
+          type: "boolean",
+          default: false,
         }),
     (argv) => main(argv),
   );
 }
 
-interface MainOptions {
+interface MainConfiguration {
   instanceSchemaUrl: string;
   defaultMetaSchemaUrl: string;
   packageDirectory: string;
@@ -71,25 +77,29 @@ interface MainOptions {
   defaultTypeName: string;
   nameMaximumIterations: number;
   transformMaximumIterations: number;
+  unionObjectAndMap: boolean;
 }
 
-async function main(options: MainOptions) {
+async function main(configuration: MainConfiguration) {
   let instanceSchemaUrl: URL;
-  if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
-    instanceSchemaUrl = new URL(options.instanceSchemaUrl);
+  if (/^\w+\:\/\//.test(configuration.instanceSchemaUrl)) {
+    instanceSchemaUrl = new URL(configuration.instanceSchemaUrl);
   } else {
-    instanceSchemaUrl = new URL("file://" + path.resolve(process.cwd(), options.instanceSchemaUrl));
+    instanceSchemaUrl = new URL(
+      "file://" + path.resolve(process.cwd(), configuration.instanceSchemaUrl),
+    );
   }
 
-  const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-  const packageDirectoryPath = path.resolve(options.packageDirectory);
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const {
     packageName,
     packageVersion,
     nameMaximumIterations,
     transformMaximumIterations,
     defaultTypeName,
-  } = options;
+    unionObjectAndMap,
+  } = configuration;
 
   const context = new DocumentContext();
   context.registerFactory(
@@ -121,5 +131,6 @@ async function main(options: MainOptions) {
     packageDirectoryPath,
     packageName,
     packageVersion,
+    unionObjectAndMap,
   });
 }
