@@ -163,17 +163,17 @@ export function* generateTypesTsCode(
 
                 if (objectProperties[name] == null) {
                   yield itt`
-                  [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: any,
-                `;
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: any,
+                  `;
                 } else {
                   yield itt`
-                  [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateTypeReference(objectProperties[name])},
-                `;
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(objectProperties[name])},
+                  `;
                 }
               }
             }
 
-            if (!isObject && configuration.unionObjectAndMap) {
+            if (!isObject || configuration.unionObjectAndMap) {
               const elementKeys = new Array<number>();
               if (item.mapProperties != null) {
                 elementKeys.push(item.mapProperties);
