@@ -178,7 +178,6 @@ export function* generateTypesTsCode(
               if (item.mapProperties != null) {
                 elementKeys.push(item.mapProperties);
               }
-
               if (item.patternProperties != null) {
                 for (const elementKey of Object.values(item.patternProperties)) {
                   elementKeys.push(elementKey);
@@ -186,9 +185,10 @@ export function* generateTypesTsCode(
               }
 
               if (elementKeys.length > 0) {
-                const typeNames = elementKeys.map((elementKey) =>
-                  generateTypeReference(elementKey),
-                );
+                const typeNames = [
+                  ...elementKeys,
+                  ...Object.values(item.objectProperties ?? {}),
+                ].map((elementKey) => generateTypeReference(elementKey));
 
                 if (undefinedProperty) {
                   typeNames.push("undefined");
