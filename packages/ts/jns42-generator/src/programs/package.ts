@@ -56,13 +56,13 @@ export function configurePackageProgram(argv: yargs.Argv) {
         .option("transform-maximum-iterations", {
           description: "maximum number of iterations for transforming",
           type: "number",
-          default: 1000,
+          default: 100,
         }),
     (argv) => main(argv),
   );
 }
 
-interface MainOptions {
+interface MainConfiguration {
   instanceSchemaUrl: string;
   defaultMetaSchemaUrl: string;
   packageDirectory: string;
@@ -73,23 +73,25 @@ interface MainOptions {
   transformMaximumIterations: number;
 }
 
-async function main(options: MainOptions) {
+async function main(configuration: MainConfiguration) {
   let instanceSchemaUrl: URL;
-  if (/^\w+\:\/\//.test(options.instanceSchemaUrl)) {
-    instanceSchemaUrl = new URL(options.instanceSchemaUrl);
+  if (/^\w+\:\/\//.test(configuration.instanceSchemaUrl)) {
+    instanceSchemaUrl = new URL(configuration.instanceSchemaUrl);
   } else {
-    instanceSchemaUrl = new URL("file://" + path.resolve(process.cwd(), options.instanceSchemaUrl));
+    instanceSchemaUrl = new URL(
+      "file://" + path.resolve(process.cwd(), configuration.instanceSchemaUrl),
+    );
   }
 
-  const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-  const packageDirectoryPath = path.resolve(options.packageDirectory);
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const {
     packageName,
     packageVersion,
     nameMaximumIterations,
     transformMaximumIterations,
     defaultTypeName,
-  } = options;
+  } = configuration;
 
   const context = new DocumentContext();
   context.registerFactory(

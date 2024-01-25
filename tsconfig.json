@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/node20",
+  "compilerOptions": {
+    "outDir": "./out",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "declaration": true,
+    "composite": true,
+    "lib": ["ES2023", "DOM"],
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "packages/ts/jns42-generator" },
+    { "path": "packages/ts/jns42-optimizer" },
+  ],
+}

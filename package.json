@@ -6,10 +6,12 @@
   ],
   "scripts": {
     "spelling": "cspell",
-    "formatting": "prettier --check *"
+    "formatting": "prettier --check *",
+    "build": "tsc --build"
   },
   "devDependencies": {
     "cspell": "^8.3.2",
-    "prettier": "^3.1.1"
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3"
   }
 }

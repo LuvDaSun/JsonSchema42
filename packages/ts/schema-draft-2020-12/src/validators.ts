@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.5                         -- www.JsonSchema42.org
+// v0.12.6                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
 export interface ValidationError {
@@ -66,1048 +66,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("Schema", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
+return false;
+}
 if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
 ) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "$id":
-if(!withPath(propertyName, () => {
-if(!isId(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$schema":
-if(!withPath(propertyName, () => {
-if(!isCoreSchema(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$ref":
-if(!withPath(propertyName, () => {
-if(!isRef(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$anchor":
-if(!withPath(propertyName, () => {
-if(!isAnchor(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$dynamicRef":
-if(!withPath(propertyName, () => {
-if(!isDynamicRef(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$dynamicAnchor":
-if(!withPath(propertyName, () => {
-if(!isDynamicAnchor(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$vocabulary":
-if(!withPath(propertyName, () => {
-if(!isVocabulary(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$comment":
-if(!withPath(propertyName, () => {
-if(!isComment(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "$defs":
-if(!withPath(propertyName, () => {
-if(!isDefs(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 2 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "prefixItems":
-if(!withPath(propertyName, () => {
-if(!isPrefixItems(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "items":
-if(!withPath(propertyName, () => {
-if(!isApplicatorItems(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "contains":
-if(!withPath(propertyName, () => {
-if(!isContains(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "additionalProperties":
-if(!withPath(propertyName, () => {
-if(!isApplicatorAdditionalProperties(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "properties":
-if(!withPath(propertyName, () => {
-if(!isProperties(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "patternProperties":
-if(!withPath(propertyName, () => {
-if(!isPatternProperties(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "dependentSchemas":
-if(!withPath(propertyName, () => {
-if(!isDependentSchemas(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "propertyNames":
-if(!withPath(propertyName, () => {
-if(!isApplicatorPropertyNames(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "if":
-if(!withPath(propertyName, () => {
-if(!isIf(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "then":
-if(!withPath(propertyName, () => {
-if(!isThen(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "else":
-if(!withPath(propertyName, () => {
-if(!isElse(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "allOf":
-if(!withPath(propertyName, () => {
-if(!isAllOf(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "anyOf":
-if(!withPath(propertyName, () => {
-if(!isAnyOf(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "oneOf":
-if(!withPath(propertyName, () => {
-if(!isOneOf(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "not":
-if(!withPath(propertyName, () => {
-if(!isNot(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 3 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 4 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "unevaluatedItems":
-if(!withPath(propertyName, () => {
-if(!isUnevaluatedItems(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "unevaluatedProperties":
-if(!withPath(propertyName, () => {
-if(!isUnevaluatedProperties(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 5 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 6 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "type":
-if(!withPath(propertyName, () => {
-if(!isType(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "const":
-if(!withPath(propertyName, () => {
-if(!isConst(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "enum":
-if(!withPath(propertyName, () => {
-if(!isEnum(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "multipleOf":
-if(!withPath(propertyName, () => {
-if(!isMultipleOf(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "maximum":
-if(!withPath(propertyName, () => {
-if(!isMaximum(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "exclusiveMaximum":
-if(!withPath(propertyName, () => {
-if(!isExclusiveMaximum(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "minimum":
-if(!withPath(propertyName, () => {
-if(!isMinimum(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "exclusiveMinimum":
-if(!withPath(propertyName, () => {
-if(!isExclusiveMinimum(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "maxLength":
-if(!withPath(propertyName, () => {
-if(!isMaxLength(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "minLength":
-if(!withPath(propertyName, () => {
-if(!isMinLength(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "pattern":
-if(!withPath(propertyName, () => {
-if(!isPattern(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "maxItems":
-if(!withPath(propertyName, () => {
-if(!isMaxItems(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "minItems":
-if(!withPath(propertyName, () => {
-if(!isMinItems(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "uniqueItems":
-if(!withPath(propertyName, () => {
-if(!isUniqueItems(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "maxContains":
-if(!withPath(propertyName, () => {
-if(!isMaxContains(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "minContains":
-if(!withPath(propertyName, () => {
-if(!isMinContains(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "maxProperties":
-if(!withPath(propertyName, () => {
-if(!isMaxProperties(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "minProperties":
-if(!withPath(propertyName, () => {
-if(!isMinProperties(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "required":
-if(!withPath(propertyName, () => {
-if(!isRequired(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "dependentRequired":
-if(!withPath(propertyName, () => {
-if(!isDependentRequired(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 7 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 8 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "title":
-if(!withPath(propertyName, () => {
-if(!isTitle(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "description":
-if(!withPath(propertyName, () => {
-if(!isDescription(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "default":
-if(!withPath(propertyName, () => {
-if(!isDefault(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "deprecated":
-if(!withPath(propertyName, () => {
-if(!isDeprecated(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "readOnly":
-if(!withPath(propertyName, () => {
-if(!isReadOnly(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "writeOnly":
-if(!withPath(propertyName, () => {
-if(!isWriteOnly(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "examples":
-if(!withPath(propertyName, () => {
-if(!isExamples(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 9 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 10 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "format":
-if(!withPath(propertyName, () => {
-if(!isFormat(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 11 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 12 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
-for(const propertyName in value) {
-const propertyValue = value[propertyName as keyof typeof value];
-if(propertyValue === undefined) {
-continue;
-}
-switch(propertyName) {
-case "contentEncoding":
-if(!withPath(propertyName, () => {
-if(!isContentEncoding(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "contentMediaType":
-if(!withPath(propertyName, () => {
-if(!isContentMediaType(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-case "contentSchema":
-if(!withPath(propertyName, () => {
-if(!isContentSchema(propertyValue)) {
-recordError("objectProperties");
-return false;
-}
-return true;
-})) {
-return false
-}
-break;
-default:
-break;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 13 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 14 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
-return false;
-}
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1162,40 +134,31 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
+}
+{
+let counter = 0;
+if(counter === 0 && isAllOf0(value)) {
 counter += 1;
 }
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
+if(counter === 1 && isAllOf1(value)) {
 counter += 1;
 }
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
+if(counter === 2 && isAllOf2(value)) {
 counter += 1;
 }
-if(counter === 15 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
+if(counter === 3 && isAllOf3(value)) {
 counter += 1;
 }
-if(counter < 16) {
+if(counter === 4 && isAllOf4(value)) {
+counter += 1;
+}
+if(counter === 5 && isAllOf5(value)) {
+counter += 1;
+}
+if(counter === 6 && isAllOf6(value)) {
+counter += 1;
+}
+if(counter < 7) {
 recordError("allOf");
 return false;
 }
@@ -1219,14 +182,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Definitions", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1245,6 +213,7 @@ return true;
 return false
 }
 break;
+}
 }
 }
 return true;
@@ -1266,14 +235,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Dependencies", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1292,6 +266,7 @@ return true;
 return false
 }
 break;
+}
 }
 }
 return true;
@@ -1314,8 +289,9 @@ depth += 1;
 try{
 return withType("RecursiveAnchor", () => {
 if(!isAnchorString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1336,8 +312,9 @@ depth += 1;
 try{
 return withType("RecursiveRef", () => {
 if(!isUriReferenceString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1357,8 +334,9 @@ depth += 1;
 try{
 return withType("AllOf0", () => {
 if(!isCore(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1378,8 +356,9 @@ depth += 1;
 try{
 return withType("AllOf1", () => {
 if(!isApplicator(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1399,8 +378,9 @@ depth += 1;
 try{
 return withType("AllOf2", () => {
 if(!isUnevaluated(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1420,8 +400,9 @@ depth += 1;
 try{
 return withType("AllOf3", () => {
 if(!isValidation(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1441,8 +422,9 @@ depth += 1;
 try{
 return withType("AllOf4", () => {
 if(!isMetaData(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1462,8 +444,9 @@ depth += 1;
 try{
 return withType("AllOf5", () => {
 if(!isFormatAnnotation(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1483,8 +466,9 @@ depth += 1;
 try{
 return withType("AllOf6", () => {
 if(!isContent(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1504,8 +488,9 @@ depth += 1;
 try{
 return withType("DefinitionsAdditionalProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1556,8 +541,9 @@ depth += 1;
 try{
 return withType("Dependencies0", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1577,8 +563,9 @@ depth += 1;
 try{
 return withType("Dependencies1", () => {
 if(!isStringArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1597,11 +584,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("AnchorString", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
+}
+if(
+typeof value === "string"
+) {
+if(
+!new RegExp("^[A-Za-z_][-A-Za-z0-9._]*$").test(value)
+) {
+recordError("valuePattern");
+return false;
+}
 }
 return true;
 ;
@@ -1621,10 +616,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("UriReferenceString", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1646,22 +639,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("Core", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1771,43 +762,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -1827,10 +781,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("UriString", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1851,35 +803,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Id", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-if(!isUriReferenceString(value)) {
-return false;
-};
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
 if(
-typeof value !== "string"
+typeof value === "string"
 ) {
-recordError("string");
+if(
+!new RegExp("^[^#]*#?$").test(value)
+) {
+recordError("valuePattern");
 return false;
 }
-return true;
-})(value)
-) {
-counter += 1;
 }
-if(counter < 2) {
-recordError("allOf");
+if(!isUriReferenceString(value)) {
+recordError("reference");
 return false;
-}
 }
 return true;
 ;
@@ -1900,8 +836,9 @@ depth += 1;
 try{
 return withType("CoreSchema", () => {
 if(!isUriString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1921,8 +858,9 @@ depth += 1;
 try{
 return withType("Ref", () => {
 if(!isUriReferenceString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1942,8 +880,9 @@ depth += 1;
 try{
 return withType("Anchor", () => {
 if(!isAnchorString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1963,8 +902,9 @@ depth += 1;
 try{
 return withType("DynamicRef", () => {
 if(!isUriReferenceString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1984,8 +924,9 @@ depth += 1;
 try{
 return withType("DynamicAnchor", () => {
 if(!isAnchorString(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2004,14 +945,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Vocabulary", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2032,6 +978,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -2050,10 +997,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Comment", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -2074,14 +1019,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Defs", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2102,6 +1052,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -2120,8 +1071,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("VocabularyAdditionalProperties", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -2142,35 +1093,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("VocabularyPropertyNames", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
+if(!((typeof value === "string"))) {
+recordError("types");
+return false;
+}
 if(!isUriString(value)) {
+recordError("reference");
 return false;
-};
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -2191,8 +1120,9 @@ depth += 1;
 try{
 return withType("DefsAdditionalProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2212,22 +1142,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("Applicator", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2403,43 +1331,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -2459,10 +1350,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("SchemaArray", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 if(value.length < 1) {
 recordError("minimumItems");
 return false;
@@ -2484,6 +1378,7 @@ break;
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -2503,8 +1398,9 @@ depth += 1;
 try{
 return withType("PrefixItems", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2524,8 +1420,9 @@ depth += 1;
 try{
 return withType("ApplicatorItems", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2545,8 +1442,9 @@ depth += 1;
 try{
 return withType("Contains", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2566,8 +1464,9 @@ depth += 1;
 try{
 return withType("ApplicatorAdditionalProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2586,14 +1485,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Properties", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2614,6 +1518,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -2632,14 +1537,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("PatternProperties", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2660,6 +1570,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -2678,14 +1589,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("DependentSchemas", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -2704,6 +1620,7 @@ return true;
 return false
 }
 break;
+}
 }
 }
 return true;
@@ -2725,8 +1642,9 @@ depth += 1;
 try{
 return withType("ApplicatorPropertyNames", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2746,8 +1664,9 @@ depth += 1;
 try{
 return withType("If", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2767,8 +1686,9 @@ depth += 1;
 try{
 return withType("Then", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2788,8 +1708,9 @@ depth += 1;
 try{
 return withType("Else", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2809,8 +1730,9 @@ depth += 1;
 try{
 return withType("AllOf", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2830,8 +1752,9 @@ depth += 1;
 try{
 return withType("AnyOf", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2851,8 +1774,9 @@ depth += 1;
 try{
 return withType("OneOf", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2872,8 +1796,9 @@ depth += 1;
 try{
 return withType("Not", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2893,8 +1818,9 @@ depth += 1;
 try{
 return withType("SchemaArrayItems", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2914,8 +1840,9 @@ depth += 1;
 try{
 return withType("PropertiesAdditionalProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2935,8 +1862,9 @@ depth += 1;
 try{
 return withType("PatternPropertiesAdditionalProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2955,10 +1883,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("PatternPropertiesPropertyNames", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -2980,8 +1906,9 @@ depth += 1;
 try{
 return withType("DependentSchemasAdditionalProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3001,22 +1928,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("Unevaluated", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -3049,43 +1974,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -3106,8 +1994,9 @@ depth += 1;
 try{
 return withType("UnevaluatedItems", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3127,8 +2016,9 @@ depth += 1;
 try{
 return withType("UnevaluatedProperties", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3148,22 +2038,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("Validation", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -3394,43 +2282,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -3450,19 +2301,24 @@ resetErrors();
 depth += 1;
 try{
 return withType("NonNegativeInteger", () => {
-if(
-typeof value !== "number" ||
-isNaN(value) ||
-value % 1 !== 0
-) {
-recordError("integer");
+if(!((
+typeof value === "number" &&
+!isNaN(value) &&
+value % 1 === 0
+))) {
+recordError("types");
 return false;
 }
+if(
+typeof value === "number" &&
+!isNaN(value)
+) {
 if(
 value < 0
 ) {
 recordError("minimumInclusive");
 return false;
+}
 }
 return true;
 ;
@@ -3483,8 +2339,9 @@ depth += 1;
 try{
 return withType("NonNegativeIntegerDefault0", () => {
 if(!isNonNegativeInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3515,12 +2372,6 @@ value !== "string"
 recordError("options");
 return false;
 }
-if(
-typeof value !== "string"
-) {
-recordError("string");
-return false;
-}
 return true;
 ;
 });
@@ -3539,10 +2390,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("StringArray", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 const elementValueSeen = new Set<unknown>();
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
@@ -3565,6 +2419,7 @@ break;
 break;
 }
 elementValueSeen.add(elementValue);
+}
 }
 return true;
 ;
@@ -3615,6 +2470,10 @@ resetErrors();
 depth += 1;
 try{
 return withType("Const", () => {
+if(!((true))) {
+recordError("types");
+return false;
+}
 return true;
 ;
 });
@@ -3633,10 +2492,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Enum", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -3652,6 +2514,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -3672,18 +2535,23 @@ resetErrors();
 depth += 1;
 try{
 return withType("MultipleOf", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+typeof value === "number" &&
+!isNaN(value)
+) {
 if(
 value <= 0
 ) {
 recordError("minimumExclusive");
 return false;
+}
 }
 return true;
 ;
@@ -3703,11 +2571,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("Maximum", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -3728,11 +2596,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("ExclusiveMaximum", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -3753,11 +2621,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("Minimum", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -3778,11 +2646,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("ExclusiveMinimum", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -3804,8 +2672,9 @@ depth += 1;
 try{
 return withType("MaxLength", () => {
 if(!isNonNegativeInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3825,8 +2694,9 @@ depth += 1;
 try{
 return withType("MinLength", () => {
 if(!isNonNegativeIntegerDefault0(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3845,10 +2715,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Pattern", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -3870,8 +2738,9 @@ depth += 1;
 try{
 return withType("MaxItems", () => {
 if(!isNonNegativeInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3891,8 +2760,9 @@ depth += 1;
 try{
 return withType("MinItems", () => {
 if(!isNonNegativeIntegerDefault0(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3911,8 +2781,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("UniqueItems", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -3934,8 +2804,9 @@ depth += 1;
 try{
 return withType("MaxContains", () => {
 if(!isNonNegativeInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3955,8 +2826,9 @@ depth += 1;
 try{
 return withType("MinContains", () => {
 if(!isNonNegativeInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3976,8 +2848,9 @@ depth += 1;
 try{
 return withType("MaxProperties", () => {
 if(!isNonNegativeInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -3997,8 +2870,9 @@ depth += 1;
 try{
 return withType("MinProperties", () => {
 if(!isNonNegativeIntegerDefault0(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -4018,8 +2892,9 @@ depth += 1;
 try{
 return withType("Required", () => {
 if(!isStringArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -4038,14 +2913,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("DependentRequired", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -4066,6 +2946,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -4084,10 +2965,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("StringArrayItems", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4109,8 +2988,9 @@ depth += 1;
 try{
 return withType("Type0", () => {
 if(!isSimpleTypes(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -4129,10 +3009,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Type1", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 if(value.length < 1) {
 recordError("minimumItems");
 return false;
@@ -4160,6 +3043,7 @@ break;
 }
 elementValueSeen.add(elementValue);
 }
+}
 return true;
 ;
 });
@@ -4178,6 +3062,10 @@ resetErrors();
 depth += 1;
 try{
 return withType("EnumItems", () => {
+if(!((true))) {
+recordError("types");
+return false;
+}
 return true;
 ;
 });
@@ -4197,8 +3085,9 @@ depth += 1;
 try{
 return withType("DependentRequiredAdditionalProperties", () => {
 if(!isStringArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -4218,8 +3107,9 @@ depth += 1;
 try{
 return withType("TypeItems", () => {
 if(!isSimpleTypes(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -4239,22 +3129,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("MetaData", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -4342,43 +3230,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -4398,10 +3249,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Title", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4422,10 +3271,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Description", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4446,6 +3293,10 @@ resetErrors();
 depth += 1;
 try{
 return withType("Default", () => {
+if(!((true))) {
+recordError("types");
+return false;
+}
 return true;
 ;
 });
@@ -4464,8 +3315,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Deprecated", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4486,8 +3337,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("ReadOnly", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4508,8 +3359,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("WriteOnly", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4530,10 +3381,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Examples", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -4549,6 +3403,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -4569,6 +3424,10 @@ resetErrors();
 depth += 1;
 try{
 return withType("ExamplesItems", () => {
+if(!((true))) {
+recordError("types");
+return false;
+}
 return true;
 ;
 });
@@ -4588,22 +3447,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("FormatAnnotation", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -4625,43 +3482,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -4681,10 +3501,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Format", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4706,22 +3524,20 @@ resetErrors();
 depth += 1;
 try{
 return withType("Content", () => {
-{
-let counter = 0;
-if(counter === 0 &&
-((value: unknown) => {
-{
-let counter = 0;
-if(counter < 2 &&
-((value: unknown) => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) ||
+(typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -4765,43 +3581,6 @@ default:
 break;
 }
 }
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2 &&
-((value: unknown) => {
-if(typeof value !== "boolean") {
-recordError("boolean");
-return false;
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter !== 1) {
-recordError("oneOf");
-return false;
-}
-}
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter === 1 &&
-((value: unknown) => {
-return true;
-})(value)
-) {
-counter += 1;
-}
-if(counter < 2) {
-recordError("allOf");
-return false;
-}
 }
 return true;
 ;
@@ -4821,10 +3600,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("ContentEncoding", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4845,10 +3622,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("ContentMediaType", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -4870,8 +3645,9 @@ depth += 1;
 try{
 return withType("ContentSchema", () => {
 if(!isSchema(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });

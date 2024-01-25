@@ -4,7 +4,6 @@ import {
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
   isIfSchemaModel,
-  isNotSchemaModel,
   isOneOfSchemaModel,
   isReferenceSchemaModel,
   isSingleTypeSchemaModel,
@@ -91,7 +90,7 @@ export const mockable: SchemaTransform = (arena, model, modelKey) => {
     mockable = false;
   }
 
-  if (isNotSchemaModel(model)) {
+  if (model.not != null) {
     mockable = false;
   }
 

@@ -62,13 +62,13 @@ export function configureTestProgram(argv: yargs.Argv) {
         .option("transform-maximum-iterations", {
           description: "maximum number of iterations for transforming",
           type: "number",
-          default: 1000,
+          default: 100,
         }),
     (argv) => main(argv),
   );
 }
 
-interface MainOptions {
+interface MainConfiguration {
   pathToTest: string;
   defaultMetaSchemaUrl: string;
   outputDirectory: string;
@@ -79,18 +79,18 @@ interface MainOptions {
   transformMaximumIterations: number;
 }
 
-async function main(options: MainOptions) {
-  const pathToTest = path.resolve(options.pathToTest);
+async function main(configuration: MainConfiguration) {
+  const pathToTest = path.resolve(configuration.pathToTest);
 
-  const defaultMetaSchemaId = options.defaultMetaSchemaUrl;
-  const packageDirectoryRoot = path.resolve(options.outputDirectory);
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const packageDirectoryRoot = path.resolve(configuration.outputDirectory);
   const {
     packageName,
     packageVersion,
     nameMaximumIterations,
     transformMaximumIterations,
     defaultName,
-  } = options;
+  } = configuration;
 
   const testUrl = new URL(`file://${pathToTest}`);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
