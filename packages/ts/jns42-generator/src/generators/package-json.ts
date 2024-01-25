@@ -1,9 +1,10 @@
 import { PackageJson } from "type-fest";
 import { packageInfo } from "../utils/index.js";
 
-export function getPackageJsonData(name: string, version?: string) {
+export function getPackageJsonData(name: string, version: string) {
   const content: PackageJson = {
-    name: name,
+    name,
+    version,
     sideEffects: false,
     type: "module",
     main: "./out/main.js",
@@ -35,12 +36,6 @@ export function getPackageJsonData(name: string, version?: string) {
     dependencies: withDependencies(["@types/node"]),
     devDependencies: withDependencies(["typescript", "@tsconfig/node20"]),
   };
-
-  if (version == null) {
-    content.private = true;
-  } else {
-    content.version = version;
-  }
 
   return content;
 }

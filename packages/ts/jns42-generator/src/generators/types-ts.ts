@@ -13,8 +13,12 @@ import {
   joinIterable,
   toPascal,
 } from "../utils/index.js";
+import { PackageConfiguration } from "./package.js";
 
-export function* generateTypesTsCode(specification: models.Specification) {
+export function* generateTypesTsCode(
+  specification: models.Specification,
+  configuration: PackageConfiguration,
+) {
   yield banner;
 
   const { names, typesArena } = specification;
@@ -27,191 +31,188 @@ export function* generateTypesTsCode(specification: models.Specification) {
     }
 
     const typeName = toPascal(names[nodeId]);
-    const definition = generateTypeDefinition(specification, itemKey);
+    const definition = generateTypeDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
       export type ${typeName} = (${definition});
     `;
   }
-}
 
-function* generateTypeReference(
-  specification: models.Specification,
-  itemKey: number,
-): Iterable<NestedText> {
-  const { names, typesArena } = specification;
-  const item = typesArena.getItem(itemKey);
-  if (item.id == null) {
-    yield itt`(${generateTypeDefinition(specification, itemKey)})`;
-  } else {
-    const typeName = toPascal(names[item.id]);
-    yield typeName;
-  }
-}
-
-function* generateTypeDefinition(specification: models.Specification, itemKey: number) {
-  const { names, typesArena } = specification;
-  const item = typesArena.getItem(itemKey);
-
-  if (isAliasSchemaModel(item)) {
-    yield generateTypeReference(specification, item.alias);
-    return;
+  function* generateTypeReference(itemKey: number): Iterable<NestedText> {
+    const item = typesArena.getItem(itemKey);
+    if (item.id == null) {
+      yield itt`(${generateTypeDefinition(itemKey)})`;
+    } else {
+      const typeName = toPascal(names[item.id]);
+      yield typeName;
+    }
   }
 
-  if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
-    yield itt`
+  function* generateTypeDefinition(itemKey: number) {
+    const item = typesArena.getItem(itemKey);
+
+    if (isAliasSchemaModel(item)) {
+      yield generateTypeReference(item.alias);
+      return;
+    }
+
+    if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+      yield itt`
       ${joinIterable(
         item.oneOf.map(
           (element) => itt`
-            ${generateTypeReference(specification, element)}
+            ${generateTypeReference(element)}
           `,
         ),
         " |\n",
       )}
     `;
-    return;
-  }
-
-  if (isTypeSchemaModel(item)) {
-    if (item.options != null && item.options.length > 0) {
-      yield joinIterable(
-        item.options.map((option) => JSON.stringify(option)),
-        " |\n",
-      );
       return;
     }
-  }
 
-  if (isSingleTypeSchemaModel(item) && item.types != null) {
-    switch (item.types[0]) {
-      case "never":
-        yield "never";
+    if (isTypeSchemaModel(item)) {
+      if (item.options != null && item.options.length > 0) {
+        yield joinIterable(
+          item.options.map((option) => JSON.stringify(option)),
+          " |\n",
+        );
         return;
+      }
+    }
 
-      case "any":
-        yield "any";
-        return;
+    if (isSingleTypeSchemaModel(item) && item.types != null) {
+      switch (item.types[0]) {
+        case "never":
+          yield "never";
+          return;
 
-      case "null":
-        yield "null";
-        return;
+        case "any":
+          yield "any";
+          return;
 
-      case "boolean":
-        yield "boolean";
-        return;
+        case "null":
+          yield "null";
+          return;
 
-      case "integer":
-      case "number":
-        yield "number";
-        return;
+        case "boolean":
+          yield "boolean";
+          return;
 
-      case "string":
-        yield "string";
-        return;
+        case "integer":
+        case "number":
+          yield "number";
+          return;
 
-      case "array": {
-        yield itt`
+        case "string":
+          yield "string";
+          return;
+
+        case "array": {
+          yield itt`
           [
             ${generateInterfaceContent()}
           ]
         `;
 
-        return;
+          return;
 
-        function* generateInterfaceContent() {
-          if (item.tupleItems != null) {
-            for (const elementKey of item.tupleItems) {
-              yield itt`
-                ${generateTypeReference(specification, elementKey)},
+          function* generateInterfaceContent() {
+            if (item.tupleItems != null) {
+              for (const elementKey of item.tupleItems) {
+                yield itt`
+                ${generateTypeReference(elementKey)},
               `;
+              }
             }
-          }
 
-          if (item.arrayItems != null) {
-            yield itt`
-              ...(${generateTypeReference(specification, item.arrayItems)})[]
+            if (item.arrayItems != null) {
+              yield itt`
+              ...(${generateTypeReference(item.arrayItems)})[]
             `;
-          }
+            }
 
-          if (item.tupleItems == null && item.arrayItems == null) {
-            yield itt`
+            if (item.tupleItems == null && item.arrayItems == null) {
+              yield itt`
               ...any
             `;
+            }
           }
         }
-      }
 
-      case "map": {
-        yield itt`
+        case "map": {
+          yield itt`
           {
             ${generateInterfaceContent()}
           }
         `;
 
-        return;
+          return;
 
-        function* generateInterfaceContent() {
-          let undefinedProperty = false;
+          function* generateInterfaceContent() {
+            let undefinedProperty = false;
+            const isObject = item.objectProperties != null || item.required != null;
 
-          if (item.objectProperties != null || item.required != null) {
-            const required = new Set(item.required);
-            const objectProperties = item.objectProperties ?? {};
-            const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
+            if (isObject) {
+              const required = new Set(item.required);
+              const objectProperties = item.objectProperties ?? {};
+              const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
 
-            for (const name of propertyNames) {
-              undefinedProperty ||= !required.has(name);
+              for (const name of propertyNames) {
+                undefinedProperty ||= !required.has(name);
 
-              if (objectProperties[name] == null) {
-                yield itt`
-                  [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: any,
-                `;
-              } else {
-                yield itt`
-                  [${JSON.stringify(name)}]${required.has(name) ? "" : "?"}: ${generateTypeReference(specification, objectProperties[name])},
-                `;
-              }
-            }
-          }
-
-          {
-            const elementKeys = new Array<number>();
-            if (item.mapProperties != null) {
-              elementKeys.push(item.mapProperties);
-            }
-            if (item.patternProperties != null) {
-              for (const elementKey of Object.values(item.patternProperties)) {
-                elementKeys.push(elementKey);
+                if (objectProperties[name] == null) {
+                  yield itt`
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: any,
+                  `;
+                } else {
+                  yield itt`
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(objectProperties[name])},
+                  `;
+                }
               }
             }
 
-            if (elementKeys.length > 0) {
-              const typeNames = [...elementKeys, ...Object.values(item.objectProperties ?? {})].map(
-                (elementKey) => generateTypeReference(specification, elementKey),
-              );
+            if (!isObject || configuration.unionObjectAndMap) {
+              const elementKeys = new Array<number>();
+              if (item.mapProperties != null) {
+                elementKeys.push(item.mapProperties);
+              }
+              if (item.patternProperties != null) {
+                for (const elementKey of Object.values(item.patternProperties)) {
+                  elementKeys.push(elementKey);
+                }
+              }
 
-              if (undefinedProperty) {
-                typeNames.push("undefined");
+              if (elementKeys.length > 0) {
+                const typeNames = [
+                  ...elementKeys,
+                  ...Object.values(item.objectProperties ?? {}),
+                ].map((elementKey) => generateTypeReference(elementKey));
+
+                if (undefinedProperty) {
+                  typeNames.push("undefined");
+                }
+
+                yield itt`
+                [
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
+                ]: ${joinIterable(typeNames, " |\n")}
+              `;
+                return;
               }
 
               yield itt`
-                [
-                  name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
-                ]: ${joinIterable(typeNames, " |\n")}
-              `;
-              return;
-            }
-
-            yield itt`
               [
-                name: ${item.propertyNames == null ? "string" : generateTypeReference(specification, item.propertyNames)}
+                name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
               ]: any
             `;
+            }
           }
         }
       }
     }
-  }
 
-  yield "unknown";
+    yield "unknown";
+  }
 }

@@ -1,7 +1,11 @@
 import * as models from "../models/index.js";
 import { banner, itt } from "../utils/index.js";
+import { PackageConfiguration } from "./package.js";
 
-export function* generateMainTsCode(specification: models.Specification) {
+export function* generateMainTsCode(
+  specification: models.Specification,
+  configuration: PackageConfiguration,
+) {
   yield banner;
 
   yield itt`

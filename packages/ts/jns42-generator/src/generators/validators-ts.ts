@@ -10,8 +10,12 @@ import {
   toCamel,
   toPascal,
 } from "../utils/index.js";
+import { PackageConfiguration } from "./package.js";
 
-export function* generateValidatorsTsCode(specification: models.Specification) {
+export function* generateValidatorsTsCode(
+  specification: models.Specification,
+  configuration: PackageConfiguration,
+) {
   yield banner;
 
   const { names, validatorsArena } = specification;
@@ -89,7 +93,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     const typeName = toPascal(names[nodeId]);
     const functionName = toCamel("is", names[nodeId]);
-    const statements = generateValidatorStatements(specification, itemKey, "value");
+    const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
@@ -110,45 +114,40 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     `;
   }
-}
 
-function* generateValidatorReference(
-  specification: models.Specification,
-  typeKey: number,
-  valueExpression: string,
-): Iterable<NestedText> {
-  const { names, validatorsArena } = specification;
-  const typeItem = validatorsArena.getItem(typeKey);
-  if (typeItem.id == null) {
-    yield itt`
+  function* generateValidatorReference(
+    typeKey: number,
+    valueExpression: string,
+  ): Iterable<NestedText> {
+    const typeItem = validatorsArena.getItem(typeKey);
+    if (typeItem.id == null) {
+      yield itt`
       ((value: unknown) => {
-          ${generateValidatorStatements(specification, typeKey, "value")}
+          ${generateValidatorStatements(typeKey, "value")}
       })(${valueExpression})
     `;
-  } else {
-    const functionName = toCamel("is", names[typeItem.id]);
-    yield itt`${functionName}(${valueExpression})`;
+    } else {
+      const functionName = toCamel("is", names[typeItem.id]);
+      yield itt`${functionName}(${valueExpression})`;
+    }
   }
-}
 
-function* generateValidatorStatements(
-  specification: models.Specification,
-  itemKey: number,
-  valueExpression: string,
-): Iterable<NestedText> {
-  const { validatorsArena } = specification;
-  const item = validatorsArena.getItem(itemKey);
+  function* generateValidatorStatements(
+    itemKey: number,
+    valueExpression: string,
+  ): Iterable<NestedText> {
+    const item = validatorsArena.getItem(itemKey);
 
-  if (item.alias != null) {
-    yield itt`
-      if(!${generateValidatorReference(specification, item.alias, valueExpression)}) {
+    if (item.alias != null) {
+      yield itt`
+      if(!${generateValidatorReference(item.alias, valueExpression)}) {
         return false;
       };
     `;
-  }
+    }
 
-  if (item.options != null) {
-    yield itt`
+    if (item.options != null) {
+      yield itt`
       if(
         ${joinIterable(
           item.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
@@ -159,10 +158,10 @@ function* generateValidatorStatements(
         return false;
       }
     `;
-  }
+    }
 
-  if (item.types != null && item.types.length > 0) {
-    yield itt`
+    if (item.types != null && item.types.length > 0) {
+      yield itt`
       if(!(${joinIterable(
         mapIterable(generateSubAssertions(), (assertion) => itt`(${assertion})`),
         " ||\n",
@@ -171,77 +170,77 @@ function* generateValidatorStatements(
         return false;
       }
     `;
-    function* generateSubAssertions() {
-      for (const type of item.types ?? []) {
-        switch (type) {
-          case "any": {
-            yield JSON.stringify(true);
-            break;
-          }
+      function* generateSubAssertions() {
+        for (const type of item.types ?? []) {
+          switch (type) {
+            case "any": {
+              yield JSON.stringify(true);
+              break;
+            }
 
-          case "never": {
-            yield JSON.stringify(false);
-            return;
-          }
+            case "never": {
+              yield JSON.stringify(false);
+              return;
+            }
 
-          case "null": {
-            yield itt`${valueExpression} === null`;
-            break;
-          }
+            case "null": {
+              yield itt`${valueExpression} === null`;
+              break;
+            }
 
-          case "boolean": {
-            yield itt`typeof ${valueExpression} === "boolean"`;
-            break;
-          }
+            case "boolean": {
+              yield itt`typeof ${valueExpression} === "boolean"`;
+              break;
+            }
 
-          case "integer": {
-            yield itt`
+            case "integer": {
+              yield itt`
               typeof ${valueExpression} === "number" &&
               !isNaN(${valueExpression}) &&
               ${valueExpression} % 1 === 0
             `;
-            break;
-          }
+              break;
+            }
 
-          case "number": {
-            yield itt`
+            case "number": {
+              yield itt`
               typeof ${valueExpression} === "number" &&
               !isNaN(${valueExpression})
             `;
-            break;
-          }
+              break;
+            }
 
-          case "string": {
-            yield itt`typeof ${valueExpression} === "string"`;
-            break;
-          }
+            case "string": {
+              yield itt`typeof ${valueExpression} === "string"`;
+              break;
+            }
 
-          case "array": {
-            yield itt`Array.isArray(${valueExpression})`;
-            break;
-          }
+            case "array": {
+              yield itt`Array.isArray(${valueExpression})`;
+              break;
+            }
 
-          case "map": {
-            yield itt`
+            case "map": {
+              yield itt`
               ${valueExpression} !== null &&
               typeof ${valueExpression} === "object" &&
               !Array.isArray(${valueExpression})
             `;
-            break;
+              break;
+            }
           }
         }
       }
     }
-  }
 
-  if (
-    item.minimumInclusive != null ||
-    item.minimumExclusive != null ||
-    item.maximumInclusive != null ||
-    item.maximumExclusive != null ||
-    item.multipleOf != null
-  ) {
-    yield itt`
+    if (
+      item.minimumInclusive != null ||
+      item.minimumExclusive != null ||
+      item.maximumInclusive != null ||
+      item.maximumExclusive != null ||
+      item.multipleOf != null
+    ) {
+      yield itt`
       if(
         typeof ${valueExpression} === "number" &&
         !isNaN(${valueExpression})
@@ -250,9 +249,9 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateSubValidators() {
-      if (item.minimumInclusive != null) {
-        yield itt`
+      function* generateSubValidators() {
+        if (item.minimumInclusive != null) {
+          yield itt`
           if(
             ${valueExpression} < ${JSON.stringify(item.minimumInclusive)}
           ) {
@@ -260,10 +259,10 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (item.minimumExclusive != null) {
-        yield itt`
+        if (item.minimumExclusive != null) {
+          yield itt`
           if(
             ${valueExpression} <= ${JSON.stringify(item.minimumExclusive)}
           ) {
@@ -271,10 +270,10 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (item.maximumInclusive != null) {
-        yield itt`
+        if (item.maximumInclusive != null) {
+          yield itt`
           if(
             ${valueExpression} > ${JSON.stringify(item.maximumInclusive)}
           ) {
@@ -282,10 +281,10 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (item.maximumExclusive != null) {
-        yield itt`
+        if (item.maximumExclusive != null) {
+          yield itt`
           if(
             ${valueExpression} >= ${JSON.stringify(item.maximumExclusive)}
           ) {
@@ -293,10 +292,10 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (item.multipleOf != null) {
-        yield itt`
+        if (item.multipleOf != null) {
+          yield itt`
           if(
             ${valueExpression} % ${JSON.stringify(item.multipleOf)} !== 0
           ) {
@@ -304,12 +303,12 @@ function* generateValidatorStatements(
             return false;
           }
         `;
+        }
       }
     }
-  }
 
-  if (item.minimumLength != null || item.maximumLength != null || item.valuePattern != null) {
-    yield itt`
+    if (item.minimumLength != null || item.maximumLength != null || item.valuePattern != null) {
+      yield itt`
       if(
         typeof ${valueExpression} === "string"
       ) {
@@ -317,9 +316,9 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateSubValidators() {
-      if (item.minimumLength != null) {
-        yield itt`
+      function* generateSubValidators() {
+        if (item.minimumLength != null) {
+          yield itt`
           if(
             ${valueExpression}.length < ${JSON.stringify(item.minimumLength)}
           ) {
@@ -327,10 +326,10 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (item.maximumLength != null) {
-        yield itt`
+        if (item.maximumLength != null) {
+          yield itt`
           if(
             value.length > ${JSON.stringify(item.maximumLength)}
           ) {
@@ -338,10 +337,10 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      for (const ruleValue of item.valuePattern ?? []) {
-        yield itt`
+        for (const ruleValue of item.valuePattern ?? []) {
+          yield itt`
           if(
             !new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})
           ) {
@@ -349,20 +348,20 @@ function* generateValidatorStatements(
             return false;
           }
         `;
+        }
       }
     }
-  }
 
-  if (
-    item.minimumItems != null ||
-    item.maximumItems != null ||
-    item.uniqueItems != null ||
-    item.tupleItems != null ||
-    item.arrayItems != null
-  ) {
-    const trackElements = item.uniqueItems ?? false;
+    if (
+      item.minimumItems != null ||
+      item.maximumItems != null ||
+      item.uniqueItems != null ||
+      item.tupleItems != null ||
+      item.arrayItems != null
+    ) {
+      const trackElements = item.uniqueItems ?? false;
 
-    yield itt`
+      yield itt`
       if(
         Array.isArray(${valueExpression})
       ) {
@@ -370,9 +369,9 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateSubValidators() {
-      if (item.tupleItems != null) {
-        yield itt`
+      function* generateSubValidators() {
+        if (item.tupleItems != null) {
+          yield itt`
           if(
             ${valueExpression}.length < ${JSON.stringify(item.tupleItems.length)}
           ) {
@@ -380,74 +379,74 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (item.minimumItems != null) {
-        yield itt`
+        if (item.minimumItems != null) {
+          yield itt`
           if(${valueExpression}.length < ${JSON.stringify(item.minimumItems)}) {
             recordError("minimumItems");
             return false;
           }
         `;
-      }
+        }
 
-      if (item.maximumItems != null) {
-        yield itt`
+        if (item.maximumItems != null) {
+          yield itt`
           if(${valueExpression}.length > ${JSON.stringify(item.maximumItems)}) {
             recordError("maximumItems");
             return false;
           }
         `;
-      }
+        }
 
-      if (trackElements) {
-        yield itt`
+        if (trackElements) {
+          yield itt`
           const elementValueSeen = new Set<unknown>();
         `;
-      }
+        }
 
-      yield itt`
+        yield itt`
         for(let elementIndex = 0; elementIndex < ${valueExpression}.length; elementIndex ++) {
           ${generateLoopContent()}
         }
       `;
-    }
+      }
 
-    function* generateLoopContent() {
-      yield itt`
+      function* generateLoopContent() {
+        yield itt`
         const elementValue = ${valueExpression}[elementIndex];
       `;
 
-      if (item.uniqueItems ?? false) {
-        yield itt`
+        if (item.uniqueItems ?? false) {
+          yield itt`
           if(elementValueSeen.has(elementValue)) {
             recordError("uniqueItems");
             return false;
           }
         `;
-      }
+        }
 
-      yield itt`
+        yield itt`
         switch(elementIndex) {
           ${generateCaseClauses()}
         }
       `;
 
-      if (trackElements) {
-        yield itt`
+        if (trackElements) {
+          yield itt`
           elementValueSeen.add(elementValue);
         `;
+        }
       }
-    }
 
-    function* generateCaseClauses() {
-      if (item.tupleItems != null) {
-        for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
-          const elementKey = item.tupleItems[elementIndex];
-          yield itt`
+      function* generateCaseClauses() {
+        if (item.tupleItems != null) {
+          for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+            const elementKey = item.tupleItems[elementIndex];
+            yield itt`
             case ${JSON.stringify(elementIndex)}:
               if(!withPath(String(elementIndex), () => {
-                if(!${generateValidatorReference(specification, elementKey, `elementValue`)}) {
+                if(!${generateValidatorReference(elementKey, `elementValue`)}) {
                   recordError("elementValue");
                   return false;
                 }
@@ -457,21 +456,21 @@ function* generateValidatorStatements(
               }
               break;
           `;
+          }
         }
-      }
 
-      yield itt`
+        yield itt`
         default:
           ${generateDefaultCaseContent()}
           break;
       `;
-    }
+      }
 
-    function* generateDefaultCaseContent() {
-      if (item.arrayItems != null) {
-        yield itt`
+      function* generateDefaultCaseContent() {
+        if (item.arrayItems != null) {
+          yield itt`
           if(!withPath(String(elementIndex), () => {
-            if(!${generateValidatorReference(specification, item.arrayItems, `elementValue`)}) {
+            if(!${generateValidatorReference(item.arrayItems, `elementValue`)}) {
               recordError("elementValue");
               return false;
             }
@@ -481,21 +480,21 @@ function* generateValidatorStatements(
           }
           break;
         `;
+        }
       }
     }
-  }
 
-  if (
-    item.minimumProperties != null ||
-    item.maximumProperties != null ||
-    item.required != null ||
-    item.objectProperties != null ||
-    item.patternProperties != null ||
-    item.mapProperties != null
-  ) {
-    const countProperties = item.minimumProperties != null || item.maximumProperties != null;
+    if (
+      item.minimumProperties != null ||
+      item.maximumProperties != null ||
+      item.required != null ||
+      item.objectProperties != null ||
+      item.patternProperties != null ||
+      item.mapProperties != null
+    ) {
+      const countProperties = item.minimumProperties != null || item.maximumProperties != null;
 
-    yield itt`
+      yield itt`
       if(
         ${valueExpression} !== null &&
         typeof ${valueExpression} === "object" &&
@@ -505,12 +504,12 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateSubValidators() {
-      /**
-       * check if all the required properties are present
-       */
-      for (const propertyName of item.required ?? []) {
-        yield itt`
+      function* generateSubValidators() {
+        /**
+         * check if all the required properties are present
+         */
+        for (const propertyName of item.required ?? []) {
+          yield itt`
           if(
             !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
             ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
@@ -519,68 +518,67 @@ function* generateValidatorStatements(
             return false;
           }
         `;
-      }
+        }
 
-      if (countProperties) {
-        yield itt`
+        if (countProperties) {
+          yield itt`
           let propertyCount = 0;
         `;
-      }
+        }
 
-      yield itt`
+        yield itt`
         for(const propertyName in ${valueExpression}) {
           ${generateLoopContent()}
         }
       `;
 
-      if (item.minimumProperties != null) {
-        yield itt`
+        if (item.minimumProperties != null) {
+          yield itt`
           if(propertyCount < ${JSON.stringify(item.minimumProperties)}) {
             recordError("minimumProperties");
             return false;
             }
         `;
+        }
       }
-    }
 
-    function* generateLoopContent() {
-      yield itt`
+      function* generateLoopContent() {
+        yield itt`
         const propertyValue = value[propertyName as keyof typeof value];
         if(propertyValue === undefined) {
           continue;
         }
       `;
 
-      if (countProperties) {
-        yield itt`
+        if (countProperties) {
+          yield itt`
           propertyCount++;
         `;
-      }
+        }
 
-      if (item.maximumProperties != null) {
-        yield itt`
+        if (item.maximumProperties != null) {
+          yield itt`
           if(propertyCount > ${JSON.stringify(item.maximumProperties)}) {
             recordError("maximumProperties");
             return false;
           }
         `;
-      }
+        }
 
-      yield itt`
+        yield itt`
         switch(propertyName) {
           ${generateCaseClauses()}
         }
       `;
-    }
+      }
 
-    function* generateCaseClauses() {
-      if (item.objectProperties != null) {
-        for (const propertyName in item.objectProperties) {
-          yield itt`
+      function* generateCaseClauses() {
+        if (item.objectProperties != null) {
+          for (const propertyName in item.objectProperties) {
+            yield itt`
             case ${JSON.stringify(propertyName)}:
               if(!withPath(propertyName, () => {
                 if(!${generateValidatorReference(
-                  specification,
                   item.objectProperties[propertyName],
                   `propertyValue`,
                 )}) {
@@ -593,25 +591,24 @@ function* generateValidatorStatements(
               }
               break;
           `;
+          }
         }
-      }
 
-      yield itt`
+        yield itt`
         default:
           ${generateDefaultCaseContent()}
           break;
       `;
-    }
+      }
 
-    function* generateDefaultCaseContent() {
-      if (item.patternProperties != null) {
-        for (const propertyPattern in item.patternProperties) {
-          yield itt`
+      function* generateDefaultCaseContent() {
+        if (item.patternProperties != null) {
+          for (const propertyPattern in item.patternProperties) {
+            yield itt`
             if(!withPath(propertyName, () => {
               if(
                 new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName) &&
                 !${generateValidatorReference(
-                  specification,
                   item.patternProperties[propertyPattern],
                   `propertyValue`,
                 )}
@@ -623,14 +620,14 @@ function* generateValidatorStatements(
               return false
             }
           `;
+          }
         }
-      }
 
-      if (item.mapProperties != null) {
-        yield itt`
+        if (item.mapProperties != null) {
+          yield itt`
           if(!withPath(propertyName, () => {
             if(
-              !${generateValidatorReference(specification, item.mapProperties, `propertyValue`)}
+              !${generateValidatorReference(item.mapProperties, `propertyValue`)}
             ) {
               return false;
             }  
@@ -639,21 +636,21 @@ function* generateValidatorStatements(
             return false
           }
         `;
+        }
       }
     }
-  }
 
-  if (item.reference != null) {
-    yield itt`
-      if(!${generateValidatorReference(specification, item.reference, valueExpression)}) {
+    if (item.reference != null) {
+      yield itt`
+      if(!${generateValidatorReference(item.reference, valueExpression)}) {
         recordError("reference");
         return false;
       }
     `;
-  }
+    }
 
-  if (item.allOf != null) {
-    yield itt`
+    if (item.allOf != null) {
+      yield itt`
       {
         let counter = 0;
 
@@ -666,26 +663,25 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateInnerStatements() {
-      assert(item.allOf != null);
+      function* generateInnerStatements() {
+        assert(item.allOf != null);
 
-      for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
-        const element = item.allOf[elementIndex];
-        yield itt`
+        for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
+          const element = item.allOf[elementIndex];
+          yield itt`
           if(counter === ${JSON.stringify(elementIndex)} && ${generateValidatorReference(
-            specification,
             element,
             valueExpression,
           )}) {
             counter += 1;
           }
         `;
+        }
       }
     }
-  }
 
-  if (item.anyOf != null) {
-    yield itt`
+    if (item.anyOf != null) {
+      yield itt`
       {
         let counter = 0;
 
@@ -698,26 +694,22 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateInnerStatements() {
-      assert(item.anyOf != null);
+      function* generateInnerStatements() {
+        assert(item.anyOf != null);
 
-      for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
-        const element = item.anyOf[elementIndex];
-        yield itt`
-          if(counter < 1 && ${generateValidatorReference(
-            specification,
-            element,
-            valueExpression,
-          )}) {
+        for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
+          const element = item.anyOf[elementIndex];
+          yield itt`
+          if(counter < 1 && ${generateValidatorReference(element, valueExpression)}) {
             counter += 1;
           }
         `;
+        }
       }
     }
-  }
 
-  if (item.oneOf != null) {
-    yield itt`
+    if (item.oneOf != null) {
+      yield itt`
       {
         let counter = 0;
 
@@ -730,27 +722,23 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateInnerStatements() {
-      assert(item.oneOf != null);
+      function* generateInnerStatements() {
+        assert(item.oneOf != null);
 
-      for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
-        const element = item.oneOf[elementIndex];
-        yield itt`
-          if(counter < 2 && ${generateValidatorReference(
-            specification,
-            element,
-            valueExpression,
-          )}) {
+        for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
+          const element = item.oneOf[elementIndex];
+          yield itt`
+          if(counter < 2 && ${generateValidatorReference(element, valueExpression)}) {
             counter += 1;
           }
         `;
+        }
       }
     }
-  }
 
-  if (item.if != null) {
-    yield itt`
-      if(${generateValidatorReference(specification, item.if, valueExpression)}) {
+    if (item.if != null) {
+      yield itt`
+      if(${generateValidatorReference(item.if, valueExpression)}) {
         ${generateInnerThenStatements()}
       }
       else {
@@ -758,39 +746,40 @@ function* generateValidatorStatements(
       }
     `;
 
-    function* generateInnerThenStatements() {
-      if (item.then != null) {
-        yield itt`
-          if(!${generateValidatorReference(specification, item.then, valueExpression)}) {
+      function* generateInnerThenStatements() {
+        if (item.then != null) {
+          yield itt`
+          if(!${generateValidatorReference(item.then, valueExpression)}) {
             recordError("then");
             return false;
           }
         `;
+        }
       }
-    }
 
-    function* generateInnerElseStatements() {
-      if (item.else != null) {
-        yield itt`
-          if(!${generateValidatorReference(specification, item.else, valueExpression)}) {
+      function* generateInnerElseStatements() {
+        if (item.else != null) {
+          yield itt`
+          if(!${generateValidatorReference(item.else, valueExpression)}) {
             recordError("else");
             return false;
           }
         `;
+        }
       }
     }
-  }
 
-  if (item.not != null) {
-    yield itt`
-      if(${generateValidatorReference(specification, item.not, valueExpression)}) {
+    if (item.not != null) {
+      yield itt`
+      if(${generateValidatorReference(item.not, valueExpression)}) {
         recordError("not");
         return false;
       }
     `;
-  }
+    }
 
-  yield itt`
+    yield itt`
     return true;
   `;
+  }
 }
