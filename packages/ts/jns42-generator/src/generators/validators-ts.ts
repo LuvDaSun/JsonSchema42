@@ -354,10 +354,11 @@ function* generateValidatorStatements(
   }
 
   if (
-    item.tupleItems != null ||
     item.minimumItems != null ||
     item.maximumItems != null ||
-    item.uniqueItems != null
+    item.uniqueItems != null ||
+    item.tupleItems != null ||
+    item.arrayItems != null
   ) {
     const trackElements = item.uniqueItems ?? false;
 
@@ -373,7 +374,7 @@ function* generateValidatorStatements(
       if (item.tupleItems != null) {
         yield itt`
           if(
-            ${valueExpression}.length !== ${JSON.stringify(item.tupleItems.length)}
+            ${valueExpression}.length < ${JSON.stringify(item.tupleItems.length)}
           ) {
             recordError("tupleItems");
             return false;

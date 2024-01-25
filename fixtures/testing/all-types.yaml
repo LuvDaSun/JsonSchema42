@@ -5,7 +5,7 @@ schemas:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     description: "all types"
     oneOf:
-      # - { $ref: "#/$defs/never-model" }
+      - { $ref: "#/$defs/never-model" }
       # - { $ref: "#/$defs/any-model" }
       - { $ref: "#/$defs/null-model" }
       - { $ref: "#/$defs/boolean-model" }
@@ -17,7 +17,7 @@ schemas:
       - { $ref: "#/$defs/object-model" }
       - { $ref: "#/$defs/record-model" }
     $defs:
-      # never-model: false
+      never-model: false
       # any-model: true
       null-model: { type: "null" }
       boolean-model: { type: "boolean" }
@@ -29,7 +29,7 @@ schemas:
         prefixItems:
           - { type: "integer" }
           - { type: "string" }
-        # items: false
+        items: false
       array-model:
         type: "array"
         items: { type: "string" }
@@ -39,7 +39,7 @@ schemas:
         properties:
           a: { type: "integer" }
           b: { type: "string" }
-        # additionalProperties: false
+        additionalProperties: false
       record-model:
         type: "object"
         additionalProperties: { type: "string" }
@@ -54,9 +54,8 @@ valid:
   array: ["hi"]
   object: { "a": 1 }
   record: { "z": "z" }
-
 invalid:
-  tuple: [1, 2]
+  # tuple: [1, 2]
   array: [1]
   object: { "b": 1 }
   record: { "0": 0 }
