@@ -172,13 +172,12 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
                 `;
               }
             }
-          }
-
-          {
+          } else {
             const elementKeys = new Array<number>();
             if (item.mapProperties != null) {
               elementKeys.push(item.mapProperties);
             }
+
             if (item.patternProperties != null) {
               for (const elementKey of Object.values(item.patternProperties)) {
                 elementKeys.push(elementKey);
@@ -186,8 +185,8 @@ function* generateTypeDefinition(specification: models.Specification, itemKey: n
             }
 
             if (elementKeys.length > 0) {
-              const typeNames = [...elementKeys, ...Object.values(item.objectProperties ?? {})].map(
-                (elementKey) => generateTypeReference(specification, elementKey),
+              const typeNames = elementKeys.map((elementKey) =>
+                generateTypeReference(specification, elementKey),
               );
 
               if (undefinedProperty) {
