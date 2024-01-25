@@ -56,7 +56,7 @@ export function configurePackageProgram(argv: yargs.Argv) {
         .option("transform-maximum-iterations", {
           description: "maximum number of iterations for transforming",
           type: "number",
-          default: 1000,
+          default: 100,
         })
         .option("union-object-and-map", {
           description:

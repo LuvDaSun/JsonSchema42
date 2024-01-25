@@ -1,4 +1,9 @@
-import { Node, SchemaDocument, isSchemaDocument } from "schema-intermediate";
+import {
+  Node,
+  SchemaDocument,
+  getLastValidationError,
+  isSchemaDocument,
+} from "schema-intermediate";
 import { DocumentBase } from "../document-base.js";
 
 export class Document extends DocumentBase<SchemaDocument> {
@@ -9,8 +14,11 @@ export class Document extends DocumentBase<SchemaDocument> {
     super(documentNode);
   }
 
-  protected isDocumentNode(node: unknown): node is SchemaDocument {
-    return isSchemaDocument(node);
+  protected assertDocumentNode(node: unknown): asserts node is SchemaDocument {
+    if (!isSchemaDocument(node)) {
+      const validationError = getLastValidationError();
+      throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
+    }
   }
 
   public getIntermediateNodeEntries(): Iterable<readonly [string, Node]> {

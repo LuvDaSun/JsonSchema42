@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.5                         -- www.JsonSchema42.org
+// v0.12.6                         -- www.JsonSchema42.org
 //
 import * as types from "./types.js";
 export interface ParserGeneratorOptions {
@@ -2097,28 +2097,7 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
-default:
-return undefined;
-}
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(value)
-);
+return (value);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
@@ -2147,11 +2126,7 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (
-parseType0(value, configuration)
-??
-parseType1(value, configuration)
-);
+return (value);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}

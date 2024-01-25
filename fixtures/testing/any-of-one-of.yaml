@@ -11,7 +11,7 @@ schemas:
       - required: [d]
       - required: [e]
 
-  flipped:
+  presolved:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     oneOf:
       - anyOf:

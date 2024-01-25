@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.5                         -- www.JsonSchema42.org
+// v0.12.6                         -- www.JsonSchema42.org
 //
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -39,14 +39,6 @@ assert.equal(valid, true);
 test("NonNegativeIntegerDefault0", () => {
 const mock = mocks.mockNonNegativeIntegerDefault0();
 const valid = validators.isNonNegativeIntegerDefault0(mock);
-assert.equal(valid, true);
-});
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
-*/
-test("SimpleTypes", () => {
-const mock = mocks.mockSimpleTypes();
-const valid = validators.isSimpleTypes(mock);
 assert.equal(valid, true);
 });
 /**
@@ -167,14 +159,6 @@ assert.equal(valid, true);
 test("StringArrayItems", () => {
 const mock = mocks.mockStringArrayItems();
 const valid = validators.isStringArrayItems(mock);
-assert.equal(valid, true);
-});
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
-*/
-test("TypeItems", () => {
-const mock = mocks.mockTypeItems();
-const valid = validators.isTypeItems(mock);
 assert.equal(valid, true);
 });
 /**

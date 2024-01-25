@@ -159,7 +159,7 @@ export class SchemaArena extends Arena<SchemaModel> {
       model.types =
         schema.types == null
           ? implicitTypes[id] == null
-            ? guessTypes(schema)
+            ? undefined
             : [implicitTypes[id]]
           : schema.types;
 

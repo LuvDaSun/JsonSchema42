@@ -5,9 +5,7 @@ export abstract class DocumentBase<N = unknown> {
   public readonly documentNode: N;
 
   constructor(documentNode: unknown) {
-    if (!this.isDocumentNode(documentNode)) {
-      throw new TypeError("invalid documentNode");
-    }
+    this.assertDocumentNode(documentNode);
     this.documentNode = documentNode;
   }
 
@@ -21,7 +19,7 @@ export abstract class DocumentBase<N = unknown> {
 
   public abstract getNodeUrls(): Iterable<URL>;
 
-  protected abstract isDocumentNode(node: unknown): node is N;
+  protected abstract assertDocumentNode(node: unknown): asserts node is N;
 
   public abstract pointerToNodeHash(nodePointer: string): string;
   public abstract nodeHashToPointer(nodeHash: string): string;

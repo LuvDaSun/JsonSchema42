@@ -44,9 +44,10 @@ export type SchemaModel = {
   if?: SchemaKey;
   then?: SchemaKey;
   else?: SchemaKey;
-  not?: SchemaKey;
 
   types?: SchemaType[];
+
+  not?: SchemaKey;
 
   dependentSchemas?: Record<string, SchemaKey>;
   objectProperties?: Record<string, SchemaKey>;
@@ -95,8 +96,11 @@ export function isMetaSchemaModel(model: SchemaModel): model is MetaSchemaModel 
   return hasMembers(model, [], metaSchemaOptional);
 }
 
-export type TypeSchemaModel = MetaSchemaModel & {
+export type TypeSchemaModel = Partial<MetaSchemaModel> & {
   types?: SchemaType[];
+
+  not?: SchemaKey;
+
   dependentSchemas?: Record<string, SchemaKey>;
   objectProperties?: Record<string, SchemaKey>;
   mapProperties?: SchemaKey;
@@ -125,6 +129,9 @@ export type TypeSchemaModel = MetaSchemaModel & {
 };
 export const typeSchemaOptional = [
   "types",
+
+  "not",
+
   "dependentSchemas",
   "objectProperties",
   "mapProperties",
@@ -155,8 +162,8 @@ export function isTypeSchemaModel(model: SchemaModel): model is TypeSchemaModel 
   return hasMembers(model, [], [...typeSchemaOptional, ...metaSchemaOptional]);
 }
 
-export type SingleTypeSchemaModel = TypeSchemaModel &
-  MetaSchemaModel & {
+export type SingleTypeSchemaModel = Partial<MetaSchemaModel> &
+  TypeSchemaModel & {
     types?: [SchemaType];
   };
 export function isSingleTypeSchemaModel(model: SchemaModel): model is SingleTypeSchemaModel {
@@ -166,74 +173,70 @@ export function isSingleTypeSchemaModel(model: SchemaModel): model is SingleType
   );
 }
 
-export type ChildSchemaModel = MetaSchemaModel &
-  Partial<
-    TypeSchemaModel &
-      ReferenceSchemaModel &
-      AllOfSchemaModel &
-      AnyOfSchemaModel &
-      OneOfSchemaModel &
-      IfSchemaModel &
-      NotSchemaModel
-  > & {
+export type ChildSchemaModel = Partial<MetaSchemaModel> &
+  Partial<TypeSchemaModel> &
+  Partial<ReferenceSchemaModel> &
+  Partial<AllOfSchemaModel> &
+  Partial<AnyOfSchemaModel> &
+  Partial<OneOfSchemaModel> &
+  Partial<IfSchemaModel> & {
     parent: SchemaKey;
   };
 export const parentSchemaRequired = ["parent"] as const;
 export function isChildSchemaModel(model: SchemaModel): model is ChildSchemaModel {
   return hasMembers(model, parentSchemaRequired, [
-    ...typeSchemaOptional,
     ...metaSchemaOptional,
+    ...typeSchemaOptional,
     ...referenceSchemaRequired,
     ...allOfSchemaRequired,
     ...anyOfSchemaRequired,
     ...oneOfSchemaRequired,
     ...ifSchemaRequired,
     ...ifSchemaOptional,
-    ...notSchemaRequired,
   ]);
 }
 
-export type AliasSchemaModel = MetaSchemaModel & {
+export type AliasSchemaModel = Partial<MetaSchemaModel> & {
   alias: SchemaKey;
 };
 export const aliasSchemaRequired = ["alias"] as const;
 export function isAliasSchemaModel(model: SchemaModel): model is AliasSchemaModel {
-  return hasMembers(model, aliasSchemaRequired, metaSchemaOptional);
+  return hasMembers(model, aliasSchemaRequired, [...metaSchemaOptional]);
 }
 
-export type ReferenceSchemaModel = MetaSchemaModel & {
+export type ReferenceSchemaModel = Partial<MetaSchemaModel> & {
   reference: SchemaKey;
 };
 export const referenceSchemaRequired = ["reference"] as const;
 export function isReferenceSchemaModel(model: SchemaModel): model is ReferenceSchemaModel {
-  return hasMembers(model, referenceSchemaRequired, metaSchemaOptional);
+  return hasMembers(model, referenceSchemaRequired, [...metaSchemaOptional]);
 }
 
-export type OneOfSchemaModel = MetaSchemaModel & {
+export type OneOfSchemaModel = Partial<MetaSchemaModel> & {
   oneOf: SchemaKey[];
 };
 export const oneOfSchemaRequired = ["oneOf"] as const;
 export function isOneOfSchemaModel(model: SchemaModel): model is OneOfSchemaModel {
-  return hasMembers(model, oneOfSchemaRequired, metaSchemaOptional);
+  return hasMembers(model, oneOfSchemaRequired, [...metaSchemaOptional]);
 }
 
-export type AnyOfSchemaModel = MetaSchemaModel & {
+export type AnyOfSchemaModel = Partial<MetaSchemaModel> & {
   anyOf: SchemaKey[];
 };
 export const anyOfSchemaRequired = ["anyOf"] as const;
 export function isAnyOfSchemaModel(model: SchemaModel): model is AnyOfSchemaModel {
-  return hasMembers(model, anyOfSchemaRequired, metaSchemaOptional);
+  return hasMembers(model, anyOfSchemaRequired, [...metaSchemaOptional]);
 }
 
-export type AllOfSchemaModel = MetaSchemaModel & {
+export type AllOfSchemaModel = Partial<MetaSchemaModel> & {
   allOf: SchemaKey[];
 };
 export const allOfSchemaRequired = ["allOf"] as const;
 export function isAllOfSchemaModel(model: SchemaModel): model is AllOfSchemaModel {
-  return hasMembers(model, allOfSchemaRequired, metaSchemaOptional);
+  return hasMembers(model, allOfSchemaRequired, [...metaSchemaOptional]);
 }
 
-export type IfSchemaModel = MetaSchemaModel & {
+export type IfSchemaModel = Partial<MetaSchemaModel> & {
   if: SchemaKey;
   then?: SchemaKey;
   else?: SchemaKey;
@@ -242,14 +245,6 @@ export const ifSchemaRequired = ["if"] as const;
 export const ifSchemaOptional = ["then", "else"] as const;
 export function isIfSchemaModel(model: SchemaModel): model is IfSchemaModel {
   return hasMembers(model, ifSchemaRequired, [...ifSchemaOptional, ...metaSchemaOptional]);
-}
-
-export type NotSchemaModel = MetaSchemaModel & {
-  not: SchemaKey;
-};
-export const notSchemaRequired = ["not"] as const;
-export function isNotSchemaModel(model: SchemaModel): model is NotSchemaModel {
-  return hasMembers(model, notSchemaRequired, metaSchemaOptional);
 }
 
 function hasMembers<T>(model: T, required: Iterable<keyof T>, optional: Iterable<keyof T>) {

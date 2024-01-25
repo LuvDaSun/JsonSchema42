@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.5                         -- www.JsonSchema42.org
+// v0.12.6                         -- www.JsonSchema42.org
 //
 /**
 * @summary Core and Validation specifications meta-schema
@@ -551,11 +551,7 @@ export type StringArray = (
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
 */
-export type Type = (
-Type0
-|
-Type1
-);
+export type Type = (unknown);
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
 */

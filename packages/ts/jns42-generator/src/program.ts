@@ -3,7 +3,7 @@ import yargs from "yargs/yargs";
 import * as programs from "./programs/index.js";
 import { packageInfo } from "./utils/index.js";
 
-main();
+await main();
 
 async function main() {
   const program = yargs(hideBin(process.argv));
@@ -16,6 +16,7 @@ async function main() {
   }
 
   program.version(packageInfo.version!);
+  program.demandCommand();
 
-  program.parse();
+  await program.parseAsync();
 }
