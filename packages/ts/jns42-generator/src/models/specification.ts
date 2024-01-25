@@ -68,6 +68,7 @@ export function loadSpecification(
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
+        schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
         schemaTransforms.resolveOneOf,

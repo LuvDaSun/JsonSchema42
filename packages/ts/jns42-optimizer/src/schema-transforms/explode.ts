@@ -7,6 +7,7 @@ import {
   ifSchemaOptional,
   ifSchemaRequired,
   isAliasSchemaModel,
+  notSchemaRequired,
   oneOfSchemaRequired,
   referenceSchemaRequired,
   typeSchemaOptional,
@@ -81,7 +82,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     anyOf: anyOfSchemaRequired,
     oneOf: oneOfSchemaRequired,
     if: [...ifSchemaRequired, ...ifSchemaOptional],
-    // not: notSchemaRequired,
+    not: notSchemaRequired,
     type: typeSchemaOptional,
   };
 
@@ -193,16 +194,16 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     newModel.allOf.push(newSubKey);
   }
 
-  // if (schemaModels.not) {
-  //   const newSubModel: SchemaModel = {
-  //     parent: modelKey,
-  //     mockable: model.mockable,
-  //
-  //     not: model.not,
-  //   };
-  //   const newSubKey = arena.addItem(newSubModel);
-  //   newModel.allOf.push(newSubKey);
-  // }
+  if (schemaModels.not) {
+    const newSubModel: SchemaModel = {
+      parent: modelKey,
+      mockable: model.mockable,
+
+      not: model.not,
+    };
+    const newSubKey = arena.addItem(newSubModel);
+    newModel.allOf.push(newSubKey);
+  }
 
   if (schemaModels.type) {
     const newSubModel: SchemaModel = {
