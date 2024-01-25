@@ -109,7 +109,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     if: undefined,
     then: undefined,
     else: undefined,
-    // not: undefined,
+    not: undefined,
 
     types: undefined,
     dependentSchemas: undefined,
