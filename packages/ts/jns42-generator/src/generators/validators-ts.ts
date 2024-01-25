@@ -122,10 +122,10 @@ export function* generateValidatorsTsCode(
     const typeItem = validatorsArena.getItem(typeKey);
     if (typeItem.id == null) {
       yield itt`
-        ((value: unknown) => {
-            ${generateValidatorStatements(typeKey, "value")}
-        })(${valueExpression})
-      `;
+      ((value: unknown) => {
+          ${generateValidatorStatements(typeKey, "value")}
+      })(${valueExpression})
+    `;
     } else {
       const functionName = toCamel("is", names[typeItem.id]);
       yield itt`${functionName}(${valueExpression})`;
@@ -138,6 +138,28 @@ export function* generateValidatorsTsCode(
   ): Iterable<NestedText> {
     const item = validatorsArena.getItem(itemKey);
 
+    if (item.alias != null) {
+      yield itt`
+      if(!${generateValidatorReference(item.alias, valueExpression)}) {
+        return false;
+      };
+    `;
+    }
+
+    if (item.options != null) {
+      yield itt`
+      if(
+        ${joinIterable(
+          item.options.map((option) => itt`${valueExpression} !== ${JSON.stringify(option)}`),
+          " &&\n",
+        )}
+      ) {
+        recordError("options");
+        return false;
+      }
+    `;
+    }
+
     if (item.types != null && item.types.length > 0) {
       yield itt`
       if(!(${joinIterable(
@@ -148,7 +170,6 @@ export function* generateValidatorsTsCode(
         return false;
       }
     `;
-
       function* generateSubAssertions() {
         for (const type of item.types ?? []) {
           switch (type) {
@@ -617,148 +638,148 @@ export function* generateValidatorsTsCode(
         `;
         }
       }
+    }
 
-      if (item.reference != null) {
-        yield itt`
-        if(!${generateValidatorReference(item.reference, valueExpression)}) {
-          recordError("reference");
-          return false;
-        }
-      `;
-      }
-
-      if (item.allOf != null) {
-        yield itt`
-        {
-          let counter = 0;
-  
-          ${generateInnerStatements()}
-  
-          if(counter < ${JSON.stringify(item.allOf.length)}) {
-            recordError("allOf");
-            return false;
-          }
-        }
-      `;
-
-        function* generateInnerStatements() {
-          assert(item.allOf != null);
-
-          for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
-            const element = item.allOf[elementIndex];
-            yield itt`
-            if(counter === ${JSON.stringify(elementIndex)} && ${generateValidatorReference(
-              element,
-              valueExpression,
-            )}) {
-              counter += 1;
-            }
-          `;
-          }
-        }
-      }
-
-      if (item.anyOf != null) {
-        yield itt`
-        {
-          let counter = 0;
-  
-          ${generateInnerStatements()}
-  
-          if(counter < 1) {
-            recordError("anyOf");
-            return false;
-          }
-        }
-      `;
-
-        function* generateInnerStatements() {
-          assert(item.anyOf != null);
-
-          for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
-            const element = item.anyOf[elementIndex];
-            yield itt`
-            if(counter < 1 && ${generateValidatorReference(element, valueExpression)}) {
-              counter += 1;
-            }
-          `;
-          }
-        }
-      }
-
-      if (item.oneOf != null) {
-        yield itt`
-        {
-          let counter = 0;
-  
-          ${generateInnerStatements()}
-  
-          if(counter !== 1) {
-            recordError("oneOf");
-            return false;
-          }
-        }
-      `;
-
-        function* generateInnerStatements() {
-          assert(item.oneOf != null);
-
-          for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
-            const element = item.oneOf[elementIndex];
-            yield itt`
-            if(counter < 2 && ${generateValidatorReference(element, valueExpression)}) {
-              counter += 1;
-            }
-          `;
-          }
-        }
-      }
-
-      if (item.if != null) {
-        yield itt`
-        if(${generateValidatorReference(item.if, valueExpression)}) {
-          ${generateInnerThenStatements()}
-        }
-        else {
-          ${generateInnerElseStatements()}
-        }
-      `;
-
-        function* generateInnerThenStatements() {
-          if (item.then != null) {
-            yield itt`
-            if(!${generateValidatorReference(item.then, valueExpression)}) {
-              recordError("then");
-              return false;
-            }
-          `;
-          }
-        }
-
-        function* generateInnerElseStatements() {
-          if (item.else != null) {
-            yield itt`
-            if(!${generateValidatorReference(item.else, valueExpression)}) {
-              recordError("else");
-              return false;
-            }
-          `;
-          }
-        }
-      }
-
-      if (item.not != null) {
-        yield itt`
-        if(${generateValidatorReference(item.not, valueExpression)}) {
-          recordError("not");
-          return false;
-        }
-      `;
-      }
-
+    if (item.reference != null) {
       yield itt`
-      return true;
+      if(!${generateValidatorReference(item.reference, valueExpression)}) {
+        recordError("reference");
+        return false;
+      }
     `;
     }
+
+    if (item.allOf != null) {
+      yield itt`
+      {
+        let counter = 0;
+
+        ${generateInnerStatements()}
+
+        if(counter < ${JSON.stringify(item.allOf.length)}) {
+          recordError("allOf");
+          return false;
+        }
+      }
+    `;
+
+      function* generateInnerStatements() {
+        assert(item.allOf != null);
+
+        for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
+          const element = item.allOf[elementIndex];
+          yield itt`
+          if(counter === ${JSON.stringify(elementIndex)} && ${generateValidatorReference(
+            element,
+            valueExpression,
+          )}) {
+            counter += 1;
+          }
+        `;
+        }
+      }
+    }
+
+    if (item.anyOf != null) {
+      yield itt`
+      {
+        let counter = 0;
+
+        ${generateInnerStatements()}
+
+        if(counter < 1) {
+          recordError("anyOf");
+          return false;
+        }
+      }
+    `;
+
+      function* generateInnerStatements() {
+        assert(item.anyOf != null);
+
+        for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
+          const element = item.anyOf[elementIndex];
+          yield itt`
+          if(counter < 1 && ${generateValidatorReference(element, valueExpression)}) {
+            counter += 1;
+          }
+        `;
+        }
+      }
+    }
+
+    if (item.oneOf != null) {
+      yield itt`
+      {
+        let counter = 0;
+
+        ${generateInnerStatements()}
+
+        if(counter !== 1) {
+          recordError("oneOf");
+          return false;
+        }
+      }
+    `;
+
+      function* generateInnerStatements() {
+        assert(item.oneOf != null);
+
+        for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
+          const element = item.oneOf[elementIndex];
+          yield itt`
+          if(counter < 2 && ${generateValidatorReference(element, valueExpression)}) {
+            counter += 1;
+          }
+        `;
+        }
+      }
+    }
+
+    if (item.if != null) {
+      yield itt`
+      if(${generateValidatorReference(item.if, valueExpression)}) {
+        ${generateInnerThenStatements()}
+      }
+      else {
+        ${generateInnerElseStatements()}
+      }
+    `;
+
+      function* generateInnerThenStatements() {
+        if (item.then != null) {
+          yield itt`
+          if(!${generateValidatorReference(item.then, valueExpression)}) {
+            recordError("then");
+            return false;
+          }
+        `;
+        }
+      }
+
+      function* generateInnerElseStatements() {
+        if (item.else != null) {
+          yield itt`
+          if(!${generateValidatorReference(item.else, valueExpression)}) {
+            recordError("else");
+            return false;
+          }
+        `;
+        }
+      }
+    }
+
+    if (item.not != null) {
+      yield itt`
+      if(${generateValidatorReference(item.not, valueExpression)}) {
+        recordError("not");
+        return false;
+      }
+    `;
+    }
+
+    yield itt`
+    return true;
+  `;
   }
 }

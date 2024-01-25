@@ -11,11 +11,8 @@
 */
 export type SchemaDocument = (
 {
-["$schema"]: Schema,
-["schemas"]: Schemas,
-[
-name: string
-]: any
+"$schema": Schema,
+"schemas": Schemas,
 }
 );
 /**
@@ -23,46 +20,43 @@ name: string
 */
 export type Node = (
 {
-["title"]?: Title,
-["description"]?: Description,
-["examples"]?: Examples,
-["deprecated"]?: Deprecated,
-["types"]?: Types,
-["reference"]?: Reference,
-["oneOf"]?: OneOf,
-["anyOf"]?: AnyOf,
-["allOf"]?: AllOf,
-["if"]?: If,
-["then"]?: Then,
-["else"]?: Else,
-["not"]?: Not,
-["dependentSchemas"]?: DependentSchemas,
-["objectProperties"]?: ObjectProperties,
-["mapProperties"]?: MapProperties,
-["patternProperties"]?: PatternProperties,
-["propertyNames"]?: PropertyNames,
-["tupleItems"]?: TupleItems,
-["arrayItems"]?: ArrayItems,
-["contains"]?: Contains,
-["options"]?: Options,
-["minimumInclusive"]?: MinimumInclusive,
-["minimumExclusive"]?: MinimumExclusive,
-["maximumInclusive"]?: MaximumInclusive,
-["maximumExclusive"]?: MaximumExclusive,
-["multipleOf"]?: MultipleOf,
-["minimumLength"]?: MinimumLength,
-["maximumLength"]?: MaximumLength,
-["valuePattern"]?: ValuePattern,
-["valueFormat"]?: ValueFormat,
-["minimumItems"]?: MinimumItems,
-["maximumItems"]?: MaximumItems,
-["uniqueItems"]?: UniqueItems,
-["required"]?: Required,
-["minimumProperties"]?: MinimumProperties,
-["maximumProperties"]?: MaximumProperties,
-[
-name: string
-]: any
+"title"?: Title,
+"description"?: Description,
+"examples"?: Examples,
+"deprecated"?: Deprecated,
+"types"?: Types,
+"reference"?: Reference,
+"oneOf"?: OneOf,
+"anyOf"?: AnyOf,
+"allOf"?: AllOf,
+"if"?: If,
+"then"?: Then,
+"else"?: Else,
+"not"?: Not,
+"dependentSchemas"?: DependentSchemas,
+"objectProperties"?: ObjectProperties,
+"mapProperties"?: MapProperties,
+"patternProperties"?: PatternProperties,
+"propertyNames"?: PropertyNames,
+"tupleItems"?: TupleItems,
+"arrayItems"?: ArrayItems,
+"contains"?: Contains,
+"options"?: Options,
+"minimumInclusive"?: MinimumInclusive,
+"minimumExclusive"?: MinimumExclusive,
+"maximumInclusive"?: MaximumInclusive,
+"maximumExclusive"?: MaximumExclusive,
+"multipleOf"?: MultipleOf,
+"minimumLength"?: MinimumLength,
+"maximumLength"?: MaximumLength,
+"valuePattern"?: ValuePattern,
+"valueFormat"?: ValueFormat,
+"minimumItems"?: MinimumItems,
+"maximumItems"?: MaximumItems,
+"uniqueItems"?: UniqueItems,
+"required"?: Required,
+"minimumProperties"?: MinimumProperties,
+"maximumProperties"?: MaximumProperties,
 }
 );
 /**
