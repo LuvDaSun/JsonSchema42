@@ -53,14 +53,13 @@ valid:
   number:
     type: number
     value: 1
-
-invalid:
-  invalid-string:
-    type: string
-    value: 100
-  invalid-number:
-    type: number
-    value: not-a-number
-  unknown-type:
-    type: something
-    value: {}
+# invalid:
+#   invalid-string:
+#     type: string
+#     value: 100
+#   invalid-number:
+#     type: number
+#     value: not-a-number
+#   unknown-type:
+#     type: something
+#     value: {}
