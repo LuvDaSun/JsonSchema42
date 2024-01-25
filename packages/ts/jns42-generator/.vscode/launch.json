@@ -5,6 +5,8 @@
       "type": "node",
       "request": "launch",
       "name": "run file",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["c8", "--reporter", "lcov", "node"],
       "program": "${file}",
       "args": [],
       "env": {
@@ -20,6 +22,8 @@
       "type": "node",
       "request": "launch",
       "name": "package file",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["c8", "--reporter", "lcov", "node"],
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
@@ -44,6 +48,8 @@
       "type": "node",
       "request": "launch",
       "name": "test fixture",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["c8", "--reporter", "lcov", "node"],
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "test",

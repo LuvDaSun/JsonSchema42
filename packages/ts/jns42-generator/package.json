@@ -39,6 +39,7 @@
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
+    "c8": "^9.1.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
@@ -56,6 +57,12 @@
     "yargs": "^17.7.2"
   },
   "bundledDependencies": [
+    "jns42-optimizer",
+    "schema-draft-04",
+    "schema-draft-2020-12",
+    "schema-intermediate"
+  ],
+  "bundleDependencies": [
     "jns42-optimizer",
     "schema-draft-04",
     "schema-draft-2020-12",
