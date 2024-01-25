@@ -160,7 +160,7 @@ async function main(configuration: MainConfiguration) {
       });
     }
 
-    test.skip("test package", () => {
+    test("test package", () => {
       cp.execSync("npm test", {
         cwd: packageDirectoryPath,
         env: process.env,
@@ -168,7 +168,7 @@ async function main(configuration: MainConfiguration) {
       });
     });
 
-    await test.skip("valid", async () => {
+    await test("valid", async () => {
       const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
