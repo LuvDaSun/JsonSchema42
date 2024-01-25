@@ -1,5 +1,11 @@
-import { isThen } from "schema-intermediate";
-import { SchemaTransform } from "../schema/index.js";
+import {
+  AllOfSchemaModel,
+  NotSchemaModel,
+  OneOfSchemaModel,
+  SchemaModel,
+  SchemaTransform,
+  isIfSchemaModel,
+} from "../schema/index.js";
 
 /**
  * This transformer turns if-then-else into a one-of
@@ -14,21 +20,50 @@ import { SchemaTransform } from "../schema/index.js";
  *
  * ```yaml
  * - oneOf
- *   - 1
  *   - 2
+ *   - 3
+ * - not: 100
  * - allOf:
  *   - 100
  *   - 200
  * - allOf:
  *   - 1
  *   - 300
- * - not: 100
  * ```
  */
 export const resolveIfThenElse: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
-  if (!isThen(model)) {
+  if (!isIfSchemaModel(model)) {
     return model;
+  }
+
+  const newModel: OneOfSchemaModel & SchemaModel = {
+    ...model,
+    oneOf: [],
+    if: undefined,
+    then: undefined,
+    else: undefined,
+  };
+
+  if (model.then != null) {
+    const thenModel: AllOfSchemaModel = {
+      allOf: [model.if, model.then],
+    };
+    const thenKey = arena.addItem(thenModel);
+    newModel.oneOf.push(thenKey);
+  }
+
+  if (model.else != null) {
+    const notIfModel: NotSchemaModel = {
+      not: model.if,
+    };
+    const notIfKey = arena.addItem(notIfModel);
+
+    const elseModel: AllOfSchemaModel = {
+      allOf: [notIfKey, model.else],
+    };
+    const elseKey = arena.addItem(elseModel);
+    newModel.oneOf.push(elseKey);
   }
 
   return model;
