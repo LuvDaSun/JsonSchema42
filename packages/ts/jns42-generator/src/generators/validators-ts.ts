@@ -461,12 +461,12 @@ export function* generateValidatorsTsCode(
 
         yield itt`
           default:
-            ${joinIterable(generateDefaultCaseIfStatements(), " else ")}
+            ${generateDefaultCaseStatements()}
             break;
         `;
       }
 
-      function* generateDefaultCaseIfStatements() {
+      function* generateDefaultCaseStatements() {
         if (item.arrayItems != null) {
           yield itt`
             if(!withPath(String(elementIndex), () => {
@@ -596,28 +596,30 @@ export function* generateValidatorsTsCode(
 
         yield itt`
           default:
-            ${joinIterable(generateDefaultCaseIfStatements(), " else ")}
+            ${generateDefaultCaseStatements()}
             break;
         `;
       }
 
-      function* generateDefaultCaseIfStatements() {
+      function* generateDefaultCaseStatements() {
         if (item.patternProperties != null) {
           for (const propertyPattern in item.patternProperties) {
             yield itt`
-              if(!withPath(propertyName, () => {
-                if(
-                  new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName) &&
-                  !${generateValidatorReference(
-                    item.patternProperties[propertyPattern],
-                    `propertyValue`,
-                  )}
-                ) {
-                  return false;
-                }  
-                return true;
-              })) {
-                return false
+              if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
+                if(!withPath(propertyName, () => {
+                  if(
+                    !${generateValidatorReference(
+                      item.patternProperties[propertyPattern],
+                      `propertyValue`,
+                    )}
+                  ) {
+                    return false;
+                  }  
+                  return true;
+                })) {
+                  return false
+                }
+                continue;
               }
             `;
           }
