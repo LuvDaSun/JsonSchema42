@@ -39,6 +39,6 @@
     "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
     "type-fest": "^4.9.0",
-    "schema-intermediate": "*"
+    "schema-intermediate": "0.0.0"
   }
 }

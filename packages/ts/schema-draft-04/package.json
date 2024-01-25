@@ -1,5 +1,6 @@
 {
   "name": "schema-draft-04",
+  "version": "0.0.0",
   "sideEffects": false,
   "type": "module",
   "main": "./out/main.js",
@@ -37,6 +38,5 @@
   "devDependencies": {
     "typescript": "^5.3.3",
     "@tsconfig/node20": "^20.1.2"
-  },
-  "version": "0.0.0"
+  }
 }

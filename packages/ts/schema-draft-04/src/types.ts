@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.6                         -- www.JsonSchema42.org
+// v0.12.7                         -- www.JsonSchema42.org
 //
 /**
 * @description Core schema meta-schema
@@ -11,42 +11,39 @@
 */
 export type SchemaDocument = (
 {
-["id"]?: Id,
-["$schema"]?: Schema,
-["title"]?: Title,
-["description"]?: Description,
-["default"]?: Default,
-["multipleOf"]?: MultipleOf,
-["maximum"]?: Maximum,
-["exclusiveMaximum"]?: ExclusiveMaximum,
-["minimum"]?: Minimum,
-["exclusiveMinimum"]?: ExclusiveMinimum,
-["maxLength"]?: MaxLength,
-["minLength"]?: MinLength,
-["pattern"]?: Pattern,
-["additionalItems"]?: AdditionalItems,
-["items"]?: PropertiesItems,
-["maxItems"]?: MaxItems,
-["minItems"]?: MinItems,
-["uniqueItems"]?: UniqueItems,
-["maxProperties"]?: MaxProperties,
-["minProperties"]?: MinProperties,
-["required"]?: Required,
-["additionalProperties"]?: PropertiesAdditionalProperties,
-["definitions"]?: Definitions,
-["properties"]?: Properties,
-["patternProperties"]?: PatternProperties,
-["dependencies"]?: Dependencies,
-["enum"]?: Enum,
-["type"]?: Type,
-["format"]?: Format,
-["allOf"]?: AllOf,
-["anyOf"]?: AnyOf,
-["oneOf"]?: OneOf,
-["not"]?: Not,
-[
-name: string
-]: any
+"id"?: Id,
+"$schema"?: Schema,
+"title"?: Title,
+"description"?: Description,
+"default"?: Default,
+"multipleOf"?: MultipleOf,
+"maximum"?: Maximum,
+"exclusiveMaximum"?: ExclusiveMaximum,
+"minimum"?: Minimum,
+"exclusiveMinimum"?: ExclusiveMinimum,
+"maxLength"?: MaxLength,
+"minLength"?: MinLength,
+"pattern"?: Pattern,
+"additionalItems"?: AdditionalItems,
+"items"?: PropertiesItems,
+"maxItems"?: MaxItems,
+"minItems"?: MinItems,
+"uniqueItems"?: UniqueItems,
+"maxProperties"?: MaxProperties,
+"minProperties"?: MinProperties,
+"required"?: Required,
+"additionalProperties"?: PropertiesAdditionalProperties,
+"definitions"?: Definitions,
+"properties"?: Properties,
+"patternProperties"?: PatternProperties,
+"dependencies"?: Dependencies,
+"enum"?: Enum,
+"type"?: Type,
+"format"?: Format,
+"allOf"?: AllOf,
+"anyOf"?: AnyOf,
+"oneOf"?: OneOf,
+"not"?: Not,
 }
 );
 /**
