@@ -33,19 +33,20 @@ schemas:
         type: string
       value: true
     oneOf:
-      - properties:
-          type:
-            const: string
+      - $ref: "#/$defs/type-is-string"
+        properties:
           value:
             type: string
       - not:
-          properties:
-            type:
-              const: number
+          $ref: "#/$defs/type-is-string"
         properties:
           value:
             type: number
-
+    $defs:
+      type-is-string:
+        properties:
+          type:
+            const: string
 valid:
   string:
     type: string

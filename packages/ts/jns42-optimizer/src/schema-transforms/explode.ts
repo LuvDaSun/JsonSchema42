@@ -77,7 +77,6 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     anyOf: anyOfSchemaRequired,
     oneOf: oneOfSchemaRequired,
     if: [...ifSchemaRequired, ...ifSchemaOptional],
-    // not: notSchemaRequired,
     type: typeSchemaOptional,
   };
 
@@ -104,7 +103,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     if: undefined,
     then: undefined,
     else: undefined,
-    // not: undefined,
+    not: undefined,
 
     types: undefined,
     dependentSchemas: undefined,
@@ -204,6 +203,7 @@ export const explode: SchemaTransform = (arena, model, modelKey) => {
     const newSubModel: SchemaModel = {
       parent: modelKey,
       mockable: model.mockable,
+      not: model.not,
 
       types: model.types,
       dependentSchemas: model.dependentSchemas,

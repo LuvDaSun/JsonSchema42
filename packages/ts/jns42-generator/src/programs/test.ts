@@ -62,7 +62,7 @@ export function configureTestProgram(argv: yargs.Argv) {
         .option("transform-maximum-iterations", {
           description: "maximum number of iterations for transforming",
           type: "number",
-          default: 1000,
+          default: 100,
         }),
     (argv) => main(argv),
   );
