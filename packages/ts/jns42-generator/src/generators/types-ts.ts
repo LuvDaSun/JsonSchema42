@@ -151,9 +151,8 @@ export function* generateTypesTsCode(
 
           function* generateInterfaceContent() {
             let undefinedProperty = false;
-            const isObject = item.objectProperties != null || item.required != null;
 
-            if (isObject) {
+            if (item.objectProperties != null || item.required != null) {
               const required = new Set(item.required);
               const objectProperties = item.objectProperties ?? {};
               const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
@@ -173,7 +172,7 @@ export function* generateTypesTsCode(
               }
             }
 
-            if (!isObject || configuration.unionObjectAndMap) {
+            {
               const elementKeys = new Array<number>();
               if (item.mapProperties != null) {
                 elementKeys.push(item.mapProperties);

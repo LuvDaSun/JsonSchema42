@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.9                         -- www.JsonSchema42.org
+// v0.12.10                        -- www.JsonSchema42.org
 //
 /**
 * @summary JsonSchema42 intermediate schema
@@ -13,6 +13,9 @@ export type SchemaDocument = (
 {
 "$schema": Schema,
 "schemas": Schemas,
+[
+name: string
+]: any
 }
 );
 /**
@@ -57,6 +60,9 @@ export type Node = (
 "required"?: Required,
 "minimumProperties"?: MinimumProperties,
 "maximumProperties"?: MaximumProperties,
+[
+name: string
+]: any
 }
 );
 /**

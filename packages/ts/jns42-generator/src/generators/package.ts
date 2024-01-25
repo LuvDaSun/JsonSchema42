@@ -17,7 +17,6 @@ export interface PackageConfiguration {
   packageName: string;
   packageVersion: string;
   packageDirectoryPath: string;
-  unionObjectAndMap: boolean;
 }
 
 export function generatePackage(

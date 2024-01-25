@@ -63,12 +63,6 @@ export function configureTestProgram(argv: yargs.Argv) {
           description: "maximum number of iterations for transforming",
           type: "number",
           default: 100,
-        })
-        .option("union-object-and-map", {
-          description:
-            "If a type is both a map and an object, add index with a union type of all the properties",
-          type: "boolean",
-          default: false,
         }),
     (argv) => main(argv),
   );
@@ -83,7 +77,6 @@ interface MainConfiguration {
   defaultName: string;
   nameMaximumIterations: number;
   transformMaximumIterations: number;
-  unionObjectAndMap: boolean;
 }
 
 async function main(configuration: MainConfiguration) {
@@ -97,7 +90,6 @@ async function main(configuration: MainConfiguration) {
     nameMaximumIterations,
     transformMaximumIterations,
     defaultName,
-    unionObjectAndMap,
   } = configuration;
 
   const testUrl = new URL(`file://${pathToTest}`);
@@ -147,7 +139,6 @@ async function main(configuration: MainConfiguration) {
         packageDirectoryPath,
         packageName,
         packageVersion,
-        unionObjectAndMap,
       });
     }
 

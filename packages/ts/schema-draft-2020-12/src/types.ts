@@ -3,7 +3,7 @@
 //  _ |  |___ ___ ___|   __|___| |_ ___ _____  __| | |_  |
 // | |_| |_ -| . |   |__   |  _|   | -_|     ||. |_  |  _|
 // |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|
-// v0.12.9                         -- www.JsonSchema42.org
+// v0.12.10                        -- www.JsonSchema42.org
 //
 /**
 * @summary Core and Validation specifications meta-schema
@@ -73,6 +73,9 @@ export type Schema = (
 "dependencies"?: Dependencies,
 "$recursiveAnchor"?: RecursiveAnchor,
 "$recursiveRef"?: RecursiveRef,
+[
+name: string
+]: any
 }
 )
 |
@@ -211,6 +214,9 @@ StringArray
 "dependencies"?: Dependencies,
 "$recursiveAnchor"?: RecursiveAnchor,
 "$recursiveRef"?: RecursiveRef,
+[
+name: string
+]: any
 }
 )
 |
@@ -248,6 +254,9 @@ export type Core = (
 "$vocabulary"?: Vocabulary,
 "$comment"?: Comment,
 "$defs"?: Defs,
+[
+name: string
+]: any
 }
 )
 |
@@ -339,6 +348,9 @@ export type Applicator = (
 "anyOf"?: AnyOf,
 "oneOf"?: OneOf,
 "not"?: Not,
+[
+name: string
+]: any
 }
 )
 |
@@ -459,6 +471,9 @@ export type Unevaluated = (
 {
 "unevaluatedItems"?: UnevaluatedItems,
 "unevaluatedProperties"?: UnevaluatedProperties,
+[
+name: string
+]: any
 }
 )
 |
@@ -499,6 +514,9 @@ export type Validation = (
 "minProperties"?: MinProperties,
 "required"?: Required,
 "dependentRequired"?: DependentRequired,
+[
+name: string
+]: any
 }
 )
 |
@@ -662,6 +680,9 @@ export type MetaData = (
 "readOnly"?: ReadOnly,
 "writeOnly"?: WriteOnly,
 "examples"?: Examples,
+[
+name: string
+]: any
 }
 )
 |
@@ -711,6 +732,9 @@ export type FormatAnnotation = (
 (
 {
 "format"?: Format,
+[
+name: string
+]: any
 }
 )
 |
@@ -730,6 +754,9 @@ export type Content = (
 "contentEncoding"?: ContentEncoding,
 "contentMediaType"?: ContentMediaType,
 "contentSchema"?: ContentSchema,
+[
+name: string
+]: any
 }
 )
 |
