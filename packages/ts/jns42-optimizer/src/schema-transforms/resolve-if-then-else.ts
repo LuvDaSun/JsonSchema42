@@ -66,5 +66,5 @@ export const resolveIfThenElse: SchemaTransform = (arena, model, modelKey) => {
     newModel.oneOf.push(elseKey);
   }
 
-  return model;
+  return newModel;
 };
