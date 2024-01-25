@@ -42,14 +42,6 @@ const valid = validators.isNonNegativeIntegerDefault0(mock);
 assert.equal(valid, true);
 });
 /**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
-*/
-test("SimpleTypes", () => {
-const mock = mocks.mockSimpleTypes();
-const valid = validators.isSimpleTypes(mock);
-assert.equal(valid, true);
-});
-/**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
 */
 test("MultipleOf", () => {
@@ -167,14 +159,6 @@ assert.equal(valid, true);
 test("StringArrayItems", () => {
 const mock = mocks.mockStringArrayItems();
 const valid = validators.isStringArrayItems(mock);
-assert.equal(valid, true);
-});
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
-*/
-test("TypeItems", () => {
-const mock = mocks.mockTypeItems();
-const valid = validators.isTypeItems(mock);
 assert.equal(valid, true);
 });
 /**

@@ -2097,28 +2097,7 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (
-((value: unknown) => {
-if(Array.isArray(value)) {
-switch(value.length) {
-case 1:
-[value] = value
-break;
-default:
-return undefined;
-}
-}
-switch(typeof value) {
-case "string":
-return value;
-case "number":
-case "boolean":
-return String(value);
-default:
-return undefined;
-}
-})(value)
-);
+return (value);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/stringArray}
@@ -2147,11 +2126,7 @@ const configuration = {
 ...defaultParserGeneratorOptions,
 ...options,
 };
-return (
-parseType0(value, configuration)
-??
-parseType1(value, configuration)
-);
+return (value);
 }
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}

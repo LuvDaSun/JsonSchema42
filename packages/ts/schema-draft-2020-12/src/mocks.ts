@@ -117,31 +117,6 @@ depthCounters[59]--;
 }
 }
 /**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/$defs/simpleTypes}
-*/
-export function mockSimpleTypes(options: MockGeneratorOptions = {}): types.SimpleTypes {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[60] ??= 0;
-try {
-depthCounters[60]++;
-return (
-(
-[
-"array", "boolean", "integer", "null", "number", "object", "string"
-] as const
-)[
-nextSeed() % 7
-]
-);
-}
-finally {
-depthCounters[60]--;
-}
-}
-/**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/multipleOf}
 */
 export function mockMultipleOf(options: MockGeneratorOptions = {}): types.MultipleOf {
@@ -439,23 +414,6 @@ join("")
 }
 finally {
 depthCounters[82]--;
-}
-}
-/**
-* @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type/anyOf/1/items}
-*/
-export function mockTypeItems(options: MockGeneratorOptions = {}): types.TypeItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[87] ??= 0;
-try {
-depthCounters[87]++;
-return (mockSimpleTypes());
-}
-finally {
-depthCounters[87]--;
 }
 }
 /**

@@ -18,14 +18,6 @@ const valid = validators.isPositiveInteger(mock);
 assert.equal(valid, true);
 });
 /**
-* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
-*/
-test("SimpleTypes", () => {
-const mock = mocks.mockSimpleTypes();
-const valid = validators.isSimpleTypes(mock);
-assert.equal(valid, true);
-});
-/**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/id}
 */
 test("Id", () => {
@@ -151,13 +143,5 @@ assert.equal(valid, true);
 test("StringArrayItems", () => {
 const mock = mocks.mockStringArrayItems();
 const valid = validators.isStringArrayItems(mock);
-assert.equal(valid, true);
-});
-/**
-* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
-*/
-test("TypeItems", () => {
-const mock = mocks.mockTypeItems();
-const valid = validators.isTypeItems(mock);
 assert.equal(valid, true);
 });

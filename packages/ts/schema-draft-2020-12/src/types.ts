@@ -551,11 +551,7 @@ export type StringArray = (
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/type}
 */
-export type Type = (
-Type0
-|
-Type1
-);
+export type Type = (unknown);
 /**
 * @see {@link https://json-schema.org/draft/2020-12/meta/validation#/properties/const}
 */

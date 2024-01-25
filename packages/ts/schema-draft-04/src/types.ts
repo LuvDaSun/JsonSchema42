@@ -234,11 +234,7 @@ export type Enum = (
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/type}
 */
-export type Type = (
-Type0
-|
-Type1
-);
+export type Type = (unknown);
 /**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/format}
 */

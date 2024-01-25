@@ -66,14 +66,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("SchemaDocument", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 if(
 !("$schema" in value) ||
 value["$schema"] === undefined
@@ -120,6 +125,7 @@ default:
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -138,14 +144,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Node", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -563,6 +574,7 @@ default:
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -581,10 +593,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("NodeReference", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -605,12 +615,12 @@ resetErrors();
 depth += 1;
 try{
 return withType("IntegerValue", () => {
-if(
-typeof value !== "number" ||
-isNaN(value) ||
-value % 1 !== 0
-) {
-recordError("integer");
+if(!((
+typeof value === "number" &&
+!isNaN(value) &&
+value % 1 === 0
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -631,11 +641,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("NumberValue", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -656,8 +666,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("BooleanValue", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -678,10 +688,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("StringValue", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -702,10 +710,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("NonEmptyStringValue", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -726,12 +732,12 @@ resetErrors();
 depth += 1;
 try{
 return withType("Amount", () => {
-if(
-typeof value !== "number" ||
-isNaN(value) ||
-value % 1 !== 0
-) {
-recordError("integer");
+if(!((
+typeof value === "number" &&
+!isNaN(value) &&
+value % 1 === 0
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -758,10 +764,8 @@ value !== "https://schema.JsonSchema42.org/jns42-intermediate/schema.json"
 recordError("options");
 return false;
 }
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -782,14 +786,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Schemas", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -808,6 +817,7 @@ return true;
 return false
 }
 break;
+}
 }
 }
 return true;
@@ -829,8 +839,9 @@ depth += 1;
 try{
 return withType("Title", () => {
 if(!isNonEmptyStringValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -850,8 +861,9 @@ depth += 1;
 try{
 return withType("Description", () => {
 if(!isNonEmptyStringValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -870,10 +882,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Examples", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -889,6 +904,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -910,8 +926,9 @@ depth += 1;
 try{
 return withType("Deprecated", () => {
 if(!isBooleanValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -931,10 +948,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Types", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -950,6 +970,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -971,8 +992,9 @@ depth += 1;
 try{
 return withType("Reference", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -991,10 +1013,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("OneOf", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -1010,6 +1035,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -1030,10 +1056,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("AnyOf", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -1049,6 +1078,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -1069,10 +1099,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("AllOf", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -1088,6 +1121,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -1109,8 +1143,9 @@ depth += 1;
 try{
 return withType("If", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1130,8 +1165,9 @@ depth += 1;
 try{
 return withType("Then", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1151,8 +1187,9 @@ depth += 1;
 try{
 return withType("Else", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1172,8 +1209,9 @@ depth += 1;
 try{
 return withType("Not", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1192,14 +1230,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("DependentSchemas", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1220,6 +1263,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -1238,14 +1282,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("ObjectProperties", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1264,6 +1313,7 @@ return true;
 return false
 }
 break;
+}
 }
 }
 return true;
@@ -1285,8 +1335,9 @@ depth += 1;
 try{
 return withType("MapProperties", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1305,14 +1356,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("PatternProperties", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1331,6 +1387,7 @@ return true;
 return false
 }
 break;
+}
 }
 }
 return true;
@@ -1352,8 +1409,9 @@ depth += 1;
 try{
 return withType("PropertyNames", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1372,10 +1430,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("TupleItems", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -1391,6 +1452,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -1412,8 +1474,9 @@ depth += 1;
 try{
 return withType("ArrayItems", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1433,8 +1496,9 @@ depth += 1;
 try{
 return withType("Contains", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1453,10 +1517,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Options", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
 switch(elementIndex) {
@@ -1472,6 +1539,7 @@ return false;
 }
 break;
 break;
+}
 }
 }
 return true;
@@ -1493,8 +1561,9 @@ depth += 1;
 try{
 return withType("MinimumInclusive", () => {
 if(!isNumberValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1514,8 +1583,9 @@ depth += 1;
 try{
 return withType("MinimumExclusive", () => {
 if(!isNumberValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1535,8 +1605,9 @@ depth += 1;
 try{
 return withType("MaximumInclusive", () => {
 if(!isNumberValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1556,8 +1627,9 @@ depth += 1;
 try{
 return withType("MaximumExclusive", () => {
 if(!isNumberValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1577,8 +1649,9 @@ depth += 1;
 try{
 return withType("MultipleOf", () => {
 if(!isNumberValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1598,8 +1671,9 @@ depth += 1;
 try{
 return withType("MinimumLength", () => {
 if(!isAmount(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1619,8 +1693,9 @@ depth += 1;
 try{
 return withType("MaximumLength", () => {
 if(!isAmount(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1640,8 +1715,9 @@ depth += 1;
 try{
 return withType("ValuePattern", () => {
 if(!isNonEmptyStringValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1661,8 +1737,9 @@ depth += 1;
 try{
 return withType("ValueFormat", () => {
 if(!isNonEmptyStringValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1682,8 +1759,9 @@ depth += 1;
 try{
 return withType("MinimumItems", () => {
 if(!isAmount(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1703,8 +1781,9 @@ depth += 1;
 try{
 return withType("MaximumItems", () => {
 if(!isAmount(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1723,8 +1802,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("UniqueItems", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1745,10 +1824,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Required", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 const elementValueSeen = new Set<unknown>();
 for(let elementIndex = 0; elementIndex < value.length; elementIndex ++) {
 const elementValue = value[elementIndex];
@@ -1772,6 +1854,7 @@ break;
 }
 elementValueSeen.add(elementValue);
 }
+}
 return true;
 ;
 });
@@ -1791,8 +1874,9 @@ depth += 1;
 try{
 return withType("MinimumProperties", () => {
 if(!isAmount(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1812,8 +1896,9 @@ depth += 1;
 try{
 return withType("MaximumProperties", () => {
 if(!isAmount(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1833,8 +1918,9 @@ depth += 1;
 try{
 return withType("SchemasAdditionalProperties", () => {
 if(!isNode(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1853,6 +1939,10 @@ resetErrors();
 depth += 1;
 try{
 return withType("ExamplesItems", () => {
+if(!((true))) {
+recordError("types");
+return false;
+}
 return true;
 ;
 });
@@ -1885,10 +1975,8 @@ value !== "map"
 recordError("options");
 return false;
 }
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1910,8 +1998,9 @@ depth += 1;
 try{
 return withType("OneOfItems", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1931,8 +2020,9 @@ depth += 1;
 try{
 return withType("AnyOfItems", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1952,8 +2042,9 @@ depth += 1;
 try{
 return withType("AllOfItems", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1973,8 +2064,9 @@ depth += 1;
 try{
 return withType("DependentSchemasAdditionalProperties", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1994,8 +2086,9 @@ depth += 1;
 try{
 return withType("ObjectPropertiesAdditionalProperties", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2015,8 +2108,9 @@ depth += 1;
 try{
 return withType("PatternPropertiesAdditionalProperties", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2036,8 +2130,9 @@ depth += 1;
 try{
 return withType("TupleItemsItems", () => {
 if(!isNodeReference(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -2056,6 +2151,10 @@ resetErrors();
 depth += 1;
 try{
 return withType("OptionsItems", () => {
+if(!((true))) {
+recordError("types");
+return false;
+}
 return true;
 ;
 });
@@ -2075,8 +2174,9 @@ depth += 1;
 try{
 return withType("RequiredItems", () => {
 if(!isStringValue(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });

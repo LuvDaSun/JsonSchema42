@@ -56,31 +56,6 @@ depthCounters[2]--;
 }
 }
 /**
-* @see {@link http://json-schema.org/draft-04/schema#/definitions/simpleTypes}
-*/
-export function mockSimpleTypes(options: MockGeneratorOptions = {}): types.SimpleTypes {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[4] ??= 0;
-try {
-depthCounters[4]++;
-return (
-(
-[
-"array", "boolean", "integer", "null", "number", "object", "string"
-] as const
-)[
-nextSeed() % 7
-]
-);
-}
-finally {
-depthCounters[4]--;
-}
-}
-/**
 * @see {@link http://json-schema.org/draft-04/schema#/properties/id}
 */
 export function mockId(options: MockGeneratorOptions = {}): types.Id {
@@ -431,23 +406,6 @@ join("")
 }
 finally {
 depthCounters[42]--;
-}
-}
-/**
-* @see {@link http://json-schema.org/draft-04/schema#/properties/type/anyOf/1/items}
-*/
-export function mockTypeItems(options: MockGeneratorOptions = {}): types.TypeItems {
-const configuration = {
-...defaultMockGeneratorOptions,
-...options,
-};
-depthCounters[57] ??= 0;
-try {
-depthCounters[57]++;
-return (mockSimpleTypes());
-}
-finally {
-depthCounters[57]--;
 }
 }
 let seed = 1;

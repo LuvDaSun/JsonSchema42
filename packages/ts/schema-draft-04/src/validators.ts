@@ -66,14 +66,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("SchemaDocument", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -447,6 +452,7 @@ default:
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -465,10 +471,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("SchemaArray", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 if(value.length < 1) {
 recordError("minimumItems");
 return false;
@@ -490,6 +499,7 @@ break;
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -508,19 +518,24 @@ resetErrors();
 depth += 1;
 try{
 return withType("PositiveInteger", () => {
-if(
-typeof value !== "number" ||
-isNaN(value) ||
-value % 1 !== 0
-) {
-recordError("integer");
+if(!((
+typeof value === "number" &&
+!isNaN(value) &&
+value % 1 === 0
+))) {
+recordError("types");
 return false;
 }
+if(
+typeof value === "number" &&
+!isNaN(value)
+) {
 if(
 value < 0
 ) {
 recordError("minimumInclusive");
 return false;
+}
 }
 return true;
 ;
@@ -583,12 +598,6 @@ value !== "string"
 recordError("options");
 return false;
 }
-if(
-typeof value !== "string"
-) {
-recordError("string");
-return false;
-}
 return true;
 ;
 });
@@ -607,10 +616,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("StringArray", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 if(value.length < 1) {
 recordError("minimumItems");
 return false;
@@ -638,6 +650,7 @@ break;
 }
 elementValueSeen.add(elementValue);
 }
+}
 return true;
 ;
 });
@@ -656,10 +669,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Id", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -680,10 +691,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Schema", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -704,10 +713,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Title", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -728,10 +735,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Description", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -770,18 +775,23 @@ resetErrors();
 depth += 1;
 try{
 return withType("MultipleOf", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+typeof value === "number" &&
+!isNaN(value)
+) {
 if(
 value <= 0
 ) {
 recordError("minimumExclusive");
 return false;
+}
 }
 return true;
 ;
@@ -801,11 +811,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("Maximum", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -826,8 +836,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("ExclusiveMaximum", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -848,11 +858,11 @@ resetErrors();
 depth += 1;
 try{
 return withType("Minimum", () => {
-if(
-typeof value !== "number" ||
-isNaN(value)
-) {
-recordError("number");
+if(!((
+typeof value === "number" &&
+!isNaN(value)
+))) {
+recordError("types");
 return false;
 }
 return true;
@@ -873,8 +883,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("ExclusiveMinimum", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -896,8 +906,9 @@ depth += 1;
 try{
 return withType("MaxLength", () => {
 if(!isPositiveInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -917,8 +928,9 @@ depth += 1;
 try{
 return withType("MinLength", () => {
 if(!isPositiveIntegerDefault0(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -937,10 +949,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Pattern", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1024,8 +1034,9 @@ depth += 1;
 try{
 return withType("MaxItems", () => {
 if(!isPositiveInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1045,8 +1056,9 @@ depth += 1;
 try{
 return withType("MinItems", () => {
 if(!isPositiveIntegerDefault0(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1065,8 +1077,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("UniqueItems", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1088,8 +1100,9 @@ depth += 1;
 try{
 return withType("MaxProperties", () => {
 if(!isPositiveInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1109,8 +1122,9 @@ depth += 1;
 try{
 return withType("MinProperties", () => {
 if(!isPositiveIntegerDefault0(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1130,8 +1144,9 @@ depth += 1;
 try{
 return withType("Required", () => {
 if(!isStringArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1181,14 +1196,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Definitions", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1209,6 +1229,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -1227,14 +1248,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Properties", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1255,6 +1281,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -1273,14 +1300,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("PatternProperties", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1301,6 +1333,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -1319,14 +1352,19 @@ resetErrors();
 depth += 1;
 try{
 return withType("Dependencies", () => {
-if(
-value === null ||
-typeof value !== "object" ||
-Array.isArray(value)
-) {
-recordError("object");
+if(!((
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+))) {
+recordError("types");
 return false;
 }
+if(
+value !== null &&
+typeof value === "object" &&
+!Array.isArray(value)
+) {
 for(const propertyName in value) {
 const propertyValue = value[propertyName as keyof typeof value];
 if(propertyValue === undefined) {
@@ -1347,6 +1385,7 @@ return false
 break;
 }
 }
+}
 return true;
 ;
 });
@@ -1365,10 +1404,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Enum", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 if(value.length < 1) {
 recordError("minimumItems");
 return false;
@@ -1385,6 +1427,7 @@ default:
 break;
 }
 elementValueSeen.add(elementValue);
+}
 }
 return true;
 ;
@@ -1435,10 +1478,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("Format", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1460,8 +1501,9 @@ depth += 1;
 try{
 return withType("AllOf", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1481,8 +1523,9 @@ depth += 1;
 try{
 return withType("AnyOf", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1502,8 +1545,9 @@ depth += 1;
 try{
 return withType("OneOf", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1523,8 +1567,9 @@ depth += 1;
 try{
 return withType("Not", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1544,8 +1589,9 @@ depth += 1;
 try{
 return withType("SchemaArrayItems", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1565,8 +1611,9 @@ depth += 1;
 try{
 return withType("PositiveIntegerDefault00", () => {
 if(!isPositiveInteger(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1603,10 +1650,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("StringArrayItems", () => {
-if(
-typeof value !== "string"
-) {
-recordError("string");
+if(!((typeof value === "string"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1627,8 +1672,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("AdditionalItems0", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1650,8 +1695,9 @@ depth += 1;
 try{
 return withType("AdditionalItems1", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1671,8 +1717,9 @@ depth += 1;
 try{
 return withType("Items0", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1692,8 +1739,9 @@ depth += 1;
 try{
 return withType("Items1", () => {
 if(!isSchemaArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1712,8 +1760,8 @@ resetErrors();
 depth += 1;
 try{
 return withType("AdditionalProperties0", () => {
-if(typeof value !== "boolean") {
-recordError("boolean");
+if(!((typeof value === "boolean"))) {
+recordError("types");
 return false;
 }
 return true;
@@ -1735,8 +1783,9 @@ depth += 1;
 try{
 return withType("AdditionalProperties1", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1756,8 +1805,9 @@ depth += 1;
 try{
 return withType("DefinitionsAdditionalProperties", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1777,8 +1827,9 @@ depth += 1;
 try{
 return withType("PropertiesPropertiesAdditionalProperties", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1798,8 +1849,9 @@ depth += 1;
 try{
 return withType("PatternPropertiesAdditionalProperties", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1850,8 +1902,9 @@ depth += 1;
 try{
 return withType("Type0", () => {
 if(!isSimpleTypes(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1870,10 +1923,13 @@ resetErrors();
 depth += 1;
 try{
 return withType("Type1", () => {
-if(!Array.isArray(value)) {
-recordError("array");
+if(!((Array.isArray(value)))) {
+recordError("types");
 return false;
 }
+if(
+Array.isArray(value)
+) {
 if(value.length < 1) {
 recordError("minimumItems");
 return false;
@@ -1901,6 +1957,7 @@ break;
 }
 elementValueSeen.add(elementValue);
 }
+}
 return true;
 ;
 });
@@ -1920,8 +1977,9 @@ depth += 1;
 try{
 return withType("Dependencies0", () => {
 if(!isSchemaDocument(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1941,8 +1999,9 @@ depth += 1;
 try{
 return withType("Dependencies1", () => {
 if(!isStringArray(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
@@ -1962,8 +2021,9 @@ depth += 1;
 try{
 return withType("TypeItems", () => {
 if(!isSimpleTypes(value)) {
+recordError("reference");
 return false;
-};
+}
 return true;
 ;
 });
