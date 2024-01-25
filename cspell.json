@@ -8,6 +8,7 @@
     "esbenp",
     "lcov",
     "notdir",
+    "presolved",
     "ryanluker",
     "serde",
     "structs",

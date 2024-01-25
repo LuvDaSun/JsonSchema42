@@ -1,0 +1,66 @@
+$schema: "./schema.json"
+
+schemas:
+  original:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    type: "object"
+    required:
+      - type
+    properties:
+      type:
+        type: string
+      value: true
+    if:
+      properties:
+        type:
+          const: string
+    then:
+      properties:
+        value:
+          type: string
+    else:
+      properties:
+        value:
+          type: number
+
+  presolved:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    type: "object"
+    required:
+      - type
+    properties:
+      type:
+        type: string
+      value: true
+    oneOf:
+      - properties:
+          type:
+            const: string
+          value:
+            type: string
+      - not:
+          properties:
+            type:
+              const: number
+        properties:
+          value:
+            type: number
+
+valid:
+  string:
+    type: string
+    value: yeah
+  number:
+    type: number
+    value: 1
+
+invalid:
+  invalid-string:
+    type: string
+    value: 100
+  invalid-number:
+    type: number
+    value: not-a-number
+  unknown-type:
+    type: something
+    value: {}

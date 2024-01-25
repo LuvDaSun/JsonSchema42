@@ -21,7 +21,7 @@ schemas:
               e: { type: string }
               f: { type: string }
 
-  flipped:
+  presolved:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     oneOf:
       - allOf:

@@ -1,4 +1,4 @@
-import { SchemaDocument, isSchemaDocument } from "schema-draft-04";
+import { SchemaDocument, getLastValidationError, isSchemaDocument } from "schema-draft-04";
 import * as schemaIntermediate from "schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
@@ -34,8 +34,11 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region document
 
-  protected isDocumentNode(node: unknown): node is N {
-    return isNode(node);
+  protected assertDocumentNode(node: unknown): asserts node is N {
+    if (!isNode(node)) {
+      const validationError = getLastValidationError();
+      throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
+    }
   }
 
   public *getNodeUrls(): Iterable<URL> {

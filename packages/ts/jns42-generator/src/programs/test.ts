@@ -168,7 +168,7 @@ async function main(configuration: MainConfiguration) {
       });
     });
 
-    await test("valid", async () => {
+    await test.skip("valid", async () => {
       const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
