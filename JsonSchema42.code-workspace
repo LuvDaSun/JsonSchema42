@@ -41,4 +41,12 @@
     "npm.packageManager": "npm",
     "rust-analyzer.check.command": "clippy",
   },
+  "extensions": {
+    "recommendations": [
+      "ryanluker.vscode-coverage-gutters",
+      "esbenp.prettier-vscode",
+      "streetsidesoftware.code-spell-checker",
+    ],
+    "unwantedRecommendations": [],
+  },
 }

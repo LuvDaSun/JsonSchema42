@@ -7,12 +7,17 @@
     "endregion",
     "esbenp",
     "notdir",
+    "ryanluker",
     "serde",
     "structs",
     "unalias",
     "urlencoding"
   ],
   "useGitignore": true,
-  "files": ["**"],
-  "enableFiletypes": ["*"]
+  "files": [
+    "**"
+  ],
+  "enableFiletypes": [
+    "*"
+  ]
 }
