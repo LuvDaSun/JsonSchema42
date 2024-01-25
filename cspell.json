@@ -16,10 +16,6 @@
     "urlencoding"
   ],
   "useGitignore": true,
-  "files": [
-    "**"
-  ],
-  "enableFiletypes": [
-    "*"
-  ]
+  "files": ["**"],
+  "enableFiletypes": ["*"]
 }
