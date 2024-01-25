@@ -39,7 +39,7 @@ export const resolveParent: SchemaTransform = (arena, model, modelKey) => {
   const newModel: SchemaModel = {
     ...model,
     parent: undefined,
-    not: model.not,
+    not: mergeKey(model.not, parentModel.not),
     mockable: booleanMergeAnd(model.mockable, parentModel.mockable),
 
     types: intersectionMergeTypes(model.types, parentModel.types),

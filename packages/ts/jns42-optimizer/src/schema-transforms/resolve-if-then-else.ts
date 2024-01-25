@@ -1,9 +1,9 @@
 import {
   AllOfSchemaModel,
-  NotSchemaModel,
   OneOfSchemaModel,
   SchemaModel,
   SchemaTransform,
+  TypeSchemaModel,
   isIfSchemaModel,
 } from "../schema/index.js";
 
@@ -54,7 +54,7 @@ export const resolveIfThenElse: SchemaTransform = (arena, model, modelKey) => {
   }
 
   if (model.else != null) {
-    const notIfModel: NotSchemaModel = {
+    const notIfModel: TypeSchemaModel = {
       not: model.if,
     };
     const notIfKey = arena.addItem(notIfModel);

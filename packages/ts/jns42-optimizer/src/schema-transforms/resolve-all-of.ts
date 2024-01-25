@@ -3,7 +3,6 @@ import {
   SchemaTransform,
   intersectionMergeTypes,
   isAllOfSchemaModel,
-  isNotSchemaModel,
   isSingleTypeSchemaModel,
 } from "../schema/index.js";
 import {
@@ -55,14 +54,6 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
   for (const elementKey of model.allOf) {
     let [, elementModel] = arena.resolveItem(elementKey);
     let not = false;
-
-    if (isNotSchemaModel(elementModel)) {
-      [, elementModel] = arena.resolveItem(elementModel.not);
-      elementModel = {
-        ...elementModel,
-        required: [],
-      };
-    }
 
     if (!isSingleTypeSchemaModel(elementModel)) {
       // we want to only only merge single types this is because the intersectionMergeTypes
