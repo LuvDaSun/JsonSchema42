@@ -7,6 +7,7 @@
     "endregion",
     "esbenp",
     "lcov",
+    "luvdasun",
     "notdir",
     "presolved",
     "ryanluker",
@@ -16,6 +17,10 @@
     "urlencoding"
   ],
   "useGitignore": true,
-  "files": ["**"],
-  "enableFiletypes": ["*"]
+  "files": [
+    "**"
+  ],
+  "enableFiletypes": [
+    "*"
+  ]
 }

@@ -1,4 +1,4 @@
-import * as schemaIntermediate from "schema-intermediate";
+import * as schemaIntermediate from "@luvdasun/schema-intermediate";
 import { DocumentBase } from "./document-base.js";
 import { DocumentContext } from "./document-context.js";
 

@@ -1,5 +1,5 @@
 {
-  "name": "schema-intermediate",
+  "name": "@luvdasun/schema-intermediate",
   "version": "0.0.1",
   "sideEffects": false,
   "type": "module",

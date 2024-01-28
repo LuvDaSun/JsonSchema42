@@ -1,4 +1,4 @@
-import * as schemaIntermediate from "schema-intermediate";
+import * as schemaIntermediate from "@luvdasun/schema-intermediate";
 import * as schemaTransforms from "../schema-transforms/index.js";
 import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";

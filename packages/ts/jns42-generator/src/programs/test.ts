@@ -52,7 +52,7 @@ export function configureTestProgram(argv: yargs.Argv) {
         .option("default-name", {
           description: "default name for types",
           type: "string",
-          default: "schema-document",
+          default: "@luvdasun/schema-document",
         })
         .option("name-maximum-iterations", {
           description: "maximum number of iterations for finding unique names",

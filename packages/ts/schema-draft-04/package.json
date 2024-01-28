@@ -1,5 +1,5 @@
 {
-  "name": "schema-draft-04",
+  "name": "@luvdasun/schema-draft-04",
   "version": "0.0.1",
   "sideEffects": false,
   "type": "module",

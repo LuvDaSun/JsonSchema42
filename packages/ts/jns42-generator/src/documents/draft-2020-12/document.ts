@@ -1,5 +1,9 @@
-import { Schema as N, getLastValidationError, isSchema as isNode } from "schema-draft-2020-12";
-import * as schemaIntermediate from "schema-intermediate";
+import {
+  Schema as N,
+  getLastValidationError,
+  isSchema as isNode,
+} from "@luvdasun/schema-draft-2020-12";
+import * as schemaIntermediate from "@luvdasun/schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
