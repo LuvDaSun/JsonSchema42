@@ -11,6 +11,5 @@
   "include": ["src"],
   "references": [
     { "path": "packages/ts/jns42-generator" },
-    { "path": "packages/ts/jns42-optimizer" },
   ],
 }
