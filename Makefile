@@ -28,7 +28,7 @@ out/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	npx jns42-generator package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name @luvdasun/$(notdir $(basename $@)) \
-		--package-version 0.0.1 \
+		--package-version 0.3.0 \
 
 out/schema-draft-04:
 	mkdir --parents $(@D)
@@ -36,7 +36,7 @@ out/schema-draft-04:
 	npx jns42-generator package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
 		--package-name @luvdasun/$(notdir $(basename $@)) \
-		--package-version 0.0.1 \
+		--package-version 0.3.0 \
 
 out/schema-draft-2020-12:
 	mkdir --parents $(@D)
@@ -44,7 +44,7 @@ out/schema-draft-2020-12:
 	npx jns42-generator package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
 		--package-name @luvdasun/$(notdir $(basename $@)) \
-		--package-version 0.0.1 \
+		--package-version 0.3.0 \
 
 out/schema-swagger-v2:
 	mkdir --parents $(@D)
@@ -52,7 +52,7 @@ out/schema-swagger-v2:
 	npx jns42-generator package http://swagger.io/v2/schema.json\# \
 		--package-directory $@ \
 		--package-name @luvdasun/$(notdir $(basename $@)) \
-		--package-version 0.0.1 \
+		--package-version 0.3.0 \
 
 out/schema-oas-v3-0:
 	mkdir --parents $(@D)
@@ -60,7 +60,7 @@ out/schema-oas-v3-0:
 	npx jns42-generator package https://spec.openapis.org/oas/3.0/schema/2021-09-28 \
 		--package-directory $@ \
 		--package-name @luvdasun/$(notdir $(basename $@)) \
-		--package-version 0.0.1 \
+		--package-version 0.3.0 \
 
 out/schema-oas-v3-1:
 	mkdir --parents $(@D)
@@ -68,7 +68,7 @@ out/schema-oas-v3-1:
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/schema/2022-10-07 \
 		--package-directory $@ \
 		--package-name @luvdasun/$(notdir $(basename $@)) \
-		--package-version 0.0.1 \
+		--package-version 0.3.0 \
 
 generated/ts/%: out/%
 	mkdir --parents $(@D)

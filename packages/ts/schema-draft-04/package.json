@@ -1,6 +1,6 @@
 {
-  "name": "@luvdasun/schema-draft-04",
-  "version": "0.0.1",
+  "name": "@jns42/schema-draft-04",
+  "version": "0.3.0",
   "sideEffects": false,
   "type": "module",
   "main": "./out/main.js",

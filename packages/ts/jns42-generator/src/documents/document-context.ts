@@ -1,4 +1,4 @@
-import * as schemaIntermediate from "@luvdasun/schema-intermediate";
+import * as schemaIntermediate from "@jns42/schema-intermediate";
 import { discoverSchemaId, loadYAML, normalizeUrl, readNode } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";

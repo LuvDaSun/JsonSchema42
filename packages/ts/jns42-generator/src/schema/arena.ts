@@ -1,4 +1,4 @@
-import * as schemaIntermediate from "@luvdasun/schema-intermediate";
+import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { Arena, ArenaTransform } from "../utils/arena.js";
 import { SchemaModel, SchemaType, isAliasSchemaModel } from "./model.js";

@@ -1,4 +1,4 @@
-import * as schemaIntermediate from "@luvdasun/schema-intermediate";
+import * as schemaIntermediate from "@jns42/schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
 import * as models from "../models/index.js";
