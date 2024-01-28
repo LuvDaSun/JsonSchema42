@@ -47,7 +47,6 @@
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "entities": "^4.5.0",
-    "jns42-optimizer": "0.0.0",
     "schema-draft-04": "0.0.0",
     "schema-draft-2020-12": "0.0.0",
     "schema-intermediate": "0.0.0",
@@ -57,7 +56,6 @@
     "yargs": "^17.7.2"
   },
   "bundledDependencies": [
-    "jns42-optimizer",
     "schema-draft-04",
     "schema-draft-2020-12",
     "schema-intermediate"
