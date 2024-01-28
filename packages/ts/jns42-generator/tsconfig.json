@@ -10,7 +10,6 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../jns42-optimizer" },
     { "path": "../schema-intermediate" },
     { "path": "../schema-draft-04" },
     { "path": "../schema-draft-2020-12" },

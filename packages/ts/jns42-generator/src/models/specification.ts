@@ -1,5 +1,6 @@
-import { SchemaArena, schemaTransforms, selectSchemaDependencies } from "jns42-optimizer";
 import * as schemaIntermediate from "schema-intermediate";
+import * as schemaTransforms from "../schema-transforms/index.js";
+import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";
 
 export interface Specification {
