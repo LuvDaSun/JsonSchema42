@@ -9,9 +9,5 @@
     "lib": ["ES2023", "DOM"],
   },
   "include": ["src"],
-  "references": [
-    { "path": "../../../packages/ts/schema-intermediate" },
-    { "path": "../../../packages/ts/schema-draft-04" },
-    { "path": "../../../packages/ts/schema-draft-2020-12" },
-  ],
+  "references": [],
 }
