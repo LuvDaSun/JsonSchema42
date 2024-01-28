@@ -10,8 +10,8 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../schema-intermediate" },
-    { "path": "../schema-draft-04" },
-    { "path": "../schema-draft-2020-12" },
+    { "path": "../../generated/schema-intermediate" },
+    { "path": "../../generated/schema-draft-04" },
+    { "path": "../../generated/schema-draft-2020-12" },
   ],
 }
