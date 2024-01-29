@@ -47,7 +47,16 @@ generated/ts/schema-draft-2020-12:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${VERSION} \
 
-generated/ts/schema-swagger-v2:
+generated/ts/schema-oas-v3-1:
+	mkdir --parents $(@D)
+
+	npx jns42-generator package https://spec.openapis.org/oas/3.1/dialect/base \
+		--package-directory $@ \
+		--package-name @jns42/$(notdir $(basename $@)) \
+		--package-version ${VERSION} \
+
+
+generated/ts/swagger-v2:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package http://swagger.io/v2/schema.json\# \
@@ -55,7 +64,7 @@ generated/ts/schema-swagger-v2:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${VERSION} \
 
-generated/ts/schema-oas-v3-0:
+generated/ts/oas-v3-0:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.0/schema/2021-09-28 \
@@ -63,7 +72,7 @@ generated/ts/schema-oas-v3-0:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${VERSION} \
 
-generated/ts/schema-oas-v3-1:
+generated/ts/oas-v3-1:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/schema/2022-10-07 \
