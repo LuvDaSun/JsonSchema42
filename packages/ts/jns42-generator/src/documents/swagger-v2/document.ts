@@ -1,31 +1,12 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { DefinitionsSchema as N, isDefinitionsSchema as isNode } from "@jns42/swagger-v2";
-import { DocumentContext } from "../document-context.js";
+import {
+  DefinitionsSchema as N,
+  getLastValidationError,
+  isDefinitionsSchema as isNode,
+} from "@jns42/swagger-v2";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly nodeNameMap = new Map<string, string>();
-
-  constructor(
-    givenUrl: URL,
-    antecedentUrl: URL | null,
-    documentNode: unknown,
-    context: DocumentContext,
-  ) {
-    super(givenUrl, antecedentUrl, documentNode, context);
-
-    for (const [nodePointer, node] of this.nodes) {
-      const nodeId = this.selectNodeId(node);
-      if (nodeId != null && nodeId.startsWith("#")) {
-        const nodeName = this.nodeHashToPointer(nodeId);
-        if (this.nodeNameMap.has(nodeName)) {
-          throw new TypeError(`duplicate node name ${nodeName}`);
-        }
-        this.nodeNameMap.set(nodeName, nodePointer);
-      }
-    }
-  }
-
   //#region document
 
   protected assertDocumentNode(node: unknown): asserts node is N {
@@ -35,24 +16,12 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<URL> {
-    yield* super.getNodeUrls();
-
-    for (const [nodeName] of this.nodeNameMap) {
-      yield this.pointerToNodeUrl(nodeName);
-    }
-  }
-
   //#endregion
 
   //#region node
 
   protected isNodeEmbeddedSchema(node: N): boolean {
-    const nodeId = this.selectNodeId(node);
-    if (nodeId == null || nodeId.startsWith("#")) {
-      return false;
-    }
-    return true;
+    return false;
   }
   public pointerToNodeHash(nodePointer: string): string {
     return `#${nodePointer}`;
@@ -90,16 +59,6 @@ export class Document extends SchemaDocumentBase<N> {
   private resolveReferenceNodeUrl(nodeRef: string): URL {
     const resolvedNodeUrl = new URL(nodeRef, this.documentNodeUrl);
 
-    const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
-    if (resolvedDocument instanceof Document) {
-      const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
-      const anchorResolvedPointer = resolvedDocument.nodeNameMap.get(resolvedPointer);
-      if (anchorResolvedPointer != null) {
-        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
-        return anchorResolvedUrl;
-      }
-    }
-
     return resolvedNodeUrl;
   }
 
@@ -118,15 +77,11 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectNodeSchema(node: N) {
-    if (typeof node === "object") {
-      return node.$schema;
-    }
+    return undefined;
   }
 
   protected selectNodeId(node: N) {
-    if (typeof node === "object") {
-      return node.id;
-    }
+    return undefined;
   }
 
   protected selectNodeRef(node: N) {
