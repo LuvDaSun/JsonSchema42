@@ -1,12 +1,12 @@
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
-import * as schemaOasV30 from "../documents/oas-v3-0/index.js";
+import * as oasV30 from "../documents/oas-v3-0/index.js";
 import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
 import * as schemaDraft202012 from "../documents/schema-draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
 import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
-import * as schemaSwaggerV2 from "../documents/swagger-v2/index.js";
+import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
 
@@ -27,10 +27,10 @@ export function configurePackageProgram(argv: yargs.Argv) {
           choices: [
             schemaDraft202012.metaSchemaId,
             schemaDraft04.metaSchemaId,
-            schemaIntermediate.metaSchemaId,
-            schemaSwaggerV2.metaSchemaId,
-            schemaOasV30.metaSchemaId,
             schemaOasV31.metaSchemaId,
+            oasV30.metaSchemaId,
+            swaggerV2.metaSchemaId,
+            schemaIntermediate.metaSchemaId,
           ] as const,
           default: schemaDraft202012.metaSchemaId,
         })
@@ -109,6 +109,18 @@ async function main(configuration: MainConfiguration) {
     schemaDraft04.metaSchemaId,
     ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
       new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
+  );
+  context.registerFactory(
+    schemaOasV31.metaSchemaId,
+    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+  );
+  context.registerFactory(
+    oasV30.metaSchemaId,
+    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+  );
+  context.registerFactory(
+    swaggerV2.metaSchemaId,
+    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
   );
   context.registerFactory(
     schemaIntermediate.metaSchemaId,
