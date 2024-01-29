@@ -1,9 +1,9 @@
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
-import * as schemaDraft04 from "../documents/draft-04/index.js";
-import * as schema202012 from "../documents/draft-2020-12/index.js";
-import * as schemaIntermediate from "../documents/intermediate/index.js";
+import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
+import * as schema202012 from "../documents/schema-draft-2020-12/index.js";
+import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
 
 export function configureIntermediateProgram(argv: yargs.Argv) {
   return argv.command(

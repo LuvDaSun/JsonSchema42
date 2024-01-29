@@ -1,0 +1,442 @@
+import * as spec from "@jns42/schema-draft-04";
+import * as schemaIntermediate from "@jns42/schema-intermediate";
+import { DocumentContext } from "../document-context.js";
+import { SchemaDocumentBase } from "../schema-document-base.js";
+
+type N = spec.SchemaDocument | boolean;
+
+export class Document extends SchemaDocumentBase<N> {
+  private readonly nodeNameMap = new Map<string, string>();
+
+  constructor(
+    givenUrl: URL,
+    antecedentUrl: URL | null,
+    documentNode: unknown,
+    context: DocumentContext,
+  ) {
+    super(givenUrl, antecedentUrl, documentNode, context);
+
+    for (const [nodePointer, node] of this.nodes) {
+      const nodeId = this.selectNodeId(node);
+      if (nodeId != null && nodeId.startsWith("#")) {
+        const nodeName = this.nodeHashToPointer(nodeId);
+        if (this.nodeNameMap.has(nodeName)) {
+          throw new TypeError(`duplicate node name ${nodeName}`);
+        }
+        this.nodeNameMap.set(nodeName, nodePointer);
+      }
+    }
+  }
+
+  //#region document
+
+  protected assertDocumentNode(node: unknown): asserts node is N {
+    if (!spec.isSchemaDocument(node) && typeof node !== "boolean") {
+      const validationError = spec.getLastValidationError();
+      throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
+    }
+  }
+
+  public *getNodeUrls(): Iterable<URL> {
+    yield* super.getNodeUrls();
+
+    for (const [nodeName] of this.nodeNameMap) {
+      yield this.pointerToNodeUrl(nodeName);
+    }
+  }
+
+  //#endregion
+
+  //#region node
+
+  protected isNodeEmbeddedSchema(node: N): boolean {
+    const nodeId = this.selectNodeId(node);
+    if (nodeId == null || nodeId.startsWith("#")) {
+      return false;
+    }
+    return true;
+  }
+  public pointerToNodeHash(nodePointer: string): string {
+    return `#${nodePointer}`;
+  }
+  public nodeHashToPointer(nodeHash: string): string {
+    if (nodeHash === "") {
+      return "";
+    }
+    if (!nodeHash.startsWith("#")) {
+      throw new TypeError("hash should start with #");
+    }
+    return nodeHash.substring(1);
+  }
+
+  //#endregion
+
+  //#region intermediate applicators
+
+  protected getIntermediateReference(
+    nodePointer: string,
+    node: N,
+  ): schemaIntermediate.Reference | undefined {
+    const nodeRef = this.selectNodeRef(node);
+    if (nodeRef != null) {
+      const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeRef);
+      const resolvedNodeId = resolvedNodeUrl.toString();
+      return resolvedNodeId;
+    }
+  }
+
+  //#endregion
+
+  //#region reference
+
+  private resolveReferenceNodeUrl(nodeRef: string): URL {
+    const resolvedNodeUrl = new URL(nodeRef, this.documentNodeUrl);
+
+    const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
+    if (resolvedDocument instanceof Document) {
+      const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
+      const anchorResolvedPointer = resolvedDocument.nodeNameMap.get(resolvedPointer);
+      if (anchorResolvedPointer != null) {
+        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
+        return anchorResolvedUrl;
+      }
+    }
+
+    return resolvedNodeUrl;
+  }
+
+  //#endregion
+
+  //#region core selectors
+
+  protected selectNodeTypes(node: N) {
+    if (spec.isSchemaDocument(node) && node.type != null) {
+      if (Array.isArray(node.type)) {
+        return node.type as string[];
+      } else {
+        return [node.type] as string[];
+      }
+    }
+  }
+
+  protected selectNodeSchema(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.$schema;
+    }
+  }
+
+  protected selectNodeId(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.id;
+    }
+  }
+
+  protected selectNodeRef(node: N) {
+    if (spec.isSchemaDocument(node) && "$ref" in node && typeof node.$ref === "string") {
+      return node.$ref;
+    }
+  }
+
+  //#endregion
+
+  //#region metadata selectors
+
+  protected selectNodeTitle(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.title;
+    }
+  }
+
+  protected selectNodeDescription(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.description;
+    }
+  }
+
+  protected selectNodeDeprecated(node: N): boolean | undefined {
+    return undefined;
+  }
+  protected selectNodeExamples(node: N): any[] | undefined {
+    return undefined;
+  }
+
+  //#endregion
+
+  //#region pointers selectors
+
+  protected *selectNodePropertiesPointerEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.properties != null) {
+      for (const key of Object.keys(node.properties)) {
+        const subNodePointer = [nodePointer, "properties", key].join("/");
+        yield [key, subNodePointer] as const;
+      }
+    }
+  }
+
+  protected *selectNodeDependentSchemasPointerEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, string]> {
+    yield* [];
+  }
+
+  protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.patternProperties != null) {
+      for (const key of Object.keys(node.patternProperties)) {
+        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        yield [key, subNodePointer] as const;
+      }
+    }
+  }
+
+  //#endregion
+
+  //#region schema selectors
+
+  protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.definitions != null) {
+      for (const [key, subNode] of Object.entries(node.definitions)) {
+        const subNodePointer = [nodePointer, "definitions", key].join("/");
+        yield [subNodePointer, subNode] as const;
+      }
+    }
+  }
+
+  protected *selectSubNodeObjectPropertyEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.properties != null) {
+      for (const [key, subNode] of Object.entries(node.properties)) {
+        const subNodePointer = [nodePointer, "properties", key].join("/");
+        yield [subNodePointer, subNode] as const;
+      }
+    }
+  }
+
+  protected *selectSubNodeMapPropertiesEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.additionalProperties != null) {
+      const subNode = node.additionalProperties;
+      const subNodePointer = [nodePointer, "additionalProperties"].join("/");
+      yield [subNodePointer, subNode] as const;
+    }
+  }
+
+  protected *selectSubNodeTupleItemsEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    if (spec.isSchemaDocument(node) && node.items != null && Array.isArray(node.items)) {
+      for (const [key, subNode] of Object.entries(node.items)) {
+        const subNodePointer = [nodePointer, "items", key].join("/");
+        yield [subNodePointer, subNode] as [string, N];
+      }
+    }
+  }
+  protected *selectSubNodeArrayItemsEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    if (spec.isSchemaDocument(node) && node.items != null && !Array.isArray(node.items)) {
+      const subNode = node.items;
+      const subNodePointer = [nodePointer, "items"].join("/");
+      yield [subNodePointer, subNode] as const;
+    }
+    if (spec.isSchemaDocument(node) && node.additionalItems != null) {
+      const subNode = node.additionalItems;
+      const subNodePointer = [nodePointer, "additionalItems"].join("/");
+      yield [subNodePointer, subNode] as const;
+    }
+  }
+  protected *selectSubNodeContainsEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    yield* [];
+  }
+
+  protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.patternProperties != null) {
+      for (const [key, subNode] of Object.entries(node.patternProperties)) {
+        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        yield [subNodePointer, subNode] as const;
+      }
+    }
+  }
+
+  protected *selectSubNodePropertyNamesEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    yield* [];
+  }
+
+  protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.anyOf != null) {
+      for (const [key, subNode] of Object.entries(node.anyOf)) {
+        const subNodePointer = [nodePointer, "anyOf", key].join("/");
+        yield [subNodePointer, subNode] as [string, N];
+      }
+    }
+  }
+
+  protected *selectSubNodeOneOfEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.oneOf != null) {
+      for (const [key, subNode] of Object.entries(node.oneOf)) {
+        const subNodePointer = [nodePointer, "oneOf", key].join("/");
+        yield [subNodePointer, subNode] as [string, N];
+      }
+    }
+  }
+
+  protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.allOf != null) {
+      for (const [key, subNode] of Object.entries(node.allOf)) {
+        const subNodePointer = [nodePointer, "allOf", key].join("/");
+        yield [subNodePointer, subNode] as [string, N];
+      }
+    }
+  }
+
+  protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
+    if (spec.isSchemaDocument(node) && node.not != null) {
+      const subNode = node.not;
+      const subNodePointer = [nodePointer, "not"].join("/");
+      yield [subNodePointer, subNode] as const;
+    }
+  }
+
+  protected selectSubNodeIfEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+    return [];
+  }
+
+  protected selectSubNodeThenEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+    return [];
+  }
+
+  protected *selectSubNodeElseEntries(
+    nodePointer: string,
+    node: N,
+  ): Iterable<readonly [string, N]> {
+    yield* [];
+  }
+
+  //#endregion
+
+  //#region validation selectors
+
+  protected selectValidationMaximumProperties(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.maxProperties;
+    }
+  }
+
+  protected selectValidationMinimumProperties(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.minProperties;
+    }
+  }
+
+  protected selectValidationRequired(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.required;
+    }
+  }
+
+  protected selectValidationMinimumItems(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.minItems;
+    }
+  }
+
+  protected selectValidationMaximumItems(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.maxItems;
+    }
+  }
+
+  protected selectValidationUniqueItems(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.uniqueItems;
+    }
+  }
+
+  protected selectValidationMinimumLength(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.minLength;
+    }
+  }
+
+  protected selectValidationMaximumLength(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.maxLength;
+    }
+  }
+
+  protected selectValidationValuePattern(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.pattern;
+    }
+  }
+
+  protected selectValidationValueFormat(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.format;
+    }
+  }
+
+  protected selectValidationMinimumInclusive(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      if (node.exclusiveMinimum ?? false) {
+        return undefined;
+      } else {
+        return node.minimum;
+      }
+    }
+  }
+
+  protected selectValidationMinimumExclusive(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      if (node.exclusiveMinimum ?? false) {
+        return node.minimum;
+      } else {
+        return undefined;
+      }
+    }
+  }
+
+  protected selectValidationMaximumInclusive(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      if (node.exclusiveMaximum ?? false) {
+        return undefined;
+      } else {
+        return node.maximum;
+      }
+    }
+  }
+
+  protected selectValidationMaximumExclusive(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      if (node.exclusiveMaximum ?? false) {
+        return node.maximum;
+      } else {
+        return undefined;
+      }
+    }
+  }
+
+  protected selectValidationMultipleOf(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.multipleOf;
+    }
+  }
+
+  protected selectValidationEnum(node: N) {
+    if (spec.isSchemaDocument(node)) {
+      return node.enum;
+    }
+  }
+
+  protected selectValidationConst(node: N) {
+    return undefined;
+  }
+
+  //#endregion
+}

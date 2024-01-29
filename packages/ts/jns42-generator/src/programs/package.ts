@@ -1,9 +1,12 @@
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
-import * as schemaDraft04 from "../documents/draft-04/index.js";
-import * as schema202012 from "../documents/draft-2020-12/index.js";
-import * as schemaIntermediate from "../documents/intermediate/index.js";
+import * as schemaOasV30 from "../documents/oas-v3-0/index.js";
+import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
+import * as schemaDraft202012 from "../documents/schema-draft-2020-12/index.js";
+import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
+import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
+import * as schemaSwaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
 
@@ -22,11 +25,14 @@ export function configurePackageProgram(argv: yargs.Argv) {
           description: "the default meta schema to use",
           type: "string",
           choices: [
-            schema202012.metaSchemaId,
+            schemaDraft202012.metaSchemaId,
             schemaDraft04.metaSchemaId,
             schemaIntermediate.metaSchemaId,
+            schemaSwaggerV2.metaSchemaId,
+            schemaOasV30.metaSchemaId,
+            schemaOasV31.metaSchemaId,
           ] as const,
-          default: schema202012.metaSchemaId,
+          default: schemaDraft202012.metaSchemaId,
         })
         .option("package-directory", {
           description: "where to output the package",
@@ -95,9 +101,9 @@ async function main(configuration: MainConfiguration) {
 
   const context = new DocumentContext();
   context.registerFactory(
-    schema202012.metaSchemaId,
+    schemaDraft202012.metaSchemaId,
     ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schema202012.Document(givenUrl, antecedentUrl, rootNode, context),
+      new schemaDraft202012.Document(givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaDraft04.metaSchemaId,
