@@ -1,11 +1,9 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import {
-  DialectBase as N,
-  getLastValidationError,
-  isDialectBase as isNode,
-} from "@jns42/schema-oas-v3-1";
+import * as spec from "@jns42/schema-oas-v3-1";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
+
+type N = spec.DialectBase;
 
 export class Document extends SchemaDocumentBase<N> {
   private readonly anchorMap = new Map<string, string>();
@@ -41,8 +39,8 @@ export class Document extends SchemaDocumentBase<N> {
   //#region document
 
   protected assertDocumentNode(node: unknown): asserts node is N {
-    if (!isNode(node)) {
-      const validationError = getLastValidationError();
+    if (!spec.isDialectBase(node)) {
+      const validationError = spec.getLastValidationError();
       throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
     }
   }
@@ -261,7 +259,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region schema selectors
 
   protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.$defs != null) {
+    if (typeof node === "object" && spec.isDefs(node.$defs)) {
       for (const [key, subNode] of Object.entries(node.$defs)) {
         const subNodePointer = [nodePointer, "$defs", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -270,7 +268,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeObjectPropertyEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.properties != null) {
+    if (typeof node === "object" && spec.isProperties(node.properties)) {
       for (const [key, subNode] of Object.entries(node.properties)) {
         const subNodePointer = [nodePointer, "properties", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -279,7 +277,10 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeMapPropertiesEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.additionalProperties != null) {
+    if (
+      typeof node === "object" &&
+      spec.isApplicatorAdditionalProperties(node.additionalProperties)
+    ) {
       const subNode = node.additionalProperties;
       const subNodePointer = [nodePointer, "additionalProperties"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -287,7 +288,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.patternProperties != null) {
+    if (typeof node === "object" && spec.isPatternProperties(node.patternProperties)) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
         const subNodePointer = [nodePointer, "patternProperties", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -296,7 +297,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodePropertyNamesEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.propertyNames != null) {
+    if (typeof node === "object" && spec.isApplicatorPropertyNames(node.propertyNames != null)) {
       const subNode = node.propertyNames;
       const subNodePointer = [nodePointer, "propertyNames"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -304,7 +305,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeTupleItemsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.prefixItems != null) {
+    if (typeof node === "object" && spec.isPrefixItems(node.prefixItems)) {
       for (const [key, subNode] of Object.entries(node.prefixItems)) {
         const subNodePointer = [nodePointer, "prefixItems", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -313,7 +314,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeArrayItemsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.items != null) {
+    if (typeof node === "object" && spec.isApplicatorItems(node.items)) {
       const subNode = node.items;
       const subNodePointer = [nodePointer, "items"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -321,7 +322,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeContainsEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.contains != null) {
+    if (typeof node === "object" && spec.isContains(node.contains)) {
       const subNode = node.contains;
       const subNodePointer = [nodePointer, "contains"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -329,7 +330,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.allOf != null) {
+    if (typeof node === "object" && spec.isAllOf(node.allOf)) {
       for (const [key, subNode] of Object.entries(node.allOf)) {
         const subNodePointer = [nodePointer, "allOf", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -338,7 +339,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.anyOf != null) {
+    if (typeof node === "object" && spec.isAnyOf(node.anyOf)) {
       for (const [key, subNode] of Object.entries(node.anyOf)) {
         const subNodePointer = [nodePointer, "anyOf", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -347,7 +348,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeOneOfEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.oneOf != null) {
+    if (typeof node === "object" && spec.isOneOf(node.oneOf)) {
       for (const [key, subNode] of Object.entries(node.oneOf)) {
         const subNodePointer = [nodePointer, "oneOf", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -356,7 +357,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.not != null) {
+    if (typeof node === "object" && spec.isNot(node.not)) {
       const subNode = node.not;
       const subNodePointer = [nodePointer, "not"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -364,7 +365,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeIfEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.if != null) {
+    if (typeof node === "object" && spec.isIf(node.if)) {
       const subNode = node.if;
       const subNodePointer = [nodePointer, "if"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -372,7 +373,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeThenEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.then != null) {
+    if (typeof node === "object" && spec.isThen(node.then)) {
       const subNode = node.then;
       const subNodePointer = [nodePointer, "then"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -380,7 +381,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeElseEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.else != null) {
+    if (typeof node === "object" && spec.isElse(node.else)) {
       const subNode = node.else;
       const subNodePointer = [nodePointer, "else"].join("/");
       yield [subNodePointer, subNode] as const;

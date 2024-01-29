@@ -1,17 +1,15 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import {
-  DefinitionsSchema as N,
-  getLastValidationError,
-  isDefinitionsSchema as isNode,
-} from "@jns42/swagger-v2";
+import * as spec from "@jns42/swagger-v2";
 import { SchemaDocumentBase } from "../schema-document-base.js";
+
+type N = spec.DefinitionsSchema | boolean;
 
 export class Document extends SchemaDocumentBase<N> {
   //#region document
 
   protected assertDocumentNode(node: unknown): asserts node is N {
-    if (!isNode(node)) {
-      const validationError = getLastValidationError();
+    if (!spec.isDefinitionsSchema(node) || typeof node !== "boolean") {
+      const validationError = spec.getLastValidationError();
       throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
     }
   }
@@ -192,11 +190,6 @@ export class Document extends SchemaDocumentBase<N> {
       const subNodePointer = [nodePointer, "items"].join("/");
       yield [subNodePointer, subNode] as const;
     }
-    if (typeof node === "object" && node.additionalItems != null) {
-      const subNode = node.additionalItems;
-      const subNodePointer = [nodePointer, "additionalItems"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
   }
   protected *selectSubNodeContainsEntries(
     nodePointer: string,
@@ -249,11 +242,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
-    if (typeof node === "object" && node.not != null) {
-      const subNode = node.not;
-      const subNodePointer = [nodePointer, "not"].join("/");
-      yield [subNodePointer, subNode] as const;
-    }
+    //
   }
 
   protected selectSubNodeIfEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
