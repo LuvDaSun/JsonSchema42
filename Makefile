@@ -1,13 +1,14 @@
 SHELL:=$(PREFIX)/bin/sh
-VERSION:=0.3.1
+VERSION:=0.4.0
 
 build: \
 	generated/ts/schema-intermediate \
 	generated/ts/schema-draft-04 \
 	generated/ts/schema-draft-2020-12 \
-	generated/ts/schema-swagger-v2 \
-	generated/ts/schema-oas-v3-0 \
 	generated/ts/schema-oas-v3-1 \
+	generated/ts/swagger-v2 \
+	generated/ts/oas-v3-0 \
+	generated/ts/oas-v3-1 \
 
 	npm install
 
