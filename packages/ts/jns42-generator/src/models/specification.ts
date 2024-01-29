@@ -48,12 +48,12 @@ export function loadSpecification(
         schemaTransforms.explode,
         schemaTransforms.singleType,
 
+        schemaTransforms.flipAllOfOneOf,
+        schemaTransforms.flipAnyOfOneOf,
+
         schemaTransforms.flatten,
         schemaTransforms.unique,
         schemaTransforms.alias,
-
-        schemaTransforms.flipAllOfOneOf,
-        schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveAllOf,
