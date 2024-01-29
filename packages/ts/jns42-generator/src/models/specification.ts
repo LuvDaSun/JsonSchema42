@@ -28,21 +28,7 @@ export function loadSpecification(
   // transform the validatorsArena
   {
     let transformIterations = 0;
-    while (
-      validatorsArena
-        .applyTransform
-        // order matters!
-        // schemaTransforms.explode,
-        // schemaTransforms.singleType,
-
-        // schemaTransforms.flatten,
-        // schemaTransforms.unique,
-        // schemaTransforms.alias,
-
-        // schemaTransforms.resolveParent,
-        // schemaTransforms.flushParent,
-        () > 0
-    ) {
+    while (validatorsArena.applyTransform() > 0) {
       transformIterations++;
       if (transformIterations < transformMaximumIterations) {
         continue;
