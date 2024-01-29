@@ -1,11 +1,11 @@
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
-import * as schemaDraft04 from "../documents/draft-04/index.js";
-import * as schemaDraft202012 from "../documents/draft-2020-12/index.js";
-import * as schemaIntermediate from "../documents/intermediate/index.js";
 import * as schemaOasV30 from "../documents/oas-v3-0/index.js";
-import * as schemaOasV31 from "../documents/oas-v3-1/index.js";
+import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
+import * as schemaDraft202012 from "../documents/schema-draft-2020-12/index.js";
+import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
+import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as schemaSwaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
