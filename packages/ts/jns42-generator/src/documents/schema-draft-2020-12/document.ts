@@ -1,11 +1,9 @@
-import {
-  Schema as N,
-  getLastValidationError,
-  isSchema as isNode,
-} from "@jns42/schema-draft-2020-12";
+import * as spec from "@jns42/schema-draft-2020-12";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
+
+type N = spec.Schema;
 
 export class Document extends SchemaDocumentBase<N> {
   private readonly anchorMap = new Map<string, string>();
@@ -41,8 +39,8 @@ export class Document extends SchemaDocumentBase<N> {
   //#region document
 
   protected assertDocumentNode(node: unknown): asserts node is N {
-    if (!isNode(node)) {
-      const validationError = getLastValidationError();
+    if (!spec.isSchema(node)) {
+      const validationError = spec.getLastValidationError();
       throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
     }
   }
