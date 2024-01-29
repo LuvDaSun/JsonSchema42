@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.12.10",
+  "version": "0.12.11",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -15,9 +15,8 @@
     "src/**"
   ],
   "scripts": {
-    "prepack": "./prepack",
+    "prepack": "tsc --build",
     "pretest": "tsc --build",
-    "prepare": "tsc --build",
     "build": "tsc --build",
     "clean": "rm -rf ./out && tsc --build --clean",
     "test": "node --test ./out/**/*.test.js"
@@ -43,23 +42,17 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@types/node": "^20.11.0",
+    "@jns42/schema-draft-04": "^0.3.1",
+    "@jns42/schema-draft-2020-12": "^0.3.1",
+    "@jns42/schema-intermediate": "^0.3.1",
+    "@types/node": "^20.11.10",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "entities": "^4.5.0",
-    "jns42-optimizer": "0.0.0",
-    "schema-draft-04": "0.0.0",
-    "schema-draft-2020-12": "0.0.0",
-    "schema-intermediate": "0.0.0",
+    "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
     "type-fest": "^4.9.0",
     "yaml": "^2.3.4",
     "yargs": "^17.7.2"
-  },
-  "bundledDependencies": [
-    "jns42-optimizer",
-    "schema-draft-04",
-    "schema-draft-2020-12",
-    "schema-intermediate"
-  ]
+  }
 }

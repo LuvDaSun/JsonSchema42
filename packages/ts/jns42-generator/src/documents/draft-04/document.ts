@@ -1,5 +1,5 @@
-import { SchemaDocument, getLastValidationError, isSchemaDocument } from "schema-draft-04";
-import * as schemaIntermediate from "schema-intermediate";
+import { SchemaDocument, getLastValidationError, isSchemaDocument } from "@jns42/schema-draft-04";
+import * as schemaIntermediate from "@jns42/schema-intermediate";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 

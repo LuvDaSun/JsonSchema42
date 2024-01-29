@@ -1,10 +1,10 @@
+import * as models from "../models/index.js";
 import {
   isAliasSchemaModel,
   isOneOfSchemaModel,
   isSingleTypeSchemaModel,
   isTypeSchemaModel,
-} from "jns42-optimizer";
-import * as models from "../models/index.js";
+} from "../schema/index.js";
 import {
   NestedText,
   banner,

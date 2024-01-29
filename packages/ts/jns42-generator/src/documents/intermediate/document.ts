@@ -3,7 +3,7 @@ import {
   SchemaDocument,
   getLastValidationError,
   isSchemaDocument,
-} from "schema-intermediate";
+} from "@jns42/schema-intermediate";
 import { DocumentBase } from "../document-base.js";
 
 export class Document extends DocumentBase<SchemaDocument> {

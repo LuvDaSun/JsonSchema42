@@ -1,6 +1,6 @@
+import * as schemaIntermediate from "@jns42/schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
-import * as schemaIntermediate from "schema-intermediate";
 import * as models from "../models/index.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";

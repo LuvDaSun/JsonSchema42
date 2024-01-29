@@ -1,5 +1,5 @@
 import { encode } from "entities";
-import { MetaSchemaModel } from "jns42-optimizer";
+import { MetaSchemaModel } from "../schema/index.js";
 import { NestedText } from "./iterable-text-template.js";
 
 export function* generateJsDocComments(typeItem: MetaSchemaModel): Iterable<NestedText> {

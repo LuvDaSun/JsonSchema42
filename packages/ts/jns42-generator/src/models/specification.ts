@@ -1,5 +1,6 @@
-import { SchemaArena, schemaTransforms, selectSchemaDependencies } from "jns42-optimizer";
-import * as schemaIntermediate from "schema-intermediate";
+import * as schemaIntermediate from "@jns42/schema-intermediate";
+import * as schemaTransforms from "../schema-transforms/index.js";
+import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";
 
 export interface Specification {
@@ -27,21 +28,7 @@ export function loadSpecification(
   // transform the validatorsArena
   {
     let transformIterations = 0;
-    while (
-      validatorsArena
-        .applyTransform
-        // order matters!
-        // schemaTransforms.explode,
-        // schemaTransforms.singleType,
-
-        // schemaTransforms.flatten,
-        // schemaTransforms.unique,
-        // schemaTransforms.alias,
-
-        // schemaTransforms.resolveParent,
-        // schemaTransforms.flushParent,
-        () > 0
-    ) {
+    while (validatorsArena.applyTransform() > 0) {
       transformIterations++;
       if (transformIterations < transformMaximumIterations) {
         continue;
