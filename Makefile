@@ -20,9 +20,10 @@ clean: \
 	rm --recursive --force generated/ts/schema-intermediate
 	rm --recursive --force generated/ts/schema-draft-04
 	rm --recursive --force generated/ts/schema-draft-2020-12
-	rm --recursive --force generated/ts/schema-swagger-v2 \
-	rm --recursive --force generated/ts/schema-oas-v3-0 \
 	rm --recursive --force generated/ts/schema-oas-v3-1 \
+	rm --recursive --force generated/ts/swagger-v2 \
+	rm --recursive --force generated/ts/oas-v3-0 \
+	rm --recursive --force generated/ts/oas-v3-1 \
 
 generated/ts/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir --parents $(@D)
