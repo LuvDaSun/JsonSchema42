@@ -1,5 +1,5 @@
 SHELL:=$(PREFIX)/bin/sh
-VERSION:=0.3.0
+VERSION:=0.3.1
 
 build: \
 	generated/ts/schema-intermediate \
