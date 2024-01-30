@@ -25,8 +25,8 @@ export function getPackageJsonData(name: string, version: string) {
       },
     },
     scripts: {
+      prepack: "tsc --build",
       pretest: "tsc --build",
-      prepare: "tsc --build",
       build: "tsc --build",
       clean: "rm -rf ./out && tsc --build --clean",
       test: "node --test ./out/*.test.js",
