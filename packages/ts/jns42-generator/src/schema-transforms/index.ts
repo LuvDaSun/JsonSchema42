@@ -12,4 +12,5 @@ export * from "./resolve-if-then-else.js";
 export * from "./resolve-one-of.js";
 export * from "./resolve-parent.js";
 export * from "./single-type.js";
+export * from "./unalias.js";
 export * from "./unique.js";
