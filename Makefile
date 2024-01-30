@@ -1,5 +1,5 @@
 SHELL:=$(PREFIX)/bin/sh
-VERSION:=0.4.0
+NPM_VERSION:=$(shell npx jns42-generator --version)
 
 build: \
 	generated/ts/schema-intermediate \
@@ -10,7 +10,7 @@ build: \
 	generated/ts/oas-v3-0 \
 	generated/ts/oas-v3-1 \
 
-	npm install
+	npm install --no-package-lock
 
 rebuild: \
 	clean build
@@ -31,7 +31,7 @@ generated/ts/schema-intermediate: packages/oas/schema-intermediate/src/schema.ya
 	npx jns42-generator package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 generated/ts/schema-draft-04:
 	mkdir --parents $(@D)
@@ -39,7 +39,7 @@ generated/ts/schema-draft-04:
 	npx jns42-generator package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 generated/ts/schema-draft-2020-12:
 	mkdir --parents $(@D)
@@ -47,7 +47,7 @@ generated/ts/schema-draft-2020-12:
 	npx jns42-generator package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 generated/ts/schema-oas-v3-1:
 	mkdir --parents $(@D)
@@ -55,7 +55,7 @@ generated/ts/schema-oas-v3-1:
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/dialect/base \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 
 generated/ts/swagger-v2:
@@ -64,7 +64,7 @@ generated/ts/swagger-v2:
 	npx jns42-generator package http://swagger.io/v2/schema.json\# \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 generated/ts/oas-v3-0:
 	mkdir --parents $(@D)
@@ -72,7 +72,7 @@ generated/ts/oas-v3-0:
 	npx jns42-generator package https://spec.openapis.org/oas/3.0/schema/2021-09-28 \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 generated/ts/oas-v3-1:
 	mkdir --parents $(@D)
@@ -80,7 +80,7 @@ generated/ts/oas-v3-1:
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/schema/2022-10-07 \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${VERSION} \
+		--package-version ${NPM_VERSION} \
 
 .PHONY: \
 	build \
