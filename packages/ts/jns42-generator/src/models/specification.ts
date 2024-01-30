@@ -62,6 +62,7 @@ export function loadSpecification(
         schemaTransforms.resolveParent,
 
         schemaTransforms.flushParent,
+        schemaTransforms.unalias,
       ) > 0
     ) {
       transformIterations++;

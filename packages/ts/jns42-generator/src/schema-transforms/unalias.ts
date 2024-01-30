@@ -1,4 +1,5 @@
 import { SchemaTransform } from "../schema/index.js";
+import { deepEqual } from "../utils/index.js";
 
 export const unalias: SchemaTransform = (arena, model, modelKey) => {
   let newModel = model;
@@ -92,6 +93,10 @@ export const unalias: SchemaTransform = (arena, model, modelKey) => {
         ]),
       ),
     };
+  }
+
+  if (deepEqual(model, newModel)) {
+    return model;
   }
 
   return newModel;
