@@ -11,18 +11,48 @@ schemas:
       - required: [d]
       - required: [e]
 
-  presolved:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
-    oneOf:
-      - anyOf:
-          - required: [a]
-          - required: [d]
-          - required: [e]
-      - anyOf:
-          - required: [b]
-          - required: [d]
-          - required: [e]
-      - anyOf:
-          - required: [c]
-          - required: [d]
-          - required: [e]
+  # presolved:
+  #   $schema: "https://json-schema.org/draft/2020-12/schema"
+  #   oneOf:
+  #     - anyOf:
+  #         - required: [a]
+  #         - required: [d]
+  #         - required: [e]
+  #     - anyOf:
+  #         - required: [b]
+  #         - required: [d]
+  #         - required: [e]
+  #     - anyOf:
+  #         - required: [c]
+  #         - required: [d]
+  #         - required: [e]
+
+valid:
+  a:
+    a: "a"
+  bde:
+    b: "b"
+    d: "d"
+    e: "e"
+  cde:
+    c: "c"
+    d: "d"
+    e: "e"
+  abcde:
+    a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+    e: "e"
+
+invalid:
+  ab:
+    a: "a"
+    b: "b"
+  ac:
+    a: "a"
+    b: "b"
+  abc:
+    a: "a"
+    b: "b"
+    c: "c"

@@ -49,7 +49,7 @@ export function loadSpecification(
         schemaTransforms.singleType,
 
         schemaTransforms.flipAllOfOneOf,
-        schemaTransforms.flipAnyOfOneOf,
+        // schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.flatten,
         schemaTransforms.unique,
