@@ -10,12 +10,8 @@ import {
   toCamel,
   toPascal,
 } from "../utils/index.js";
-import { PackageConfiguration } from "./package.js";
 
-export function* generateValidatorsTsCode(
-  specification: models.Specification,
-  configuration: PackageConfiguration,
-) {
+export function* generateValidatorsTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, validatorsArena } = specification;

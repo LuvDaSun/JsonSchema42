@@ -1,11 +1,7 @@
 import * as models from "../models/index.js";
 import { banner, itt, mapIterable, toCamel } from "../utils/index.js";
-import { PackageConfiguration } from "./package.js";
 
-export function* generateExamplesTestTsCode(
-  specification: models.Specification,
-  configuration: PackageConfiguration,
-) {
+export function* generateExamplesTestTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, typesArena } = specification;
