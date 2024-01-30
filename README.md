@@ -22,7 +22,7 @@ So use this only for debugging! And make sure you know what you are doing.
 
 ## Publishing
 
-Bump version via `npm --workspaces version patch`.
+Bump version via `npm --workspaces version patch`. You could also bump a minor or major version.
 
 Then regenerate code via `make rebuild`.
 
@@ -30,4 +30,4 @@ Then update dependencies via `npm --workspaces update --save`, or do this manual
 
 The publish everything via `npm --workspaces publish`.
 
-Then commit and push everything to
+Then commit and push everything to git. Do make sure that the `package-lock.json` does not reference the generated code!
