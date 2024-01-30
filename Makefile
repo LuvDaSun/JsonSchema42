@@ -1,5 +1,5 @@
 SHELL:=$(PREFIX)/bin/sh
-NPM_VERSION:=$(npx jns42-generator --version)
+NPM_VERSION:=$(shell npx jns42-generator --version)
 
 build: \
 	generated/ts/schema-intermediate \
