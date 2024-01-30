@@ -13,12 +13,8 @@ import {
   joinIterable,
   toPascal,
 } from "../utils/index.js";
-import { PackageConfiguration } from "./package.js";
 
-export function* generateTypesTsCode(
-  specification: models.Specification,
-  configuration: PackageConfiguration,
-) {
+export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, typesArena } = specification;

@@ -12,12 +12,8 @@ import {
   joinIterable,
   toCamel,
 } from "../utils/index.js";
-import { PackageConfiguration } from "./package.js";
 
-export function* generateParsersTsCode(
-  specification: models.Specification,
-  configuration: PackageConfiguration,
-) {
+export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, typesArena } = specification;

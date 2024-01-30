@@ -54,43 +54,43 @@ export function generatePackage(
   }
 
   {
-    const content = generateMainTsCode(specification, configuration);
+    const content = generateMainTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "main.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateValidatorsTsCode(specification, configuration);
+    const content = generateValidatorsTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "validators.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateTypesTsCode(specification, configuration);
+    const content = generateTypesTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "types.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateParsersTsCode(specification, configuration);
+    const content = generateParsersTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "parsers.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateMocksTsCode(specification, configuration);
+    const content = generateMocksTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "mocks.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateExamplesTestTsCode(specification, configuration);
+    const content = generateExamplesTestTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "examples.test.ts");
     writeContentToFile(filePath, content);
   }
 
   {
-    const content = generateMocksTestTsCode(specification, configuration);
+    const content = generateMocksTestTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "mocks.test.ts");
     writeContentToFile(filePath, content);
   }
