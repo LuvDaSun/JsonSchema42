@@ -10,7 +10,7 @@ build: \
 	generated/ts/oas-v3-0 \
 	generated/ts/oas-v3-1 \
 
-	npm install --no-update-lock
+	npm install --no-package-lock
 
 rebuild: \
 	clean build
