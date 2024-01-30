@@ -56,6 +56,7 @@ import {
 export const flushParent: SchemaTransform = (arena, model, modelKey) => {
   const newModel = {
     ...model,
+    not: undefined,
     types: undefined,
     options: undefined,
     required: undefined,
