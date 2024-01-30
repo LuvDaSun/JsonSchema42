@@ -1,11 +1,7 @@
 import * as models from "../models/index.js";
 import { banner, generateJsDocComments, itt, toCamel } from "../utils/index.js";
-import { PackageConfiguration } from "./package.js";
 
-export function* generateMocksTestTsCode(
-  specification: models.Specification,
-  configuration: PackageConfiguration,
-) {
+export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
 
   const { names, typesArena } = specification;
