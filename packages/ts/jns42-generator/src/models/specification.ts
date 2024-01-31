@@ -45,15 +45,15 @@ export function loadSpecification(
         // order matters!
         schemaTransforms.mockable,
 
-        schemaTransforms.explode,
         schemaTransforms.singleType,
+        schemaTransforms.explode,
+
+        schemaTransforms.flipAllOfOneOf,
+        // schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.flatten,
         schemaTransforms.unique,
         schemaTransforms.alias,
-
-        schemaTransforms.flipAllOfOneOf,
-        schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveAllOf,
@@ -62,6 +62,7 @@ export function loadSpecification(
         schemaTransforms.resolveParent,
 
         schemaTransforms.flushParent,
+        schemaTransforms.unalias,
       ) > 0
     ) {
       transformIterations++;

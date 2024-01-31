@@ -1,6 +1,7 @@
 import * as models from "../models/index.js";
 import {
   isAliasSchemaModel,
+  isAllOfSchemaModel,
   isOneOfSchemaModel,
   isSingleTypeSchemaModel,
   isTypeSchemaModel,
@@ -62,6 +63,20 @@ export function* generateTypesTsCode(specification: models.Specification) {
           `,
         ),
         " |\n",
+      )}
+    `;
+      return;
+    }
+
+    if (isAllOfSchemaModel(item) && item.allOf.length > 0) {
+      yield itt`
+      ${joinIterable(
+        item.allOf.map(
+          (element) => itt`
+            ${generateTypeReference(element)}
+          `,
+        ),
+        " &\n",
       )}
     `;
       return;

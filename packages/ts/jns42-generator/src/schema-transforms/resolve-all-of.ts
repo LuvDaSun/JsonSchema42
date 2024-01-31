@@ -53,7 +53,6 @@ export const resolveAllOf: SchemaTransform = (arena, model, modelKey) => {
   let newModel!: SchemaModel;
   for (const elementKey of model.allOf) {
     let [, elementModel] = arena.resolveItem(elementKey);
-    let not = false;
 
     if (!isSingleTypeSchemaModel(elementModel)) {
       // we want to only only merge single types this is because the intersectionMergeTypes
