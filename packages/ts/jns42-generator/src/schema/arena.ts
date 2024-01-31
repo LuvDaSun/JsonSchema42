@@ -35,6 +35,10 @@ export class SchemaArena extends Arena<SchemaModel> {
     const rendered: any = {};
 
     const formatId = (id: string) => {
+      const uri = new URL(id);
+      if (uri.hash === "") {
+        return "#";
+      }
       return new URL(id).hash;
     };
 
