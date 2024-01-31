@@ -15,6 +15,7 @@ export * from "./name.js";
 export * from "./namer.js";
 export * from "./normalize-object.js";
 export * from "./package.js";
+export * from "./product.js";
 export * from "./properties.js";
 export * from "./read-node.js";
 export * from "./root.js";

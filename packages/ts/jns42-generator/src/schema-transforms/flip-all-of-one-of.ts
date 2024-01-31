@@ -1,18 +1,61 @@
 import {
-  AllOfSchemaModel,
   OneOfSchemaModel,
   SchemaModel,
   SchemaTransform,
   isAllOfSchemaModel,
   isOneOfSchemaModel,
 } from "../schema/index.js";
+import { product } from "../utils/index.js";
 
 /**
  * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
- * will flip em! It will become a oneOf with an allOf in it.
+ * will flip em! It will become a oneOf with a few allOfs in it.
  *
  * We can generate code for a oneOf with some allOfs in it, but for an allOf with
  * a bunch of oneOfs, we cannot generate code.
+ * 
+ * this
+
+```yaml
+- allOf:
+    - 1
+    - 2
+    - 3
+- type: object
+- oneOf:
+    - 100
+    - 200
+- oneOf:
+    - 300
+    - 400
+```
+
+will become
+
+```yaml
+- oneOf:
+    - 2
+    - 3
+    - 4
+    - 5
+- type: object
+- allOf:
+    - 1
+    - 100
+    - 300
+- allOf:
+    - 1
+    - 100
+    - 400
+- allOf:
+    - 1
+    - 200
+    - 300
+- allOf:
+    - 1
+    - 200
+    - 400
+```
  */
 export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge
@@ -20,35 +63,36 @@ export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
     return model;
   }
 
-  const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], allOf: undefined };
+  // first we resolve all models in allOf
+  const allOfModelEntries = model.allOf.map((key) => [key, arena.resolveItem(key)[1]] as const);
 
-  const baseElementEntries = model.allOf
-    .map((element) => [element, arena.resolveItem(element)] as const)
-    .filter(([element, [, item]]) => isOneOfSchemaModel(item))
-    .map(([element, [, item]]) => [element, item as OneOfSchemaModel] as const);
-  const leafElements = baseElementEntries.flatMap(([key, item]) => item.oneOf);
-  if (leafElements.length < 2) {
+  // then we filter in the oneOf-s
+  const oneOfModelEntries = allOfModelEntries
+    .filter(([key, model]) => isOneOfSchemaModel(model))
+    .map((entry) => entry as [number, OneOfSchemaModel]);
+
+  // if no oneOf-s in this allof, then we are done
+  if (oneOfModelEntries.length === 0) {
     return model;
   }
 
-  const baseElementSet = new Set(baseElementEntries.map(([key, item]) => key));
+  // then we filter out the oneOf-s
+  const notOneOfModelEntries = allOfModelEntries.filter(
+    ([key, model]) => !isOneOfSchemaModel(model),
+  );
 
-  // for (const leafElement of leafElements) {
-  //   const [, leafModel] = arena.resolveItem(leafElement);
-  //   if (!isSingleTypeSchemaModel(leafModel)) {
-  //     return model;
-  //   }
-  // }
+  // we will be creating a oneOf model based on the source model.
+  const newModel: SchemaModel & OneOfSchemaModel = { ...model, oneOf: [], allOf: undefined };
 
-  for (const leafElement of leafElements) {
-    const newLeafElements = [...model.allOf, leafElement].filter((key) => !baseElementSet.has(key));
-    const newLeafModel: AllOfSchemaModel = {
-      mockable: model.mockable,
-      allOf: newLeafElements,
+  for (const set of product(oneOfModelEntries.map(([key, model]) => model.oneOf))) {
+    const newSubModel = {
+      parent: modelKey,
+      allOf: [...notOneOfModelEntries.map((entry) => entry[0]), ...set],
     };
-    const newLeafKey = arena.addItem(newLeafModel);
-    newModel.oneOf.push(newLeafKey);
+    const newSubKey = arena.addItem(newSubModel);
+    newModel.oneOf.push(newSubKey);
   }
 
+  // and return the new model!
   return newModel;
 };
