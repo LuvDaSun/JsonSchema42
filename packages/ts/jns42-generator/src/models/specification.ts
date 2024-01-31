@@ -45,12 +45,12 @@ export function loadSpecification(
     let transformIterations = 0;
     fs.writeFileSync(
       path.join("logs", `types-${transformIterations}.yaml`),
-      Yaml.stringify(typesArena.renderItems()),
+      Yaml.stringify(typesArena.renderItems(), { aliasDuplicateObjects: false }),
     );
     while (
       typesArena.applyTransform(
         // order matters!
-        schemaTransforms.mockable,
+        // schemaTransforms.mockable,
 
         schemaTransforms.singleType,
         schemaTransforms.explode,
@@ -75,7 +75,7 @@ export function loadSpecification(
       transformIterations++;
       fs.writeFileSync(
         path.join("logs", `types-${transformIterations}.yaml`),
-        Yaml.stringify(typesArena.renderItems()),
+        Yaml.stringify(typesArena.renderItems(), { aliasDuplicateObjects: false }),
       );
       if (transformIterations < transformMaximumIterations) {
         continue;
