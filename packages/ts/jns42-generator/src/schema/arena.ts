@@ -25,6 +25,98 @@ export class SchemaArena extends Arena<SchemaModel> {
     return arena;
   }
 
+  public renderItem(key: number): any {
+    const item = this.getItem(key);
+    const rendered: any = {};
+
+    rendered.mockable = item.mockable;
+    rendered.id = item.id;
+    rendered.title = item.title;
+    rendered.description = item.description;
+    rendered.examples = item.examples;
+    rendered.deprecated = item.deprecated;
+
+    rendered.types = item.types;
+
+    rendered.required = item.required;
+    rendered.options = item.options;
+
+    rendered.minimumInclusive = item.minimumInclusive;
+    rendered.minimumExclusive = item.minimumExclusive;
+    rendered.maximumInclusive = item.maximumInclusive;
+    rendered.maximumExclusive = item.maximumExclusive;
+    rendered.multipleOf = item.multipleOf;
+    rendered.minimumLength = item.minimumLength;
+    rendered.maximumLength = item.maximumLength;
+    rendered.valuePattern = item.valuePattern;
+    rendered.valueFormat = item.valueFormat;
+    rendered.minimumItems = item.minimumItems;
+    rendered.maximumItems = item.maximumItems;
+    rendered.uniqueItems = item.uniqueItems;
+    rendered.minimumProperties = item.minimumProperties;
+    rendered.maximumProperties = item.maximumProperties;
+
+    rendered.alias = item.alias == null ? undefined : this.renderItemMaybe(item.alias);
+    rendered.parent = item.parent == null ? undefined : this.renderItemMaybe(item.parent);
+    rendered.reference = item.reference == null ? undefined : this.renderItemMaybe(item.reference);
+    rendered.if = item.if == null ? undefined : this.renderItemMaybe(item.if);
+    rendered.then = item.then == null ? undefined : this.renderItemMaybe(item.then);
+    rendered.else = item.else == null ? undefined : this.renderItemMaybe(item.else);
+    rendered.not = item.not == null ? undefined : this.renderItemMaybe(item.not);
+    rendered.mapProperties =
+      item.mapProperties == null ? undefined : this.renderItemMaybe(item.mapProperties);
+    rendered.propertyNames =
+      item.propertyNames == null ? undefined : this.renderItemMaybe(item.propertyNames);
+    rendered.arrayItems =
+      item.arrayItems == null ? undefined : this.renderItemMaybe(item.arrayItems);
+    rendered.contains = item.contains == null ? undefined : this.renderItemMaybe(item.contains);
+
+    rendered.oneOf = item.oneOf == null ? undefined : item.oneOf.map(this.renderItemMaybe);
+    rendered.anyOf = item.anyOf == null ? undefined : item.anyOf.map(this.renderItemMaybe);
+    rendered.allOf = item.allOf == null ? undefined : item.allOf.map(this.renderItemMaybe);
+    rendered.tupleItems =
+      item.tupleItems == null ? undefined : item.tupleItems.map(this.renderItemMaybe);
+
+    rendered.dependentSchemas =
+      item.dependentSchemas == null
+        ? undefined
+        : Object.fromEntries(
+            Object.entries(item.dependentSchemas).map(([name, key]) => [
+              name,
+              this.renderItemMaybe(key),
+            ]),
+          );
+    rendered.objectProperties =
+      item.objectProperties == null
+        ? undefined
+        : Object.fromEntries(
+            Object.entries(item.objectProperties).map(([name, key]) => [
+              name,
+              this.renderItemMaybe(key),
+            ]),
+          );
+    rendered.patternProperties =
+      item.patternProperties == null
+        ? undefined
+        : Object.fromEntries(
+            Object.entries(item.patternProperties).map(([name, key]) => [
+              name,
+              this.renderItemMaybe(key),
+            ]),
+          );
+
+    return rendered;
+  }
+
+  private renderItemMaybe(key: number) {
+    const item = this.getItem(key);
+    if (item.id) {
+      return item.id;
+    }
+
+    return this.renderItem(key);
+  }
+
   public static fromIntermediate(document: schemaIntermediate.SchemaDocument): SchemaArena {
     const arena = new SchemaArena();
     /*
