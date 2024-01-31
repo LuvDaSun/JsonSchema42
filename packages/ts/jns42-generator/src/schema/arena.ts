@@ -25,9 +25,24 @@ export class SchemaArena extends Arena<SchemaModel> {
     return arena;
   }
 
+  public renderItems() {
+    const keys = [...this].filter(([key, item]) => item.id != null).map(([key]) => key);
+    return keys.map((key) => this.renderItem(key));
+  }
+
   public renderItem(key: number): any {
     const item = this.getItem(key);
     const rendered: any = {};
+
+    const mapItemKey = (key: number) => {
+      const item = this.getItem(key);
+      if (item.id) {
+        const uri = new URL(item.id);
+        return uri.hash;
+      }
+
+      return this.renderItem(key);
+    };
 
     rendered.mockable = item.mockable;
     rendered.id = item.id;
@@ -56,65 +71,45 @@ export class SchemaArena extends Arena<SchemaModel> {
     rendered.minimumProperties = item.minimumProperties;
     rendered.maximumProperties = item.maximumProperties;
 
-    rendered.alias = item.alias == null ? undefined : this.renderItemMaybe(item.alias);
-    rendered.parent = item.parent == null ? undefined : this.renderItemMaybe(item.parent);
-    rendered.reference = item.reference == null ? undefined : this.renderItemMaybe(item.reference);
-    rendered.if = item.if == null ? undefined : this.renderItemMaybe(item.if);
-    rendered.then = item.then == null ? undefined : this.renderItemMaybe(item.then);
-    rendered.else = item.else == null ? undefined : this.renderItemMaybe(item.else);
-    rendered.not = item.not == null ? undefined : this.renderItemMaybe(item.not);
+    rendered.alias = item.alias == null ? undefined : mapItemKey(item.alias);
+    rendered.parent = item.parent == null ? undefined : mapItemKey(item.parent);
+    rendered.reference = item.reference == null ? undefined : mapItemKey(item.reference);
+    rendered.if = item.if == null ? undefined : mapItemKey(item.if);
+    rendered.then = item.then == null ? undefined : mapItemKey(item.then);
+    rendered.else = item.else == null ? undefined : mapItemKey(item.else);
+    rendered.not = item.not == null ? undefined : mapItemKey(item.not);
     rendered.mapProperties =
-      item.mapProperties == null ? undefined : this.renderItemMaybe(item.mapProperties);
+      item.mapProperties == null ? undefined : mapItemKey(item.mapProperties);
     rendered.propertyNames =
-      item.propertyNames == null ? undefined : this.renderItemMaybe(item.propertyNames);
-    rendered.arrayItems =
-      item.arrayItems == null ? undefined : this.renderItemMaybe(item.arrayItems);
-    rendered.contains = item.contains == null ? undefined : this.renderItemMaybe(item.contains);
+      item.propertyNames == null ? undefined : mapItemKey(item.propertyNames);
+    rendered.arrayItems = item.arrayItems == null ? undefined : mapItemKey(item.arrayItems);
+    rendered.contains = item.contains == null ? undefined : mapItemKey(item.contains);
 
-    rendered.oneOf = item.oneOf == null ? undefined : item.oneOf.map(this.renderItemMaybe);
-    rendered.anyOf = item.anyOf == null ? undefined : item.anyOf.map(this.renderItemMaybe);
-    rendered.allOf = item.allOf == null ? undefined : item.allOf.map(this.renderItemMaybe);
-    rendered.tupleItems =
-      item.tupleItems == null ? undefined : item.tupleItems.map(this.renderItemMaybe);
+    rendered.oneOf = item.oneOf == null ? undefined : item.oneOf.map(mapItemKey);
+    rendered.anyOf = item.anyOf == null ? undefined : item.anyOf.map(mapItemKey);
+    rendered.allOf = item.allOf == null ? undefined : item.allOf.map(mapItemKey);
+    rendered.tupleItems = item.tupleItems == null ? undefined : item.tupleItems.map(mapItemKey);
 
     rendered.dependentSchemas =
       item.dependentSchemas == null
         ? undefined
         : Object.fromEntries(
-            Object.entries(item.dependentSchemas).map(([name, key]) => [
-              name,
-              this.renderItemMaybe(key),
-            ]),
+            Object.entries(item.dependentSchemas).map(([name, key]) => [name, mapItemKey(key)]),
           );
     rendered.objectProperties =
       item.objectProperties == null
         ? undefined
         : Object.fromEntries(
-            Object.entries(item.objectProperties).map(([name, key]) => [
-              name,
-              this.renderItemMaybe(key),
-            ]),
+            Object.entries(item.objectProperties).map(([name, key]) => [name, mapItemKey(key)]),
           );
     rendered.patternProperties =
       item.patternProperties == null
         ? undefined
         : Object.fromEntries(
-            Object.entries(item.patternProperties).map(([name, key]) => [
-              name,
-              this.renderItemMaybe(key),
-            ]),
+            Object.entries(item.patternProperties).map(([name, key]) => [name, mapItemKey(key)]),
           );
 
     return rendered;
-  }
-
-  private renderItemMaybe(key: number) {
-    const item = this.getItem(key);
-    if (item.id) {
-      return item.id;
-    }
-
-    return this.renderItem(key);
   }
 
   public static fromIntermediate(document: schemaIntermediate.SchemaDocument): SchemaArena {

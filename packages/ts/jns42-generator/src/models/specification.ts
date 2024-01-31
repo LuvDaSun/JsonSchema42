@@ -1,4 +1,7 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import * as fs from "fs";
+import path from "path";
+import Yaml from "yaml";
 import * as schemaTransforms from "../schema-transforms/index.js";
 import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";
@@ -40,6 +43,10 @@ export function loadSpecification(
   // transform the typesArena
   {
     let transformIterations = 0;
+    fs.writeFileSync(
+      path.join("logs", `types-${transformIterations}.yaml`),
+      Yaml.stringify(typesArena.renderItems()),
+    );
     while (
       typesArena.applyTransform(
         // order matters!
@@ -66,6 +73,10 @@ export function loadSpecification(
       ) > 0
     ) {
       transformIterations++;
+      fs.writeFileSync(
+        path.join("logs", `types-${transformIterations}.yaml`),
+        Yaml.stringify(typesArena.renderItems()),
+      );
       if (transformIterations < transformMaximumIterations) {
         continue;
       }

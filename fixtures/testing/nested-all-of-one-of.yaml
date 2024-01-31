@@ -34,40 +34,39 @@ schemas:
             properties:
               d:
                 type: string
+#   presolved:
+#     oneOf:
+#       - type: boolean
+#       - type: object
+#         required:
+#           - a
+#           - b
+#           - c
+#           - d
+#         properties:
+#           a:
+#             type: string
+#           b:
+#             type: string
+#           c:
+#             type: string
+#           d:
+#             type: string
 
-  presolved:
-    oneOf:
-      - type: boolean
-      - type: object
-        required:
-          - a
-          - b
-          - c
-          - d
-        properties:
-          a:
-            type: string
-          b:
-            type: string
-          c:
-            type: string
-          d:
-            type: string
+# valid:
+#   "true": true
+#   abcd:
+#     a: "a"
+#     b: "b"
+#     c: "c"
+#     d: "d"
 
-valid:
-  "true": true
-  abcd:
-    a: "a"
-    b: "b"
-    c: "c"
-    d: "d"
-
-invalid:
-  "1": 1
-  bcd:
-    b: "b"
-    c: "c"
-    d: "d"
-  ab:
-    a: "a"
-    b: "b"
+# invalid:
+#   "1": 1
+#   bcd:
+#     b: "b"
+#     c: "c"
+#     d: "d"
+#   ab:
+#     a: "a"
+#     b: "b"

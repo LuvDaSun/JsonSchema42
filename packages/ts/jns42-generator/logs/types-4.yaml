@@ -1,0 +1,123 @@
+- mockable: true
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml
+  oneOf:
+    - mockable: false
+      types: &a1
+        - map
+      required: &a2
+        - a
+        - b
+      objectProperties:
+        a: "#/allOf/0/properties/a"
+        b: "#/allOf/0/properties/b"
+    - mockable: false
+      types: *a1
+      required:
+        - d
+        - c
+      objectProperties:
+        c: "#/allOf/1/allOf/0/properties/c"
+        d: "#/allOf/1/allOf/1/properties/d"
+    - mockable: false
+      types: &a3
+        - boolean
+      required: *a2
+      objectProperties:
+        a: "#/allOf/0/properties/a"
+        b: "#/allOf/0/properties/b"
+    - mockable: false
+      types: *a3
+      required:
+        - d
+        - c
+      objectProperties:
+        c: "#/allOf/1/allOf/0/properties/c"
+        d: "#/allOf/1/allOf/1/properties/d"
+- mockable: false
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/0
+  oneOf:
+    - mockable: false
+      types:
+        - map
+      required: *a2
+      objectProperties:
+        a: "#/allOf/0/properties/a"
+        b: "#/allOf/0/properties/b"
+    - mockable: false
+      types:
+        - boolean
+      required: *a2
+      objectProperties:
+        a: "#/allOf/0/properties/a"
+        b: "#/allOf/0/properties/b"
+- mockable: true
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1
+  oneOf:
+    - mockable: false
+      types: *a1
+      required: &a4
+        - c
+      objectProperties:
+        c: "#/allOf/1/allOf/0/properties/c"
+    - mockable: false
+      types: *a1
+      required: &a5
+        - d
+      objectProperties:
+        d: "#/allOf/1/allOf/1/properties/d"
+    - mockable: false
+      types: *a3
+      required: *a4
+      objectProperties:
+        c: "#/allOf/1/allOf/0/properties/c"
+    - mockable: false
+      types: *a3
+      required: *a5
+      objectProperties:
+        d: "#/allOf/1/allOf/1/properties/d"
+- mockable: true
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/0/properties/a
+  types:
+    - string
+- mockable: true
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/0/properties/b
+  types:
+    - string
+- mockable: false
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/0
+  oneOf:
+    - mockable: false
+      types:
+        - map
+      required: *a4
+      objectProperties:
+        c: "#/allOf/1/allOf/0/properties/c"
+    - mockable: false
+      types:
+        - boolean
+      required: *a4
+      objectProperties:
+        c: "#/allOf/1/allOf/0/properties/c"
+- mockable: false
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/1
+  oneOf:
+    - mockable: false
+      types:
+        - map
+      required: *a5
+      objectProperties:
+        d: "#/allOf/1/allOf/1/properties/d"
+    - mockable: false
+      types:
+        - boolean
+      required: *a5
+      objectProperties:
+        d: "#/allOf/1/allOf/1/properties/d"
+- mockable: true
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/0/properties/c
+  types:
+    - string
+- mockable: true
+  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/1/properties/d
+  types:
+    - string
