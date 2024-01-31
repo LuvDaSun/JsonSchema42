@@ -110,7 +110,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region core selectors
 
   protected selectNodeTypes(node: N) {
-    if (spec.isSchemaDocument(node) && node.type != null) {
+    if (typeof node === "object" && node.type != null) {
       if (Array.isArray(node.type)) {
         return node.type as string[];
       } else {
@@ -120,19 +120,19 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectNodeSchema(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.$schema;
     }
   }
 
   protected selectNodeId(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.id;
     }
   }
 
   protected selectNodeRef(node: N) {
-    if (spec.isSchemaDocument(node) && "$ref" in node && typeof node.$ref === "string") {
+    if (typeof node === "object" && "$ref" in node && typeof node.$ref === "string") {
       return node.$ref;
     }
   }
@@ -142,13 +142,13 @@ export class Document extends SchemaDocumentBase<N> {
   //#region metadata selectors
 
   protected selectNodeTitle(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.title;
     }
   }
 
   protected selectNodeDescription(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.description;
     }
   }
@@ -165,7 +165,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region pointers selectors
 
   protected *selectNodePropertiesPointerEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.properties != null) {
+    if (typeof node === "object" && node.properties != null) {
       for (const key of Object.keys(node.properties)) {
         const subNodePointer = [nodePointer, "properties", key].join("/");
         yield [key, subNodePointer] as const;
@@ -181,7 +181,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.patternProperties != null) {
+    if (typeof node === "object" && node.patternProperties != null) {
       for (const key of Object.keys(node.patternProperties)) {
         const subNodePointer = [nodePointer, "patternProperties", key].join("/");
         yield [key, subNodePointer] as const;
@@ -194,7 +194,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region schema selectors
 
   protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.definitions != null) {
+    if (typeof node === "object" && node.definitions != null) {
       for (const [key, subNode] of Object.entries(node.definitions)) {
         const subNodePointer = [nodePointer, "definitions", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -203,7 +203,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeObjectPropertyEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.properties != null) {
+    if (typeof node === "object" && node.properties != null) {
       for (const [key, subNode] of Object.entries(node.properties)) {
         const subNodePointer = [nodePointer, "properties", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -212,7 +212,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeMapPropertiesEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.additionalProperties != null) {
+    if (typeof node === "object" && node.additionalProperties != null) {
       const subNode = node.additionalProperties;
       const subNodePointer = [nodePointer, "additionalProperties"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -223,7 +223,7 @@ export class Document extends SchemaDocumentBase<N> {
     nodePointer: string,
     node: N,
   ): Iterable<readonly [string, N]> {
-    if (spec.isSchemaDocument(node) && node.items != null && Array.isArray(node.items)) {
+    if (typeof node === "object" && node.items != null && Array.isArray(node.items)) {
       for (const [key, subNode] of Object.entries(node.items)) {
         const subNodePointer = [nodePointer, "items", key].join("/");
         yield [subNodePointer, subNode] as [string, N];
@@ -234,12 +234,12 @@ export class Document extends SchemaDocumentBase<N> {
     nodePointer: string,
     node: N,
   ): Iterable<readonly [string, N]> {
-    if (spec.isSchemaDocument(node) && node.items != null && !Array.isArray(node.items)) {
+    if (typeof node === "object" && node.items != null && !Array.isArray(node.items)) {
       const subNode = node.items;
       const subNodePointer = [nodePointer, "items"].join("/");
       yield [subNodePointer, subNode] as const;
     }
-    if (spec.isSchemaDocument(node) && node.additionalItems != null) {
+    if (typeof node === "object" && node.additionalItems != null) {
       const subNode = node.additionalItems;
       const subNodePointer = [nodePointer, "additionalItems"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -253,7 +253,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.patternProperties != null) {
+    if (typeof node === "object" && node.patternProperties != null) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
         const subNodePointer = [nodePointer, "patternProperties", key].join("/");
         yield [subNodePointer, subNode] as const;
@@ -269,7 +269,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.anyOf != null) {
+    if (typeof node === "object" && node.anyOf != null) {
       for (const [key, subNode] of Object.entries(node.anyOf)) {
         const subNodePointer = [nodePointer, "anyOf", key].join("/");
         yield [subNodePointer, subNode] as [string, N];
@@ -278,7 +278,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeOneOfEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.oneOf != null) {
+    if (typeof node === "object" && node.oneOf != null) {
       for (const [key, subNode] of Object.entries(node.oneOf)) {
         const subNodePointer = [nodePointer, "oneOf", key].join("/");
         yield [subNodePointer, subNode] as [string, N];
@@ -287,7 +287,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.allOf != null) {
+    if (typeof node === "object" && node.allOf != null) {
       for (const [key, subNode] of Object.entries(node.allOf)) {
         const subNodePointer = [nodePointer, "allOf", key].join("/");
         yield [subNodePointer, subNode] as [string, N];
@@ -296,7 +296,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
-    if (spec.isSchemaDocument(node) && node.not != null) {
+    if (typeof node === "object" && node.not != null) {
       const subNode = node.not;
       const subNodePointer = [nodePointer, "not"].join("/");
       yield [subNodePointer, subNode] as const;
@@ -323,67 +323,67 @@ export class Document extends SchemaDocumentBase<N> {
   //#region validation selectors
 
   protected selectValidationMaximumProperties(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.maxProperties;
     }
   }
 
   protected selectValidationMinimumProperties(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.minProperties;
     }
   }
 
   protected selectValidationRequired(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.required;
     }
   }
 
   protected selectValidationMinimumItems(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.minItems;
     }
   }
 
   protected selectValidationMaximumItems(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.maxItems;
     }
   }
 
   protected selectValidationUniqueItems(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.uniqueItems;
     }
   }
 
   protected selectValidationMinimumLength(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.minLength;
     }
   }
 
   protected selectValidationMaximumLength(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.maxLength;
     }
   }
 
   protected selectValidationValuePattern(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.pattern;
     }
   }
 
   protected selectValidationValueFormat(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.format;
     }
   }
 
   protected selectValidationMinimumInclusive(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       if (node.exclusiveMinimum ?? false) {
         return undefined;
       } else {
@@ -393,7 +393,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectValidationMinimumExclusive(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       if (node.exclusiveMinimum ?? false) {
         return node.minimum;
       } else {
@@ -403,7 +403,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectValidationMaximumInclusive(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       if (node.exclusiveMaximum ?? false) {
         return undefined;
       } else {
@@ -413,7 +413,7 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectValidationMaximumExclusive(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       if (node.exclusiveMaximum ?? false) {
         return node.maximum;
       } else {
@@ -423,13 +423,13 @@ export class Document extends SchemaDocumentBase<N> {
   }
 
   protected selectValidationMultipleOf(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.multipleOf;
     }
   }
 
   protected selectValidationEnum(node: N) {
-    if (spec.isSchemaDocument(node)) {
+    if (typeof node === "object") {
       return node.enum;
     }
   }
