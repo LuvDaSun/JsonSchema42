@@ -1,4 +1,4 @@
-- id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml
+- id: ""
   allOf:
     - "#/allOf/0"
     - mockable: true
@@ -35,7 +35,7 @@
         - types: &a2
             - boolean
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/0
+  id: "#/allOf/0"
   allOf:
     - mockable: true
       oneOf:
@@ -52,7 +52,7 @@
       objectProperties:
         a: "#/allOf/0/properties/a"
         b: "#/allOf/0/properties/b"
-- id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1
+- id: "#/allOf/1"
   allOf:
     - "#/allOf/1/allOf/0"
     - "#/allOf/1/allOf/1"
@@ -60,15 +60,15 @@
         - types: *a1
         - types: *a2
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/0/properties/a
+  id: "#/allOf/0/properties/a"
   types:
     - string
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/0/properties/b
+  id: "#/allOf/0/properties/b"
   types:
     - string
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/0
+  id: "#/allOf/1/allOf/0"
   allOf:
     - mockable: true
       oneOf:
@@ -81,7 +81,7 @@
       objectProperties:
         c: "#/allOf/1/allOf/0/properties/c"
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/1
+  id: "#/allOf/1/allOf/1"
   allOf:
     - mockable: true
       oneOf:
@@ -94,10 +94,10 @@
       objectProperties:
         d: "#/allOf/1/allOf/1/properties/d"
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/0/properties/c
+  id: "#/allOf/1/allOf/0/properties/c"
   types:
     - string
 - mockable: true
-  id: file:///home/elmerbulthuis/workspace/JsonSchema42/fixtures/testing/nested-all-of-one-of.yaml#/allOf/1/allOf/1/properties/d
+  id: "#/allOf/1/allOf/1/properties/d"
   types:
     - string

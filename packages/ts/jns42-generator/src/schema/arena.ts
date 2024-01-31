@@ -34,18 +34,21 @@ export class SchemaArena extends Arena<SchemaModel> {
     const item = this.getItem(key);
     const rendered: any = {};
 
+    const formatId = (id: string) => {
+      return new URL(id).hash;
+    };
+
     const mapItemKey = (key: number) => {
       const item = this.getItem(key);
       if (item.id) {
-        const uri = new URL(item.id);
-        return uri.hash;
+        return formatId(item.id);
       }
 
       return this.renderItem(key);
     };
 
     rendered.mockable = item.mockable;
-    rendered.id = item.id;
+    rendered.id = item.id == null ? undefined : formatId(item.id);
     rendered.title = item.title;
     rendered.description = item.description;
     rendered.examples = item.examples;
