@@ -13,8 +13,10 @@
     "ryanluker",
     "serde",
     "structs",
+    "tamasfe",
     "unalias",
-    "urlencoding"
+    "urlencoding",
+    "vadimcn"
   ],
   "useGitignore": true,
   "files": ["**"],
