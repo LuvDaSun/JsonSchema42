@@ -1,5 +1,5 @@
 use super::{loader::LoaderBox, meta::MetaSchemaId};
-use crate::{schemas, utils::value_rc::ValueRc};
+use crate::{documents, utils::value_rc::ValueRc};
 use std::{collections::HashMap, fs::File, rc::Rc};
 use url::Url;
 
@@ -17,23 +17,23 @@ impl<'a> Manager<'a> {
             loaders: vec![
                 (
                     MetaSchemaId::Draft202012,
-                    Box::new(schemas::draft_2020_12::loader::LoaderImpl::new()) as LoaderBox,
+                    Box::new(documents::draft_2020_12::loader::LoaderImpl::new()) as LoaderBox,
                 ),
                 (
                     MetaSchemaId::Draft201909,
-                    Box::new(schemas::draft_2019_09::loader::LoaderImpl::new()),
+                    Box::new(documents::draft_2019_09::loader::LoaderImpl::new()),
                 ),
                 (
                     MetaSchemaId::Draft07,
-                    Box::new(schemas::draft_07::loader::LoaderImpl::new()),
+                    Box::new(documents::draft_07::loader::LoaderImpl::new()),
                 ),
                 (
                     MetaSchemaId::Draft06,
-                    Box::new(schemas::draft_06::loader::LoaderImpl::new()),
+                    Box::new(documents::draft_06::loader::LoaderImpl::new()),
                 ),
                 (
                     MetaSchemaId::Draft04,
-                    Box::new(schemas::draft_04::loader::LoaderImpl::new()),
+                    Box::new(documents::draft_04::loader::LoaderImpl::new()),
                 ),
             ]
             .into_iter()

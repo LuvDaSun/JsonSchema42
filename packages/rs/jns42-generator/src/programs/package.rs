@@ -1,5 +1,5 @@
-use crate::schemas::manager::Manager;
-use crate::schemas::meta::MetaSchemaId;
+use crate::documents::manager::Manager;
+use crate::documents::meta::MetaSchemaId;
 use clap::Parser;
 use url::Url;
 

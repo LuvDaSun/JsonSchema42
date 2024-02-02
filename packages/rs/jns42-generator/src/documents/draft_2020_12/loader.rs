@@ -1,6 +1,6 @@
 use super::meta::META_SCHEMA_ID;
 use super::selectors::Selectors;
-use crate::schemas::loader::Loader;
+use crate::documents::loader::Loader;
 use crate::utils::value_rc::ValueRc;
 use std::collections::HashMap;
 use std::rc::Rc;
