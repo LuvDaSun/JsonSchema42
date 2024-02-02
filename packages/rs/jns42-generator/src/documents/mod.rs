@@ -10,3 +10,4 @@ pub mod meta;
 
 pub mod document;
 pub mod document_context;
+pub mod schema_document;

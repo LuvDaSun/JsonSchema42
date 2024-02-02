@@ -1,12 +1,11 @@
 use crate::models;
 use std::{
     collections::{HashMap, HashSet},
-    iter::{self, empty},
     rc::Rc,
 };
 use url::Url;
 
-use super::document::{self, Document};
+use super::{document::Document, schema_document::SchemaDocument};
 
 type DocumentFactory = dyn Fn() -> dyn Document;
 
@@ -38,12 +37,12 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-    pub fn register_factory(&mut self, schema: Url, factory: Box<DocumentFactory>) {
+    pub fn register_factory(&mut self, schema: &Url, factory: Box<DocumentFactory>) {
         /*
          * don't check if the factory is already registered here so we can
          * override factories
          */
-        self.factories.insert(schema, factory);
+        self.factories.insert(schema.clone(), factory);
     }
 
     pub fn get_intermediate_data(&self) -> models::intermediate::IntermediateSchema {
@@ -72,5 +71,74 @@ impl DocumentContext {
         let document_url = self.node_documents.get(node_url).unwrap();
 
         self.get_document(document_url)
+    }
+
+    pub fn load_from_url(
+        &mut self,
+        retrieval_url: &Url,
+        given_url: &Url,
+        antecedent_url: Option<&Url>,
+        default_schema_id: &Url,
+    ) {
+        let document_node = self.node_cache.get(retrieval_url);
+
+        if document_node.is_none() {
+            self.fill_node_cache(retrieval_url, document_node)
+        }
+
+        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_id);
+    }
+
+    pub fn load_from_document(
+        &mut self,
+        retrieval_url: &Url,
+        given_url: &Url,
+        antecedent_url: Option<&Url>,
+        document_node: Rc<serde_json::Value>,
+        default_schema_id: &Url,
+    ) {
+        todo!()
+    }
+
+    fn fill_node_cache(&mut self, retrieval_url: &Url, document_node: Rc<serde_json::Value>) {
+        todo!()
+    }
+
+    fn load_from_cache(
+        &mut self,
+        retrievalUrl: &Url,
+        givenUrl: &Url,
+        antecedentUrl: Option<&Url>,
+        defaultSchemaId: &Url,
+    ) {
+        todo!()
+    }
+
+    fn load_from_schema_document(
+        &mut self,
+        retrieval_url: &Url,
+        document: impl SchemaDocument,
+        default_schema_id: &Url,
+    ) {
+        for embedded_document in document.get_embedded_documents(retrieval_url) {
+            self.load_from_document(
+                &embedded_document.retrieval_url,
+                &embedded_document.given_url,
+                Some(document.get_document_id()),
+                embedded_document.node.clone(),
+                default_schema_id,
+            )
+            .await;
+        }
+
+        for referenced_document in document.get_referenced_documents(retrieval_url) {
+            self.load_from_url(
+                &referenced_document.retrieval_url,
+                &referenced_document.given_url,
+                Some(document.get_document_id()),
+                default_schema_id,
+            )
+            .await;
+        }
     }
 }
