@@ -1,5 +1,6 @@
-mod programs;
 mod documents;
+mod models;
+mod programs;
 mod utils;
 
 use clap::Parser;
