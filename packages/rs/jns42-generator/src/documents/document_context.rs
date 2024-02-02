@@ -1,4 +1,4 @@
-use crate::models;
+use crate::{models, utils::yaml::load_yaml};
 use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
@@ -83,7 +83,9 @@ impl DocumentContext {
         let document_node = self.node_cache.get(retrieval_url);
 
         if document_node.is_none() {
-            self.fill_node_cache(retrieval_url, document_node)
+            let document_node = load_yaml(retrieval_url);
+
+            self.fill_node_cache(retrieval_url, Rc::new(document_node));
         }
 
         self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_id);
@@ -127,8 +129,7 @@ impl DocumentContext {
                 Some(document.get_document_id()),
                 embedded_document.node.clone(),
                 default_schema_id,
-            )
-            .await;
+            );
         }
 
         for referenced_document in document.get_referenced_documents(retrieval_url) {
@@ -137,8 +138,7 @@ impl DocumentContext {
                 &referenced_document.given_url,
                 Some(document.get_document_id()),
                 default_schema_id,
-            )
-            .await;
+            );
         }
     }
 }
