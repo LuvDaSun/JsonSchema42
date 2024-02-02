@@ -7,3 +7,6 @@ pub mod draft_2020_12;
 pub mod loader;
 pub mod manager;
 pub mod meta;
+
+pub mod document;
+pub mod document_context;
