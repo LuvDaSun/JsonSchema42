@@ -12,6 +12,10 @@
       "name": "ts/jns42-generator",
       "path": "packages/ts/jns42-generator",
     },
+    {
+      "name": "rs/jns42-generator",
+      "path": "packages/rs/jns42-generator",
+    },
   ],
   "settings": {
     "editor.formatOnSave": true,
