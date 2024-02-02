@@ -1,5 +1,5 @@
 use url::Url;
 
-pub fn load_yaml(url: &Url) -> serde_json::Value {
+pub async fn load_yaml(url: &Url) -> serde_json::Value {
     todo!()
 }

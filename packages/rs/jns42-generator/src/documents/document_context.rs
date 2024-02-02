@@ -73,7 +73,7 @@ impl DocumentContext {
         self.get_document(document_url)
     }
 
-    pub fn load_from_url(
+    pub async fn load_from_url(
         &mut self,
         retrieval_url: &Url,
         given_url: &Url,
@@ -83,7 +83,7 @@ impl DocumentContext {
         let document_node = self.node_cache.get(retrieval_url);
 
         if document_node.is_none() {
-            let document_node = load_yaml(retrieval_url);
+            let document_node = load_yaml(retrieval_url).await;
 
             self.fill_node_cache(retrieval_url, Rc::new(document_node));
         }
@@ -91,7 +91,7 @@ impl DocumentContext {
         self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_id);
     }
 
-    pub fn load_from_document(
+    pub async fn load_from_document(
         &mut self,
         retrieval_url: &Url,
         given_url: &Url,
@@ -116,7 +116,7 @@ impl DocumentContext {
         todo!()
     }
 
-    fn load_from_schema_document(
+    async fn load_from_schema_document(
         &mut self,
         retrieval_url: &Url,
         document: impl SchemaDocument,
@@ -129,7 +129,8 @@ impl DocumentContext {
                 Some(document.get_document_id()),
                 embedded_document.node.clone(),
                 default_schema_id,
-            );
+            )
+            .await;
         }
 
         for referenced_document in document.get_referenced_documents(retrieval_url) {
@@ -138,7 +139,8 @@ impl DocumentContext {
                 &referenced_document.given_url,
                 Some(document.get_document_id()),
                 default_schema_id,
-            );
+            )
+            .await;
         }
     }
 }
