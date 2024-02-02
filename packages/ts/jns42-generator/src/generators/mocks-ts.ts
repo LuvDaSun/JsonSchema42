@@ -332,7 +332,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
               }
             }
 
-            if (item.arrayItems != null) {
+            if (
+              item.arrayItems != null &&
+              (typesArena.resolveItem(item.arrayItems)[1].mockable ?? false)
+            ) {
               yield itt`
               ...new Array(
                 Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
@@ -400,17 +403,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
                   ? "configuration.defaultMaximumProperties"
                   : JSON.stringify(item.maximumProperties);
 
-              const elementKeys = new Array<number>();
-              if (item.mapProperties != null) {
-                elementKeys.push(item.mapProperties);
-              }
-              if (item.patternProperties != null) {
-                for (const elementKey of Object.values(item.patternProperties)) {
-                  elementKeys.push(elementKey);
-                }
-              }
-
-              if (elementKeys.length > 0) {
+              if (
+                item.mapProperties != null &&
+                typesArena.resolveItem(item.mapProperties)[1].mockable
+              ) {
                 yield itt`
                   ...Object.fromEntries(
                     new Array(
@@ -438,23 +434,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                           `
                           : generateMockReference(item.propertyNames)
                       },
-                      (() => {
-                        switch (
-                          (
-                            nextSeed() % ${JSON.stringify(elementKeys.length)}
-                          ) as ${joinIterable(
-                            elementKeys.map((element, index) => JSON.stringify(index)),
-                            " | ",
-                          )}
-                          ) {
-                            ${elementKeys.map(
-                              (element, index) => itt`
-                                case ${JSON.stringify(index)}:
-                                  return (${generateMockReference(element)});
-                              `,
-                            )}              
-                          }
-                        })(),
+                      ${generateMockReference(item.mapProperties)},
                       ]
                     )
                   )

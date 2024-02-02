@@ -34,26 +34,30 @@ export const mockable: SchemaTransform = (arena, model, modelKey) => {
     );
   }
 
-  if (model.arrayItems != null) {
-    const [, subModel] = arena.resolveItem(model.arrayItems);
-    mockable = booleanMergeAnd(mockable, subModel.mockable);
-  }
-
-  if (model.mapProperties != null) {
-    const [, subModel] = arena.resolveItem(model.mapProperties);
-    mockable = booleanMergeAnd(mockable, subModel.mockable);
-  }
-
   if (model.tupleItems != null) {
+    let subMockable: boolean | undefined;
     for (const elementKey of model.tupleItems) {
       const [, subModel] = arena.resolveItem(elementKey);
+      subMockable = booleanMergeAnd(subMockable, subModel.mockable);
+    }
+    mockable = booleanMergeAnd(mockable, subMockable);
+  } else {
+    if (model.arrayItems != null && model.minimumItems != null) {
+      const [, subModel] = arena.resolveItem(model.arrayItems);
       mockable = booleanMergeAnd(mockable, subModel.mockable);
     }
   }
 
   if (model.objectProperties != null) {
+    let subMockable: boolean | undefined;
     for (const elementKey of Object.values(model.objectProperties)) {
       const [, subModel] = arena.resolveItem(elementKey);
+      subMockable = booleanMergeAnd(subMockable, subModel.mockable);
+    }
+    mockable = booleanMergeAnd(mockable, subMockable);
+  } else {
+    if (model.mapProperties != null && model.minimumProperties != null) {
+      const [, subModel] = arena.resolveItem(model.mapProperties);
       mockable = booleanMergeAnd(mockable, subModel.mockable);
     }
   }
@@ -69,21 +73,28 @@ export const mockable: SchemaTransform = (arena, model, modelKey) => {
   }
 
   if (isAllOfSchemaModel(model)) {
+    let subMockable: boolean | undefined;
+    // all sub schemas need to be mockable
     for (const elementKey of model.allOf) {
       const [, subModel] = arena.resolveItem(elementKey);
-      mockable = booleanMergeAnd(mockable, subModel.mockable);
+      subMockable = booleanMergeAnd(subMockable, subModel.mockable);
     }
+    mockable = booleanMergeAnd(mockable, subMockable);
   }
 
   if (isAnyOfSchemaModel(model)) {
+    // anyof can never me mocked
     mockable = false;
   }
 
   if (isOneOfSchemaModel(model)) {
+    let subMockable: boolean | undefined;
+    // one of can be mocked if one of the elements can be mocked
     for (const elementKey of model.oneOf) {
       const [, subModel] = arena.resolveItem(elementKey);
-      mockable = booleanMergeOr(mockable, subModel.mockable);
+      subMockable = booleanMergeOr(subMockable, subModel.mockable);
     }
+    mockable = booleanMergeAnd(mockable, subMockable);
   }
 
   if (isIfSchemaModel(model)) {
