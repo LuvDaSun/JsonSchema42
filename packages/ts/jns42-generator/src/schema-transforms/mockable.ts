@@ -8,7 +8,7 @@ import {
   isReferenceSchemaModel,
   isSingleTypeSchemaModel,
 } from "../schema/index.js";
-import { booleanMergeAnd } from "../utils/merge.js";
+import { booleanMergeAnd, booleanMergeOr } from "../utils/merge.js";
 
 export const mockable: SchemaTransform = (arena, model, modelKey) => {
   let mockable = model.mockable;
@@ -82,7 +82,7 @@ export const mockable: SchemaTransform = (arena, model, modelKey) => {
   if (isOneOfSchemaModel(model)) {
     for (const elementKey of model.oneOf) {
       const [, subModel] = arena.resolveItem(elementKey);
-      mockable = booleanMergeAnd(mockable, subModel.mockable);
+      mockable = booleanMergeOr(mockable, subModel.mockable);
     }
   }
 

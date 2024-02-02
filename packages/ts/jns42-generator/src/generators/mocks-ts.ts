@@ -129,20 +129,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+      const oneOfMockableEntries = item.oneOf
+        .map((key) => [key, typesArena.resolveItem(key)[1]] as const)
+        .filter(([key, item]) => item.mockable);
+
       yield itt`
         (() => {
           switch (
             (
-              nextSeed() % ${JSON.stringify(item.oneOf.length)}
+              nextSeed() % ${JSON.stringify(oneOfMockableEntries.length)}
             ) as ${joinIterable(
-              item.oneOf.map((element, index) => JSON.stringify(index)),
+              item.oneOf.map((entry, index) => JSON.stringify(index)),
               " | ",
             )}
           ) {
-            ${item.oneOf.map(
-              (element, index) => itt`
+            ${oneOfMockableEntries.map(
+              (entry, index) => itt`
                 case ${JSON.stringify(index)}:
-                  return (${generateMockReference(element)});
+                  return (${generateMockReference(entry[0])});
               `,
             )}              
           }
