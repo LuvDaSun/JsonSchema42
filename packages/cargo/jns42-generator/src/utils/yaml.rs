@@ -45,6 +45,7 @@ pub async fn load_yaml(
     let mut res = sender.send_request(req).await?;
 
     println!("Response status: {}", res.status());
+    println!("{:?}", res.headers());
 
     while let Some(next) = res.frame().await {
         let frame = next?;
@@ -54,4 +55,17 @@ pub async fn load_yaml(
     }
 
     todo!()
+}
+
+mod test {
+
+    #[tokio::test]
+    async fn test_fetch() {
+        use super::*;
+
+        let url = "https://spec.openapis.org/oas/3.1/dialect/base"
+            .parse()
+            .unwrap();
+        let _res = load_yaml(&url).await.unwrap();
+    }
 }
