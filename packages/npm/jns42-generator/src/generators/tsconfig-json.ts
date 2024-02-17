@@ -1,4 +1,4 @@
-export function getTsconfigJsonData() {
+export function generateTsconfigJsonData() {
   const content = {
     extends: "@tsconfig/node20",
     compilerOptions: {
@@ -6,10 +6,9 @@ export function getTsconfigJsonData() {
       rootDir: "./src",
       sourceMap: true,
       declaration: true,
-      composite: true,
-      lib: ["ES2023"],
+      lib: ["es2023"],
     },
-    include: ["src"],
+    include: ["./src"],
   };
 
   return content;
