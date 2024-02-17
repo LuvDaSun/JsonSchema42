@@ -122,50 +122,42 @@ mod tests {
     use serde_json::Value;
     use std::path::PathBuf;
     use tokio::fs::File;
-
-    // #[tokio::test]
-    // async fn test_1() -> Result<(), String> {
-    //     let https_connector = HttpsConnector::new();
-
-    //     let client = Client::builder();
-    //     let client = client.build::<_, Body>(https_connector);
-
-    //     let url = Uri::from_static("https://api.chucknorris.io/jokes/random");
-    //     let response = client
-    //         .get(url)
-    //         .await
-    //         .map_err(|err| err.message().to_string())?;
-
-    //     let body = response.into_body();
-    //     let mut last_error = None;
-    //     let body = body.map(|chunk| match chunk {
-    //         Ok(chunk) => chunk,
-    //         Err(error) => {
-    //             last_error = Some(error);
-    //             Default::default()
-    //         }
-    //     });
-
-    //     let mut deserializer = JsonDeserializer::<Value, _, _>::new(body);
-
-    //     let mut count = 0;
-
-    //     while let Some(item) = deserializer.next().await {
-    //         print!("{:?}", item);
-
-    //         count += 1;
-    //     }
-    //     if let Some(last_error) = last_error {
-    //         return Err(last_error.to_string());
-    //     }
-
-    //     assert_eq!(count, 1);
-
-    //     Ok(())
-    // }
+    use url::Url;
 
     #[tokio::test]
-    async fn test_2() -> Result<(), String> {
+    async fn test_1() -> Result<(), Box<dyn std::error::Error>> {
+        let url = Url::parse("https://api.chucknorris.io/jokes/random").unwrap();
+        let response = reqwest::get(url).await?.error_for_status()?;
+
+        let body = response.bytes_stream();
+        let mut last_error = Ok(());
+        let body = body.map(|chunk| match chunk {
+            Ok(chunk) => chunk,
+            Err(error) => {
+                last_error = Err(error);
+                Default::default()
+            }
+        });
+
+        let mut deserializer = JsonDeserializer::<Value, _, _>::new(body);
+
+        let mut count = 0;
+
+        while let Some(item) = deserializer.next().await {
+            print!("{:?}", item);
+
+            count += 1;
+        }
+
+        last_error?;
+
+        assert_eq!(count, 1);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_2() -> Result<(), Box<dyn std::error::Error>> {
         let path = PathBuf::new();
         let path = path.join("..");
         let path = path.join("..");
@@ -174,13 +166,13 @@ mod tests {
         let path = path.join("miscellaneous");
         let path = path.join("people.jsonl");
 
-        let file = File::open(path).await.map_err(|err| err.to_string())?;
+        let file = File::open(path).await?;
         let file = ReadStream::new(file);
-        let mut last_error = None;
+        let mut last_result = Ok(());
         let file = file.map(|chunk| match chunk {
             Ok(chunk) => chunk,
             Err(error) => {
-                last_error = Some(error);
+                last_result = Err(error);
                 Default::default()
             }
         });
@@ -194,9 +186,8 @@ mod tests {
 
             count += 1;
         }
-        if let Some(last_error) = last_error {
-            return Err(last_error.to_string());
-        }
+
+        last_result?;
 
         assert_eq!(count, 3);
 

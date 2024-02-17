@@ -94,25 +94,25 @@ impl DocumentContext {
 
     pub async fn load_from_document(
         &mut self,
-        retrieval_url: &Url,
-        given_url: &Url,
-        antecedent_url: Option<&Url>,
-        document_node: Rc<serde_json::Value>,
-        default_schema_id: &Url,
+        _retrieval_url: &Url,
+        _given_url: &Url,
+        _antecedent_url: Option<&Url>,
+        _document_node: Rc<serde_json::Value>,
+        _default_schema_id: &Url,
     ) {
         todo!()
     }
 
-    fn fill_node_cache(&mut self, retrieval_url: &Url, document_node: Rc<serde_json::Value>) {
+    fn fill_node_cache(&mut self, _retrieval_url: &Url, _document_nodee: Rc<serde_json::Value>) {
         todo!()
     }
 
     fn load_from_cache(
         &mut self,
-        retrievalUrl: &Url,
-        givenUrl: &Url,
-        antecedentUrl: Option<&Url>,
-        defaultSchemaId: &Url,
+        _retrieval_url: &Url,
+        _given_url: &Url,
+        _antecedent_url: Option<&Url>,
+        _default_schema_id: &Url,
     ) {
         todo!()
     }
