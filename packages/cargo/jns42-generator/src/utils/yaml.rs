@@ -1,5 +1,5 @@
 use hyper::Request;
-use std::iter::empty;
+use std::{iter::empty, net::TcpStream};
 use url::Url;
 
 pub async fn load_yaml(url: &Url) -> serde_json::Value {
