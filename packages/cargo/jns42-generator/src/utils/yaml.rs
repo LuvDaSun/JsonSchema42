@@ -7,9 +7,7 @@ use tokio::io::{self, AsyncWriteExt};
 use tokio::net::TcpStream;
 use url::Url;
 
-pub async fn load_yaml(
-    url: &Url,
-) -> Result<serde_json::Value, Box<dyn std::error::Error + Send + Sync>> {
+pub async fn load_yaml(url: &Url) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
     // Get the host and the port
     let host = url.host().unwrap();
     let port = url.port().unwrap_or(80);
