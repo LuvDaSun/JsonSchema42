@@ -9,6 +9,7 @@ words:
   - luvdasun
   - notdir
   - presolved
+  - reqwest
   - ryanluker
   - serde
   - structs
@@ -17,5 +18,7 @@ words:
   - urlencoding
   - vadimcn
 useGitignore: true
-files: ["**"]
-enableFiletypes: ["*"]
+files:
+  - "**"
+enableFiletypes:
+  - "*"
