@@ -7,9 +7,9 @@ import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { generateMocksTestTsCode } from "./mocks-test-ts.js";
 import { generateMocksTsCode } from "./mocks-ts.js";
-import { getPackageJsonData } from "./package-json.js";
+import { generatePackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
-import { getTsconfigJsonData } from "./tsconfig-json.js";
+import { generateTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
 
@@ -30,7 +30,7 @@ export function generatePackage(
   fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
 
   {
-    const content = getPackageJsonData(packageName, packageVersion);
+    const content = generatePackageJsonData(packageName, packageVersion);
     const filePath = path.join(packageDirectoryPath, "package.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
@@ -48,7 +48,7 @@ export function generatePackage(
   }
 
   {
-    const content = getTsconfigJsonData();
+    const content = generateTsconfigJsonData();
     const filePath = path.join(packageDirectoryPath, "tsconfig.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
