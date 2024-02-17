@@ -83,7 +83,8 @@ impl DocumentContext {
         let document_node = self.node_cache.get(retrieval_url);
 
         if document_node.is_none() {
-            let document_node = load_yaml(retrieval_url).await;
+            // TODO remove unwrap
+            let document_node = load_yaml(retrieval_url).await.unwrap();
 
             self.fill_node_cache(retrieval_url, Rc::new(document_node));
         }
