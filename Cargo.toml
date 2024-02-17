@@ -1,3 +1,3 @@
 [workspace]
 resolver = "2"
-members = ["packages/rs/jns42-generator"]
+members = ["packages/cargo/jns42-generator"]

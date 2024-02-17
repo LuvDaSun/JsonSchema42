@@ -2,8 +2,8 @@
   "private": true,
   "packageManager": "npm@10.3.0",
   "workspaces": [
-    "packages/ts/*",
-    "generated/ts/*"
+    "packages/npm/*",
+    "generated/npm/*"
   ],
   "scripts": {
     "spelling": "cspell",

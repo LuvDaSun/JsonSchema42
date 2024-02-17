@@ -9,12 +9,12 @@
       "path": "packages/oas/schema-intermediate",
     },
     {
-      "name": "ts/jns42-generator",
-      "path": "packages/ts/jns42-generator",
+      "name": "npm/jns42-generator",
+      "path": "packages/npm/jns42-generator",
     },
     {
-      "name": "rs/jns42-generator",
-      "path": "packages/rs/jns42-generator",
+      "name": "cargo/jns42-generator",
+      "path": "packages/cargo/jns42-generator",
     },
   ],
   "settings": {
