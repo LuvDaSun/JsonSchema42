@@ -32,22 +32,6 @@
       "editor.defaultFormatter": "rust-lang.rust-analyzer",
     },
   },
-  "tasks": {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "type": "process",
-        "label": "build",
-        "command": "npm",
-        "args": ["run", "build"],
-        "problemMatcher": ["$tsc"],
-        "group": {
-          "kind": "build",
-          "isDefault": true,
-        },
-      },
-    ],
-  },
   "extensions": {
     "recommendations": [
       "ryanluker.vscode-coverage-gutters",

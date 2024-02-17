@@ -1,8 +1,15 @@
+use http_body_util::Empty;
+use hyper::body::Bytes;
 use hyper::Request;
-use std::{iter::empty, net::TcpStream};
+use hyper::Request;
+use hyper_util::rt::TokioIo;
+use std::iter::empty;
+use tokio::net::TcpStream;
 use url::Url;
 
-pub async fn load_yaml(url: &Url) -> serde_json::Value {
+pub async fn load_yaml(
+    url: &Url,
+) -> Result<serde_json::Value, Box<dyn std::error::Error + Send + Sync>> {
     // Get the host and the port
     let host = url.host().unwrap();
     let port = url.port().unwrap_or(80);
@@ -10,7 +17,7 @@ pub async fn load_yaml(url: &Url) -> serde_json::Value {
     let address = format!("{}:{}", host, port);
 
     // Open a TCP connection to the remote host
-    let stream = TcpStream::connect(address).await?;
+    let stream = TcpStream::connect(address)?;
 
     // Use an adapter to access something implementing `tokio::io` traits as if they implement
     // `hyper::rt` IO traits.
@@ -29,6 +36,13 @@ pub async fn load_yaml(url: &Url) -> serde_json::Value {
 
     // Await the response...
     let mut res = sender.send_request(req).await?;
+
+    while let Some(next) = res.frame().await {
+        let frame = next?;
+        if let Some(chunk) = frame.data_ref() {
+            io::stdout().write_all(chunk).await?;
+        }
+    }
 
     todo!()
 }
