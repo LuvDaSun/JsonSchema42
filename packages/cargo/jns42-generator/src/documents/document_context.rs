@@ -103,7 +103,7 @@ impl DocumentContext {
         todo!()
     }
 
-    fn fill_node_cache(&mut self, _retrieval_url: &Url, _document_nodee: Rc<serde_json::Value>) {
+    fn fill_node_cache(&mut self, _retrieval_url: &Url, _document_node: Rc<serde_json::Value>) {
         todo!()
     }
 
