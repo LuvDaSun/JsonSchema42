@@ -1,11 +1,14 @@
 use futures_util::stream::StreamExt;
 use futures_util::Stream;
 use serde::de::DeserializeOwned;
-use serde_json::Deserializer;
+use serde_yaml::Deserializer;
 use std::collections::VecDeque;
 use std::error::Error;
+use std::ops::Index;
 use std::pin::Pin;
 use std::task::{Context, Poll};
+
+const DOCUMENT_DELIMITER: [u8; 3] = [45, 45, 45]; // ---
 
 pub struct YamlDeserializer<T, S, I, E>
 where
@@ -17,6 +20,7 @@ where
     inner: S,
     buffer: Vec<u8>,
     queue: VecDeque<T>,
+    delimiter_search_offset: usize,
     at_end: bool,
 }
 
@@ -32,6 +36,7 @@ where
             inner,
             buffer: Vec::new(),
             queue: VecDeque::new(),
+            delimiter_search_offset: 0,
             at_end: false,
         }
     }
@@ -83,33 +88,50 @@ where
                 }
             }
 
-            let deserializer = Deserializer::from_slice(buffer);
-            let mut deserializer = deserializer.into_iter();
-            for item in deserializer.by_ref() {
+            // figure out if we have a document in our buffer
+            let has_document;
+
+            if self_mut.at_end {
+                // if we are at the end then we have a document, empty documents are
+                // automagically handled by the serializer
+                self_mut.delimiter_search_offset = buffer.len();
+                has_document = self_mut.delimiter_search_offset > 0;
+            } else if let Some(position) = buffer
+                .as_slice()
+                .windows(DOCUMENT_DELIMITER.len())
+                .position(|window| window == DOCUMENT_DELIMITER)
+            {
+                // hurray! we found a document (well maybe)
+                self_mut.delimiter_search_offset = position + DOCUMENT_DELIMITER.len();
+                has_document = self_mut.delimiter_search_offset > 0;
+            } else {
+                has_document = false;
+                self_mut.delimiter_search_offset =
+                    buffer.len().saturating_sub(DOCUMENT_DELIMITER.len());
+            }
+
+            if has_document {
+                // we have a document \o/
+                let document_buffer: Vec<_> =
+                    buffer.drain(..self_mut.delimiter_search_offset).collect();
+                self_mut.delimiter_search_offset = 0;
+
+                let deserializer = Deserializer::from_slice(&document_buffer);
+                let item = T::deserialize(deserializer);
+
                 match item {
-                    // we found some valid json
                     Ok(item) => {
                         // push it to the queue
                         queue.push_front(item);
                     }
-                    Err(error) => match error.classify() {
-                        // in this case this means we need more data, not really an error
-                        serde_json::error::Category::Eof => {
-                            break;
-                        }
-                        _ => {
-                            // Emit error and end stream
-                            queue.clear();
-                            self_mut.at_end = true;
-                            return Poll::Ready(Some(Err(Box::new(error))));
-                        }
-                    },
+                    Err(error) => {
+                        // Emit error and end stream
+                        queue.clear();
+                        self_mut.at_end = true;
+                        return Poll::Ready(Some(Err(Box::new(error))));
+                    }
                 }
             }
-
-            // cut off bytes in the buffer that are successfully parsed
-            let offset = deserializer.byte_offset();
-            let _: Vec<_> = buffer.drain(0..offset).collect();
         }
 
         if let Some(item) = queue.pop_back() {
@@ -141,7 +163,7 @@ mod tests {
 
         let body = response.bytes_stream();
 
-        let mut deserializer = YamlDeserializer::new(body);
+        let mut deserializer = YamlDeserializer::<serde_json::Value, _, _, _>::new(body);
 
         let mut count = 0;
 
@@ -164,12 +186,12 @@ mod tests {
         let path = path.join("..");
         let path = path.join("fixtures");
         let path = path.join("miscellaneous");
-        let path = path.join("people.jsonl");
+        let path = path.join("people.yaml");
 
         let file = File::open(path).await?;
         let file = ReadStream::new(file);
 
-        let mut deserializer = YamlDeserializer::new(file);
+        let mut deserializer = YamlDeserializer::<serde_json::Value, _, _, _>::new(file);
 
         let mut count = 0;
 
