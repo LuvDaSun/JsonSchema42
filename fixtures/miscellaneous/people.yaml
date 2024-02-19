@@ -3,6 +3,5 @@
 ---
 { "name": "Alice", "age": 25 }
 ---
-{ "name": "Bob", "age": 35 }
----
-
+name: Bob
+age: 35

@@ -4,11 +4,12 @@ use serde::de::DeserializeOwned;
 use serde_yaml::Deserializer;
 use std::collections::VecDeque;
 use std::error::Error;
-use std::ops::Index;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
 const DOCUMENT_DELIMITER: [u8; 3] = [45, 45, 45]; // ---
+const NEWLINE_DELIMITER: u8 = 10; // \n
+const NEWLINE_DELIMITER_PREFIX: u8 = 13; // \r
 
 pub struct YamlDeserializer<T, S, I, E>
 where
@@ -17,10 +18,17 @@ where
     I: Into<Vec<u8>>,
     E: Error,
 {
+    // source stream
     inner: S,
+    // buffer with read data
     buffer: Vec<u8>,
+    // queue of deserialized items to emit
     queue: VecDeque<T>,
-    delimiter_search_offset: usize,
+    // this is where the next document starts
+    document_offset: usize,
+    // buffer is processed until here
+    buffer_offset: usize,
+    // source stream is at it end
     at_end: bool,
 }
 
@@ -36,7 +44,8 @@ where
             inner,
             buffer: Vec::new(),
             queue: VecDeque::new(),
-            delimiter_search_offset: 0,
+            document_offset: 0,
+            buffer_offset: 0,
             at_end: false,
         }
     }
@@ -88,33 +97,54 @@ where
                 }
             }
 
-            // figure out if we have a document in our buffer
-            let has_document;
+            // figure out the length of a found document (0 means no document)
+            let mut document_length = 0;
 
-            if self_mut.at_end {
-                // if we are at the end then we have a document, empty documents are
-                // automagically handled by the serializer
-                self_mut.delimiter_search_offset = buffer.len();
-                has_document = self_mut.delimiter_search_offset > 0;
-            } else if let Some(position) = buffer
-                .as_slice()
-                .windows(DOCUMENT_DELIMITER.len())
-                .position(|window| window == DOCUMENT_DELIMITER)
-            {
-                // hurray! we found a document (well maybe)
-                self_mut.delimiter_search_offset = position + DOCUMENT_DELIMITER.len();
-                has_document = self_mut.delimiter_search_offset > 0;
-            } else {
-                has_document = false;
-                self_mut.delimiter_search_offset =
-                    buffer.len().saturating_sub(DOCUMENT_DELIMITER.len());
+            // split lines
+            let lines = buffer[self_mut.buffer_offset..].split(|value| *value == NEWLINE_DELIMITER); // split by \n
+
+            // lets find the document delimiter line
+
+            let mut next_buffer_offset = self_mut.buffer_offset;
+            for line in lines {
+                // the buffer_offset state is always one line behind
+                self_mut.buffer_offset = next_buffer_offset;
+
+                let mut line = line;
+                if let Some(last) = line.last() {
+                    if *last == NEWLINE_DELIMITER_PREFIX {
+                        line = &line[..line.len() - 1];
+                        next_buffer_offset += line.len() + 2;
+                    } else {
+                        next_buffer_offset += line.len() + 1;
+                    }
+                } else {
+                    // line is empty, we only advance the newline character
+                    next_buffer_offset += 1;
+                }
+
+                if line == DOCUMENT_DELIMITER {
+                    // hurray we found a document
+                    document_length = self_mut.buffer_offset - self_mut.document_offset;
+                    self_mut.buffer_offset = next_buffer_offset;
+                    break;
+                }
             }
 
-            if has_document {
+            if document_length == 0 && self_mut.at_end {
+                // not found a document, but we are at the end!
+                self_mut.buffer_offset = buffer.len();
+                document_length = buffer.len() - self_mut.document_offset;
+            }
+
+            if document_length > 0 {
                 // we have a document \o/
-                let document_buffer: Vec<_> =
-                    buffer.drain(..self_mut.delimiter_search_offset).collect();
-                self_mut.delimiter_search_offset = 0;
+                let document_buffer: Vec<_> = buffer
+                    .drain(0..(self_mut.document_offset + document_length))
+                    .skip(self_mut.document_offset)
+                    .collect();
+                self_mut.buffer_offset = 0;
+                self_mut.document_offset = 0;
 
                 let deserializer = Deserializer::from_slice(&document_buffer);
                 let item = T::deserialize(deserializer);
