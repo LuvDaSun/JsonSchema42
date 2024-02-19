@@ -148,8 +148,6 @@ mod tests {
         while let Some(item) = deserializer.next().await {
             let item = item?;
 
-            print!("{:?}", item);
-
             count += 1;
         }
 
@@ -177,8 +175,6 @@ mod tests {
 
         while let Some(item) = deserializer.next().await {
             let item = item?;
-
-            print!("{:?}", item);
 
             count += 1;
         }
