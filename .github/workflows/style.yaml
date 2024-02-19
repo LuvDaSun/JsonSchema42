@@ -38,4 +38,5 @@ jobs:
     container: rust:1.73.0
     steps:
       - uses: actions/checkout@v4
+      - run: rustup component add clippy
       - run: cargo clippy --all-targets
