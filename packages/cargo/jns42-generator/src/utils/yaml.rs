@@ -1,16 +1,19 @@
-use hyper::body::Buf;
-use serde_json::Deserializer;
+use crate::utils::json_deserializer::JsonDeserializer;
+use futures_util::stream::StreamExt;
 use url::Url;
 
-pub async fn load_yaml(url: &Url) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+pub async fn load_yaml(url: &Url) -> Result<Option<serde_json::Value>, Box<dyn std::error::Error>> {
     let response = reqwest::get(url.as_str()).await?.error_for_status()?;
-    let bytes = response.bytes().await?;
+    let body = response.bytes_stream();
 
-    let deserializer = Deserializer::from_reader(bytes.reader());
+    let mut deserializer = JsonDeserializer::new(body);
+    if let Some(item) = deserializer.next().await {
+        let item = item?;
 
-    // let value = deserializer.next().unwrap();
-
-    todo!()
+        Ok(Some(item))
+    } else {
+        Ok(None)
+    }
 }
 
 mod test {

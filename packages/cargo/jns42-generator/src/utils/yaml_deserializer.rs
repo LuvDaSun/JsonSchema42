@@ -7,7 +7,7 @@ use std::error::Error;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-pub struct JsonDeserializer<T, S, I, E>
+pub struct YamlDeserializer<T, S, I, E>
 where
     T: DeserializeOwned,
     S: Stream<Item = Result<I, E>>,
@@ -20,7 +20,7 @@ where
     at_end: bool,
 }
 
-impl<T, S, I, E> JsonDeserializer<T, S, I, E>
+impl<T, S, I, E> YamlDeserializer<T, S, I, E>
 where
     T: DeserializeOwned,
     S: Stream<Item = Result<I, E>>,
@@ -37,7 +37,7 @@ where
     }
 }
 
-impl<T, S, I, E> Stream for JsonDeserializer<T, S, I, E>
+impl<T, S, I, E> Stream for YamlDeserializer<T, S, I, E>
 where
     Self: Unpin,
     T: DeserializeOwned,
@@ -141,7 +141,7 @@ mod tests {
 
         let body = response.bytes_stream();
 
-        let mut deserializer = JsonDeserializer::new(body);
+        let mut deserializer = YamlDeserializer::new(body);
 
         let mut count = 0;
 
@@ -169,7 +169,7 @@ mod tests {
         let file = File::open(path).await?;
         let file = ReadStream::new(file);
 
-        let mut deserializer = JsonDeserializer::new(file);
+        let mut deserializer = YamlDeserializer::new(file);
 
         let mut count = 0;
 
