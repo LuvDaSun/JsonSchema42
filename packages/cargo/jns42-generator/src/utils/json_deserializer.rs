@@ -3,25 +3,28 @@ use futures_util::Stream;
 use serde::de::DeserializeOwned;
 use serde_json::Deserializer;
 use std::collections::VecDeque;
+use std::error::Error;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-pub struct JsonDeserializer<T, S, I>
+pub struct JsonDeserializer<T, S, I, E>
 where
     T: DeserializeOwned,
-    S: Stream<Item = I>,
+    S: Stream<Item = Result<I, E>>,
     I: Into<Vec<u8>>,
+    E: Error,
 {
     inner: S,
     buffer: Vec<u8>,
     queue: VecDeque<T>,
     at_end: bool,
 }
-impl<T, S, I> JsonDeserializer<T, S, I>
+impl<T, S, I, E> JsonDeserializer<T, S, I, E>
 where
     T: DeserializeOwned,
-    S: Stream<Item = I>,
+    S: Stream<Item = Result<I, E>>,
     I: Into<Vec<u8>>,
+    E: Error,
 {
     pub fn new(inner: S) -> Self {
         Self {
@@ -33,14 +36,15 @@ where
     }
 }
 
-impl<T, S, I> Stream for JsonDeserializer<T, S, I>
+impl<T, S, I, E> Stream for JsonDeserializer<T, S, I, E>
 where
     Self: Unpin,
     T: DeserializeOwned,
-    S: Stream<Item = I> + Unpin,
+    S: Stream<Item = Result<I, E>> + Unpin,
     I: Into<Vec<u8>>,
+    E: Error + 'static,
 {
-    type Item = Result<T, serde_json::Error>;
+    type Item = Result<T, Box<dyn Error>>;
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
         let self_mut = self.get_mut();
@@ -55,10 +59,16 @@ where
             loop {
                 let next_future = inner.poll_next_unpin(cx);
                 match next_future {
-                    Poll::Ready(Some(chunk)) => {
+                    Poll::Ready(Some(Ok(chunk))) => {
                         // append read data to buffer
                         let mut chunk = chunk.into();
                         buffer.append(&mut chunk);
+                    }
+                    Poll::Ready(Some(Err(error))) => {
+                        // Emit error and end stream
+                        queue.clear();
+                        self_mut.at_end = true;
+                        return Poll::Ready(Some(Err(Box::new(error))));
                     }
                     Poll::Ready(None) => {
                         // done!
@@ -90,7 +100,7 @@ where
                             // Emit error and end stream
                             queue.clear();
                             self_mut.at_end = true;
-                            return Poll::Ready(Some(Err(error)));
+                            return Poll::Ready(Some(Err(Box::new(error))));
                         }
                     },
                 }
@@ -130,26 +140,18 @@ mod tests {
         let response = reqwest::get(url).await?.error_for_status()?;
 
         let body = response.bytes_stream();
-        let mut last_error = Ok(());
-        let body = body.map(|chunk| match chunk {
-            Ok(chunk) => chunk,
-            Err(error) => {
-                last_error = Err(error);
-                Default::default()
-            }
-        });
 
-        let mut deserializer = JsonDeserializer::<Value, _, _>::new(body);
+        let mut deserializer = JsonDeserializer::<Value, _, _, _>::new(body);
 
         let mut count = 0;
 
         while let Some(item) = deserializer.next().await {
+            let item = item?;
+
             print!("{:?}", item);
 
             count += 1;
         }
-
-        last_error?;
 
         assert_eq!(count, 1);
 
@@ -168,26 +170,18 @@ mod tests {
 
         let file = File::open(path).await?;
         let file = ReadStream::new(file);
-        let mut last_result = Ok(());
-        let file = file.map(|chunk| match chunk {
-            Ok(chunk) => chunk,
-            Err(error) => {
-                last_result = Err(error);
-                Default::default()
-            }
-        });
 
-        let mut deserializer = JsonDeserializer::<Value, _, _>::new(file);
+        let mut deserializer = JsonDeserializer::<Value, _, _, _>::new(file);
 
         let mut count = 0;
 
         while let Some(item) = deserializer.next().await {
+            let item = item?;
+
             print!("{:?}", item);
 
             count += 1;
         }
-
-        last_result?;
 
         assert_eq!(count, 3);
 
