@@ -25,6 +25,8 @@ mod test {
         let url = "https://spec.openapis.org/oas/3.1/dialect/base"
             .parse()
             .unwrap();
-        let _res = load_yaml(&url).await.unwrap();
+        let response = load_yaml(&url).await.unwrap();
+
+        assert!(response.is_some())
     }
 }
