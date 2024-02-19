@@ -141,7 +141,7 @@ mod tests {
 
         let body = response.bytes_stream();
 
-        let mut deserializer = JsonDeserializer::new(body);
+        let mut deserializer = JsonDeserializer::<serde_json::Value, _, _, _>::new(body);
 
         let mut count = 0;
 
@@ -169,7 +169,7 @@ mod tests {
         let file = File::open(path).await?;
         let file = ReadStream::new(file);
 
-        let mut deserializer = JsonDeserializer::new(file);
+        let mut deserializer = JsonDeserializer::<serde_json::Value, _, _, _>::new(file);
 
         let mut count = 0;
 
