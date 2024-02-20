@@ -1,0 +1,41 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests",
+      "cargo": {
+        "args": ["test", "--no-run", "--lib", "--package=jns42-generator", "--all-targets"],
+        "filter": {
+          "name": "jns42-generator",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "package file",
+      "cargo": {
+        "args": ["build", "--bin=jns42_generator", "--package=jns42-generator"],
+        "filter": {
+          "name": "jns42_generator",
+          "kind": "bin"
+        }
+      },
+      "args": [
+        "package",
+        "file://${file}",
+        "--package-directory",
+        ".package/file/${fileBasenameNoExtension}",
+        "--package-name",
+        "${fileBasenameNoExtension}",
+        "--package-version",
+        "0.0.0"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

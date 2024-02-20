@@ -1,0 +1,21 @@
+on:
+  pull_request: {}
+  push:
+    branches:
+      - "*"
+    paths:
+      - "*"
+      - .github/**
+      - fixtures/**
+      - packages/npm/**
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    container: node:21.5.0-alpine3.19
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm --workspaces run build
+      - run: npm --workspaces test
+      - run: ./packages/npm/jns42-generator/test-fixtures

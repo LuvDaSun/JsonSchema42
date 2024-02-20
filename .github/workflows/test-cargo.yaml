@@ -1,0 +1,18 @@
+on:
+  pull_request: {}
+  push:
+    branches:
+      - "*"
+    paths:
+      - "*"
+      - .github/**
+      - fixtures/**
+      - packages/cargo/**
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    container: rust:1.73.0
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --workspace --all-targets

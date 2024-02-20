@@ -2,14 +2,15 @@ SHELL:=$(PREFIX)/bin/sh
 NPM_VERSION:=$(shell npx jns42-generator --version)
 
 build: \
-	generated/ts/schema-intermediate \
-	generated/ts/schema-draft-04 \
-	generated/ts/schema-draft-2020-12 \
-	generated/ts/schema-oas-v3-1 \
-	generated/ts/swagger-v2 \
-	generated/ts/oas-v3-0 \
-	generated/ts/oas-v3-1 \
+	generated/npm/schema-intermediate \
+	generated/npm/schema-draft-04 \
+	generated/npm/schema-draft-2020-12 \
+	generated/npm/schema-oas-v3-1 \
+	generated/npm/swagger-v2 \
+	generated/npm/oas-v3-0 \
+	generated/npm/oas-v3-1 \
 
+	# Link the generated code, but don't save those links to the package lock
 	npm install --no-package-lock
 
 rebuild: \
@@ -17,15 +18,15 @@ rebuild: \
 
 clean: \
 
-	rm --recursive --force generated/ts/schema-intermediate
-	rm --recursive --force generated/ts/schema-draft-04
-	rm --recursive --force generated/ts/schema-draft-2020-12
-	rm --recursive --force generated/ts/schema-oas-v3-1 \
-	rm --recursive --force generated/ts/swagger-v2 \
-	rm --recursive --force generated/ts/oas-v3-0 \
-	rm --recursive --force generated/ts/oas-v3-1 \
+	rm --recursive --force generated/npm/schema-intermediate
+	rm --recursive --force generated/npm/schema-draft-04
+	rm --recursive --force generated/npm/schema-draft-2020-12
+	rm --recursive --force generated/npm/schema-oas-v3-1 \
+	rm --recursive --force generated/npm/swagger-v2 \
+	rm --recursive --force generated/npm/oas-v3-0 \
+	rm --recursive --force generated/npm/oas-v3-1 \
 
-generated/ts/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
+generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir --parents $(@D)
 
 	npx jns42-generator package file://${PWD}/$< \
@@ -33,7 +34,7 @@ generated/ts/schema-intermediate: packages/oas/schema-intermediate/src/schema.ya
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
-generated/ts/schema-draft-04:
+generated/npm/schema-draft-04:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package http://json-schema.org/draft-04/schema\# \
@@ -41,7 +42,7 @@ generated/ts/schema-draft-04:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
-generated/ts/schema-draft-2020-12:
+generated/npm/schema-draft-2020-12:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package https://json-schema.org/draft/2020-12/schema \
@@ -49,7 +50,7 @@ generated/ts/schema-draft-2020-12:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
-generated/ts/schema-oas-v3-1:
+generated/npm/schema-oas-v3-1:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/dialect/base \
@@ -57,8 +58,7 @@ generated/ts/schema-oas-v3-1:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
-
-generated/ts/swagger-v2:
+generated/npm/swagger-v2:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package http://swagger.io/v2/schema.json\# \
@@ -66,7 +66,7 @@ generated/ts/swagger-v2:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
-generated/ts/oas-v3-0:
+generated/npm/oas-v3-0:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.0/schema/2021-09-28 \
@@ -74,7 +74,7 @@ generated/ts/oas-v3-0:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
-generated/ts/oas-v3-1:
+generated/npm/oas-v3-1:
 	mkdir --parents $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/schema/2022-10-07 \

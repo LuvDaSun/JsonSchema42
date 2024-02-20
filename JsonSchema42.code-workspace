@@ -9,8 +9,12 @@
       "path": "packages/oas/schema-intermediate",
     },
     {
-      "name": "ts/jns42-generator",
-      "path": "packages/ts/jns42-generator",
+      "name": "npm/jns42-generator",
+      "path": "packages/npm/jns42-generator",
+    },
+    {
+      "name": "cargo/jns42-generator",
+      "path": "packages/cargo/jns42-generator",
     },
   ],
   "settings": {
@@ -24,28 +28,22 @@
     "typescript.tsdk": "./node_modules/typescript/lib",
     "npm.packageManager": "npm",
     "rust-analyzer.check.command": "clippy",
-  },
-  "tasks": {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "type": "process",
-        "label": "build",
-        "command": "npm",
-        "args": ["run", "build"],
-        "problemMatcher": ["$tsc"],
-        "group": {
-          "kind": "build",
-          "isDefault": true,
-        },
-      },
-    ],
+    "[rust]": {
+      "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    },
+    "[toml]": {
+      "editor.defaultFormatter": "tamasfe.even-better-toml",
+    },
   },
   "extensions": {
     "recommendations": [
       "ryanluker.vscode-coverage-gutters",
       "esbenp.prettier-vscode",
       "streetsidesoftware.code-spell-checker",
+      "rust-lang.rust-analyzer",
+      "vadimcn.vscode-lldb",
+      "editorconfig.editorconfig",
+      "tamasfe.even-better-toml",
     ],
     "unwantedRecommendations": [],
   },

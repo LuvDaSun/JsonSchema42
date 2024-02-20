@@ -1,0 +1,26 @@
+version: "0.2"
+words:
+  - automagically
+  - Bulthuis
+  - camelcase
+  - clippy
+  - Deque
+  - endregion
+  - esbenp
+  - lcov
+  - luvdasun
+  - notdir
+  - presolved
+  - reqwest
+  - ryanluker
+  - serde
+  - structs
+  - tamasfe
+  - unalias
+  - urlencoding
+  - vadimcn
+useGitignore: true
+files:
+  - "**"
+enableFiletypes:
+  - "*"
