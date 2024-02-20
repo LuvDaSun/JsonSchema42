@@ -1,12 +1,11 @@
 use super::document::Document;
-
-use std::rc::Rc;
+use serde_json::Value;
 use url::Url;
 
-pub struct EmbeddedDocument {
+pub struct EmbeddedDocument<'a> {
     pub retrieval_url: Url,
     pub given_url: Url,
-    pub node: Rc<serde_json::Value>,
+    pub node: &'a Value,
 }
 
 pub struct ReferencedDocument {
