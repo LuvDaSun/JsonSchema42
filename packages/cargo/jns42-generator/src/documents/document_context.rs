@@ -1,5 +1,4 @@
 use crate::{
-    documents::document,
     models,
     utils::{read_json_node::read_json_node, schema::discover_schema_uri, yaml::load_yaml},
 };
@@ -132,8 +131,8 @@ impl DocumentContext {
     async fn load_from_cache(
         &mut self,
         retrieval_url: &Url,
-        given_url: &Url,
-        antecedent_url: Option<&Url>,
+        _given_url: &Url,
+        _antecedent_url: Option<&Url>,
         default_schema_uri: &MetaSchemaId,
     ) {
         if !self.loaded.insert(retrieval_url.clone()) {
@@ -183,7 +182,7 @@ impl DocumentContext {
         todo!()
     }
 
-    async fn load_from_schema_document(
+    async fn _load_from_schema_document(
         &mut self,
         retrieval_url: &Url,
         document: impl SchemaDocument,
