@@ -1,7 +1,9 @@
 use std::error::Error;
+use std::rc::Rc;
 
 use crate::documents::document_context::DocumentContext;
 use crate::documents::meta::MetaSchemaId;
+use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use clap::Parser;
 use url::Url;
 
@@ -36,6 +38,27 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     } = options;
 
     let mut context = DocumentContext::new();
+
+    context.register_factory(
+        &MetaSchemaId::Draft202012,
+        Box::new(|| Rc::new(draft_2020_12::document::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft201909,
+        Box::new(|| Rc::new(draft_2019_09::document::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft07,
+        Box::new(|| Rc::new(draft_07::document::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft06,
+        Box::new(|| Rc::new(draft_06::document::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft04,
+        Box::new(|| Rc::new(draft_04::document::Document::new())),
+    );
 
     context
         .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
