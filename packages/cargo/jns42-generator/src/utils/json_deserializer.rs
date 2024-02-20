@@ -25,6 +25,7 @@ where
     S: Stream<Item = Result<I, Box<dyn Error>>>,
     I: Into<Vec<u8>>,
 {
+    #[allow(dead_code)]
     pub fn new(inner: S) -> Self {
         Self {
             inner,

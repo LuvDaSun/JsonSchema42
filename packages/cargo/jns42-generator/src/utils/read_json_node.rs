@@ -24,6 +24,7 @@ pub fn read_json_node(prefix: String, node: Value) -> Vec<(String, Value)> {
     }
 }
 
+#[allow(dead_code)]
 pub fn read_json_node_rc(prefix: String, node: Rc<ValueRc>) -> Vec<(String, Rc<ValueRc>)> {
     match node.borrow() {
         ValueRc::Array(array_value) => once((prefix.clone(), node.clone()))

@@ -1,5 +1,5 @@
 use super::read_stream::ReadStream;
-use futures_util::{Stream, StreamExt, TryStreamExt};
+use futures_util::{Stream, StreamExt};
 use std::{error::Error, fmt::Display};
 use tokio::fs::File;
 use url::Url;

@@ -2,12 +2,14 @@ use super::document::Document;
 use serde_json::Value;
 use url::Url;
 
+#[allow(dead_code)]
 pub struct EmbeddedDocument<'a> {
     pub retrieval_url: Url,
     pub given_url: Url,
     pub node: &'a Value,
 }
 
+#[allow(dead_code)]
 pub struct ReferencedDocument {
     pub retrieval_url: Url,
     pub given_url: Url,

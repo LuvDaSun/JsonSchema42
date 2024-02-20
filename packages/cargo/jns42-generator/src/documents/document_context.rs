@@ -58,6 +58,7 @@ impl DocumentContext {
         self.factories.insert(schema.clone(), factory);
     }
 
+    #[allow(dead_code)]
     pub fn get_intermediate_data(&self) -> models::intermediate::IntermediateSchema {
         models::intermediate::IntermediateSchema {
             schemas: self.get_intermediate_schema_entries().cloned().collect(),
@@ -74,12 +75,14 @@ impl DocumentContext {
         )
     }
 
+    #[allow(dead_code)]
     pub fn get_document(&self, document_url: &Url) -> Rc<dyn Document> {
         let document = self.documents.get(document_url).unwrap().clone();
 
         document
     }
 
+    #[allow(dead_code)]
     pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn Document> {
         let document_url = self.node_documents.get(node_url).unwrap();
 
@@ -102,9 +105,11 @@ impl DocumentContext {
             self.fill_node_cache(retrieval_url, document_node.unwrap());
         }
 
-        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri);
+        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
+            .await;
     }
 
+    #[allow(dead_code)]
     pub async fn load_from_document(
         &mut self,
         retrieval_url: &Url,
@@ -141,7 +146,7 @@ impl DocumentContext {
 
         let node = self.node_cache.get(retrieval_url).unwrap();
 
-        let schema_uri = discover_schema_uri(&node).unwrap_or_else(|| default_schema_uri.clone());
+        let schema_uri = discover_schema_uri(node).unwrap_or_else(|| default_schema_uri.clone());
         let factory = self.factories.get(&schema_uri).unwrap();
 
         let document = factory();

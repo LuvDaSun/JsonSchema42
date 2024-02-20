@@ -1,5 +1,4 @@
 use serde_json::Value;
-use url::Url;
 
 use crate::documents::meta::MetaSchemaId;
 
