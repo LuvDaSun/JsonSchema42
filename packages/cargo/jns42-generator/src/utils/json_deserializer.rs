@@ -7,12 +7,11 @@ use std::error::Error;
 use std::pin::Pin;
 use std::task::{Context, Poll};
 
-pub struct JsonDeserializer<T, S, I, E>
+pub struct JsonDeserializer<T, S, I>
 where
     T: DeserializeOwned,
-    S: Stream<Item = Result<I, E>>,
+    S: Stream<Item = Result<I, Box<dyn Error>>>,
     I: Into<Vec<u8>>,
-    E: Error,
 {
     inner: S,
     buffer: Vec<u8>,
@@ -20,12 +19,11 @@ where
     at_end: bool,
 }
 
-impl<T, S, I, E> JsonDeserializer<T, S, I, E>
+impl<T, S, I> JsonDeserializer<T, S, I>
 where
     T: DeserializeOwned,
-    S: Stream<Item = Result<I, E>>,
+    S: Stream<Item = Result<I, Box<dyn Error>>>,
     I: Into<Vec<u8>>,
-    E: Error,
 {
     pub fn new(inner: S) -> Self {
         Self {
@@ -37,13 +35,12 @@ where
     }
 }
 
-impl<T, S, I, E> Stream for JsonDeserializer<T, S, I, E>
+impl<T, S, I> Stream for JsonDeserializer<T, S, I>
 where
     Self: Unpin,
     T: DeserializeOwned,
-    S: Stream<Item = Result<I, E>> + Unpin,
+    S: Stream<Item = Result<I, Box<dyn Error>>> + Unpin,
     I: Into<Vec<u8>>,
-    E: Error + 'static,
 {
     type Item = Result<T, Box<dyn Error>>;
 
@@ -69,7 +66,7 @@ where
                         // Emit error and end stream
                         queue.clear();
                         self_mut.at_end = true;
-                        return Poll::Ready(Some(Err(Box::new(error))));
+                        return Poll::Ready(Some(Err(error)));
                     }
                     Poll::Ready(None) => {
                         // done!
@@ -127,9 +124,9 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::read_stream::ReadStream;
-
     use super::*;
+    use crate::utils::read_stream::ReadStream;
+    use futures_util::TryStreamExt;
     use std::path::PathBuf;
     use tokio::fs::File;
     use url::Url;
@@ -139,9 +136,11 @@ mod tests {
         let url = Url::parse("https://api.chucknorris.io/jokes/random").unwrap();
         let response = reqwest::get(url).await?.error_for_status()?;
 
-        let body = response.bytes_stream();
+        let body = response
+            .bytes_stream()
+            .map_err(|error| Box::new(error) as Box<dyn Error>);
 
-        let mut deserializer = JsonDeserializer::<serde_json::Value, _, _, _>::new(body);
+        let mut deserializer = JsonDeserializer::<serde_json::Value, _, _>::new(body);
 
         let mut count = 0;
 
@@ -167,9 +166,9 @@ mod tests {
         let path = path.join("people.jsonl");
 
         let file = File::open(path).await?;
-        let file = ReadStream::new(file);
+        let file = ReadStream::new(file).map_err(|error| Box::new(error) as Box<dyn Error>);
 
-        let mut deserializer = JsonDeserializer::<serde_json::Value, _, _, _>::new(file);
+        let mut deserializer = JsonDeserializer::<serde_json::Value, _, _>::new(file);
 
         let mut count = 0;
 
