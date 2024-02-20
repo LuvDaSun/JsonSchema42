@@ -2,7 +2,7 @@ use crate::documents;
 use clap::ValueEnum;
 use std::fmt::Display;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, ValueEnum)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, ValueEnum)]
 pub enum MetaSchemaId {
     Unknown,
 

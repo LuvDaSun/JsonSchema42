@@ -9,7 +9,7 @@ use std::{
 };
 use url::Url;
 
-use super::{document::Document, schema_document::SchemaDocument};
+use super::{document::Document, meta::MetaSchemaId, schema_document::SchemaDocument};
 
 type DocumentFactory = dyn Fn() -> Rc<dyn Document>;
 
@@ -17,7 +17,7 @@ pub struct DocumentContext {
     /**
      * document factories by schema identifier
      */
-    factories: HashMap<Url, Box<DocumentFactory>>,
+    factories: HashMap<MetaSchemaId, Box<DocumentFactory>>,
 
     /**
      * all documents, indexed by document id
@@ -41,7 +41,17 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-    pub fn register_factory(&mut self, schema: &Url, factory: Box<DocumentFactory>) {
+    pub fn new() -> Self {
+        Self {
+            factories: Default::default(),
+            documents: Default::default(),
+            node_documents: Default::default(),
+            node_cache: Default::default(),
+            loaded: Default::default(),
+        }
+    }
+
+    pub fn register_factory(&mut self, schema: &MetaSchemaId, factory: Box<DocumentFactory>) {
         /*
          * don't check if the factory is already registered here so we can
          * override factories
@@ -82,7 +92,7 @@ impl DocumentContext {
         retrieval_url: &Url,
         given_url: &Url,
         antecedent_url: Option<&Url>,
-        default_schema_uri: &Url,
+        default_schema_uri: &MetaSchemaId,
     ) {
         let document_node = self.node_cache.get(retrieval_url);
 
@@ -102,7 +112,7 @@ impl DocumentContext {
         given_url: &Url,
         antecedent_url: Option<&Url>,
         document_node: serde_json::Value,
-        default_schema_uri: &Url,
+        default_schema_uri: &MetaSchemaId,
     ) {
         if !self.node_cache.contains_key(retrieval_url) {
             self.fill_node_cache(retrieval_url, document_node)
@@ -124,7 +134,7 @@ impl DocumentContext {
         retrieval_url: &Url,
         given_url: &Url,
         antecedent_url: Option<&Url>,
-        default_schema_uri: &Url,
+        default_schema_uri: &MetaSchemaId,
     ) {
         if !self.loaded.insert(retrieval_url.clone()) {
             return;
@@ -177,7 +187,7 @@ impl DocumentContext {
         &mut self,
         retrieval_url: &Url,
         document: impl SchemaDocument,
-        default_schema_uri: &Url,
+        default_schema_uri: &MetaSchemaId,
     ) {
         for embedded_document in document.get_embedded_documents(retrieval_url) {
             self.load_from_document(

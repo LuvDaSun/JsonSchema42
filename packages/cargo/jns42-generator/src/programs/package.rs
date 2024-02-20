@@ -1,4 +1,6 @@
-use crate::documents::manager::Manager;
+use std::error::Error;
+
+use crate::documents::document_context::DocumentContext;
 use crate::documents::meta::MetaSchemaId;
 use clap::Parser;
 use url::Url;
@@ -26,16 +28,18 @@ pub struct CommandOptions {
     pub unique_name_seed: usize,
 }
 
-pub fn run_command(options: CommandOptions) -> Result<(), &'static str> {
+pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
     let CommandOptions {
         schema_url,
         default_meta_schema_url,
         ..
     } = options;
 
-    let mut manager = Manager::new();
+    let mut context = DocumentContext::new();
 
-    manager.load_from_url(&schema_url, &schema_url, default_meta_schema_url)?;
+    context
+        .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
+        .await;
 
     Ok(())
 }

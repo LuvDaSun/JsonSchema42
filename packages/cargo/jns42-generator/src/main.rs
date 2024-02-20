@@ -5,8 +5,12 @@ mod utils;
 
 use clap::Parser;
 use programs::{run_program, ProgramOptions};
+use std::error::Error;
 
-fn main() {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     let options = ProgramOptions::parse();
-    run_program(options).unwrap()
+    run_program(options).await?;
+
+    Ok(())
 }
