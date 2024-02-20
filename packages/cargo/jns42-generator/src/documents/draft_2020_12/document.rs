@@ -1,10 +1,20 @@
+use crate::documents::document_context::DocumentContext;
+use serde_json::Value;
+use url::Url;
+
 pub struct Document {
-    //
+    antecedent_url: Option<Url>,
+    document_node_url: Url,
+    document_node: Value,
 }
 
 impl Document {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(given_url: Url, antecedent_url: Option<Url>, document_node: Value) -> Self {
+        Self {
+            antecedent_url,
+            document_node,
+            document_node_url: given_url,
+        }
     }
 }
 

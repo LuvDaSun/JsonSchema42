@@ -2,6 +2,7 @@ use crate::{
     models,
     utils::{read_json_node::read_json_node, schema::discover_schema_uri, yaml::load_yaml},
 };
+use serde_json::Value;
 use std::{
     collections::{HashMap, HashSet},
     rc::Rc,
@@ -10,7 +11,14 @@ use url::Url;
 
 use super::{document::Document, meta::MetaSchemaId, schema_document::SchemaDocument};
 
-type DocumentFactory = dyn Fn() -> Rc<dyn Document>;
+pub struct DocumentInitializer<'a> {
+    pub retrieval_url: &'a Url,
+    pub given_url: &'a Url,
+    pub antecedent_url: Option<&'a Url>,
+    pub document_node: &'a Value,
+}
+
+pub type DocumentFactory = dyn Fn(DocumentInitializer) -> Rc<dyn Document>;
 
 pub struct DocumentContext {
     /**
@@ -136,8 +144,8 @@ impl DocumentContext {
     async fn load_from_cache(
         &mut self,
         retrieval_url: &Url,
-        _given_url: &Url,
-        _antecedent_url: Option<&Url>,
+        given_url: &Url,
+        antecedent_url: Option<&Url>,
         default_schema_uri: &MetaSchemaId,
     ) {
         if !self.loaded.insert(retrieval_url.clone()) {
@@ -149,7 +157,12 @@ impl DocumentContext {
         let schema_uri = discover_schema_uri(node).unwrap_or_else(|| default_schema_uri.clone());
         let factory = self.factories.get(&schema_uri).unwrap();
 
-        let document = factory();
+        let document = factory(DocumentInitializer {
+            retrieval_url,
+            given_url,
+            antecedent_url,
+            document_node: node,
+        });
         let document_uri = document.get_document_uri();
         let document_uri_string = document_uri.as_str();
 
@@ -187,7 +200,8 @@ impl DocumentContext {
         todo!()
     }
 
-    async fn _load_from_schema_document(
+    #[allow(dead_code)]
+    async fn load_from_schema_document(
         &mut self,
         retrieval_url: &Url,
         document: impl SchemaDocument,
