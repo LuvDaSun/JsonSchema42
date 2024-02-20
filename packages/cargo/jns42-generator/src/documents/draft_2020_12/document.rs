@@ -1,7 +1,7 @@
-use crate::documents::document_context::DocumentContext;
 use serde_json::Value;
 use url::Url;
 
+#[allow(dead_code)]
 pub struct Document {
     antecedent_url: Option<Url>,
     document_node_url: Url,
