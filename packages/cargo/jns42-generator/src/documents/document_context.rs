@@ -1,6 +1,9 @@
 use crate::{
     models,
-    utils::{read_json_node::read_json_node, schema::discover_schema_uri, yaml::load_yaml},
+    utils::{
+        read_json_node::read_json_node, schema::discover_schema_uri, url::normalize_url,
+        yaml::load_yaml,
+    },
 };
 use serde_json::Value;
 use std::{
@@ -96,7 +99,11 @@ impl DocumentContext {
     pub fn get_document(&self, document_url: &Url) -> Rc<dyn Document> {
         let inner = self.inner();
 
-        let document = inner.documents.get(document_url).unwrap().clone();
+        let document = inner
+            .documents
+            .get(&normalize_url(document_url))
+            .unwrap()
+            .clone();
 
         document
     }
@@ -105,7 +112,7 @@ impl DocumentContext {
     pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn Document> {
         let inner = self.inner();
 
-        let document_url = inner.node_documents.get(node_url).unwrap();
+        let document_url = inner.node_documents.get(&normalize_url(node_url)).unwrap();
 
         self.get_document(document_url)
     }
@@ -119,7 +126,7 @@ impl DocumentContext {
     ) {
         let document_node_is_none = {
             let inner = self.inner();
-            let document_node = inner.node_cache.get(retrieval_url);
+            let document_node = inner.node_cache.get(&normalize_url(retrieval_url));
             document_node.is_none()
         };
 
@@ -158,7 +165,11 @@ impl DocumentContext {
     fn fill_node_cache(&mut self, retrieval_url: &Url, document_node: serde_json::Value) {
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
-            assert!(self.inner_mut().node_cache.insert(node_url, node).is_none())
+            assert!(self
+                .inner_mut()
+                .node_cache
+                .insert(normalize_url(&node_url), node)
+                .is_none())
         }
     }
 
@@ -172,11 +183,14 @@ impl DocumentContext {
         let self_clone = self.clone();
         let mut inner_mut = self.inner_mut();
 
-        if !inner_mut.loaded.insert(retrieval_url.clone()) {
+        if !inner_mut.loaded.insert(normalize_url(retrieval_url)) {
             return;
         }
 
-        let node = inner_mut.node_cache.get(retrieval_url).unwrap();
+        let node = inner_mut
+            .node_cache
+            .get(&normalize_url(retrieval_url))
+            .unwrap();
 
         let schema_uri = discover_schema_uri(node).unwrap_or_else(|| default_schema_uri.clone());
         let factory = inner_mut.factories.get(&schema_uri).unwrap();
@@ -195,11 +209,11 @@ impl DocumentContext {
 
         assert!(inner_mut
             .documents
-            .insert(document_uri.clone(), document.clone())
+            .insert(normalize_url(document_uri), document.clone())
             .is_none());
 
         for node_url in document.get_node_urls() {
-            let document_node_url_previous = inner_mut.node_documents.get(node_url);
+            let document_node_url_previous = inner_mut.node_documents.get(&normalize_url(node_url));
 
             if let Some(document_node_url_previous) = document_node_url_previous {
                 let document_node_url_previous_string = document_node_url_previous.as_str();
@@ -211,7 +225,7 @@ impl DocumentContext {
                 if document_uri_string.starts_with(document_node_url_previous_string) {
                     assert!(inner_mut
                         .node_documents
-                        .insert(node_url.clone(), document_uri.clone())
+                        .insert(normalize_url(node_url), normalize_url(document_uri))
                         .is_some());
                     continue;
                 }
@@ -220,7 +234,7 @@ impl DocumentContext {
             }
             assert!(inner_mut
                 .node_documents
-                .insert(node_url.clone(), document_uri.clone())
+                .insert(normalize_url(node_url), normalize_url(document_uri))
                 .is_none());
         }
     }
