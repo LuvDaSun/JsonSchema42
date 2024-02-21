@@ -223,8 +223,6 @@ impl DocumentContext {
                 .insert(node_url.clone(), document_uri.clone())
                 .is_none());
         }
-
-        todo!()
     }
 
     #[allow(dead_code)]
