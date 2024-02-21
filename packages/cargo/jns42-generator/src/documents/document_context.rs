@@ -4,7 +4,7 @@ use crate::{
 };
 use serde_json::Value;
 use std::{
-    cell::RefCell,
+    cell::{Ref, RefCell, RefMut},
     collections::{HashMap, HashSet},
     rc::Rc,
 };
@@ -21,6 +21,7 @@ pub struct DocumentInitializer {
 
 pub type DocumentFactory = dyn Fn(DocumentContext, DocumentInitializer) -> Rc<dyn Document>;
 
+#[derive(Default)]
 struct Inner {
     /**
      * document factories by schema identifier
@@ -48,30 +49,29 @@ struct Inner {
     loaded: HashSet<Url>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct DocumentContext(Rc<RefCell<Inner>>);
 
 impl DocumentContext {
     pub fn new() -> Self {
-        let inner = Inner {
-            factories: Default::default(),
-            documents: Default::default(),
-            node_documents: Default::default(),
-            node_cache: Default::default(),
-            loaded: Default::default(),
-        };
-        let inner = RefCell::new(inner);
-        let inner = Rc::new(inner);
-        Self(inner)
+        Default::default()
+    }
+
+    fn inner(&self) -> Ref<Inner> {
+        self.0.borrow()
+    }
+
+    fn inner_mut(&mut self) -> RefMut<Inner> {
+        self.0.borrow_mut()
     }
 
     pub fn register_factory(&mut self, schema: &MetaSchemaId, factory: Box<DocumentFactory>) {
+        let mut inner_mut = self.inner_mut();
         /*
          * don't check if the factory is already registered here so we can
          * override factories
          */
-        let mut inner = self.0.borrow_mut();
-        inner.factories.insert(schema.clone(), factory);
+        inner_mut.factories.insert(schema.clone(), factory);
     }
 
     #[allow(dead_code)]
@@ -82,7 +82,8 @@ impl DocumentContext {
     }
 
     pub fn get_intermediate_schema_entries(&self) -> Vec<serde_json::Value> {
-        let inner = self.0.borrow();
+        let inner = self.inner();
+
         inner
             .documents
             .iter()
@@ -93,7 +94,8 @@ impl DocumentContext {
 
     #[allow(dead_code)]
     pub fn get_document(&self, document_url: &Url) -> Rc<dyn Document> {
-        let inner = self.0.borrow();
+        let inner = self.inner();
+
         let document = inner.documents.get(document_url).unwrap().clone();
 
         document
@@ -101,7 +103,8 @@ impl DocumentContext {
 
     #[allow(dead_code)]
     pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn Document> {
-        let inner = self.0.borrow();
+        let inner = self.inner();
+
         let document_url = inner.node_documents.get(node_url).unwrap();
 
         self.get_document(document_url)
@@ -115,7 +118,7 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let document_node_is_none = {
-            let inner = self.0.borrow();
+            let inner = self.inner();
             let document_node = inner.node_cache.get(retrieval_url);
             document_node.is_none()
         };
@@ -123,12 +126,10 @@ impl DocumentContext {
         if document_node_is_none {
             let document_node = load_yaml(retrieval_url).await.unwrap();
 
-            self.clone()
-                .fill_node_cache(retrieval_url, document_node.unwrap());
+            self.fill_node_cache(retrieval_url, document_node.unwrap());
         }
 
-        self.clone()
-            .load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
+        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
             .await;
     }
 
@@ -142,25 +143,22 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let node_cache_contains_key = {
-            let inner = self.0.borrow();
+            let inner = self.inner();
             inner.node_cache.contains_key(retrieval_url)
         };
 
         if !node_cache_contains_key {
-            self.clone().fill_node_cache(retrieval_url, document_node)
+            self.fill_node_cache(retrieval_url, document_node)
         }
 
-        self.clone()
-            .load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
+        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
             .await;
     }
 
     fn fill_node_cache(&mut self, retrieval_url: &Url, document_node: serde_json::Value) {
-        let mut inner = self.0.borrow_mut();
-
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
-            assert!(inner.node_cache.insert(node_url, node).is_none())
+            assert!(self.inner_mut().node_cache.insert(node_url, node).is_none())
         }
     }
 
@@ -171,19 +169,20 @@ impl DocumentContext {
         antecedent_url: Option<&Url>,
         default_schema_uri: &MetaSchemaId,
     ) {
-        let mut inner = self.0.borrow_mut();
+        let self_clone = self.clone();
+        let mut inner_mut = self.inner_mut();
 
-        if !inner.loaded.insert(retrieval_url.clone()) {
+        if !inner_mut.loaded.insert(retrieval_url.clone()) {
             return;
         }
 
-        let node = inner.node_cache.get(retrieval_url).unwrap();
+        let node = inner_mut.node_cache.get(retrieval_url).unwrap();
 
         let schema_uri = discover_schema_uri(node).unwrap_or_else(|| default_schema_uri.clone());
-        let factory = inner.factories.get(&schema_uri).unwrap();
+        let factory = inner_mut.factories.get(&schema_uri).unwrap();
 
         let document = factory(
-            self.clone(),
+            self_clone,
             DocumentInitializer {
                 retrieval_url: retrieval_url.clone(),
                 given_url: given_url.clone(),
@@ -194,13 +193,13 @@ impl DocumentContext {
         let document_uri = document.get_document_uri();
         let document_uri_string = document_uri.as_str();
 
-        assert!(inner
+        assert!(inner_mut
             .documents
             .insert(document_uri.clone(), document.clone())
             .is_none());
 
         for node_url in document.get_node_urls() {
-            let document_node_url_previous = inner.node_documents.get(node_url);
+            let document_node_url_previous = inner_mut.node_documents.get(node_url);
 
             if let Some(document_node_url_previous) = document_node_url_previous {
                 let document_node_url_previous_string = document_node_url_previous.as_str();
@@ -210,7 +209,7 @@ impl DocumentContext {
                 }
 
                 if document_uri_string.starts_with(document_node_url_previous_string) {
-                    assert!(inner
+                    assert!(inner_mut
                         .node_documents
                         .insert(node_url.clone(), document_uri.clone())
                         .is_some());
@@ -219,7 +218,7 @@ impl DocumentContext {
 
                 unreachable!("duplicate node");
             }
-            assert!(inner
+            assert!(inner_mut
                 .node_documents
                 .insert(node_url.clone(), document_uri.clone())
                 .is_none());
