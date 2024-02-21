@@ -1,16 +1,24 @@
+use crate::documents::document_context::DocumentContext;
 use serde_json::Value;
 use url::Url;
 
 #[allow(dead_code)]
 pub struct Document {
+    document_context: DocumentContext,
     antecedent_url: Option<Url>,
     document_node_url: Url,
     document_node: Value,
 }
 
 impl Document {
-    pub fn new(given_url: Url, antecedent_url: Option<Url>, document_node: Value) -> Self {
+    pub fn new(
+        document_context: DocumentContext,
+        given_url: Url,
+        antecedent_url: Option<Url>,
+        document_node: Value,
+    ) -> Self {
         Self {
+            document_context,
             antecedent_url,
             document_node,
             document_node_url: given_url,

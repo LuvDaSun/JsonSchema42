@@ -1,20 +1,9 @@
-use serde_json::Value;
-use url::Url;
-
 #[allow(dead_code)]
-pub struct Document {
-    antecedent_url: Option<Url>,
-    document_node_url: Url,
-    document_node: Value,
-}
+pub struct Document {}
 
 impl Document {
-    pub fn new(given_url: Url, antecedent_url: Option<Url>, document_node: Value) -> Self {
-        Self {
-            antecedent_url,
-            document_node,
-            document_node_url: given_url,
-        }
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
