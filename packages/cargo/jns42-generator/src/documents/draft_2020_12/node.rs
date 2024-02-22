@@ -2,6 +2,8 @@
 
 use std::collections::HashMap;
 
+use serde_json::{Number, Value};
+
 #[derive(Debug, Clone)]
 pub enum Node {
     Null,
@@ -52,6 +54,26 @@ impl Node {
         match self {
             Node::Object(value) => Some(value),
             _ => None,
+        }
+    }
+}
+
+impl From<Value> for Node {
+    fn from(value: Value) -> Self {
+        match value {
+            Value::Null => Self::Null,
+            Value::Bool(value) => Self::Bool(value),
+            Value::Number(value) => Self::Float(value.as_f64().unwrap()),
+            Value::String(value) => Self::String(value),
+            Value::Array(value) => {
+                Self::Array(value.into_iter().map(|value| value.into()).collect())
+            }
+            Value::Object(value) => Self::Object(
+                value
+                    .into_iter()
+                    .map(|(key, value)| (key, value.into()))
+                    .collect(),
+            ),
         }
     }
 }
