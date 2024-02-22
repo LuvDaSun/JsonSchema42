@@ -1,3 +1,4 @@
+use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::{
     models,
     utils::{read_json_node::read_json_node, url::normalize_url, yaml::load_yaml},
@@ -10,8 +11,6 @@ use std::{
     rc::{Rc, Weak},
 };
 use url::Url;
-
-use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 
 pub struct DocumentInitializer<'a> {
     pub retrieval_url: Url,
@@ -231,18 +230,27 @@ impl DocumentContext {
                 .is_none());
         }
 
-        for embedded_document in document.get_embedded_documents(retrieval_url) {
+        let embedded_documents = document.clone().get_embedded_documents(retrieval_url);
+        for embedded_document in embedded_documents {
+            let node = self
+                .clone()
+                .node_cache
+                .borrow()
+                .get(&embedded_document.node_url)
+                .unwrap()
+                .clone();
             self.load_from_document(
                 &embedded_document.retrieval_url,
                 &embedded_document.given_url,
                 Some(&document.get_document_uri()),
-                embedded_document.node.clone(),
+                node,
                 default_schema_uri,
             )
             .await;
         }
 
-        for referenced_document in document.get_referenced_documents(retrieval_url) {
+        let referenced_documents = document.clone().get_referenced_documents(retrieval_url);
+        for referenced_document in referenced_documents {
             self.load_from_url(
                 &referenced_document.retrieval_url,
                 &referenced_document.given_url,

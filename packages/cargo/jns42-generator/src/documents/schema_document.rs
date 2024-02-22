@@ -1,11 +1,11 @@
-use serde_json::Value;
+use std::rc::Rc;
 use url::Url;
 
 #[allow(dead_code)]
-pub struct EmbeddedDocument<'a> {
+pub struct EmbeddedDocument {
     pub retrieval_url: Url,
     pub given_url: Url,
-    pub node: &'a Value,
+    pub node_url: Url,
 }
 
 #[allow(dead_code)]
@@ -15,15 +15,8 @@ pub struct ReferencedDocument {
 }
 
 pub trait SchemaDocument {
-    fn get_referenced_documents(
-        &self,
-        retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = ReferencedDocument> + '_>;
-
-    fn get_embedded_documents(
-        &self,
-        retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = EmbeddedDocument> + '_>;
+    fn get_referenced_documents(self: Rc<Self>, retrieval_url: &Url) -> Vec<ReferencedDocument>;
+    fn get_embedded_documents(self: Rc<Self>, retrieval_url: &Url) -> Vec<EmbeddedDocument>;
 
     fn get_document_uri(&self) -> Url;
     fn get_node_urls(&self) -> Box<dyn Iterator<Item = Url> + '_>;

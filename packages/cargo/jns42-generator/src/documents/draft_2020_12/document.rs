@@ -2,7 +2,10 @@ use crate::documents::{
     draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument,
 };
 use serde_json::Value;
-use std::{collections::HashMap, rc::Weak};
+use std::{
+    collections::HashMap,
+    rc::{Rc, Weak},
+};
 use url::Url;
 
 use super::Node;
@@ -26,7 +29,7 @@ impl Document {
     ) -> Self {
         let document_node_pointer = "".to_string();
         let nodes = document_node
-            .select_all_sub_nodes(&document_node_pointer)
+            .select_all_sub_nodes_and_self(&document_node_pointer)
             .into_iter()
             .collect();
 
@@ -64,21 +67,33 @@ impl SchemaDocument for Document {
         }))
     }
 
+    fn get_referenced_documents(self: Rc<Self>, retrieval_url: &Url) -> Vec<ReferencedDocument> {
+        self.nodes
+            .iter()
+            .filter_map(|(pointer, node)| node.select_ref().map(|node_ref| (pointer, node_ref)))
+            .map(|(_pointer, node_ref)| ReferencedDocument {
+                retrieval_url: retrieval_url.join(node_ref).unwrap(),
+                given_url: self.get_document_uri().join(node_ref).unwrap(),
+            })
+            .collect()
+    }
+
+    fn get_embedded_documents(self: Rc<Self>, retrieval_url: &Url) -> Vec<EmbeddedDocument> {
+        self.nodes
+            .iter()
+            .filter_map(|(pointer, node)| node.select_id().map(|node_id| (pointer, node_id)))
+            .map(|(pointer, node_id)| EmbeddedDocument {
+                retrieval_url: retrieval_url.join(node_id).unwrap(),
+                given_url: self.get_document_uri().join(node_id).unwrap(),
+                node_url: self
+                    .get_document_uri()
+                    .join(&format!("#{}", pointer))
+                    .unwrap(),
+            })
+            .collect()
+    }
+
     fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = Value> + '_> {
-        todo!()
-    }
-
-    fn get_referenced_documents(
-        &self,
-        _retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = ReferencedDocument> + '_> {
-        todo!()
-    }
-
-    fn get_embedded_documents(
-        &self,
-        _retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = EmbeddedDocument> + '_> {
         todo!()
     }
 }

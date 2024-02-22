@@ -1,5 +1,6 @@
 use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use serde_json::Value;
+use std::rc::Rc;
 use url::Url;
 
 #[allow(dead_code)]
@@ -24,17 +25,11 @@ impl SchemaDocument for Document {
         todo!()
     }
 
-    fn get_referenced_documents(
-        &self,
-        _retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = ReferencedDocument> + '_> {
+    fn get_referenced_documents(self: Rc<Self>, _retrieval_url: &Url) -> Vec<ReferencedDocument> {
         todo!()
     }
 
-    fn get_embedded_documents(
-        &self,
-        _retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = EmbeddedDocument> + '_> {
+    fn get_embedded_documents(self: Rc<Self>, _retrieval_url: &Url) -> Vec<EmbeddedDocument> {
         todo!()
     }
 }
