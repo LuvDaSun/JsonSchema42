@@ -78,7 +78,7 @@ impl AsRef<JsonPointer> for UrlWithPointer {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Default)]
 pub struct JsonPointer(Vec<String>);
 
 impl JsonPointer {
