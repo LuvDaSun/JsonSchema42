@@ -65,6 +65,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         Box::new(move |_context, _initializer| Rc::new(draft_04::Document::new())),
     );
 
+    let context = Rc::new(context);
     context
         .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
         .await;
