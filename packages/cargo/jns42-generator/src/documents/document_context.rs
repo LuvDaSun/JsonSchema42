@@ -13,7 +13,7 @@ use std::{
 };
 use url::Url;
 
-use super::{document::Document, meta::MetaSchemaId, schema_document::SchemaDocument};
+use super::{document::SchemaDocument, meta::MetaSchemaId};
 
 pub struct DocumentInitializer {
     pub retrieval_url: Url,
@@ -22,7 +22,7 @@ pub struct DocumentInitializer {
     pub document_node: Value,
 }
 
-pub type DocumentFactory = dyn Fn(DocumentContext, DocumentInitializer) -> Rc<dyn Document>;
+pub type DocumentFactory = dyn Fn(DocumentContext, DocumentInitializer) -> Rc<dyn SchemaDocument>;
 
 #[derive(Default)]
 struct Inner {
@@ -34,7 +34,7 @@ struct Inner {
     /**
      * all documents, indexed by document id
      */
-    documents: HashMap<Url, Rc<dyn Document>>,
+    documents: HashMap<Url, Rc<dyn SchemaDocument>>,
 
     /**
      * maps node urls to their documents
@@ -96,7 +96,7 @@ impl DocumentContext {
     }
 
     #[allow(dead_code)]
-    pub fn get_document(&self, document_url: &Url) -> Rc<dyn Document> {
+    pub fn get_document(&self, document_url: &Url) -> Rc<dyn SchemaDocument> {
         let inner = self.borrow();
 
         let document = inner
@@ -109,7 +109,7 @@ impl DocumentContext {
     }
 
     #[allow(dead_code)]
-    pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn Document> {
+    pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn SchemaDocument> {
         let inner = self.borrow();
 
         let document_url = inner.node_documents.get(&normalize_url(node_url)).unwrap();
