@@ -12,11 +12,11 @@ use url::Url;
 
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 
-pub struct DocumentInitializer {
+pub struct DocumentInitializer<'a> {
     pub retrieval_url: Url,
     pub given_url: Url,
     pub antecedent_url: Option<Url>,
-    pub document_node: Value,
+    pub document_node: &'a Value,
 }
 
 pub type DocumentFactory = dyn Fn(DocumentContext, DocumentInitializer) -> Rc<dyn SchemaDocument>;
@@ -198,7 +198,7 @@ impl DocumentContext {
                 retrieval_url: retrieval_url.clone(),
                 given_url: given_url.clone(),
                 antecedent_url: antecedent_url.cloned(),
-                document_node: node.clone(),
+                document_node: node,
             },
         );
         let document_uri = document.get_document_uri();

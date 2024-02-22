@@ -4,12 +4,14 @@ use crate::documents::{
 use serde_json::Value;
 use url::Url;
 
+use super::Node;
+
 #[allow(dead_code)]
 pub struct Document {
     document_context: DocumentContext,
     antecedent_url: Option<Url>,
     document_node_url: Url,
-    document_node: Value,
+    document_node: Node,
 }
 
 impl Document {
@@ -17,13 +19,13 @@ impl Document {
         document_context: DocumentContext,
         given_url: Url,
         antecedent_url: Option<Url>,
-        document_node: Value,
+        document_node: Node,
     ) -> Self {
         Self {
             document_context,
             antecedent_url,
-            document_node,
             document_node_url: given_url,
+            document_node,
         }
     }
 }

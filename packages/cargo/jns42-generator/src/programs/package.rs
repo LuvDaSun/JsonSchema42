@@ -44,7 +44,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
                 context,
                 initializer.given_url,
                 initializer.antecedent_url,
-                initializer.document_node,
+                initializer.document_node.into(),
             ))
         }),
     );
