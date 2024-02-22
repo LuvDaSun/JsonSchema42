@@ -88,7 +88,6 @@ impl DocumentContext {
             .documents
             .iter()
             .flat_map(|(_id, document)| document.get_intermediate_node_entries())
-            .cloned()
             .collect()
     }
 
@@ -206,11 +205,12 @@ impl DocumentContext {
 
         assert!(inner_mut
             .documents
-            .insert(normalize_url(document_uri), document.clone())
+            .insert(normalize_url(&document_uri), document.clone())
             .is_none());
 
         for node_url in document.get_node_urls() {
-            let document_node_url_previous = inner_mut.node_documents.get(&normalize_url(node_url));
+            let document_node_url_previous =
+                inner_mut.node_documents.get(&normalize_url(&node_url));
 
             if let Some(document_node_url_previous) = document_node_url_previous {
                 let document_node_url_previous_string = document_node_url_previous.as_str();
@@ -222,7 +222,7 @@ impl DocumentContext {
                 if document_uri_string.starts_with(document_node_url_previous_string) {
                     assert!(inner_mut
                         .node_documents
-                        .insert(normalize_url(node_url), normalize_url(document_uri))
+                        .insert(normalize_url(&node_url), normalize_url(&document_uri))
                         .is_some());
                     continue;
                 }
@@ -231,7 +231,7 @@ impl DocumentContext {
             }
             assert!(inner_mut
                 .node_documents
-                .insert(normalize_url(node_url), normalize_url(document_uri))
+                .insert(normalize_url(&node_url), normalize_url(&document_uri))
                 .is_none());
         }
     }
@@ -247,7 +247,7 @@ impl DocumentContext {
             self.load_from_document(
                 &embedded_document.retrieval_url,
                 &embedded_document.given_url,
-                Some(document.get_document_uri()),
+                Some(&document.get_document_uri()),
                 embedded_document.node.clone(),
                 default_schema_uri,
             )
@@ -258,7 +258,7 @@ impl DocumentContext {
             self.load_from_url(
                 &referenced_document.retrieval_url,
                 &referenced_document.given_url,
-                Some(document.get_document_uri()),
+                Some(&document.get_document_uri()),
                 default_schema_uri,
             )
             .await;
