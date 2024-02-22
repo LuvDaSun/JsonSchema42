@@ -1,9 +1,6 @@
 use crate::{
     models,
-    utils::{
-        read_json_node::read_json_node, schema::discover_schema_uri, url::normalize_url,
-        yaml::load_yaml,
-    },
+    utils::{read_json_node::read_json_node, url::normalize_url, yaml::load_yaml},
 };
 use serde_json::Value;
 use std::{
@@ -13,7 +10,7 @@ use std::{
 };
 use url::Url;
 
-use super::{document::SchemaDocument, meta::MetaSchemaId};
+use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 
 pub struct DocumentInitializer {
     pub retrieval_url: Url,
@@ -192,7 +189,7 @@ impl DocumentContext {
             .get(&normalize_url(retrieval_url))
             .unwrap();
 
-        let schema_uri = discover_schema_uri(node).unwrap_or_else(|| default_schema_uri.clone());
+        let schema_uri = MetaSchemaId::discover(node).unwrap_or_else(|| default_schema_uri.clone());
         let factory = inner_mut.factories.get(&schema_uri).unwrap();
 
         let document = factory(

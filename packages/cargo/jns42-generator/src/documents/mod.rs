@@ -4,7 +4,10 @@ pub mod draft_07;
 pub mod draft_2019_09;
 pub mod draft_2020_12;
 
-pub mod meta;
+mod document_context;
+mod meta;
+mod schema_document;
 
-pub mod document;
-pub mod document_context;
+pub use document_context::*;
+pub use meta::*;
+pub use schema_document::*;

@@ -1,10 +1,8 @@
+use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
+use crate::documents::{DocumentContext, MetaSchemaId};
+use clap::Parser;
 use std::error::Error;
 use std::rc::Rc;
-
-use crate::documents::document_context::DocumentContext;
-use crate::documents::meta::MetaSchemaId;
-use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
-use clap::Parser;
 use url::Url;
 
 #[derive(Parser, Debug)]

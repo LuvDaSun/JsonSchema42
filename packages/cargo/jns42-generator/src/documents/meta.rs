@@ -1,5 +1,6 @@
 use crate::documents;
 use clap::ValueEnum;
+use serde_json::Value;
 use std::fmt::Display;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, ValueEnum)]
@@ -20,6 +21,18 @@ pub enum MetaSchemaId {
 
     #[clap(name = documents::draft_04::meta::META_SCHEMA_ID)]
     Draft04,
+}
+
+impl MetaSchemaId {
+    pub fn discover(node: &Value) -> Option<MetaSchemaId> {
+        match node {
+            Value::Object(object_value) => match object_value.get("$schema") {
+                Some(Value::String(string_value)) => Some(string_value.as_str().into()),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
 }
 
 impl Display for MetaSchemaId {

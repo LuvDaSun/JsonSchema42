@@ -3,7 +3,6 @@ pub mod json_pointer;
 pub mod read_json_node;
 pub mod read_stream;
 pub mod read_url;
-pub mod schema;
 pub mod url;
 pub mod value_rc;
 pub mod yaml;
