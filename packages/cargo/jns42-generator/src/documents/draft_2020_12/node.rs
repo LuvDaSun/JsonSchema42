@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use serde_json::{Number, Value};
+use serde_json::Value;
 
 #[derive(Debug, Clone)]
 pub enum Node {
