@@ -2,11 +2,12 @@ use crate::{
     models,
     utils::{read_json_node::read_json_node, url::normalize_url, yaml::load_yaml},
 };
+use async_recursion::async_recursion;
 use serde_json::Value;
 use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
-    rc::Rc,
+    rc::{Rc, Weak},
 };
 use url::Url;
 
@@ -20,7 +21,7 @@ pub struct DocumentInitializer<'a> {
 }
 
 pub type DocumentFactory =
-    dyn Fn(Rc<DocumentContext>, DocumentInitializer) -> Rc<dyn SchemaDocument>;
+    dyn Fn(Weak<DocumentContext>, DocumentInitializer) -> Rc<dyn SchemaDocument>;
 
 #[derive(Default)]
 pub struct DocumentContext {
@@ -143,54 +144,67 @@ impl DocumentContext {
     }
 
     fn fill_node_cache(self: &Rc<Self>, retrieval_url: &Url, document_node: serde_json::Value) {
-        let mut node_cache_mut = self.node_cache.borrow_mut();
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
-            assert!(node_cache_mut
+            assert!(self
+                .node_cache
+                .borrow_mut()
                 .insert(normalize_url(&node_url), node)
                 .is_none())
         }
     }
 
-    async fn load_from_cache(
-        self: &Rc<Self>,
-        retrieval_url: &Url,
-        given_url: &Url,
-        antecedent_url: Option<&Url>,
-        default_schema_uri: &MetaSchemaId,
+    #[async_recursion(?Send)]
+    async fn load_from_cache<'a>(
+        self: &'a Rc<Self>,
+        retrieval_url: &'a Url,
+        given_url: &'a Url,
+        antecedent_url: Option<&'a Url>,
+        default_schema_uri: &'a MetaSchemaId,
     ) {
-        let node_cache = self.node_cache.borrow();
-        let mut loaded_mut = self.loaded.borrow_mut();
-        let mut documents_mut = self.documents.borrow_mut();
-        let mut node_documents_mut = self.node_documents.borrow_mut();
-
-        if !loaded_mut.insert(normalize_url(retrieval_url)) {
+        if !self
+            .loaded
+            .borrow_mut()
+            .insert(normalize_url(retrieval_url))
+        {
             return;
         }
 
-        let node = node_cache.get(&normalize_url(retrieval_url)).unwrap();
+        let node = self
+            .node_cache
+            .borrow()
+            .get(&normalize_url(retrieval_url))
+            .unwrap()
+            .clone();
 
-        let schema_uri = MetaSchemaId::discover(node).unwrap_or_else(|| default_schema_uri.clone());
+        let schema_uri =
+            MetaSchemaId::discover(&node).unwrap_or_else(|| default_schema_uri.clone());
         let factory = self.factories.get(&schema_uri).unwrap();
 
         let document = factory(
-            self.clone(),
+            Rc::downgrade(self),
             DocumentInitializer {
                 retrieval_url: retrieval_url.clone(),
                 given_url: given_url.clone(),
                 antecedent_url: antecedent_url.cloned(),
-                document_node: node,
+                document_node: &node,
             },
         );
         let document_uri = document.get_document_uri();
         let document_uri_string = document_uri.as_str();
 
-        assert!(documents_mut
+        assert!(self
+            .documents
+            .borrow_mut()
             .insert(normalize_url(&document_uri), document.clone())
             .is_none());
 
         for node_url in document.get_node_urls() {
-            let document_node_url_previous = node_documents_mut.get(&normalize_url(&node_url));
+            let document_node_url_previous = self
+                .node_documents
+                .borrow()
+                .get(&normalize_url(&node_url))
+                .cloned();
 
             if let Some(document_node_url_previous) = document_node_url_previous {
                 let document_node_url_previous_string = document_node_url_previous.as_str();
@@ -200,7 +214,9 @@ impl DocumentContext {
                 }
 
                 if document_uri_string.starts_with(document_node_url_previous_string) {
-                    assert!(node_documents_mut
+                    assert!(self
+                        .node_documents
+                        .borrow_mut()
                         .insert(normalize_url(&node_url), normalize_url(&document_uri))
                         .is_some());
                     continue;
@@ -208,19 +224,13 @@ impl DocumentContext {
 
                 unreachable!("duplicate node");
             }
-            assert!(node_documents_mut
+            assert!(self
+                .node_documents
+                .borrow_mut()
                 .insert(normalize_url(&node_url), normalize_url(&document_uri))
                 .is_none());
         }
-    }
 
-    #[allow(dead_code)]
-    async fn load_from_schema_document(
-        self: &Rc<Self>,
-        retrieval_url: &Url,
-        document: impl SchemaDocument,
-        default_schema_uri: &MetaSchemaId,
-    ) {
         for embedded_document in document.get_embedded_documents(retrieval_url) {
             self.load_from_document(
                 &embedded_document.retrieval_url,

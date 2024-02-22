@@ -13,6 +13,7 @@ repository = "git@github.com:LuvDaSun/jns42-generator-ts"
 maintenance = { status = "actively-developed" }
 
 [dependencies]
+async-recursion = "1.0.5"
 clap = { version = "~4.1.14", features = ["derive"] }
 futures-util = "~0.3.30"
 http-body-util = "~0.1.0"

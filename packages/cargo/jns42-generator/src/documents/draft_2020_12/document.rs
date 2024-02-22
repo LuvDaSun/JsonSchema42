@@ -2,14 +2,14 @@ use crate::documents::{
     draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument,
 };
 use serde_json::Value;
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, rc::Weak};
 use url::Url;
 
 use super::Node;
 
 #[allow(dead_code)]
 pub struct Document {
-    document_context: Rc<DocumentContext>,
+    document_context: Weak<DocumentContext>,
     antecedent_url: Option<Url>,
     given_url: Url,
     document_node: Node,
@@ -19,7 +19,7 @@ pub struct Document {
 
 impl Document {
     pub fn new(
-        document_context: Rc<DocumentContext>,
+        document_context: Weak<DocumentContext>,
         given_url: Url,
         antecedent_url: Option<Url>,
         document_node: Node,
