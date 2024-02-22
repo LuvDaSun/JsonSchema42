@@ -60,16 +60,16 @@ impl DocumentContext {
         Default::default()
     }
 
-    fn inner(&self) -> Ref<Inner> {
+    fn borrow(&self) -> Ref<Inner> {
         self.0.borrow()
     }
 
-    fn inner_mut(&mut self) -> RefMut<Inner> {
+    fn borrow_mut(&mut self) -> RefMut<Inner> {
         self.0.borrow_mut()
     }
 
     pub fn register_factory(&mut self, schema: &MetaSchemaId, factory: Box<DocumentFactory>) {
-        let mut inner_mut = self.inner_mut();
+        let mut inner_mut = self.borrow_mut();
         /*
          * don't check if the factory is already registered here so we can
          * override factories
@@ -85,7 +85,7 @@ impl DocumentContext {
     }
 
     pub fn get_intermediate_schema_entries(&self) -> Vec<serde_json::Value> {
-        let inner = self.inner();
+        let inner = self.borrow();
 
         inner
             .documents
@@ -97,7 +97,7 @@ impl DocumentContext {
 
     #[allow(dead_code)]
     pub fn get_document(&self, document_url: &Url) -> Rc<dyn Document> {
-        let inner = self.inner();
+        let inner = self.borrow();
 
         let document = inner
             .documents
@@ -110,7 +110,7 @@ impl DocumentContext {
 
     #[allow(dead_code)]
     pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn Document> {
-        let inner = self.inner();
+        let inner = self.borrow();
 
         let document_url = inner.node_documents.get(&normalize_url(node_url)).unwrap();
 
@@ -125,7 +125,7 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let document_node_is_none = {
-            let inner = self.inner();
+            let inner = self.borrow();
             let document_node = inner.node_cache.get(&normalize_url(retrieval_url));
             document_node.is_none()
         };
@@ -150,7 +150,7 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let node_cache_contains_key = {
-            let inner = self.inner();
+            let inner = self.borrow();
             inner.node_cache.contains_key(retrieval_url)
         };
 
@@ -166,7 +166,7 @@ impl DocumentContext {
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
             assert!(self
-                .inner_mut()
+                .borrow_mut()
                 .node_cache
                 .insert(normalize_url(&node_url), node)
                 .is_none())
@@ -181,7 +181,7 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let self_clone = self.clone();
-        let mut inner_mut = self.inner_mut();
+        let mut inner_mut = self.borrow_mut();
 
         if !inner_mut.loaded.insert(normalize_url(retrieval_url)) {
             return;
