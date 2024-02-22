@@ -3,7 +3,7 @@ use crate::{
         draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument,
         SchemaDocument,
     },
-    utils::url::JsonPointer,
+    utils::json_pointer::JsonPointer,
 };
 use serde_json::Value;
 use std::{

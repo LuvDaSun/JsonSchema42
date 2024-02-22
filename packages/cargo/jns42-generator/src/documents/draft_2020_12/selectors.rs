@@ -1,5 +1,6 @@
+use crate::utils::json_pointer::JsonPointer;
+
 use super::Node;
-use crate::utils::url::JsonPointer;
 use std::iter::once;
 
 pub trait Selectors {
