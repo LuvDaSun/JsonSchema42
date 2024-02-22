@@ -16,25 +16,25 @@ impl SchemaDocument for Document {
         todo!()
     }
 
-    fn get_node_urls(&self) -> Box<dyn Iterator<Item = Url>> {
+    fn get_node_urls(&self) -> Box<dyn Iterator<Item = Url> + '_> {
         todo!()
     }
 
-    fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = Value>> {
+    fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = Value> + '_> {
         todo!()
     }
 
     fn get_referenced_documents(
         &self,
         _retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = ReferencedDocument>> {
+    ) -> Box<dyn Iterator<Item = ReferencedDocument> + '_> {
         todo!()
     }
 
     fn get_embedded_documents(
         &self,
         _retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = EmbeddedDocument>> {
+    ) -> Box<dyn Iterator<Item = EmbeddedDocument> + '_> {
         todo!()
     }
 }
