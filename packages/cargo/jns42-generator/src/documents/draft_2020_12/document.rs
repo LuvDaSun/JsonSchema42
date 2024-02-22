@@ -1,5 +1,9 @@
-use crate::documents::{
-    draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument,
+use crate::{
+    documents::{
+        draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument,
+        SchemaDocument,
+    },
+    utils::url::JsonPointer,
 };
 use serde_json::Value;
 use std::{
@@ -16,8 +20,8 @@ pub struct Document {
     antecedent_url: Option<Url>,
     given_url: Url,
     document_node: Node,
-    document_node_pointer: String,
-    nodes: HashMap<String, Node>,
+    document_node_pointer: JsonPointer,
+    nodes: HashMap<JsonPointer, Node>,
 }
 
 impl Document {
@@ -27,7 +31,7 @@ impl Document {
         antecedent_url: Option<Url>,
         document_node: Node,
     ) -> Self {
-        let document_node_pointer = "".to_string();
+        let document_node_pointer = Default::default();
         let nodes = document_node
             .select_all_sub_nodes_and_self(&document_node_pointer)
             .into_iter()
@@ -62,7 +66,7 @@ impl SchemaDocument for Document {
     fn get_node_urls(&self) -> Box<dyn Iterator<Item = Url> + '_> {
         Box::new(self.nodes.keys().map(|pointer| {
             self.get_document_uri()
-                .join(&format!("#{}", pointer))
+                .join(&format!("#{}", pointer.to_string()))
                 .unwrap()
         }))
     }
@@ -87,7 +91,7 @@ impl SchemaDocument for Document {
                 given_url: self.get_document_uri().join(node_id).unwrap(),
                 node_url: self
                     .get_document_uri()
-                    .join(&format!("#{}", pointer))
+                    .join(&format!("#{}", pointer.to_string()))
                     .unwrap(),
             })
             .collect()
