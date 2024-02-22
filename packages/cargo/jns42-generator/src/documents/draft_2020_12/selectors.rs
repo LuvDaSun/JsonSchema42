@@ -1,32 +1,28 @@
-use crate::utils::{json_pointer::join_json_pointer, value_rc::ValueRc};
-use std::rc::Rc;
+use super::Node;
+use crate::utils::json_pointer::join_json_pointer;
 
 pub trait Selectors {
     fn select_schema(&self) -> Option<&str>;
     fn select_id(&self) -> Option<&str>;
     fn select_ref(&self) -> Option<&str>;
 
-    fn select_sub_nodes(&self, pointer: &str) -> Vec<(String, Rc<ValueRc>)>;
-    fn select_all_sub_nodes(&self, pointer: &str) -> Vec<(String, Rc<ValueRc>)>;
+    fn select_sub_nodes(&self, pointer: &str) -> Vec<(String, Node)>;
+    fn select_all_sub_nodes(&self, pointer: &str) -> Vec<(String, Node)>;
 
-    fn select_sub_node_def_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>>;
-    fn select_sub_node_property_entries(&self, pointer: &str)
-        -> Option<Vec<(String, Rc<ValueRc>)>>;
+    fn select_sub_node_def_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
+    fn select_sub_node_property_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
     fn select_sub_node_additional_properties_entries(
         &self,
         pointer: &str,
-    ) -> Option<Vec<(String, Rc<ValueRc>)>>;
-    fn select_sub_node_prefix_items_entries(
-        &self,
-        pointer: &str,
-    ) -> Option<Vec<(String, Rc<ValueRc>)>>;
-    fn select_sub_node_items_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>>;
-    fn select_sub_node_all_of_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>>;
-    fn select_sub_node_any_of_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>>;
-    fn select_sub_node_one_of_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>>;
+    ) -> Option<Vec<(String, Node)>>;
+    fn select_sub_node_prefix_items_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
+    fn select_sub_node_items_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
+    fn select_sub_node_all_of_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
+    fn select_sub_node_any_of_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
+    fn select_sub_node_one_of_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>>;
 }
 
-impl Selectors for Rc<ValueRc> {
+impl Selectors for Node {
     fn select_schema(&self) -> Option<&str> {
         self.as_object()?.get("$schema")?.as_str()
     }
@@ -39,7 +35,7 @@ impl Selectors for Rc<ValueRc> {
         self.as_object()?.get("$ref")?.as_str()
     }
 
-    fn select_all_sub_nodes(&self, pointer: &str) -> Vec<(String, Rc<ValueRc>)> {
+    fn select_all_sub_nodes(&self, pointer: &str) -> Vec<(String, Node)> {
         let result = self.select_sub_nodes(pointer);
         vec![
             result.clone(),
@@ -55,7 +51,7 @@ impl Selectors for Rc<ValueRc> {
         .collect()
     }
 
-    fn select_sub_nodes(&self, pointer: &str) -> Vec<(String, Rc<ValueRc>)> {
+    fn select_sub_nodes(&self, pointer: &str) -> Vec<(String, Node)> {
         vec![
             self.select_sub_node_def_entries(pointer)
                 .unwrap_or_default(),
@@ -81,7 +77,7 @@ impl Selectors for Rc<ValueRc> {
 
     //
 
-    fn select_sub_node_def_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_def_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "$defs";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -98,10 +94,7 @@ impl Selectors for Rc<ValueRc> {
 
         Some(result)
     }
-    fn select_sub_node_property_entries(
-        &self,
-        pointer: &str,
-    ) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_property_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "properties";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -121,7 +114,7 @@ impl Selectors for Rc<ValueRc> {
     fn select_sub_node_additional_properties_entries(
         &self,
         pointer: &str,
-    ) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    ) -> Option<Vec<(String, Node)>> {
         let select_name = "additionalProperties";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -132,10 +125,7 @@ impl Selectors for Rc<ValueRc> {
 
         Some(result)
     }
-    fn select_sub_node_prefix_items_entries(
-        &self,
-        pointer: &str,
-    ) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_prefix_items_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "prefixItems";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -153,7 +143,7 @@ impl Selectors for Rc<ValueRc> {
 
         Some(result)
     }
-    fn select_sub_node_items_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_items_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "items";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -164,7 +154,7 @@ impl Selectors for Rc<ValueRc> {
 
         Some(result)
     }
-    fn select_sub_node_all_of_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_all_of_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "allOf";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -182,7 +172,7 @@ impl Selectors for Rc<ValueRc> {
 
         Some(result)
     }
-    fn select_sub_node_any_of_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_any_of_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "anyOf";
         let selected = self.as_object()?.get(select_name)?;
 
@@ -200,7 +190,7 @@ impl Selectors for Rc<ValueRc> {
 
         Some(result)
     }
-    fn select_sub_node_one_of_entries(&self, pointer: &str) -> Option<Vec<(String, Rc<ValueRc>)>> {
+    fn select_sub_node_one_of_entries(&self, pointer: &str) -> Option<Vec<(String, Node)>> {
         let select_name = "oneOf";
         let selected = self.as_object()?.get(select_name)?;
 

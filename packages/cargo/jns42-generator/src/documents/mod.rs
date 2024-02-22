@@ -7,7 +7,9 @@ pub mod draft_2020_12;
 mod document_context;
 mod meta;
 mod schema_document;
+mod selectors;
 
 pub use document_context::*;
 pub use meta::*;
 pub use schema_document::*;
+pub use selectors::*;

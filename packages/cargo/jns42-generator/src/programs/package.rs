@@ -40,7 +40,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     context.register_factory(
         &MetaSchemaId::Draft202012,
         Box::new(move |context, initializer| {
-            Rc::new(draft_2020_12::document::Document::new(
+            Rc::new(draft_2020_12::Document::new(
                 context,
                 initializer.given_url,
                 initializer.antecedent_url,
@@ -50,19 +50,19 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     );
     context.register_factory(
         &MetaSchemaId::Draft201909,
-        Box::new(move |_context, _initializer| Rc::new(draft_2019_09::document::Document::new())),
+        Box::new(move |_context, _initializer| Rc::new(draft_2019_09::Document::new())),
     );
     context.register_factory(
         &MetaSchemaId::Draft07,
-        Box::new(move |_context, _initializer| Rc::new(draft_07::document::Document::new())),
+        Box::new(move |_context, _initializer| Rc::new(draft_07::Document::new())),
     );
     context.register_factory(
         &MetaSchemaId::Draft06,
-        Box::new(move |_context, _initializer| Rc::new(draft_06::document::Document::new())),
+        Box::new(move |_context, _initializer| Rc::new(draft_06::Document::new())),
     );
     context.register_factory(
         &MetaSchemaId::Draft04,
-        Box::new(move |_context, _initializer| Rc::new(draft_04::document::Document::new())),
+        Box::new(move |_context, _initializer| Rc::new(draft_04::Document::new())),
     );
 
     context
