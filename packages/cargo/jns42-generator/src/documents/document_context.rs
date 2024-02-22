@@ -131,7 +131,7 @@ impl DocumentContext {
     ) {
         let node_cache_contains_key = {
             let node_cache = self.node_cache.borrow();
-            node_cache.contains_key(retrieval_url)
+            node_cache.contains_key(&normalize_url(retrieval_url))
         };
 
         if !node_cache_contains_key {
@@ -189,7 +189,7 @@ impl DocumentContext {
                 document_node: &node,
             },
         );
-        let document_uri = document.get_document_uri();
+        let document_uri = normalize_url(&document.get_document_uri());
         let document_uri_string = document_uri.as_str();
 
         assert!(self
@@ -203,7 +203,7 @@ impl DocumentContext {
                 .node_documents
                 .borrow()
                 .get(&normalize_url(&node_url))
-                .cloned();
+                .map(normalize_url);
 
             if let Some(document_node_url_previous) = document_node_url_previous {
                 let document_node_url_previous_string = document_node_url_previous.as_str();
@@ -236,7 +236,7 @@ impl DocumentContext {
                 .clone()
                 .node_cache
                 .borrow()
-                .get(&embedded_document.node_url)
+                .get(&normalize_url(&embedded_document.node_url))
                 .unwrap()
                 .clone();
             self.load_from_document(
