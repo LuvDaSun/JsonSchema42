@@ -67,7 +67,7 @@ impl DocumentContext {
     }
 
     #[allow(dead_code)]
-    pub fn get_intermediate_data(&self) -> IntermediateSchema {
+    pub fn get_intermediate_document(&self) -> IntermediateSchema {
         IntermediateSchema {
             schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json".to_string(),
             schemas: self.get_intermediate_schema_map(),

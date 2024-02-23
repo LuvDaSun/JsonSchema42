@@ -76,5 +76,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         )
         .await;
 
+    let intermediate_document = context.get_intermediate_document();
+
     Ok(())
 }
