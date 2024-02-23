@@ -7,10 +7,7 @@ use crate::{
     utils::{json_pointer::JsonPointer, url::UrlWithPointer},
 };
 use serde_json::Value;
-use std::{
-    collections::{HashMap, VecDeque},
-    rc::Weak,
-};
+use std::{collections::HashMap, rc::Weak};
 
 #[allow(dead_code)]
 pub struct Document {
