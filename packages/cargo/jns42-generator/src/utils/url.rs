@@ -2,6 +2,17 @@ use super::json_pointer::JsonPointer;
 use std::hash::{Hash, Hasher};
 use url::{ParseError, Url};
 
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+pub struct ServerUrl(Url);
+
+impl From<UrlWithPointer> for ServerUrl {
+    fn from(url: UrlWithPointer) -> Self {
+        let mut url = url.0;
+        url.set_fragment(None);
+        Self(url)
+    }
+}
+
 #[derive(Clone, Debug, Eq)]
 pub struct UrlWithPointer(Url, JsonPointer);
 

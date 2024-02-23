@@ -1,7 +1,11 @@
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::{
     models,
-    utils::{read_json_node::read_json_node, url::UrlWithPointer, yaml::load_yaml},
+    utils::{
+        read_json_node::read_json_node,
+        url::{ServerUrl, UrlWithPointer},
+        yaml::load_yaml,
+    },
 };
 use async_recursion::async_recursion;
 use serde_json::Value;
@@ -46,7 +50,7 @@ pub struct DocumentContext {
     /**
      * keep track of what we have been loading (so we only load it once)
      */
-    loaded: RefCell<HashSet<UrlWithPointer>>,
+    loaded: RefCell<HashSet<ServerUrl>>,
 }
 
 impl DocumentContext {
@@ -164,7 +168,9 @@ impl DocumentContext {
             return;
         }
 
-        if !self.loaded.borrow_mut().insert(retrieval_url.clone()) {
+        let server_url = retrieval_url.clone().into();
+
+        if !self.loaded.borrow_mut().insert(server_url) {
             return;
         }
 
