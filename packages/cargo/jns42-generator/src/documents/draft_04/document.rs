@@ -3,7 +3,6 @@ use crate::{
     models::intermediate::IntermediateNode,
     utils::url::UrlWithPointer,
 };
-use serde_json::Value;
 
 #[allow(dead_code)]
 pub struct Document {}

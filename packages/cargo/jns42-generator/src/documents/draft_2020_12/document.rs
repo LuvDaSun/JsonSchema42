@@ -7,7 +7,6 @@ use crate::{
     models::intermediate::IntermediateNode,
     utils::{json_pointer::JsonPointer, url::UrlWithPointer},
 };
-use serde_json::Value;
 use std::{collections::HashMap, rc::Weak};
 
 #[allow(dead_code)]

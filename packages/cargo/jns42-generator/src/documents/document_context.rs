@@ -1,9 +1,6 @@
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::{
-    models::{
-        self,
-        intermediate::{IntermediateNode, IntermediateSchema},
-    },
+    models::intermediate::{IntermediateNode, IntermediateSchema},
     utils::{
         read_json_node::read_json_node,
         url::{ServerUrl, UrlWithPointer},
@@ -13,7 +10,7 @@ use crate::{
 use async_recursion::async_recursion;
 use serde_json::Value;
 use std::{
-    cell::{Ref, RefCell},
+    cell::RefCell,
     collections::{HashMap, HashSet},
     rc::{Rc, Weak},
 };
