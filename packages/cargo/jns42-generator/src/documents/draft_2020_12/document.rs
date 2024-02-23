@@ -8,23 +8,27 @@ use crate::{
 };
 use serde_json::Value;
 use std::{
-    collections::HashMap,
-    rc::{Rc, Weak},
+    collections::{HashMap, VecDeque},
+    rc::Weak,
 };
 
 #[allow(dead_code)]
 pub struct Document {
     document_context: Weak<DocumentContext>,
-    antecedent_url: Option<UrlWithPointer>,
     given_url: UrlWithPointer,
+    antecedent_url: Option<UrlWithPointer>,
     document_url: UrlWithPointer,
     document_node: Node,
     nodes: HashMap<JsonPointer, Node>,
+
+    referenced_documents: Vec<ReferencedDocument>,
+    embedded_documents: Vec<EmbeddedDocument>,
 }
 
 impl Document {
     pub fn new(
         document_context: Weak<DocumentContext>,
+        retrieval_url: UrlWithPointer,
         given_url: UrlWithPointer,
         antecedent_url: Option<UrlWithPointer>,
         document_node: Node,
@@ -39,11 +43,37 @@ impl Document {
         });
         let document_url = node_url.unwrap_or(given_url.clone());
 
-        let document_node_pointer = Default::default();
-        let nodes = document_node
-            .select_all_sub_nodes_and_self(&document_node_pointer)
-            .into_iter()
-            .collect();
+        let document_node_pointer: &JsonPointer = document_url.as_ref();
+
+        let mut nodes = HashMap::new();
+        let mut referenced_documents = Vec::new();
+        let mut embedded_documents = Vec::new();
+
+        let mut node_queue = VecDeque::new();
+        node_queue.push_back((document_node_pointer.clone(), document_node.clone()));
+        while let Some((pointer, node)) = node_queue.pop_front() {
+            nodes.insert(pointer.clone(), node.clone());
+
+            for (sub_pointer, sub_node) in node.select_sub_nodes(&pointer) {
+                if let Some(node_ref) = node.select_ref() {
+                    referenced_documents.push(ReferencedDocument {
+                        retrieval_url: retrieval_url.join(node_ref).unwrap(),
+                        given_url: document_url.join(node_ref).unwrap(),
+                    });
+                }
+
+                if let Some(node_id) = node.select_id() {
+                    embedded_documents.push(EmbeddedDocument {
+                        retrieval_url: retrieval_url.join(node_id).unwrap(),
+                        given_url: document_url.join(node_id).unwrap(),
+                    });
+
+                    continue;
+                }
+
+                node_queue.push_back((sub_pointer, sub_node))
+            }
+        }
 
         Self {
             document_context,
@@ -52,6 +82,8 @@ impl Document {
             document_url,
             document_node,
             nodes,
+            referenced_documents,
+            embedded_documents,
         }
     }
 }
@@ -69,36 +101,12 @@ impl SchemaDocument for Document {
         }))
     }
 
-    fn get_referenced_documents(
-        self: Rc<Self>,
-        retrieval_url: &UrlWithPointer,
-    ) -> Vec<ReferencedDocument> {
-        self.nodes
-            .iter()
-            .filter_map(|(pointer, node)| node.select_ref().map(|node_ref| (pointer, node_ref)))
-            .map(|(_pointer, node_ref)| ReferencedDocument {
-                retrieval_url: retrieval_url.join(node_ref).unwrap(),
-                given_url: self.get_document_uri().join(node_ref).unwrap(),
-            })
-            .collect()
+    fn get_referenced_documents(&self) -> &Vec<ReferencedDocument> {
+        &self.referenced_documents
     }
 
-    fn get_embedded_documents(
-        self: Rc<Self>,
-        retrieval_url: &UrlWithPointer,
-    ) -> Vec<EmbeddedDocument> {
-        self.nodes
-            .iter()
-            .filter_map(|(pointer, node)| node.select_id().map(|node_id| (pointer, node_id)))
-            .map(|(pointer, node_id)| EmbeddedDocument {
-                retrieval_url: retrieval_url.join(node_id).unwrap(),
-                given_url: self.get_document_uri().join(node_id).unwrap(),
-                node_url: self
-                    .get_document_uri()
-                    .join(&format!("#{}", pointer.to_string()))
-                    .unwrap(),
-            })
-            .collect()
+    fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument> {
+        &self.embedded_documents
     }
 
     fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = Value> + '_> {

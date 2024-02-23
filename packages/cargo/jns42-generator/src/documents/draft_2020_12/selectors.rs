@@ -1,7 +1,5 @@
-use crate::utils::json_pointer::JsonPointer;
-
 use super::Node;
-use std::iter::once;
+use crate::utils::json_pointer::JsonPointer;
 
 pub trait Selectors {
     fn select_schema(&self) -> Option<&str>;
@@ -9,8 +7,6 @@ pub trait Selectors {
     fn select_ref(&self) -> Option<&str>;
 
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
-    fn select_all_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
-    fn select_all_sub_nodes_and_self(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
 
     fn select_sub_node_def_entries(
         &self,
@@ -57,33 +53,6 @@ impl Selectors for Node {
 
     fn select_ref(&self) -> Option<&str> {
         self.as_object()?.get("$ref")?.as_str()
-    }
-
-    fn select_all_sub_nodes_and_self(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
-        once((pointer.clone(), self.clone()))
-            .chain(self.select_all_sub_nodes(pointer))
-            .collect()
-    }
-
-    fn select_all_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
-        let result = self.select_sub_nodes(pointer);
-        vec![
-            result.clone(),
-            result
-                .iter()
-                .flat_map(|(sub_pointer, sub_node)| {
-                    if sub_node.select_id().is_some() {
-                        // node is an embedded schema!
-                        Default::default()
-                    } else {
-                        sub_node.select_all_sub_nodes(sub_pointer)
-                    }
-                })
-                .collect(),
-        ]
-        .into_iter()
-        .flatten()
-        .collect()
     }
 
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
@@ -258,6 +227,4 @@ impl Selectors for Node {
 
         Some(result)
     }
-
-    //
 }

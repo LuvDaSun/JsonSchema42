@@ -42,6 +42,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         Box::new(move |context, initializer| {
             Rc::new(draft_2020_12::Document::new(
                 context,
+                initializer.retrieval_url,
                 initializer.given_url,
                 initializer.antecedent_url,
                 initializer.document_node.into(),

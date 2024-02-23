@@ -196,13 +196,13 @@ impl DocumentContext {
                 .is_none());
         }
 
-        let embedded_documents = document.clone().get_embedded_documents(retrieval_url);
+        let embedded_documents = document.get_embedded_documents();
         for embedded_document in embedded_documents {
             let node = self
                 .clone()
                 .cache
                 .borrow()
-                .get(&embedded_document.node_url)
+                .get(&embedded_document.retrieval_url)
                 .unwrap()
                 .clone();
             self.load_from_document(
@@ -215,7 +215,7 @@ impl DocumentContext {
             .await;
         }
 
-        let referenced_documents = document.clone().get_referenced_documents(retrieval_url);
+        let referenced_documents = document.get_referenced_documents();
         for referenced_document in referenced_documents {
             self.load_from_url(
                 &referenced_document.retrieval_url,

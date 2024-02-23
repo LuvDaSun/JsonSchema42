@@ -3,7 +3,6 @@ use crate::{
     utils::url::UrlWithPointer,
 };
 use serde_json::Value;
-use std::rc::Rc;
 
 #[allow(dead_code)]
 pub struct Document {}
@@ -27,17 +26,11 @@ impl SchemaDocument for Document {
         todo!()
     }
 
-    fn get_referenced_documents(
-        self: Rc<Self>,
-        _retrieval_url: &UrlWithPointer,
-    ) -> Vec<ReferencedDocument> {
+    fn get_referenced_documents(&self) -> &Vec<ReferencedDocument> {
         todo!()
     }
 
-    fn get_embedded_documents(
-        self: Rc<Self>,
-        _retrieval_url: &UrlWithPointer,
-    ) -> Vec<EmbeddedDocument> {
+    fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument> {
         todo!()
     }
 }
