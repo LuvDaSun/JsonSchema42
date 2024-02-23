@@ -160,6 +160,10 @@ impl DocumentContext {
         antecedent_url: Option<&'a UrlWithPointer>,
         default_schema_uri: &'a MetaSchemaId,
     ) {
+        if self.node_documents.borrow().contains_key(retrieval_url) {
+            return;
+        }
+
         if !self.loaded.borrow_mut().insert(retrieval_url.clone()) {
             return;
         }
@@ -189,11 +193,14 @@ impl DocumentContext {
 
         // Map node urls to this document
         for node_url in document.get_node_urls() {
-            assert!(self
+            let ok = self
                 .node_documents
                 .borrow_mut()
-                .insert(node_url, document_uri.clone())
-                .is_none());
+                .insert(node_url.clone(), document_uri.clone())
+                .is_none();
+            if !ok {
+                println!("{} -> {}", node_url.to_string(), document_uri.to_string());
+            }
         }
 
         let embedded_documents = document.get_embedded_documents();
