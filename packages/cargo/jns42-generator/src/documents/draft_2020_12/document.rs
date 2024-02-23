@@ -49,9 +49,9 @@ impl Document {
         let mut referenced_documents = Vec::new();
         let mut embedded_documents = Vec::new();
 
-        let mut node_queue = VecDeque::new();
-        node_queue.push_back((document_node_pointer.clone(), document_node.clone()));
-        while let Some((pointer, node)) = node_queue.pop_front() {
+        let mut node_queue = Vec::new();
+        node_queue.push((document_node_pointer.clone(), document_node.clone()));
+        while let Some((pointer, node)) = node_queue.pop() {
             nodes.insert(pointer.clone(), node.clone());
 
             if let Some(node_ref) = node.select_ref() {
@@ -70,7 +70,7 @@ impl Document {
                     continue;
                 }
 
-                node_queue.push_back((sub_pointer, sub_node))
+                node_queue.push((sub_pointer, sub_node))
             }
         }
 
