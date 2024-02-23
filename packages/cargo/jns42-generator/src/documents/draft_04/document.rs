@@ -1,7 +1,9 @@
-use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
+use crate::{
+    documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument},
+    utils::url::UrlWithPointer,
+};
 use serde_json::Value;
 use std::rc::Rc;
-use url::Url;
 
 #[allow(dead_code)]
 pub struct Document {}
@@ -13,11 +15,11 @@ impl Document {
 }
 
 impl SchemaDocument for Document {
-    fn get_document_uri(&self) -> Url {
+    fn get_document_uri(&self) -> UrlWithPointer {
         todo!()
     }
 
-    fn get_node_urls(&self) -> Box<dyn Iterator<Item = Url> + '_> {
+    fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_> {
         todo!()
     }
 
@@ -25,11 +27,17 @@ impl SchemaDocument for Document {
         todo!()
     }
 
-    fn get_referenced_documents(self: Rc<Self>, _retrieval_url: &Url) -> Vec<ReferencedDocument> {
+    fn get_referenced_documents(
+        self: Rc<Self>,
+        _retrieval_url: &UrlWithPointer,
+    ) -> Vec<ReferencedDocument> {
         todo!()
     }
 
-    fn get_embedded_documents(self: Rc<Self>, _retrieval_url: &Url) -> Vec<EmbeddedDocument> {
+    fn get_embedded_documents(
+        self: Rc<Self>,
+        _retrieval_url: &UrlWithPointer,
+    ) -> Vec<EmbeddedDocument> {
         todo!()
     }
 }

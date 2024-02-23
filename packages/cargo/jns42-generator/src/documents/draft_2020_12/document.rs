@@ -1,24 +1,22 @@
+use super::Node;
 use crate::{
     documents::{
         draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument,
         SchemaDocument,
     },
-    utils::json_pointer::JsonPointer,
+    utils::{json_pointer::JsonPointer, url::UrlWithPointer},
 };
 use serde_json::Value;
 use std::{
     collections::HashMap,
     rc::{Rc, Weak},
 };
-use url::Url;
-
-use super::Node;
 
 #[allow(dead_code)]
 pub struct Document {
     document_context: Weak<DocumentContext>,
-    antecedent_url: Option<Url>,
-    given_url: Url,
+    antecedent_url: Option<UrlWithPointer>,
+    given_url: UrlWithPointer,
     document_node: Node,
     document_node_pointer: JsonPointer,
     nodes: HashMap<JsonPointer, Node>,
@@ -27,8 +25,8 @@ pub struct Document {
 impl Document {
     pub fn new(
         document_context: Weak<DocumentContext>,
-        given_url: Url,
-        antecedent_url: Option<Url>,
+        given_url: UrlWithPointer,
+        antecedent_url: Option<UrlWithPointer>,
         document_node: Node,
     ) -> Self {
         let document_node_pointer = Default::default();
@@ -49,21 +47,21 @@ impl Document {
 }
 
 impl SchemaDocument for Document {
-    fn get_document_uri(&self) -> Url {
+    fn get_document_uri(&self) -> UrlWithPointer {
         let node_id = self.document_node.select_id();
 
         let node_url = node_id.and_then(|node_id| {
             if let Some(antecedent_url) = &self.antecedent_url {
                 antecedent_url.join(node_id).ok()
             } else {
-                Url::parse(node_id).ok()
+                UrlWithPointer::parse(node_id).ok()
             }
         });
 
         node_url.unwrap_or(self.given_url.clone())
     }
 
-    fn get_node_urls(&self) -> Box<dyn Iterator<Item = Url> + '_> {
+    fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_> {
         Box::new(self.nodes.keys().map(|pointer| {
             self.get_document_uri()
                 .join(&format!("#{}", pointer.to_string()))
@@ -71,7 +69,10 @@ impl SchemaDocument for Document {
         }))
     }
 
-    fn get_referenced_documents(self: Rc<Self>, retrieval_url: &Url) -> Vec<ReferencedDocument> {
+    fn get_referenced_documents(
+        self: Rc<Self>,
+        retrieval_url: &UrlWithPointer,
+    ) -> Vec<ReferencedDocument> {
         self.nodes
             .iter()
             .filter_map(|(pointer, node)| node.select_ref().map(|node_ref| (pointer, node_ref)))
@@ -82,7 +83,10 @@ impl SchemaDocument for Document {
             .collect()
     }
 
-    fn get_embedded_documents(self: Rc<Self>, retrieval_url: &Url) -> Vec<EmbeddedDocument> {
+    fn get_embedded_documents(
+        self: Rc<Self>,
+        retrieval_url: &UrlWithPointer,
+    ) -> Vec<EmbeddedDocument> {
         self.nodes
             .iter()
             .filter_map(|(pointer, node)| node.select_id().map(|node_id| (pointer, node_id)))

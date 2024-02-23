@@ -67,7 +67,12 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
     let context = Rc::new(context);
     context
-        .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
+        .load_from_url(
+            &schema_url.clone().into(),
+            &schema_url.clone().into(),
+            None,
+            &default_meta_schema_url,
+        )
         .await;
 
     Ok(())

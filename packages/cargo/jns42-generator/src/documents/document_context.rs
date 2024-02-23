@@ -1,7 +1,7 @@
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::{
     models,
-    utils::{read_json_node::read_json_node, url::normalize_url, yaml::load_yaml},
+    utils::{read_json_node::read_json_node, url::UrlWithPointer, yaml::load_yaml},
 };
 use async_recursion::async_recursion;
 use serde_json::Value;
@@ -10,12 +10,11 @@ use std::{
     collections::{HashMap, HashSet},
     rc::{Rc, Weak},
 };
-use url::Url;
 
 pub struct DocumentInitializer<'a> {
-    pub retrieval_url: Url,
-    pub given_url: Url,
-    pub antecedent_url: Option<Url>,
+    pub retrieval_url: UrlWithPointer,
+    pub given_url: UrlWithPointer,
+    pub antecedent_url: Option<UrlWithPointer>,
     pub document_node: &'a Value,
 }
 
@@ -32,22 +31,22 @@ pub struct DocumentContext {
     /**
      * all documents, indexed by document id
      */
-    documents: RefCell<HashMap<Url, Rc<dyn SchemaDocument>>>,
+    documents: RefCell<HashMap<UrlWithPointer, Rc<dyn SchemaDocument>>>,
 
     /**
      * maps node urls to their documents
      */
-    node_documents: RefCell<HashMap<Url, Url>>,
+    node_documents: RefCell<HashMap<UrlWithPointer, UrlWithPointer>>,
 
     /**
      * all loaded nodes
      */
-    node_cache: RefCell<HashMap<Url, serde_json::Value>>,
+    node_cache: RefCell<HashMap<UrlWithPointer, serde_json::Value>>,
 
     /**
      * keep track of what we have been loading (so we only load it once)
      */
-    loaded: RefCell<HashSet<Url>>,
+    loaded: RefCell<HashSet<UrlWithPointer>>,
 }
 
 impl DocumentContext {
@@ -80,38 +79,38 @@ impl DocumentContext {
     }
 
     #[allow(dead_code)]
-    pub fn get_document(&self, document_url: &Url) -> Rc<dyn SchemaDocument> {
+    pub fn get_document(&self, document_url: &UrlWithPointer) -> Rc<dyn SchemaDocument> {
         let documents = self.documents.borrow();
 
-        let document = documents.get(&normalize_url(document_url)).unwrap().clone();
+        let document = documents.get(document_url).unwrap().clone();
 
         document
     }
 
     #[allow(dead_code)]
-    pub fn get_document_for_node(&self, node_url: &Url) -> Rc<dyn SchemaDocument> {
+    pub fn get_document_for_node(&self, node_url: &UrlWithPointer) -> Rc<dyn SchemaDocument> {
         let node_documents = self.node_documents.borrow();
 
-        let document_url = node_documents.get(&normalize_url(node_url)).unwrap();
+        let document_url = node_documents.get(node_url).unwrap();
 
         self.get_document(document_url)
     }
 
     pub async fn load_from_url(
         self: &Rc<Self>,
-        retrieval_url: &Url,
-        given_url: &Url,
-        antecedent_url: Option<&Url>,
+        retrieval_url: &UrlWithPointer,
+        given_url: &UrlWithPointer,
+        antecedent_url: Option<&UrlWithPointer>,
         default_schema_uri: &MetaSchemaId,
     ) {
         let document_node_is_none = {
             let node_cache = self.node_cache.borrow();
-            let document_node = node_cache.get(&normalize_url(retrieval_url));
+            let document_node = node_cache.get(retrieval_url);
             document_node.is_none()
         };
 
         if document_node_is_none {
-            let document_node = load_yaml(retrieval_url).await.unwrap();
+            let document_node = load_yaml(retrieval_url.as_ref()).await.unwrap();
 
             self.fill_node_cache(retrieval_url, document_node.unwrap());
         }
@@ -123,15 +122,15 @@ impl DocumentContext {
     #[allow(dead_code)]
     pub async fn load_from_document(
         self: &Rc<Self>,
-        retrieval_url: &Url,
-        given_url: &Url,
-        antecedent_url: Option<&Url>,
+        retrieval_url: &UrlWithPointer,
+        given_url: &UrlWithPointer,
+        antecedent_url: Option<&UrlWithPointer>,
         document_node: serde_json::Value,
         default_schema_uri: &MetaSchemaId,
     ) {
         let node_cache_contains_key = {
             let node_cache = self.node_cache.borrow();
-            node_cache.contains_key(&normalize_url(retrieval_url))
+            node_cache.contains_key(retrieval_url)
         };
 
         if !node_cache_contains_key {
@@ -142,13 +141,17 @@ impl DocumentContext {
             .await;
     }
 
-    fn fill_node_cache(self: &Rc<Self>, retrieval_url: &Url, document_node: serde_json::Value) {
+    fn fill_node_cache(
+        self: &Rc<Self>,
+        retrieval_url: &UrlWithPointer,
+        document_node: serde_json::Value,
+    ) {
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
             assert!(self
                 .node_cache
                 .borrow_mut()
-                .insert(normalize_url(&node_url), node)
+                .insert(node_url, node)
                 .is_none())
         }
     }
@@ -156,25 +159,16 @@ impl DocumentContext {
     #[async_recursion(?Send)]
     async fn load_from_cache<'a>(
         self: &'a Rc<Self>,
-        retrieval_url: &'a Url,
-        given_url: &'a Url,
-        antecedent_url: Option<&'a Url>,
+        retrieval_url: &'a UrlWithPointer,
+        given_url: &'a UrlWithPointer,
+        antecedent_url: Option<&'a UrlWithPointer>,
         default_schema_uri: &'a MetaSchemaId,
     ) {
-        if !self
-            .loaded
-            .borrow_mut()
-            .insert(normalize_url(retrieval_url))
-        {
+        if !self.loaded.borrow_mut().insert(retrieval_url.clone()) {
             return;
         }
 
-        let node = self
-            .node_cache
-            .borrow()
-            .get(&normalize_url(retrieval_url))
-            .unwrap()
-            .clone();
+        let node = self.node_cache.borrow().get(retrieval_url).unwrap().clone();
 
         let schema_uri =
             MetaSchemaId::discover(&node).unwrap_or_else(|| default_schema_uri.clone());
@@ -189,34 +183,30 @@ impl DocumentContext {
                 document_node: &node,
             },
         );
-        let document_uri = normalize_url(&document.get_document_uri());
-        let document_uri_string = document_uri.as_str();
+        let document_uri = document.get_document_uri();
+        let document_uri_string = document_uri.to_string();
 
         assert!(self
             .documents
             .borrow_mut()
-            .insert(normalize_url(&document_uri), document.clone())
+            .insert(document_uri.clone(), document.clone())
             .is_none());
 
         for node_url in document.get_node_urls() {
-            let document_node_url_previous = self
-                .node_documents
-                .borrow()
-                .get(&normalize_url(&node_url))
-                .map(normalize_url);
+            let document_node_url_previous = self.node_documents.borrow().get(&node_url).cloned();
 
             if let Some(document_node_url_previous) = document_node_url_previous {
-                let document_node_url_previous_string = document_node_url_previous.as_str();
+                let document_node_url_previous_string = document_node_url_previous.to_string();
 
-                if document_node_url_previous_string.starts_with(document_uri_string) {
+                if document_node_url_previous_string.starts_with(&document_uri_string) {
                     continue;
                 }
 
-                if document_uri_string.starts_with(document_node_url_previous_string) {
+                if document_uri_string.starts_with(&document_node_url_previous_string) {
                     assert!(self
                         .node_documents
                         .borrow_mut()
-                        .insert(normalize_url(&node_url), normalize_url(&document_uri))
+                        .insert(node_url, document_uri.clone())
                         .is_some());
                     continue;
                 }
@@ -226,7 +216,7 @@ impl DocumentContext {
             assert!(self
                 .node_documents
                 .borrow_mut()
-                .insert(normalize_url(&node_url), normalize_url(&document_uri))
+                .insert(node_url, document_uri.clone())
                 .is_none());
         }
 
@@ -236,7 +226,7 @@ impl DocumentContext {
                 .clone()
                 .node_cache
                 .borrow()
-                .get(&normalize_url(&embedded_document.node_url))
+                .get(&embedded_document.node_url)
                 .unwrap()
                 .clone();
             self.load_from_document(

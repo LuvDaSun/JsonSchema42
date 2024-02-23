@@ -1,31 +1,6 @@
-use std::hash::{Hash, Hasher};
-use url::Url;
-
 use super::json_pointer::JsonPointer;
-
-pub fn normalize_url(url: &Url) -> Url {
-    if url.fragment().unwrap_or("") == "" {
-        url.join("#").unwrap()
-    } else {
-        url.clone()
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ServerUrl(Url);
-
-impl From<Url> for ServerUrl {
-    fn from(mut url: Url) -> Self {
-        url.set_fragment(None);
-        Self(url)
-    }
-}
-
-impl AsRef<Url> for ServerUrl {
-    fn as_ref(&self) -> &Url {
-        &self.0
-    }
-}
+use std::hash::{Hash, Hasher};
+use url::{ParseError, Url};
 
 #[derive(Clone, Debug, Eq)]
 pub struct UrlWithPointer(Url, JsonPointer);
@@ -36,6 +11,16 @@ impl UrlWithPointer {
         let mut url = self.0.clone();
         url.set_fragment(Some(&pointer.to_string()));
         Self(url, pointer)
+    }
+
+    pub fn join(&self, input: &str) -> Result<Self, ParseError> {
+        let url = self.0.join(input)?;
+        Ok(url.into())
+    }
+
+    pub fn parse(input: &str) -> Result<Self, ParseError> {
+        let url = Url::parse(input)?;
+        Ok(url.into())
     }
 }
 
@@ -65,6 +50,12 @@ impl From<Url> for UrlWithPointer {
     fn from(url: Url) -> Self {
         let pointer = (&url).into();
         Self(url, pointer)
+    }
+}
+
+impl ToString for UrlWithPointer {
+    fn to_string(&self) -> String {
+        self.0.to_string()
     }
 }
 
