@@ -116,6 +116,10 @@ impl SchemaDocument for Document {
                     description: node.select_description().map(|value| value.to_string()),
                     // examples: node.select_examples(),
                     deprecated: node.select_deprecated(),
+
+                    types: node
+                        .select_types()
+                        .map(|value| value.iter().map(|value| value.to_string()).collect()),
                 },
             )
         }))

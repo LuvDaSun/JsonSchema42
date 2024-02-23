@@ -11,8 +11,9 @@ pub trait Selectors {
     // fn select_examples(&self) -> Option<&Vec<Value>>;
     fn select_deprecated(&self) -> Option<bool>;
 
-    fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
+    fn select_types(&self) -> Option<Vec<&str>>;
 
+    fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
     fn select_sub_node_def_entries(
         &self,
         pointer: &JsonPointer,
@@ -77,6 +78,14 @@ impl Selectors for Node {
 
     fn select_deprecated(&self) -> Option<bool> {
         self.as_object()?.get("deprecated")?.as_bool()
+    }
+
+    fn select_types(&self) -> Option<Vec<&str>> {
+        match self.as_object()?.get("type")? {
+            Node::String(value) => Some(vec![value]),
+            Node::Array(value) => Some(value.iter().filter_map(|value| value.as_str()).collect()),
+            _ => None,
+        }
     }
 
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {

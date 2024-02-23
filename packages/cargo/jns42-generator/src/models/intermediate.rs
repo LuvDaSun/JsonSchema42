@@ -11,4 +11,6 @@ pub struct IntermediateNode {
     pub description: Option<String>,
     // pub examples: Option<Vec<Value>>,
     pub deprecated: Option<bool>,
+
+    pub types: Option<Vec<String>>,
 }
