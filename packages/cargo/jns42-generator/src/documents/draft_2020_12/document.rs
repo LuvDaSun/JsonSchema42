@@ -19,8 +19,8 @@ pub struct Document {
     antecedent_url: Option<UrlWithPointer>,
     document_url: UrlWithPointer,
     document_node: Node,
-    nodes: HashMap<JsonPointer, Node>,
 
+    nodes: HashMap<JsonPointer, Node>,
     referenced_documents: Vec<ReferencedDocument>,
     embedded_documents: Vec<EmbeddedDocument>,
 }
@@ -54,20 +54,19 @@ impl Document {
         while let Some((pointer, node)) = node_queue.pop_front() {
             nodes.insert(pointer.clone(), node.clone());
 
+            if let Some(node_ref) = node.select_ref() {
+                referenced_documents.push(ReferencedDocument {
+                    retrieval_url: retrieval_url.join(node_ref).unwrap(),
+                    given_url: document_url.join(node_ref).unwrap(),
+                });
+            }
+
             for (sub_pointer, sub_node) in node.select_sub_nodes(&pointer) {
-                if let Some(node_ref) = node.select_ref() {
-                    referenced_documents.push(ReferencedDocument {
-                        retrieval_url: retrieval_url.join(node_ref).unwrap(),
-                        given_url: document_url.join(node_ref).unwrap(),
-                    });
-                }
-
-                if let Some(node_id) = node.select_id() {
+                if let Some(sub_node_id) = sub_node.select_id() {
                     embedded_documents.push(EmbeddedDocument {
-                        retrieval_url: retrieval_url.join(node_id).unwrap(),
-                        given_url: document_url.join(node_id).unwrap(),
+                        retrieval_url: retrieval_url.join(sub_node_id).unwrap(),
+                        given_url: document_url.join(sub_node_id).unwrap(),
                     });
-
                     continue;
                 }
 
