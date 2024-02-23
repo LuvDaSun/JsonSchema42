@@ -1,5 +1,6 @@
 use crate::{
     documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument},
+    models::intermediate::IntermediateNode,
     utils::url::UrlWithPointer,
 };
 use serde_json::Value;
@@ -22,7 +23,9 @@ impl SchemaDocument for Document {
         todo!()
     }
 
-    fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = Value> + '_> {
+    fn get_intermediate_node_entries(
+        &self,
+    ) -> Box<dyn Iterator<Item = (String, IntermediateNode)> + '_> {
         todo!()
     }
 

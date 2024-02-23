@@ -1,6 +1,9 @@
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::{
-    models,
+    models::{
+        self,
+        intermediate::{IntermediateNode, IntermediateSchema},
+    },
     utils::{
         read_json_node::read_json_node,
         url::{ServerUrl, UrlWithPointer},
@@ -10,7 +13,7 @@ use crate::{
 use async_recursion::async_recursion;
 use serde_json::Value;
 use std::{
-    cell::RefCell,
+    cell::{Ref, RefCell},
     collections::{HashMap, HashSet},
     rc::{Rc, Weak},
 };
@@ -67,13 +70,14 @@ impl DocumentContext {
     }
 
     #[allow(dead_code)]
-    pub fn get_intermediate_data(&self) -> models::intermediate::IntermediateSchema {
-        models::intermediate::IntermediateSchema {
-            schemas: self.get_intermediate_schema_entries(),
+    pub fn get_intermediate_data(&self) -> IntermediateSchema {
+        IntermediateSchema {
+            schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json".to_string(),
+            schemas: self.get_intermediate_schema_map(),
         }
     }
 
-    pub fn get_intermediate_schema_entries(&self) -> Vec<serde_json::Value> {
+    pub fn get_intermediate_schema_map(&self) -> HashMap<String, IntermediateNode> {
         let documents = self.documents.borrow();
 
         documents

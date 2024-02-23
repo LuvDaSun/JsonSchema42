@@ -4,6 +4,7 @@ use crate::{
         draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument,
         SchemaDocument,
     },
+    models::intermediate::IntermediateNode,
     utils::{json_pointer::JsonPointer, url::UrlWithPointer},
 };
 use serde_json::Value;
@@ -105,7 +106,9 @@ impl SchemaDocument for Document {
         &self.embedded_documents
     }
 
-    fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = Value> + '_> {
+    fn get_intermediate_node_entries(
+        &self,
+    ) -> Box<dyn Iterator<Item = (String, IntermediateNode)> + '_> {
         todo!()
     }
 }

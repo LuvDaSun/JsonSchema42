@@ -1,4 +1,4 @@
-use crate::utils::url::UrlWithPointer;
+use crate::{models::intermediate::IntermediateNode, utils::url::UrlWithPointer};
 
 #[allow(dead_code)]
 pub struct EmbeddedDocument {
@@ -19,5 +19,7 @@ pub trait SchemaDocument {
     fn get_document_uri(&self) -> &UrlWithPointer;
     fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_>;
 
-    fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = serde_json::Value> + '_>;
+    fn get_intermediate_node_entries(
+        &self,
+    ) -> Box<dyn Iterator<Item = (String, IntermediateNode)> + '_>;
 }
