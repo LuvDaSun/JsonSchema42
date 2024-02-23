@@ -120,6 +120,8 @@ impl SchemaDocument for Document {
                     types: node
                         .select_types()
                         .map(|value| value.iter().map(|value| value.to_string()).collect()),
+
+                    reference: node.select_reference().map(|value| value.to_string()),
                 },
             )
         }))

@@ -13,6 +13,8 @@ pub trait Selectors {
 
     fn select_types(&self) -> Option<Vec<&str>>;
 
+    fn select_reference(&self) -> Option<&str>;
+
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
     fn select_sub_node_def_entries(
         &self,
@@ -86,6 +88,10 @@ impl Selectors for Node {
             Node::Array(value) => Some(value.iter().filter_map(|value| value.as_str()).collect()),
             _ => None,
         }
+    }
+
+    fn select_reference(&self) -> Option<&str> {
+        self.as_object()?.get("type")?.as_str()
     }
 
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
