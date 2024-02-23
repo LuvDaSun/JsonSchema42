@@ -108,6 +108,16 @@ impl SchemaDocument for Document {
     fn get_intermediate_node_entries(
         &self,
     ) -> Box<dyn Iterator<Item = (String, IntermediateNode)> + '_> {
-        todo!()
+        Box::new(self.nodes.iter().map(|(node_id, node)| {
+            (
+                node_id.to_string(),
+                IntermediateNode {
+                    title: node.select_title().map(|value| value.to_string()),
+                    description: node.select_description().map(|value| value.to_string()),
+                    // examples: node.select_examples(),
+                    deprecated: node.select_deprecated(),
+                },
+            )
+        }))
     }
 }

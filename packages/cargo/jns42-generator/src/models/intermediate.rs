@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
-
 #[allow(dead_code)]
 pub struct IntermediateSchema {
     pub schema: String,
@@ -9,8 +7,8 @@ pub struct IntermediateSchema {
 }
 
 pub struct IntermediateNode {
-    pub title: String,
-    pub description: String,
-    pub examples: Vec<Value>,
-    pub deprecated: bool,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    // pub examples: Option<Vec<Value>>,
+    pub deprecated: Option<bool>,
 }

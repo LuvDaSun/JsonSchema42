@@ -6,6 +6,11 @@ pub trait Selectors {
     fn select_id(&self) -> Option<&str>;
     fn select_ref(&self) -> Option<&str>;
 
+    fn select_title(&self) -> Option<&str>;
+    fn select_description(&self) -> Option<&str>;
+    // fn select_examples(&self) -> Option<&Vec<Value>>;
+    fn select_deprecated(&self) -> Option<bool>;
+
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
 
     fn select_sub_node_def_entries(
@@ -53,6 +58,25 @@ impl Selectors for Node {
 
     fn select_ref(&self) -> Option<&str> {
         self.as_object()?.get("$ref")?.as_str()
+    }
+
+    fn select_title(&self) -> Option<&str> {
+        self.as_object()?.get("title")?.as_str()
+    }
+
+    fn select_description(&self) -> Option<&str> {
+        self.as_object()?.get("description")?.as_str()
+    }
+
+    // fn select_examples(&self) -> Option<&Vec<Value>> {
+    //     self.as_object()?
+    //         .get("examples")?
+    //         .as_array()
+    //         .map(|item| item.into())
+    // }
+
+    fn select_deprecated(&self) -> Option<bool> {
+        self.as_object()?.get("deprecated")?.as_bool()
     }
 
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
