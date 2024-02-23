@@ -15,7 +15,7 @@ impl Document {
 }
 
 impl SchemaDocument for Document {
-    fn get_document_uri(&self) -> UrlWithPointer {
+    fn get_document_uri(&self) -> &UrlWithPointer {
         todo!()
     }
 

@@ -24,7 +24,7 @@ pub trait SchemaDocument {
         retrieval_url: &UrlWithPointer,
     ) -> Vec<EmbeddedDocument>;
 
-    fn get_document_uri(&self) -> UrlWithPointer;
+    fn get_document_uri(&self) -> &UrlWithPointer;
     fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_>;
 
     fn get_intermediate_node_entries(&self) -> Box<dyn Iterator<Item = serde_json::Value> + '_>;

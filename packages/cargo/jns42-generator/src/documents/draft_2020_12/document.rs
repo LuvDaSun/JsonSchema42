@@ -17,8 +17,8 @@ pub struct Document {
     document_context: Weak<DocumentContext>,
     antecedent_url: Option<UrlWithPointer>,
     given_url: UrlWithPointer,
+    document_url: UrlWithPointer,
     document_node: Node,
-    document_node_pointer: JsonPointer,
     nodes: HashMap<JsonPointer, Node>,
 }
 
@@ -29,6 +29,16 @@ impl Document {
         antecedent_url: Option<UrlWithPointer>,
         document_node: Node,
     ) -> Self {
+        let node_id = document_node.select_id();
+        let node_url = node_id.and_then(|node_id| {
+            if let Some(antecedent_url) = &antecedent_url {
+                antecedent_url.join(node_id).ok()
+            } else {
+                UrlWithPointer::parse(node_id).ok()
+            }
+        });
+        let document_url = node_url.unwrap_or(given_url.clone());
+
         let document_node_pointer = Default::default();
         let nodes = document_node
             .select_all_sub_nodes_and_self(&document_node_pointer)
@@ -39,26 +49,16 @@ impl Document {
             document_context,
             antecedent_url,
             given_url,
+            document_url,
             document_node,
-            document_node_pointer,
             nodes,
         }
     }
 }
 
 impl SchemaDocument for Document {
-    fn get_document_uri(&self) -> UrlWithPointer {
-        let node_id = self.document_node.select_id();
-
-        let node_url = node_id.and_then(|node_id| {
-            if let Some(antecedent_url) = &self.antecedent_url {
-                antecedent_url.join(node_id).ok()
-            } else {
-                UrlWithPointer::parse(node_id).ok()
-            }
-        });
-
-        node_url.unwrap_or(self.given_url.clone())
+    fn get_document_uri(&self) -> &UrlWithPointer {
+        &self.document_url
     }
 
     fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_> {

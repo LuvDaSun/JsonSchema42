@@ -6,13 +6,6 @@ use url::{ParseError, Url};
 pub struct UrlWithPointer(Url, JsonPointer);
 
 impl UrlWithPointer {
-    pub fn push_pointer(&self, input: String) -> Self {
-        let pointer = self.1.push(input);
-        let mut url = self.0.clone();
-        url.set_fragment(Some(&pointer.to_string()));
-        Self(url, pointer)
-    }
-
     pub fn join(&self, input: &str) -> Result<Self, ParseError> {
         let url = self.0.join(input)?;
         Ok(url.into())
@@ -30,7 +23,7 @@ impl Hash for UrlWithPointer {
         self.0.host().hash(state);
         self.0.port_or_known_default().hash(state);
         self.0.path().hash(state);
-        self.0.query().unwrap_or("?").hash(state);
+        self.0.query().unwrap_or("").hash(state);
         self.1.hash(state);
     }
 }
@@ -41,7 +34,7 @@ impl PartialEq for UrlWithPointer {
             && self.0.host() == other.0.host()
             && self.0.port_or_known_default() == other.0.port_or_known_default()
             && self.0.path() == other.0.path()
-            && self.0.query().unwrap_or("?") == other.0.query().unwrap_or("?")
+            && self.0.query().unwrap_or("") == other.0.query().unwrap_or("")
             && self.1 == other.1
     }
 }

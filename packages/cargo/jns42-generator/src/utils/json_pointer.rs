@@ -15,9 +15,12 @@ impl From<&Url> for JsonPointer {
     fn from(url: &Url) -> Self {
         let fragment = url.fragment();
 
-        if let Some(mut fragment) = fragment {
-            fragment = fragment.strip_prefix('#').unwrap_or(fragment);
-            let path = fragment.split('/').map(|part| part.to_string()).collect();
+        if let Some(fragment) = fragment {
+            let path = fragment
+                .split('/')
+                .filter(|part| !part.is_empty())
+                .map(|part| part.to_string())
+                .collect();
             Self(path)
         } else {
             Self(Default::default())

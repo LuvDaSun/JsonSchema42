@@ -152,12 +152,19 @@ export class DocumentContext {
     }
     this.documents.set(documentId, document);
 
+    // Map all node urls to the document they belong to.
     for (const nodeUrl of document.getNodeUrls()) {
       const nodeId = normalizeUrl(nodeUrl).toString();
+      // Figure out if the node already belongs to a document. This might be the case when
+      // dealing with embedded documents
       const documentNodeUrlPrevious = this.nodeDocuments.get(nodeId);
+
       if (documentNodeUrlPrevious != null) {
         const documentNodeIdPrevious = documentNodeUrlPrevious.toString();
         if (documentNodeIdPrevious.startsWith(documentId)) {
+          // if the previous node id starts with the document id that means that the
+          // previous document is a descendant of document. We will not change anything
+          // about that
           continue;
         }
         if (documentId.startsWith(documentNodeIdPrevious)) {
@@ -167,6 +174,8 @@ export class DocumentContext {
         }
         throw new TypeError(`duplicate node with id ${nodeId}`);
       }
+
+      // if the node is is not yet linked to a document
       this.nodeDocuments.set(nodeId, document.documentNodeUrl);
     }
 

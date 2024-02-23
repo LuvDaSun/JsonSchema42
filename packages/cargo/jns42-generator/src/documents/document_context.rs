@@ -41,7 +41,7 @@ pub struct DocumentContext {
     /**
      * all loaded nodes
      */
-    node_cache: RefCell<HashMap<UrlWithPointer, serde_json::Value>>,
+    cache: RefCell<HashMap<UrlWithPointer, serde_json::Value>>,
 
     /**
      * keep track of what we have been loading (so we only load it once)
@@ -104,7 +104,7 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let document_node_is_none = {
-            let node_cache = self.node_cache.borrow();
+            let node_cache = self.cache.borrow();
             let document_node = node_cache.get(retrieval_url);
             document_node.is_none()
         };
@@ -129,7 +129,7 @@ impl DocumentContext {
         default_schema_uri: &MetaSchemaId,
     ) {
         let node_cache_contains_key = {
-            let node_cache = self.node_cache.borrow();
+            let node_cache = self.cache.borrow();
             node_cache.contains_key(retrieval_url)
         };
 
@@ -148,11 +148,7 @@ impl DocumentContext {
     ) {
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
-            assert!(self
-                .node_cache
-                .borrow_mut()
-                .insert(node_url, node)
-                .is_none())
+            assert!(self.cache.borrow_mut().insert(node_url, node).is_none())
         }
     }
 
@@ -168,7 +164,7 @@ impl DocumentContext {
             return;
         }
 
-        let node = self.node_cache.borrow().get(retrieval_url).unwrap().clone();
+        let node = self.cache.borrow().get(retrieval_url).unwrap().clone();
 
         let schema_uri =
             MetaSchemaId::discover(&node).unwrap_or_else(|| default_schema_uri.clone());
@@ -184,7 +180,6 @@ impl DocumentContext {
             },
         );
         let document_uri = document.get_document_uri();
-        let document_uri_string = document_uri.to_string();
 
         assert!(self
             .documents
@@ -192,27 +187,8 @@ impl DocumentContext {
             .insert(document_uri.clone(), document.clone())
             .is_none());
 
+        // Map node urls to this document
         for node_url in document.get_node_urls() {
-            let document_node_url_previous = self.node_documents.borrow().get(&node_url).cloned();
-
-            if let Some(document_node_url_previous) = document_node_url_previous {
-                let document_node_url_previous_string = document_node_url_previous.to_string();
-
-                if document_node_url_previous_string.starts_with(&document_uri_string) {
-                    continue;
-                }
-
-                if document_uri_string.starts_with(&document_node_url_previous_string) {
-                    assert!(self
-                        .node_documents
-                        .borrow_mut()
-                        .insert(node_url, document_uri.clone())
-                        .is_some());
-                    continue;
-                }
-
-                unreachable!("duplicate node");
-            }
             assert!(self
                 .node_documents
                 .borrow_mut()
@@ -224,7 +200,7 @@ impl DocumentContext {
         for embedded_document in embedded_documents {
             let node = self
                 .clone()
-                .node_cache
+                .cache
                 .borrow()
                 .get(&embedded_document.node_url)
                 .unwrap()
@@ -232,7 +208,7 @@ impl DocumentContext {
             self.load_from_document(
                 &embedded_document.retrieval_url,
                 &embedded_document.given_url,
-                Some(&document.get_document_uri()),
+                Some(document.get_document_uri()),
                 node,
                 default_schema_uri,
             )
@@ -244,7 +220,7 @@ impl DocumentContext {
             self.load_from_url(
                 &referenced_document.retrieval_url,
                 &referenced_document.given_url,
-                Some(&document.get_document_uri()),
+                Some(document.get_document_uri()),
                 default_schema_uri,
             )
             .await;
