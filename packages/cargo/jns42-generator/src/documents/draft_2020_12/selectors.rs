@@ -1,3 +1,5 @@
+use serde_json::Value;
+
 use super::Node;
 use crate::utils::json_pointer::JsonPointer;
 
@@ -12,6 +14,23 @@ pub trait Selectors {
     fn select_deprecated(&self) -> Option<bool>;
 
     fn select_types(&self) -> Option<Vec<&str>>;
+
+    fn select_options(&self) -> Option<Vec<Value>>;
+    fn select_minimum_inclusive(&self) -> Option<f64>;
+    fn select_minimum_exclusive(&self) -> Option<f64>;
+    fn select_maximum_inclusive(&self) -> Option<f64>;
+    fn select_maximum_exclusive(&self) -> Option<f64>;
+    fn select_multiple_of(&self) -> Option<f64>;
+    fn select_minimum_length(&self) -> Option<usize>;
+    fn select_maximum_length(&self) -> Option<usize>;
+    fn select_value_pattern(&self) -> Option<&str>;
+    fn select_value_format(&self) -> Option<&str>;
+    fn select_maximum_items(&self) -> Option<usize>;
+    fn select_minimum_items(&self) -> Option<usize>;
+    fn select_unique_items(&self) -> Option<bool>;
+    fn select_minimum_properties(&self) -> Option<usize>;
+    fn select_maximum_properties(&self) -> Option<usize>;
+    fn select_required(&self) -> Option<Vec<&str>>;
 
     fn select_reference(&self) -> Option<&str>;
 
@@ -265,5 +284,90 @@ impl Selectors for Node {
             .collect();
 
         Some(result)
+    }
+
+    fn select_options(&self) -> Option<Vec<Value>> {
+        Some(vec![])
+    }
+
+    fn select_minimum_inclusive(&self) -> Option<f64> {
+        self.as_object()?.get("minimumInclusive")?.as_float()
+    }
+
+    fn select_minimum_exclusive(&self) -> Option<f64> {
+        self.as_object()?.get("minimumExclusive")?.as_float()
+    }
+
+    fn select_maximum_inclusive(&self) -> Option<f64> {
+        self.as_object()?.get("maximumInclusive")?.as_float()
+    }
+
+    fn select_maximum_exclusive(&self) -> Option<f64> {
+        self.as_object()?.get("maximumExclusive")?.as_float()
+    }
+
+    fn select_multiple_of(&self) -> Option<f64> {
+        self.as_object()?.get("multipleOf")?.as_float()
+    }
+
+    fn select_minimum_length(&self) -> Option<usize> {
+        self.as_object()?
+            .get("minimumLength")?
+            .as_float()
+            .map(|value| value as usize)
+    }
+
+    fn select_maximum_length(&self) -> Option<usize> {
+        self.as_object()?
+            .get("maximumLength")?
+            .as_float()
+            .map(|value| value as usize)
+    }
+
+    fn select_value_pattern(&self) -> Option<&str> {
+        self.as_object()?.get("valuePattern")?.as_str()
+    }
+
+    fn select_value_format(&self) -> Option<&str> {
+        self.as_object()?.get("valueFormat")?.as_str()
+    }
+
+    fn select_maximum_items(&self) -> Option<usize> {
+        self.as_object()?
+            .get("maximumItems")?
+            .as_float()
+            .map(|value| value as usize)
+    }
+
+    fn select_minimum_items(&self) -> Option<usize> {
+        self.as_object()?
+            .get("minimumLength")?
+            .as_float()
+            .map(|value| value as usize)
+    }
+
+    fn select_unique_items(&self) -> Option<bool> {
+        self.as_object()?.get("uniqueItems")?.as_bool()
+    }
+
+    fn select_minimum_properties(&self) -> Option<usize> {
+        self.as_object()?
+            .get("minimumProperties")?
+            .as_float()
+            .map(|value| value as usize)
+    }
+
+    fn select_maximum_properties(&self) -> Option<usize> {
+        self.as_object()?
+            .get("maximumProperties")?
+            .as_float()
+            .map(|value| value as usize)
+    }
+
+    fn select_required(&self) -> Option<Vec<&str>> {
+        self.as_object()?
+            .get("minimumLength")?
+            .as_array()
+            .map(|value| value.iter().filter_map(|value| value.as_str()).collect())
     }
 }

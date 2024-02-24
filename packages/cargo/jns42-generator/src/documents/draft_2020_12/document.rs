@@ -112,15 +112,38 @@ impl SchemaDocument for Document {
             (
                 node_id.to_string(),
                 IntermediateNode {
+                    // meta
                     title: node.select_title().map(|value| value.to_string()),
                     description: node.select_description().map(|value| value.to_string()),
                     // examples: node.select_examples(),
                     deprecated: node.select_deprecated(),
 
+                    // types
                     types: node
                         .select_types()
                         .map(|value| value.iter().map(|value| value.to_string()).collect()),
 
+                    // assertions
+                    options: Default::default(),
+                    minimum_inclusive: node.select_minimum_inclusive(),
+                    minimum_exclusive: node.select_minimum_exclusive(),
+                    maximum_inclusive: node.select_maximum_inclusive(),
+                    maximum_exclusive: node.select_maximum_exclusive(),
+                    multiple_of: node.select_multiple_of(),
+                    minimum_length: node.select_minimum_length(),
+                    maximum_length: node.select_maximum_length(),
+                    value_pattern: node.select_value_pattern().map(|value| value.to_string()),
+                    value_format: node.select_value_format().map(|value| value.to_string()),
+                    maximum_items: node.select_maximum_items(),
+                    minimum_items: node.select_minimum_items(),
+                    unique_items: node.select_unique_items(),
+                    minimum_properties: node.select_minimum_properties(),
+                    maximum_properties: node.select_maximum_properties(),
+                    required: node
+                        .select_required()
+                        .map(|value| value.iter().map(|value| value.to_string()).collect()),
+
+                    // applicators
                     reference: node.select_reference().map(|value| value.to_string()),
                 },
             )
