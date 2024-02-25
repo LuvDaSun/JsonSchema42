@@ -1,5 +1,6 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
+use crate::utils::names::make_names;
 use clap::Parser;
 use std::error::Error;
 use std::rc::Rc;
@@ -76,7 +77,9 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         )
         .await;
 
-    let _intermediate_document = context.get_intermediate_document();
+    let intermediate_document = context.get_intermediate_document();
+
+    let _names = make_names(intermediate_document.schemas.keys());
 
     Ok(())
 }

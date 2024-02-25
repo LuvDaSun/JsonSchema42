@@ -1,5 +1,6 @@
 pub mod json_deserializer;
 pub mod json_pointer;
+pub mod names;
 pub mod read_json_node;
 pub mod read_stream;
 pub mod read_url;
