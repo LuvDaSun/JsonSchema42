@@ -1,8 +1,8 @@
-use std::error::Error;
-
-use crate::documents::document_context::DocumentContext;
-use crate::documents::meta::MetaSchemaId;
+use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
+use crate::documents::{DocumentContext, MetaSchemaId};
 use clap::Parser;
+use std::error::Error;
+use std::rc::Rc;
 use url::Url;
 
 #[derive(Parser, Debug)]
@@ -37,9 +37,46 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
     let mut context = DocumentContext::new();
 
+    context.register_factory(
+        &MetaSchemaId::Draft202012,
+        Box::new(move |context, initializer| {
+            Rc::new(draft_2020_12::Document::new(
+                context,
+                initializer.retrieval_url,
+                initializer.given_url,
+                initializer.antecedent_url,
+                initializer.document_node.into(),
+            ))
+        }),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft201909,
+        Box::new(move |_context, _initializer| Rc::new(draft_2019_09::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft07,
+        Box::new(move |_context, _initializer| Rc::new(draft_07::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft06,
+        Box::new(move |_context, _initializer| Rc::new(draft_06::Document::new())),
+    );
+    context.register_factory(
+        &MetaSchemaId::Draft04,
+        Box::new(move |_context, _initializer| Rc::new(draft_04::Document::new())),
+    );
+
+    let context = Rc::new(context);
     context
-        .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
+        .load_from_url(
+            &schema_url.clone().into(),
+            &schema_url.clone().into(),
+            None,
+            &default_meta_schema_url,
+        )
         .await;
+
+    let _intermediate_document = context.get_intermediate_document();
 
     Ok(())
 }

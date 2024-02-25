@@ -1,29 +1,25 @@
-use super::document::Document;
-use serde_json::Value;
-use url::Url;
+use crate::{models::intermediate::IntermediateNode, utils::url::UrlWithPointer};
 
-pub struct EmbeddedDocument<'a> {
-    pub retrieval_url: Url,
-    pub given_url: Url,
-    pub node: &'a Value,
+#[allow(dead_code)]
+pub struct EmbeddedDocument {
+    pub retrieval_url: UrlWithPointer,
+    pub given_url: UrlWithPointer,
 }
 
+#[allow(dead_code)]
 pub struct ReferencedDocument {
-    pub retrieval_url: Url,
-    pub given_url: Url,
+    pub retrieval_url: UrlWithPointer,
+    pub given_url: UrlWithPointer,
 }
 
-pub trait SchemaDocument
-where
-    Self: Document,
-{
-    fn get_referenced_documents(
-        &self,
-        retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = &ReferencedDocument>>;
+pub trait SchemaDocument {
+    fn get_referenced_documents(&self) -> &Vec<ReferencedDocument>;
+    fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument>;
 
-    fn get_embedded_documents(
+    fn get_document_uri(&self) -> &UrlWithPointer;
+    fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_>;
+
+    fn get_intermediate_node_entries(
         &self,
-        retrieval_url: &Url,
-    ) -> Box<dyn Iterator<Item = &EmbeddedDocument>>;
+    ) -> Box<dyn Iterator<Item = (String, IntermediateNode)> + '_>;
 }
