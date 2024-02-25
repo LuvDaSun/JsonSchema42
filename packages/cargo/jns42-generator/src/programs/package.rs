@@ -3,6 +3,7 @@ use crate::documents::{DocumentContext, MetaSchemaId};
 use crate::utils::names::make_names;
 use clap::Parser;
 use std::error::Error;
+use std::iter::once;
 use std::rc::Rc;
 use url::Url;
 
@@ -79,7 +80,14 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
     let intermediate_document = context.get_intermediate_document();
 
-    let _names = make_names(intermediate_document.schemas.keys());
+    let _names = make_names(
+        intermediate_document
+            .schemas
+            .keys()
+            .map(|key| key.split('/')),
+        once("schema"),
+        5,
+    );
 
     Ok(())
 }
