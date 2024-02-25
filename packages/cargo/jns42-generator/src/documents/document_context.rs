@@ -7,7 +7,6 @@ use crate::{
         yaml::load_yaml,
     },
 };
-use async_recursion::async_recursion;
 use serde_json::Value;
 use std::{
     cell::RefCell,
@@ -108,6 +107,31 @@ impl DocumentContext {
         antecedent_url: Option<&UrlWithPointer>,
         default_schema_uri: &MetaSchemaId,
     ) {
+        let mut queue = Default::default();
+        self.load_from_url_with_queue(
+            retrieval_url,
+            given_url,
+            antecedent_url,
+            default_schema_uri,
+            &mut queue,
+        )
+        .await;
+        self.load_from_cache_queue(&mut queue).await;
+    }
+
+    async fn load_from_url_with_queue(
+        self: &Rc<Self>,
+        retrieval_url: &UrlWithPointer,
+        given_url: &UrlWithPointer,
+        antecedent_url: Option<&UrlWithPointer>,
+        default_schema_uri: &MetaSchemaId,
+        queue: &mut Vec<(
+            UrlWithPointer,
+            UrlWithPointer,
+            Option<UrlWithPointer>,
+            MetaSchemaId,
+        )>,
+    ) {
         let document_node_is_none = {
             let node_cache = self.cache.borrow();
             let document_node = node_cache.get(retrieval_url);
@@ -120,8 +144,12 @@ impl DocumentContext {
             self.fill_node_cache(retrieval_url, document_node.unwrap());
         }
 
-        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
-            .await;
+        queue.push((
+            retrieval_url.clone(),
+            given_url.clone(),
+            antecedent_url.cloned(),
+            default_schema_uri.clone(),
+        ));
     }
 
     #[allow(dead_code)]
@@ -133,6 +161,33 @@ impl DocumentContext {
         document_node: serde_json::Value,
         default_schema_uri: &MetaSchemaId,
     ) {
+        let mut queue = Default::default();
+        self.load_from_document_with_queue(
+            retrieval_url,
+            given_url,
+            antecedent_url,
+            document_node,
+            default_schema_uri,
+            &mut queue,
+        )
+        .await;
+        self.load_from_cache_queue(&mut queue).await;
+    }
+
+    async fn load_from_document_with_queue(
+        self: &Rc<Self>,
+        retrieval_url: &UrlWithPointer,
+        given_url: &UrlWithPointer,
+        antecedent_url: Option<&UrlWithPointer>,
+        document_node: serde_json::Value,
+        default_schema_uri: &MetaSchemaId,
+        queue: &mut Vec<(
+            UrlWithPointer,
+            UrlWithPointer,
+            Option<UrlWithPointer>,
+            MetaSchemaId,
+        )>,
+    ) {
         let node_cache_contains_key = {
             let node_cache = self.cache.borrow();
             node_cache.contains_key(retrieval_url)
@@ -142,8 +197,12 @@ impl DocumentContext {
             self.fill_node_cache(retrieval_url, document_node)
         }
 
-        self.load_from_cache(retrieval_url, given_url, antecedent_url, default_schema_uri)
-            .await;
+        queue.push((
+            retrieval_url.clone(),
+            given_url.clone(),
+            antecedent_url.cloned(),
+            default_schema_uri.clone(),
+        ));
     }
 
     fn fill_node_cache(
@@ -157,13 +216,40 @@ impl DocumentContext {
         }
     }
 
-    #[async_recursion(?Send)]
-    async fn load_from_cache<'a>(
-        self: &'a Rc<Self>,
-        retrieval_url: &'a UrlWithPointer,
-        given_url: &'a UrlWithPointer,
-        antecedent_url: Option<&'a UrlWithPointer>,
-        default_schema_uri: &'a MetaSchemaId,
+    async fn load_from_cache_queue(
+        self: &Rc<Self>,
+        queue: &mut Vec<(
+            UrlWithPointer,
+            UrlWithPointer,
+            Option<UrlWithPointer>,
+            MetaSchemaId,
+        )>,
+    ) {
+        while let Some((retrieval_url, given_url, antecedent_url, default_schema_uri)) = queue.pop()
+        {
+            self.load_from_cache_with_queue(
+                &retrieval_url,
+                &given_url,
+                antecedent_url.as_ref(),
+                &default_schema_uri,
+                queue,
+            )
+            .await
+        }
+    }
+
+    async fn load_from_cache_with_queue(
+        self: &Rc<Self>,
+        retrieval_url: &UrlWithPointer,
+        given_url: &UrlWithPointer,
+        antecedent_url: Option<&UrlWithPointer>,
+        default_schema_uri: &MetaSchemaId,
+        queue: &mut Vec<(
+            UrlWithPointer,
+            UrlWithPointer,
+            Option<UrlWithPointer>,
+            MetaSchemaId,
+        )>,
     ) {
         if self.node_documents.borrow().contains_key(retrieval_url) {
             return;
@@ -219,23 +305,25 @@ impl DocumentContext {
                 .get(&embedded_document.retrieval_url)
                 .unwrap()
                 .clone();
-            self.load_from_document(
+            self.load_from_document_with_queue(
                 &embedded_document.retrieval_url,
                 &embedded_document.given_url,
                 Some(document.get_document_uri()),
                 node,
                 default_schema_uri,
+                queue,
             )
             .await;
         }
 
         let referenced_documents = document.get_referenced_documents();
         for referenced_document in referenced_documents {
-            self.load_from_url(
+            self.load_from_url_with_queue(
                 &referenced_document.retrieval_url,
                 &referenced_document.given_url,
                 Some(document.get_document_uri()),
                 default_schema_uri,
+                queue,
             )
             .await;
         }
