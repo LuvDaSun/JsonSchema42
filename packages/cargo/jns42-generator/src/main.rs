@@ -2,6 +2,7 @@ mod documents;
 mod generators;
 mod models;
 mod programs;
+mod schema_transforms;
 mod utils;
 
 use clap::Parser;

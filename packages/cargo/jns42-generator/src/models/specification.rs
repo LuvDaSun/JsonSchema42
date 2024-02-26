@@ -1,5 +1,8 @@
 use super::{arena::Arena, intermediate::IntermediateSchema, schema::SchemaNode};
-use crate::utils::{names::optimize_names, url::UrlWithPointer};
+use crate::{
+    schema_transforms,
+    utils::{names::optimize_names, url::UrlWithPointer},
+};
 use im::HashMap;
 
 pub struct Specification {
@@ -34,25 +37,26 @@ impl Specification {
             })
             .collect();
 
-        let mut key_map = HashMap::new();
         let mut arena = Arena::new();
-        for id in intermediate_document.schemas.keys() {
-            let item = SchemaNode {
-                id: Some(id.clone()),
-                ..Default::default()
-            };
 
-            let key = arena.add_item(item);
-            key_map.insert(id, key);
-        }
+        {
+            let mut key_map = HashMap::new();
+            for id in intermediate_document.schemas.keys() {
+                let item = SchemaNode {
+                    id: Some(id.clone()),
+                    ..Default::default()
+                };
 
-        let transformer = |arena: &mut Arena<SchemaNode>, key: usize| {
-            let item = arena.get_item(key).clone();
-            if let Some(id) = &item.id {
-                let schema = intermediate_document.schemas.get(id).unwrap();
+                let key = arena.add_item(item);
+                key_map.insert(id, key);
+            }
 
-                let item =
-                    SchemaNode {
+            let transformer = |arena: &mut Arena<SchemaNode>, key: usize| {
+                let item = arena.get_item(key).clone();
+                if let Some(id) = &item.id {
+                    let schema = intermediate_document.schemas.get(id).unwrap();
+
+                    let item = SchemaNode {
                         id: Some(id.clone()),
                         title: schema.title.clone(),
                         description: schema.description.clone(),
@@ -91,12 +95,23 @@ impl Specification {
                         ..Default::default()
                     };
 
-                arena.set_item(key, item);
-            }
-        };
+                    arena.set_item(key, item);
+                }
+            };
 
-        while arena.apply_transform(transformer) > 0 {
-            //
+            while arena.apply_transform(transformer) > 0 {
+                //
+            }
+        }
+        {
+            fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
+                schema_transforms::single_type::single_type_transform(arena, key);
+                schema_transforms::explode::explode_transform(arena, key);
+            }
+
+            while arena.apply_transform(transformer) > 0 {
+                //
+            }
         }
 
         Self { arena, names }
