@@ -27,6 +27,7 @@ pub fn single_type_transform(arena: &mut Arena<SchemaNode>, key: usize) {
                             .into_iter()
                             .map(|r#type| {
                                 arena.add_item(SchemaNode {
+                                    parent: Some(key),
                                     types: Some(once(r#type).collect()),
                                     ..Default::default()
                                 })
@@ -64,10 +65,12 @@ mod tests {
                 ..Default::default()
             },
             SchemaNode {
+                parent: Some(0),
                 types: Some(vec!["string".to_string()]),
                 ..Default::default()
             },
             SchemaNode {
+                parent: Some(0),
                 types: Some(vec!["number".to_string()]),
                 ..Default::default()
             },

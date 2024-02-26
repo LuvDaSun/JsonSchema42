@@ -5,12 +5,14 @@ pub type SchemaKey = usize;
 
 #[derive(Clone, PartialEq, Default, Debug)]
 pub struct SchemaNode {
+    pub parent: Option<SchemaKey>,
+    pub mockable: Option<bool>,
     pub id: Option<String>,
 
     // metadata
     pub title: Option<String>,
     pub description: Option<String>,
-    // pub examples: Option<Vec<Value>>,
+    pub examples: Option<Vec<Value>>,
     pub deprecated: Option<bool>,
 
     // types
