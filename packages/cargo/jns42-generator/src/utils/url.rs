@@ -26,6 +26,14 @@ impl UrlWithPointer {
         let url = Url::parse(input)?;
         Ok(url.into())
     }
+
+    pub fn get_url(&self) -> &Url {
+        &self.0
+    }
+
+    pub fn get_pointer(&self) -> &JsonPointer {
+        &self.1
+    }
 }
 
 impl Hash for UrlWithPointer {
@@ -60,17 +68,5 @@ impl From<Url> for UrlWithPointer {
 impl ToString for UrlWithPointer {
     fn to_string(&self) -> String {
         self.0.to_string()
-    }
-}
-
-impl AsRef<Url> for UrlWithPointer {
-    fn as_ref(&self) -> &Url {
-        &self.0
-    }
-}
-
-impl AsRef<JsonPointer> for UrlWithPointer {
-    fn as_ref(&self) -> &JsonPointer {
-        &self.1
     }
 }

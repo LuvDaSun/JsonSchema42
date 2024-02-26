@@ -28,6 +28,12 @@ impl From<&Url> for JsonPointer {
     }
 }
 
+impl AsRef<Vec<String>> for JsonPointer {
+    fn as_ref(&self) -> &Vec<String> {
+        &self.0
+    }
+}
+
 impl ToString for JsonPointer {
     fn to_string(&self) -> String {
         self.0.join("/")

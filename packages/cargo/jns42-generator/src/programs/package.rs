@@ -1,6 +1,8 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
+use crate::utils::json_pointer::JsonPointer;
 use crate::utils::names::optimize_names;
+use crate::utils::url::UrlWithPointer;
 use clap::Parser;
 use std::error::Error;
 use std::rc::Rc;
@@ -79,14 +81,26 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
     let intermediate_document = context.get_intermediate_document();
 
-    let _names = optimize_names(
-        intermediate_document
-            .schemas
-            .keys()
-            .map(|key| key.split('/').collect())
-            .collect(),
-        5,
-    );
+    let urls: Vec<_> = intermediate_document
+        .schemas
+        .keys()
+        .map(|key| UrlWithPointer::parse(key).unwrap())
+        .collect();
+
+    let names = urls
+        .iter()
+        .map(|url| {
+            let name: Vec<_> = url
+                .get_pointer()
+                .as_ref()
+                .iter()
+                .map(|part| part.as_str())
+                .collect();
+            name
+        })
+        .collect();
+
+    let _names = optimize_names(names, 5);
 
     Ok(())
 }

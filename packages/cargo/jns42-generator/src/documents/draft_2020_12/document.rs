@@ -40,7 +40,7 @@ impl Document {
         });
         let document_url = node_url.unwrap_or(given_url.clone());
 
-        let document_node_pointer: &JsonPointer = document_url.as_ref();
+        let document_node_pointer: &JsonPointer = document_url.get_pointer();
 
         let mut nodes = HashMap::new();
         let mut referenced_documents = Vec::new();

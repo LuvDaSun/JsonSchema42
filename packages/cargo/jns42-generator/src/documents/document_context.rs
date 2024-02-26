@@ -139,7 +139,7 @@ impl DocumentContext {
         };
 
         if document_node_is_none {
-            let document_node = load_yaml(retrieval_url.as_ref()).await.unwrap();
+            let document_node = load_yaml(retrieval_url.get_url()).await.unwrap();
 
             self.fill_node_cache(retrieval_url, document_node.unwrap());
         }
