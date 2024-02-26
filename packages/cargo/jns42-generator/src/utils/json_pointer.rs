@@ -1,6 +1,6 @@
 use url::Url;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Default)]
+#[derive(Clone, Default, Debug, PartialOrd, Ord, Eq, PartialEq, Hash)]
 pub struct JsonPointer(Vec<String>);
 
 impl JsonPointer {

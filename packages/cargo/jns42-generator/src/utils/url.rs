@@ -1,8 +1,7 @@
 use super::json_pointer::JsonPointer;
-use std::hash::{Hash, Hasher};
 use url::{ParseError, Url};
 
-#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq, Hash)]
 pub struct ServerUrl(Url);
 
 impl From<UrlWithPointer> for ServerUrl {
@@ -13,7 +12,7 @@ impl From<UrlWithPointer> for ServerUrl {
     }
 }
 
-#[derive(Clone, Debug, Eq)]
+#[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq, Hash)]
 pub struct UrlWithPointer(Url, JsonPointer);
 
 impl UrlWithPointer {
@@ -42,31 +41,12 @@ impl UrlWithPointer {
     }
 }
 
-impl Hash for UrlWithPointer {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.0.scheme().hash(state);
-        self.0.host().hash(state);
-        self.0.port_or_known_default().hash(state);
-        self.0.path().hash(state);
-        self.0.query().unwrap_or("").hash(state);
-        self.1.hash(state);
-    }
-}
-
-impl PartialEq for UrlWithPointer {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.scheme() == other.0.scheme()
-            && self.0.host() == other.0.host()
-            && self.0.port_or_known_default() == other.0.port_or_known_default()
-            && self.0.path() == other.0.path()
-            && self.0.query().unwrap_or("") == other.0.query().unwrap_or("")
-            && self.1 == other.1
-    }
-}
-
 impl From<Url> for UrlWithPointer {
     fn from(url: Url) -> Self {
-        let pointer = (&url).into();
+        let mut url = url;
+        let pointer: JsonPointer = (&url).into();
+        let fragment = pointer.to_string();
+        url.set_fragment(Some(&fragment));
         Self(url, pointer)
     }
 }

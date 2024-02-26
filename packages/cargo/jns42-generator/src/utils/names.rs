@@ -1,8 +1,7 @@
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    collections::{BTreeSet, HashMap, HashSet},
-    hash::Hash,
+    collections::{BTreeMap, BTreeSet, HashMap, HashSet},
 };
 
 #[derive(Debug, Default, PartialEq, Eq)]
@@ -48,7 +47,7 @@ pub fn optimize_names<'f, K>(
     maximum_iterations: usize,
 ) -> impl Iterator<Item = (K, Vec<Cow<'f, str>>)>
 where
-    K: Clone + PartialEq + Eq + Hash,
+    K: Clone + PartialOrd + Ord,
 {
     let names: Vec<_> = names.into_iter().collect();
 
@@ -68,7 +67,7 @@ where
     // then we create part info's that we can optimize. The key is the original key, then the
     // value is a tuple where the first element is the optimized name and the second part are
     // the ordered part info's. Those are ordered!
-    let mut part_info_map: HashMap<_, (Vec<&str>, BTreeSet<_>)> = HashMap::new();
+    let mut part_info_map: BTreeMap<_, (Vec<&str>, BTreeSet<_>)> = BTreeMap::new();
     for (key, name) in names.iter() {
         let part_info_entry = part_info_map.entry(key.clone()).or_default();
         for (index, part) in name.iter().enumerate() {
@@ -86,7 +85,7 @@ where
     // Ideally there is only one element in the vector that is the value. This means that the
     // optimized name references only one original key and that we can use it as a replacement
     // for the original name.
-    let mut optimized_names: HashMap<Vec<_>, Vec<_>> = Default::default();
+    let mut optimized_names: HashMap<Vec<_>, BTreeSet<_>> = Default::default();
     // then run the optimization process! we keep on iterating the optimization until we reach the
     // maximum number of iterations, or if there is nothing more to optimize.
 
@@ -96,7 +95,7 @@ where
 
         for (key, part_info) in &part_info_map {
             let keys = optimized_names.entry(part_info.0.clone()).or_default();
-            (*keys).push(key.clone());
+            (*keys).insert(key.clone());
         }
 
         for keys in optimized_names.values() {
