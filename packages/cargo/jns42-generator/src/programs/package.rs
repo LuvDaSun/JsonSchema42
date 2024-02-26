@@ -8,6 +8,7 @@ use crate::utils::url::UrlWithPointer;
 use clap::Parser;
 use im::HashMap;
 use std::error::Error;
+use std::path::PathBuf;
 use std::rc::Rc;
 use url::Url;
 
@@ -19,7 +20,7 @@ pub struct CommandOptions {
     pub default_meta_schema_url: MetaSchemaId,
 
     #[arg(long)]
-    pub package_directory: String,
+    pub package_directory: PathBuf,
 
     #[arg(long)]
     pub package_name: String,
@@ -166,7 +167,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     generate_package(PackageConfiguration {
         package_name: package_name.as_str(),
         package_version: package_version.as_str(),
-        package_directory: package_directory.as_str(),
+        package_directory: &package_directory,
     })
     .await?;
 

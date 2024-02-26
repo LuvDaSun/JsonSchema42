@@ -1,11 +1,10 @@
 use std::{error::Error, path::PathBuf};
-
-use tokio::fs::create_dir_all;
+use tokio::fs;
 
 pub struct PackageConfiguration<'s> {
     pub package_name: &'s str,
     pub package_version: &'s str,
-    pub package_directory: &'s str,
+    pub package_directory: &'s PathBuf,
 }
 
 pub async fn generate_package(
@@ -14,17 +13,21 @@ pub async fn generate_package(
     let PackageConfiguration {
         package_name,
         package_version,
-        package_directory: package_directory_path,
+        package_directory,
     } = configuration;
 
-    let mut path = PathBuf::new();
-    path.push(package_directory_path);
-    create_dir_all(path).await?;
+    let root_path = package_directory;
+    let src_path = &package_directory.join("src");
 
-    let mut path = PathBuf::new();
-    path.push(package_directory_path);
-    path.push("src");
-    create_dir_all(path).await?;
+    fs::create_dir_all(root_path).await?;
+    fs::create_dir_all(src_path).await?;
+
+    let content = super::cargo_toml::generate_file_content(package_name, package_version)?;
+    fs::write(root_path.join("Cargo.toml"), content).await?;
+
+    let tokens = super::lib_rs::generate_file_token_stream()?;
+    let content = super::file::generate_file_content(tokens)?;
+    fs::write(src_path.join("lib.rs"), content).await?;
 
     Ok(())
 }
