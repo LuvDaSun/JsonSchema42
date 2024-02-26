@@ -37,28 +37,33 @@ export type SchemaModel = {
   examples?: any[];
   deprecated?: boolean;
 
+  types?: SchemaType[];
+
   reference?: SchemaKey;
+
   oneOf?: SchemaKey[];
   anyOf?: SchemaKey[];
   allOf?: SchemaKey[];
+
   if?: SchemaKey;
   then?: SchemaKey;
   else?: SchemaKey;
 
-  types?: SchemaType[];
-
   not?: SchemaKey;
 
-  dependentSchemas?: Record<string, SchemaKey>;
-  objectProperties?: Record<string, SchemaKey>;
   mapProperties?: SchemaKey;
-  patternProperties?: Record<string, SchemaKey>;
-  propertyNames?: SchemaKey;
-  tupleItems?: SchemaKey[];
   arrayItems?: SchemaKey;
+  propertyNames?: SchemaKey;
   contains?: SchemaKey;
-  required?: string[];
+
+  tupleItems?: SchemaKey[];
+
+  objectProperties?: Record<string, SchemaKey>;
+  patternProperties?: Record<string, SchemaKey>;
+  dependentSchemas?: Record<string, SchemaKey>;
+
   options?: any[];
+  required?: string[];
 
   minimumInclusive?: number;
   minimumExclusive?: number;
