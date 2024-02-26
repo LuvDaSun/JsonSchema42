@@ -93,7 +93,7 @@ pub fn optimize_names<'f>(
             (*original_names).push(part_info.0.clone());
         }
 
-        for (_optimized_name, original_names) in &optimized_names {
+        for original_names in optimized_names.values() {
             if original_names.len() == 1 {
                 // hurray optimization for this name is done!
                 continue;
