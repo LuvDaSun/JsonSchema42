@@ -2,6 +2,7 @@ use std::{
     borrow::Cow,
     cmp::Ordering,
     collections::{BTreeSet, HashMap, HashSet},
+    hash::Hash,
 };
 
 #[derive(Debug, Default, PartialEq, Eq)]
@@ -42,14 +43,17 @@ impl<'s> Ord for PartInfo<'s> {
     }
 }
 
-pub fn optimize_names(
-    names: Vec<Vec<&str>>,
+pub fn optimize_names<K>(
+    names: Vec<(K, Vec<&str>)>,
     maximum_iterations: usize,
-) -> impl Iterator<Item = (Vec<&str>, Vec<Cow<str>>)> {
+) -> impl Iterator<Item = (Vec<&str>, Vec<Cow<str>>)>
+where
+    K: Clone + PartialEq + Eq + Hash,
+{
     // first we calculate the cardinality of each name-part we use this hashmap to keep
     // count
     let mut cardinality_counters = HashMap::<_, usize>::new();
-    for name in &names {
+    for (_key, name) in &names {
         // unique name parts
         let name: HashSet<_> = name.iter().collect();
         for part in name {
@@ -63,7 +67,7 @@ pub fn optimize_names(
     // value is a tuple where the first element is the optimized name and the second part are
     // the ordered part info's. Those are ordered!
     let mut part_info_map: HashMap<Vec<&str>, (Vec<&str>, BTreeSet<_>)> = HashMap::new();
-    for name in &names {
+    for (_key, name) in &names {
         let part_info_entry = part_info_map.entry(name.to_vec()).or_default();
         for (index, part) in name.iter().enumerate() {
             let part_info = PartInfo {
@@ -207,7 +211,7 @@ mod tests {
 
     #[test]
     fn test_names() {
-        let actual: BTreeSet<_> = optimize_names(vec![vec!["A"], vec![""]], 5).collect();
+        let actual: BTreeSet<_> = optimize_names(vec![(1, vec!["A"]), (2, vec![""])], 5).collect();
         let expected: BTreeSet<_> = [
             (vec!["A"], vec![Cow::Borrowed("A")]),
             (vec![""], vec![Cow::Borrowed("")]),
@@ -216,7 +220,7 @@ mod tests {
         .collect();
         assert_eq!(actual, expected);
 
-        let actual: BTreeSet<_> = optimize_names(vec![vec!["A"], vec!["B"]], 5).collect();
+        let actual: BTreeSet<_> = optimize_names(vec![(1, vec!["A"]), (2, vec!["B"])], 5).collect();
         let expected: BTreeSet<_> = [
             (vec!["A"], vec![Cow::Borrowed("A")]),
             (vec!["B"], vec![Cow::Borrowed("B")]),
@@ -225,8 +229,11 @@ mod tests {
         .collect();
         assert_eq!(actual, expected);
 
-        let actual: BTreeSet<_> =
-            optimize_names(vec![vec!["A"], vec!["B", "C"], vec!["B", "D"]], 5).collect();
+        let actual: BTreeSet<_> = optimize_names(
+            vec![(1, vec!["A"]), (2, vec!["B", "C"]), (3, vec!["B", "D"])],
+            5,
+        )
+        .collect();
         let expected: BTreeSet<_> = [
             (vec!["A"], vec![Cow::Borrowed("A")]),
             (vec!["B", "C"], vec![Cow::Borrowed("C")]),
@@ -238,9 +245,9 @@ mod tests {
 
         let actual: BTreeSet<_> = optimize_names(
             vec![
-                vec!["cat", "properties", "id"],
-                vec!["dog", "properties", "id"],
-                vec!["goat", "properties", "id"],
+                (1, vec!["cat", "properties", "id"]),
+                (2, vec!["dog", "properties", "id"]),
+                (3, vec!["goat", "properties", "id"]),
             ],
             5,
         )

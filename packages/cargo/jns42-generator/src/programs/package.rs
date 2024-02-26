@@ -95,7 +95,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
                 .iter()
                 .map(|part| part.as_str())
                 .collect();
-            name
+            (url, name)
         })
         .collect();
 
