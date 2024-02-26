@@ -1,7 +1,15 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
+use crate::generators::package::{generate_package, PackageConfiguration};
+use crate::models::arena::Arena;
+use crate::models::schema::SchemaNode;
+use crate::models::specification::Specification;
+use crate::utils::names::optimize_names;
+use crate::utils::url::UrlWithPointer;
 use clap::Parser;
+use im::HashMap;
 use std::error::Error;
+use std::path::PathBuf;
 use std::rc::Rc;
 use url::Url;
 
@@ -13,7 +21,7 @@ pub struct CommandOptions {
     pub default_meta_schema_url: MetaSchemaId,
 
     #[arg(long)]
-    pub package_directory: String,
+    pub package_directory: PathBuf,
 
     #[arg(long)]
     pub package_name: String,
@@ -32,6 +40,9 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     let CommandOptions {
         schema_url,
         default_meta_schema_url,
+        package_directory,
+        package_name,
+        package_version,
         ..
     } = options;
 
@@ -76,7 +87,19 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         )
         .await;
 
-    let _intermediate_document = context.get_intermediate_document();
+    let intermediate_document = context.get_intermediate_document();
+
+    let specification = Specification::new(intermediate_document);
+
+    generate_package(
+        PackageConfiguration {
+            package_name: package_name.as_str(),
+            package_version: package_version.as_str(),
+            package_directory: &package_directory,
+        },
+        &specification,
+    )
+    .await?;
 
     Ok(())
 }

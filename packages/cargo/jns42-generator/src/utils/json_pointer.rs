@@ -1,6 +1,6 @@
 use url::Url;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Default)]
+#[derive(Clone, Default, Debug, PartialOrd, Ord, Eq, PartialEq, Hash)]
 pub struct JsonPointer(Vec<String>);
 
 impl JsonPointer {
@@ -17,6 +17,8 @@ impl From<&Url> for JsonPointer {
 
         if let Some(fragment) = fragment {
             let path = fragment
+                .strip_prefix('/')
+                .unwrap_or_default()
                 .split('/')
                 .filter(|part| !part.is_empty())
                 .map(|part| part.to_string())
@@ -28,8 +30,14 @@ impl From<&Url> for JsonPointer {
     }
 }
 
+impl AsRef<Vec<String>> for JsonPointer {
+    fn as_ref(&self) -> &Vec<String> {
+        &self.0
+    }
+}
+
 impl ToString for JsonPointer {
     fn to_string(&self) -> String {
-        self.0.join("/")
+        "/".to_string() + self.0.join("/").as_str()
     }
 }

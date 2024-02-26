@@ -8,6 +8,7 @@ words:
   - endregion
   - esbenp
   - Hasher
+  - Inflector
   - lcov
   - luvdasun
   - notdir

@@ -2,7 +2,6 @@ import camelcase from "camelcase";
 
 const startsWithLetterRe = /^[a-zA-Z]/u;
 const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
-const identifierRe = /^[a-zA-Z0-9]+$/u;
 
 export interface PartInfo {
   value: string;
