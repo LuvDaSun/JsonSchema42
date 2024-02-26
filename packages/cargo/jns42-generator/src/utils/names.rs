@@ -42,11 +42,10 @@ impl<'s> Ord for PartInfo<'s> {
     }
 }
 
-pub fn optimize_names<'f>(
-    names: Vec<Vec<&'f str>>,
-    default_name: Vec<&'f str>,
+pub fn optimize_names(
+    names: Vec<Vec<&str>>,
     maximum_iterations: usize,
-) -> impl Iterator<Item = (Vec<&'f str>, Vec<Cow<'f, str>>)> {
+) -> impl Iterator<Item = (Vec<&str>, Vec<Cow<str>>)> {
     // first we calculate the cardinality of each name-part we use this hashmap to keep
     // count
     let mut cardinality_counters = HashMap::<_, usize>::new();
@@ -89,8 +88,8 @@ pub fn optimize_names<'f>(
         optimized_names = Default::default();
 
         for (optimized_name, part_info) in &part_info_map {
-            let original_names = optimized_names.entry(optimized_name.clone()).or_default();
-            (*original_names).push(part_info.0.clone());
+            let original_names = optimized_names.entry(part_info.0.clone()).or_default();
+            (*original_names).push(optimized_name.clone());
         }
 
         for original_names in optimized_names.values() {
@@ -148,7 +147,7 @@ pub fn optimize_names<'f>(
 
 #[cfg(test)]
 mod tests {
-    use super::PartInfo;
+    use super::*;
 
     #[test]
     fn test_part_info_order() {
@@ -202,6 +201,27 @@ mod tests {
         ]
         .into();
 
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_names() {
+        let actual: Vec<_> = optimize_names(vec![vec!["A"], vec![""]], 5)
+            .map(|v| (v.0, v.1.into_iter().map(|v| v.into_owned()).collect()))
+            .collect();
+        let expected: Vec<_> = [(["A"], ["A"]), ([""], [""])]
+            .map(|v| (v.0.to_vec(), v.1.map(|v| v.to_string()).to_vec()))
+            .into_iter()
+            .collect();
+        assert_eq!(actual, expected);
+
+        let actual: BTreeSet<_> = optimize_names(vec![vec!["A"], vec!["B"]], 5)
+            .map(|v| (v.0, v.1.into_iter().map(|v| v.into_owned()).collect()))
+            .collect();
+        let expected: BTreeSet<_> = [(["A"], ["A"]), (["B"], ["B"])]
+            .map(|v| (v.0.to_vec(), v.1.map(|v| v.to_string()).to_vec()))
+            .into_iter()
+            .collect();
         assert_eq!(actual, expected);
     }
 }

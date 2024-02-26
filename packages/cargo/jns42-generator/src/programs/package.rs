@@ -3,7 +3,6 @@ use crate::documents::{DocumentContext, MetaSchemaId};
 use crate::utils::names::optimize_names;
 use clap::Parser;
 use std::error::Error;
-use std::iter::once;
 use std::rc::Rc;
 use url::Url;
 
@@ -86,7 +85,6 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
             .keys()
             .map(|key| key.split('/').collect())
             .collect(),
-        once("schema").collect(),
         5,
     );
 
