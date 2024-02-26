@@ -46,14 +46,14 @@ impl<'s> Ord for PartInfo<'s> {
 pub fn optimize_names<K>(
     names: Vec<(K, Vec<&str>)>,
     maximum_iterations: usize,
-) -> impl Iterator<Item = (Vec<&str>, Vec<Cow<str>>)>
+) -> impl Iterator<Item = (K, Vec<Cow<str>>)>
 where
     K: Clone + PartialEq + Eq + Hash,
 {
     // first we calculate the cardinality of each name-part we use this hashmap to keep
     // count
     let mut cardinality_counters = HashMap::<_, usize>::new();
-    for (_key, name) in &names {
+    for (_key, name) in names.iter() {
         // unique name parts
         let name: HashSet<_> = name.iter().collect();
         for part in name {
@@ -63,12 +63,12 @@ where
         }
     }
 
-    // then we create part info's that we can optimize. The key is the original name, then the
+    // then we create part info's that we can optimize. The key is the original key, then the
     // value is a tuple where the first element is the optimized name and the second part are
     // the ordered part info's. Those are ordered!
-    let mut part_info_map: HashMap<Vec<&str>, (Vec<&str>, BTreeSet<_>)> = HashMap::new();
-    for (_key, name) in &names {
-        let part_info_entry = part_info_map.entry(name.to_vec()).or_default();
+    let mut part_info_map: HashMap<_, (Vec<&str>, BTreeSet<_>)> = HashMap::new();
+    for (key, name) in names.iter() {
+        let part_info_entry = part_info_map.entry(key.clone()).or_default();
         for (index, part) in name.iter().enumerate() {
             let part_info = PartInfo {
                 cardinality: *cardinality_counters.entry(part).or_default(),
@@ -80,24 +80,25 @@ where
         }
     }
 
-    // this is where we keep the optimized names as the key, the original names are in the value.
+    // this is where we keep the optimized names as the key, the original keys are in the value.
     // Ideally there is only one element in the vector that is the value. This means that the
-    // optimized name references only one original name and that we can use it as a replacement
+    // optimized name references only one original key and that we can use it as a replacement
     // for the original name.
-    let mut optimized_names: HashMap<Vec<_>, Vec<Vec<_>>> = Default::default();
+    let mut optimized_names: HashMap<Vec<_>, Vec<_>> = Default::default();
     // then run the optimization process! we keep on iterating the optimization until we reach the
     // maximum number of iterations, or if there is nothing more to optimize.
+
     for _iteration in 0..maximum_iterations {
         let mut done = true;
         optimized_names = Default::default();
 
-        for (optimized_name, part_info) in &part_info_map {
-            let original_names = optimized_names.entry(part_info.0.clone()).or_default();
-            (*original_names).push(optimized_name.clone());
+        for (key, part_info) in &part_info_map {
+            let keys = optimized_names.entry(part_info.0.clone()).or_default();
+            (*keys).push(key.clone());
         }
 
-        for original_names in optimized_names.values() {
-            if original_names.len() == 1 {
+        for keys in optimized_names.values() {
+            if keys.len() == 1 {
                 // hurray optimization for this name is done!
                 continue;
             }
@@ -110,8 +111,8 @@ where
             // part info and add it to the optimized name. The part infos are ordered by cardinality
             // so unique names are more likely to popup. More unique names (lower cardinality) will
             // be at the beginning of the set.
-            for original_name in original_names {
-                let (optimized_name, part_infos) = part_info_map.get_mut(original_name).unwrap();
+            for key in keys {
+                let (optimized_name, part_infos) = part_info_map.get_mut(key).unwrap();
                 let part_info = part_infos.pop_first();
                 if let Some(part_info) = part_info {
                     optimized_name.push(part_info.value);
@@ -129,24 +130,21 @@ where
     // by adding an index to it.
     optimized_names
         .into_iter()
-        .flat_map(|(optimized_name, original_names)| {
-            let unique = original_names.len() == 1;
-            original_names
-                .into_iter()
-                .enumerate()
-                .map(move |(index, original_name)| {
-                    let mut optimized_name: Vec<_> = optimized_name
-                        .iter()
-                        .map(|value| Cow::Borrowed(*value))
-                        .collect();
-                    optimized_name.reverse();
-                    if unique {
-                        (original_name, optimized_name)
-                    } else {
-                        optimized_name.push(Cow::Owned(index.to_string()));
-                        (original_name, optimized_name)
-                    }
-                })
+        .flat_map(|(optimized_name, keys)| {
+            let unique = keys.len() == 1;
+            keys.into_iter().enumerate().map(move |(index, key)| {
+                let mut optimized_name: Vec<_> = optimized_name
+                    .iter()
+                    .map(|value| Cow::Borrowed(*value))
+                    .collect();
+                optimized_name.reverse();
+                if unique {
+                    (key, optimized_name)
+                } else {
+                    optimized_name.push(Cow::Owned(index.to_string()));
+                    (key, optimized_name)
+                }
+            })
         })
 }
 
@@ -212,21 +210,15 @@ mod tests {
     #[test]
     fn test_names() {
         let actual: BTreeSet<_> = optimize_names(vec![(1, vec!["A"]), (2, vec![""])], 5).collect();
-        let expected: BTreeSet<_> = [
-            (vec!["A"], vec![Cow::Borrowed("A")]),
-            (vec![""], vec![Cow::Borrowed("")]),
-        ]
-        .into_iter()
-        .collect();
+        let expected: BTreeSet<_> = [(1, vec![Cow::Borrowed("A")]), (2, vec![Cow::Borrowed("")])]
+            .into_iter()
+            .collect();
         assert_eq!(actual, expected);
 
         let actual: BTreeSet<_> = optimize_names(vec![(1, vec!["A"]), (2, vec!["B"])], 5).collect();
-        let expected: BTreeSet<_> = [
-            (vec!["A"], vec![Cow::Borrowed("A")]),
-            (vec!["B"], vec![Cow::Borrowed("B")]),
-        ]
-        .into_iter()
-        .collect();
+        let expected: BTreeSet<_> = [(1, vec![Cow::Borrowed("A")]), (2, vec![Cow::Borrowed("B")])]
+            .into_iter()
+            .collect();
         assert_eq!(actual, expected);
 
         let actual: BTreeSet<_> = optimize_names(
@@ -235,9 +227,9 @@ mod tests {
         )
         .collect();
         let expected: BTreeSet<_> = [
-            (vec!["A"], vec![Cow::Borrowed("A")]),
-            (vec!["B", "C"], vec![Cow::Borrowed("C")]),
-            (vec!["B", "D"], vec![Cow::Borrowed("D")]),
+            (1, vec![Cow::Borrowed("A")]),
+            (2, vec![Cow::Borrowed("C")]),
+            (3, vec![Cow::Borrowed("D")]),
         ]
         .into_iter()
         .collect();
@@ -253,18 +245,9 @@ mod tests {
         )
         .collect();
         let expected: BTreeSet<_> = [
-            (
-                vec!["cat", "properties", "id"],
-                vec![Cow::Borrowed("cat"), Cow::Borrowed("id")],
-            ),
-            (
-                vec!["dog", "properties", "id"],
-                vec![Cow::Borrowed("dog"), Cow::Borrowed("id")],
-            ),
-            (
-                vec!["goat", "properties", "id"],
-                vec![Cow::Borrowed("goat"), Cow::Borrowed("id")],
-            ),
+            (1, vec![Cow::Borrowed("cat"), Cow::Borrowed("id")]),
+            (2, vec![Cow::Borrowed("dog"), Cow::Borrowed("id")]),
+            (3, vec![Cow::Borrowed("goat"), Cow::Borrowed("id")]),
         ]
         .into_iter()
         .collect();
