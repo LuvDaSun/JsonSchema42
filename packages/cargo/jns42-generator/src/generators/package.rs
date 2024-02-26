@@ -1,3 +1,4 @@
+use crate::models::specification::Specification;
 use std::{error::Error, path::PathBuf};
 use tokio::fs;
 
@@ -9,6 +10,7 @@ pub struct PackageConfiguration<'s> {
 
 pub async fn generate_package(
     configuration: PackageConfiguration<'_>,
+    specification: &Specification,
 ) -> Result<(), Box<dyn Error>> {
     let PackageConfiguration {
         package_name,
@@ -25,9 +27,13 @@ pub async fn generate_package(
     let content = super::cargo_toml::generate_file_content(package_name, package_version)?;
     fs::write(root_path.join("Cargo.toml"), content).await?;
 
-    let tokens = super::lib_rs::generate_file_token_stream()?;
+    let tokens = super::lib_rs::generate_file_token_stream(specification)?;
     let content = super::file::generate_file_content(tokens)?;
     fs::write(src_path.join("lib.rs"), content).await?;
+
+    let tokens = super::types_rs::generate_file_token_stream(specification)?;
+    let content = super::file::generate_file_content(tokens)?;
+    fs::write(src_path.join("types.rs"), content).await?;
 
     Ok(())
 }
