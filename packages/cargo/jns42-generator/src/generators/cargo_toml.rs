@@ -1,5 +1,6 @@
-use super::banner::BANNER_TOML;
 use std::error::Error;
+
+use super::banner::get_banner_toml;
 
 pub fn generate_file_content(
     package_name: &str,
@@ -60,5 +61,5 @@ pub fn generate_file_content(
 
     let content = toml::ser::to_string_pretty(&manifest_table)?;
 
-    Ok(format!("{}{}", BANNER_TOML, content))
+    Ok(format!("{}\n\n{}", get_banner_toml(), content))
 }

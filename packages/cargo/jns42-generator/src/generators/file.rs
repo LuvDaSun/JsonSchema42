@@ -1,9 +1,9 @@
-use std::error::Error;
-
-use super::banner::BANNER_RS;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use rust_format::Formatter;
+use std::error::Error;
+
+use super::banner::get_banner_rs;
 
 pub fn generate_file_content(file_tokens: TokenStream) -> Result<String, Box<dyn Error>> {
     let mut tokens = quote!();
@@ -15,5 +15,5 @@ pub fn generate_file_content(file_tokens: TokenStream) -> Result<String, Box<dyn
 
     let content = formatter.format_tokens(tokens)?;
 
-    Ok(format!("{}{}", BANNER_RS, content))
+    Ok(format!("{}\n\n{}", get_banner_rs(), content))
 }
