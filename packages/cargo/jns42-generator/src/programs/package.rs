@@ -1,6 +1,6 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
-use crate::utils::names::make_names;
+use crate::utils::names::optimize_names;
 use clap::Parser;
 use std::error::Error;
 use std::iter::once;
@@ -80,12 +80,13 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
     let intermediate_document = context.get_intermediate_document();
 
-    let _names = make_names(
+    let _names = optimize_names(
         intermediate_document
             .schemas
             .keys()
-            .map(|key| key.split('/')),
-        once("schema"),
+            .map(|key| key.split('/').collect())
+            .collect(),
+        once("schema").collect(),
         5,
     );
 
