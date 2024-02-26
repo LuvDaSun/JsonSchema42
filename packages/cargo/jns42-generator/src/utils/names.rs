@@ -135,6 +135,7 @@ pub fn optimize_names(
                         .iter()
                         .map(|value| Cow::Borrowed(*value))
                         .collect();
+                    optimized_name.reverse();
                     if unique {
                         (original_name, optimized_name)
                     } else {
@@ -206,22 +207,60 @@ mod tests {
 
     #[test]
     fn test_names() {
-        let actual: Vec<_> = optimize_names(vec![vec!["A"], vec![""]], 5)
-            .map(|v| (v.0, v.1.into_iter().map(|v| v.into_owned()).collect()))
-            .collect();
-        let expected: Vec<_> = [(["A"], ["A"]), ([""], [""])]
-            .map(|v| (v.0.to_vec(), v.1.map(|v| v.to_string()).to_vec()))
-            .into_iter()
-            .collect();
+        let actual: BTreeSet<_> = optimize_names(vec![vec!["A"], vec![""]], 5).collect();
+        let expected: BTreeSet<_> = [
+            (vec!["A"], vec![Cow::Borrowed("A")]),
+            (vec![""], vec![Cow::Borrowed("")]),
+        ]
+        .into_iter()
+        .collect();
         assert_eq!(actual, expected);
 
-        let actual: BTreeSet<_> = optimize_names(vec![vec!["A"], vec!["B"]], 5)
-            .map(|v| (v.0, v.1.into_iter().map(|v| v.into_owned()).collect()))
-            .collect();
-        let expected: BTreeSet<_> = [(["A"], ["A"]), (["B"], ["B"])]
-            .map(|v| (v.0.to_vec(), v.1.map(|v| v.to_string()).to_vec()))
-            .into_iter()
-            .collect();
+        let actual: BTreeSet<_> = optimize_names(vec![vec!["A"], vec!["B"]], 5).collect();
+        let expected: BTreeSet<_> = [
+            (vec!["A"], vec![Cow::Borrowed("A")]),
+            (vec!["B"], vec![Cow::Borrowed("B")]),
+        ]
+        .into_iter()
+        .collect();
+        assert_eq!(actual, expected);
+
+        let actual: BTreeSet<_> =
+            optimize_names(vec![vec!["A"], vec!["B", "C"], vec!["B", "D"]], 5).collect();
+        let expected: BTreeSet<_> = [
+            (vec!["A"], vec![Cow::Borrowed("A")]),
+            (vec!["B", "C"], vec![Cow::Borrowed("C")]),
+            (vec!["B", "D"], vec![Cow::Borrowed("D")]),
+        ]
+        .into_iter()
+        .collect();
+        assert_eq!(actual, expected);
+
+        let actual: BTreeSet<_> = optimize_names(
+            vec![
+                vec!["cat", "properties", "id"],
+                vec!["dog", "properties", "id"],
+                vec!["goat", "properties", "id"],
+            ],
+            5,
+        )
+        .collect();
+        let expected: BTreeSet<_> = [
+            (
+                vec!["cat", "properties", "id"],
+                vec![Cow::Borrowed("cat"), Cow::Borrowed("id")],
+            ),
+            (
+                vec!["dog", "properties", "id"],
+                vec![Cow::Borrowed("dog"), Cow::Borrowed("id")],
+            ),
+            (
+                vec!["goat", "properties", "id"],
+                vec![Cow::Borrowed("goat"), Cow::Borrowed("id")],
+            ),
+        ]
+        .into_iter()
+        .collect();
         assert_eq!(actual, expected);
     }
 }
