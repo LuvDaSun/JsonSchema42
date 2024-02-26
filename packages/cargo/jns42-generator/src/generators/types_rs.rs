@@ -9,7 +9,7 @@ pub fn generate_file_token_stream(
 ) -> Result<TokenStream, Box<dyn Error>> {
     let mut tokens = quote! {};
 
-    for (_key, item) in specification.arena.iter() {
+    for item in specification.arena.iter() {
         if let Some(id) = &item.id {
             let uri = UrlWithPointer::parse(id).unwrap();
             let name_parts = specification.names.get(&uri).unwrap();
