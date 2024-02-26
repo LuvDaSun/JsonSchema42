@@ -17,6 +17,8 @@ impl From<&Url> for JsonPointer {
 
         if let Some(fragment) = fragment {
             let path = fragment
+                .strip_prefix('/')
+                .unwrap_or_default()
                 .split('/')
                 .filter(|part| !part.is_empty())
                 .map(|part| part.to_string())
@@ -36,6 +38,6 @@ impl AsRef<Vec<String>> for JsonPointer {
 
 impl ToString for JsonPointer {
     fn to_string(&self) -> String {
-        self.0.join("/")
+        "/".to_string() + self.0.join("/").as_str()
     }
 }

@@ -205,11 +205,7 @@ impl DocumentContext {
         ));
     }
 
-    fn fill_node_cache(
-        self: &Rc<Self>,
-        retrieval_url: &UrlWithPointer,
-        document_node: serde_json::Value,
-    ) {
+    fn fill_node_cache(&self, retrieval_url: &UrlWithPointer, document_node: serde_json::Value) {
         for (pointer, node) in read_json_node("".into(), document_node) {
             let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
             assert!(self.cache.borrow_mut().insert(node_url, node).is_none())

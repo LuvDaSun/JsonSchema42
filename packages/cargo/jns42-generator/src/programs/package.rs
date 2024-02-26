@@ -1,6 +1,5 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
-use crate::utils::json_pointer::JsonPointer;
 use crate::utils::names::optimize_names;
 use crate::utils::url::UrlWithPointer;
 use clap::Parser;
@@ -87,7 +86,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         .map(|key| UrlWithPointer::parse(key).unwrap())
         .collect();
 
-    let names = urls
+    let original_names = urls
         .iter()
         .map(|url| {
             let name: Vec<_> = url
@@ -100,7 +99,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         })
         .collect();
 
-    let _names = optimize_names(names, 5);
+    let _optimized_names: Vec<_> = optimize_names(original_names, 5).collect();
 
     Ok(())
 }

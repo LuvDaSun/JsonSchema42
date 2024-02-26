@@ -91,9 +91,9 @@ impl SchemaDocument for Document {
 
     fn get_node_urls(&self) -> Box<dyn Iterator<Item = UrlWithPointer> + '_> {
         Box::new(self.nodes.keys().map(|pointer| {
-            self.get_document_uri()
-                .join(&format!("#{}", pointer.to_string()))
-                .unwrap()
+            let mut url = self.get_document_uri().clone();
+            url.set_pointer(pointer.clone());
+            url
         }))
     }
 
@@ -108,9 +108,11 @@ impl SchemaDocument for Document {
     fn get_intermediate_node_entries(
         &self,
     ) -> Box<dyn Iterator<Item = (String, IntermediateNode)> + '_> {
-        Box::new(self.nodes.iter().map(|(node_id, node)| {
+        Box::new(self.nodes.iter().map(|(pointer, node)| {
+            let mut node_url = self.get_document_uri().clone();
+            node_url.set_pointer(pointer.clone());
             (
-                node_id.to_string(),
+                node_url.to_string(),
                 IntermediateNode {
                     // meta
                     title: node.select_title().map(|value| value.to_string()),

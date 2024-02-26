@@ -34,6 +34,12 @@ impl UrlWithPointer {
     pub fn get_pointer(&self) -> &JsonPointer {
         &self.1
     }
+
+    pub fn set_pointer(&mut self, pointer: JsonPointer) {
+        let fragment = pointer.to_string();
+        self.0.set_fragment(Some(&fragment));
+        self.1 = pointer;
+    }
 }
 
 impl Hash for UrlWithPointer {
