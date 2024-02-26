@@ -1,8 +1,11 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
+use crate::models::arena::Arena;
+use crate::models::schema::SchemaNode;
 use crate::utils::names::optimize_names;
 use crate::utils::url::UrlWithPointer;
 use clap::Parser;
+use im::HashMap;
 use std::error::Error;
 use std::rc::Rc;
 use url::Url;
@@ -97,6 +100,64 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     });
 
     let _optimized_names: Vec<_> = optimize_names(original_names, 5).collect();
+
+    let mut key_map = HashMap::new();
+    let mut arena = Arena::new();
+    for id in intermediate_document.schemas.keys() {
+        let item = SchemaNode {
+            id: Some(id.clone()),
+            ..Default::default()
+        };
+
+        let key = arena.add_item(item);
+        key_map.insert(id, key);
+    }
+
+    let transformer = |arena: &mut Arena<SchemaNode>, key: usize| {
+        let item = arena.get_item(key).clone();
+        if let Some(id) = &item.id {
+            let schema = intermediate_document.schemas.get(id).unwrap();
+
+            let item = SchemaNode {
+                id: Some(id.clone()),
+                title: schema.title.clone(),
+                description: schema.description.clone(),
+                // examples: schema.examples,
+                deprecated: item.deprecated,
+
+                minimum_inclusive: item.minimum_inclusive,
+                minimum_exclusive: item.minimum_exclusive,
+                maximum_inclusive: item.maximum_inclusive,
+                maximum_exclusive: item.maximum_exclusive,
+                multiple_of: item.multiple_of,
+
+                minimum_length: item.minimum_length,
+                maximum_length: item.maximum_length,
+                value_pattern: item.value_pattern,
+                value_format: item.value_format,
+
+                maximum_items: item.maximum_items,
+                minimum_items: item.minimum_items,
+                unique_items: item.unique_items,
+
+                minimum_properties: item.minimum_properties,
+                maximum_properties: item.maximum_properties,
+                required: item.required,
+
+                ..Default::default()
+            };
+
+            arena.set_item(key, item);
+        }
+    };
+
+    while arena.apply_transform(transformer) > 0 {
+        //
+    }
+
+    for (key, item) in arena.iter() {
+        println!("{} / {:?}", key, item);
+    }
 
     Ok(())
 }

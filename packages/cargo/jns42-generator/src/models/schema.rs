@@ -1,14 +1,11 @@
-use std::collections::HashMap;
-
 use serde_json::Value;
 
-#[allow(dead_code)]
-pub struct IntermediateSchema {
-    pub schema: String,
-    pub schemas: HashMap<String, IntermediateNode>,
-}
+pub type SchemaKey = usize;
 
-pub struct IntermediateNode {
+#[derive(Clone, PartialEq, Default, Debug)]
+pub struct SchemaNode {
+    pub id: Option<String>,
+
     // metadata
     pub title: Option<String>,
     pub description: Option<String>,
@@ -41,5 +38,5 @@ pub struct IntermediateNode {
     pub required: Option<Vec<String>>,
 
     // applicators
-    pub reference: Option<String>,
+    pub reference: Option<SchemaKey>,
 }
