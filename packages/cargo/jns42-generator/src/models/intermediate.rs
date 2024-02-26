@@ -42,4 +42,8 @@ pub struct IntermediateNode {
 
     // applicators
     pub reference: Option<String>,
+
+    pub all_of: Option<Vec<String>>,
+    pub any_of: Option<Vec<String>>,
+    pub one_of: Option<Vec<String>>,
 }

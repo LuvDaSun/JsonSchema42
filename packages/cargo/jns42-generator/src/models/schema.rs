@@ -39,4 +39,8 @@ pub struct SchemaNode {
 
     // applicators
     pub reference: Option<SchemaKey>,
+
+    pub all_of: Option<Vec<SchemaKey>>,
+    pub any_of: Option<Vec<SchemaKey>>,
+    pub one_of: Option<Vec<SchemaKey>>,
 }

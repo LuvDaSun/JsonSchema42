@@ -127,6 +127,7 @@ impl SchemaDocument for Document {
 
                     // assertions
                     options: Default::default(),
+
                     minimum_inclusive: node.select_minimum_inclusive(),
                     minimum_exclusive: node.select_minimum_exclusive(),
                     maximum_inclusive: node.select_maximum_inclusive(),
@@ -147,6 +148,43 @@ impl SchemaDocument for Document {
 
                     // applicators
                     reference: node.select_reference().map(|value| value.to_string()),
+
+                    all_of: node
+                        .select_sub_node_all_of_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+                    any_of: node
+                        .select_sub_node_any_of_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+                    one_of: node
+                        .select_sub_node_one_of_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
                 },
             )
         }))

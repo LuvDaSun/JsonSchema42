@@ -51,34 +51,45 @@ impl Specification {
             if let Some(id) = &item.id {
                 let schema = intermediate_document.schemas.get(id).unwrap();
 
-                let item = SchemaNode {
-                    id: Some(id.clone()),
-                    title: schema.title.clone(),
-                    description: schema.description.clone(),
-                    // examples: schema.examples,
-                    deprecated: item.deprecated,
+                let item =
+                    SchemaNode {
+                        id: Some(id.clone()),
+                        title: schema.title.clone(),
+                        description: schema.description.clone(),
+                        // examples: schema.examples,
+                        deprecated: schema.deprecated,
 
-                    minimum_inclusive: item.minimum_inclusive,
-                    minimum_exclusive: item.minimum_exclusive,
-                    maximum_inclusive: item.maximum_inclusive,
-                    maximum_exclusive: item.maximum_exclusive,
-                    multiple_of: item.multiple_of,
+                        minimum_inclusive: schema.minimum_inclusive,
+                        minimum_exclusive: schema.minimum_exclusive,
+                        maximum_inclusive: schema.maximum_inclusive,
+                        maximum_exclusive: schema.maximum_exclusive,
+                        multiple_of: schema.multiple_of,
 
-                    minimum_length: item.minimum_length,
-                    maximum_length: item.maximum_length,
-                    value_pattern: item.value_pattern,
-                    value_format: item.value_format,
+                        minimum_length: schema.minimum_length,
+                        maximum_length: schema.maximum_length,
+                        value_pattern: schema.value_pattern.clone(),
+                        value_format: schema.value_format.clone(),
 
-                    maximum_items: item.maximum_items,
-                    minimum_items: item.minimum_items,
-                    unique_items: item.unique_items,
+                        maximum_items: schema.maximum_items,
+                        minimum_items: schema.minimum_items,
+                        unique_items: schema.unique_items,
 
-                    minimum_properties: item.minimum_properties,
-                    maximum_properties: item.maximum_properties,
-                    required: item.required,
+                        minimum_properties: schema.minimum_properties,
+                        maximum_properties: schema.maximum_properties,
+                        required: schema.required.clone(),
 
-                    ..Default::default()
-                };
+                        all_of: schema.all_of.as_ref().map(|value| {
+                            value.iter().map(|url| *key_map.get(url).unwrap()).collect()
+                        }),
+                        any_of: schema.any_of.as_ref().map(|value| {
+                            value.iter().map(|url| *key_map.get(url).unwrap()).collect()
+                        }),
+                        one_of: schema.one_of.as_ref().map(|value| {
+                            value.iter().map(|url| *key_map.get(url).unwrap()).collect()
+                        }),
+
+                        ..Default::default()
+                    };
 
                 arena.set_item(key, item);
             }
