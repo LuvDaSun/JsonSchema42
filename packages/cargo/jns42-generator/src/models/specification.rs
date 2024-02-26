@@ -3,8 +3,8 @@ use crate::utils::{names::optimize_names, url::UrlWithPointer};
 use im::HashMap;
 
 pub struct Specification {
-    arena: Arena<SchemaNode>,
-    names: HashMap<UrlWithPointer, Vec<String>>,
+    pub arena: Arena<SchemaNode>,
+    pub names: HashMap<UrlWithPointer, Vec<String>>,
 }
 
 impl Specification {
