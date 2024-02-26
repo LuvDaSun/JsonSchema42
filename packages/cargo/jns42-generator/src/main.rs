@@ -1,4 +1,5 @@
 mod documents;
+mod generators;
 mod models;
 mod programs;
 mod utils;

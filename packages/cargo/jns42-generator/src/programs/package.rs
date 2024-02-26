@@ -1,5 +1,6 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
+use crate::generators::package::{generate_package, PackageConfiguration};
 use crate::models::arena::Arena;
 use crate::models::schema::SchemaNode;
 use crate::utils::names::optimize_names;
@@ -37,6 +38,9 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     let CommandOptions {
         schema_url,
         default_meta_schema_url,
+        package_directory,
+        package_name,
+        package_version,
         ..
     } = options;
 
@@ -158,6 +162,13 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     for (key, item) in arena.iter() {
         println!("{} / {:?}", key, item);
     }
+
+    generate_package(PackageConfiguration {
+        package_name: package_name.as_str(),
+        package_version: package_version.as_str(),
+        package_directory: package_directory.as_str(),
+    })
+    .await?;
 
     Ok(())
 }
