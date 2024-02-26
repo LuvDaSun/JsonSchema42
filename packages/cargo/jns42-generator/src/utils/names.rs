@@ -43,13 +43,15 @@ impl<'s> Ord for PartInfo<'s> {
     }
 }
 
-pub fn optimize_names<K>(
-    names: Vec<(K, Vec<&str>)>,
+pub fn optimize_names<'f, K>(
+    names: impl IntoIterator<Item = (K, Vec<&'f str>)>,
     maximum_iterations: usize,
-) -> impl Iterator<Item = (K, Vec<Cow<str>>)>
+) -> impl Iterator<Item = (K, Vec<Cow<'f, str>>)>
 where
     K: Clone + PartialEq + Eq + Hash,
 {
+    let names: Vec<_> = names.into_iter().collect();
+
     // first we calculate the cardinality of each name-part we use this hashmap to keep
     // count
     let mut cardinality_counters = HashMap::<_, usize>::new();
@@ -209,20 +211,20 @@ mod tests {
 
     #[test]
     fn test_names() {
-        let actual: BTreeSet<_> = optimize_names(vec![(1, vec!["A"]), (2, vec![""])], 5).collect();
+        let actual: BTreeSet<_> = optimize_names([(1, vec!["A"]), (2, vec![""])], 5).collect();
         let expected: BTreeSet<_> = [(1, vec![Cow::Borrowed("A")]), (2, vec![Cow::Borrowed("")])]
             .into_iter()
             .collect();
         assert_eq!(actual, expected);
 
-        let actual: BTreeSet<_> = optimize_names(vec![(1, vec!["A"]), (2, vec!["B"])], 5).collect();
+        let actual: BTreeSet<_> = optimize_names([(1, vec!["A"]), (2, vec!["B"])], 5).collect();
         let expected: BTreeSet<_> = [(1, vec![Cow::Borrowed("A")]), (2, vec![Cow::Borrowed("B")])]
             .into_iter()
             .collect();
         assert_eq!(actual, expected);
 
         let actual: BTreeSet<_> = optimize_names(
-            vec![(1, vec!["A"]), (2, vec!["B", "C"]), (3, vec!["B", "D"])],
+            [(1, vec!["A"]), (2, vec!["B", "C"]), (3, vec!["B", "D"])],
             5,
         )
         .collect();
@@ -236,7 +238,7 @@ mod tests {
         assert_eq!(actual, expected);
 
         let actual: BTreeSet<_> = optimize_names(
-            vec![
+            [
                 (1, vec!["cat", "properties", "id"]),
                 (2, vec!["dog", "properties", "id"]),
                 (3, vec!["goat", "properties", "id"]),

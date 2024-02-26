@@ -86,18 +86,15 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
         .map(|key| UrlWithPointer::parse(key).unwrap())
         .collect();
 
-    let original_names = urls
-        .iter()
-        .map(|url| {
-            let name: Vec<_> = url
-                .get_pointer()
-                .as_ref()
-                .iter()
-                .map(|part| part.as_str())
-                .collect();
-            (url, name)
-        })
-        .collect();
+    let original_names = urls.iter().map(|url| {
+        let name: Vec<_> = url
+            .get_pointer()
+            .as_ref()
+            .iter()
+            .map(|part| part.as_str())
+            .collect();
+        (url, name)
+    });
 
     let _optimized_names: Vec<_> = optimize_names(original_names, 5).collect();
 
