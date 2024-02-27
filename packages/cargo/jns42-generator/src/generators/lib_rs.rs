@@ -11,8 +11,8 @@ pub fn generate_file_token_stream(
 
     tokens.append_all(quote! {
       pub mod errors;
-      pub mod inner_types;
-      pub mod new_types;
+      pub mod interiors;
+      pub mod types;
     });
 
     Ok(tokens)
