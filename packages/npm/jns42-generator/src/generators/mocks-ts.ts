@@ -139,7 +139,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
             (
               nextSeed() % ${JSON.stringify(oneOfMockableEntries.length)}
             ) as ${joinIterable(
-              item.oneOf.map((entry, index) => JSON.stringify(index)),
+              oneOfMockableEntries.map((entry, index) => JSON.stringify(index)),
               " | ",
             )}
           ) {

@@ -37,6 +37,9 @@ generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.y
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
+
 generated/npm/schema-draft-04:
 	mkdir --parents $(@D)
 
@@ -44,6 +47,9 @@ generated/npm/schema-draft-04:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
+
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-draft-2020-12:
 	mkdir --parents $(@D)
@@ -53,6 +59,9 @@ generated/npm/schema-draft-2020-12:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
+
 generated/npm/schema-oas-v3-1:
 	mkdir --parents $(@D)
 
@@ -60,6 +69,9 @@ generated/npm/schema-oas-v3-1:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
+
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/swagger-v2:
 	mkdir --parents $(@D)
@@ -69,6 +81,9 @@ generated/npm/swagger-v2:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
+
 generated/npm/oas-v3-0:
 	mkdir --parents $(@D)
 
@@ -77,6 +92,9 @@ generated/npm/oas-v3-0:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
 
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
+
 generated/npm/oas-v3-1:
 	mkdir --parents $(@D)
 
@@ -84,6 +102,9 @@ generated/npm/oas-v3-1:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
+
+	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir --parents $(@D)
