@@ -25,8 +25,8 @@ where
         key
     }
 
-    pub fn iter(&self) -> impl Iterator<Item = (usize, &T)> {
-        self.0.iter().enumerate()
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        self.0.iter()
     }
 
     pub fn apply_transform(&mut self, transform: impl Fn(&mut Self, usize)) -> usize {

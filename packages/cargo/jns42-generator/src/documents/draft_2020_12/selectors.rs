@@ -13,9 +13,12 @@ pub trait Selectors {
     // fn select_examples(&self) -> Option<&Vec<Value>>;
     fn select_deprecated(&self) -> Option<bool>;
 
+    fn select_options(&self) -> Option<Vec<Value>>;
+
     fn select_types(&self) -> Option<Vec<&str>>;
 
-    fn select_options(&self) -> Option<Vec<Value>>;
+    fn select_reference(&self) -> Option<&str>;
+
     fn select_minimum_inclusive(&self) -> Option<f64>;
     fn select_minimum_exclusive(&self) -> Option<f64>;
     fn select_maximum_inclusive(&self) -> Option<f64>;
@@ -31,8 +34,6 @@ pub trait Selectors {
     fn select_minimum_properties(&self) -> Option<usize>;
     fn select_maximum_properties(&self) -> Option<usize>;
     fn select_required(&self) -> Option<Vec<&str>>;
-
-    fn select_reference(&self) -> Option<&str>;
 
     fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
     fn select_sub_node_def_entries(
