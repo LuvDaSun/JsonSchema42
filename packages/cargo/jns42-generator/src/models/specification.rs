@@ -5,8 +5,8 @@ use crate::{
 };
 use im::HashMap;
 use inflector::Inflector;
-use proc_macro2::Ident;
-use quote::format_ident;
+use proc_macro2::{Ident, TokenStream};
+use quote::{format_ident, quote};
 
 pub struct Specification {
     pub arena: Arena<SchemaNode>,
@@ -142,27 +142,25 @@ impl Specification {
         name
     }
 
-    pub fn get_interior_identifier(&self, key: &usize) -> Ident {
-        let name = self.get_name(key);
-        let identifier = format_ident!("crate::interior::{}", name);
-        identifier
+    pub fn get_interior_identifier(&self, key: &usize) -> TokenStream {
+        let identifier = self.get_identifier(key);
+        quote! {super::interior::#identifier}
     }
 
     pub fn get_interior_name(&self, key: &usize) -> String {
         let name = self.get_name(key);
-        let name = format!("crate::interior::{}", name);
+        let name = format!("super::interior::{}", name);
         name
     }
 
-    pub fn get_type_identifier(&self, key: &usize) -> Ident {
-        let name = self.get_name(key);
-        let identifier = format_ident!("crate::types::{}", name);
-        identifier
+    pub fn get_type_identifier(&self, key: &usize) -> TokenStream {
+        let identifier = self.get_identifier(key);
+        quote! {super::interior::#identifier}
     }
 
     pub fn _get_type_name(&self, key: &usize) -> String {
         let name = self.get_name(key);
-        let name = format!("crate::types::{}", name);
+        let name = format!("super::types::{}", name);
         name
     }
 }

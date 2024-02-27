@@ -39,7 +39,7 @@ fn generate_type_token_stream(
       #[doc = #documentation]
     });
 
-    let identifier = specification.get_name(key);
+    let identifier = specification.get_identifier(key);
     let type_identifier = specification.get_type_identifier(key);
 
     if let Some(types) = &item.types {
