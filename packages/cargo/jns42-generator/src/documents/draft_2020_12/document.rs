@@ -159,6 +159,7 @@ impl SchemaDocument for Document {
                                 })
                                 .collect()
                         }),
+
                     any_of: node
                         .select_sub_node_any_of_entries(node_url.get_pointer())
                         .map(|value| {
@@ -171,6 +172,7 @@ impl SchemaDocument for Document {
                                 })
                                 .collect()
                         }),
+
                     one_of: node
                         .select_sub_node_one_of_entries(node_url.get_pointer())
                         .map(|value| {
