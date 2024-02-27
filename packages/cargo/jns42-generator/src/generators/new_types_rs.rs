@@ -41,7 +41,8 @@ fn generate_type_token_stream(
     let id = item.id.as_ref().unwrap();
     let uri = UrlWithPointer::parse(id).unwrap();
     let name_parts = specification.names.get(&uri).unwrap();
-    let name_ident = format_ident!("T{}", name_parts.join(" ").to_pascal_case());
+    let name = format!("T{}", name_parts.join(" ").to_pascal_case());
+    let name_ident = format_ident!("{}", name);
 
     if let Some(types) = &item.types {
         if types.len() == 1 {
@@ -93,6 +94,32 @@ fn generate_type_token_stream(
                     });
                 }
             };
+
+            tokens.append_all(quote! {
+              impl #name_ident {
+                 fn new(value: super::inner_types::#name_ident) -> Result<Self, super::errors::ValidationError> {
+                      let instance = Self(value);
+                      if instance.validate() {
+                          Ok(instance)
+                      } else {
+                          Err(ValidationError::new(#name))
+                      }
+                  }
+                  fn validate(&self) -> bool {
+                    true
+                  }
+              }
+            });
+
+            tokens.append_all(quote! {
+              impl TryFrom<super::inner_types::#name_ident> for #name_ident {
+                type Error = super::errors::ValidationError;
+                fn try_from(value: super::inner_types::#name_ident) -> Result<Self, Self::Error> {
+                    Self::new(value)
+                }
+              }
+            });
+
             return Ok(tokens);
         }
     }

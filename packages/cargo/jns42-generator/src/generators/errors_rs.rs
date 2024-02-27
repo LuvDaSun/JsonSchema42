@@ -1,14 +1,10 @@
-use crate::{
-    models::{schema::SchemaNode, specification::Specification},
-    utils::url::UrlWithPointer,
-};
-use inflector::Inflector;
+use crate::models::specification::Specification;
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, TokenStreamExt};
+use quote::{quote, TokenStreamExt};
 use std::error::Error;
 
 pub fn generate_file_token_stream(
-    specification: &Specification,
+    _specification: &Specification,
 ) -> Result<TokenStream, Box<dyn Error>> {
     let mut tokens = quote! {};
 

@@ -95,6 +95,15 @@ fn generate_type_token_stream(
                     });
                 }
             };
+
+            tokens.append_all(quote! {
+              impl From<super::new_types::#name_ident> for #name_ident {
+                fn from(value: super::new_types::#name_ident) -> Self {
+                    value.0
+                }
+              }
+            });
+
             return Ok(tokens);
         }
     }
