@@ -19,7 +19,7 @@
       "request": "launch",
       "name": "package file",
       "cargo": {
-        "args": ["build", "--bin=jns42_generator", "--package=jns42-generator"],
+        "args": ["build", "--bin=jns42-generator", "--package=jns42-generator"],
         "filter": {
           "name": "jns42_generator",
           "kind": "bin"
