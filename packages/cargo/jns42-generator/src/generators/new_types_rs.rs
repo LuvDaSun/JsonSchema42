@@ -42,114 +42,66 @@ fn generate_type_token_stream(
     let uri = UrlWithPointer::parse(id).unwrap();
     let name_parts = specification.names.get(&uri).unwrap();
     let name = format!("T{}", name_parts.join(" ").to_pascal_case());
-    let name_ident = format_ident!("{}", name);
+    let name_identifier = format_ident!("{}", name);
+
+    tokens.append_all(quote! {
+      pub struct #name_identifier(super::inner_types::#name_identifier);
+    });
+
+    tokens.append_all(quote! {
+      impl #name_identifier {
+          fn new(value: super::inner_types::#name_identifier) -> Result<Self, super::errors::ValidationError> {
+              let instance = Self(value);
+              if instance.validate() {
+                  Ok(instance)
+              } else {
+                  Err(ValidationError::new(#name))
+              }
+          }
+          fn validate(&self) -> bool {
+            true
+          }
+      }
+    });
+
+    tokens.append_all(quote! {
+      impl TryFrom<super::inner_types::#name_identifier> for #name_identifier {
+        type Error = super::errors::ValidationError;
+        fn try_from(value: super::inner_types::#name_identifier) -> Result<Self, Self::Error> {
+            Self::new(value)
+        }
+      }
+    });
+
+    tokens.append_all(quote! {
+      impl std::ops::Deref for #name_identifier {
+        type Target = super::inner_types::#name_identifier;
+        fn deref(&self) -> &Self::Target {
+            &self.0
+        }
+      }
+    });
 
     if let Some(types) = &item.types {
         if types.len() == 1 {
             let r#type = types.first().unwrap();
             match r#type {
-                crate::models::schema::SchemaType::Never => {
+                crate::models::schema::SchemaType::Boolean
+                | crate::models::schema::SchemaType::Integer
+                | crate::models::schema::SchemaType::Number
+                | crate::models::schema::SchemaType::String => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Any => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Null => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Boolean => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Integer => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Number => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::String => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Array => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-                crate::models::schema::SchemaType::Object => {
-                    tokens.append_all(quote! {
-                      pub struct #name_ident(super::inner_types::#name_ident);
-                    });
-                }
-            };
-
-            tokens.append_all(quote! {
-              impl #name_ident {
-                 fn new(value: super::inner_types::#name_ident) -> Result<Self, super::errors::ValidationError> {
-                      let instance = Self(value);
-                      if instance.validate() {
-                          Ok(instance)
-                      } else {
-                          Err(ValidationError::new(#name))
+                      impl ToString for #name_identifier {
+                          fn to_string(&self) -> String {
+                              self.0.to_string()
+                          }
                       }
-                  }
-                  fn validate(&self) -> bool {
-                    true
-                  }
-              }
-            });
-
-            tokens.append_all(quote! {
-              impl TryFrom<super::inner_types::#name_ident> for #name_ident {
-                type Error = super::errors::ValidationError;
-                fn try_from(value: super::inner_types::#name_ident) -> Result<Self, Self::Error> {
-                    Self::new(value)
+                    });
                 }
-              }
-            });
-
-            return Ok(tokens);
+                _ => {}
+            };
         }
     }
-
-    if let Some(one_of) = &item.one_of {
-        let mut inner_tokens = quote!();
-        for sub_key in one_of {
-            let sub_item = specification.arena.get_item(*sub_key);
-            let sub_name_parts = specification
-                .names
-                .get(&UrlWithPointer::parse(sub_item.id.as_ref().unwrap().as_str()).unwrap())
-                .unwrap();
-            let sub_name_ident = format_ident!("T{}", sub_name_parts.join(" ").to_pascal_case());
-            inner_tokens.append_all(quote! {
-                #sub_name_ident(#sub_name_ident),
-            });
-        }
-
-        tokens.append_all(quote! {
-          pub enum #name_ident {
-            #inner_tokens
-          }
-        });
-
-        return Ok(tokens);
-    }
-
-    tokens.append_all(quote! {
-      pub struct #name_ident();
-    });
 
     Ok(tokens)
 }

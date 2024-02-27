@@ -41,7 +41,8 @@ fn generate_type_token_stream(
     let id = item.id.as_ref().unwrap();
     let uri = UrlWithPointer::parse(id).unwrap();
     let name_parts = specification.names.get(&uri).unwrap();
-    let name_ident = format_ident!("T{}", name_parts.join(" ").to_pascal_case());
+    let name = format!("T{}", name_parts.join(" ").to_pascal_case());
+    let name_identifier = format_ident!("{}", name);
 
     if let Some(types) = &item.types {
         if types.len() == 1 {
@@ -49,47 +50,47 @@ fn generate_type_token_stream(
             match r#type {
                 crate::models::schema::SchemaType::Never => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = ();
+                      pub type #name_identifier = ();
                     });
                 }
                 crate::models::schema::SchemaType::Any => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = std::any:Any;
+                      pub type #name_identifier = std::any:Any;
                     });
                 }
                 crate::models::schema::SchemaType::Null => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = ();
+                      pub type #name_identifier = ();
                     });
                 }
                 crate::models::schema::SchemaType::Boolean => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = bool;
+                      pub type #name_identifier = bool;
                     });
                 }
                 crate::models::schema::SchemaType::Integer => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = i64;
+                      pub type #name_identifier = i64;
                     });
                 }
                 crate::models::schema::SchemaType::Number => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = f64;
+                      pub type #name_identifier = f64;
                     });
                 }
                 crate::models::schema::SchemaType::String => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = String;
+                      pub type #name_identifier = String;
                     });
                 }
                 crate::models::schema::SchemaType::Array => {
                     tokens.append_all(quote! {
-                      pub type #name_ident = Vec<()>;
+                      pub type #name_identifier = Vec<()>;
                     });
                 }
                 crate::models::schema::SchemaType::Object => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident {
+                      pub struct #name_identifier {
                         //
                       }
                     });
@@ -97,8 +98,8 @@ fn generate_type_token_stream(
             };
 
             tokens.append_all(quote! {
-              impl From<super::new_types::#name_ident> for #name_ident {
-                fn from(value: super::new_types::#name_ident) -> Self {
+              impl From<super::new_types::#name_identifier> for #name_identifier {
+                fn from(value: super::new_types::#name_identifier) -> Self {
                     value.0
                 }
               }
@@ -123,7 +124,7 @@ fn generate_type_token_stream(
         }
 
         tokens.append_all(quote! {
-          pub enum #name_ident {
+          pub enum #name_identifier {
             #inner_tokens
           }
         });
@@ -132,7 +133,7 @@ fn generate_type_token_stream(
     }
 
     tokens.append_all(quote! {
-      pub struct #name_ident();
+      pub struct #name_identifier();
     });
 
     Ok(tokens)
