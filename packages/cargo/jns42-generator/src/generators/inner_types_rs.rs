@@ -49,47 +49,49 @@ fn generate_type_token_stream(
             match r#type {
                 crate::models::schema::SchemaType::Never => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(());
+                      pub type #name_ident = ();
                     });
                 }
                 crate::models::schema::SchemaType::Any => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(std::any:Any);
+                      pub type #name_ident = std::any:Any;
                     });
                 }
                 crate::models::schema::SchemaType::Null => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(());
+                      pub type #name_ident = ();
                     });
                 }
                 crate::models::schema::SchemaType::Boolean => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(bool);
+                      pub type #name_ident = bool;
                     });
                 }
                 crate::models::schema::SchemaType::Integer => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(isize);
+                      pub type #name_ident = i64;
                     });
                 }
                 crate::models::schema::SchemaType::Number => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(f64);
+                      pub type #name_ident = f64;
                     });
                 }
                 crate::models::schema::SchemaType::String => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(String);
+                      pub type #name_ident = String;
                     });
                 }
                 crate::models::schema::SchemaType::Array => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(Vec<()>);
+                      pub type #name_ident = Vec<()>;
                     });
                 }
                 crate::models::schema::SchemaType::Object => {
                     tokens.append_all(quote! {
-                      pub struct #name_ident(());
+                      pub struct #name_ident {
+                        //
+                      }
                     });
                 }
             };
