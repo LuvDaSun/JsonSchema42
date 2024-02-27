@@ -1,7 +1,37 @@
+use super::intermediate::IntermediateType;
 use im::HashMap;
 use serde_json::Value;
 
 pub type SchemaKey = usize;
+
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum SchemaType {
+    Never,
+    Any,
+    Null,
+    Boolean,
+    Integer,
+    Number,
+    String,
+    Array,
+    Object,
+}
+
+impl From<&IntermediateType> for SchemaType {
+    fn from(value: &IntermediateType) -> Self {
+        match value {
+            IntermediateType::Never => Self::Never,
+            IntermediateType::Any => Self::Any,
+            IntermediateType::Null => Self::Null,
+            IntermediateType::Boolean => Self::Boolean,
+            IntermediateType::Integer => Self::Integer,
+            IntermediateType::Number => Self::Number,
+            IntermediateType::String => Self::String,
+            IntermediateType::Array => Self::Array,
+            IntermediateType::Object => Self::Object,
+        }
+    }
+}
 
 #[derive(Clone, PartialEq, Default, Debug)]
 pub struct SchemaNode {
@@ -16,7 +46,7 @@ pub struct SchemaNode {
     pub deprecated: Option<bool>,
 
     // types
-    pub types: Option<Vec<String>>,
+    pub types: Option<Vec<SchemaType>>,
 
     // applicators
     pub reference: Option<SchemaKey>,

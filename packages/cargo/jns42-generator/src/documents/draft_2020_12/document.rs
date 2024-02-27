@@ -121,9 +121,7 @@ impl SchemaDocument for Document {
                     deprecated: node.select_deprecated(),
 
                     // types
-                    types: node
-                        .select_types()
-                        .map(|value| value.iter().map(|value| value.to_string()).collect()),
+                    types: node.select_types(),
 
                     // assertions
                     options: Default::default(),
