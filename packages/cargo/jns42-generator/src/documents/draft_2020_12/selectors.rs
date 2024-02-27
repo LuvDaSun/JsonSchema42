@@ -1,7 +1,7 @@
 use serde_json::Value;
 
 use super::Node;
-use crate::utils::json_pointer::JsonPointer;
+use crate::{models::intermediate::IntermediateType, utils::json_pointer::JsonPointer};
 
 pub trait Selectors {
     fn select_schema(&self) -> Option<&str>;
@@ -15,7 +15,7 @@ pub trait Selectors {
 
     fn select_options(&self) -> Option<Vec<Value>>;
 
-    fn select_types(&self) -> Option<Vec<&str>>;
+    fn select_types(&self) -> Option<Vec<IntermediateType>>;
 
     fn select_reference(&self) -> Option<&str>;
 
@@ -102,10 +102,15 @@ impl Selectors for Node {
         self.as_object()?.get("deprecated")?.as_bool()
     }
 
-    fn select_types(&self) -> Option<Vec<&str>> {
+    fn select_types(&self) -> Option<Vec<IntermediateType>> {
         match self.as_object()?.get("type")? {
-            Node::String(value) => Some(vec![value]),
-            Node::Array(value) => Some(value.iter().filter_map(|value| value.as_str()).collect()),
+            Node::String(value) => Some(vec![IntermediateType::parse(value)]),
+            Node::Array(value) => Some(
+                value
+                    .iter()
+                    .filter_map(|value| value.as_str().map(IntermediateType::parse))
+                    .collect(),
+            ),
             _ => None,
         }
     }

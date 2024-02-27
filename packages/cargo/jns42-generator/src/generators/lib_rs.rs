@@ -10,7 +10,9 @@ pub fn generate_file_token_stream(
     let mut tokens = quote! {};
 
     tokens.append_all(quote! {
-        pub mod types;
+      pub mod errors;
+      pub mod interiors;
+      pub mod types;
     });
 
     Ok(tokens)

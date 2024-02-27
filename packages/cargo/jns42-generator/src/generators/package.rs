@@ -31,9 +31,17 @@ pub async fn generate_package(
     let content = super::file::generate_file_content(tokens)?;
     fs::write(src_path.join("lib.rs"), content).await?;
 
+    let tokens = super::errors_rs::generate_file_token_stream(specification)?;
+    let content = super::file::generate_file_content(tokens)?;
+    fs::write(src_path.join("errors.rs"), content).await?;
+
     let tokens = super::types_rs::generate_file_token_stream(specification)?;
     let content = super::file::generate_file_content(tokens)?;
     fs::write(src_path.join("types.rs"), content).await?;
+
+    let tokens = super::interiors_rs::generate_file_token_stream(specification)?;
+    let content = super::file::generate_file_content(tokens)?;
+    fs::write(src_path.join("interiors.rs"), content).await?;
 
     Ok(())
 }

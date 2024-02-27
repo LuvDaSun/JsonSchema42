@@ -1,7 +1,30 @@
 use crate::models::{arena::Arena, schema::SchemaNode};
 use std::iter::once;
 
-// WIP
+/**
+ * This transformer makes the types array into a single type. This is achieved by creating a
+ * few new types with a single type and putting them in a oneOf.
+ *
+ * ```yaml
+ * - types:
+ *   - number
+ *   - string
+ * ```
+ *
+ * will become
+ *
+ * ```yaml
+ * - oneOf:
+ *   - 1
+ *   - 2
+ * - parent: 0
+ *   types:
+ *   - number
+ * - parent: 0
+ *   types:
+ *   - string
+ * ```
+ */
 pub fn single_type_transform(arena: &mut Arena<SchemaNode>, key: usize) {
     let item = arena.get_item(key);
 
@@ -45,14 +68,17 @@ pub fn single_type_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::{arena::Arena, schema::SchemaNode};
+    use crate::models::{
+        arena::Arena,
+        schema::{SchemaNode, SchemaType},
+    };
 
     #[test]
     fn test_single_type() {
         let mut arena = Arena::new();
 
         arena.add_item(SchemaNode {
-            types: Some(vec!["string".to_string(), "number".to_string()]),
+            types: Some(vec![SchemaType::String, SchemaType::Number]),
             ..Default::default()
         });
 
@@ -66,12 +92,12 @@ mod tests {
             },
             SchemaNode {
                 parent: Some(0),
-                types: Some(vec!["string".to_string()]),
+                types: Some(vec![SchemaType::String]),
                 ..Default::default()
             },
             SchemaNode {
                 parent: Some(0),
-                types: Some(vec!["number".to_string()]),
+                types: Some(vec![SchemaType::Number]),
                 ..Default::default()
             },
         ];

@@ -2,12 +2,64 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
+use super::schema::SchemaType;
+
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub struct IntermediateSchema {
     pub schema: String,
     pub schemas: HashMap<String, IntermediateNode>,
 }
 
+#[derive(Clone, Copy, Debug)]
+pub enum IntermediateType {
+    Never,
+    Any,
+    Null,
+    Boolean,
+    Integer,
+    Number,
+    String,
+    Array,
+    Object,
+}
+
+impl IntermediateType {
+    pub fn parse(input: &str) -> Self {
+        match input {
+            "never" => Self::Never,
+            "any" => Self::Any,
+            "null" => Self::Null,
+            "boolean" => Self::Boolean,
+            "integer" => Self::Integer,
+            "number" => Self::Number,
+            "string" => Self::String,
+            "array" => Self::Array,
+            "object" => Self::Object,
+            _ => {
+                unreachable!();
+            }
+        }
+    }
+}
+
+impl From<&SchemaType> for IntermediateType {
+    fn from(value: &SchemaType) -> Self {
+        match value {
+            SchemaType::Never => Self::Never,
+            SchemaType::Any => Self::Any,
+            SchemaType::Null => Self::Null,
+            SchemaType::Boolean => Self::Boolean,
+            SchemaType::Integer => Self::Integer,
+            SchemaType::Number => Self::Number,
+            SchemaType::String => Self::String,
+            SchemaType::Array => Self::Array,
+            SchemaType::Object => Self::Object,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct IntermediateNode {
     // metadata
     pub title: Option<String>,
@@ -16,7 +68,7 @@ pub struct IntermediateNode {
     pub deprecated: Option<bool>,
 
     // types
-    pub types: Option<Vec<String>>,
+    pub types: Option<Vec<IntermediateType>>,
 
     // assertions
     pub options: Option<Vec<Value>>,

@@ -63,6 +63,11 @@ impl Specification {
                         // examples: schema.examples,
                         deprecated: schema.deprecated,
 
+                        types: schema
+                            .types
+                            .as_ref()
+                            .map(|value| value.iter().map(|value| value.into()).collect()),
+
                         minimum_inclusive: schema.minimum_inclusive,
                         minimum_exclusive: schema.minimum_exclusive,
                         maximum_inclusive: schema.maximum_inclusive,
@@ -103,6 +108,7 @@ impl Specification {
                 //
             }
         }
+
         {
             fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
                 schema_transforms::single_type::single_type_transform(arena, key);

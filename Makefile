@@ -1,5 +1,6 @@
 SHELL:=$(PREFIX)/bin/sh
 NPM_VERSION:=$(shell npx jns42-generator --version)
+CARGO_VERSION:=$(word 2,$(shell cargo run --package jns42-generator -- --version))
 
 build: \
 	generated/npm/schema-intermediate \
@@ -9,6 +10,7 @@ build: \
 	generated/npm/swagger-v2 \
 	generated/npm/oas-v3-0 \
 	generated/npm/oas-v3-1 \
+	generated/cargo/schema-intermediate \
 
 	# Link the generated code, but don't save those links to the package lock
 	npm install --no-package-lock
@@ -25,6 +27,7 @@ clean: \
 	rm --recursive --force generated/npm/swagger-v2 \
 	rm --recursive --force generated/npm/oas-v3-0 \
 	rm --recursive --force generated/npm/oas-v3-1 \
+	rm --recursive --force generated/cargo/schema-intermediate
 
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir --parents $(@D)
@@ -81,6 +84,16 @@ generated/npm/oas-v3-1:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version ${NPM_VERSION} \
+
+generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
+	mkdir --parents $(@D)
+
+	cargo run \
+		--package jns42-generator \
+		package file://${PWD}/$< \
+		--package-directory $@ \
+		--package-name jns42-$(notdir $(basename $@)) \
+		--package-version ${CARGO_VERSION} \
 
 .PHONY: \
 	build \

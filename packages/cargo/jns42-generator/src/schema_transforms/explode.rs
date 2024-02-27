@@ -1,5 +1,59 @@
 use crate::models::{arena::Arena, schema::SchemaNode};
 
+/**
+ * Turns the model into a single all-of with various
+ * sub compound models in it.
+ * This is useful for the rare case in which a schema defines different compounds on a single
+ * schema node. So if a schema has an allOf *and* a oneOf. This edge case is handled buy
+ * exploding the schema into a schema of allOf with all of the compounds in it.
+ *
+ * this
+ * ```yaml
+ * - reference: 10
+ * - allOf
+ *   - 100
+ *   - 200
+ * - anyOf
+ *   - 300
+ *   - 400
+ * - oneOf
+ *   - 500
+ *   - 600
+ * - if: 700
+ *   then: 800
+ *   else: 900
+ * ```
+ *
+ * will become
+ * ```yaml
+ * - allOf
+ *   - 1
+ *   - 2
+ *   - 3
+ *   - 4
+ * - parent: 0
+ *   reference: 10
+ * - allOf
+ *   parent: 0
+ *   allOf
+ *   - 100
+ *   - 200
+ * - parent: 0
+ *   anyOf
+ *   - 300
+ *   - 400
+ * - parent: 0
+ *   oneOf
+ *   - 500
+ *   - 600
+ * - parent: 0
+ *   if: 700
+ *   then: 800
+ *   else: 900
+ *
+ * ```
+ *
+ */
 pub fn explode_transform(arena: &mut Arena<SchemaNode>, key: usize) {
     let item = arena.get_item(key);
     let mut sub_items = Vec::new();
