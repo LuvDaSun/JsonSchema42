@@ -1,10 +1,6 @@
-use crate::{
-    models::{schema::SchemaNode, specification::Specification},
-    utils::url::UrlWithPointer,
-};
-use inflector::Inflector;
+use crate::models::{schema::SchemaNode, specification::Specification};
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, TokenStreamExt};
+use quote::{quote, TokenStreamExt};
 use std::error::Error;
 
 pub fn generate_file_token_stream(
@@ -12,9 +8,9 @@ pub fn generate_file_token_stream(
 ) -> Result<TokenStream, Box<dyn Error>> {
     let mut tokens = quote! {};
 
-    for item in specification.arena.iter() {
+    for (key, item) in specification.arena.iter().enumerate() {
         if item.id.is_some() {
-            tokens.append_all(generate_type_token_stream(specification, item));
+            tokens.append_all(generate_type_token_stream(specification, &key, item));
         }
     }
 
@@ -23,6 +19,7 @@ pub fn generate_file_token_stream(
 
 fn generate_type_token_stream(
     specification: &Specification,
+    key: &usize,
     item: &SchemaNode,
 ) -> Result<TokenStream, Box<dyn Error>> {
     let mut tokens = quote! {};
@@ -38,23 +35,20 @@ fn generate_type_token_stream(
       #[doc = #documentation]
     });
 
-    let id = item.id.as_ref().unwrap();
-    let uri = UrlWithPointer::parse(id).unwrap();
-    let name_parts = specification.names.get(&uri).unwrap();
-    let name = format!("T{}", name_parts.join(" ").to_pascal_case());
-    let name_identifier = format_ident!("{}", name);
-    let interior_name = format!("super::interior::{}", name);
-    let interior_name_identifier = quote! { super::interior::#name_identifier };
+    let identifier = specification.get_identifier(key);
+    let name = specification.get_name(key);
+    let interior_name = specification.get_interior_name(key);
+    let interior_identifier = specification.get_interior_identifier(key);
 
     tokens.append_all(quote! {
       #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
       #[serde(try_from = #interior_name)]
-      pub struct #name_identifier(#interior_name_identifier);
+      pub struct #identifier(#interior_identifier);
     });
 
     tokens.append_all(quote! {
-      impl #name_identifier {
-          fn new(value: #interior_name_identifier) -> Result<Self, super::errors::ValidationError> {
+      impl #identifier {
+          fn new(value: #interior_identifier) -> Result<Self, super::errors::ValidationError> {
               let instance = Self(value);
               if instance.validate() {
                   Ok(instance)
@@ -69,17 +63,17 @@ fn generate_type_token_stream(
     });
 
     tokens.append_all(quote! {
-      impl TryFrom<#interior_name_identifier> for #name_identifier {
+      impl TryFrom<#interior_identifier> for #identifier {
         type Error = super::errors::ValidationError;
-        fn try_from(value: #interior_name_identifier) -> Result<Self, Self::Error> {
+        fn try_from(value: #interior_identifier) -> Result<Self, Self::Error> {
             Self::new(value)
         }
       }
     });
 
     tokens.append_all(quote! {
-      impl std::ops::Deref for #name_identifier {
-        type Target = #interior_name_identifier;
+      impl std::ops::Deref for #identifier {
+        type Target = #interior_identifier;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
@@ -95,7 +89,7 @@ fn generate_type_token_stream(
                 | crate::models::schema::SchemaType::Number
                 | crate::models::schema::SchemaType::String => {
                     tokens.append_all(quote! {
-                      impl ToString for #name_identifier {
+                      impl ToString for #identifier {
                           fn to_string(&self) -> String {
                               self.0.to_string()
                           }

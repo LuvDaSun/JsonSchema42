@@ -12,9 +12,9 @@ pub fn generate_file_token_stream(
 ) -> Result<TokenStream, Box<dyn Error>> {
     let mut tokens = quote! {};
 
-    for item in specification.arena.iter() {
+    for (key, item) in specification.arena.iter().enumerate() {
         if item.id.is_some() {
-            tokens.append_all(generate_type_token_stream(specification, item));
+            tokens.append_all(generate_type_token_stream(specification, &key, item));
         }
     }
 
@@ -23,6 +23,7 @@ pub fn generate_file_token_stream(
 
 fn generate_type_token_stream(
     specification: &Specification,
+    key: &usize,
     item: &SchemaNode,
 ) -> Result<TokenStream, Box<dyn Error>> {
     let mut tokens = quote! {};
@@ -38,13 +39,8 @@ fn generate_type_token_stream(
       #[doc = #documentation]
     });
 
-    let id = item.id.as_ref().unwrap();
-    let uri = UrlWithPointer::parse(id).unwrap();
-    let name_parts = specification.names.get(&uri).unwrap();
-    let name = format!("T{}", name_parts.join(" ").to_pascal_case());
-    let name_identifier = format_ident!("{}", name);
-    let _type_name = format!("super::types::{}", name);
-    let type_name_identifier = quote! { super::types::#name_identifier };
+    let identifier = specification.get_name(key);
+    let type_identifier = specification.get_type_identifier(key);
 
     if let Some(types) = &item.types {
         if types.len() == 1 {
@@ -52,37 +48,37 @@ fn generate_type_token_stream(
             match r#type {
                 crate::models::schema::SchemaType::Never => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = ();
+                      pub type #identifier = ();
                     });
                 }
                 crate::models::schema::SchemaType::Any => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = std::any:Any;
+                      pub type #identifier = std::any:Any;
                     });
                 }
                 crate::models::schema::SchemaType::Null => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = ();
+                      pub type #identifier = ();
                     });
                 }
                 crate::models::schema::SchemaType::Boolean => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = bool;
+                      pub type #identifier = bool;
                     });
                 }
                 crate::models::schema::SchemaType::Integer => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = i64;
+                      pub type #identifier = i64;
                     });
                 }
                 crate::models::schema::SchemaType::Number => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = f64;
+                      pub type #identifier = f64;
                     });
                 }
                 crate::models::schema::SchemaType::String => {
                     tokens.append_all(quote! {
-                      pub type #name_identifier = String;
+                      pub type #identifier = String;
                     });
                 }
                 crate::models::schema::SchemaType::Array => {
@@ -90,52 +86,29 @@ fn generate_type_token_stream(
                         let inner_tokens = tuple_items_keys
                             .iter()
                             .map(|tuple_items_key| {
-                                let tuple_items_item =
-                                    specification.arena.get_item(*tuple_items_key);
-                                let tuple_items_id = tuple_items_item.id.as_ref().unwrap();
-                                let tuple_items_uri =
-                                    UrlWithPointer::parse(tuple_items_id).unwrap();
+                                let tuple_items_identifier =
+                                    specification.get_type_identifier(tuple_items_key);
 
-                                let tuple_items_name_parts =
-                                    specification.names.get(&tuple_items_uri).unwrap();
-                                let tuple_items_name = format!(
-                                    "T{}",
-                                    tuple_items_name_parts.join(" ").to_pascal_case()
-                                );
-                                let tuple_items_name_identifier =
-                                    format_ident!("{}", tuple_items_name);
-                                let tuple_items_type_name_identifier =
-                                    quote! { super::types::#tuple_items_name_identifier };
-
-                                quote! { #tuple_items_type_name_identifier }
+                                quote! { #tuple_items_identifier }
                             })
                             .reduce(|a, b| quote!(#a, #b))
                             .unwrap_or_default();
 
                         tokens.append_all(quote! {
-                          pub type #name_identifier = (
+                          pub type #identifier = (
                             #inner_tokens
                           );
                         });
                     } else if let Some(array_items_key) = &item.array_items {
-                        let array_items_item = specification.arena.get_item(*array_items_key);
-                        let array_items_id = array_items_item.id.as_ref().unwrap();
-                        let array_items_uri = UrlWithPointer::parse(array_items_id).unwrap();
-
-                        let array_items_name_parts =
-                            specification.names.get(&array_items_uri).unwrap();
-                        let array_items_name =
-                            format!("T{}", array_items_name_parts.join(" ").to_pascal_case());
-                        let array_items_name_identifier = format_ident!("{}", array_items_name);
-                        let array_items_type_name_identifier =
-                            quote! { super::types::#array_items_name_identifier };
+                        let array_items_identifier =
+                            specification.get_type_identifier(array_items_key);
 
                         tokens.append_all(quote! {
-                          pub type #name_identifier = Vec<#array_items_type_name_identifier>;
+                          pub type #identifier = Vec<#array_items_identifier>;
                         });
                     } else {
                         tokens.append_all(quote! {
-                          pub type #name_identifier = Vec<()>;
+                          pub type #identifier = Vec<()>;
                         });
                     }
                 }
@@ -148,33 +121,19 @@ fn generate_type_token_stream(
                             .unwrap_or_default();
                         let inner_tokens = object_properties_entries
                             .iter()
-                            .map(|(object_properties_property, object_properties_key)| {
-                                let object_properties_item =
-                                    specification.arena.get_item(*object_properties_key);
-                                let object_properties_id =
-                                    object_properties_item.id.as_ref().unwrap();
-                                let object_properties_uri =
-                                    UrlWithPointer::parse(object_properties_id).unwrap();
+                            .map(|(member_name, object_properties_key)| {
+                                let member_identifier = format_ident!("{}", member_name);
+                                let object_properties_identifier =
+                                    specification.get_type_identifier(object_properties_key);
 
-                                let object_properties_name_parts =
-                                    specification.names.get(&object_properties_uri).unwrap();
-                                let object_properties_name = format!(
-                                    "T{}",
-                                    object_properties_name_parts.join(" ").to_pascal_case()
-                                );
-                                let object_properties_name_identifier =                                    format_ident!("{}", object_properties_name);
-                                let _object_properties_type_name =
-                                    format!("super::types::{}", object_properties_name);
-                                let _object_properties_type_name_identifier =
-                                  quote! { super::types::#object_properties_name_identifier };
-
-                                let object_properties_property_identifier = format_ident!("{}", object_properties_property);
-
-                                if required.contains(object_properties_property){
-                                  quote! { #object_properties_property_identifier: #object_properties_name_identifier }
-                                }
-                                else {
-                                  quote! { #object_properties_property_identifier: Option<#object_properties_name_identifier> }
+                                if required.contains(member_name) {
+                                    quote! {
+                                      #member_identifier: #object_properties_identifier
+                                    }
+                                } else {
+                                    quote! {
+                                      #member_identifier: Option<#object_properties_identifier>
+                                    }
                                 }
                             })
                             .reduce(|a, b| quote!(#a, #b))
@@ -182,41 +141,29 @@ fn generate_type_token_stream(
 
                         tokens.append_all(quote! {
                             #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
-                            pub struct #name_identifier {
+                            pub struct #identifier {
                               #inner_tokens
                             }
                           });
                     } else if let Some(map_properties_key) = &item.map_properties {
-                        let map_properties_item = specification.arena.get_item(*map_properties_key);
-                        let map_properties_id = map_properties_item.id.as_ref().unwrap();
-                        let map_properties_uri = UrlWithPointer::parse(map_properties_id).unwrap();
-
-                        let map_properties_name_parts =
-                            specification.names.get(&map_properties_uri).unwrap();
-                        let map_properties_name =
-                            format!("T{}", map_properties_name_parts.join(" ").to_pascal_case());
-                        let map_properties_name_identifier =
-                            format_ident!("{}", map_properties_name);
-                        let _map_properties_type_name =
-                            format!("super::types::{}", map_properties_name);
-                        let map_properties_type_name_identifier =
-                            quote! { super::types::#map_properties_name_identifier };
+                        let map_properties_identifier =
+                            specification.get_type_identifier(map_properties_key);
 
                         tokens.append_all(quote! {
-                          pub type #name_identifier = HashMap<String, #map_properties_type_name_identifier>;
+                          pub type #identifier = HashMap<String, #map_properties_identifier>;
                         });
                     } else {
                         tokens.append_all(quote! {
                           #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
-                          pub type #name_identifier = std::collections::HashMap<String, ()>;
+                          pub type #identifier = std::collections::HashMap<String, ()>;
                         });
                     }
                 }
             };
 
             tokens.append_all(quote! {
-              impl From<#type_name_identifier> for #name_identifier {
-                fn from(value: #type_name_identifier) -> Self {
+              impl From<#type_identifier> for #identifier {
+                fn from(value: #type_identifier) -> Self {
                     value.0
                 }
               }
@@ -241,7 +188,7 @@ fn generate_type_token_stream(
         }
 
         tokens.append_all(quote! {
-          pub enum #name_identifier {
+          pub enum #identifier {
             #inner_tokens
           }
         });
@@ -250,7 +197,7 @@ fn generate_type_token_stream(
     }
 
     tokens.append_all(quote! {
-      pub struct #name_identifier();
+      pub struct #identifier();
     });
 
     Ok(tokens)

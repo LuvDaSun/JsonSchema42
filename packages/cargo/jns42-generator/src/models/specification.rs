@@ -4,6 +4,9 @@ use crate::{
     utils::{names::optimize_names, url::UrlWithPointer},
 };
 use im::HashMap;
+use inflector::Inflector;
+use proc_macro2::Ident;
+use quote::format_ident;
 
 pub struct Specification {
     pub arena: Arena<SchemaNode>,
@@ -121,5 +124,45 @@ impl Specification {
         }
 
         Self { arena, names }
+    }
+}
+
+impl Specification {
+    pub fn get_identifier(&self, key: &usize) -> Ident {
+        let name = self.get_name(key);
+        let identifier = format_ident!("{}", name);
+        identifier
+    }
+
+    pub fn get_name(&self, key: &usize) -> String {
+        let id = self.arena.get_item(*key).id.as_ref().unwrap();
+        let uri = UrlWithPointer::parse(id).unwrap();
+        let parts = self.names.get(&uri).unwrap();
+        let name = format!("T{}", parts.join(" ").to_pascal_case());
+        name
+    }
+
+    pub fn get_interior_identifier(&self, key: &usize) -> Ident {
+        let name = self.get_name(key);
+        let identifier = format_ident!("crate::interior::{}", name);
+        identifier
+    }
+
+    pub fn get_interior_name(&self, key: &usize) -> String {
+        let name = self.get_name(key);
+        let name = format!("crate::interior::{}", name);
+        name
+    }
+
+    pub fn get_type_identifier(&self, key: &usize) -> Ident {
+        let name = self.get_name(key);
+        let identifier = format_ident!("crate::types::{}", name);
+        identifier
+    }
+
+    pub fn get_type_name(&self, key: &usize) -> String {
+        let name = self.get_name(key);
+        let name = format!("crate::types::{}", name);
+        name
     }
 }
