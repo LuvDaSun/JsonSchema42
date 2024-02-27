@@ -9,13 +9,12 @@ use crate::{
 };
 use std::{collections::HashMap, rc::Weak};
 
-#[allow(dead_code)]
 pub struct Document {
-    document_context: Weak<DocumentContext>,
-    given_url: UrlWithPointer,
-    antecedent_url: Option<UrlWithPointer>,
+    _document_context: Weak<DocumentContext>,
+    _given_url: UrlWithPointer,
+    _antecedent_url: Option<UrlWithPointer>,
     document_url: UrlWithPointer,
-    document_node: Node,
+    _document_node: Node,
 
     nodes: HashMap<JsonPointer, Node>,
     referenced_documents: Vec<ReferencedDocument>,
@@ -72,11 +71,11 @@ impl Document {
         }
 
         Self {
-            document_context,
-            antecedent_url,
-            given_url,
+            _document_context: document_context,
+            _antecedent_url: antecedent_url,
+            _given_url: given_url,
             document_url,
-            document_node,
+            _document_node: document_node,
             nodes,
             referenced_documents,
             embedded_documents,

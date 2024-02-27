@@ -4,7 +4,6 @@ use serde_json::Value;
 
 use super::schema::SchemaType;
 
-#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct IntermediateSchema {
     pub schema: String,

@@ -4,10 +4,10 @@ use crate::{
     utils::url::UrlWithPointer,
 };
 
-#[allow(dead_code)]
 pub struct Document {}
 
 impl Document {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {}
     }

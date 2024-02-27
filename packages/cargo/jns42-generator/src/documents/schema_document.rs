@@ -1,12 +1,10 @@
 use crate::{models::intermediate::IntermediateNode, utils::url::UrlWithPointer};
 
-#[allow(dead_code)]
 pub struct EmbeddedDocument {
     pub retrieval_url: UrlWithPointer,
     pub given_url: UrlWithPointer,
 }
 
-#[allow(dead_code)]
 pub struct ReferencedDocument {
     pub retrieval_url: UrlWithPointer,
     pub given_url: UrlWithPointer,

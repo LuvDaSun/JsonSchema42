@@ -65,7 +65,6 @@ impl DocumentContext {
         self.factories.insert(schema.clone(), factory);
     }
 
-    #[allow(dead_code)]
     pub fn get_intermediate_document(&self) -> IntermediateSchema {
         IntermediateSchema {
             schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json".to_string(),
@@ -82,7 +81,6 @@ impl DocumentContext {
             .collect()
     }
 
-    #[allow(dead_code)]
     pub fn get_document(&self, document_url: &UrlWithPointer) -> Rc<dyn SchemaDocument> {
         let documents = self.documents.borrow();
 
@@ -91,7 +89,6 @@ impl DocumentContext {
         document
     }
 
-    #[allow(dead_code)]
     pub fn get_document_for_node(&self, node_url: &UrlWithPointer) -> Rc<dyn SchemaDocument> {
         let node_documents = self.node_documents.borrow();
 
@@ -152,7 +149,6 @@ impl DocumentContext {
         ));
     }
 
-    #[allow(dead_code)]
     pub async fn load_from_document(
         self: &Rc<Self>,
         retrieval_url: &UrlWithPointer,

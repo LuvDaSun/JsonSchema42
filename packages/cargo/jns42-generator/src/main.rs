@@ -1,9 +1,9 @@
-mod documents;
-mod generators;
-mod models;
-mod programs;
-mod schema_transforms;
-mod utils;
+pub mod documents;
+pub mod generators;
+pub mod models;
+pub mod programs;
+pub mod schema_transforms;
+pub mod utils;
 
 use clap::Parser;
 use programs::{run_program, ProgramOptions};
