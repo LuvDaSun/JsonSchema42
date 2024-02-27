@@ -10,6 +10,13 @@ pub fn generate_file_token_stream(
     let mut tokens = quote! {};
 
     for item in specification.arena.iter() {
+        let comments: Vec<_> = [&item.title, &item.description, &item.id]
+            .into_iter()
+            .flatten()
+            .cloned()
+            .collect();
+        let comments = comments.join("\n\n");
+
         if let Some(id) = &item.id {
             let uri = UrlWithPointer::parse(id).unwrap();
             let name_parts = specification.names.get(&uri).unwrap();
@@ -33,12 +40,14 @@ pub fn generate_file_token_stream(
                 }
 
                 tokens.append_all(quote! {
+                  #[doc = #comments]
                   pub enum #name_ident {
                     #inner_tokens
                   }
                 });
             } else {
                 tokens.append_all(quote! {
+                  #[doc = #comments]
                   pub struct #name_ident();
                 });
             }
