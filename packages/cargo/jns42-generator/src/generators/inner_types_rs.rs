@@ -43,6 +43,8 @@ fn generate_type_token_stream(
     let name_parts = specification.names.get(&uri).unwrap();
     let name = format!("T{}", name_parts.join(" ").to_pascal_case());
     let name_identifier = format_ident!("{}", name);
+    let _new_name = format!("super::new_types::{}", name);
+    let new_name_identifier = quote! { super::new_types::#name_identifier };
 
     if let Some(types) = &item.types {
         if types.len() == 1 {
@@ -90,6 +92,7 @@ fn generate_type_token_stream(
                 }
                 crate::models::schema::SchemaType::Object => {
                     tokens.append_all(quote! {
+                      #[derive(Debug, serde :: Serialize, serde :: Deserialize, Clone, PartialEq, Eq)]
                       pub struct #name_identifier {
                         //
                       }
@@ -98,8 +101,8 @@ fn generate_type_token_stream(
             };
 
             tokens.append_all(quote! {
-              impl From<super::new_types::#name_identifier> for #name_identifier {
-                fn from(value: super::new_types::#name_identifier) -> Self {
+              impl From<#new_name_identifier> for #name_identifier {
+                fn from(value: #new_name_identifier) -> Self {
                     value.0
                 }
               }

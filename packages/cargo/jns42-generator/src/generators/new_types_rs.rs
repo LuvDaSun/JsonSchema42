@@ -43,14 +43,18 @@ fn generate_type_token_stream(
     let name_parts = specification.names.get(&uri).unwrap();
     let name = format!("T{}", name_parts.join(" ").to_pascal_case());
     let name_identifier = format_ident!("{}", name);
+    let inner_name = format!("super::inner_types::{}", name);
+    let inner_name_identifier = quote! { super::inner_types::#name_identifier };
 
     tokens.append_all(quote! {
-      pub struct #name_identifier(super::inner_types::#name_identifier);
+      #[derive(Debug, serde :: Serialize, serde :: Deserialize, Clone, PartialEq, Eq)]
+      #[serde(try_from = #inner_name)]
+      pub struct #name_identifier(#inner_name_identifier);
     });
 
     tokens.append_all(quote! {
       impl #name_identifier {
-          fn new(value: super::inner_types::#name_identifier) -> Result<Self, super::errors::ValidationError> {
+          fn new(value: #inner_name_identifier) -> Result<Self, super::errors::ValidationError> {
               let instance = Self(value);
               if instance.validate() {
                   Ok(instance)
@@ -65,9 +69,9 @@ fn generate_type_token_stream(
     });
 
     tokens.append_all(quote! {
-      impl TryFrom<super::inner_types::#name_identifier> for #name_identifier {
+      impl TryFrom<#inner_name_identifier> for #name_identifier {
         type Error = super::errors::ValidationError;
-        fn try_from(value: super::inner_types::#name_identifier) -> Result<Self, Self::Error> {
+        fn try_from(value: #inner_name_identifier) -> Result<Self, Self::Error> {
             Self::new(value)
         }
       }
@@ -75,7 +79,7 @@ fn generate_type_token_stream(
 
     tokens.append_all(quote! {
       impl std::ops::Deref for #name_identifier {
-        type Target = super::inner_types::#name_identifier;
+        type Target = #inner_name_identifier;
         fn deref(&self) -> &Self::Target {
             &self.0
         }
