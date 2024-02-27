@@ -1,11 +1,10 @@
 mod package;
 
+use clap::{Parser, Subcommand};
 use std::error::Error;
 
-use clap::{Parser, Subcommand};
-
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about)]
 pub struct ProgramOptions {
     #[command(subcommand)]
     pub command: ProgramCommands,
