@@ -240,23 +240,23 @@ impl Specification {
 
   pub fn get_interior_identifier(&self, key: &usize) -> TokenStream {
     let identifier = self.get_identifier(key);
-    quote! {super::interior::#identifier}
+    quote! {crate::interiors::#identifier}
   }
 
   pub fn get_interior_name(&self, key: &usize) -> String {
     let name = self.get_name(key);
-    let name = format!("super::interior::{}", name);
+    let name = format!("crate::interiors::{}", name);
     name
   }
 
   pub fn get_type_identifier(&self, key: &usize) -> TokenStream {
     let identifier = self.get_identifier(key);
-    quote! {super::types::#identifier}
+    quote! {crate::types::#identifier}
   }
 
   pub fn _get_type_name(&self, key: &usize) -> String {
     let name = self.get_name(key);
-    let name = format!("super::types::{}", name);
+    let name = format!("crate::types::{}", name);
     name
   }
 }

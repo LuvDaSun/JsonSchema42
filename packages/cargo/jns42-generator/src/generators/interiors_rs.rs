@@ -1,6 +1,6 @@
 use crate::{
   models::{schema::SchemaNode, specification::Specification},
-  utils::{name::to_pascal, url::UrlWithPointer},
+  utils::name::to_camel,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};
@@ -119,7 +119,7 @@ fn generate_type_token_stream(
             let inner_tokens = object_properties_entries
               .iter()
               .map(|(member_name, object_properties_key)| {
-                let member_identifier = format_ident!("{}", to_pascal([member_name]));
+                let member_identifier = format_ident!("{}", to_camel([member_name]));
                 let object_properties_identifier =
                   specification.get_type_identifier(object_properties_key);
 
@@ -146,7 +146,7 @@ fn generate_type_token_stream(
             let map_properties_identifier = specification.get_type_identifier(map_properties_key);
 
             tokens.append_all(quote! {
-              pub type #identifier = HashMap<String, #map_properties_identifier>;
+              pub type #identifier = std::collections::HashMap<String, #map_properties_identifier>;
             });
           } else {
             tokens.append_all(quote! {
@@ -171,14 +171,9 @@ fn generate_type_token_stream(
   if let Some(one_of) = &item.one_of {
     let mut inner_tokens = quote!();
     for sub_key in one_of {
-      let sub_item = specification.arena.get_item(*sub_key);
-      let sub_name_parts = specification
-        .names
-        .get(&UrlWithPointer::parse(sub_item.id.as_ref().unwrap().as_str()).unwrap())
-        .unwrap();
-      let sub_name_ident = format_ident!("T{}", to_pascal(sub_name_parts));
+      let sub_identifier = specification.get_type_identifier(sub_key);
       inner_tokens.append_all(quote! {
-          #sub_name_ident(#sub_name_ident),
+          #sub_identifier(#sub_identifier),
       });
     }
 

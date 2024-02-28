@@ -43,17 +43,17 @@ fn generate_type_token_stream(
   tokens.append_all(quote! {
     #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
     #[serde(try_from = #interior_name)]
-    pub struct #identifier(#interior_identifier);
+    pub struct #identifier(pub(super) #interior_identifier);
   });
 
   tokens.append_all(quote! {
     impl #identifier {
-        fn new(value: #interior_identifier) -> Result<Self, super::errors::ValidationError> {
+        fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
             let instance = Self(value);
             if instance.validate() {
                 Ok(instance)
             } else {
-                Err(ValidationError::new(#name))
+                Err(crate::errors::ValidationError::new(#name))
             }
         }
         fn validate(&self) -> bool {
@@ -64,7 +64,7 @@ fn generate_type_token_stream(
 
   tokens.append_all(quote! {
     impl TryFrom<#interior_identifier> for #identifier {
-      type Error = super::errors::ValidationError;
+      type Error = crate::errors::ValidationError;
       fn try_from(value: #interior_identifier) -> Result<Self, Self::Error> {
           Self::new(value)
       }
