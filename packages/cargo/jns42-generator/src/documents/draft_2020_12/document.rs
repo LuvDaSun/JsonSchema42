@@ -116,7 +116,7 @@ impl SchemaDocument for Document {
                     // meta
                     title: node.select_title().map(|value| value.to_string()),
                     description: node.select_description().map(|value| value.to_string()),
-                    // examples: node.select_examples(),
+                    examples: None, // TODO
                     deprecated: node.select_deprecated(),
 
                     // types
@@ -145,45 +145,6 @@ impl SchemaDocument for Document {
 
                     // applicators
                     reference: node.select_reference().map(|value| value.to_string()),
-
-                    all_of: node
-                        .select_sub_node_all_of_entries(node_url.get_pointer())
-                        .map(|value| {
-                            value
-                                .iter()
-                                .map(|(pointer, _node)| {
-                                    let mut sub_url = node_url.clone();
-                                    sub_url.set_pointer(pointer.clone());
-                                    sub_url.to_string()
-                                })
-                                .collect()
-                        }),
-
-                    any_of: node
-                        .select_sub_node_any_of_entries(node_url.get_pointer())
-                        .map(|value| {
-                            value
-                                .iter()
-                                .map(|(pointer, _node)| {
-                                    let mut sub_url = node_url.clone();
-                                    sub_url.set_pointer(pointer.clone());
-                                    sub_url.to_string()
-                                })
-                                .collect()
-                        }),
-
-                    one_of: node
-                        .select_sub_node_one_of_entries(node_url.get_pointer())
-                        .map(|value| {
-                            value
-                                .iter()
-                                .map(|(pointer, _node)| {
-                                    let mut sub_url = node_url.clone();
-                                    sub_url.set_pointer(pointer.clone());
-                                    sub_url.to_string()
-                                })
-                                .collect()
-                        }),
 
                     r#if: node
                         .select_sub_node_if_entries(node_url.get_pointer())
@@ -221,6 +182,53 @@ impl SchemaDocument for Document {
                                 })
                                 .collect()
                         }),
+                    not: None,
+
+                    array_items: None,
+                    contains: None,
+                    property_names: None,
+                    map_properties: None,
+
+                    all_of: node
+                        .select_sub_node_all_of_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+                    any_of: node
+                        .select_sub_node_any_of_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+                    one_of: node
+                        .select_sub_node_one_of_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+
+                    dependent_schemas: None,
+                    object_properties: None,
+                    pattern_properties: None,
                 },
             )
         }))

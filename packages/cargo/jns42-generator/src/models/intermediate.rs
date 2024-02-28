@@ -63,7 +63,7 @@ pub struct IntermediateNode {
     // metadata
     pub title: Option<String>,
     pub description: Option<String>,
-    // pub examples: Option<Vec<Value>>,
+    pub examples: Option<Vec<Value>>,
     pub deprecated: Option<bool>,
 
     // types
@@ -101,4 +101,15 @@ pub struct IntermediateNode {
     pub r#if: Option<String>,
     pub r#then: Option<String>,
     pub r#else: Option<String>,
+
+    pub not: Option<String>,
+
+    pub contains: Option<String>,
+    pub property_names: Option<String>,
+    pub map_properties: Option<String>,
+    pub array_items: Option<String>,
+
+    pub object_properties: Option<HashMap<String, String>>,
+    pub pattern_properties: Option<HashMap<String, String>>,
+    pub dependent_schemas: Option<HashMap<String, String>>,
 }
