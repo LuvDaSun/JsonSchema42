@@ -1,5 +1,6 @@
+use std::collections::HashMap;
+
 use super::intermediate::IntermediateType;
-use im::HashMap;
 use serde_json::Value;
 
 pub type SchemaKey = usize;

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::{
   arena::Arena,
   intermediate::IntermediateSchema,
@@ -7,7 +9,6 @@ use crate::{
   schema_transforms,
   utils::{names::optimize_names, url::UrlWithPointer},
 };
-use im::HashMap;
 use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
@@ -146,10 +147,11 @@ impl Specification {
           maximum_properties: schema.maximum_properties,
           required: schema.required.clone(),
 
-          reference: schema
-            .reference
-            .as_ref()
-            .map(|url| *key_map.get(url).unwrap()),
+          // reference: schema
+          //   .reference
+          //   .as_ref()
+          //   .map(|url| *key_map.get(url).unwrap()),
+          reference: None, // TODO
 
           contains: schema
             .r#contains

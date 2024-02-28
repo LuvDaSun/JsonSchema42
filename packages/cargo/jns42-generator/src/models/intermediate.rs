@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
-use serde_json::Value;
-
 use super::schema::SchemaType;
+use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug)]
 pub struct IntermediateSchema {
@@ -97,6 +95,7 @@ pub struct IntermediateNode {
   pub all_of: Option<Vec<String>>,
   pub any_of: Option<Vec<String>>,
   pub one_of: Option<Vec<String>>,
+  pub tuple_items: Option<Vec<String>>,
 
   pub r#if: Option<String>,
   pub r#then: Option<String>,
