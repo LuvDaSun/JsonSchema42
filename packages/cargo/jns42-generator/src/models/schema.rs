@@ -36,7 +36,6 @@ impl From<&IntermediateType> for SchemaType {
 #[derive(Clone, PartialEq, Default, Debug)]
 pub struct SchemaNode {
     pub parent: Option<SchemaKey>,
-    pub mockable: Option<bool>,
     pub id: Option<String>,
 
     // metadata

@@ -68,6 +68,16 @@ pub trait Selectors {
         &self,
         pointer: &JsonPointer,
     ) -> Option<Vec<(JsonPointer, Node)>>;
+    fn select_sub_node_if_entries(&self, pointer: &JsonPointer)
+        -> Option<Vec<(JsonPointer, Node)>>;
+    fn select_sub_node_then_entries(
+        &self,
+        pointer: &JsonPointer,
+    ) -> Option<Vec<(JsonPointer, Node)>>;
+    fn select_sub_node_else_entries(
+        &self,
+        pointer: &JsonPointer,
+    ) -> Option<Vec<(JsonPointer, Node)>>;
 }
 
 impl Selectors for Node {
@@ -136,6 +146,11 @@ impl Selectors for Node {
             self.select_sub_node_any_of_entries(pointer)
                 .unwrap_or_default(),
             self.select_sub_node_one_of_entries(pointer)
+                .unwrap_or_default(),
+            self.select_sub_node_if_entries(pointer).unwrap_or_default(),
+            self.select_sub_node_then_entries(pointer)
+                .unwrap_or_default(),
+            self.select_sub_node_else_entries(pointer)
                 .unwrap_or_default(),
         ]
         .into_iter()
@@ -288,6 +303,42 @@ impl Selectors for Node {
                 )
             })
             .collect();
+
+        Some(result)
+    }
+
+    fn select_sub_node_if_entries(
+        &self,
+        pointer: &JsonPointer,
+    ) -> Option<Vec<(JsonPointer, Node)>> {
+        let select_name = "if";
+        let selected = self.as_object()?.get(select_name)?;
+
+        let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
+
+        Some(result)
+    }
+
+    fn select_sub_node_then_entries(
+        &self,
+        pointer: &JsonPointer,
+    ) -> Option<Vec<(JsonPointer, Node)>> {
+        let select_name = "then";
+        let selected = self.as_object()?.get(select_name)?;
+
+        let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
+
+        Some(result)
+    }
+
+    fn select_sub_node_else_entries(
+        &self,
+        pointer: &JsonPointer,
+    ) -> Option<Vec<(JsonPointer, Node)>> {
+        let select_name = "else";
+        let selected = self.as_object()?.get(select_name)?;
+
+        let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
 
         Some(result)
     }

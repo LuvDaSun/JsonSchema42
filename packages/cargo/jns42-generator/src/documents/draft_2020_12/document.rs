@@ -184,6 +184,43 @@ impl SchemaDocument for Document {
                                 })
                                 .collect()
                         }),
+
+                    r#if: node
+                        .select_sub_node_if_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+                    then: node
+                        .select_sub_node_then_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
+                    r#else: node
+                        .select_sub_node_else_entries(node_url.get_pointer())
+                        .map(|value| {
+                            value
+                                .iter()
+                                .map(|(pointer, _node)| {
+                                    let mut sub_url = node_url.clone();
+                                    sub_url.set_pointer(pointer.clone());
+                                    sub_url.to_string()
+                                })
+                                .collect()
+                        }),
                 },
             )
         }))

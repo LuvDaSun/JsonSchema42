@@ -97,4 +97,8 @@ pub struct IntermediateNode {
     pub all_of: Option<Vec<String>>,
     pub any_of: Option<Vec<String>>,
     pub one_of: Option<Vec<String>>,
+
+    pub r#if: Option<String>,
+    pub r#then: Option<String>,
+    pub r#else: Option<String>,
 }

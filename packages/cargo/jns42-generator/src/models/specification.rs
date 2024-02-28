@@ -60,16 +60,20 @@ impl Specification {
                     let schema = intermediate_document.schemas.get(id).unwrap();
 
                     let item = SchemaNode {
+                        parent: None, // TODO
+
                         id: Some(id.clone()),
                         title: schema.title.clone(),
                         description: schema.description.clone(),
-                        // examples: schema.examples,
+                        examples: None, // TODO
                         deprecated: schema.deprecated,
 
                         types: schema
                             .types
                             .as_ref()
                             .map(|value| value.iter().map(|value| value.into()).collect()),
+
+                        options: None, // TODO
 
                         minimum_inclusive: schema.minimum_inclusive,
                         minimum_exclusive: schema.minimum_exclusive,
@@ -90,6 +94,22 @@ impl Specification {
                         maximum_properties: schema.maximum_properties,
                         required: schema.required.clone(),
 
+                        reference: None, // TODO
+
+                        contains: None,       // TODO
+                        property_names: None, // TODO
+                        map_properties: None, // TODO
+                        array_items: None,    // TODO
+                        r#if: schema.r#if.as_ref().map(|url| *key_map.get(url).unwrap()),
+                        then: schema.then.as_ref().map(|url| *key_map.get(url).unwrap()),
+                        r#else: schema.r#else.as_ref().map(|url| *key_map.get(url).unwrap()),
+                        not: None, // TODO
+
+                        dependent_schemas: None,  // TODO
+                        object_properties: None,  // TODO
+                        pattern_properties: None, // TODO
+
+                        tuple_items: None, // TODO
                         all_of: schema.all_of.as_ref().map(|value| {
                             value.iter().map(|url| *key_map.get(url).unwrap()).collect()
                         }),
@@ -99,8 +119,6 @@ impl Specification {
                         one_of: schema.one_of.as_ref().map(|value| {
                             value.iter().map(|url| *key_map.get(url).unwrap()).collect()
                         }),
-
-                        ..Default::default()
                     };
 
                     arena.set_item(key, item);
