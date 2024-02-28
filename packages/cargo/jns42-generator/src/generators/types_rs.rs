@@ -36,68 +36,76 @@ fn generate_type_token_stream(
   });
 
   let identifier = specification.get_identifier(key);
-  let name = specification.get_name(key);
-  let interior_name = specification.get_interior_name(key);
-  let interior_identifier = specification.get_interior_identifier(key);
 
-  tokens.append_all(quote! {
-    #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
-    #[serde(try_from = #interior_name)]
-    pub struct #identifier(pub(super) #interior_identifier);
-  });
+  if let Some(reference) = &item.reference {
+    let reference_identifier = specification.get_identifier(reference);
+    tokens.append_all(quote! {
+      pub type #identifier = #reference_identifier;
+    });
+  } else {
+    let name = specification.get_name(key);
+    let interior_name = specification.get_interior_name(key);
+    let interior_identifier = specification.get_interior_identifier(key);
 
-  tokens.append_all(quote! {
-    impl #identifier {
-        fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
-            let instance = Self(value);
-            if instance.validate() {
-                Ok(instance)
-            } else {
-                Err(crate::errors::ValidationError::new(#name))
-            }
-        }
-        fn validate(&self) -> bool {
-          true
-        }
-    }
-  });
+    tokens.append_all(quote! {
+      #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+      #[serde(try_from = #interior_name)]
+      pub struct #identifier(pub(super) #interior_identifier);
+    });
 
-  tokens.append_all(quote! {
-    impl TryFrom<#interior_identifier> for #identifier {
-      type Error = crate::errors::ValidationError;
-      fn try_from(value: #interior_identifier) -> Result<Self, Self::Error> {
-          Self::new(value)
+    tokens.append_all(quote! {
+      impl #identifier {
+          fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
+              let instance = Self(value);
+              if instance.validate() {
+                  Ok(instance)
+              } else {
+                  Err(crate::errors::ValidationError::new(#name))
+              }
+          }
+          fn validate(&self) -> bool {
+            true
+          }
       }
-    }
-  });
+    });
 
-  tokens.append_all(quote! {
-    impl std::ops::Deref for #identifier {
-      type Target = #interior_identifier;
-      fn deref(&self) -> &Self::Target {
-          &self.0
-      }
-    }
-  });
-
-  if let Some(types) = &item.types {
-    if types.len() == 1 {
-      let r#type = types.first().unwrap();
-      match r#type {
-        crate::models::schema::SchemaType::Boolean
-        | crate::models::schema::SchemaType::Integer
-        | crate::models::schema::SchemaType::Number
-        | crate::models::schema::SchemaType::String => {
-          tokens.append_all(quote! {
-            impl ToString for #identifier {
-                fn to_string(&self) -> String {
-                    self.0.to_string()
-                }
-            }
-          });
+    tokens.append_all(quote! {
+      impl TryFrom<#interior_identifier> for #identifier {
+        type Error = crate::errors::ValidationError;
+        fn try_from(value: #interior_identifier) -> Result<Self, Self::Error> {
+            Self::new(value)
         }
-        _ => {}
-      };
+      }
+    });
+
+    tokens.append_all(quote! {
+      impl std::ops::Deref for #identifier {
+        type Target = #interior_identifier;
+        fn deref(&self) -> &Self::Target {
+            &self.0
+        }
+      }
+    });
+
+    if let Some(types) = &item.types {
+      if types.len() == 1 {
+        let r#type = types.first().unwrap();
+        match r#type {
+          crate::models::schema::SchemaType::Boolean
+          | crate::models::schema::SchemaType::Integer
+          | crate::models::schema::SchemaType::Number
+          | crate::models::schema::SchemaType::String => {
+            tokens.append_all(quote! {
+              impl ToString for #identifier {
+                  fn to_string(&self) -> String {
+                      self.0.to_string()
+                  }
+              }
+            });
+          }
+          _ => {}
+        };
+      }
     }
   }
 
