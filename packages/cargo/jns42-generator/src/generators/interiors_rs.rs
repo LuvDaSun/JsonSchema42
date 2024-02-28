@@ -46,6 +46,8 @@ fn generate_type_token_stream(
     tokens.append_all(quote! {
       pub type #identifier = #reference_identifier;
     });
+
+    return Ok(tokens);
   } else if let Some(types) = &item.types {
     if types.len() == 1 {
       let r#type = types.first().unwrap();
