@@ -10,6 +10,7 @@ use crate::{
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use std::collections::HashMap;
+use url::Url;
 
 pub struct Specification {
   pub arena: Arena<SchemaNode>,
@@ -18,7 +19,7 @@ pub struct Specification {
 
 impl Specification {
   pub fn new(intermediate_document: IntermediateSchema) -> Self {
-    let mut parents = HashMap::new();
+    let mut parents: HashMap<_, &str> = HashMap::new();
     let mut implicit_types = HashMap::new();
 
     let urls: Vec<_> = intermediate_document
@@ -43,7 +44,7 @@ impl Specification {
     let mut arena = Arena::new();
 
     {
-      let mut key_map = HashMap::new();
+      let mut key_map: HashMap<&str, usize> = HashMap::new();
       for (id, schema) in &intermediate_document.schemas {
         let item = SchemaNode {
           id: Some(id.clone()),
@@ -92,13 +93,14 @@ impl Specification {
         }
 
         if let Some(child_id) = &schema.property_names {
-          implicit_types.insert(child_id, SchemaType::String);
+          implicit_types.insert(child_id.clone(), SchemaType::String);
         }
       }
 
       let transformer = |arena: &mut Arena<SchemaNode>, key: usize| {
         let item = arena.get_item(key).clone();
         let id = item.id.unwrap();
+        let schema_url = Url::parse(&id).unwrap();
         let schema = intermediate_document.schemas.get(&id).unwrap();
         let parent = parents.get(&id).map(|id| *key_map.get(id).unwrap());
         let types = schema
@@ -107,6 +109,10 @@ impl Specification {
           .map(|value| value.iter().map(|value| value.into()).collect())
           .and_then(|value: Vec<_>| if value.is_empty() { None } else { Some(value) })
           .or_else(|| implicit_types.get(&id).map(|value| vec![*value]));
+        let reference = schema
+          .reference
+          .as_ref()
+          .map(|url| *key_map.get(schema_url.join(url).unwrap().as_str()).unwrap());
 
         let item = SchemaNode {
           parent,
@@ -139,63 +145,77 @@ impl Specification {
           maximum_properties: schema.maximum_properties,
           required: schema.required.clone(),
 
-          // reference: schema
-          //   .reference
-          //   .as_ref()
-          //   .map(|url| *key_map.get(url).unwrap()),
-          reference: None, // TODO
+          reference,
 
           contains: schema
             .r#contains
             .as_ref()
-            .map(|url| *key_map.get(url).unwrap()),
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
           property_names: schema
             .r#property_names
             .as_ref()
-            .map(|url| *key_map.get(url).unwrap()),
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
           map_properties: schema
             .r#map_properties
             .as_ref()
-            .map(|url| *key_map.get(url).unwrap()),
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
           array_items: schema
             .r#array_items
             .as_ref()
-            .map(|url| *key_map.get(url).unwrap()),
-          r#if: schema.r#if.as_ref().map(|url| *key_map.get(url).unwrap()),
-          then: schema.then.as_ref().map(|url| *key_map.get(url).unwrap()),
-          r#else: schema.r#else.as_ref().map(|url| *key_map.get(url).unwrap()),
-          not: schema.r#not.as_ref().map(|url| *key_map.get(url).unwrap()),
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
+          r#if: schema
+            .r#if
+            .as_ref()
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
+          then: schema
+            .then
+            .as_ref()
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
+          r#else: schema
+            .r#else
+            .as_ref()
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
+          not: schema
+            .r#not
+            .as_ref()
+            .map(|url| *key_map.get(url.as_str()).unwrap()),
 
           tuple_items: None, // TODO
-          all_of: schema
-            .all_of
-            .as_ref()
-            .map(|value| value.iter().map(|url| *key_map.get(url).unwrap()).collect()),
-          any_of: schema
-            .any_of
-            .as_ref()
-            .map(|value| value.iter().map(|url| *key_map.get(url).unwrap()).collect()),
-          one_of: schema
-            .one_of
-            .as_ref()
-            .map(|value| value.iter().map(|url| *key_map.get(url).unwrap()).collect()),
+          all_of: schema.all_of.as_ref().map(|value| {
+            value
+              .iter()
+              .map(|url| *key_map.get(url.as_str()).unwrap())
+              .collect()
+          }),
+          any_of: schema.any_of.as_ref().map(|value| {
+            value
+              .iter()
+              .map(|url| *key_map.get(url.as_str()).unwrap())
+              .collect()
+          }),
+          one_of: schema.one_of.as_ref().map(|value| {
+            value
+              .iter()
+              .map(|url| *key_map.get(url.as_str()).unwrap())
+              .collect()
+          }),
 
           dependent_schemas: schema.dependent_schemas.as_ref().map(|value| {
             value
               .iter()
-              .map(|(name, url)| (name.clone(), *key_map.get(url).unwrap()))
+              .map(|(name, url)| (name.clone(), *key_map.get(url.as_str()).unwrap()))
               .collect()
           }),
           object_properties: schema.object_properties.as_ref().map(|value| {
             value
               .iter()
-              .map(|(name, url)| (name.clone(), *key_map.get(url).unwrap()))
+              .map(|(name, url)| (name.clone(), *key_map.get(url.as_str()).unwrap()))
               .collect()
           }),
           pattern_properties: schema.pattern_properties.as_ref().map(|value| {
             value
               .iter()
-              .map(|(name, url)| (name.clone(), *key_map.get(url).unwrap()))
+              .map(|(name, url)| (name.clone(), *key_map.get(url.as_str()).unwrap()))
               .collect()
           }),
         };
