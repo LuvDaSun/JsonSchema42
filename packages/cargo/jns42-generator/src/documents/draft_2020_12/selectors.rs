@@ -353,9 +353,8 @@ impl Selectors for Node {
     let selected = self.as_object()?.get(select_name)?;
 
     let result = selected
-      .as_array()?
+      .as_object()?
       .iter()
-      .enumerate()
       .map(|(key, sub_node)| {
         (
           pointer.push(select_name.to_string()).push(key.to_string()),
@@ -374,9 +373,8 @@ impl Selectors for Node {
     let selected = self.as_object()?.get(select_name)?;
 
     let result = selected
-      .as_array()?
+      .as_object()?
       .iter()
-      .enumerate()
       .map(|(key, sub_node)| {
         (
           pointer.push(select_name.to_string()).push(key.to_string()),
@@ -395,9 +393,8 @@ impl Selectors for Node {
     let selected = self.as_object()?.get(select_name)?;
 
     let result = selected
-      .as_array()?
+      .as_object()?
       .iter()
-      .enumerate()
       .map(|(key, sub_node)| {
         (
           pointer.push(select_name.to_string()).push(key.to_string()),

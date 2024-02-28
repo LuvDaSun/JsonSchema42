@@ -1,8 +1,7 @@
 use crate::{
   models::{schema::SchemaNode, specification::Specification},
-  utils::url::UrlWithPointer,
+  utils::{name::to_pascal, url::UrlWithPointer},
 };
-use inflector::Inflector;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};
 use std::{collections::HashSet, error::Error};
@@ -120,7 +119,7 @@ fn generate_type_token_stream(
             let inner_tokens = object_properties_entries
               .iter()
               .map(|(member_name, object_properties_key)| {
-                let member_identifier = format_ident!("{}", member_name);
+                let member_identifier = format_ident!("{}", to_pascal([member_name]));
                 let object_properties_identifier =
                   specification.get_type_identifier(object_properties_key);
 
@@ -138,7 +137,7 @@ fn generate_type_token_stream(
               .unwrap_or_default();
 
             tokens.append_all(quote! {
-              #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
+              #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
               pub struct #identifier {
                 #inner_tokens
               }
@@ -151,7 +150,6 @@ fn generate_type_token_stream(
             });
           } else {
             tokens.append_all(quote! {
-              #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
               pub type #identifier = std::collections::HashMap<String, ()>;
             });
           }
@@ -178,7 +176,7 @@ fn generate_type_token_stream(
         .names
         .get(&UrlWithPointer::parse(sub_item.id.as_ref().unwrap().as_str()).unwrap())
         .unwrap();
-      let sub_name_ident = format_ident!("T{}", sub_name_parts.join(" ").to_pascal_case());
+      let sub_name_ident = format_ident!("T{}", to_pascal(sub_name_parts));
       inner_tokens.append_all(quote! {
           #sub_name_ident(#sub_name_ident),
       });
@@ -194,6 +192,7 @@ fn generate_type_token_stream(
   }
 
   tokens.append_all(quote! {
+    #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
     pub struct #identifier();
   });
 

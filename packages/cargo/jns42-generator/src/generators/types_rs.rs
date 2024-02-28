@@ -41,7 +41,7 @@ fn generate_type_token_stream(
   let interior_identifier = specification.get_interior_identifier(key);
 
   tokens.append_all(quote! {
-    #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
+    #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
     #[serde(try_from = #interior_name)]
     pub struct #identifier(#interior_identifier);
   });

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use super::{
   arena::Arena,
   intermediate::IntermediateSchema,
@@ -7,11 +5,11 @@ use super::{
 };
 use crate::{
   schema_transforms,
-  utils::{names::optimize_names, url::UrlWithPointer},
+  utils::{name::to_pascal, names::optimize_names, url::UrlWithPointer},
 };
-use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
+use std::collections::HashMap;
 
 pub struct Specification {
   pub arena: Arena<SchemaNode>,
@@ -29,23 +27,17 @@ impl Specification {
       .map(|key| UrlWithPointer::parse(key).unwrap())
       .collect();
 
-    let original_names = urls.iter().map(|url| {
-      let name: Vec<_> = url
-        .get_pointer()
-        .as_ref()
-        .iter()
-        .map(|part| part.as_str())
-        .collect();
-      (url, name)
-    });
+    let original_names: Vec<_> = urls
+      .iter()
+      .map(|url| {
+        let name: Vec<_> = url.get_pointer().as_ref().clone();
+        (url, name)
+      })
+      .collect();
 
     let names = optimize_names(original_names, 5)
-      .map(|(id, name)| {
-        (
-          id.clone(),
-          name.into_iter().map(|part| part.into_owned()).collect(),
-        )
-      })
+      .into_iter()
+      .map(|(id, name)| (id.clone(), name))
       .collect();
 
     let mut arena = Arena::new();
@@ -242,7 +234,7 @@ impl Specification {
     let id = self.arena.get_item(*key).id.as_ref().unwrap();
     let uri = UrlWithPointer::parse(id).unwrap();
     let parts = self.names.get(&uri).unwrap();
-    let name = format!("T{}", parts.join(" ").to_pascal_case());
+    let name = format!("T{}", to_pascal(parts));
     name
   }
 
@@ -259,7 +251,7 @@ impl Specification {
 
   pub fn get_type_identifier(&self, key: &usize) -> TokenStream {
     let identifier = self.get_identifier(key);
-    quote! {super::interior::#identifier}
+    quote! {super::types::#identifier}
   }
 
   pub fn _get_type_name(&self, key: &usize) -> String {
