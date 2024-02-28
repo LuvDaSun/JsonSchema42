@@ -11,9 +11,9 @@ use std::error::Error;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let options = ProgramOptions::parse();
+  let options = ProgramOptions::parse();
 
-    run_program(options).await?;
+  run_program(options).await?;
 
-    Ok(())
+  Ok(())
 }
