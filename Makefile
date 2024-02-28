@@ -1,6 +1,4 @@
 SHELL:=$(PREFIX)/bin/sh
-NPM_VERSION:=$(shell npx jns42-generator --version)
-CARGO_VERSION:=$(word 2,$(shell cargo run --package jns42-generator -- --version))
 
 build: \
 	generated/npm/schema-intermediate \
@@ -28,9 +26,9 @@ generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.y
 	npx jns42-generator package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-draft-04:
@@ -39,9 +37,9 @@ generated/npm/schema-draft-04:
 	npx jns42-generator package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-draft-2020-12:
@@ -50,9 +48,9 @@ generated/npm/schema-draft-2020-12:
 	npx jns42-generator package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-oas-v3-1:
@@ -61,9 +59,9 @@ generated/npm/schema-oas-v3-1:
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/dialect/base \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/swagger-v2:
@@ -72,9 +70,9 @@ generated/npm/swagger-v2:
 	npx jns42-generator package http://swagger.io/v2/schema.json\# \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/oas-v3-0:
@@ -83,9 +81,9 @@ generated/npm/oas-v3-0:
 	npx jns42-generator package https://spec.openapis.org/oas/3.0/schema/2021-09-28 \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/oas-v3-1:
@@ -94,9 +92,9 @@ generated/npm/oas-v3-1:
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/schema/2022-10-07 \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version ${NPM_VERSION} \
+		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --workspace @jns42/$(notdir $(basename $@))
+	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
@@ -107,7 +105,7 @@ generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema
 		package file://${PWD}/$< \
 		--package-directory $@ \
 		--package-name jns42-$(notdir $(basename $@)) \
-		--package-version ${CARGO_VERSION} \
+		--package-version $(word 2,$(shell cargo run --package jns42-generator -- --version)) \
 
 .PHONY: \
 	build \

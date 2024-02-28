@@ -41,7 +41,14 @@ fn generate_type_token_stream(
   let identifier = specification.get_identifier(key);
   let type_identifier = specification.get_type_identifier(key);
 
-  if let Some(types) = &item.types {
+  if let Some(reference) = &item.reference {
+    let reference_identifier = specification.get_identifier(reference);
+    tokens.append_all(quote! {
+      pub type #identifier = #reference_identifier;
+    });
+
+    return Ok(tokens);
+  } else if let Some(types) = &item.types {
     if types.len() == 1 {
       let r#type = types.first().unwrap();
       match r#type {

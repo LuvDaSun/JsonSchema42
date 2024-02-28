@@ -125,7 +125,7 @@ impl Selectors for Node {
   }
 
   fn select_reference(&self) -> Option<&str> {
-    self.as_object()?.get("type")?.as_str()
+    self.as_object()?.get("$ref")?.as_str()
   }
 
   fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
