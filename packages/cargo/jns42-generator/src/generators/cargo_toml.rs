@@ -1,6 +1,5 @@
-use std::error::Error;
-
 use super::banner::get_banner_toml;
+use std::error::Error;
 
 pub fn generate_file_content(
   package_name: &str,
@@ -39,7 +38,10 @@ pub fn generate_file_content(
 
   let lib_table = toml::Value::Table({
     let mut map = toml::map::Map::new();
-    map.insert("path".to_owned(), toml::Value::String("lib.rs".to_owned()));
+    map.insert(
+      "path".to_owned(),
+      toml::Value::String("src/lib.rs".to_owned()),
+    );
     map
   });
 

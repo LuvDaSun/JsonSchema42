@@ -582,6 +582,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "jns42-schema-intermediate"
+version = "0.0.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "js-sys"
 version = "0.3.68"
 source = "registry+https://github.com/rust-lang/crates.io-index"
