@@ -1,6 +1,6 @@
 use crate::{
   models::{schema::SchemaNode, specification::Specification},
-  utils::name::to_camel,
+  utils::name::to_snake,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};
@@ -89,7 +89,7 @@ fn generate_type_token_stream(
 
                 quote! { #tuple_items_identifier }
               })
-              .reduce(|a, b| quote!(#a, #b))
+              .reduce(|a, b| quote! {#a, #b})
               .unwrap_or_default();
 
             tokens.append_all(quote! {
@@ -119,21 +119,21 @@ fn generate_type_token_stream(
             let inner_tokens = object_properties_entries
               .iter()
               .map(|(member_name, object_properties_key)| {
-                let member_identifier = format_ident!("{}", to_camel([member_name]));
+                let member_identifier = format_ident!("r#{}", to_snake([member_name]));
                 let object_properties_identifier =
                   specification.get_type_identifier(object_properties_key);
 
                 if required.contains(member_name) {
                   quote! {
-                    #member_identifier: #object_properties_identifier
+                    pub #member_identifier: #object_properties_identifier
                   }
                 } else {
                   quote! {
-                    #member_identifier: Option<#object_properties_identifier>
+                    pub #member_identifier: Option<#object_properties_identifier>
                   }
                 }
               })
-              .reduce(|a, b| quote!(#a, #b))
+              .reduce(|a, b| quote! {#a, #b})
               .unwrap_or_default();
 
             tokens.append_all(quote! {
@@ -169,7 +169,7 @@ fn generate_type_token_stream(
   }
 
   if let Some(one_of) = &item.one_of {
-    let mut inner_tokens = quote!();
+    let mut inner_tokens = quote! {};
     for sub_key in one_of {
       let sub_identifier = specification.get_type_identifier(sub_key);
       inner_tokens.append_all(quote! {

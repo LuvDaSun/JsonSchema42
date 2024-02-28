@@ -6,7 +6,7 @@ use std::error::Error;
 use super::banner::get_banner_rs;
 
 pub fn generate_file_content(file_tokens: TokenStream) -> Result<String, Box<dyn Error>> {
-  let mut tokens = quote!();
+  let mut tokens = quote! {};
 
   tokens.append_all(file_tokens);
 

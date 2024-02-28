@@ -226,7 +226,7 @@ impl Specification {
 impl Specification {
   pub fn get_identifier(&self, key: &usize) -> Ident {
     let name = self.get_name(key);
-    let identifier = format_ident!("{}", name);
+    let identifier = format_ident!("r#{}", name);
     identifier
   }
 
