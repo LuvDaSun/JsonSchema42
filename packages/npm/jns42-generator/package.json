@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -42,21 +42,21 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@jns42/oas-v3-0": "^0.13.6",
-    "@jns42/oas-v3-1": "^0.13.6",
-    "@jns42/schema-draft-04": "^0.13.6",
-    "@jns42/schema-draft-2020-12": "^0.13.6",
-    "@jns42/schema-intermediate": "^0.13.6",
-    "@jns42/schema-oas-v3-1": "^0.13.6",
-    "@jns42/swagger-v2": "^0.13.6",
-    "@types/node": "^20.11.13",
+    "@jns42/oas-v3-0": "^0.13.7",
+    "@jns42/oas-v3-1": "^0.13.7",
+    "@jns42/schema-draft-04": "^0.13.7",
+    "@jns42/schema-draft-2020-12": "^0.13.7",
+    "@jns42/schema-intermediate": "^0.13.7",
+    "@jns42/schema-oas-v3-1": "^0.13.7",
+    "@jns42/swagger-v2": "^0.13.7",
+    "@types/node": "^20.11.20",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "entities": "^4.5.0",
     "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
     "type-fest": "^4.9.0",
-    "yaml": "^2.3.4",
+    "yaml": "^2.4.0",
     "yargs": "^17.7.2"
   }
 }

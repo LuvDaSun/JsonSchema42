@@ -20,8 +20,10 @@ http-body-util = "^0.1.0"
 hyper = { version = "^1.1.0", features = ["full"] }
 hyper-util = { version = "^0.1.3", features = ["full"] }
 im = "^15.1.0"
+once_cell = "^1.19.0"
 proc-macro2 = "^1.0.78"
 quote = "^1.0.35"
+regex = "^1.10.3"
 reqwest = { version = "^0.11.24", features = ["stream"] }
 rust-format = { version = "^0.3.4", features = ["token_stream"] }
 serde = "^1.0.158"
@@ -36,5 +38,5 @@ urlencoding = "^2.1.2"
 path = "src/lib.rs"
 
 [[bin]]
-name = "jns42_generator"
+name = "jns42-generator"
 path = "src/main.rs"
