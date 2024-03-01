@@ -28,7 +28,7 @@ impl Arena<SchemaNode> {
       .any(|(key, _item)| key == ancestor_key)
   }
 
-  pub fn get_name_parts(&self, key: SchemaKey) -> impl Iterator<Item = &String> {
+  pub fn get_name_parts(&self, key: SchemaKey) -> impl Iterator<Item = &str> {
     let ancestors: Vec<_> = self
       .get_ancestors(key)
       .map(|(_key, item)| item)
@@ -46,9 +46,13 @@ impl Arena<SchemaNode> {
       })
       .map(|(_item_previous, item)| {
         empty()
-          .chain(item.id.as_ref().map(|id| id.get_pointer().as_ref().iter()))
+          .chain(item.id.as_ref().map(|id| {
+            empty()
+              .chain(id.get_url().path_segments().into_iter().flatten())
+              .chain(id.get_pointer().as_ref().iter().map(|value| value.as_str()))
+          }))
           .flatten()
-          .chain(item.name.as_ref())
+          .chain(item.name.as_deref())
       })
       .collect();
 
