@@ -82,7 +82,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
   let intermediate_document = context.get_intermediate_document();
 
-  let specification = Specification::new(root_url.to_string(), intermediate_document);
+  let specification = Specification::new(root_url, intermediate_document);
 
   generate_package(
     PackageConfiguration {

@@ -1,5 +1,7 @@
 use std::{collections::HashMap, iter::empty};
 
+use crate::utils::url::UrlWithPointer;
+
 use super::intermediate::IntermediateType;
 use serde_json::Value;
 
@@ -38,7 +40,7 @@ impl From<&IntermediateType> for SchemaType {
 pub struct SchemaNode {
   pub primary: Option<bool>,
   pub parent: Option<SchemaKey>,
-  pub id: Option<String>,
+  pub id: Option<UrlWithPointer>,
 
   // metadata
   pub title: Option<String>,

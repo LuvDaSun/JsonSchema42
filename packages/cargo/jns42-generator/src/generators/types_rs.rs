@@ -31,11 +31,14 @@ fn generate_type_token_stream(
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
-  let documentation: Vec<_> = [&item.title, &item.description, &item.id]
-    .into_iter()
-    .flatten()
-    .cloned()
-    .collect();
+  let documentation: Vec<_> = [
+    item.title.clone(),
+    item.description.clone(),
+    item.id.as_ref().map(|id| id.get_url().to_string()),
+  ]
+  .into_iter()
+  .flatten()
+  .collect();
   let documentation = documentation.join("\n\n");
 
   tokens.append_all(quote! {

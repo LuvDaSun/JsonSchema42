@@ -13,6 +13,18 @@ impl JsonPointer {
   pub fn tip(&self) -> Option<&str> {
     self.0.last().map(String::as_str)
   }
+
+  pub fn escape(input: &str) -> String {
+    // ~ -> ~0
+    // / -> ~1
+    input.replace('~', "~0").replace('/', "~1")
+  }
+
+  pub fn unescape(input: &str) -> String {
+    // ~0 -> ~
+    // ~1 -> /
+    input.replace("~0", "~").replace("~1", "/")
+  }
 }
 
 impl From<&Url> for JsonPointer {
@@ -25,7 +37,7 @@ impl From<&Url> for JsonPointer {
         .unwrap_or_default()
         .split('/')
         .filter(|part| !part.is_empty())
-        .map(|part| part.to_string())
+        .map(Self::unescape)
         .collect();
       Self(path)
     } else {
@@ -42,6 +54,11 @@ impl AsRef<Vec<String>> for JsonPointer {
 
 impl ToString for JsonPointer {
   fn to_string(&self) -> String {
-    "/".to_string() + self.0.join("/").as_str()
+    self
+      .0
+      .iter()
+      .map(|part| format!("/{}", Self::escape(part)))
+      .reduce(|a, b| a + b.as_str())
+      .unwrap_or_default()
   }
 }
