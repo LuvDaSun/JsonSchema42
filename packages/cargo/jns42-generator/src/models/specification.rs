@@ -108,6 +108,7 @@ impl Specification {
         let primary = if id == root_id { Some(true) } else { None };
 
         let item = SchemaNode {
+          name: None,
           primary,
           parent,
           types,
@@ -268,14 +269,12 @@ impl Specification {
       .iter()
       .enumerate()
       .filter(|(_key, item)| item.primary.unwrap_or_default())
-      .filter_map(|(key, item)| item.id.as_ref().map(|id| (key, id)))
-      .map(|(key, id)| (key, id.get_pointer().as_ref().clone()));
+      .map(|(key, _item)| (key, arena.get_name_parts(key)));
     let secondary_name_entries = arena
       .iter()
       .enumerate()
       .filter(|(_key, item)| !item.primary.unwrap_or_default())
-      .filter_map(|(key, item)| item.id.as_ref().map(|id| (key, id)))
-      .map(|(key, id)| (key, id.get_pointer().as_ref().clone()));
+      .map(|(key, _item)| (key, arena.get_name_parts(key)));
     let primary_names = optimize_names(primary_name_entries, 5).into_iter();
     let secondary_names = optimize_names(secondary_name_entries, 5).into_iter();
 

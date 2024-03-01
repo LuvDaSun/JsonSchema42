@@ -1,5 +1,5 @@
 #[derive(Clone, Debug, PartialEq, Default)]
-pub struct Arena<T>(im::Vector<T>)
+pub struct Arena<T>(pub(super) im::Vector<T>)
 where
   T: Clone + PartialEq;
 
