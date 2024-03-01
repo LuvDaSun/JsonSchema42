@@ -5,13 +5,20 @@ use std::error::Error;
 
 pub fn generate_file_token_stream(
   specification: &Specification,
+  is_primary: bool,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
   for (key, item) in specification.arena.iter().enumerate() {
-    if item.id.is_some() {
-      tokens.append_all(generate_type_token_stream(specification, &key, item));
+    if item.primary.unwrap_or_default() != is_primary {
+      continue;
     }
+
+    if item.id.is_none() {
+      continue;
+    };
+
+    tokens.append_all(generate_type_token_stream(specification, &key, item));
   }
 
   Ok(tokens)

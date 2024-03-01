@@ -4,17 +4,17 @@ use super::{
   schema::{SchemaNode, SchemaType},
 };
 use crate::{
-  schema_transforms,
+  schema_transforms::{self},
   utils::{name::to_pascal, names::optimize_names, url::UrlWithPointer},
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use std::collections::HashMap;
+use std::{collections::HashMap, iter::empty};
 use url::Url;
 
 pub struct Specification {
   pub arena: Arena<SchemaNode>,
-  pub names: HashMap<UrlWithPointer, Vec<String>>,
+  pub names: HashMap<usize, (bool, Vec<String>)>,
 }
 
 impl Specification {
@@ -240,23 +240,42 @@ impl Specification {
 
     // generate names
 
-    let urls: Vec<_> = intermediate_document
-      .schemas
-      .keys()
-      .map(|key| UrlWithPointer::parse(key).unwrap())
-      .collect();
-
-    let original_names: Vec<_> = urls
+    let primary_name_entries = arena
       .iter()
-      .map(|url| {
-        let name: Vec<_> = url.get_pointer().as_ref().clone();
-        (url, name)
-      })
-      .collect();
+      .enumerate()
+      .filter(|(_key, item)| item.primary.unwrap_or_default())
+      .filter_map(|(key, item)| item.id.as_ref().map(|id| (key, id)))
+      .map(|(key, id)| {
+        (
+          key,
+          UrlWithPointer::parse(id)
+            .unwrap()
+            .get_pointer()
+            .as_ref()
+            .clone(),
+        )
+      });
+    let secondary_name_entries = arena
+      .iter()
+      .enumerate()
+      .filter(|(_key, item)| !item.primary.unwrap_or_default())
+      .filter_map(|(key, item)| item.id.as_ref().map(|id| (key, id)))
+      .map(|(key, id)| {
+        (
+          key,
+          UrlWithPointer::parse(id)
+            .unwrap()
+            .get_pointer()
+            .as_ref()
+            .clone(),
+        )
+      });
+    let primary_names = optimize_names(primary_name_entries, 5).into_iter();
+    let secondary_names = optimize_names(secondary_name_entries, 5).into_iter();
 
-    let names = optimize_names(original_names, 5)
-      .into_iter()
-      .map(|(id, name)| (id.clone(), name))
+    let names = empty()
+      .chain(primary_names.map(|(key, parts)| (key, (true, parts))))
+      .chain(secondary_names.map(|(key, parts)| (key, (false, parts))))
       .collect();
 
     Self { arena, names }
@@ -264,39 +283,61 @@ impl Specification {
 }
 
 impl Specification {
-  pub fn get_identifier(&self, key: &usize) -> Ident {
-    let name = self.get_name(key);
+  fn get_is_primary_and_identifier(&self, key: &usize) -> (bool, Ident) {
+    let (is_primary, name) = self.get_is_primary_and_name(key);
     let identifier = format_ident!("r#{}", name);
-    identifier
+    (is_primary, identifier)
+  }
+
+  fn get_is_primary_and_name(&self, key: &usize) -> (bool, String) {
+    let (is_primary, parts) = self.names.get(key).unwrap();
+    let name = format!("T{}", to_pascal(parts));
+    (*is_primary, name)
+  }
+
+  pub fn get_identifier(&self, key: &usize) -> Ident {
+    let (_is_primary, name) = self.get_is_primary_and_identifier(key);
+    name
   }
 
   pub fn get_name(&self, key: &usize) -> String {
-    let id = self.arena.get_item(*key).id.as_ref().unwrap();
-    let uri = UrlWithPointer::parse(id).unwrap();
-    let parts = self.names.get(&uri).unwrap();
-    let name = format!("T{}", to_pascal(parts));
+    let (_is_primary, name) = self.get_is_primary_and_name(key);
     name
   }
 
   pub fn get_interior_identifier(&self, key: &usize) -> TokenStream {
-    let identifier = self.get_identifier(key);
-    quote! {crate::interiors::#identifier}
+    let (is_primary, identifier) = self.get_is_primary_and_identifier(key);
+    if is_primary {
+      quote! {crate::interiors::#identifier}
+    } else {
+      quote! {crate::interiors_secondary::#identifier}
+    }
   }
 
   pub fn get_interior_name(&self, key: &usize) -> String {
-    let name = self.get_name(key);
-    let name = format!("crate::interiors::{}", name);
-    name
+    let (is_primary, name) = self.get_is_primary_and_name(key);
+    if is_primary {
+      format!("crate::interiors::{}", name)
+    } else {
+      format!("crate::interiors_secondary::{}", name)
+    }
   }
 
   pub fn get_type_identifier(&self, key: &usize) -> TokenStream {
-    let identifier = self.get_identifier(key);
-    quote! {crate::types::#identifier}
+    let (is_primary, identifier) = self.get_is_primary_and_identifier(key);
+    if is_primary {
+      quote! {crate::types::#identifier}
+    } else {
+      quote! {crate::types_secondary::#identifier}
+    }
   }
 
   pub fn _get_type_name(&self, key: &usize) -> String {
-    let name = self.get_name(key);
-    let name = format!("crate::types::{}", name);
-    name
+    let (is_primary, name) = self.get_is_primary_and_name(key);
+    if is_primary {
+      format!("crate::types::{}", name)
+    } else {
+      format!("crate::types_secondary::{}", name)
+    }
   }
 }

@@ -72,19 +72,17 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     Box::new(move |_context, _initializer| Rc::new(draft_04::Document::new())),
   );
 
+  let schema_url = schema_url.clone().into();
   let context = Rc::new(context);
   context
-    .load_from_url(
-      &schema_url.clone().into(),
-      &schema_url.clone().into(),
-      None,
-      &default_meta_schema_url,
-    )
+    .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
     .await;
+
+  let root_url = context.resolve_retrieval_url(&schema_url).unwrap();
 
   let intermediate_document = context.get_intermediate_document();
 
-  let specification = Specification::new(schema_url.to_string(), intermediate_document);
+  let specification = Specification::new(root_url.to_string(), intermediate_document);
 
   generate_package(
     PackageConfiguration {
