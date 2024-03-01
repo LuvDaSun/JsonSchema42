@@ -18,7 +18,7 @@ pub struct Specification {
 }
 
 impl Specification {
-  pub fn new(intermediate_document: IntermediateSchema) -> Self {
+  pub fn new(root_id: String, intermediate_document: IntermediateSchema) -> Self {
     let mut parents: HashMap<_, &str> = HashMap::new();
     let mut implicit_types = HashMap::new();
 
@@ -96,7 +96,10 @@ impl Specification {
           .as_ref()
           .map(|url| *key_map.get(schema_url.join(url).unwrap().as_str()).unwrap());
 
+        let primary = if id == root_id { Some(true) } else { None };
+
         let item = SchemaNode {
+          primary,
           parent,
           types,
 
@@ -216,6 +219,18 @@ impl Specification {
       fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
         schema_transforms::single_type::single_type_transform(arena, key);
         schema_transforms::explode::explode_transform(arena, key);
+      }
+
+      while arena.apply_transform(transformer) > 0 {
+        //
+      }
+    }
+
+    // then set schema primary field
+
+    {
+      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
+        schema_transforms::primary::primary_transform(arena, key);
       }
 
       while arena.apply_transform(transformer) > 0 {

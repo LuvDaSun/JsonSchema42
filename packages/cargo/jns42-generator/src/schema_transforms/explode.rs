@@ -162,7 +162,7 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_explode() {
+  fn test_explode_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
@@ -176,7 +176,9 @@ mod tests {
       ..Default::default()
     });
 
-    arena.apply_transform(explode_transform);
+    while arena.apply_transform(explode_transform) > 0 {
+      //
+    }
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
