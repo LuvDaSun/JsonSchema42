@@ -5,7 +5,10 @@ use super::{
 use std::iter::empty;
 
 impl Arena<SchemaNode> {
-  pub fn get_ancestors(&self, key: SchemaKey) -> impl Iterator<Item = (SchemaKey, &SchemaNode)> {
+  pub fn get_ancestors(
+    &self,
+    key: SchemaKey,
+  ) -> impl DoubleEndedIterator<Item = (SchemaKey, &SchemaNode)> {
     let mut result = Vec::new();
 
     let mut key_maybe = Some(key);
@@ -26,7 +29,7 @@ impl Arena<SchemaNode> {
   }
 
   pub fn get_name_parts(&self, key: SchemaKey) -> impl Iterator<Item = &String> {
-    let ancestors = self
+    let ancestors: Vec<_> = self
       .get_ancestors(key)
       .map(|(_key, item)| item)
       .scan(None, |state, item| {
@@ -41,17 +44,15 @@ impl Arena<SchemaNode> {
           true
         }
       })
-      .flat_map(|(_item_previous, item)| {
+      .map(|(_item_previous, item)| {
         empty()
           .chain(item.id.as_ref().map(|id| id.get_pointer().as_ref().iter()))
           .flatten()
           .chain(item.name.as_ref())
       })
-      .collect::<Vec<_>>()
-      .into_iter()
-      .rev();
+      .collect();
 
-    ancestors
+    ancestors.into_iter().rev().flatten()
   }
 }
 
@@ -65,13 +66,13 @@ mod tests {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
-      id: Some(UrlWithPointer::parse("http://id.com#/0").unwrap()),
+      id: Some(UrlWithPointer::parse("http://id.com#/a/0").unwrap()),
       ..Default::default()
     });
 
     arena.add_item(SchemaNode {
       parent: Some(0),
-      id: Some(UrlWithPointer::parse("http://id.com#/1").unwrap()),
+      id: Some(UrlWithPointer::parse("http://id.com#/b/1").unwrap()),
       ..Default::default()
     });
 
@@ -87,12 +88,15 @@ mod tests {
       ..Default::default()
     });
 
-    assert_eq!(arena.get_name_parts(0).collect::<Vec<_>>(), vec!["0"]);
-    assert_eq!(arena.get_name_parts(1).collect::<Vec<_>>(), vec!["1"]);
-    assert_eq!(arena.get_name_parts(2).collect::<Vec<_>>(), vec!["1", "2"]);
+    assert_eq!(arena.get_name_parts(0).collect::<Vec<_>>(), vec!["a", "0"]);
+    assert_eq!(arena.get_name_parts(1).collect::<Vec<_>>(), vec!["b", "1"]);
+    assert_eq!(
+      arena.get_name_parts(2).collect::<Vec<_>>(),
+      vec!["b", "1", "2"]
+    );
     assert_eq!(
       arena.get_name_parts(3).collect::<Vec<_>>(),
-      vec!["1", "2", "3"]
+      vec!["b", "1", "2", "3"]
     );
   }
 }
