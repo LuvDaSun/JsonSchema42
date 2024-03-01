@@ -1,9 +1,8 @@
+use super::banner::get_banner_rs;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use rust_format::Formatter;
 use std::error::Error;
-
-use super::banner::get_banner_rs;
 
 pub fn generate_file_content(file_tokens: TokenStream) -> Result<String, Box<dyn Error>> {
   let mut tokens = quote! {};

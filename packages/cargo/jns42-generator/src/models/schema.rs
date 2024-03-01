@@ -1,9 +1,7 @@
-use std::{collections::HashMap, iter::empty};
-
-use crate::utils::url::UrlWithPointer;
-
 use super::intermediate::IntermediateType;
+use crate::utils::url::UrlWithPointer;
 use serde_json::Value;
+use std::{collections::HashMap, iter::empty};
 
 pub type SchemaKey = usize;
 
