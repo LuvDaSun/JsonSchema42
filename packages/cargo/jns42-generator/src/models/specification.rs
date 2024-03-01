@@ -22,27 +22,9 @@ impl Specification {
     let mut parents: HashMap<_, &str> = HashMap::new();
     let mut implicit_types = HashMap::new();
 
-    let urls: Vec<_> = intermediate_document
-      .schemas
-      .keys()
-      .map(|key| UrlWithPointer::parse(key).unwrap())
-      .collect();
-
-    let original_names: Vec<_> = urls
-      .iter()
-      .map(|url| {
-        let name: Vec<_> = url.get_pointer().as_ref().clone();
-        (url, name)
-      })
-      .collect();
-
-    let names = optimize_names(original_names, 5)
-      .into_iter()
-      .map(|(id, name)| (id.clone(), name))
-      .collect();
+    // first load schemas in the arena
 
     let mut arena = Arena::new();
-
     {
       let mut key_map: HashMap<&str, usize> = HashMap::new();
       for (id, schema) in &intermediate_document.schemas {
@@ -228,6 +210,8 @@ impl Specification {
       }
     }
 
+    // then optimize the schemas
+
     {
       fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
         schema_transforms::single_type::single_type_transform(arena, key);
@@ -238,6 +222,27 @@ impl Specification {
         //
       }
     }
+
+    // generate names
+
+    let urls: Vec<_> = intermediate_document
+      .schemas
+      .keys()
+      .map(|key| UrlWithPointer::parse(key).unwrap())
+      .collect();
+
+    let original_names: Vec<_> = urls
+      .iter()
+      .map(|url| {
+        let name: Vec<_> = url.get_pointer().as_ref().clone();
+        (url, name)
+      })
+      .collect();
+
+    let names = optimize_names(original_names, 5)
+      .into_iter()
+      .map(|(id, name)| (id.clone(), name))
+      .collect();
 
     Self { arena, names }
   }
