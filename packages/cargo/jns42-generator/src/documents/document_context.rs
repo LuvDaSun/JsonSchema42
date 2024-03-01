@@ -50,6 +50,11 @@ pub struct DocumentContext {
    * keep track of what we have been loading (so we only load it once)
    */
   loaded: RefCell<HashSet<ServerUrl>>,
+
+  /**
+   * maps retrieval url to document url
+   */
+  resolved: RefCell<HashMap<UrlWithPointer, UrlWithPointer>>,
 }
 
 impl DocumentContext {
@@ -63,6 +68,10 @@ impl DocumentContext {
      * override factories
      */
     self.factories.insert(schema.clone(), factory);
+  }
+
+  pub fn resolve_retrieval_url(&self, retrieval_url: &UrlWithPointer) -> Option<UrlWithPointer> {
+    self.resolved.borrow().get(retrieval_url).cloned()
   }
 
   pub fn get_intermediate_document(&self) -> IntermediateSchema {
@@ -228,7 +237,7 @@ impl DocumentContext {
           &default_schema_uri,
           queue,
         )
-        .await
+        .await;
     }
   }
 
@@ -250,7 +259,6 @@ impl DocumentContext {
     }
 
     let server_url = retrieval_url.clone().into();
-
     if !self.loaded.borrow_mut().insert(server_url) {
       return;
     }
@@ -270,6 +278,12 @@ impl DocumentContext {
       },
     );
     let document_uri = document.get_document_uri();
+
+    assert!(self
+      .resolved
+      .borrow_mut()
+      .insert(retrieval_url.clone(), document_uri.clone())
+      .is_none());
 
     assert!(self
       .documents

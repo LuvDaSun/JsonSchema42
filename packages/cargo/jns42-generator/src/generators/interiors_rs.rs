@@ -8,13 +8,20 @@ use std::{collections::HashSet, error::Error};
 
 pub fn generate_file_token_stream(
   specification: &Specification,
+  is_primary: bool,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
   for (key, item) in specification.arena.iter().enumerate() {
-    if item.id.is_some() {
-      tokens.append_all(generate_type_token_stream(specification, &key, item));
+    if item.primary.unwrap_or_default() != is_primary {
+      continue;
     }
+
+    if item.id.is_none() {
+      continue;
+    };
+
+    tokens.append_all(generate_type_token_stream(specification, &key, item));
   }
 
   Ok(tokens)
@@ -27,11 +34,14 @@ fn generate_type_token_stream(
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
-  let documentation: Vec<_> = [&item.title, &item.description, &item.id]
-    .into_iter()
-    .flatten()
-    .cloned()
-    .collect();
+  let documentation: Vec<_> = [
+    item.title.clone(),
+    item.description.clone(),
+    item.id.as_ref().map(|id| id.get_url().to_string()),
+  ]
+  .into_iter()
+  .flatten()
+  .collect();
   let documentation = documentation.join("\n\n");
 
   tokens.append_all(quote! {
