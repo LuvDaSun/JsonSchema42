@@ -36,6 +36,8 @@ pub trait Selectors {
   fn select_required(&self) -> Option<Vec<&str>>;
 
   fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
+  fn select_reference_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+
   fn select_definition_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
 
   fn select_additional_properties_entries(
@@ -130,19 +132,34 @@ impl Selectors for Node {
 
   fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
     vec![
+      self.select_reference_entries(pointer).unwrap_or_default(),
       self.select_definition_entries(pointer).unwrap_or_default(),
+      self
+        .select_property_names_entries(pointer)
+        .unwrap_or_default(),
+      self.select_if_entries(pointer).unwrap_or_default(),
+      self.select_then_entries(pointer).unwrap_or_default(),
+      self.select_else_entries(pointer).unwrap_or_default(),
+      self.select_not_entries(pointer).unwrap_or_default(),
       self.select_property_entries(pointer).unwrap_or_default(),
       self
         .select_additional_properties_entries(pointer)
         .unwrap_or_default(),
-      self.select_tuple_items_entries(pointer).unwrap_or_default(),
       self.select_array_items_entries(pointer).unwrap_or_default(),
+      self.select_contains_entries(pointer).unwrap_or_default(),
+      self.select_tuple_items_entries(pointer).unwrap_or_default(),
       self.select_all_of_entries(pointer).unwrap_or_default(),
       self.select_any_of_entries(pointer).unwrap_or_default(),
       self.select_one_of_entries(pointer).unwrap_or_default(),
-      self.select_if_entries(pointer).unwrap_or_default(),
-      self.select_then_entries(pointer).unwrap_or_default(),
-      self.select_else_entries(pointer).unwrap_or_default(),
+      self
+        .select_object_properties_entries(pointer)
+        .unwrap_or_default(),
+      self
+        .select_pattern_properties_entries(pointer)
+        .unwrap_or_default(),
+      self
+        .select_dependent_schemas_entries(pointer)
+        .unwrap_or_default(),
     ]
     .into_iter()
     .flatten()
@@ -151,6 +168,14 @@ impl Selectors for Node {
 
   //
 
+  fn select_reference_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+    let select_name = "$ref";
+    let selected = self.as_object()?.get(select_name)?;
+
+    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
+
+    Some(result)
+  }
   fn select_definition_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
     let select_name = "$defs";
     let selected = self.as_object()?.get(select_name)?;
