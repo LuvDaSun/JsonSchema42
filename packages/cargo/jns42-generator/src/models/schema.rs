@@ -7,7 +7,7 @@ use serde_json::Value;
 
 pub type SchemaKey = usize;
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum SchemaType {
   Never,
   Any,
