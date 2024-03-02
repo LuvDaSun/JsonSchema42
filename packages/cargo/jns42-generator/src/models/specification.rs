@@ -246,6 +246,7 @@ impl Specification {
       fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
         schema_transforms::single_type::single_type_transform(arena, key);
         schema_transforms::explode::explode_transform(arena, key);
+        schema_transforms::reference::reference_transform(arena, key);
       }
 
       while arena.apply_transform(transformer) > 0 {
