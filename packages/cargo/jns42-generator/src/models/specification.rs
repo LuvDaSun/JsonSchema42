@@ -9,7 +9,10 @@ use crate::{
 };
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use std::{collections::HashMap, iter::empty};
+use std::{
+  collections::HashMap,
+  iter::{empty, once},
+};
 
 pub struct Specification {
   pub arena: Arena<SchemaNode>,
@@ -97,9 +100,9 @@ impl Specification {
         let types = schema
           .types
           .as_ref()
+          .and_then(|value| if value.is_empty() { None } else { Some(value) })
           .map(|value| value.iter().map(|value| value.into()).collect())
-          .and_then(|value: Vec<_>| if value.is_empty() { None } else { Some(value) })
-          .or_else(|| implicit_types.get(&id).map(|value| vec![*value]));
+          .or_else(|| implicit_types.get(&id).map(|value| once(*value).collect()));
         let reference = schema
           .reference
           .as_ref()
