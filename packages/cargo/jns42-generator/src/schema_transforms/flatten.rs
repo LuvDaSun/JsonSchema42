@@ -20,6 +20,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     sub_keys_getter: impl Fn(&SchemaNode) -> &Option<Vec<usize>>,
   ) {
     if let Some(sub_keys) = sub_keys_getter(item) {
+      // FIXME
       item.all_of = Some(
         sub_keys
           .iter()

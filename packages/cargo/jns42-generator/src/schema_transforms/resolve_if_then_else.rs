@@ -37,7 +37,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let item = item.clone();
 
-  let mut new_item = SchemaNode {
+  let mut item_new = SchemaNode {
     r#if: None,
     then: None,
     r#else: None,
@@ -51,7 +51,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    new_item.one_of.as_mut().unwrap().push(new_sub_key)
+    item_new.one_of.as_mut().unwrap().push(new_sub_key)
   }
 
   if let Some(r#else) = item.r#else {
@@ -66,8 +66,10 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    new_item.one_of.as_mut().unwrap().push(new_sub_key)
+    item_new.one_of.as_mut().unwrap().push(new_sub_key)
   }
+
+  arena.set_item(key, item_new);
 }
 
 #[cfg(test)]
