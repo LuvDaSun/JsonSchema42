@@ -6,15 +6,15 @@ pub fn flatten_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  transform(arena, &mut item_new, |item| &item.all_of);
-  transform(arena, &mut item_new, |item| &item.any_of);
-  transform(arena, &mut item_new, |item| &item.one_of);
+  transform_sub(arena, &mut item_new, |item| &item.all_of);
+  transform_sub(arena, &mut item_new, |item| &item.any_of);
+  transform_sub(arena, &mut item_new, |item| &item.one_of);
 
   if item != &item_new {
     arena.set_item(key, item_new);
   }
 
-  fn transform(
+  fn transform_sub(
     arena: &Arena<SchemaNode>,
     item: &mut SchemaNode,
     sub_keys_getter: impl Fn(&SchemaNode) -> &Option<Vec<usize>>,

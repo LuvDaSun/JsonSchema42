@@ -23,15 +23,15 @@ pub fn reference_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  transform(&mut item_new.all_of, &mut item_new.reference);
-  transform(&mut item_new.any_of, &mut item_new.reference);
-  transform(&mut item_new.one_of, &mut item_new.reference);
+  transform_sub(&mut item_new.all_of, &mut item_new.reference);
+  transform_sub(&mut item_new.any_of, &mut item_new.reference);
+  transform_sub(&mut item_new.one_of, &mut item_new.reference);
 
   if item != &item_new {
     arena.set_item(key, item_new);
   }
 
-  fn transform(sub_keys: &mut Option<Vec<usize>>, reference: &mut Option<usize>) {
+  fn transform_sub(sub_keys: &mut Option<Vec<usize>>, reference: &mut Option<usize>) {
     if let Some(sub_keys_some) = sub_keys {
       match sub_keys_some.len() {
         0 => {
