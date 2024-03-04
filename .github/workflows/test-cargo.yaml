@@ -4,6 +4,7 @@ on:
     branches:
       - "*"
     paths:
+      - Cargo.lock
       - .github/**
       - fixtures/**
       - packages/cargo/**
