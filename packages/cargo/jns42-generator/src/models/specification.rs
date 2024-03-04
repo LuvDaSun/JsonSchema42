@@ -253,12 +253,12 @@ impl Specification {
       fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
-        schema_transforms::resolve_single_all_of::transform(arena, key);
-        schema_transforms::resolve_single_any_of::transform(arena, key);
-        schema_transforms::resolve_single_one_of::transform(arena, key);
-        schema_transforms::flatten_all_of::transform(arena, key);
-        schema_transforms::flatten_any_of::transform(arena, key);
-        schema_transforms::flatten_one_of::transform(arena, key);
+        schema_transforms::resolve_single::all_of::transform(arena, key);
+        schema_transforms::resolve_single::any_of::transform(arena, key);
+        schema_transforms::resolve_single::one_of::transform(arena, key);
+        schema_transforms::flatten::all_of::transform(arena, key);
+        schema_transforms::flatten::any_of::transform(arena, key);
+        schema_transforms::flatten::one_of::transform(arena, key);
         schema_transforms::resolve_if_then_else::transform(arena, key);
       }
     }

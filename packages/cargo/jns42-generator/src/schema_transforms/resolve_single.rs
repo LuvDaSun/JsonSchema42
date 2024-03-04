@@ -13,8 +13,8 @@
  * ```
  */
 macro_rules! generate_mod {
-  ( $name: ident, $member: ident ) => {
-    pub mod $name {
+  ( $member: ident ) => {
+    pub mod $member {
       use $crate::models::{arena::Arena, schema::SchemaNode};
 
       pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
@@ -74,6 +74,6 @@ macro_rules! generate_mod {
   };
 }
 
-generate_mod!(resolve_single_all_of, all_of);
-generate_mod!(resolve_single_any_of, any_of);
-generate_mod!(resolve_single_one_of, one_of);
+generate_mod!(all_of);
+generate_mod!(any_of);
+generate_mod!(one_of);
