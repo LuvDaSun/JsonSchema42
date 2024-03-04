@@ -21,25 +21,18 @@ pub fn reference_transform(arena: &mut Arena<SchemaNode>, key: usize) {
     return;
   }
 
-  // we keep the found reference here! This is se from allOf, anyOf and oneOf. If it is already
-  // set, then this means that we found 2! in that case we don't change anything.
-  let mut reference = None;
+  let mut item_new = item.clone();
 
   if let Some(sub_keys) = &item.all_of {
     match sub_keys.len() {
       0 => {
-        let item = SchemaNode {
-          all_of: None,
-          ..item.clone()
-        };
-        arena.set_item(key, item);
-        return;
+        item_new.all_of = None;
       }
       1 => {
-        if reference.is_some() {
+        if item_new.reference.is_some() {
           return;
         }
-        reference = sub_keys.first().copied();
+        item_new.reference = sub_keys.first().copied();
       }
       _ => return,
     };
@@ -47,19 +40,12 @@ pub fn reference_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   if let Some(sub_keys) = &item.any_of {
     match sub_keys.len() {
-      0 => {
-        let item = SchemaNode {
-          any_of: None,
-          ..item.clone()
-        };
-        arena.set_item(key, item);
-        return;
-      }
+      0 => item_new.any_of = None,
       1 => {
-        if reference.is_some() {
+        if item_new.reference.is_some() {
           return;
         }
-        reference = sub_keys.first().copied();
+        item_new.reference = sub_keys.first().copied();
       }
       _ => return,
     };
@@ -67,36 +53,20 @@ pub fn reference_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   if let Some(sub_keys) = &item.one_of {
     match sub_keys.len() {
-      0 => {
-        let item = SchemaNode {
-          one_of: None,
-          ..item.clone()
-        };
-        arena.set_item(key, item);
-        return;
-      }
+      0 => item_new.one_of = None,
       1 => {
-        if reference.is_some() {
+        if item_new.reference.is_some() {
           return;
         }
-        reference = sub_keys.first().copied();
+        item_new.reference = sub_keys.first().copied();
       }
       _ => return,
     };
   }
 
-  let Some(reference) = reference else {
-    return;
-  };
-
-  let item = SchemaNode {
-    reference: Some(reference),
-    all_of: None,
-    any_of: None,
-    one_of: None,
-    ..item.clone()
-  };
-  arena.set_item(key, item);
+  if item != &item_new {
+    arena.set_item(key, item_new);
+  }
 }
 
 #[cfg(test)]

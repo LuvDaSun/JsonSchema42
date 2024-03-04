@@ -247,6 +247,7 @@ impl Specification {
         schema_transforms::single_type::single_type_transform(arena, key);
         schema_transforms::explode::explode_transform(arena, key);
         schema_transforms::reference::reference_transform(arena, key);
+        schema_transforms::flatten::flatten_transform(arena, key);
       }
 
       while arena.apply_transform(transformer) > 0 {
