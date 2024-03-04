@@ -254,7 +254,9 @@ impl Specification {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
         schema_transforms::reference::transform(arena, key);
-        schema_transforms::flatten::transform(arena, key);
+        schema_transforms::flatten_all_of::transform(arena, key);
+        schema_transforms::flatten_any_of::transform(arena, key);
+        schema_transforms::flatten_one_of::transform(arena, key);
         schema_transforms::resolve_if_then_else::transform(arena, key);
       }
     }
