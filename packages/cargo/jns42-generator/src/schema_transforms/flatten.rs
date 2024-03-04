@@ -1,5 +1,4 @@
-#[macro_export]
-macro_rules! transform_member {
+macro_rules! generate_mod {
   ( $name: ident, $member: ident ) => {
     pub mod $name {
       use std::iter::once;
@@ -99,6 +98,6 @@ macro_rules! transform_member {
   };
 }
 
-transform_member!(flatten_all_of, all_of);
-transform_member!(flatten_any_of, any_of);
-transform_member!(flatten_one_of, one_of);
+generate_mod!(flatten_all_of, all_of);
+generate_mod!(flatten_any_of, any_of);
+generate_mod!(flatten_one_of, one_of);
