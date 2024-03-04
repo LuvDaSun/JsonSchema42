@@ -7,12 +7,14 @@ use crate::{
   schema_transforms::{self},
   utils::{name::to_pascal, names::optimize_names, url::UrlWithPointer},
 };
+use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use std::{
-  collections::HashMap,
-  iter::{empty, once},
-};
+use regex::Regex;
+use std::collections::HashMap;
+use std::iter::{empty, once};
+
+pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
 pub struct Specification {
   pub arena: Arena<SchemaNode>,
@@ -111,6 +113,7 @@ impl Specification {
         let primary = if id == root_id { Some(true) } else { None };
 
         let item = SchemaNode {
+          name: None,
           primary,
           parent,
           types,
@@ -274,14 +277,40 @@ impl Specification {
       .iter()
       .enumerate()
       .filter(|(_key, item)| item.primary.unwrap_or_default())
-      .filter_map(|(key, item)| item.id.as_ref().map(|id| (key, id)))
-      .map(|(key, id)| (key, id.get_pointer().as_ref().clone()));
+      .map(|(key, _item)| {
+        (
+          key,
+          arena
+            .get_name_parts(key)
+            .map(|part| {
+              NON_IDENTIFIER_REGEX
+                .replace_all(part, " ")
+                .into_owned()
+                .trim()
+                .to_string()
+            })
+            .filter(|part| !part.is_empty()),
+        )
+      });
     let secondary_name_entries = arena
       .iter()
       .enumerate()
       .filter(|(_key, item)| !item.primary.unwrap_or_default())
-      .filter_map(|(key, item)| item.id.as_ref().map(|id| (key, id)))
-      .map(|(key, id)| (key, id.get_pointer().as_ref().clone()));
+      .map(|(key, _item)| {
+        (
+          key,
+          arena
+            .get_name_parts(key)
+            .map(|part| {
+              NON_IDENTIFIER_REGEX
+                .replace_all(part, " ")
+                .into_owned()
+                .trim()
+                .to_string()
+            })
+            .filter(|part| !part.is_empty()),
+        )
+      });
     let primary_names = optimize_names(primary_name_entries, 5).into_iter();
     let secondary_names = optimize_names(secondary_name_entries, 5).into_iter();
 

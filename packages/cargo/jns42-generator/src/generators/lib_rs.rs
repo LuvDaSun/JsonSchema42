@@ -1,8 +1,7 @@
-use std::error::Error;
-
 use crate::models::specification::Specification;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
+use std::error::Error;
 
 pub fn generate_file_token_stream(
   _specification: &Specification,

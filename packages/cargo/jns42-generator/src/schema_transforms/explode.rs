@@ -67,6 +67,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   {
     sub_items.push(SchemaNode {
       parent: Some(key),
+      name: Some("types".to_string()),
       types: item.types.clone(),
       ..Default::default()
     })
@@ -75,6 +76,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   if item.reference.is_some() {
     sub_items.push(SchemaNode {
       parent: Some(key),
+      name: Some("reference".to_string()),
       reference: item.reference,
       ..Default::default()
     })
@@ -89,6 +91,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   {
     sub_items.push(SchemaNode {
       parent: Some(key),
+      name: Some("all_of".to_string()),
       all_of: item.all_of.clone(),
       ..Default::default()
     })
@@ -103,6 +106,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   {
     sub_items.push(SchemaNode {
       parent: Some(key),
+      name: Some("any_of".to_string()),
       any_of: item.any_of.clone(),
       ..Default::default()
     })
@@ -117,6 +121,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   {
     sub_items.push(SchemaNode {
       parent: Some(key),
+      name: Some("one_of".to_string()),
       one_of: item.one_of.clone(),
       ..Default::default()
     })
@@ -125,6 +130,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   if item.r#if.is_some() || item.then.is_some() || item.r#else.is_some() {
     sub_items.push(SchemaNode {
       parent: Some(key),
+      name: Some("if_then_else".to_string()),
       r#if: item.r#if,
       then: item.then,
       r#else: item.r#else,
@@ -183,37 +189,36 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
       SchemaNode {
-        reference: None,
-        any_of: None,
-        one_of: None,
-        r#if: None,
-        then: None,
-        r#else: None,
         all_of: Some(vec![1, 2, 3, 4, 5]),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
+        name: Some("reference".to_string()),
         reference: Some(10),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
+        name: Some("all_of".to_string()),
         all_of: Some(vec![100, 200]),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
+        name: Some("any_of".to_string()),
         any_of: Some(vec![300, 400]),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
+        name: Some("one_of".to_string()),
         one_of: Some(vec![500, 600]),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
+        name: Some("if_then_else".to_string()),
         r#if: Some(700),
         then: Some(800),
         r#else: Some(900),
