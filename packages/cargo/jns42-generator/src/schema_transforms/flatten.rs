@@ -6,7 +6,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  macro_rules! transform_with {
+  macro_rules! transform_member {
     ( $member: ident ) => {
       if let Some(sub_keys) = &item.$member {
         item_new.$member = Some(
@@ -27,9 +27,9 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     };
   }
 
-  transform_with!(all_of);
-  transform_with!(any_of);
-  transform_with!(one_of);
+  transform_member!(all_of);
+  transform_member!(any_of);
+  transform_member!(one_of);
 
   if item != &item_new {
     arena.set_item(key, item_new);
@@ -46,26 +46,29 @@ mod tests {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
-      all_of: Some([4, 5].into()),
+      // 0
+      all_of: Some([3, 4].into()),
       ..Default::default()
     });
 
     arena.add_item(SchemaNode {
-      all_of: Some([6, 7].into()),
+      // 1
+      all_of: Some([5, 6].into()),
       ..Default::default()
     });
 
     arena.add_item(SchemaNode {
-      all_of: Some([1, 2].into()),
+      // 2
+      all_of: Some([0, 1, 7, 8].into()),
       ..Default::default()
     });
 
-    arena.add_item(Default::default());
-    arena.add_item(Default::default());
-    arena.add_item(Default::default());
-    arena.add_item(Default::default());
-    arena.add_item(Default::default());
-    arena.add_item(Default::default());
+    arena.add_item(Default::default()); // 3
+    arena.add_item(Default::default()); // 4
+    arena.add_item(Default::default()); // 5
+    arena.add_item(Default::default()); // 6
+    arena.add_item(Default::default()); // 7
+    arena.add_item(Default::default()); // 8
 
     while arena.apply_transform(transform) > 0 {
       //
@@ -74,15 +77,15 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
       SchemaNode {
-        all_of: Some([4, 5].into()),
+        all_of: Some([3, 4].into()),
         ..Default::default()
       },
       SchemaNode {
-        all_of: Some([6, 7].into()),
+        all_of: Some([5, 6].into()),
         ..Default::default()
       },
       SchemaNode {
-        all_of: Some([4, 5, 6, 7, 8, 9].into()),
+        all_of: Some([3, 4, 5, 6, 7, 8].into()),
         ..Default::default()
       },
       Default::default(),

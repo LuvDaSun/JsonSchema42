@@ -23,7 +23,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  macro_rules! transform_with {
+  macro_rules! transform_member {
     ( $member: ident ) => {
       if let Some(sub_keys) = &item_new.$member {
         match sub_keys.len() {
@@ -44,9 +44,9 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     };
   }
 
-  transform_with!(all_of);
-  transform_with!(any_of);
-  transform_with!(one_of);
+  transform_member!(all_of);
+  transform_member!(any_of);
+  transform_member!(one_of);
 
   if item != &item_new {
     arena.set_item(key, item_new);
