@@ -252,6 +252,7 @@ impl Specification {
         schema_transforms::explode::explode_transform(arena, key);
         schema_transforms::reference::reference_transform(arena, key);
         schema_transforms::flatten::flatten_transform(arena, key);
+        schema_transforms::resolve_if_then_else::resolve_if_then_else_transform(arena, key);
       }
     }
 

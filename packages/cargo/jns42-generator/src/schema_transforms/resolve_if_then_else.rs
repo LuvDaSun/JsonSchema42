@@ -1,0 +1,116 @@
+use crate::models::{arena::Arena, schema::SchemaNode};
+
+/**
+ * This transformer turns if-then-else into a one-of
+ *
+ * ```yaml
+ * - if: 100
+ *   then: 200
+ *   else : 300
+ * ```
+ *
+ * will become
+ *
+ * ```yaml
+ * - oneOf
+ *   - 2
+ *   - 3
+ * - not: 100
+ * - allOf:
+ *   - 100
+ *   - 200
+ * - allOf:
+ *   - 1
+ *   - 300
+ * ```
+ */
+pub fn resolve_if_then_else_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+  let item = arena.get_item(key);
+
+  if item.one_of.is_some() {
+    return;
+  }
+
+  let Some(r#if) = item.r#if else {
+    return;
+  };
+
+  let item = item.clone();
+
+  let mut new_item = SchemaNode {
+    r#if: None,
+    then: None,
+    r#else: None,
+    one_of: Some(Default::default()),
+    ..item
+  };
+
+  if let Some(then) = item.then {
+    let new_sub_item = SchemaNode {
+      all_of: Some(vec![r#if, then]),
+      ..Default::default()
+    };
+    let new_sub_key = arena.add_item(new_sub_item);
+    new_item.one_of.as_mut().unwrap().push(new_sub_key)
+  }
+
+  if let Some(r#else) = item.r#else {
+    let new_sub_sub_item = SchemaNode {
+      not: Some(r#if),
+      ..Default::default()
+    };
+    let new_sub_sub_key = arena.add_item(new_sub_sub_item);
+
+    let new_sub_item = SchemaNode {
+      all_of: Some(vec![new_sub_sub_key, r#else]),
+      ..Default::default()
+    };
+    let new_sub_key = arena.add_item(new_sub_item);
+    new_item.one_of.as_mut().unwrap().push(new_sub_key)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::models::{arena::Arena, schema::SchemaNode};
+
+  #[test]
+  fn test_resolve_if_then_else_transform() {
+    let mut arena = Arena::new();
+
+    arena.add_item(SchemaNode {
+      r#if: Some(100),
+      then: Some(200),
+      r#else: Some(300),
+      ..Default::default()
+    });
+
+    while arena.apply_transform(resolve_if_then_else_transform) > 0 {
+      //
+    }
+
+    let actual: Vec<_> = arena.iter().cloned().collect();
+    let expected: Vec<_> = [
+      SchemaNode {
+        one_of: Some([1, 3].into()),
+        ..Default::default()
+      },
+      SchemaNode {
+        all_of: Some([100, 200].into()),
+        ..Default::default()
+      },
+      SchemaNode {
+        not: Some(100),
+        ..Default::default()
+      },
+      SchemaNode {
+        all_of: Some([2, 300].into()),
+        ..Default::default()
+      },
+    ]
+    .into();
+
+    assert_eq!(actual, expected)
+  }
+}

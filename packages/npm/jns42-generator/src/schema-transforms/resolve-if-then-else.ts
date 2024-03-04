@@ -32,7 +32,6 @@ import {
  * ```
  */
 export const resolveIfThenElse: SchemaTransform = (arena, model, modelKey) => {
-  // we need at least two to merge
   if (!isIfSchemaModel(model)) {
     return model;
   }
