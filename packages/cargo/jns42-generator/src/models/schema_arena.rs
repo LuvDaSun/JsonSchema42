@@ -53,6 +53,7 @@ impl Arena<SchemaNode> {
           }))
           .flatten()
           .chain(item.name.as_deref())
+          .filter(|part| !part.is_empty())
       })
       .collect();
 
