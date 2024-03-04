@@ -20,6 +20,32 @@ pub enum SchemaType {
   Object,
 }
 
+impl SchemaType {
+  pub fn intersection(self, other: Self) -> Self {
+    if self == other {
+      return self;
+    }
+
+    if self == Self::Any {
+      return other;
+    }
+
+    if other == Self::Any {
+      return self;
+    }
+
+    if self == Self::Never {
+      return self;
+    }
+
+    if other == Self::Never {
+      return other;
+    }
+
+    SchemaType::Never
+  }
+}
+
 impl From<&IntermediateType> for SchemaType {
   fn from(value: &IntermediateType) -> Self {
     match value {
