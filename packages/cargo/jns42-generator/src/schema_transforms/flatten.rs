@@ -6,36 +6,33 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  transform_sub(arena, &mut item_new, |item| &item.all_of);
-  transform_sub(arena, &mut item_new, |item| &item.any_of);
-  transform_sub(arena, &mut item_new, |item| &item.one_of);
+  macro_rules! transform_with {
+    ( $member: ident ) => {
+      if let Some(sub_keys) = &item.$member {
+        item_new.$member = Some(
+          sub_keys
+            .iter()
+            .copied()
+            .map(|sub_key| (sub_key, arena.get_item(sub_key)))
+            .flat_map(|(sub_key, sub_item)| {
+              if let Some(sub_sub_keys) = &sub_item.$member {
+                sub_sub_keys.clone()
+              } else {
+                once(sub_key).collect()
+              }
+            })
+            .collect(),
+        );
+      }
+    };
+  }
+
+  transform_with!(all_of);
+  transform_with!(any_of);
+  transform_with!(one_of);
 
   if item != &item_new {
     arena.set_item(key, item_new);
-  }
-
-  fn transform_sub(
-    arena: &Arena<SchemaNode>,
-    item: &mut SchemaNode,
-    sub_keys_getter: impl Fn(&SchemaNode) -> &Option<Vec<usize>>,
-  ) {
-    if let Some(sub_keys) = sub_keys_getter(item) {
-      // FIXME
-      item.all_of = Some(
-        sub_keys
-          .iter()
-          .copied()
-          .map(|sub_key| (sub_key, arena.get_item(sub_key)))
-          .flat_map(|(sub_key, sub_item)| {
-            if let Some(sub_sub_keys) = sub_keys_getter(sub_item) {
-              sub_sub_keys.clone()
-            } else {
-              once(sub_key).collect()
-            }
-          })
-          .collect(),
-      );
-    }
   }
 }
 
