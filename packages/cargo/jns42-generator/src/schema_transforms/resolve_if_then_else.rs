@@ -24,7 +24,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  *   - 300
  * ```
  */
-pub fn resolve_if_then_else_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
 
   if item.one_of.is_some() {
@@ -78,7 +78,7 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_resolve_if_then_else_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
@@ -88,7 +88,7 @@ mod tests {
       ..Default::default()
     });
 
-    while arena.apply_transform(resolve_if_then_else_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 

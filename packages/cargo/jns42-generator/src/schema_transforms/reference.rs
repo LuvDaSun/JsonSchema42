@@ -14,7 +14,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  * - reference: 1
  * ```
  */
-pub fn reference_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
 
   if item.reference.is_some() {
@@ -59,7 +59,7 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_reference_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
@@ -77,7 +77,7 @@ mod tests {
       ..Default::default()
     });
 
-    while arena.apply_transform(reference_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 
