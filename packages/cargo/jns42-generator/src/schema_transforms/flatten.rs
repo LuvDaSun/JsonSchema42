@@ -6,59 +6,35 @@ pub fn flatten_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  if let Some(sub_keys) = &item.all_of {
-    item_new.all_of = Some(
-      sub_keys
-        .iter()
-        .copied()
-        .map(|sub_key| (sub_key, arena.get_item(sub_key)))
-        .flat_map(|(sub_key, sub_item)| {
-          if let Some(sub_sub_keys) = &sub_item.all_of {
-            sub_sub_keys.clone()
-          } else {
-            once(sub_key).collect()
-          }
-        })
-        .collect(),
-    );
-  }
-
-  if let Some(sub_keys) = &item.any_of {
-    item_new.any_of = Some(
-      sub_keys
-        .iter()
-        .copied()
-        .map(|sub_key| (sub_key, arena.get_item(sub_key)))
-        .flat_map(|(sub_key, sub_item)| {
-          if let Some(sub_sub_keys) = &sub_item.any_of {
-            sub_sub_keys.clone()
-          } else {
-            once(sub_key).collect()
-          }
-        })
-        .collect(),
-    );
-  }
-
-  if let Some(sub_keys) = &item.one_of {
-    item_new.one_of = Some(
-      sub_keys
-        .iter()
-        .copied()
-        .map(|sub_key| (sub_key, arena.get_item(sub_key)))
-        .flat_map(|(sub_key, sub_item)| {
-          if let Some(sub_sub_keys) = &sub_item.one_of {
-            sub_sub_keys.clone()
-          } else {
-            once(sub_key).collect()
-          }
-        })
-        .collect(),
-    );
-  }
+  transform(arena, &mut item_new, |item| &item.all_of);
+  transform(arena, &mut item_new, |item| &item.any_of);
+  transform(arena, &mut item_new, |item| &item.one_of);
 
   if item != &item_new {
     arena.set_item(key, item_new);
+  }
+
+  fn transform(
+    arena: &Arena<SchemaNode>,
+    item: &mut SchemaNode,
+    sub_keys_getter: impl Fn(&SchemaNode) -> &Option<Vec<usize>>,
+  ) {
+    if let Some(sub_keys) = sub_keys_getter(item) {
+      item.all_of = Some(
+        sub_keys
+          .iter()
+          .copied()
+          .map(|sub_key| (sub_key, arena.get_item(sub_key)))
+          .flat_map(|(sub_key, sub_item)| {
+            if let Some(sub_sub_keys) = sub_keys_getter(sub_item) {
+              sub_sub_keys.clone()
+            } else {
+              once(sub_key).collect()
+            }
+          })
+          .collect(),
+      );
+    }
   }
 }
 

@@ -23,49 +23,31 @@ pub fn reference_transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let mut item_new = item.clone();
 
-  if let Some(sub_keys) = &item.all_of {
-    match sub_keys.len() {
-      0 => {
-        item_new.all_of = None;
-      }
-      1 => {
-        if item_new.reference.is_some() {
-          return;
-        }
-        item_new.reference = sub_keys.first().copied();
-      }
-      _ => return,
-    };
-  }
-
-  if let Some(sub_keys) = &item.any_of {
-    match sub_keys.len() {
-      0 => item_new.any_of = None,
-      1 => {
-        if item_new.reference.is_some() {
-          return;
-        }
-        item_new.reference = sub_keys.first().copied();
-      }
-      _ => return,
-    };
-  }
-
-  if let Some(sub_keys) = &item.one_of {
-    match sub_keys.len() {
-      0 => item_new.one_of = None,
-      1 => {
-        if item_new.reference.is_some() {
-          return;
-        }
-        item_new.reference = sub_keys.first().copied();
-      }
-      _ => return,
-    };
-  }
+  transform(&mut item_new.all_of, &mut item_new.reference);
+  transform(&mut item_new.any_of, &mut item_new.reference);
+  transform(&mut item_new.one_of, &mut item_new.reference);
 
   if item != &item_new {
     arena.set_item(key, item_new);
+  }
+
+  fn transform(sub_keys: &mut Option<Vec<usize>>, reference: &mut Option<usize>) {
+    if let Some(sub_keys_some) = sub_keys {
+      match sub_keys_some.len() {
+        0 => {
+          *sub_keys = None;
+        }
+        1 => {
+          if reference.is_some() {
+            // if a reference was already set we are not going to overwrite
+            return;
+          }
+          *reference = sub_keys_some.first().copied();
+          *sub_keys = None;
+        }
+        _ => {}
+      };
+    }
   }
 }
 
