@@ -25,7 +25,7 @@ use std::iter::once;
  *   - string
  * ```
  */
-pub fn single_type_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
 
   let Some(types) = &item.types else {
@@ -76,7 +76,7 @@ mod tests {
   };
 
   #[test]
-  fn test_single_type_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
@@ -84,7 +84,7 @@ mod tests {
       ..Default::default()
     });
 
-    while arena.apply_transform(single_type_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 

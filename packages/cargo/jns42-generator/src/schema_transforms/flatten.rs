@@ -1,7 +1,7 @@
 use crate::models::{arena::Arena, schema::SchemaNode};
 use std::iter::once;
 
-pub fn flatten_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
 
   let mut item_new = item.clone();
@@ -44,7 +44,7 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_flatten_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
@@ -69,7 +69,7 @@ mod tests {
     arena.add_item(Default::default());
     arena.add_item(Default::default());
 
-    while arena.apply_transform(flatten_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 

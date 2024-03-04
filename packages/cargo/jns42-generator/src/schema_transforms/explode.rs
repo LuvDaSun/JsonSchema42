@@ -54,7 +54,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  * ```
  *
  */
-pub fn explode_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
   let mut sub_items = Vec::new();
 
@@ -162,7 +162,7 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_explode_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
@@ -176,7 +176,7 @@ mod tests {
       ..Default::default()
     });
 
-    while arena.apply_transform(explode_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 
