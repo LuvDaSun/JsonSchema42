@@ -16,6 +16,7 @@ words:
   - reqwest
   - ryanluker
   - serde
+  - snakecase
   - structs
   - tamasfe
   - unalias

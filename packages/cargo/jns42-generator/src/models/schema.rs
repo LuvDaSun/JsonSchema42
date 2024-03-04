@@ -1,9 +1,7 @@
-use std::{collections::HashMap, iter::empty};
-
-use crate::utils::url::UrlWithPointer;
-
 use super::intermediate::IntermediateType;
+use crate::utils::url::UrlWithPointer;
 use serde_json::Value;
+use std::{collections::HashMap, iter::empty};
 
 pub type SchemaKey = usize;
 
@@ -18,6 +16,22 @@ pub enum SchemaType {
   String,
   Array,
   Object,
+}
+
+impl ToString for SchemaType {
+  fn to_string(&self) -> String {
+    match self {
+      Self::Never => "never".to_string(),
+      Self::Any => "any".to_string(),
+      Self::Null => "null".to_string(),
+      Self::Boolean => "boolean".to_string(),
+      Self::Integer => "integer".to_string(),
+      Self::Number => "number".to_string(),
+      Self::String => "string".to_string(),
+      Self::Array => "array".to_string(),
+      Self::Object => "object".to_string(),
+    }
+  }
 }
 
 impl From<&IntermediateType> for SchemaType {
@@ -38,6 +52,8 @@ impl From<&IntermediateType> for SchemaType {
 
 #[derive(Clone, PartialEq, Default, Debug)]
 pub struct SchemaNode {
+  pub name: Option<String>,
+
   pub primary: Option<bool>,
   pub parent: Option<SchemaKey>,
   pub id: Option<UrlWithPointer>,
