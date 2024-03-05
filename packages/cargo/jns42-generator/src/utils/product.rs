@@ -1,7 +1,12 @@
-pub fn product<T>(sets: Vec<Vec<T>>) -> Vec<Vec<T>>
+pub fn product<T>(sets: impl IntoIterator<Item = impl IntoIterator<Item = T>>) -> Vec<Vec<T>>
 where
   T: Clone,
 {
+  let sets: Vec<Vec<_>> = sets
+    .into_iter()
+    .map(|sets| sets.into_iter().collect())
+    .collect();
+
   if sets.is_empty() {
     return Default::default();
   }

@@ -2,7 +2,7 @@ use super::intermediate::IntermediateType;
 use crate::utils::merge::Merger;
 use crate::utils::{merge::merge_option, url::UrlWithPointer};
 use serde_json::Value;
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::{collections::HashMap, iter::empty, rc::Rc};
 
 pub type SchemaKey = usize;
@@ -98,9 +98,9 @@ pub struct SchemaNode {
   // applicators
   pub reference: Option<SchemaKey>,
 
-  pub all_of: Option<Vec<SchemaKey>>,
-  pub any_of: Option<Vec<SchemaKey>>,
-  pub one_of: Option<Vec<SchemaKey>>,
+  pub all_of: Option<BTreeSet<SchemaKey>>,
+  pub any_of: Option<BTreeSet<SchemaKey>>,
+  pub one_of: Option<BTreeSet<SchemaKey>>,
 
   pub r#if: Option<SchemaKey>,
   pub then: Option<SchemaKey>,

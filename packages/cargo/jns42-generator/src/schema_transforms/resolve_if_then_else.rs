@@ -47,11 +47,11 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   if let Some(then) = item.then {
     let new_sub_item = SchemaNode {
-      all_of: Some(vec![r#if, then]),
+      all_of: Some([r#if, then].into()),
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    item_new.one_of.as_mut().unwrap().push(new_sub_key)
+    assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key));
   }
 
   if let Some(r#else) = item.r#else {
@@ -62,11 +62,11 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     let new_sub_sub_key = arena.add_item(new_sub_sub_item);
 
     let new_sub_item = SchemaNode {
-      all_of: Some(vec![new_sub_sub_key, r#else]),
+      all_of: Some([new_sub_sub_key, r#else].into()),
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    item_new.one_of.as_mut().unwrap().push(new_sub_key)
+    assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key))
   }
 
   arena.set_item(key, item_new);

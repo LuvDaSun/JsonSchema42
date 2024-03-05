@@ -54,12 +54,12 @@ mod tests {
 
     arena.add_item(SchemaNode {
       primary: Some(true),
-      all_of: Some(vec![1]),
+      all_of: Some([1].into()),
       ..Default::default()
     });
 
     arena.add_item(SchemaNode {
-      all_of: Some(vec![2]),
+      all_of: Some([2].into()),
       ..Default::default()
     });
 
@@ -75,12 +75,12 @@ mod tests {
     let expected = vec![
       SchemaNode {
         primary: Some(true),
-        all_of: Some(vec![1]),
+        all_of: Some([1].into()),
         ..Default::default()
       },
       SchemaNode {
         primary: Some(true),
-        all_of: Some(vec![2]),
+        all_of: Some([2].into()),
         ..Default::default()
       },
       SchemaNode {

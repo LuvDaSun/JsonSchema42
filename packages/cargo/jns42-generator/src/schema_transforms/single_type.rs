@@ -92,7 +92,7 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
       SchemaNode {
-        one_of: Some(vec![1, 2]),
+        one_of: Some([1, 2].into()),
         ..Default::default()
       },
       SchemaNode {
