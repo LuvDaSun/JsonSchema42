@@ -249,14 +249,12 @@ impl SchemaNode {
       title: None,
       description: None,
       examples: None,
-      deprecated: generate_merge_option!(deprecated, |a, b| a & b),
+      deprecated: generate_merge_option!(deprecated, |one, other| one & other),
 
-      types: merge_option(
-        self.types.as_ref().and_then(|value| value.first()),
-        other.types.as_ref().and_then(|value| value.first()),
-        Rc::new(|one, other| one.intersection(other)),
-      )
-      .map(|value| once(value).collect()),
+      types: generate_merge_option!(types, |one, other| vec![one
+        .first()
+        .unwrap()
+        .intersection(other.first().unwrap())]),
 
       reference: None, // TODO
 
@@ -297,7 +295,7 @@ impl SchemaNode {
 
       minimum_items: generate_merge_option!(minimum_items, |one, other| *one.min(other)),
       maximum_items: generate_merge_option!(maximum_items, |one, other| *one.max(other)),
-      unique_items: generate_merge_option!(unique_items, |a, b| a & b),
+      unique_items: generate_merge_option!(unique_items, |one, other| one | other),
 
       minimum_properties: generate_merge_option!(minimum_properties, |one, other| *one.min(other)),
       maximum_properties: generate_merge_option!(maximum_properties, |one, other| *one.max(other)),
