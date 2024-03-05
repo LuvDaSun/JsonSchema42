@@ -205,10 +205,10 @@ impl SchemaNode {
         merge_option(
           self.$member.as_ref(),
           other.$member.as_ref(),
-          Rc::new(move |one, other| {
-            let length = one.len().max(other.len());
+          Rc::new(move |base, other| {
+            let length = base.len().max(other.len());
             (0..length)
-              .map(|index| merge_option(one.get(index), other.get(index), merge_key.clone()))
+              .map(|index| merge_option(base.get(index), other.get(index), merge_key.clone()))
               .map(|key| key.unwrap())
               .collect()
           }),
@@ -222,14 +222,14 @@ impl SchemaNode {
         merge_option(
           self.$member.as_ref(),
           other.$member.as_ref(),
-          Rc::new(move |one, other| {
-            let properties: HashSet<_> = empty().chain(one.keys()).chain(other.keys()).collect();
+          Rc::new(move |base, other| {
+            let properties: HashSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
             properties
               .into_iter()
               .map(|property| {
                 (
                   property,
-                  merge_option(one.get(property), other.get(property), merge_key.clone()),
+                  merge_option(base.get(property), other.get(property), merge_key.clone()),
                 )
               })
               .map(|(property, key)| (property.clone(), key.unwrap()))
@@ -248,9 +248,9 @@ impl SchemaNode {
       title: None,
       description: None,
       examples: None,
-      deprecated: generate_merge_option!(deprecated, |one, other| one & other),
+      deprecated: generate_merge_option!(deprecated, |base, other| base & other),
 
-      types: generate_merge_option!(types, |one, other| vec![one
+      types: generate_merge_option!(types, |base, other| vec![base
         .first()
         .unwrap()
         .intersection(other.first().unwrap())]),
@@ -281,23 +281,25 @@ impl SchemaNode {
       options: None,  // TODO
       required: None, // TODO
 
-      minimum_inclusive: generate_merge_option!(minimum_inclusive, |one, other| one.min(*other)),
-      minimum_exclusive: generate_merge_option!(minimum_exclusive, |one, other| one.min(*other)),
-      maximum_inclusive: generate_merge_option!(maximum_inclusive, |one, other| one.max(*other)),
-      maximum_exclusive: generate_merge_option!(maximum_exclusive, |one, other| one.max(*other)),
+      minimum_inclusive: generate_merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: generate_merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: generate_merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: generate_merge_option!(maximum_exclusive, |base, other| base.max(*other)),
       multiple_of: None, // TODO
 
-      minimum_length: generate_merge_option!(minimum_length, |one, other| *one.min(other)),
-      maximum_length: generate_merge_option!(maximum_length, |one, other| *one.max(other)),
+      minimum_length: generate_merge_option!(minimum_length, |base, other| *base.min(other)),
+      maximum_length: generate_merge_option!(maximum_length, |base, other| *base.max(other)),
       value_pattern: None, // TODO
       value_format: None,  // TODO
 
-      minimum_items: generate_merge_option!(minimum_items, |one, other| *one.min(other)),
-      maximum_items: generate_merge_option!(maximum_items, |one, other| *one.max(other)),
-      unique_items: generate_merge_option!(unique_items, |one, other| one | other),
+      minimum_items: generate_merge_option!(minimum_items, |base, other| *base.min(other)),
+      maximum_items: generate_merge_option!(maximum_items, |base, other| *base.max(other)),
+      unique_items: generate_merge_option!(unique_items, |base, other| base | other),
 
-      minimum_properties: generate_merge_option!(minimum_properties, |one, other| *one.min(other)),
-      maximum_properties: generate_merge_option!(maximum_properties, |one, other| *one.max(other)),
+      minimum_properties: generate_merge_option!(minimum_properties, |base, other| *base
+        .min(other)),
+      maximum_properties: generate_merge_option!(maximum_properties, |base, other| *base
+        .max(other)),
     }
   }
 
