@@ -6,21 +6,22 @@
 export class JsonPointer {
   private constructor(
     private readonly base: string,
-    private readonly pointer = new Array<string>(),
+    private readonly pointer: string[],
+    private readonly alwaysIncludeHash: boolean,
   ) {
     //
   }
 
-  public static parse(input: string) {
+  public static parse(input: string, alwaysIncludeHash = true) {
     const hashIndex = input.indexOf("#");
     if (hashIndex < 0) {
-      return new JsonPointer(input);
+      return new JsonPointer(input, [], alwaysIncludeHash);
     }
 
     const base = input.substring(0, hashIndex);
     const hash = input.substring(hashIndex + 1);
     if (hash.length === 0) {
-      return new JsonPointer(base);
+      return new JsonPointer(base, [], alwaysIncludeHash);
     }
 
     const pointer = hash
@@ -33,21 +34,21 @@ export class JsonPointer {
       throw new TypeError("invalid json pointer");
     }
 
-    return new JsonPointer(base, pointer);
+    return new JsonPointer(base, pointer, alwaysIncludeHash);
   }
 
   public push(...parts: string[]) {
-    return new JsonPointer(this.base, [...this.pointer, ...parts]);
+    return new JsonPointer(this.base, [...this.pointer, ...parts], this.alwaysIncludeHash);
   }
 
-  public toString(alwaysIncludeHash = true) {
+  public toString() {
     let hash = this.pointer
       .map((part) => JsonPointer.escape(part))
       .map((part) => encodeURI(part))
       .map((part) => "/" + part)
       .join("");
 
-    if (alwaysIncludeHash) {
+    if (this.alwaysIncludeHash) {
       return this.base + "#" + hash;
     }
 
@@ -56,6 +57,10 @@ export class JsonPointer {
     }
 
     return this.base;
+  }
+
+  public valueOf() {
+    return this.toString();
   }
 
   public getBase() {
