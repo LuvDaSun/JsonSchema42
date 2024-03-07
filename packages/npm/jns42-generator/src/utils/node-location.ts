@@ -1,15 +1,21 @@
+import path from "path";
+
 /**
  * Location of a node. The location can be either a path or a url
  *
  * @see https://www.rfc-editor.org/rfc/rfc6901
  */
 export class NodeLocation {
+  public readonly base: string;
+
   private constructor(
     public readonly origin: string,
-    public readonly base: string,
+    base: string,
     public readonly pointer: string[],
     public readonly anchor: string,
-  ) {}
+  ) {
+    this.base = path.normalize(base);
+  }
 
   public static parse(input: string) {
     // replace all "\" with "/"
@@ -44,12 +50,20 @@ export class NodeLocation {
     }
   }
 
-  public push(...parts: string[]) {
+  public pushPointer(...parts: string[]) {
     if (this.anchor.length > 0) {
       throw new TypeError("cannot push to a location with an anchor");
     }
 
     return new NodeLocation(this.origin, this.base, [...this.pointer, ...parts], "");
+  }
+
+  public setAnchor(anchor: string) {
+    if (this.pointer.length > 0) {
+      throw new TypeError("cannot push to a location with a pointer");
+    }
+
+    return new NodeLocation(this.origin, this.base, [], anchor);
   }
 
   public join(other: NodeLocation) {

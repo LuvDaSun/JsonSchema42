@@ -53,7 +53,7 @@ export class Document extends SchemaDocumentBase<N> {
     yield* super.getNodeUrls();
 
     for (const [anchorId] of this.anchorMap) {
-      yield NodeLocation.parse(anchorId);
+      yield this.documentNodeLocation.toRoot().setAnchor(anchorId);
     }
 
     /*
@@ -89,7 +89,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region reference
 
   private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
-    const resolvedNodeUrl = this.documentNodeUrl.join(NodeLocation.parse(nodeRef));
+    const resolvedNodeUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {

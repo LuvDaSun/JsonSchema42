@@ -4,9 +4,9 @@ import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
 export interface DocumentInitializer<N = unknown> {
-  retrievalUrl: NodeLocation;
-  givenUrl: NodeLocation;
-  antecedentUrl: NodeLocation | null;
+  retrievalLocation: NodeLocation;
+  givenLocation: NodeLocation;
+  antecedentLocation: NodeLocation | null;
   documentNode: N;
 }
 
@@ -59,8 +59,8 @@ export class DocumentContext {
     }
   }
 
-  public getDocument(documentUrl: NodeLocation) {
-    const documentId = documentUrl.toString();
+  public getDocument(documentLocation: NodeLocation) {
+    const documentId = documentLocation.toString();
     const document = this.documents.get(documentId);
     if (document == null) {
       throw new TypeError(`document not found ${documentId}`);
@@ -68,50 +68,51 @@ export class DocumentContext {
     return document;
   }
 
-  public getDocumentForNode(nodeUrl: NodeLocation) {
-    const nodeId = nodeUrl.toString();
-    const documentUrl = this.nodeDocuments.get(nodeId);
-    if (documentUrl == null) {
+  public getDocumentForNode(nodeLocation: NodeLocation) {
+    const nodeId = nodeLocation.toString();
+    const documentLocation = this.nodeDocuments.get(nodeId);
+    if (documentLocation == null) {
       throw new TypeError(`document not found for node ${nodeId}`);
     }
-    return this.getDocument(documentUrl);
+    return this.getDocument(documentLocation);
   }
 
   public async loadFromUrl(
-    retrievalUrl: NodeLocation,
-    givenUrl: NodeLocation,
-    antecedentUrl: NodeLocation | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = retrievalUrl.toString();
+    const retrievalId = retrievalLocation.toString();
     if (!this.cache.has(retrievalId)) {
-      const documentNode = await loadYAML(retrievalId);
-      this.fillNodeCache(retrievalUrl, documentNode);
+      const rootLocation = retrievalLocation.toRoot();
+      const rootPath = rootLocation.toString(false);
+      const documentNode = await loadYAML(rootPath);
+      this.fillNodeCache(rootLocation, documentNode);
     }
 
-    await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
+    await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
   }
 
   public async loadFromDocument(
-    retrievalUrl: NodeLocation,
-    givenUrl: NodeLocation,
-    antecedentUrl: NodeLocation | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const retrievalId = retrievalUrl.toString();
+    const retrievalId = retrievalLocation.toString();
     if (!this.cache.has(retrievalId)) {
-      this.fillNodeCache(retrievalUrl, documentNode);
+      this.fillNodeCache(retrievalLocation, documentNode);
     }
 
-    await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
+    await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
   }
 
-  private fillNodeCache(retrievalUrl: NodeLocation, documentNode: unknown) {
-    const retrievalBaseUrl = retrievalUrl;
+  private fillNodeCache(retrievalLocation: NodeLocation, documentNode: unknown) {
     for (const [pointer, node] of readNode([], documentNode)) {
-      const nodeRetrievalUrl = retrievalBaseUrl.push(...pointer);
-      const nodeRetrievalId = nodeRetrievalUrl.toString();
+      const nodeRetrievalLocation = retrievalLocation.pushPointer(...pointer);
+      const nodeRetrievalId = nodeRetrievalLocation.toString();
       if (this.cache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);
       }
@@ -121,14 +122,14 @@ export class DocumentContext {
   }
 
   private async loadFromCache(
-    retrievalUrl: NodeLocation,
-    givenUrl: NodeLocation,
-    antecedentUrl: NodeLocation | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = retrievalUrl.toString();
+    const retrievalId = retrievalLocation.toString();
 
-    if (this.nodeDocuments.has(retrievalId)) {
+    if (this.resolved.has(retrievalId)) {
       return;
     }
 
@@ -149,18 +150,18 @@ export class DocumentContext {
     }
 
     const document = factory({
-      retrievalUrl,
-      givenUrl,
-      antecedentUrl,
+      retrievalLocation,
+      givenLocation,
+      antecedentLocation,
       documentNode: node,
     });
-    const documentUrl = document.documentNodeUrl;
+    const documentLocation = document.documentNodeLocation;
     if (this.resolved.has(retrievalId)) {
       throw new TypeError(`duplicate in resolved ${retrievalId}`);
     }
-    this.resolved.set(retrievalId, documentUrl);
+    this.resolved.set(retrievalId, documentLocation);
 
-    const documentId = documentUrl.toString();
+    const documentId = documentLocation.toString();
     if (this.documents.has(documentId)) {
       throw new TypeError(`duplicate document ${documentId}`);
     }
@@ -175,7 +176,7 @@ export class DocumentContext {
       }
 
       // if the node is is not yet linked to a document
-      this.nodeDocuments.set(nodeId, document.documentNodeUrl);
+      this.nodeDocuments.set(nodeId, documentLocation);
     }
 
     if (document instanceof SchemaDocumentBase) {
@@ -184,19 +185,25 @@ export class DocumentContext {
   }
 
   private async loadFromSchemaDocument(document: SchemaDocumentBase, defaultSchemaId: string) {
-    for (const { retrievalUrl, givenUrl } of document.embeddedDocuments) {
-      let node = this.cache.get(retrievalUrl.toString());
+    for (const { retrievalLocation, givenLocation } of document.embeddedDocuments) {
+      const retrievalId = retrievalLocation.toString();
+      let node = this.cache.get(retrievalId);
       await this.loadFromDocument(
-        retrievalUrl,
-        givenUrl,
-        document.documentNodeUrl,
+        retrievalLocation,
+        givenLocation,
+        document.documentNodeLocation,
         node,
         defaultSchemaId,
       );
     }
 
-    for (const { retrievalUrl, givenUrl } of document.referencedDocuments) {
-      await this.loadFromUrl(retrievalUrl, givenUrl, document.documentNodeUrl, defaultSchemaId);
+    for (const { retrievalLocation, givenLocation } of document.referencedDocuments) {
+      await this.loadFromUrl(
+        retrievalLocation,
+        givenLocation,
+        document.documentNodeLocation,
+        defaultSchemaId,
+      );
     }
   }
 }

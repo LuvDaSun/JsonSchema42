@@ -9,7 +9,7 @@ import { DocumentBase } from "../document-base.js";
 
 export class Document extends DocumentBase<SchemaDocument> {
   constructor(
-    public readonly documentNodeUrl: NodeLocation,
+    public readonly documentNodeLocation: NodeLocation,
     documentNode: unknown,
   ) {
     super(documentNode);

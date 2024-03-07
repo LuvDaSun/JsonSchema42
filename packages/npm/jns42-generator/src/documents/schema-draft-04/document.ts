@@ -22,7 +22,7 @@ export class Document extends SchemaDocumentBase<N> {
       const nodeUrl = NodeLocation.parse(nodeId);
       const nodeAliasId = this.selectNodeId(node);
       if (nodeAliasId != null) {
-        const aliasUrl = this.documentNodeUrl.join(NodeLocation.parse(nodeAliasId));
+        const aliasUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeAliasId));
         const aliasId = aliasUrl.toString();
         if (this.aliasMap.has(aliasId)) {
           throw new TypeError(`duplicate node alias ${aliasId}`);
@@ -71,11 +71,11 @@ export class Document extends SchemaDocumentBase<N> {
 
   private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
     const refUrl = NodeLocation.parse(nodeRef);
-    const resolvedNodeUrl = this.documentNodeUrl.join(refUrl);
+    const resolvedNodeUrl = this.documentNodeLocation.join(refUrl);
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
-      const resolvedNodeUrl = resolvedDocument.documentNodeUrl.join(refUrl);
+      const resolvedNodeUrl = resolvedDocument.documentNodeLocation.join(refUrl);
       const resolvedNodeId = resolvedNodeUrl.toString();
       const resolvedAliasUrl = resolvedDocument.aliasMap.get(resolvedNodeId);
       if (resolvedAliasUrl != null) {

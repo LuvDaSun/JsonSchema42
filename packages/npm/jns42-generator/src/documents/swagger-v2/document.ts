@@ -36,7 +36,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region reference
 
   private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
-    const resolvedNodeUrl = this.documentNodeUrl.join(NodeLocation.parse(nodeRef));
+    const resolvedNodeUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
 
     return resolvedNodeUrl;
   }

@@ -95,29 +95,41 @@ async function main(configuration: MainConfiguration) {
   const context = new DocumentContext();
   context.registerFactory(
     schemaDraft202012.metaSchemaId,
-    ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+    ({
+      retrievalLocation: retrievalUrl,
+      givenLocation: givenUrl,
+      antecedentLocation: antecedentUrl,
+      documentNode: rootNode,
+    }) => new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaDraft04.metaSchemaId,
-    ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+    ({
+      retrievalLocation: retrievalUrl,
+      givenLocation: givenUrl,
+      antecedentLocation: antecedentUrl,
+      documentNode: rootNode,
+    }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaOasV31.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
+      new schemaIntermediate.Document(givenUrl, rootNode),
   );
   context.registerFactory(
     oasV30.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
+      new schemaIntermediate.Document(givenUrl, rootNode),
   );
   context.registerFactory(
     swaggerV2.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
+      new schemaIntermediate.Document(givenUrl, rootNode),
   );
   context.registerFactory(
     schemaIntermediate.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
+      new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
   await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
