@@ -128,6 +128,10 @@ export class DocumentContext {
   ) {
     const retrievalId = retrievalUrl.toString();
 
+    if (this.nodeDocuments.has(retrievalId)) {
+      return;
+    }
+
     if (this.loaded.has(retrievalId)) {
       return;
     }

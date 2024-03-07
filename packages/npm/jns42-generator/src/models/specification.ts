@@ -2,6 +2,7 @@ import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as schemaTransforms from "../schema-transforms/index.js";
 import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";
+import { NodeLocation } from "../utils/node-location.js";
 
 export interface Specification {
   typesArena: SchemaArena;
@@ -89,8 +90,14 @@ export function loadSpecification(
 
   const namer = new Namer(defaultTypeName, nameMaximumIterations);
   for (const nodeId in document.schemas) {
-    const nodeUrl = new URL(nodeId);
-    const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
+    const nodeLocation = NodeLocation.parse(nodeId);
+    const path = [
+      ...nodeLocation.base.split("/").map((part) => decodeURI(part)),
+      ...nodeLocation.anchor,
+      ...nodeLocation.pointer,
+    ]
+      .filter((part) => part.length > 0)
+      .join("/");
     namer.registerPath(nodeId, path);
   }
   const names = namer.getNames();
