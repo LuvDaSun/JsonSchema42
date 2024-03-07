@@ -7,7 +7,7 @@ import { SchemaDocumentBase } from "../schema-document-base.js";
 type N = spec.SchemaDocument | boolean;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly nodeNameMap = new Map<string, JsonLocation>();
+  private readonly aliasMap = new Map<string, JsonLocation>();
 
   constructor(
     givenUrl: JsonLocation,
@@ -19,13 +19,14 @@ export class Document extends SchemaDocumentBase<N> {
 
     for (const [nodeId, node] of this.nodes) {
       const nodeUrl = JsonLocation.parse(nodeId);
-      const nodeAlternativeId = this.selectNodeId(node);
-      if (nodeAlternativeId != null && nodeAlternativeId.startsWith("#")) {
-        const nodeName = nodeAlternativeId.substring(1);
-        if (this.nodeNameMap.has(nodeName)) {
-          throw new TypeError(`duplicate node name ${nodeName}`);
+      const nodeAliasId = this.selectNodeId(node);
+      if (nodeAliasId != null) {
+        const aliasUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeAliasId));
+        const aliasId = aliasUrl.toString();
+        if (this.aliasMap.has(aliasId)) {
+          throw new TypeError(`duplicate node alias ${aliasId}`);
         }
-        this.nodeNameMap.set(nodeName, nodeUrl);
+        this.aliasMap.set(aliasId, nodeUrl);
       }
     }
   }
@@ -42,8 +43,8 @@ export class Document extends SchemaDocumentBase<N> {
   public *getNodeUrls(): Iterable<JsonLocation> {
     yield* super.getNodeUrls();
 
-    for (const [nodeName] of this.nodeNameMap) {
-      yield this.pointerToNodeUrl(nodeName);
+    for (const [nodeName] of this.aliasMap) {
+      yield JsonLocation.parse(nodeName);
     }
   }
 
@@ -57,18 +58,6 @@ export class Document extends SchemaDocumentBase<N> {
       return false;
     }
     return true;
-  }
-  public pointerToNodeHash(nodePointer: string): string {
-    return `#${nodePointer}`;
-  }
-  public nodeHashToPointer(nodeHash: string): string {
-    if (nodeHash === "") {
-      return "";
-    }
-    if (!nodeHash.startsWith("#")) {
-      throw new TypeError("hash should start with #");
-    }
-    return nodeHash.substring(1);
   }
 
   //#endregion
@@ -92,15 +81,16 @@ export class Document extends SchemaDocumentBase<N> {
   //#region reference
 
   private resolveReferenceNodeUrl(nodeRef: string): JsonLocation {
-    const resolvedNodeUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeRef));
+    const refUrl = JsonLocation.parse(nodeRef);
+    const resolvedNodeUrl = this.documentNodeUrl.join(refUrl);
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
-      const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
-      const anchorResolvedPointer = resolvedDocument.nodeNameMap.get(resolvedPointer);
-      if (anchorResolvedPointer != null) {
-        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
-        return anchorResolvedUrl;
+      const resolvedNodeUrl = resolvedDocument.documentNodeUrl.join(refUrl);
+      const resolvedNodeId = resolvedNodeUrl.toString();
+      const resolvedAliasUrl = resolvedDocument.aliasMap.get(resolvedNodeId);
+      if (resolvedAliasUrl != null) {
+        return resolvedAliasUrl;
       }
     }
 
@@ -178,7 +168,7 @@ export class Document extends SchemaDocumentBase<N> {
   protected *selectNodeDependentSchemasPointerEntries(
     nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, string]> {
+  ): Iterable<readonly [string, string[]]> {
     yield* [];
   }
 

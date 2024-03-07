@@ -49,8 +49,8 @@ export class Document extends SchemaDocumentBase<N> {
   public *getNodeUrls(): Iterable<JsonLocation> {
     yield* super.getNodeUrls();
 
-    for (const [anchor] of this.anchorMap) {
-      yield this.pointerToNodeUrl(anchor);
+    for (const [anchorId] of this.anchorMap) {
+      yield JsonLocation.parse(anchorId);
     }
 
     /*
@@ -68,19 +68,6 @@ export class Document extends SchemaDocumentBase<N> {
       return false;
     }
     return true;
-  }
-
-  public pointerToNodeHash(nodePointer: string): string {
-    return nodePointer === "" ? "" : `#${nodePointer}`;
-  }
-  public nodeHashToPointer(nodeHash: string): string {
-    if (nodeHash === "") {
-      return "";
-    }
-    if (!nodeHash.startsWith("#")) {
-      throw new TypeError("hash should start with #");
-    }
-    return nodeHash.substring(1);
   }
 
   //#endregion

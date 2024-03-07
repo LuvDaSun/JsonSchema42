@@ -22,18 +22,6 @@ export class Document extends SchemaDocumentBase<N> {
   protected isNodeEmbeddedSchema(node: N): boolean {
     return false;
   }
-  public pointerToNodeHash(nodePointer: string): string {
-    return `#${nodePointer}`;
-  }
-  public nodeHashToPointer(nodeHash: string): string {
-    if (nodeHash === "") {
-      return "";
-    }
-    if (!nodeHash.startsWith("#")) {
-      throw new TypeError("hash should start with #");
-    }
-    return nodeHash.substring(1);
-  }
 
   //#endregion
 

@@ -29,11 +29,4 @@ export class Document extends DocumentBase<SchemaDocument> {
   public getNodeUrls(): Iterable<JsonLocation> {
     return Object.keys(this.documentNode.schemas).map((value) => JsonLocation.parse(value));
   }
-
-  public pointerToNodeHash(nodePointer: string): string {
-    throw new Error("Method not implemented.");
-  }
-  public nodeHashToPointer(nodeHash: string): string {
-    throw new Error("Method not implemented.");
-  }
 }

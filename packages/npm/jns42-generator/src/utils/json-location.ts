@@ -8,7 +8,7 @@ export class JsonLocation {
     private readonly origin: string,
     private readonly base: string,
     private readonly pointer: string[],
-    private readonly name: string,
+    private readonly anchor: string,
     private readonly alwaysIncludeHash: boolean,
   ) {}
 
@@ -40,14 +40,14 @@ export class JsonLocation {
         .map((part) => JsonLocation.unescape(part));
       return new JsonLocation(origin, base, pointer, "", alwaysIncludeHash);
     } else {
-      const name = decodeURI(hash);
-      return new JsonLocation(origin, base, [], name, alwaysIncludeHash);
+      const anchor = decodeURI(hash);
+      return new JsonLocation(origin, base, [], anchor, alwaysIncludeHash);
     }
   }
 
   public push(...parts: string[]) {
-    if (this.name.length > 0) {
-      throw new TypeError("cannot push to a location with a name");
+    if (this.anchor.length > 0) {
+      throw new TypeError("cannot push to a location with an anchor");
     }
 
     return new JsonLocation(
@@ -72,7 +72,7 @@ export class JsonLocation {
           this.origin,
           other.base,
           other.pointer,
-          other.name,
+          other.anchor,
           this.alwaysIncludeHash,
         );
       }
@@ -84,7 +84,7 @@ export class JsonLocation {
             this.origin,
             this.base + other.base,
             other.pointer,
-            other.name,
+            other.anchor,
             this.alwaysIncludeHash,
           );
         }
@@ -93,7 +93,7 @@ export class JsonLocation {
           this.origin,
           this.base.substring(0, searchIndex) + other.base,
           other.pointer,
-          other.name,
+          other.anchor,
           this.alwaysIncludeHash,
         );
       }
@@ -104,7 +104,7 @@ export class JsonLocation {
           this.origin,
           other.base,
           other.pointer,
-          other.name,
+          other.anchor,
           this.alwaysIncludeHash,
         );
       }
@@ -113,7 +113,7 @@ export class JsonLocation {
         this.origin,
         this.base.substring(0, lastSeparatorIndex + 1) + other.base,
         other.pointer,
-        other.name,
+        other.anchor,
         this.alwaysIncludeHash,
       );
     }
@@ -122,7 +122,7 @@ export class JsonLocation {
       this.origin,
       this.base,
       other.pointer,
-      other.name,
+      other.anchor,
       this.alwaysIncludeHash,
     );
   }
@@ -141,7 +141,7 @@ export class JsonLocation {
           .map((part) => encodeURI(part))
           .join("/");
     } else {
-      hash = encodeURI(this.name);
+      hash = encodeURI(this.anchor);
     }
 
     if (this.alwaysIncludeHash) {
