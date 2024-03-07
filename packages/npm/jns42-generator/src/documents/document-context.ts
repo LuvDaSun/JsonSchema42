@@ -1,12 +1,12 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { discoverSchemaId, loadYAML, normalizeUrl, readNode } from "../utils/index.js";
+import { JsonLocation, discoverSchemaId, loadYAML, readNode } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
 export interface DocumentInitializer<N = unknown> {
-  retrievalUrl: URL;
-  givenUrl: URL;
-  antecedentUrl: URL | null;
+  retrievalUrl: JsonLocation;
+  givenUrl: JsonLocation;
+  antecedentUrl: JsonLocation | null;
   documentNode: N;
 }
 
@@ -24,7 +24,7 @@ export class DocumentContext {
   /**
    * maps node urls to their documents
    */
-  private nodeDocuments = new Map<string, URL>();
+  private nodeDocuments = new Map<string, JsonLocation>();
   /**
    * all loaded nodes
    */
@@ -55,8 +55,8 @@ export class DocumentContext {
     }
   }
 
-  public getDocument(documentUrl: URL) {
-    const documentId = normalizeUrl(documentUrl).toString();
+  public getDocument(documentUrl: JsonLocation) {
+    const documentId = documentUrl.toString();
     const document = this.documents.get(documentId);
     if (document == null) {
       throw new TypeError(`document not found ${documentId}`);
@@ -64,8 +64,8 @@ export class DocumentContext {
     return document;
   }
 
-  public getDocumentForNode(nodeUrl: URL) {
-    const nodeId = normalizeUrl(nodeUrl).toString();
+  public getDocumentForNode(nodeUrl: JsonLocation) {
+    const nodeId = nodeUrl.toString();
     const documentUrl = this.nodeDocuments.get(nodeId);
     if (documentUrl == null) {
       throw new TypeError(`document not found for node ${nodeId}`);
@@ -74,12 +74,12 @@ export class DocumentContext {
   }
 
   public async loadFromUrl(
-    retrievalUrl: URL,
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalUrl: JsonLocation,
+    givenUrl: JsonLocation,
+    antecedentUrl: JsonLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = normalizeUrl(retrievalUrl).toString();
+    const retrievalId = retrievalUrl.toString();
     if (!this.nodeCache.has(retrievalId)) {
       const documentNode = await loadYAML(retrievalUrl.toString());
       this.fillNodeCache(retrievalUrl, documentNode);
@@ -89,13 +89,13 @@ export class DocumentContext {
   }
 
   public async loadFromDocument(
-    retrievalUrl: URL,
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalUrl: JsonLocation,
+    givenUrl: JsonLocation,
+    antecedentUrl: JsonLocation | null,
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const retrievalId = normalizeUrl(retrievalUrl).toString();
+    const retrievalId = retrievalUrl.toString();
     if (!this.nodeCache.has(retrievalId)) {
       this.fillNodeCache(retrievalUrl, documentNode);
     }
@@ -103,11 +103,11 @@ export class DocumentContext {
     await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
   }
 
-  private fillNodeCache(retrievalUrl: URL, documentNode: unknown) {
-    const retrievalBaseUrl = new URL("", retrievalUrl);
-    for (const [pointer, node] of readNode("", documentNode)) {
-      const nodeRetrievalUrl = new URL(`#${pointer}`, retrievalBaseUrl);
-      const nodeRetrievalId = normalizeUrl(nodeRetrievalUrl).toString();
+  private fillNodeCache(retrievalUrl: JsonLocation, documentNode: unknown) {
+    const retrievalBaseUrl = retrievalUrl.toRoot();
+    for (const [pointer, node] of readNode([], documentNode)) {
+      const nodeRetrievalUrl = retrievalBaseUrl.push(...pointer);
+      const nodeRetrievalId = nodeRetrievalUrl.toString();
       if (this.nodeCache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);
       }
@@ -117,12 +117,12 @@ export class DocumentContext {
   }
 
   private async loadFromCache(
-    retrievalUrl: URL,
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalUrl: JsonLocation,
+    givenUrl: JsonLocation,
+    antecedentUrl: JsonLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = normalizeUrl(retrievalUrl).toString();
+    const retrievalId = retrievalUrl.toString();
 
     if (this.loaded.has(retrievalId)) {
       return;
@@ -146,7 +146,7 @@ export class DocumentContext {
       antecedentUrl,
       documentNode: node,
     });
-    const documentId = normalizeUrl(document.documentNodeUrl).toString();
+    const documentId = document.documentNodeUrl.toString();
     if (this.documents.has(documentId)) {
       throw new TypeError(`duplicate document ${documentId}`);
     }
@@ -154,7 +154,7 @@ export class DocumentContext {
 
     // Map all node urls to the document they belong to.
     for (const nodeUrl of document.getNodeUrls()) {
-      const nodeId = normalizeUrl(nodeUrl).toString();
+      const nodeId = nodeUrl.toString();
       // Figure out if the node already belongs to a document. This might be the case when
       // dealing with embedded documents
       const documentNodeUrlPrevious = this.nodeDocuments.get(nodeId);
@@ -185,7 +185,7 @@ export class DocumentContext {
   }
 
   private async loadFromSchemaDocument(
-    retrievalUrl: URL,
+    retrievalUrl: JsonLocation,
     document: SchemaDocumentBase,
     defaultSchemaId: string,
   ) {

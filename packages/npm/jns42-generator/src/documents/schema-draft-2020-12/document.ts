@@ -1,5 +1,6 @@
 import * as spec from "@jns42/schema-draft-2020-12";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import { JsonLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
@@ -10,8 +11,8 @@ export class Document extends SchemaDocumentBase<N> {
   private readonly dynamicAnchorMap = new Map<string, string>();
 
   constructor(
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    givenUrl: JsonLocation,
+    antecedentUrl: JsonLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
@@ -45,7 +46,7 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<URL> {
+  public *getNodeUrls(): Iterable<JsonLocation> {
     yield* super.getNodeUrls();
 
     for (const [anchor] of this.anchorMap) {
@@ -87,7 +88,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region intermediate applicators
 
   protected getIntermediateReference(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
   ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
@@ -109,8 +110,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): URL {
-    const resolvedNodeUrl = new URL(nodeRef, this.documentNodeUrl);
+  private resolveReferenceNodeUrl(nodeRef: string): JsonLocation {
+    const resolvedNodeUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeRef));
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
@@ -124,7 +125,7 @@ export class Document extends SchemaDocumentBase<N> {
 
     return resolvedNodeUrl;
   }
-  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): URL {
+  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): JsonLocation {
     const documents = [this, ...this.getAntecedentDocuments()];
     documents.reverse();
 
@@ -227,28 +228,28 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region pointers selectors
 
-  protected *selectNodePropertiesPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodePropertiesPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.properties != null) {
       for (const key of Object.keys(node.properties)) {
-        const subNodePointer = [nodePointer, "properties", key].join("/");
+        const subNodePointer = [...nodePointer, "properties", key];
         yield [key, subNodePointer] as const;
       }
     }
   }
 
-  protected *selectNodeDependentSchemasPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodeDependentSchemasPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.dependentSchemas != null) {
       for (const key of Object.keys(node.dependentSchemas)) {
-        const subNodePointer = [nodePointer, "dependentSchemas", key].join("/");
+        const subNodePointer = [...nodePointer, "dependentSchemas", key];
         yield [key, subNodePointer] as const;
       }
     }
   }
 
-  protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodePatternPropertyPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const key of Object.keys(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        const subNodePointer = [...nodePointer, "patternProperties", key];
         yield [key, subNodePointer] as const;
       }
     }
@@ -258,129 +259,129 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region schema selectors
 
-  protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeDefinitionsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.$defs != null) {
       for (const [key, subNode] of Object.entries(node.$defs)) {
-        const subNodePointer = [nodePointer, "$defs", key].join("/");
+        const subNodePointer = [...nodePointer, "$defs", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeObjectPropertyEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeObjectPropertyEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.properties != null) {
       for (const [key, subNode] of Object.entries(node.properties)) {
-        const subNodePointer = [nodePointer, "properties", key].join("/");
+        const subNodePointer = [...nodePointer, "properties", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeMapPropertiesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeMapPropertiesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.additionalProperties != null) {
       const subNode = node.additionalProperties;
-      const subNodePointer = [nodePointer, "additionalProperties"].join("/");
+      const subNodePointer = [...nodePointer, "additionalProperties"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodePatternPropertiesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        const subNodePointer = [...nodePointer, "patternProperties", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodePropertyNamesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodePropertyNamesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.propertyNames != null) {
       const subNode = node.propertyNames;
-      const subNodePointer = [nodePointer, "propertyNames"].join("/");
+      const subNodePointer = [...nodePointer, "propertyNames"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeTupleItemsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeTupleItemsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.prefixItems != null) {
       for (const [key, subNode] of Object.entries(node.prefixItems)) {
-        const subNodePointer = [nodePointer, "prefixItems", key].join("/");
+        const subNodePointer = [...nodePointer, "prefixItems", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeArrayItemsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeArrayItemsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.items != null) {
       const subNode = node.items;
-      const subNodePointer = [nodePointer, "items"].join("/");
+      const subNodePointer = [...nodePointer, "items"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeContainsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeContainsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.contains != null) {
       const subNode = node.contains;
-      const subNodePointer = [nodePointer, "contains"].join("/");
+      const subNodePointer = [...nodePointer, "contains"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeAllOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.allOf != null) {
       for (const [key, subNode] of Object.entries(node.allOf)) {
-        const subNodePointer = [nodePointer, "allOf", key].join("/");
+        const subNodePointer = [...nodePointer, "allOf", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeAnyOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.anyOf != null) {
       for (const [key, subNode] of Object.entries(node.anyOf)) {
-        const subNodePointer = [nodePointer, "anyOf", key].join("/");
+        const subNodePointer = [...nodePointer, "anyOf", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeOneOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeOneOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.oneOf != null) {
       for (const [key, subNode] of Object.entries(node.oneOf)) {
-        const subNodePointer = [nodePointer, "oneOf", key].join("/");
+        const subNodePointer = [...nodePointer, "oneOf", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeNotEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.not != null) {
       const subNode = node.not;
-      const subNodePointer = [nodePointer, "not"].join("/");
+      const subNodePointer = [...nodePointer, "not"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeIfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeIfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.if != null) {
       const subNode = node.if;
-      const subNodePointer = [nodePointer, "if"].join("/");
+      const subNodePointer = [...nodePointer, "if"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeThenEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeThenEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.then != null) {
       const subNode = node.then;
-      const subNodePointer = [nodePointer, "then"].join("/");
+      const subNodePointer = [...nodePointer, "then"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeElseEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeElseEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.else != null) {
       const subNode = node.else;
-      const subNodePointer = [nodePointer, "else"].join("/");
+      const subNodePointer = [...nodePointer, "else"];
       yield [subNodePointer, subNode] as const;
     }
   }

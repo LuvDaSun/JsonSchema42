@@ -100,6 +100,10 @@ export class JsonLocation {
     return new JsonLocation(this.origin, this.base, other.pointer, this.alwaysIncludeHash);
   }
 
+  public toRoot() {
+    return new JsonLocation(this.origin, this.base, [], this.alwaysIncludeHash);
+  }
+
   public toString() {
     let hash = this.pointer
       .map((part) => JsonLocation.escape(part))

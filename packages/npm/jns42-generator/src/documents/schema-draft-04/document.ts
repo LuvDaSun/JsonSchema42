@@ -1,5 +1,6 @@
 import * as spec from "@jns42/schema-draft-04";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import { JsonLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
@@ -9,8 +10,8 @@ export class Document extends SchemaDocumentBase<N> {
   private readonly nodeNameMap = new Map<string, string>();
 
   constructor(
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    givenUrl: JsonLocation,
+    antecedentUrl: JsonLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
@@ -37,7 +38,7 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<URL> {
+  public *getNodeUrls(): Iterable<JsonLocation> {
     yield* super.getNodeUrls();
 
     for (const [nodeName] of this.nodeNameMap) {
@@ -74,7 +75,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region intermediate applicators
 
   protected getIntermediateReference(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
   ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
@@ -89,8 +90,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): URL {
-    const resolvedNodeUrl = new URL(nodeRef, this.documentNodeUrl);
+  private resolveReferenceNodeUrl(nodeRef: string): JsonLocation {
+    const resolvedNodeUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeRef));
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
@@ -164,26 +165,26 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region pointers selectors
 
-  protected *selectNodePropertiesPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodePropertiesPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.properties != null) {
       for (const key of Object.keys(node.properties)) {
-        const subNodePointer = [nodePointer, "properties", key].join("/");
+        const subNodePointer = [...nodePointer, "properties", key];
         yield [key, subNodePointer] as const;
       }
     }
   }
 
   protected *selectNodeDependentSchemasPointerEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
   ): Iterable<readonly [string, string]> {
     yield* [];
   }
 
-  protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodePatternPropertyPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const key of Object.keys(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        const subNodePointer = [...nodePointer, "patternProperties", key];
         yield [key, subNodePointer] as const;
       }
     }
@@ -193,128 +194,134 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region schema selectors
 
-  protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeDefinitionsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.definitions != null) {
       for (const [key, subNode] of Object.entries(node.definitions)) {
-        const subNodePointer = [nodePointer, "definitions", key].join("/");
+        const subNodePointer = [...nodePointer, "definitions", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeObjectPropertyEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeObjectPropertyEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.properties != null) {
       for (const [key, subNode] of Object.entries(node.properties)) {
-        const subNodePointer = [nodePointer, "properties", key].join("/");
+        const subNodePointer = [...nodePointer, "properties", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeMapPropertiesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeMapPropertiesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.additionalProperties != null) {
       const subNode = node.additionalProperties;
-      const subNodePointer = [nodePointer, "additionalProperties"].join("/");
+      const subNodePointer = [...nodePointer, "additionalProperties"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
   protected *selectSubNodeTupleItemsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]> {
+  ): Iterable<readonly [string[], N]> {
     if (typeof node === "object" && node.items != null && Array.isArray(node.items)) {
       for (const [key, subNode] of Object.entries(node.items)) {
-        const subNodePointer = [nodePointer, "items", key].join("/");
-        yield [subNodePointer, subNode] as [string, N];
+        const subNodePointer = [...nodePointer, "items", key];
+        yield [subNodePointer, subNode] as const;
       }
     }
   }
   protected *selectSubNodeArrayItemsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]> {
+  ): Iterable<readonly [string[], N]> {
     if (typeof node === "object" && node.items != null && !Array.isArray(node.items)) {
       const subNode = node.items;
-      const subNodePointer = [nodePointer, "items"].join("/");
+      const subNodePointer = [...nodePointer, "items"];
       yield [subNodePointer, subNode] as const;
     }
     if (typeof node === "object" && node.additionalItems != null) {
       const subNode = node.additionalItems;
-      const subNodePointer = [nodePointer, "additionalItems"].join("/");
+      const subNodePointer = [...nodePointer, "additionalItems"];
       yield [subNodePointer, subNode] as const;
     }
   }
   protected *selectSubNodeContainsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]> {
+  ): Iterable<readonly [string[], N]> {
     yield* [];
   }
 
-  protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodePatternPropertiesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        const subNodePointer = [...nodePointer, "patternProperties", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
   protected *selectSubNodePropertyNamesEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]> {
+  ): Iterable<readonly [string[], N]> {
     yield* [];
   }
 
-  protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeAnyOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.anyOf != null) {
       for (const [key, subNode] of Object.entries(node.anyOf)) {
-        const subNodePointer = [nodePointer, "anyOf", key].join("/");
-        yield [subNodePointer, subNode] as [string, N];
+        const subNodePointer = [...nodePointer, "anyOf", key];
+        yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeOneOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeOneOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.oneOf != null) {
       for (const [key, subNode] of Object.entries(node.oneOf)) {
-        const subNodePointer = [nodePointer, "oneOf", key].join("/");
-        yield [subNodePointer, subNode] as [string, N];
+        const subNodePointer = [...nodePointer, "oneOf", key];
+        yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeAllOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.allOf != null) {
       for (const [key, subNode] of Object.entries(node.allOf)) {
-        const subNodePointer = [nodePointer, "allOf", key].join("/");
-        yield [subNodePointer, subNode] as [string, N];
+        const subNodePointer = [...nodePointer, "allOf", key];
+        yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeNotEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.not != null) {
       const subNode = node.not;
-      const subNodePointer = [nodePointer, "not"].join("/");
+      const subNodePointer = [...nodePointer, "not"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected selectSubNodeIfEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+  protected selectSubNodeIfEntries(
+    nodePointer: string[],
+    node: N,
+  ): Iterable<readonly [string[], N]> {
     return [];
   }
 
-  protected selectSubNodeThenEntries(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+  protected selectSubNodeThenEntries(
+    nodePointer: string[],
+    node: N,
+  ): Iterable<readonly [string[], N]> {
     return [];
   }
 
   protected *selectSubNodeElseEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]> {
+  ): Iterable<readonly [string[], N]> {
     yield* [];
   }
 
