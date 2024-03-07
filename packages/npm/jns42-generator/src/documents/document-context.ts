@@ -165,10 +165,27 @@ export class DocumentContext {
     this.documents.set(documentId, document);
 
     // Map all node urls to the document they belong to.
-    for (const nodeUrl of document.getNodeUrls()) {
-      const nodeId = nodeUrl.toString();
+    for (const nodeLocation of document.getNodeUrls()) {
+      const nodeId = nodeLocation.toString();
+      // Figure out if the node already belongs to a document. This might be the case when
+      // dealing with embedded documents
+      const documentNodeLocationPrevious = this.nodeDocuments.get(nodeId);
 
-      if (this.nodeDocuments.has(nodeId)) {
+      if (documentNodeLocationPrevious != null) {
+        const documentNodeIdPrevious = documentNodeLocationPrevious.toString();
+        if (documentNodeIdPrevious.startsWith(documentId)) {
+          // if the previous node id starts with the document id that means that the
+          // previous document is a descendant of document. We will not change anything
+          // about that
+          continue;
+        }
+        if (documentId.startsWith(documentNodeIdPrevious)) {
+          // longest url has preference
+          this.nodeDocuments.set(nodeId, documentLocation);
+          continue;
+        }
+
+        // node is is already present and unrelated
         throw new TypeError(`duplicate node with id ${nodeId}`);
       }
 
