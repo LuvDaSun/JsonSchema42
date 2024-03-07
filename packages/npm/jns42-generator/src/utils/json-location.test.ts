@@ -4,35 +4,35 @@ import { JsonLocation } from "./json-location.js";
 
 test("json-location parse base", () => {
   {
-    const actual = JsonLocation.parse("a").getBase();
+    const actual = JsonLocation.parse("a").base;
     const expected = "a";
 
     assert.equal(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("a#").getBase();
+    const actual = JsonLocation.parse("a#").base;
     const expected = "a";
 
     assert.equal(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("a#/").getBase();
+    const actual = JsonLocation.parse("a#/").base;
     const expected = "a";
 
     assert.equal(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("a#/1/2/3").getBase();
+    const actual = JsonLocation.parse("a#/1/2/3").base;
     const expected = "a";
 
     assert.equal(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("a#/1/2/3#").getBase();
+    const actual = JsonLocation.parse("a#/1/2/3#").base;
     const expected = "a";
 
     assert.equal(actual, expected);
@@ -41,28 +41,28 @@ test("json-location parse base", () => {
 
 test("json-location parse pointer", () => {
   {
-    const actual = JsonLocation.parse("").getPointer();
+    const actual = JsonLocation.parse("").pointer;
     const expected: string[] = [];
 
     assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("#").getPointer();
+    const actual = JsonLocation.parse("#").pointer;
     const expected: string[] = [];
 
     assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("#/").getPointer();
+    const actual = JsonLocation.parse("#/").pointer;
     const expected = [""];
 
     assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = JsonLocation.parse("#/1/2/3").getPointer();
+    const actual = JsonLocation.parse("#/1/2/3").pointer;
     const expected = ["1", "2", "3"];
 
     assert.deepEqual(actual, expected);

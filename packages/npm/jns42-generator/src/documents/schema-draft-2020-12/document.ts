@@ -117,17 +117,17 @@ export class Document extends SchemaDocumentBase<N> {
     const documents = [this, ...this.getAntecedentDocuments()];
     documents.reverse();
 
+    const dynamicUrl = JsonLocation.parse(nodeDynamicRef);
+
     for (const document of documents) {
       if (!(document instanceof Document)) {
         continue;
       }
 
-      const resolvedPointer = this.nodeHashToPointer(nodeDynamicRef);
-      const dynamicAnchorResolvedPointer = document.dynamicAnchorMap.get(resolvedPointer);
+      const resolvedUrl = document.dynamicAnchorMap.get(dynamicUrl.anchor);
 
-      if (dynamicAnchorResolvedPointer != null) {
-        const dynamicAnchorResolvedUrl = document.pointerToNodeUrl(dynamicAnchorResolvedPointer);
-        return dynamicAnchorResolvedUrl;
+      if (resolvedUrl != null) {
+        return resolvedUrl;
       }
     }
 
