@@ -57,7 +57,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
     let pair: readonly [string[], N] | undefined;
     while ((pair = queue.shift()) != null) {
-      const [...nodePointer, node] = pair;
+      const [nodePointer, node] = pair;
 
       const nodeId = this.selectNodeId(node);
       if (nodeId == null || !this.isNodeEmbeddedSchema(node)) {
@@ -94,13 +94,13 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  protected *getNodePairs(): Iterable<readonly [string[], N]> {
+  protected *getNodePairs(): Iterable<readonly [string, N]> {
     const queue = new Array<readonly [string[], N]>();
     queue.push([[], this.documentNode]);
 
     let pair: readonly [string[], N] | undefined;
     while ((pair = queue.shift()) != null) {
-      const [...nodePointer, node] = pair;
+      const [nodePointer, node] = pair;
 
       yield [this.documentNodeUrl.push(...nodePointer).toString(), node];
 

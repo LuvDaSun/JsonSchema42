@@ -125,7 +125,7 @@ export class Document extends SchemaDocumentBase<N> {
   protected *selectNodeDependentSchemasPointerEntries(
     nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, string]> {
+  ): Iterable<readonly [string, string[]]> {
     yield* [];
   }
 

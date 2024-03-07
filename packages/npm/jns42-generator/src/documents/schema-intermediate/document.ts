@@ -27,7 +27,7 @@ export class Document extends DocumentBase<SchemaDocument> {
   }
 
   public getNodeUrls(): Iterable<JsonLocation> {
-    return Object.keys(this.documentNode.schemas);
+    return Object.keys(this.documentNode.schemas).map((value) => JsonLocation.parse(value));
   }
 
   public pointerToNodeHash(nodePointer: string): string {

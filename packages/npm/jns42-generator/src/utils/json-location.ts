@@ -8,6 +8,7 @@ export class JsonLocation {
     private readonly origin: string,
     private readonly base: string,
     private readonly pointer: string[],
+    private readonly name: string,
     private readonly alwaysIncludeHash: boolean,
   ) {}
 
@@ -22,33 +23,38 @@ export class JsonLocation {
     const hashIndex = input.indexOf("#", origin.length);
     if (hashIndex < 0) {
       const base = input.substring(origin.length);
-      return new JsonLocation(origin, base, [], alwaysIncludeHash);
+      return new JsonLocation(origin, base, [], "", alwaysIncludeHash);
     }
 
     const base = input.substring(origin.length, hashIndex);
     const hash = input.substring(hashIndex + 1);
     if (hash.length === 0) {
-      return new JsonLocation(origin, base, [], alwaysIncludeHash);
+      return new JsonLocation(origin, base, [], "", alwaysIncludeHash);
     }
 
-    const pointer = hash
-      .split("/")
-      .map((part) => part.trim())
-      .map((part) => decodeURI(part))
-      .map((part) => JsonLocation.unescape(part));
-
-    if (pointer.shift() !== "") {
-      throw new TypeError("invalid json pointer in hash");
+    if (hash.startsWith("/")) {
+      let pointer = hash
+        .substring(1)
+        .split("/")
+        .map((part) => decodeURI(part))
+        .map((part) => JsonLocation.unescape(part));
+      return new JsonLocation(origin, base, pointer, "", alwaysIncludeHash);
+    } else {
+      const name = decodeURI(hash);
+      return new JsonLocation(origin, base, [], name, alwaysIncludeHash);
     }
-
-    return new JsonLocation(origin, base, pointer, alwaysIncludeHash);
   }
 
   public push(...parts: string[]) {
+    if (this.name.length > 0) {
+      throw new TypeError("cannot push to a location with a name");
+    }
+
     return new JsonLocation(
       this.origin,
       this.base,
       [...this.pointer, ...parts],
+      "",
       this.alwaysIncludeHash,
     );
   }
@@ -62,7 +68,13 @@ export class JsonLocation {
     if (other.base.length > 0) {
       // other has an absolute base, replace the base
       if (other.base.startsWith("/")) {
-        return new JsonLocation(this.origin, other.base, other.pointer, this.alwaysIncludeHash);
+        return new JsonLocation(
+          this.origin,
+          other.base,
+          other.pointer,
+          other.name,
+          this.alwaysIncludeHash,
+        );
       }
 
       if (other.base.startsWith("?")) {
@@ -72,6 +84,7 @@ export class JsonLocation {
             this.origin,
             this.base + other.base,
             other.pointer,
+            other.name,
             this.alwaysIncludeHash,
           );
         }
@@ -80,36 +93,56 @@ export class JsonLocation {
           this.origin,
           this.base.substring(0, searchIndex) + other.base,
           other.pointer,
+          other.name,
           this.alwaysIncludeHash,
         );
       }
 
       const lastSeparatorIndex = this.base.lastIndexOf("/");
       if (lastSeparatorIndex < 0) {
-        return new JsonLocation(this.origin, other.base, other.pointer, this.alwaysIncludeHash);
+        return new JsonLocation(
+          this.origin,
+          other.base,
+          other.pointer,
+          other.name,
+          this.alwaysIncludeHash,
+        );
       }
 
       return new JsonLocation(
         this.origin,
         this.base.substring(0, lastSeparatorIndex + 1) + other.base,
         other.pointer,
+        other.name,
         this.alwaysIncludeHash,
       );
     }
 
-    return new JsonLocation(this.origin, this.base, other.pointer, this.alwaysIncludeHash);
+    return new JsonLocation(
+      this.origin,
+      this.base,
+      other.pointer,
+      other.name,
+      this.alwaysIncludeHash,
+    );
   }
 
   public toRoot() {
-    return new JsonLocation(this.origin, this.base, [], this.alwaysIncludeHash);
+    return new JsonLocation(this.origin, this.base, [], "", this.alwaysIncludeHash);
   }
 
   public toString() {
-    let hash = this.pointer
-      .map((part) => JsonLocation.escape(part))
-      .map((part) => encodeURI(part))
-      .map((part) => "/" + part)
-      .join("");
+    let hash;
+    if (this.pointer.length > 0) {
+      hash =
+        "/" +
+        this.pointer
+          .map((part) => JsonLocation.escape(part))
+          .map((part) => encodeURI(part))
+          .join("/");
+    } else {
+      hash = encodeURI(this.name);
+    }
 
     if (this.alwaysIncludeHash) {
       return this.origin + this.base + "#" + hash;

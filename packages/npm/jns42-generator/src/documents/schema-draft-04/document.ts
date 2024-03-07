@@ -7,7 +7,7 @@ import { SchemaDocumentBase } from "../schema-document-base.js";
 type N = spec.SchemaDocument | boolean;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly nodeNameMap = new Map<string, string>();
+  private readonly nodeNameMap = new Map<string, JsonLocation>();
 
   constructor(
     givenUrl: JsonLocation,
@@ -17,14 +17,15 @@ export class Document extends SchemaDocumentBase<N> {
   ) {
     super(givenUrl, antecedentUrl, documentNode, context);
 
-    for (const [nodePointer, node] of this.nodes) {
-      const nodeId = this.selectNodeId(node);
-      if (nodeId != null && nodeId.startsWith("#")) {
-        const nodeName = this.nodeHashToPointer(nodeId);
+    for (const [nodeId, node] of this.nodes) {
+      const nodeUrl = JsonLocation.parse(nodeId);
+      const nodeAlternativeId = this.selectNodeId(node);
+      if (nodeAlternativeId != null && nodeAlternativeId.startsWith("#")) {
+        const nodeName = nodeAlternativeId.substring(1);
         if (this.nodeNameMap.has(nodeName)) {
           throw new TypeError(`duplicate node name ${nodeName}`);
         }
-        this.nodeNameMap.set(nodeName, nodePointer);
+        this.nodeNameMap.set(nodeName, nodeUrl);
       }
     }
   }

@@ -16,6 +16,7 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
+import { JsonLocation } from "../utils/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
   return argv.command(
@@ -96,7 +97,7 @@ async function main(configuration: MainConfiguration) {
     defaultName,
   } = configuration;
 
-  const testUrl = new URL(`file://${pathToTest}`);
+  const testUrl = JsonLocation.parse(pathToTest);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
