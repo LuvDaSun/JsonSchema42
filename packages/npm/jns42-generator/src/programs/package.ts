@@ -9,7 +9,7 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
-import { JsonLocation } from "../utils/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(
@@ -81,7 +81,7 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaUrl = JsonLocation.parse(configuration.instanceSchemaUrl);
+  const instanceSchemaUrl = NodeLocation.parse(configuration.instanceSchemaUrl);
   const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
   const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const {

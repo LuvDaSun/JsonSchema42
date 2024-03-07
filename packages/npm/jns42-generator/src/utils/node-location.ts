@@ -1,9 +1,9 @@
 /**
- * Location of a json node. The location can be either a path or a url
+ * Location of a node. The location can be either a path or a url
  *
  * @see https://www.rfc-editor.org/rfc/rfc6901
  */
-export class JsonLocation {
+export class NodeLocation {
   private constructor(
     public readonly origin: string,
     public readonly base: string,
@@ -22,13 +22,13 @@ export class JsonLocation {
     const hashIndex = input.indexOf("#", origin.length);
     if (hashIndex < 0) {
       const base = input.substring(origin.length);
-      return new JsonLocation(origin, base, [], "");
+      return new NodeLocation(origin, base, [], "");
     }
 
     const base = input.substring(origin.length, hashIndex);
     const hash = input.substring(hashIndex + 1);
     if (hash.length === 0) {
-      return new JsonLocation(origin, base, [], "");
+      return new NodeLocation(origin, base, [], "");
     }
 
     if (hash.startsWith("/")) {
@@ -36,11 +36,11 @@ export class JsonLocation {
         .substring(1)
         .split("/")
         .map((part) => decodeURI(part))
-        .map((part) => JsonLocation.unescape(part));
-      return new JsonLocation(origin, base, pointer, "");
+        .map((part) => NodeLocation.unescape(part));
+      return new NodeLocation(origin, base, pointer, "");
     } else {
       const anchor = decodeURI(hash);
-      return new JsonLocation(origin, base, [], anchor);
+      return new NodeLocation(origin, base, [], anchor);
     }
   }
 
@@ -49,10 +49,10 @@ export class JsonLocation {
       throw new TypeError("cannot push to a location with an anchor");
     }
 
-    return new JsonLocation(this.origin, this.base, [...this.pointer, ...parts], "");
+    return new NodeLocation(this.origin, this.base, [...this.pointer, ...parts], "");
   }
 
-  public join(other: JsonLocation) {
+  public join(other: NodeLocation) {
     // other has an origin, return that
     if (other.origin.length > 0) {
       return other;
@@ -61,16 +61,16 @@ export class JsonLocation {
     if (other.base.length > 0) {
       // other has an absolute base, replace the base
       if (other.base.startsWith("/")) {
-        return new JsonLocation(this.origin, other.base, other.pointer, other.anchor);
+        return new NodeLocation(this.origin, other.base, other.pointer, other.anchor);
       }
 
       if (other.base.startsWith("?")) {
         const searchIndex = this.base.indexOf("?");
         if (searchIndex < 0) {
-          return new JsonLocation(this.origin, this.base + other.base, other.pointer, other.anchor);
+          return new NodeLocation(this.origin, this.base + other.base, other.pointer, other.anchor);
         }
 
-        return new JsonLocation(
+        return new NodeLocation(
           this.origin,
           this.base.substring(0, searchIndex) + other.base,
           other.pointer,
@@ -80,10 +80,10 @@ export class JsonLocation {
 
       const lastSeparatorIndex = this.base.lastIndexOf("/");
       if (lastSeparatorIndex < 0) {
-        return new JsonLocation(this.origin, other.base, other.pointer, other.anchor);
+        return new NodeLocation(this.origin, other.base, other.pointer, other.anchor);
       }
 
-      return new JsonLocation(
+      return new NodeLocation(
         this.origin,
         this.base.substring(0, lastSeparatorIndex + 1) + other.base,
         other.pointer,
@@ -91,11 +91,11 @@ export class JsonLocation {
       );
     }
 
-    return new JsonLocation(this.origin, this.base, other.pointer, other.anchor);
+    return new NodeLocation(this.origin, this.base, other.pointer, other.anchor);
   }
 
   public toRoot() {
-    return new JsonLocation(this.origin, this.base, [], "");
+    return new NodeLocation(this.origin, this.base, [], "");
   }
 
   public toString(alwaysIncludeHash = true) {
@@ -104,7 +104,7 @@ export class JsonLocation {
       hash =
         "/" +
         this.pointer
-          .map((part) => JsonLocation.escape(part))
+          .map((part) => NodeLocation.escape(part))
           .map((part) => encodeURI(part))
           .join("/");
     } else {

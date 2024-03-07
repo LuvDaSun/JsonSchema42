@@ -1,27 +1,27 @@
 import * as spec from "@jns42/schema-draft-04";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { JsonLocation } from "../../utils/index.js";
+import { NodeLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.SchemaDocument | boolean;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly aliasMap = new Map<string, JsonLocation>();
+  private readonly aliasMap = new Map<string, NodeLocation>();
 
   constructor(
-    givenUrl: JsonLocation,
-    antecedentUrl: JsonLocation | null,
+    givenUrl: NodeLocation,
+    antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
     super(givenUrl, antecedentUrl, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
-      const nodeUrl = JsonLocation.parse(nodeId);
+      const nodeUrl = NodeLocation.parse(nodeId);
       const nodeAliasId = this.selectNodeId(node);
       if (nodeAliasId != null) {
-        const aliasUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeAliasId));
+        const aliasUrl = this.documentNodeUrl.join(NodeLocation.parse(nodeAliasId));
         const aliasId = aliasUrl.toString();
         if (this.aliasMap.has(aliasId)) {
           throw new TypeError(`duplicate node alias ${aliasId}`);
@@ -40,11 +40,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<JsonLocation> {
+  public *getNodeUrls(): Iterable<NodeLocation> {
     yield* super.getNodeUrls();
 
     for (const [nodeName] of this.aliasMap) {
-      yield JsonLocation.parse(nodeName);
+      yield NodeLocation.parse(nodeName);
     }
   }
 
@@ -80,8 +80,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): JsonLocation {
-    const refUrl = JsonLocation.parse(nodeRef);
+  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
+    const refUrl = NodeLocation.parse(nodeRef);
     const resolvedNodeUrl = this.documentNodeUrl.join(refUrl);
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);

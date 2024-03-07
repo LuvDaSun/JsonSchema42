@@ -1,25 +1,25 @@
 import * as spec from "@jns42/schema-draft-2020-12";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { JsonLocation } from "../../utils/index.js";
+import { NodeLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.Schema;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly anchorMap = new Map<string, JsonLocation>();
-  private readonly dynamicAnchorMap = new Map<string, JsonLocation>();
+  private readonly anchorMap = new Map<string, NodeLocation>();
+  private readonly dynamicAnchorMap = new Map<string, NodeLocation>();
 
   constructor(
-    givenUrl: JsonLocation,
-    antecedentUrl: JsonLocation | null,
+    givenUrl: NodeLocation,
+    antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
     super(givenUrl, antecedentUrl, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
-      const nodeUrl = JsonLocation.parse(nodeId);
+      const nodeUrl = NodeLocation.parse(nodeId);
 
       const nodeAnchor = this.selectNodeAnchor(node);
       if (nodeAnchor != null) {
@@ -48,11 +48,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<JsonLocation> {
+  public *getNodeUrls(): Iterable<NodeLocation> {
     yield* super.getNodeUrls();
 
     for (const [anchorId] of this.anchorMap) {
-      yield JsonLocation.parse(anchorId);
+      yield NodeLocation.parse(anchorId);
     }
 
     /*
@@ -99,8 +99,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): JsonLocation {
-    const resolvedNodeUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeRef));
+  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
+    const resolvedNodeUrl = this.documentNodeUrl.join(NodeLocation.parse(nodeRef));
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
@@ -113,11 +113,11 @@ export class Document extends SchemaDocumentBase<N> {
 
     return resolvedNodeUrl;
   }
-  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): JsonLocation {
+  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): NodeLocation {
     const documents = [this, ...this.getAntecedentDocuments()];
     documents.reverse();
 
-    const dynamicUrl = JsonLocation.parse(nodeDynamicRef);
+    const dynamicUrl = NodeLocation.parse(nodeDynamicRef);
 
     for (const document of documents) {
       if (!(document instanceof Document)) {

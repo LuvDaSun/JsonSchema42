@@ -1,12 +1,12 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { JsonLocation, discoverSchemaId, loadYAML, readNode } from "../utils/index.js";
+import { NodeLocation, discoverSchemaId, loadYAML, readNode } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
 export interface DocumentInitializer<N = unknown> {
-  retrievalUrl: JsonLocation;
-  givenUrl: JsonLocation;
-  antecedentUrl: JsonLocation | null;
+  retrievalUrl: NodeLocation;
+  givenUrl: NodeLocation;
+  antecedentUrl: NodeLocation | null;
   documentNode: N;
 }
 
@@ -24,7 +24,7 @@ export class DocumentContext {
   /**
    * maps node urls to their documents
    */
-  private nodeDocuments = new Map<string, JsonLocation>();
+  private nodeDocuments = new Map<string, NodeLocation>();
   /**
    * all loaded nodes
    */
@@ -55,7 +55,7 @@ export class DocumentContext {
     }
   }
 
-  public getDocument(documentUrl: JsonLocation) {
+  public getDocument(documentUrl: NodeLocation) {
     const documentId = documentUrl.toString();
     const document = this.documents.get(documentId);
     if (document == null) {
@@ -64,7 +64,7 @@ export class DocumentContext {
     return document;
   }
 
-  public getDocumentForNode(nodeUrl: JsonLocation) {
+  public getDocumentForNode(nodeUrl: NodeLocation) {
     const nodeId = nodeUrl.toString();
     const documentUrl = this.nodeDocuments.get(nodeId);
     if (documentUrl == null) {
@@ -74,9 +74,9 @@ export class DocumentContext {
   }
 
   public async loadFromUrl(
-    retrievalUrl: JsonLocation,
-    givenUrl: JsonLocation,
-    antecedentUrl: JsonLocation | null,
+    retrievalUrl: NodeLocation,
+    givenUrl: NodeLocation,
+    antecedentUrl: NodeLocation | null,
     defaultSchemaId: string,
   ) {
     const retrievalId = retrievalUrl.toString();
@@ -89,9 +89,9 @@ export class DocumentContext {
   }
 
   public async loadFromDocument(
-    retrievalUrl: JsonLocation,
-    givenUrl: JsonLocation,
-    antecedentUrl: JsonLocation | null,
+    retrievalUrl: NodeLocation,
+    givenUrl: NodeLocation,
+    antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
@@ -103,8 +103,8 @@ export class DocumentContext {
     await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
   }
 
-  private fillNodeCache(retrievalUrl: JsonLocation, documentNode: unknown) {
-    const retrievalBaseUrl = retrievalUrl.toRoot();
+  private fillNodeCache(retrievalUrl: NodeLocation, documentNode: unknown) {
+    const retrievalBaseUrl = retrievalUrl;
     for (const [pointer, node] of readNode([], documentNode)) {
       const nodeRetrievalUrl = retrievalBaseUrl.push(...pointer);
       const nodeRetrievalId = nodeRetrievalUrl.toString();
@@ -117,9 +117,9 @@ export class DocumentContext {
   }
 
   private async loadFromCache(
-    retrievalUrl: JsonLocation,
-    givenUrl: JsonLocation,
-    antecedentUrl: JsonLocation | null,
+    retrievalUrl: NodeLocation,
+    givenUrl: NodeLocation,
+    antecedentUrl: NodeLocation | null,
     defaultSchemaId: string,
   ) {
     const retrievalId = retrievalUrl.toString();
@@ -185,7 +185,7 @@ export class DocumentContext {
   }
 
   private async loadFromSchemaDocument(
-    retrievalUrl: JsonLocation,
+    retrievalUrl: NodeLocation,
     document: SchemaDocumentBase,
     defaultSchemaId: string,
   ) {

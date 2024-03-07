@@ -1,6 +1,6 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as spec from "@jns42/swagger-v2";
-import { JsonLocation } from "../../utils/index.js";
+import { NodeLocation } from "../../utils/index.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.DefinitionsSchema | boolean;
@@ -43,8 +43,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): JsonLocation {
-    const resolvedNodeUrl = this.documentNodeUrl.join(JsonLocation.parse(nodeRef));
+  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
+    const resolvedNodeUrl = this.documentNodeUrl.join(NodeLocation.parse(nodeRef));
 
     return resolvedNodeUrl;
   }

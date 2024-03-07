@@ -3,7 +3,7 @@ import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
 import * as schema202012 from "../documents/schema-draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
-import { JsonLocation } from "../utils/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export function configureIntermediateProgram(argv: yargs.Argv) {
   return argv.command(
@@ -36,7 +36,7 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaUrl = JsonLocation.parse(configuration.instanceSchemaUrl);
+  const instanceSchemaUrl = NodeLocation.parse(configuration.instanceSchemaUrl);
 
   const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
 

@@ -1,17 +1,17 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { JsonLocation } from "../utils/index.js";
+import { NodeLocation } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { DocumentContext } from "./document-context.js";
 
 export interface EmbeddedDocument {
-  retrievalUrl: JsonLocation;
-  givenUrl: JsonLocation;
+  retrievalUrl: NodeLocation;
+  givenUrl: NodeLocation;
   node: unknown;
 }
 
 export interface ReferencedDocument {
-  retrievalUrl: JsonLocation;
-  givenUrl: JsonLocation;
+  retrievalUrl: NodeLocation;
+  givenUrl: NodeLocation;
 }
 
 export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
@@ -19,7 +19,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
    * The unique url for this document, possibly derived from the node. This
    * is not necessarily the location where the document was retrieved from.
    */
-  public readonly documentNodeUrl: JsonLocation;
+  public readonly documentNodeUrl: NodeLocation;
   /**
    * All nodes in the document, indexed by pointer
    */
@@ -32,8 +32,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
    * @param documentNode the actual document
    */
   constructor(
-    givenUrl: JsonLocation,
-    public readonly antecedentUrl: JsonLocation | null,
+    givenUrl: NodeLocation,
+    public readonly antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     protected context: DocumentContext,
   ) {
@@ -51,7 +51,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   /**
    * get all embedded document nodes
    */
-  public *getEmbeddedDocuments(retrievalUrl: JsonLocation): Iterable<EmbeddedDocument> {
+  public *getEmbeddedDocuments(retrievalUrl: NodeLocation): Iterable<EmbeddedDocument> {
     const queue = new Array<readonly [string[], N]>();
     queue.push(...this.selectSubNodes([], this.documentNode));
 
@@ -67,15 +67,15 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       }
       yield {
         node,
-        retrievalUrl: retrievalUrl.join(JsonLocation.parse(nodeId)),
-        givenUrl: this.documentNodeUrl.join(JsonLocation.parse(nodeId)),
+        retrievalUrl: retrievalUrl.join(NodeLocation.parse(nodeId)),
+        givenUrl: this.documentNodeUrl.join(NodeLocation.parse(nodeId)),
       };
     }
   }
   /**
    * get all references to other documents
    */
-  public *getReferencedDocuments(retrievalUrl: JsonLocation): Iterable<ReferencedDocument> {
+  public *getReferencedDocuments(retrievalUrl: NodeLocation): Iterable<ReferencedDocument> {
     for (const [, node] of this.nodes) {
       const nodeRef = this.selectNodeRef(node);
       if (nodeRef == null) {
@@ -83,8 +83,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       }
 
       yield {
-        retrievalUrl: retrievalUrl.join(JsonLocation.parse(nodeRef)),
-        givenUrl: this.documentNodeUrl.join(JsonLocation.parse(nodeRef)),
+        retrievalUrl: retrievalUrl.join(NodeLocation.parse(nodeRef)),
+        givenUrl: this.documentNodeUrl.join(NodeLocation.parse(nodeRef)),
       };
 
       /*
@@ -111,12 +111,12 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  protected getDocumentNodeUrl(): JsonLocation | null {
+  protected getDocumentNodeUrl(): NodeLocation | null {
     const nodeId = this.selectNodeId(this.documentNode);
     if (nodeId == null) {
       return null;
     }
-    const nodeLocation = JsonLocation.parse(nodeId);
+    const nodeLocation = NodeLocation.parse(nodeId);
 
     const documentNodeUrl =
       this.antecedentUrl == null ? nodeLocation : this.antecedentUrl.join(nodeLocation);
@@ -127,13 +127,13 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   /**
    * All unique node urls that this document contains
    */
-  public *getNodeUrls(): Iterable<JsonLocation> {
+  public *getNodeUrls(): Iterable<NodeLocation> {
     for (const [nodeId] of this.nodes) {
-      yield JsonLocation.parse(nodeId);
+      yield NodeLocation.parse(nodeId);
     }
   }
 
-  public getNodeByUrl(nodeUrl: JsonLocation) {
+  public getNodeByUrl(nodeUrl: NodeLocation) {
     const nodeId = nodeUrl.toString();
     const node = this.nodes.get(nodeId);
     if (node == null) {
@@ -161,7 +161,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediate.Node]> {
     for (const [nodeId, node] of this.nodes) {
-      const nodeUrl = JsonLocation.parse(nodeId);
+      const nodeUrl = NodeLocation.parse(nodeId);
       const nodePointer = nodeUrl.pointer;
 
       const metadata = this.getIntermediateMetadataPart(nodePointer, node);

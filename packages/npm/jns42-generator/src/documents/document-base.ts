@@ -1,8 +1,8 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { JsonLocation } from "../utils/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export abstract class DocumentBase<N = unknown> {
-  public abstract readonly documentNodeUrl: JsonLocation;
+  public abstract readonly documentNodeUrl: NodeLocation;
   public readonly documentNode: N;
 
   constructor(documentNode: unknown) {
@@ -14,7 +14,7 @@ export abstract class DocumentBase<N = unknown> {
     readonly [string, schemaIntermediate.Node]
   >;
 
-  public abstract getNodeUrls(): Iterable<JsonLocation>;
+  public abstract getNodeUrls(): Iterable<NodeLocation>;
 
   protected abstract assertDocumentNode(node: unknown): asserts node is N;
 }

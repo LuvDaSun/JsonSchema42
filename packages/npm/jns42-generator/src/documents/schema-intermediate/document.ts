@@ -4,12 +4,12 @@ import {
   getLastValidationError,
   isSchemaDocument,
 } from "@jns42/schema-intermediate";
-import { JsonLocation } from "../../utils/index.js";
+import { NodeLocation } from "../../utils/index.js";
 import { DocumentBase } from "../document-base.js";
 
 export class Document extends DocumentBase<SchemaDocument> {
   constructor(
-    public readonly documentNodeUrl: JsonLocation,
+    public readonly documentNodeUrl: NodeLocation,
     documentNode: unknown,
   ) {
     super(documentNode);
@@ -26,7 +26,7 @@ export class Document extends DocumentBase<SchemaDocument> {
     return Object.entries(this.documentNode.schemas);
   }
 
-  public getNodeUrls(): Iterable<JsonLocation> {
-    return Object.keys(this.documentNode.schemas).map((value) => JsonLocation.parse(value));
+  public getNodeUrls(): Iterable<NodeLocation> {
+    return Object.keys(this.documentNode.schemas).map((value) => NodeLocation.parse(value));
   }
 }
