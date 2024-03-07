@@ -81,7 +81,7 @@ export class DocumentContext {
   ) {
     const retrievalId = retrievalUrl.toString();
     if (!this.nodeCache.has(retrievalId)) {
-      const documentNode = await loadYAML(retrievalUrl.toString());
+      const documentNode = await loadYAML(retrievalId);
       this.fillNodeCache(retrievalUrl, documentNode);
     }
 
