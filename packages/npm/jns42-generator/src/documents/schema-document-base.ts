@@ -452,7 +452,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     if (entries.length > 0) {
       const nodeIds = Object.fromEntries(
         entries.map(([key, nodePointer]) => {
-          const nodeUrl = this.documentNodeLocation.pushPointer(...nodePointer);
+          const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
           const nodeId = String(nodeUrl);
           return [key, nodeId];
         }),
@@ -468,7 +468,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   ): Array<string> | undefined {
     if (entries.length > 0) {
       const nodeIds = entries.map(([nodePointer]) => {
-        const nodeUrl = this.documentNodeLocation.pushPointer(...nodePointer);
+        const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
         const nodeId = String(nodeUrl);
         return nodeId;
       });
@@ -482,7 +482,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     entries: Array<readonly [string[], N]>,
   ): string | undefined {
     for (const [nodePointer] of entries) {
-      const nodeUrl = this.documentNodeLocation.pushPointer(...nodePointer);
+      const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
       const nodeId = String(nodeUrl);
       return nodeId;
     }
