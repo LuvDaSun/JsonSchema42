@@ -146,6 +146,21 @@ test("json-location join", () => {
 
     assert.deepEqual(actual, expected);
   }
+
+  {
+    const actual = JsonLocation.parse("http://a.b.c/d/e/f/#/g/h/i").join(
+      JsonLocation.parse("?x=y"),
+    );
+    const expected = JsonLocation.parse("http://a.b.c/d/e/f/?x=y");
+
+    assert.deepEqual(actual, expected);
+  }
+  {
+    const actual = JsonLocation.parse("http://a.b.c/d/e?f#/g/h/i").join(JsonLocation.parse("?x=y"));
+    const expected = JsonLocation.parse("http://a.b.c/d/e?x=y");
+
+    assert.deepEqual(actual, expected);
+  }
 });
 
 test("json-location escape", () => {

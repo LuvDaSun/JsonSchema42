@@ -44,7 +44,14 @@ export class JsonLocation {
     return new JsonLocation(origin, base, pointer, alwaysIncludeHash);
   }
 
-  public push(...parts: string[]) {}
+  public push(...parts: string[]) {
+    return new JsonLocation(
+      this.origin,
+      this.base,
+      [...this.pointer, ...parts],
+      this.alwaysIncludeHash,
+    );
+  }
 
   public join(other: JsonLocation) {
     // other has an origin, return that
@@ -56,6 +63,25 @@ export class JsonLocation {
       // other has an absolute base, replace the base
       if (other.base.startsWith("/")) {
         return new JsonLocation(this.origin, other.base, other.pointer, this.alwaysIncludeHash);
+      }
+
+      if (other.base.startsWith("?")) {
+        const searchIndex = this.base.indexOf("?");
+        if (searchIndex < 0) {
+          return new JsonLocation(
+            this.origin,
+            this.base + other.base,
+            other.pointer,
+            this.alwaysIncludeHash,
+          );
+        }
+
+        return new JsonLocation(
+          this.origin,
+          this.base.substring(0, searchIndex) + other.base,
+          other.pointer,
+          this.alwaysIncludeHash,
+        );
       }
 
       const lastSeparatorIndex = this.base.lastIndexOf("/");
