@@ -81,6 +81,15 @@ test("json-location join", () => {
 
   {
     const actual = JsonLocation.parse("http://a.b.c/d/e/f#/g/h/i").join(
+      JsonLocation.parse("c:\\x"),
+    );
+    const expected = JsonLocation.parse("c:/x");
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = JsonLocation.parse("http://a.b.c/d/e/f#/g/h/i").join(
       JsonLocation.parse("/x/y/z"),
     );
     const expected = JsonLocation.parse("http://a.b.c/x/y/z#");
@@ -98,10 +107,24 @@ test("json-location join", () => {
   }
 
   {
+    const actual = JsonLocation.parse("c:\\a\\d\\e\\f").join(JsonLocation.parse("/x/y/z/"));
+    const expected = JsonLocation.parse("c:/x/y/z/#");
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
     const actual = JsonLocation.parse("http://a.b.c/d/e/f#/g/h/i").join(
       JsonLocation.parse("x/y/z/"),
     );
     const expected = JsonLocation.parse("http://a.b.c/d/e/x/y/z/#");
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = JsonLocation.parse("c:\\a\\d\\e\\f").join(JsonLocation.parse("x/y/z/"));
+    const expected = JsonLocation.parse("c:/a/d/e/x/y/z/#");
 
     assert.deepEqual(actual, expected);
   }

@@ -1,5 +1,5 @@
 /**
- * JsonPointer object for working with json pointers
+ * Location of a json node. The location can be either a path or a url
  *
  * @see https://www.rfc-editor.org/rfc/rfc6901
  */
@@ -9,12 +9,14 @@ export class JsonLocation {
     private readonly base: string,
     private readonly pointer: string[],
     private readonly alwaysIncludeHash: boolean,
-  ) {
-    //
-  }
+  ) {}
 
   public static parse(input: string, alwaysIncludeHash = true) {
-    const originMatch = input.match(/^[a-z]+\:\/\/[^\/]*/gi);
+    // replace all "\" with "/"
+    input = input.replaceAll("\\", "/");
+
+    // origin matches things like "http://a.b.c" or "C:"
+    const originMatch = input.match(/^[a-z]+\:(:?\/\/[^\/]*)?/gi);
     const origin = originMatch?.[0] ?? "";
 
     const hashIndex = input.indexOf("#", origin.length);
@@ -36,27 +38,22 @@ export class JsonLocation {
       .map((part) => JsonLocation.unescape(part));
 
     if (pointer.shift() !== "") {
-      throw new TypeError("invalid json pointer");
+      throw new TypeError("invalid json pointer in hash");
     }
 
     return new JsonLocation(origin, base, pointer, alwaysIncludeHash);
   }
 
-  public push(...parts: string[]) {
-    return new JsonLocation(
-      this.origin,
-      this.base,
-      [...this.pointer, ...parts],
-      this.alwaysIncludeHash,
-    );
-  }
+  public push(...parts: string[]) {}
 
   public join(other: JsonLocation) {
+    // other has an origin, return that
     if (other.origin.length > 0) {
       return other;
     }
 
     if (other.base.length > 0) {
+      // other has an absolute base, replace the base
       if (other.base.startsWith("/")) {
         return new JsonLocation(this.origin, other.base, other.pointer, this.alwaysIncludeHash);
       }
@@ -93,10 +90,6 @@ export class JsonLocation {
     }
 
     return this.origin + this.base;
-  }
-
-  public valueOf() {
-    return this.toString();
   }
 
   public getOrigin() {
