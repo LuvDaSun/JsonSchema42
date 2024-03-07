@@ -8,6 +8,7 @@ export * from "./deep-unique.js";
 export * from "./empty.js";
 export * from "./iterable-text-template.js";
 export * from "./iterable.js";
+export * from "./json-pointer.js";
 export * from "./load.js";
 export * from "./math.js";
 export * from "./merge.js";
