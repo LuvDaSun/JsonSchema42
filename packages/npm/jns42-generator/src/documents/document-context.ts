@@ -129,13 +129,6 @@ export class DocumentContext {
   ) {
     const retrievalId = retrievalLocation.toString();
 
-    if (antecedentLocation != null) {
-      const antecedentId = antecedentLocation.toString();
-      if (this.nodeDocuments.has(antecedentId)) {
-        return;
-      }
-    }
-
     if (this.resolved.has(retrievalId)) {
       return;
     }
