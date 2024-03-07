@@ -23,7 +23,7 @@ clean: \
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir --parents $(@D)
 
-	npx jns42-generator package file://${PWD}/$< \
+	npx jns42-generator package $< \
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
@@ -102,7 +102,7 @@ generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema
 
 	cargo run \
 		--package jns42-generator \
-		package file://${PWD}/$< \
+		package $< \
 		--package-directory $@ \
 		--package-name jns42-$(notdir $(basename $@)) \
 		--package-version $(word 2,$(shell cargo run --package jns42-generator -- --version)) \

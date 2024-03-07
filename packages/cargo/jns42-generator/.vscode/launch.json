@@ -27,7 +27,7 @@
       },
       "args": [
         "package",
-        "file://${file}",
+        "${file}",
         "--package-directory",
         ".package/file/${fileBasenameNoExtension}",
         "--package-name",
