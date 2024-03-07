@@ -175,39 +175,24 @@ export class DocumentContext {
     }
 
     if (document instanceof SchemaDocumentBase) {
-      await this.loadFromSchemaDocument(retrievalUrl, document, schemaId);
+      await this.loadFromSchemaDocument(document, schemaId);
     }
   }
 
-  private async loadFromSchemaDocument(
-    retrievalUrl: NodeLocation,
-    document: SchemaDocumentBase,
-    defaultSchemaId: string,
-  ) {
-    for (const {
-      retrievalUrl: embeddedRetrievalUrl,
-      givenUrl: embeddedGivenUrl,
-    } of document.embeddedDocuments) {
-      let node = this.cache.get(embeddedRetrievalUrl.toString());
+  private async loadFromSchemaDocument(document: SchemaDocumentBase, defaultSchemaId: string) {
+    for (const { retrievalUrl, givenUrl } of document.embeddedDocuments) {
+      let node = this.cache.get(retrievalUrl.toString());
       await this.loadFromDocument(
-        embeddedRetrievalUrl,
-        embeddedGivenUrl,
+        retrievalUrl,
+        givenUrl,
         document.documentNodeUrl,
         node,
         defaultSchemaId,
       );
     }
 
-    for (const {
-      retrievalUrl: referencedRetrievalUrl,
-      givenUrl: referencedGivenUrl,
-    } of document.embeddedDocuments) {
-      await this.loadFromUrl(
-        referencedRetrievalUrl,
-        referencedGivenUrl,
-        document.documentNodeUrl,
-        defaultSchemaId,
-      );
+    for (const { retrievalUrl, givenUrl } of document.referencedDocuments) {
+      await this.loadFromUrl(retrievalUrl, givenUrl, document.documentNodeUrl, defaultSchemaId);
     }
   }
 }
