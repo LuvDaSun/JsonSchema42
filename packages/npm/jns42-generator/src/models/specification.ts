@@ -91,11 +91,7 @@ export function loadSpecification(
   const namer = new Namer(defaultTypeName, nameMaximumIterations);
   for (const nodeId in document.schemas) {
     const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [
-      ...nodeLocation.base.split("/").map((part) => decodeURI(part)),
-      ...nodeLocation.anchor,
-      ...nodeLocation.pointer,
-    ]
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
       .filter((part) => part.length > 0)
       .join("/");
     namer.registerPath(nodeId, path);

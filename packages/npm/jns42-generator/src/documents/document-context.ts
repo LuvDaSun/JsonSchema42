@@ -129,6 +129,13 @@ export class DocumentContext {
   ) {
     const retrievalId = retrievalLocation.toString();
 
+    if (antecedentLocation != null) {
+      const antecedentId = antecedentLocation.toString();
+      if (this.nodeDocuments.has(antecedentId)) {
+        return;
+      }
+    }
+
     if (this.resolved.has(retrievalId)) {
       return;
     }
@@ -156,9 +163,6 @@ export class DocumentContext {
       documentNode: node,
     });
     const documentLocation = document.documentNodeLocation;
-    if (this.resolved.has(retrievalId)) {
-      throw new TypeError(`duplicate in resolved ${retrievalId}`);
-    }
     this.resolved.set(retrievalId, documentLocation);
 
     const documentId = documentLocation.toString();

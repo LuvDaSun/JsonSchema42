@@ -1,41 +1,143 @@
 import assert from "node:assert";
 import test from "node:test";
-import { NodeLocation } from "./node-location.js";
+import { NodeLocation, urlRegExp } from "./node-location.js";
 
-test("node-location parse base", () => {
+test("node-location path normalization", () => {
   {
-    const actual = NodeLocation.parse("a").base;
-    const expected = "a";
+    const actual = NodeLocation.parse("/a/b/../c").path;
+    const expected = ["", "a", "c"];
 
-    assert.equal(actual, expected);
+    assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = NodeLocation.parse("a#").base;
-    const expected = "a";
+    const actual = NodeLocation.parse("/../../a/b/c").path;
+    const expected = ["", "a", "b", "c"];
 
-    assert.equal(actual, expected);
+    assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = NodeLocation.parse("a#/").base;
-    const expected = "a";
+    const actual = NodeLocation.parse("../../a/b/c").path;
+    const expected = ["..", "..", "a", "b", "c"];
 
-    assert.equal(actual, expected);
+    assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = NodeLocation.parse("a#/1/2/3").base;
-    const expected = "a";
+    const actual = NodeLocation.parse("a/b/c/../../../../x").path;
+    const expected = ["..", "x"];
 
-    assert.equal(actual, expected);
+    assert.deepEqual(actual, expected);
+  }
+});
+
+test("urlRexExp", () => {
+  {
+    const actual = urlRegExp.exec("http://www.example.com")?.slice(1);
+    const expected = ["http://www.example.com", undefined, undefined, undefined];
+
+    assert.deepEqual(actual, expected);
   }
 
   {
-    const actual = NodeLocation.parse("a#/1/2/3#").base;
-    const expected = "a";
+    const actual = urlRegExp.exec("http://www.example.com/")?.slice(1);
+    const expected = ["http://www.example.com", "/", undefined, undefined];
 
-    assert.equal(actual, expected);
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("http://www.example.com/a/b/c")?.slice(1);
+    const expected = ["http://www.example.com", "/a/b/c", undefined, undefined];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("http://www.example.com/a/b/c?123")?.slice(1);
+    const expected = ["http://www.example.com", "/a/b/c", "?123", undefined];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("http://www.example.com/a/b/c?123#xxx")?.slice(1);
+    const expected = ["http://www.example.com", "/a/b/c", "?123", "#xxx"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("http://www.example.com/a/b/c#xxx")?.slice(1);
+    const expected = ["http://www.example.com", "/a/b/c", undefined, "#xxx"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("/a/b/c#xxx")?.slice(1);
+    const expected = [undefined, "/a/b/c", undefined, "#xxx"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("a/b/c?xxx")?.slice(1);
+    const expected = [undefined, "a/b/c", "?xxx", undefined];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("whoop")?.slice(1);
+    const expected = [undefined, "whoop", undefined, undefined];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = urlRegExp.exec("#")?.slice(1);
+    const expected = [undefined, undefined, undefined, "#"];
+
+    assert.deepEqual(actual, expected);
+  }
+});
+
+test("node-location parse path", () => {
+  {
+    const actual = NodeLocation.parse("a").path;
+    const expected = ["a"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = NodeLocation.parse("a#").path;
+    const expected = ["a"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = NodeLocation.parse("a#/").path;
+    const expected = ["a"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = NodeLocation.parse("a#/1/2/3").path;
+    const expected = ["a"];
+
+    assert.deepEqual(actual, expected);
+  }
+
+  {
+    const actual = NodeLocation.parse("a#/1/2/3#").path;
+    const expected = ["a"];
+
+    assert.deepEqual(actual, expected);
   }
 });
 
@@ -164,14 +266,14 @@ test("node-location join", () => {
 });
 
 test("node-location escape", () => {
-  const actual = NodeLocation.escape("~~//:-)");
+  const actual = NodeLocation.escapePointer("~~//:-)");
   const expected = "~0~0~1~1:-)";
 
   assert.equal(actual, expected);
 });
 
 test("node-location unescape", () => {
-  const actual = NodeLocation.unescape("~~~0~~~1~01:-)");
+  const actual = NodeLocation.unescapePointer("~~~0~~~1~01:-)");
   const expected = "~~~~~/~1:-)";
 
   assert.equal(actual, expected);
