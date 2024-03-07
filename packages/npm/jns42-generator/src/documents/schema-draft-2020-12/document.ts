@@ -7,8 +7,8 @@ import { SchemaDocumentBase } from "../schema-document-base.js";
 type N = spec.Schema;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly anchorMap = new Map<string, string>();
-  private readonly dynamicAnchorMap = new Map<string, string>();
+  private readonly anchorMap = new Map<string, JsonLocation>();
+  private readonly dynamicAnchorMap = new Map<string, JsonLocation>();
 
   constructor(
     givenUrl: JsonLocation,
@@ -18,13 +18,15 @@ export class Document extends SchemaDocumentBase<N> {
   ) {
     super(givenUrl, antecedentUrl, documentNode, context);
 
-    for (const [nodePointer, node] of this.nodes) {
+    for (const [nodeId, node] of this.nodes) {
+      const nodeUrl = JsonLocation.parse(nodeId);
+
       const nodeAnchor = this.selectNodeAnchor(node);
       if (nodeAnchor != null) {
         if (this.anchorMap.has(nodeAnchor)) {
           throw new TypeError(`duplicate anchor ${nodeAnchor}`);
         }
-        this.anchorMap.set(nodeAnchor, nodePointer);
+        this.anchorMap.set(nodeAnchor, nodeUrl);
       }
 
       const nodeDynamicAnchor = this.selectNodeDynamicAnchor(node);
@@ -32,7 +34,7 @@ export class Document extends SchemaDocumentBase<N> {
         if (this.dynamicAnchorMap.has(nodeDynamicAnchor)) {
           throw new TypeError(`duplicate dynamic anchor ${nodeDynamicAnchor}`);
         }
-        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodePointer);
+        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodeUrl);
       }
     }
   }
@@ -102,10 +104,9 @@ export class Document extends SchemaDocumentBase<N> {
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
-      const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
-      const anchorResolvedPointer = resolvedDocument.anchorMap.get(resolvedPointer);
-      if (anchorResolvedPointer != null) {
-        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
+      const anchor = resolvedNodeUrl.anchor;
+      const anchorResolvedUrl = resolvedDocument.anchorMap.get(anchor);
+      if (anchorResolvedUrl != null) {
         return anchorResolvedUrl;
       }
     }

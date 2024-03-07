@@ -5,10 +5,10 @@
  */
 export class JsonLocation {
   private constructor(
-    private readonly origin: string,
-    private readonly base: string,
-    private readonly pointer: string[],
-    private readonly anchor: string,
+    public readonly origin: string,
+    public readonly base: string,
+    public readonly pointer: string[],
+    public readonly anchor: string,
     private readonly alwaysIncludeHash: boolean,
   ) {}
 
@@ -153,18 +153,6 @@ export class JsonLocation {
     }
 
     return this.origin + this.base;
-  }
-
-  public getOrigin() {
-    return this.origin;
-  }
-
-  public getBase() {
-    return this.base;
-  }
-
-  public getPointer() {
-    return this.pointer;
   }
 
   public getTip() {
