@@ -11,12 +11,13 @@ export class Document extends SchemaDocumentBase<N> {
   private readonly dynamicAnchorMap = new Map<string, NodeLocation>();
 
   constructor(
+    retrievalUrl: NodeLocation,
     givenUrl: NodeLocation,
     antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
-    super(givenUrl, antecedentUrl, documentNode, context);
+    super(retrievalUrl, givenUrl, antecedentUrl, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
       const nodeUrl = NodeLocation.parse(nodeId);
@@ -58,18 +59,6 @@ export class Document extends SchemaDocumentBase<N> {
     /*
 		don't emit dynamic anchors here, they are treated differently
 		*/
-  }
-
-  //#endregion
-
-  //#region node
-
-  protected isNodeEmbeddedSchema(node: N): boolean {
-    const nodeId = this.selectNodeId(node);
-    if (nodeId == null) {
-      return false;
-    }
-    return true;
   }
 
   //#endregion

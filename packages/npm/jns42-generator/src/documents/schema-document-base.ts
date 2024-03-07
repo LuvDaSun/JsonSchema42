@@ -6,7 +6,6 @@ import { DocumentContext } from "./document-context.js";
 export interface EmbeddedDocument {
   retrievalUrl: NodeLocation;
   givenUrl: NodeLocation;
-  node: unknown;
 }
 
 export interface ReferencedDocument {
@@ -23,7 +22,10 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   /**
    * All nodes in the document, indexed by pointer
    */
-  protected readonly nodes: Map<string, N>;
+  public readonly nodes = new Map<string, N>();
+
+  public readonly referencedDocuments = new Array<ReferencedDocument>();
+  public readonly embeddedDocuments = new Array<EmbeddedDocument>();
 
   /**
    * Constructor for creating new documents
@@ -32,6 +34,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
    * @param documentNode the actual document
    */
   constructor(
+    retrievalUrl: NodeLocation,
     givenUrl: NodeLocation,
     public readonly antecedentUrl: NodeLocation | null,
     documentNode: unknown,
@@ -43,58 +46,6 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     const documentNodeUrl = maybeDocumentNodeUrl ?? givenUrl;
     this.documentNodeUrl = documentNodeUrl;
 
-    this.nodes = new Map(this.getNodePairs());
-  }
-
-  protected abstract isNodeEmbeddedSchema(node: N): boolean;
-
-  /**
-   * get all embedded document nodes
-   */
-  public *getEmbeddedDocuments(retrievalUrl: NodeLocation): Iterable<EmbeddedDocument> {
-    const queue = new Array<readonly [string[], N]>();
-    queue.push(...this.selectSubNodes([], this.documentNode));
-
-    let pair: readonly [string[], N] | undefined;
-    while ((pair = queue.shift()) != null) {
-      const [nodePointer, node] = pair;
-
-      const nodeId = this.selectNodeId(node);
-      if (nodeId == null || !this.isNodeEmbeddedSchema(node)) {
-        queue.push(...this.selectSubNodes(nodePointer, node));
-
-        continue;
-      }
-      yield {
-        node,
-        retrievalUrl: retrievalUrl.join(NodeLocation.parse(nodeId)),
-        givenUrl: this.documentNodeUrl.join(NodeLocation.parse(nodeId)),
-      };
-    }
-  }
-  /**
-   * get all references to other documents
-   */
-  public *getReferencedDocuments(retrievalUrl: NodeLocation): Iterable<ReferencedDocument> {
-    for (const [, node] of this.nodes) {
-      const nodeRef = this.selectNodeRef(node);
-      if (nodeRef == null) {
-        continue;
-      }
-
-      yield {
-        retrievalUrl: retrievalUrl.join(NodeLocation.parse(nodeRef)),
-        givenUrl: this.documentNodeUrl.join(NodeLocation.parse(nodeRef)),
-      };
-
-      /*
-			don't emit dynamic-refs here, they are supposed to be hash-only
-			urls, so they don't reference any document
-			*/
-    }
-  }
-
-  protected *getNodePairs(): Iterable<readonly [string, N]> {
     const queue = new Array<readonly [string[], N]>();
     queue.push([[], this.documentNode]);
 
@@ -102,11 +53,29 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     while ((pair = queue.shift()) != null) {
       const [nodePointer, node] = pair;
 
-      yield [this.documentNodeUrl.push(...nodePointer).toString(), node];
+      this.nodes.set(this.documentNodeUrl.push(...nodePointer).toString(), node);
 
-      const nodeId = this.selectNodeId(node);
-      if (nodeId == null || nodeId.startsWith("#")) {
-        queue.push(...this.selectSubNodes(nodePointer, node));
+      const nodeRef = this.selectNodeRef(node);
+      if (nodeRef != null) {
+        const nodeRefLocation = NodeLocation.parse(nodeRef);
+        this.referencedDocuments.push({
+          retrievalUrl: retrievalUrl.join(nodeRefLocation),
+          givenUrl: documentNodeUrl.join(nodeRefLocation),
+        });
+      }
+
+      for (const [subNodePointer, subNode] of this.selectSubNodes(nodePointer, node)) {
+        const subNodeId = this.selectNodeId(subNode);
+        if (subNodeId != null) {
+          const subNodeLocation = NodeLocation.parse(subNodeId);
+          this.embeddedDocuments.push({
+            retrievalUrl: retrievalUrl.join(subNodeLocation),
+            givenUrl: documentNodeUrl.join(subNodeLocation),
+          });
+          continue;
+        }
+
+        queue.push([subNodePointer, subNode]);
       }
     }
   }

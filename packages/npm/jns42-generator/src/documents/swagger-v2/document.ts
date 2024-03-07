@@ -17,14 +17,6 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#endregion
 
-  //#region node
-
-  protected isNodeEmbeddedSchema(node: N): boolean {
-    return false;
-  }
-
-  //#endregion
-
   //#region intermediate applicators
 
   protected getIntermediateReference(

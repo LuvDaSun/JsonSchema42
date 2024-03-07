@@ -43,13 +43,13 @@ async function main(configuration: MainConfiguration) {
   const context = new DocumentContext();
   context.registerFactory(
     schema202012.metaSchemaId,
-    ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schema202012.Document(givenUrl, antecedentUrl, rootNode, context),
+    ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+      new schema202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaDraft04.metaSchemaId,
-    ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
+    ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+      new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaIntermediate.metaSchemaId,

@@ -28,11 +28,15 @@ export class DocumentContext {
   /**
    * all loaded nodes
    */
-  private nodeCache = new Map<string, unknown>();
+  private cache = new Map<string, unknown>();
   /**
    * keep track of what we have been loading (so we only load it once)
    */
   private loaded = new Set<string>();
+  /**
+   * maps retrieval url to document url
+   */
+  private resolved = new Map<string, NodeLocation>();
 
   public registerFactory(schema: string, factory: DocumentFactory) {
     /**
@@ -80,7 +84,7 @@ export class DocumentContext {
     defaultSchemaId: string,
   ) {
     const retrievalId = retrievalUrl.toString();
-    if (!this.nodeCache.has(retrievalId)) {
+    if (!this.cache.has(retrievalId)) {
       const documentNode = await loadYAML(retrievalId);
       this.fillNodeCache(retrievalUrl, documentNode);
     }
@@ -96,7 +100,7 @@ export class DocumentContext {
     defaultSchemaId: string,
   ) {
     const retrievalId = retrievalUrl.toString();
-    if (!this.nodeCache.has(retrievalId)) {
+    if (!this.cache.has(retrievalId)) {
       this.fillNodeCache(retrievalUrl, documentNode);
     }
 
@@ -108,11 +112,11 @@ export class DocumentContext {
     for (const [pointer, node] of readNode([], documentNode)) {
       const nodeRetrievalUrl = retrievalBaseUrl.push(...pointer);
       const nodeRetrievalId = nodeRetrievalUrl.toString();
-      if (this.nodeCache.has(nodeRetrievalId)) {
+      if (this.cache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);
       }
 
-      this.nodeCache.set(nodeRetrievalId, node);
+      this.cache.set(nodeRetrievalId, node);
     }
   }
 
@@ -129,7 +133,7 @@ export class DocumentContext {
     }
     this.loaded.add(retrievalId);
 
-    const node = this.nodeCache.get(retrievalId);
+    const node = this.cache.get(retrievalId);
     if (node == null) {
       throw new TypeError("node not found in index");
     }
@@ -146,7 +150,13 @@ export class DocumentContext {
       antecedentUrl,
       documentNode: node,
     });
-    const documentId = document.documentNodeUrl.toString();
+    const documentUrl = document.documentNodeUrl;
+    if (this.resolved.has(retrievalId)) {
+      throw new TypeError(`duplicate in resolved ${retrievalId}`);
+    }
+    this.resolved.set(retrievalId, documentUrl);
+
+    const documentId = documentUrl.toString();
     if (this.documents.has(documentId)) {
       throw new TypeError(`duplicate document ${documentId}`);
     }
@@ -155,23 +165,8 @@ export class DocumentContext {
     // Map all node urls to the document they belong to.
     for (const nodeUrl of document.getNodeUrls()) {
       const nodeId = nodeUrl.toString();
-      // Figure out if the node already belongs to a document. This might be the case when
-      // dealing with embedded documents
-      const documentNodeUrlPrevious = this.nodeDocuments.get(nodeId);
 
-      if (documentNodeUrlPrevious != null) {
-        const documentNodeIdPrevious = documentNodeUrlPrevious.toString();
-        if (documentNodeIdPrevious.startsWith(documentId)) {
-          // if the previous node id starts with the document id that means that the
-          // previous document is a descendant of document. We will not change anything
-          // about that
-          continue;
-        }
-        if (documentId.startsWith(documentNodeIdPrevious)) {
-          // longest url has preference
-          this.nodeDocuments.set(nodeId, document.documentNodeUrl);
-          continue;
-        }
+      if (this.nodeDocuments.has(nodeId)) {
         throw new TypeError(`duplicate node with id ${nodeId}`);
       }
 
@@ -190,27 +185,27 @@ export class DocumentContext {
     defaultSchemaId: string,
   ) {
     for (const {
-      retrievalUrl: referencedRetrievalUrl,
-      givenUrl: referencedGivenUrl,
-    } of document.getReferencedDocuments(retrievalUrl)) {
-      await this.loadFromUrl(
-        referencedRetrievalUrl,
-        referencedGivenUrl,
-        document.documentNodeUrl,
-        defaultSchemaId,
-      );
-    }
-
-    for (const {
       retrievalUrl: embeddedRetrievalUrl,
       givenUrl: embeddedGivenUrl,
-      node,
-    } of document.getEmbeddedDocuments(retrievalUrl)) {
+    } of document.embeddedDocuments) {
+      let node = this.cache.get(embeddedRetrievalUrl.toString());
       await this.loadFromDocument(
         embeddedRetrievalUrl,
         embeddedGivenUrl,
         document.documentNodeUrl,
         node,
+        defaultSchemaId,
+      );
+    }
+
+    for (const {
+      retrievalUrl: referencedRetrievalUrl,
+      givenUrl: referencedGivenUrl,
+    } of document.embeddedDocuments) {
+      await this.loadFromUrl(
+        referencedRetrievalUrl,
+        referencedGivenUrl,
+        document.documentNodeUrl,
         defaultSchemaId,
       );
     }

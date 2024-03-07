@@ -116,28 +116,28 @@ async function main(configuration: MainConfiguration) {
       const context = new DocumentContext();
       context.registerFactory(
         schemaDraft202012.metaSchemaId,
-        ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft202012.Document(givenUrl, antecedentUrl, rootNode, context),
+        ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+          new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaDraft04.metaSchemaId,
-        ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
+        ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+          new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaOasV31.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+          new schemaOasV31.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         oasV30.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+          new oasV30.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         swaggerV2.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({ retrievalUrl, givenUrl, antecedentUrl, documentNode: rootNode }) =>
+          new swaggerV2.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaIntermediate.metaSchemaId,

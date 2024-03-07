@@ -10,12 +10,13 @@ export class Document extends SchemaDocumentBase<N> {
   private readonly aliasMap = new Map<string, NodeLocation>();
 
   constructor(
+    retrievalUrl: NodeLocation,
     givenUrl: NodeLocation,
     antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
-    super(givenUrl, antecedentUrl, documentNode, context);
+    super(retrievalUrl, givenUrl, antecedentUrl, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
       const nodeUrl = NodeLocation.parse(nodeId);
@@ -46,18 +47,6 @@ export class Document extends SchemaDocumentBase<N> {
     for (const [nodeName] of this.aliasMap) {
       yield NodeLocation.parse(nodeName);
     }
-  }
-
-  //#endregion
-
-  //#region node
-
-  protected isNodeEmbeddedSchema(node: N): boolean {
-    const nodeId = this.selectNodeId(node);
-    if (nodeId == null || nodeId.startsWith("#")) {
-      return false;
-    }
-    return true;
   }
 
   //#endregion
