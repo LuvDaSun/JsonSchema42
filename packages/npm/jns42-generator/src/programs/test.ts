@@ -16,6 +16,7 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
   return argv.command(
@@ -96,7 +97,7 @@ async function main(configuration: MainConfiguration) {
     defaultName,
   } = configuration;
 
-  const testUrl = new URL(`file://${pathToTest}`);
+  const testUrl = NodeLocation.parse(pathToTest);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
@@ -115,32 +116,53 @@ async function main(configuration: MainConfiguration) {
       const context = new DocumentContext();
       context.registerFactory(
         schemaDraft202012.metaSchemaId,
-        ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft202012.Document(givenUrl, antecedentUrl, rootNode, context),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) =>
+          new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaDraft04.metaSchemaId,
-        ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaOasV31.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new schemaOasV31.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         oasV30.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new oasV30.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         swaggerV2.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new swaggerV2.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaIntermediate.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
+        ({ givenLocation: givenUrl, documentNode: rootNode }) =>
           new schemaIntermediate.Document(givenUrl, rootNode),
       );
 
@@ -188,7 +210,9 @@ async function main(configuration: MainConfiguration) {
     });
 
     await test("valid", async () => {
-      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
+      const packageMain = await import(
+        "file://" + path.join(packageDirectoryPath, "out", "main.js")
+      );
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
         await test(testName, async () => {
@@ -202,7 +226,9 @@ async function main(configuration: MainConfiguration) {
     });
 
     await test("invalid", async () => {
-      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
+      const packageMain = await import(
+        "file://" + path.join(packageDirectoryPath, "out", "main.js")
+      );
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];
         await test(testName, async () => {

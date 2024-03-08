@@ -83,7 +83,7 @@ export class SchemaArena extends Arena<SchemaModel> {
     /*
     Populate all schemas in the arena's, reference dependent schemas by their arena id
     */
-    arena.applyTransform((arena, item) => {
+    arena.applyTransform((arena, item, key) => {
       const { id } = item;
 
       if (id == null) {
@@ -135,6 +135,7 @@ export class SchemaArena extends Arena<SchemaModel> {
       model.oneOf = schema.oneOf?.map((id) => idMap[id]);
       model.anyOf = schema.anyOf?.map((id) => idMap[id]);
       model.allOf = schema.allOf?.map((id) => idMap[id]);
+
       model.tupleItems = schema.tupleItems?.map((id) => idMap[id]);
 
       model.dependentSchemas =

@@ -1,16 +1,16 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import { NodeLocation } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { DocumentContext } from "./document-context.js";
 
 export interface EmbeddedDocument {
-  retrievalUrl: URL;
-  givenUrl: URL;
-  node: unknown;
+  retrievalLocation: NodeLocation;
+  givenLocation: NodeLocation;
 }
 
 export interface ReferencedDocument {
-  retrievalUrl: URL;
-  givenUrl: URL;
+  retrievalLocation: NodeLocation;
+  givenLocation: NodeLocation;
 }
 
 export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
@@ -18,15 +18,14 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
    * The unique url for this document, possibly derived from the node. This
    * is not necessarily the location where the document was retrieved from.
    */
-  public readonly documentNodeUrl: URL;
-  /**
-   * base pointer, this is usually ""
-   */
-  protected readonly documentNodePointer: string;
+  public readonly documentNodeLocation: NodeLocation;
   /**
    * All nodes in the document, indexed by pointer
    */
-  protected readonly nodes: Map<string, N>;
+  public readonly nodes = new Map<string, N>();
+
+  public readonly referencedDocuments = new Array<ReferencedDocument>();
+  public readonly embeddedDocuments = new Array<EmbeddedDocument>();
 
   /**
    * Constructor for creating new documents
@@ -35,8 +34,9 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
    * @param documentNode the actual document
    */
   constructor(
-    givenUrl: URL,
-    public readonly antecedentUrl: URL | null,
+    retrievalUrl: NodeLocation,
+    givenUrl: NodeLocation,
+    public readonly antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     protected context: DocumentContext,
   ) {
@@ -44,116 +44,76 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
     const maybeDocumentNodeUrl = this.getDocumentNodeUrl();
     const documentNodeUrl = maybeDocumentNodeUrl ?? givenUrl;
-    this.documentNodeUrl = documentNodeUrl;
-    this.documentNodePointer = this.nodeUrlToPointer(documentNodeUrl);
+    this.documentNodeLocation = documentNodeUrl;
 
-    this.nodes = new Map(this.getNodePairs());
-  }
+    const queue = new Array<readonly [string[], N]>();
+    queue.push([[], this.documentNode]);
 
-  protected abstract isNodeEmbeddedSchema(node: N): boolean;
-
-  /**
-   * get all embedded document nodes
-   */
-  public *getEmbeddedDocuments(retrievalUrl: URL): Iterable<EmbeddedDocument> {
-    const queue = new Array<readonly [string, N]>();
-    queue.push(...this.selectSubNodes(this.documentNodePointer, this.documentNode));
-
-    let pair: readonly [string, N] | undefined;
+    let pair: readonly [string[], N] | undefined;
     while ((pair = queue.shift()) != null) {
       const [nodePointer, node] = pair;
 
-      const nodeId = this.selectNodeId(node);
-      if (nodeId == null || !this.isNodeEmbeddedSchema(node)) {
-        queue.push(...this.selectSubNodes(nodePointer, node));
+      this.nodes.set(this.documentNodeLocation.pushPointer(...nodePointer).toString(), node);
 
-        continue;
-      }
-      yield {
-        node,
-        retrievalUrl: new URL(nodeId, retrievalUrl),
-        givenUrl: new URL(nodeId, this.documentNodeUrl),
-      };
-    }
-  }
-  /**
-   * get all references to other documents
-   */
-  public *getReferencedDocuments(retrievalUrl: URL): Iterable<ReferencedDocument> {
-    for (const [, node] of this.nodes) {
       const nodeRef = this.selectNodeRef(node);
-      if (nodeRef == null) {
-        continue;
+      if (nodeRef != null) {
+        const nodeRefLocation = NodeLocation.parse(nodeRef);
+        this.referencedDocuments.push({
+          retrievalLocation: retrievalUrl.join(nodeRefLocation),
+          givenLocation: documentNodeUrl.join(nodeRefLocation),
+        });
       }
 
-      yield {
-        retrievalUrl: new URL(nodeRef, retrievalUrl),
-        givenUrl: new URL(nodeRef, this.documentNodeUrl),
-      };
+      for (const [subNodePointer, subNode] of this.selectSubNodes(nodePointer, node)) {
+        const subNodeId = this.selectNodeId(subNode);
+        if (subNodeId != null) {
+          const subNodeLocation = NodeLocation.parse(subNodeId);
+          this.embeddedDocuments.push({
+            retrievalLocation: retrievalUrl.join(subNodeLocation),
+            givenLocation: documentNodeUrl.join(subNodeLocation),
+          });
+          continue;
+        }
 
-      /*
-			don't emit dynamic-refs here, they are supposed to be hash-only
-			urls, so they don't reference any document
-			*/
-    }
-  }
-
-  protected *getNodePairs(): Iterable<readonly [string, N]> {
-    const queue = new Array<readonly [string, N]>();
-    queue.push(...this.selectSubNodes(this.documentNodePointer, this.documentNode));
-
-    yield [this.documentNodePointer, this.documentNode];
-
-    let pair: readonly [string, N] | undefined;
-    while ((pair = queue.shift()) != null) {
-      const [nodePointer, node] = pair;
-
-      const nodeId = this.selectNodeId(node);
-      if (nodeId == null || nodeId.startsWith("#")) {
-        queue.push(...this.selectSubNodes(nodePointer, node));
-
-        yield pair;
+        queue.push([subNodePointer, subNode]);
       }
     }
   }
 
-  protected getDocumentNodeUrl(): URL | null {
+  protected getDocumentNodeUrl(): NodeLocation | null {
     const nodeId = this.selectNodeId(this.documentNode);
     if (nodeId == null) {
       return null;
     }
-    const nodeUrl =
-      this.antecedentUrl == null ? new URL(nodeId) : new URL(nodeId, this.antecedentUrl);
-    return nodeUrl;
-  }
+    const nodeLocation = NodeLocation.parse(nodeId);
 
-  public nodeUrlToPointer(nodeUrl: URL): string {
-    if (nodeUrl.origin !== this.documentNodeUrl.origin) {
-      throw new TypeError("origins should match");
-    }
-    return this.nodeHashToPointer(nodeUrl.hash);
+    const documentNodeUrl =
+      this.antecedentUrl == null ? nodeLocation : this.antecedentUrl.join(nodeLocation);
+
+    return documentNodeUrl;
   }
 
   /**
    * All unique node urls that this document contains
    */
-  public *getNodeUrls(): Iterable<URL> {
-    for (const [nodePointer] of this.nodes) {
-      yield this.pointerToNodeUrl(nodePointer);
+  public *getNodeUrls(): Iterable<NodeLocation> {
+    for (const [nodeId] of this.nodes) {
+      yield NodeLocation.parse(nodeId);
     }
   }
 
-  public getNodeByUrl(nodeUrl: URL) {
-    const nodePointer = this.nodeUrlToPointer(nodeUrl);
-    return this.getNodeByPointer(nodePointer);
-  }
-
-  public getNodeByPointer(nodePointer: string) {
-    const node = this.nodes.get(nodePointer);
+  public getNodeByUrl(nodeUrl: NodeLocation) {
+    const nodeId = nodeUrl.toString();
+    const node = this.nodes.get(nodeId);
     if (node == null) {
-      throw new TypeError(`node not found ${nodePointer}`);
+      throw new TypeError(`node not found ${nodeUrl.toString()}`);
     }
     return node;
+  }
+
+  public getNodeByPointer(nodePointer: string[]) {
+    const nodeUrl = this.documentNodeLocation.pushPointer(...nodePointer);
+    return this.getNodeByUrl(nodeUrl);
   }
 
   protected *getAntecedentDocuments(): Iterable<SchemaDocumentBase> {
@@ -169,9 +129,9 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   }
 
   public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediate.Node]> {
-    for (const [nodePointer, node] of this.nodes) {
-      const nodeUrl = this.pointerToNodeUrl(nodePointer);
-      const nodeId = nodeUrl.toString();
+    for (const [nodeId, node] of this.nodes) {
+      const nodeUrl = NodeLocation.parse(nodeId);
+      const nodePointer = nodeUrl.pointer;
 
       const metadata = this.getIntermediateMetadataPart(nodePointer, node);
       const types = this.getIntermediateTypesPart(nodePointer, node);
@@ -189,7 +149,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       ];
     }
   }
-  protected getIntermediateMetadataPart(nodePointer: string, node: N) {
+  protected getIntermediateMetadataPart(nodePointer: string[], node: N) {
     const title = this.selectNodeTitle(node);
     const description = this.selectNodeDescription(node);
     const deprecated = this.selectNodeDeprecated(node);
@@ -202,7 +162,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       examples,
     };
   }
-  protected getIntermediateTypesPart(nodePointer: string, node: N) {
+  protected getIntermediateTypesPart(nodePointer: string[], node: N) {
     let types = new Array<schemaIntermediate.TypesItems>();
 
     if (node === true) {
@@ -223,7 +183,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     return { types };
   }
 
-  protected getIntermediateAssertionsPart(nodePointer: string, node: N) {
+  protected getIntermediateAssertionsPart(nodePointer: string[], node: N) {
     const enumValues = this.selectValidationEnum(node);
     const constValue = this.selectValidationConst(node);
 
@@ -276,7 +236,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       required,
     };
   }
-  protected getIntermediateApplicatorsPart(nodePointer: string, node: N) {
+  protected getIntermediateApplicatorsPart(nodePointer: string[], node: N) {
     const reference = this.getIntermediateReference(nodePointer, node);
     const allOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
       ...this.selectSubNodeAllOfEntries(nodePointer, node),
@@ -351,7 +311,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   //#region intermediate applicators
 
   protected abstract getIntermediateReference(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
   ): schemaIntermediate.Reference | undefined;
 
@@ -359,7 +319,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   //#region selectors
 
-  protected *selectSubNodes(nodePointer: string, node: N): Iterable<readonly [string, N]> {
+  protected *selectSubNodes(nodePointer: string[], node: N): Iterable<readonly [string[], N]> {
     yield* this.selectSubNodeDefinitionsEntries(nodePointer, node);
     yield* this.selectSubNodeObjectPropertyEntries(nodePointer, node);
     yield* this.selectSubNodeMapPropertiesEntries(nodePointer, node);
@@ -407,92 +367,92 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   protected abstract selectValidationEnum(node: N): any[] | undefined;
 
   protected abstract selectNodePropertiesPointerEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, string]>;
+  ): Iterable<readonly [string, string[]]>;
   protected abstract selectNodeDependentSchemasPointerEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, string]>;
+  ): Iterable<readonly [string, string[]]>;
   protected abstract selectNodePatternPropertyPointerEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, string]>;
+  ): Iterable<readonly [string, string[]]>;
 
   protected abstract selectSubNodeDefinitionsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeObjectPropertyEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeMapPropertiesEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodePatternPropertiesEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodePropertyNamesEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeTupleItemsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeArrayItemsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeContainsEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeAllOfEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeAnyOfEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeOneOfEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeNotEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeIfEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeThenEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodeElseEntries(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-  ): Iterable<readonly [string, N]>;
+  ): Iterable<readonly [string[], N]>;
 
   //#endregion
 
   //#region helpers
 
   protected mapPointerEntriesRecord(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-    entries: Array<readonly [string, string]>,
+    entries: Array<readonly [string, string[]]>,
   ): Record<string, string> | undefined {
     if (entries.length > 0) {
       const nodeIds = Object.fromEntries(
         entries.map(([key, nodePointer]) => {
-          const nodeUrl = this.pointerToNodeUrl(nodePointer);
+          const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
           const nodeId = String(nodeUrl);
           return [key, nodeId];
         }),
@@ -502,13 +462,13 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   }
 
   protected mapEntriesToManyNodeIds(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-    entries: Array<readonly [string, N]>,
+    entries: Array<readonly [string[], N]>,
   ): Array<string> | undefined {
     if (entries.length > 0) {
-      const nodeIds = entries.map(([typeNodePointer]) => {
-        const nodeUrl = this.pointerToNodeUrl(typeNodePointer);
+      const nodeIds = entries.map(([nodePointer]) => {
+        const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
         const nodeId = String(nodeUrl);
         return nodeId;
       });
@@ -517,12 +477,12 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   }
 
   protected mapEntriesToSingleNodeId(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
-    entries: Array<readonly [string, N]>,
+    entries: Array<readonly [string[], N]>,
   ): string | undefined {
     for (const [nodePointer] of entries) {
-      const nodeUrl = this.pointerToNodeUrl(nodePointer);
+      const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
       const nodeId = String(nodeUrl);
       return nodeId;
     }

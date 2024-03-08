@@ -1,9 +1,9 @@
-import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
 import * as schema202012 from "../documents/schema-draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export function configureIntermediateProgram(argv: yargs.Argv) {
   return argv.command(
@@ -36,31 +36,33 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  let instanceSchemaUrl: URL;
-  if (/^\w+\:\/\//.test(configuration.instanceSchemaUrl)) {
-    instanceSchemaUrl = new URL(configuration.instanceSchemaUrl);
-  } else {
-    instanceSchemaUrl = new URL(
-      "file://" + path.resolve(process.cwd(), configuration.instanceSchemaUrl),
-    );
-  }
+  const instanceSchemaUrl = NodeLocation.parse(configuration.instanceSchemaUrl);
 
   const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
 
   const context = new DocumentContext();
   context.registerFactory(
     schema202012.metaSchemaId,
-    ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schema202012.Document(givenUrl, antecedentUrl, rootNode, context),
+    ({
+      retrievalLocation: retrievalUrl,
+      givenLocation: givenUrl,
+      antecedentLocation: antecedentUrl,
+      documentNode: rootNode,
+    }) => new schema202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaDraft04.metaSchemaId,
-    ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-      new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
+    ({
+      retrievalLocation: retrievalUrl,
+      givenLocation: givenUrl,
+      antecedentLocation: antecedentUrl,
+      documentNode: rootNode,
+    }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
   );
   context.registerFactory(
     schemaIntermediate.metaSchemaId,
-    ({ givenUrl, documentNode: rootNode }) => new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
+      new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
   await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);

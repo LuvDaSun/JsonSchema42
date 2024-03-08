@@ -1,12 +1,12 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { discoverSchemaId, loadYAML, normalizeUrl, readNode } from "../utils/index.js";
+import { NodeLocation, discoverSchemaId, loadYAML, readNode } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
 export interface DocumentInitializer<N = unknown> {
-  retrievalUrl: URL;
-  givenUrl: URL;
-  antecedentUrl: URL | null;
+  retrievalLocation: NodeLocation;
+  givenLocation: NodeLocation;
+  antecedentLocation: NodeLocation | null;
   documentNode: N;
 }
 
@@ -24,15 +24,19 @@ export class DocumentContext {
   /**
    * maps node urls to their documents
    */
-  private nodeDocuments = new Map<string, URL>();
+  private nodeDocuments = new Map<string, NodeLocation>();
   /**
    * all loaded nodes
    */
-  private nodeCache = new Map<string, unknown>();
+  private cache = new Map<string, unknown>();
   /**
    * keep track of what we have been loading (so we only load it once)
    */
   private loaded = new Set<string>();
+  /**
+   * maps retrieval url to document url
+   */
+  private resolved = new Map<string, NodeLocation>();
 
   public registerFactory(schema: string, factory: DocumentFactory) {
     /**
@@ -55,8 +59,8 @@ export class DocumentContext {
     }
   }
 
-  public getDocument(documentUrl: URL) {
-    const documentId = normalizeUrl(documentUrl).toString();
+  public getDocument(documentLocation: NodeLocation) {
+    const documentId = documentLocation.toString();
     const document = this.documents.get(documentId);
     if (document == null) {
       throw new TypeError(`document not found ${documentId}`);
@@ -64,72 +68,77 @@ export class DocumentContext {
     return document;
   }
 
-  public getDocumentForNode(nodeUrl: URL) {
-    const nodeId = normalizeUrl(nodeUrl).toString();
-    const documentUrl = this.nodeDocuments.get(nodeId);
-    if (documentUrl == null) {
+  public getDocumentForNode(nodeLocation: NodeLocation) {
+    const nodeId = nodeLocation.toString();
+    const documentLocation = this.nodeDocuments.get(nodeId);
+    if (documentLocation == null) {
       throw new TypeError(`document not found for node ${nodeId}`);
     }
-    return this.getDocument(documentUrl);
+    return this.getDocument(documentLocation);
   }
 
   public async loadFromUrl(
-    retrievalUrl: URL,
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = normalizeUrl(retrievalUrl).toString();
-    if (!this.nodeCache.has(retrievalId)) {
-      const documentNode = await loadYAML(retrievalUrl);
-      this.fillNodeCache(retrievalUrl, documentNode);
+    const retrievalId = retrievalLocation.toString();
+    if (!this.cache.has(retrievalId)) {
+      const rootLocation = retrievalLocation.toRoot();
+      const rootPath = rootLocation.toString(false);
+      const documentNode = await loadYAML(rootPath);
+      this.fillNodeCache(rootLocation, documentNode);
     }
 
-    await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
+    await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
   }
 
   public async loadFromDocument(
-    retrievalUrl: URL,
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const retrievalId = normalizeUrl(retrievalUrl).toString();
-    if (!this.nodeCache.has(retrievalId)) {
-      this.fillNodeCache(retrievalUrl, documentNode);
+    const retrievalId = retrievalLocation.toString();
+    if (!this.cache.has(retrievalId)) {
+      this.fillNodeCache(retrievalLocation, documentNode);
     }
 
-    await this.loadFromCache(retrievalUrl, givenUrl, antecedentUrl, defaultSchemaId);
+    await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
   }
 
-  private fillNodeCache(retrievalUrl: URL, documentNode: unknown) {
-    const retrievalBaseUrl = new URL("", retrievalUrl);
-    for (const [pointer, node] of readNode("", documentNode)) {
-      const nodeRetrievalUrl = new URL(`#${pointer}`, retrievalBaseUrl);
-      const nodeRetrievalId = normalizeUrl(nodeRetrievalUrl).toString();
-      if (this.nodeCache.has(nodeRetrievalId)) {
+  private fillNodeCache(retrievalLocation: NodeLocation, documentNode: unknown) {
+    for (const [pointer, node] of readNode([], documentNode)) {
+      const nodeRetrievalLocation = retrievalLocation.pushPointer(...pointer);
+      const nodeRetrievalId = nodeRetrievalLocation.toString();
+      if (this.cache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);
       }
 
-      this.nodeCache.set(nodeRetrievalId, node);
+      this.cache.set(nodeRetrievalId, node);
     }
   }
 
   private async loadFromCache(
-    retrievalUrl: URL,
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = normalizeUrl(retrievalUrl).toString();
+    const retrievalId = retrievalLocation.toString();
+
+    if (this.resolved.has(retrievalId)) {
+      return;
+    }
 
     if (this.loaded.has(retrievalId)) {
       return;
     }
     this.loaded.add(retrievalId);
 
-    const node = this.nodeCache.get(retrievalId);
+    const node = this.cache.get(retrievalId);
     if (node == null) {
       throw new TypeError("node not found in index");
     }
@@ -141,26 +150,29 @@ export class DocumentContext {
     }
 
     const document = factory({
-      retrievalUrl,
-      givenUrl,
-      antecedentUrl,
+      retrievalLocation,
+      givenLocation,
+      antecedentLocation,
       documentNode: node,
     });
-    const documentId = normalizeUrl(document.documentNodeUrl).toString();
+    const documentLocation = document.documentNodeLocation;
+    this.resolved.set(retrievalId, documentLocation);
+
+    const documentId = documentLocation.toString();
     if (this.documents.has(documentId)) {
       throw new TypeError(`duplicate document ${documentId}`);
     }
     this.documents.set(documentId, document);
 
     // Map all node urls to the document they belong to.
-    for (const nodeUrl of document.getNodeUrls()) {
-      const nodeId = normalizeUrl(nodeUrl).toString();
+    for (const nodeLocation of document.getNodeUrls()) {
+      const nodeId = nodeLocation.toString();
       // Figure out if the node already belongs to a document. This might be the case when
       // dealing with embedded documents
-      const documentNodeUrlPrevious = this.nodeDocuments.get(nodeId);
+      const documentNodeLocationPrevious = this.nodeDocuments.get(nodeId);
 
-      if (documentNodeUrlPrevious != null) {
-        const documentNodeIdPrevious = documentNodeUrlPrevious.toString();
+      if (documentNodeLocationPrevious != null) {
+        const documentNodeIdPrevious = documentNodeLocationPrevious.toString();
         if (documentNodeIdPrevious.startsWith(documentId)) {
           // if the previous node id starts with the document id that means that the
           // previous document is a descendant of document. We will not change anything
@@ -169,48 +181,41 @@ export class DocumentContext {
         }
         if (documentId.startsWith(documentNodeIdPrevious)) {
           // longest url has preference
-          this.nodeDocuments.set(nodeId, document.documentNodeUrl);
+          this.nodeDocuments.set(nodeId, documentLocation);
           continue;
         }
+
+        // node is is already present and unrelated
         throw new TypeError(`duplicate node with id ${nodeId}`);
       }
 
       // if the node is is not yet linked to a document
-      this.nodeDocuments.set(nodeId, document.documentNodeUrl);
+      this.nodeDocuments.set(nodeId, documentLocation);
     }
 
     if (document instanceof SchemaDocumentBase) {
-      await this.loadFromSchemaDocument(retrievalUrl, document, schemaId);
+      await this.loadFromSchemaDocument(document, schemaId);
     }
   }
 
-  private async loadFromSchemaDocument(
-    retrievalUrl: URL,
-    document: SchemaDocumentBase,
-    defaultSchemaId: string,
-  ) {
-    for (const {
-      retrievalUrl: referencedRetrievalUrl,
-      givenUrl: referencedGivenUrl,
-    } of document.getReferencedDocuments(retrievalUrl)) {
-      await this.loadFromUrl(
-        referencedRetrievalUrl,
-        referencedGivenUrl,
-        document.documentNodeUrl,
+  private async loadFromSchemaDocument(document: SchemaDocumentBase, defaultSchemaId: string) {
+    for (const { retrievalLocation, givenLocation } of document.embeddedDocuments) {
+      const retrievalId = retrievalLocation.toString();
+      let node = this.cache.get(retrievalId);
+      await this.loadFromDocument(
+        retrievalLocation,
+        givenLocation,
+        document.documentNodeLocation,
+        node,
         defaultSchemaId,
       );
     }
 
-    for (const {
-      retrievalUrl: embeddedRetrievalUrl,
-      givenUrl: embeddedGivenUrl,
-      node,
-    } of document.getEmbeddedDocuments(retrievalUrl)) {
-      await this.loadFromDocument(
-        embeddedRetrievalUrl,
-        embeddedGivenUrl,
-        document.documentNodeUrl,
-        node,
+    for (const { retrievalLocation, givenLocation } of document.referencedDocuments) {
+      await this.loadFromUrl(
+        retrievalLocation,
+        givenLocation,
+        document.documentNodeLocation,
         defaultSchemaId,
       );
     }

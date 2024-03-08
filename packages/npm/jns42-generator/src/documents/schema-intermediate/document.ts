@@ -4,11 +4,12 @@ import {
   getLastValidationError,
   isSchemaDocument,
 } from "@jns42/schema-intermediate";
+import { NodeLocation } from "../../utils/index.js";
 import { DocumentBase } from "../document-base.js";
 
 export class Document extends DocumentBase<SchemaDocument> {
   constructor(
-    public readonly documentNodeUrl: URL,
+    public readonly documentNodeLocation: NodeLocation,
     documentNode: unknown,
   ) {
     super(documentNode);
@@ -25,14 +26,7 @@ export class Document extends DocumentBase<SchemaDocument> {
     return Object.entries(this.documentNode.schemas);
   }
 
-  public getNodeUrls(): Iterable<URL> {
-    return Object.keys(this.documentNode.schemas).map((id) => new URL(id));
-  }
-
-  public pointerToNodeHash(nodePointer: string): string {
-    throw new Error("Method not implemented.");
-  }
-  public nodeHashToPointer(nodeHash: string): string {
-    throw new Error("Method not implemented.");
+  public getNodeUrls(): Iterable<NodeLocation> {
+    return Object.keys(this.documentNode.schemas).map((value) => NodeLocation.parse(value));
   }
 }
