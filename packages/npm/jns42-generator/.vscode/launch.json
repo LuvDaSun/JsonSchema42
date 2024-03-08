@@ -54,7 +54,7 @@
       "args": [
         "test",
         "${file}",
-        "--output-directory",
+        "--package-directory",
         ".package/test",
         "--package-name",
         "${fileBasenameNoExtension}",
