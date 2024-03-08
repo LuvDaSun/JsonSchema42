@@ -1,6 +1,6 @@
 import immutable from "immutable";
 
-export type ArenaTransform<T, A extends Arena<T> = Arena<T>> = (arena: A, key: number) => T;
+export type ArenaTransform<T, A extends Arena<T> = Arena<T>> = (arena: A, key: number) => void;
 
 export class Arena<T> {
   private items = immutable.List<T>();

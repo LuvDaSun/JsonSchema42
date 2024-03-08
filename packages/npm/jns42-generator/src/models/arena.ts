@@ -104,83 +104,86 @@ export class SchemaArena extends Arena<SchemaModel> {
     /*
     Populate all schemas in the arena's, reference dependent schemas by their arena id
     */
-    arena.applyTransform((arena, item, key) => {
+    arena.applyTransform((arena, key) => {
+      const item = arena.getItem(key);
       const { id } = item;
 
       if (id == null) {
-        return item;
+        return;
       }
 
       const schema = document.schemas[id];
 
-      const model: SchemaModel = {
+      const itemNew: SchemaModel = {
         id,
         parent: parents[id] == null ? undefined : idMap[parents[id]],
       };
 
-      model.title = schema.title;
-      model.description = schema.description;
-      model.examples = schema.examples;
-      model.deprecated = schema.deprecated;
+      itemNew.title = schema.title;
+      itemNew.description = schema.description;
+      itemNew.examples = schema.examples;
+      itemNew.deprecated = schema.deprecated;
 
-      model.required = schema.required;
-      model.options = schema.options;
+      itemNew.required = schema.required;
+      itemNew.options = schema.options;
 
-      model.uniqueItems = schema.uniqueItems;
+      itemNew.uniqueItems = schema.uniqueItems;
 
-      model.minimumInclusive = schema.minimumInclusive;
-      model.minimumExclusive = schema.minimumExclusive;
-      model.maximumInclusive = schema.maximumInclusive;
-      model.maximumExclusive = schema.maximumExclusive;
-      model.minimumLength = schema.minimumLength;
-      model.maximumLength = schema.maximumLength;
-      model.minimumItems = schema.minimumItems;
-      model.maximumItems = schema.maximumItems;
-      model.minimumProperties = schema.minimumProperties;
-      model.maximumProperties = schema.maximumProperties;
-      model.multipleOf = schema.multipleOf;
+      itemNew.minimumInclusive = schema.minimumInclusive;
+      itemNew.minimumExclusive = schema.minimumExclusive;
+      itemNew.maximumInclusive = schema.maximumInclusive;
+      itemNew.maximumExclusive = schema.maximumExclusive;
+      itemNew.minimumLength = schema.minimumLength;
+      itemNew.maximumLength = schema.maximumLength;
+      itemNew.minimumItems = schema.minimumItems;
+      itemNew.maximumItems = schema.maximumItems;
+      itemNew.minimumProperties = schema.minimumProperties;
+      itemNew.maximumProperties = schema.maximumProperties;
+      itemNew.multipleOf = schema.multipleOf;
 
-      model.valuePattern = schema.valuePattern == null ? undefined : [schema.valuePattern];
-      model.valueFormat = schema.valueFormat == null ? undefined : [schema.valueFormat];
+      itemNew.valuePattern = schema.valuePattern == null ? undefined : [schema.valuePattern];
+      itemNew.valueFormat = schema.valueFormat == null ? undefined : [schema.valueFormat];
 
-      model.reference = schema.reference == null ? undefined : idMap[schema.reference];
-      model.if = schema.if == null ? undefined : idMap[schema.if];
-      model.then = schema.then == null ? undefined : idMap[schema.then];
-      model.else = schema.else == null ? undefined : idMap[schema.else];
-      model.not = schema.not == null ? undefined : idMap[schema.not];
-      model.mapProperties = schema.mapProperties == null ? undefined : idMap[schema.mapProperties];
-      model.propertyNames = schema.propertyNames == null ? undefined : idMap[schema.propertyNames];
-      model.arrayItems = schema.arrayItems == null ? undefined : idMap[schema.arrayItems];
-      model.contains = schema.contains == null ? undefined : idMap[schema.contains];
+      itemNew.reference = schema.reference == null ? undefined : idMap[schema.reference];
+      itemNew.if = schema.if == null ? undefined : idMap[schema.if];
+      itemNew.then = schema.then == null ? undefined : idMap[schema.then];
+      itemNew.else = schema.else == null ? undefined : idMap[schema.else];
+      itemNew.not = schema.not == null ? undefined : idMap[schema.not];
+      itemNew.mapProperties =
+        schema.mapProperties == null ? undefined : idMap[schema.mapProperties];
+      itemNew.propertyNames =
+        schema.propertyNames == null ? undefined : idMap[schema.propertyNames];
+      itemNew.arrayItems = schema.arrayItems == null ? undefined : idMap[schema.arrayItems];
+      itemNew.contains = schema.contains == null ? undefined : idMap[schema.contains];
 
-      model.oneOf = schema.oneOf?.map((id) => idMap[id]);
-      model.anyOf = schema.anyOf?.map((id) => idMap[id]);
-      model.allOf = schema.allOf?.map((id) => idMap[id]);
+      itemNew.oneOf = schema.oneOf?.map((id) => idMap[id]);
+      itemNew.anyOf = schema.anyOf?.map((id) => idMap[id]);
+      itemNew.allOf = schema.allOf?.map((id) => idMap[id]);
 
-      model.tupleItems = schema.tupleItems?.map((id) => idMap[id]);
+      itemNew.tupleItems = schema.tupleItems?.map((id) => idMap[id]);
 
-      model.dependentSchemas =
+      itemNew.dependentSchemas =
         schema.dependentSchemas == null
           ? undefined
           : Object.fromEntries(
               Object.entries(schema.dependentSchemas).map(([name, id]) => [name, idMap[id]]),
             );
-      model.objectProperties =
+      itemNew.objectProperties =
         schema.objectProperties == null
           ? undefined
           : Object.fromEntries(
               Object.entries(schema.objectProperties).map(([name, id]) => [name, idMap[id]]),
             );
-      model.patternProperties =
+      itemNew.patternProperties =
         schema.patternProperties == null
           ? undefined
           : Object.fromEntries(
               Object.entries(schema.patternProperties).map(([name, id]) => [name, idMap[id]]),
             );
 
-      model.types = schema.types ?? implicitTypes[id];
+      itemNew.types = schema.types ?? implicitTypes[id];
 
-      return model;
+      arena.setItem(key, itemNew);
     });
 
     return arena;
