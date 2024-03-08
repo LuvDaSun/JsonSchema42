@@ -1,6 +1,10 @@
 SHELL:=$(PREFIX)/bin/sh
 
 build: \
+	generated/npm \
+	generated/cargo \
+
+generated/npm: \
 	generated/npm/schema-intermediate \
 	generated/npm/schema-draft-04 \
 	generated/npm/schema-draft-2020-12 \
@@ -8,10 +12,12 @@ build: \
 	generated/npm/swagger-v2 \
 	generated/npm/oas-v3-0 \
 	generated/npm/oas-v3-1 \
-	generated/cargo/schema-intermediate \
 
 	# Link the generated code, but don't save those links to the package lock
 	npm install --no-package-lock
+
+generated/cargo: \
+	generated/cargo/schema-intermediate \
 
 rebuild: \
 	clean build
