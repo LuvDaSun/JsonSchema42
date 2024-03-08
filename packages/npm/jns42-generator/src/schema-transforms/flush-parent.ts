@@ -5,7 +5,7 @@ import {
   isChildSchemaModel,
   isOneOfSchemaModel,
   isReferenceSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 /**
  * Flushes type properties from parents if the children have no parent relationship

@@ -1,6 +1,6 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import { SchemaArena, selectSchemaDependencies } from "../models/index.js";
 import * as schemaTransforms from "../schema-transforms/index.js";
-import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";
 import { NodeLocation } from "../utils/node-location.js";
 
@@ -50,7 +50,7 @@ export function loadSpecification(
         schemaTransforms.explode,
 
         schemaTransforms.flipAllOfOneOf,
-        // schemaTransforms.flipAnyOfOneOf,
+        schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.flatten,
         schemaTransforms.unique,

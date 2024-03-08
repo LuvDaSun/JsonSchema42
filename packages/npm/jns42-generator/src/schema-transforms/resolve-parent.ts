@@ -3,7 +3,7 @@ import {
   SchemaTransform,
   intersectionMergeTypes,
   isChildSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import {
   booleanMergeAnd,
   booleanMergeOr,

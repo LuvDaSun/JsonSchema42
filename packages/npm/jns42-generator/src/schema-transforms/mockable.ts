@@ -7,7 +7,7 @@ import {
   isOneOfSchemaModel,
   isReferenceSchemaModel,
   isSingleTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import { booleanMergeAnd, booleanMergeOr } from "../utils/merge.js";
 
 export const mockable: SchemaTransform = (arena, model, modelKey) => {

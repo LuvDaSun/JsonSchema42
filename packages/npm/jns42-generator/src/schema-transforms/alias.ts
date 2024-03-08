@@ -5,7 +5,7 @@ import {
   isAnyOfSchemaModel,
   isOneOfSchemaModel,
   isReferenceSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 /**
  * This transformer makes an alias if there is a single reference, allOf, anyOf or oneOf.

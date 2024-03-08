@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SchemaArena } from "../schema/index.js";
+import { SchemaArena } from "../models/index.js";
 import { normalizeObject } from "../utils/index.js";
 import { flipAllOfOneOf } from "./flip-all-of-one-of.js";
 

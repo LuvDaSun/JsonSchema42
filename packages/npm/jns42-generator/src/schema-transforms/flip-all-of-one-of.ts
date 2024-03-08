@@ -4,7 +4,7 @@ import {
   SchemaTransform,
   isAllOfSchemaModel,
   isOneOfSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import { product } from "../utils/index.js";
 
 /**

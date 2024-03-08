@@ -4,7 +4,7 @@ import {
   SchemaTransform,
   isOneOfSchemaModel,
   isSingleTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
   // we need at least two to merge

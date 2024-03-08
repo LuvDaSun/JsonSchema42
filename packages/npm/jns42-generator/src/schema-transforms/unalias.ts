@@ -1,4 +1,4 @@
-import { SchemaTransform } from "../schema/index.js";
+import { SchemaTransform } from "../models/index.js";
 import { deepEqual } from "../utils/index.js";
 
 export const unalias: SchemaTransform = (arena, model, modelKey) => {

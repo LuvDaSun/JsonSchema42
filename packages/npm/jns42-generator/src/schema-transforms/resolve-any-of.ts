@@ -5,7 +5,7 @@ import {
   SchemaTransform,
   isAnyOfSchemaModel,
   isSingleTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
 
 export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {

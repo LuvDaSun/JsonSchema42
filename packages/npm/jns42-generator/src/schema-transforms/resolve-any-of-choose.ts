@@ -3,7 +3,7 @@ import {
   SchemaModel,
   SchemaTransform,
   isAnyOfSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import { choose } from "../utils/index.js";
 
 /*

@@ -4,7 +4,7 @@ import {
   intersectionMergeTypes,
   isAllOfSchemaModel,
   isSingleTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import {
   booleanMergeAnd,
   booleanMergeOr,

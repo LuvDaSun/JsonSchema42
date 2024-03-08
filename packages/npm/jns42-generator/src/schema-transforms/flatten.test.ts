@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { SchemaArena } from "../schema/arena.js";
+import { SchemaArena } from "../models/arena.js";
 import { normalizeObject } from "../utils/index.js";
 import { flatten } from "./flatten.js";
 

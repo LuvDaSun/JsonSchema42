@@ -4,7 +4,7 @@ import {
   SchemaTransform,
   isAnyOfSchemaModel,
   isOneOfSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import { product } from "../utils/index.js";
 
 export const flipAnyOfOneOf: SchemaTransform = (arena, model, modelKey) => {

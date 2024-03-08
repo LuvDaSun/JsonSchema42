@@ -10,7 +10,7 @@ import {
   oneOfSchemaRequired,
   referenceSchemaRequired,
   typeSchemaOptional,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 /**
  * Turns the model into a single all-of with various

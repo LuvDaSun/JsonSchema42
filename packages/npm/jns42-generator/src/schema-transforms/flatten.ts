@@ -7,7 +7,7 @@ import {
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
   isOneOfSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 /**
  * Flattens nested allOf, anyOf, oneOf

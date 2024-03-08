@@ -3,7 +3,7 @@ import {
   isAliasSchemaModel,
   isOneOfSchemaModel,
   isSingleTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import {
   NestedText,
   banner,

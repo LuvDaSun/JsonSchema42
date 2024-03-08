@@ -5,7 +5,7 @@ import {
   isAliasSchemaModel,
   isSingleTypeSchemaModel,
   isTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a

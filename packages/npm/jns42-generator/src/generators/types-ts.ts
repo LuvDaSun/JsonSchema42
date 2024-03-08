@@ -5,7 +5,7 @@ import {
   isOneOfSchemaModel,
   isSingleTypeSchemaModel,
   isTypeSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import {
   NestedText,
   banner,

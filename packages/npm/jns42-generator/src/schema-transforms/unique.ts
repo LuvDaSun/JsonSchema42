@@ -5,7 +5,7 @@ import {
   isAllOfSchemaModel,
   isAnyOfSchemaModel,
   isOneOfSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 import { deepUnique } from "../utils/index.js";
 
 export const unique: SchemaTransform = (arena, model, modelKey) => {

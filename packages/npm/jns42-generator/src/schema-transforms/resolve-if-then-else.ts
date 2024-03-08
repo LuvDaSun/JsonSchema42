@@ -5,7 +5,7 @@ import {
   SchemaTransform,
   TypeSchemaModel,
   isIfSchemaModel,
-} from "../schema/index.js";
+} from "../models/index.js";
 
 /**
  * This transformer turns if-then-else into a one-of
