@@ -16,3 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: cargo test --workspace --all-targets
+
+  clippy:
+    runs-on: ubuntu-latest
+    container: rust:1.73.0
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup component add clippy
+      - run: cargo clippy --all-targets

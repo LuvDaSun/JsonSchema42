@@ -56,3 +56,11 @@ jobs:
       - run: npm --workspaces run build
       - run: make generated/npm
       - run: npm run test --workspaces
+
+  audit:
+    runs-on: ubuntu-latest
+    container: node:21.5.0-alpine3.19
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm --workspaces audit --audit-level high
