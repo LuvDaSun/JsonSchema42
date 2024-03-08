@@ -12,7 +12,7 @@ for F in $(ls ../../../fixtures/testing/*.yaml); do
 
   ./bin/jns42-generator test \
     $F \
-    --output-directory .package/test \
+    --package-directory .package/test \
     --package-name $(basename $F .yaml) \
     --package-version "0.0.0" \
 

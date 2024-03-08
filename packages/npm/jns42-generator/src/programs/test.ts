@@ -39,7 +39,7 @@ export function configureTestProgram(argv: yargs.Argv) {
           ] as const,
           default: schema202012.metaSchemaId,
         })
-        .option("output-directory", {
+        .option("package-directory", {
           description: "where to output the packages",
           type: "string",
           demandOption: true,
@@ -54,7 +54,7 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "string",
           demandOption: true,
         })
-        .option("default-name", {
+        .option("default-type-name", {
           description: "default name for types",
           type: "string",
           default: "schema-document",
@@ -76,10 +76,10 @@ export function configureTestProgram(argv: yargs.Argv) {
 interface MainConfiguration {
   pathToTest: string;
   defaultMetaSchemaUrl: string;
-  outputDirectory: string;
+  packageDirectory: string;
   packageName: string;
   packageVersion: string;
-  defaultName: string;
+  defaultTypeName: string;
   nameMaximumIterations: number;
   transformMaximumIterations: number;
 }
@@ -88,13 +88,13 @@ async function main(configuration: MainConfiguration) {
   const pathToTest = path.resolve(configuration.pathToTest);
 
   const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
-  const packageDirectoryRoot = path.resolve(configuration.outputDirectory);
+  const packageDirectoryRoot = path.resolve(configuration.packageDirectory);
   const {
     packageName,
     packageVersion,
     nameMaximumIterations,
     transformMaximumIterations,
-    defaultName,
+    defaultTypeName: defaultName,
   } = configuration;
 
   const testUrl = NodeLocation.parse(pathToTest);
