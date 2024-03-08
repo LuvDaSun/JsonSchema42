@@ -77,7 +77,7 @@ export class DocumentContext {
     return this.getDocument(documentLocation);
   }
 
-  public async loadFromUrl(
+  public async loadFromLocation(
     retrievalLocation: NodeLocation,
     givenLocation: NodeLocation,
     antecedentLocation: NodeLocation | null,
@@ -165,7 +165,7 @@ export class DocumentContext {
     this.documents.set(documentId, document);
 
     // Map all node urls to the document they belong to.
-    for (const nodeLocation of document.getNodeUrls()) {
+    for (const nodeLocation of document.getNodeLocations()) {
       const nodeId = nodeLocation.toString();
       // Figure out if the node already belongs to a document. This might be the case when
       // dealing with embedded documents
@@ -212,7 +212,7 @@ export class DocumentContext {
     }
 
     for (const { retrievalLocation, givenLocation } of document.referencedDocuments) {
-      await this.loadFromUrl(
+      await this.loadFromLocation(
         retrievalLocation,
         givenLocation,
         document.documentNodeLocation,

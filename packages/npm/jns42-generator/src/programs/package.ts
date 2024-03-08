@@ -132,7 +132,7 @@ async function main(configuration: MainConfiguration) {
       new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
-  await context.loadFromUrl(
+  await context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
     null,

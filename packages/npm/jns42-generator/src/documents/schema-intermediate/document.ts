@@ -26,7 +26,7 @@ export class Document extends DocumentBase<SchemaDocument> {
     return Object.entries(this.documentNode.schemas);
   }
 
-  public getNodeUrls(): Iterable<NodeLocation> {
+  public getNodeLocations(): Iterable<NodeLocation> {
     return Object.keys(this.documentNode.schemas).map((value) => NodeLocation.parse(value));
   }
 }

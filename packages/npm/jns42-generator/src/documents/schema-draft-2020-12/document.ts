@@ -49,8 +49,8 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<NodeLocation> {
-    yield* super.getNodeUrls();
+  public *getNodeLocations(): Iterable<NodeLocation> {
+    yield* super.getNodeLocations();
 
     for (const [anchorId] of this.anchorMap) {
       yield this.documentNodeLocation.toRoot().setAnchor(anchorId);

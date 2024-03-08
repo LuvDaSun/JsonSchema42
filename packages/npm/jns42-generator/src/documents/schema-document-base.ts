@@ -96,7 +96,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   /**
    * All unique node urls that this document contains
    */
-  public *getNodeUrls(): Iterable<NodeLocation> {
+  public *getNodeLocations(): Iterable<NodeLocation> {
     for (const [nodeId] of this.nodes) {
       yield NodeLocation.parse(nodeId);
     }
