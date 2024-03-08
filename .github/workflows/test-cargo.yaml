@@ -10,7 +10,7 @@ on:
       - packages/cargo/**
 
 jobs:
-  unit:
+  test:
     runs-on: ubuntu-latest
     container: rust:1.73.0
     steps:
