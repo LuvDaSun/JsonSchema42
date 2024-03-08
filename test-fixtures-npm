@@ -5,7 +5,7 @@ cd $(dirname $0)
 export NODE_ENV=development
 ERROR=0
 
-npm run build
+npm run build --workspaces
 
 for F in $(ls fixtures/testing/*.yaml); do
   echo $(basename $F .yaml)
