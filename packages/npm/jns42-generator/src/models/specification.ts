@@ -50,7 +50,7 @@ export function loadSpecification(
         schemaTransforms.explode,
 
         schemaTransforms.flipAllOfOneOf,
-        schemaTransforms.flipAnyOfOneOf,
+        // schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.flatten,
         schemaTransforms.unique,
