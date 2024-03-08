@@ -2,7 +2,8 @@
   "private": true,
   "packageManager": "npm@10.3.0",
   "workspaces": [
-    "*/npm/*"
+    "generated/npm/*",
+    "packages/npm/jns42-generator"
   ],
   "scripts": {
     "spelling": "cspell",
