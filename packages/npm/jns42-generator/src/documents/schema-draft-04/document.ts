@@ -41,8 +41,8 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<NodeLocation> {
-    yield* super.getNodeUrls();
+  public *getNodeLocations(): Iterable<NodeLocation> {
+    yield* super.getNodeLocations();
 
     for (const [nodeName] of this.aliasMap) {
       yield NodeLocation.parse(nodeName);

@@ -5,29 +5,29 @@ use url::Url;
 use super::read_url::read_url;
 
 pub async fn load_yaml(url: &Url) -> Result<Option<serde_json::Value>, Box<dyn std::error::Error>> {
-    let stream = read_url(url).await?;
+  let stream = read_url(url).await?;
 
-    let mut deserializer = YamlDeserializer::new(stream);
-    if let Some(item) = deserializer.next().await {
-        let item = item?;
+  let mut deserializer = YamlDeserializer::new(stream);
+  if let Some(item) = deserializer.next().await {
+    let item = item?;
 
-        Ok(Some(item))
-    } else {
-        Ok(None)
-    }
+    Ok(Some(item))
+  } else {
+    Ok(None)
+  }
 }
 
 mod test {
 
-    #[tokio::test]
-    async fn test_fetch() {
-        use super::*;
+  #[tokio::test]
+  async fn test_fetch() {
+    use super::*;
 
-        let url = "https://spec.openapis.org/oas/3.1/dialect/base"
-            .parse()
-            .unwrap();
-        let response = load_yaml(&url).await.unwrap();
+    let url = "https://spec.openapis.org/oas/3.1/dialect/base"
+      .parse()
+      .unwrap();
+    let response = load_yaml(&url).await.unwrap();
 
-        assert!(response.is_some())
-    }
+    assert!(response.is_some())
+  }
 }

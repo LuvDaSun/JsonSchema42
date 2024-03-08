@@ -65,7 +65,7 @@ async function main(configuration: MainConfiguration) {
       new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
-  await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
+  await context.loadFromLocation(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
 
   const intermediateData = context.getIntermediateData();
 

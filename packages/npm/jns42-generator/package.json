@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.14.0",
+  "version": "0.14.2",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -39,24 +39,24 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "c8": "^9.1.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   },
   "dependencies": {
-    "@jns42/oas-v3-0": "^0.13.7",
-    "@jns42/oas-v3-1": "^0.13.7",
-    "@jns42/schema-draft-04": "^0.13.7",
-    "@jns42/schema-draft-2020-12": "^0.13.7",
-    "@jns42/schema-intermediate": "^0.13.7",
-    "@jns42/schema-oas-v3-1": "^0.13.7",
-    "@jns42/swagger-v2": "^0.13.7",
-    "@types/node": "^20.11.20",
+    "@jns42/oas-v3-0": "^0.14.1",
+    "@jns42/oas-v3-1": "^0.14.1",
+    "@jns42/schema-draft-04": "^0.14.1",
+    "@jns42/schema-draft-2020-12": "^0.14.1",
+    "@jns42/schema-intermediate": "^0.14.1",
+    "@jns42/schema-oas-v3-1": "^0.14.1",
+    "@jns42/swagger-v2": "^0.14.1",
+    "@types/node": "^20.11.25",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",
     "entities": "^4.5.0",
     "hash.js": "^1.1.7",
     "tslib": "^2.6.2",
     "type-fest": "^4.9.0",
-    "yaml": "^2.4.0",
+    "yaml": "^2.4.1",
     "yargs": "^17.7.2"
   }
 }

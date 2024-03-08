@@ -14,7 +14,7 @@ export abstract class DocumentBase<N = unknown> {
     readonly [string, schemaIntermediate.Node]
   >;
 
-  public abstract getNodeUrls(): Iterable<NodeLocation>;
+  public abstract getNodeLocations(): Iterable<NodeLocation>;
 
   protected abstract assertDocumentNode(node: unknown): asserts node is N;
 }
