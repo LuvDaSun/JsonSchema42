@@ -1,16 +1,4 @@
-import {
-  AllOfSchemaModel,
-  SchemaModel,
-  SchemaTransform,
-  allOfSchemaRequired,
-  anyOfSchemaRequired,
-  ifSchemaOptional,
-  ifSchemaRequired,
-  isAliasSchemaModel,
-  oneOfSchemaRequired,
-  referenceSchemaRequired,
-  typeSchemaOptional,
-} from "../models/index.js";
+import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../models/index.js";
 
 /**
  * Turns the model into a single all-of with various
@@ -66,160 +54,71 @@ import {
  * ```
  *
  */
-export const explode: SchemaTransform = (arena, modelKey) => {
-  const model = arena.getItem(modelKey);
+export const explode: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
 
-  if (isAliasSchemaModel(model)) {
-    return model;
+  if (isAliasSchemaModel(item)) {
+    return item;
   }
 
-  const propertyGroups = {
-    reference: referenceSchemaRequired,
-    allOf: allOfSchemaRequired,
-    anyOf: anyOfSchemaRequired,
-    oneOf: oneOfSchemaRequired,
-    if: [...ifSchemaRequired, ...ifSchemaOptional],
-    type: typeSchemaOptional,
-  };
+  const subItems = new Array<SchemaModel>();
 
-  const schemaModels = Object.fromEntries(
-    Object.entries(propertyGroups).map(([key, properties]) => [
-      key,
-      properties.some((property) => model[property] != null),
-    ]),
-  ) as Record<keyof typeof propertyGroups, boolean>;
-
-  let count = Object.values(schemaModels).filter((value) => value).length;
-
-  if (count <= 1) {
-    // nothing to explode here
-    return model;
+  if (item.types != null && item.types.length > 0) {
+    subItems.push({
+      parent: key,
+      types: item.types,
+    });
   }
 
-  const newModel: SchemaModel & AllOfSchemaModel = {
-    ...model,
-    reference: undefined,
-    allOf: [],
-    anyOf: undefined,
-    oneOf: undefined,
-    if: undefined,
-    then: undefined,
-    else: undefined,
-    not: undefined,
-
-    types: undefined,
-    dependentSchemas: undefined,
-    objectProperties: undefined,
-    mapProperties: undefined,
-    patternProperties: undefined,
-    propertyNames: undefined,
-    tupleItems: undefined,
-    arrayItems: undefined,
-    contains: undefined,
-    required: undefined,
-    options: undefined,
-
-    minimumInclusive: undefined,
-    minimumExclusive: undefined,
-    maximumInclusive: undefined,
-    maximumExclusive: undefined,
-    multipleOf: undefined,
-    minimumLength: undefined,
-    maximumLength: undefined,
-    valuePattern: undefined,
-    valueFormat: undefined,
-    minimumItems: undefined,
-    maximumItems: undefined,
-    uniqueItems: undefined,
-    minimumProperties: undefined,
-    maximumProperties: undefined,
-  };
-
-  if (schemaModels.reference) {
-    const newSubModel: SchemaModel = {
-      reference: model.reference,
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.allOf.push(newSubKey);
+  if (item.reference != null) {
+    subItems.push({
+      parent: key,
+      reference: item.reference,
+    });
   }
 
-  if (schemaModels.allOf) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-
-      allOf: model.allOf,
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.allOf.push(newSubKey);
+  if (item.allOf != null && item.allOf.length > 0) {
+    subItems.push({
+      parent: key,
+      allOf: item.allOf,
+    });
   }
 
-  if (schemaModels.anyOf) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-
-      anyOf: model.anyOf,
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.allOf.push(newSubKey);
+  if (item.anyOf != null && item.anyOf.length > 0) {
+    subItems.push({
+      parent: key,
+      anyOf: item.anyOf,
+    });
   }
 
-  if (schemaModels.oneOf) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-
-      oneOf: model.oneOf,
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.allOf.push(newSubKey);
+  if (item.oneOf != null && item.oneOf.length > 0) {
+    subItems.push({
+      parent: key,
+      oneOf: item.oneOf,
+    });
   }
 
-  if (schemaModels.if) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-
-      if: model.if,
-      then: model.then,
-      else: model.else,
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.allOf.push(newSubKey);
+  if (item.if != null || item.then != null || item.else != null) {
+    subItems.push({
+      parent: key,
+      if: item.if,
+      then: item.then,
+      else: item.else,
+    });
   }
 
-  if (schemaModels.type) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-      not: model.not,
-
-      types: model.types,
-      dependentSchemas: model.dependentSchemas,
-      objectProperties: model.objectProperties,
-      mapProperties: model.mapProperties,
-      patternProperties: model.patternProperties,
-      propertyNames: model.propertyNames,
-      tupleItems: model.tupleItems,
-      arrayItems: model.arrayItems,
-      contains: model.contains,
-      required: model.required,
-      options: model.options,
-
-      minimumInclusive: model.minimumInclusive,
-      minimumExclusive: model.minimumExclusive,
-      maximumInclusive: model.maximumInclusive,
-      maximumExclusive: model.maximumExclusive,
-      multipleOf: model.multipleOf,
-      minimumLength: model.minimumLength,
-      maximumLength: model.maximumLength,
-      valuePattern: model.valuePattern,
-      valueFormat: model.valueFormat,
-      minimumItems: model.minimumItems,
-      maximumItems: model.maximumItems,
-      uniqueItems: model.uniqueItems,
-      minimumProperties: model.minimumProperties,
-      maximumProperties: model.maximumProperties,
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.allOf.push(newSubKey);
+  if (subItems.length > 1) {
+    let subKeys = subItems.map((subItem) => arena.addItem(subItem));
+    arena.setItem(key, {
+      types: undefined,
+      reference: undefined,
+      allOf: subKeys,
+      anyOf: undefined,
+      oneOf: undefined,
+      if: undefined,
+      then: undefined,
+      else: undefined,
+      ...item,
+    });
   }
-
-  return newModel;
 };
