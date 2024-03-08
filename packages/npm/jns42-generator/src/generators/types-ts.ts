@@ -20,7 +20,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   const { names, typesArena } = specification;
 
-  for (const [itemKey, item] of typesArena) {
+  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {

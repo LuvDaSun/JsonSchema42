@@ -5,8 +5,8 @@ export type ArenaTransform<T, A extends Arena<T> = Arena<T>> = (arena: A, key: n
 export class Arena<T> {
   private items = immutable.List<T>();
 
-  public *[Symbol.iterator]() {
-    return this.items;
+  public [Symbol.iterator]() {
+    return this.items[Symbol.iterator]();
   }
 
   public get size() {

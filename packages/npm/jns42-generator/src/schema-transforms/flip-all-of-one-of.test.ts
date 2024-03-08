@@ -64,21 +64,18 @@ test("flip-all-of-one-of 2", () => {
 
   while (arena.applyTransform(...useTransforms) > 0);
 
-  assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
-    [
-      {}, // 0
-      {}, // 1
-      {}, // 2
-      {}, // 3
-      {}, // 4
-      { oneOf: [1, 2] }, // 5
-      { oneOf: [3, 4] }, // 6
-      { oneOf: [8, 9, 10, 11] }, // 7
-      { parent: 7, allOf: [0, 1, 3] }, // 8
-      { parent: 7, allOf: [0, 1, 4] }, // 9
-      { parent: 7, allOf: [0, 2, 3] }, // 10
-      { parent: 7, allOf: [0, 2, 4] }, // 11
-    ],
-  );
+  assert.deepEqual([...arena].map(normalizeObject), [
+    {}, // 0
+    {}, // 1
+    {}, // 2
+    {}, // 3
+    {}, // 4
+    { oneOf: [1, 2] }, // 5
+    { oneOf: [3, 4] }, // 6
+    { oneOf: [8, 9, 10, 11] }, // 7
+    { parent: 7, allOf: [0, 1, 3] }, // 8
+    { parent: 7, allOf: [0, 1, 4] }, // 9
+    { parent: 7, allOf: [0, 2, 3] }, // 10
+    { parent: 7, allOf: [0, 2, 4] }, // 11
+  ]);
 });

@@ -19,7 +19,7 @@ test("flatten", () => {
   while (arena.applyTransform(flatten) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [{ allOf: [100, 200] }, { allOf: [300, 400] }, { allOf: [100, 200, 300, 400] }],
   );

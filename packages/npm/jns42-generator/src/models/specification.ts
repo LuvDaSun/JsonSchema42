@@ -76,7 +76,7 @@ export function loadSpecification(
 
   // figure out which keys are actually in use
   const usedKeys = new Set<number>();
-  for (const [key, item] of typesArena) {
+  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     if (item.id != null) {
       usedKeys.add(key);
     }

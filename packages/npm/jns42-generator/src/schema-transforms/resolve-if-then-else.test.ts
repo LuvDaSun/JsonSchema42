@@ -15,7 +15,7 @@ test("if-then-else", () => {
   while (arena.applyTransform(resolveIfThenElse) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       {

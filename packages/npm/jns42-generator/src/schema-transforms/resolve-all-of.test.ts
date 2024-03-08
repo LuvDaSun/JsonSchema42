@@ -17,7 +17,7 @@ test("resolve-all-of utility", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { types: ["never"] },
@@ -39,7 +39,7 @@ test("resolve-all-of alias", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [{ types: ["string"] }, { types: ["string"] }, { alias: str2 }, { types: ["string"] }],
   );
@@ -56,7 +56,7 @@ test("resolve-all-of primitive", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { types: ["number"] },
@@ -81,7 +81,7 @@ test("resolve-all-of tuple", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { types: ["number"] }, // 0
@@ -108,7 +108,7 @@ test("resolve-all-of array", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { types: ["number"] }, // 0
@@ -147,7 +147,7 @@ test("resolve-all-of object", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { types: ["number"] }, // 0
@@ -196,7 +196,7 @@ test("resolve-all-of map", () => {
   while (arena.applyTransform(...useTransforms) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { types: ["string"] }, // 0

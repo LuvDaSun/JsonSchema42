@@ -80,7 +80,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
   `;
 
-  for (const [itemKey, item] of validatorsArena) {
+  for (const [itemKey, item] of [...validatorsArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {

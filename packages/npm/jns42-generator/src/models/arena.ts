@@ -1,5 +1,4 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import assert from "assert";
 import { Arena, ArenaTransform } from "../utils/arena.js";
 import { SchemaModel, SchemaType, isAliasSchemaModel } from "./model.js";
 
@@ -18,9 +17,8 @@ export class SchemaArena extends Arena<SchemaModel> {
 
   public clone(): SchemaArena {
     const arena = new SchemaArena();
-    for (const [key, item] of this) {
-      const newKey = arena.addItem(item);
-      assert.equal(newKey, key);
+    for (const item of this) {
+      arena.addItem(item);
     }
     return arena;
   }

@@ -19,7 +19,7 @@ test("explode", () => {
   while (arena.applyTransform(explode) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [
       { allOf: [1, 2, 3, 4, 5] },

@@ -13,7 +13,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (const [itemKey, item] of typesArena) {
+  for (const item of typesArena) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {

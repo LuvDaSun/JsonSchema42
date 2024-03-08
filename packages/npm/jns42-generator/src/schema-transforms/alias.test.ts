@@ -13,7 +13,7 @@ test("alias", () => {
   while (arena.applyTransform(alias) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
     [{ alias: 100 }, { alias: 100 }, { alias: 100 }],
   );
