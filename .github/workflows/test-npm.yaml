@@ -8,6 +8,7 @@ on:
       - package-lock.json
       - .github/**
       - fixtures/**
+      - packages/oas/**
       - packages/npm/**
 
 jobs:
