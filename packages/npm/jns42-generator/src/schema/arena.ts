@@ -32,7 +32,7 @@ export class SchemaArena extends Arena<SchemaModel> {
     */
     const idMap: Record<string, number> = {};
     const parents: Record<string, string> = {};
-    const implicitTypes: Record<string, SchemaType> = {};
+    const implicitTypes: Record<string, SchemaType[]> = {};
 
     for (const id in document.schemas) {
       const schema = document.schemas[id];
@@ -75,8 +75,31 @@ export class SchemaArena extends Arena<SchemaModel> {
         parents[schema.not] = id;
       }
 
+      if (schema.options != null) {
+        const types = new Set<SchemaType>();
+        for (const option in schema.options) {
+          switch (typeof option) {
+            case "string":
+              types.add("string");
+              break;
+            case "number":
+              types.add("number");
+              break;
+            case "bigint":
+              types.add("integer");
+              break;
+            case "boolean":
+              types.add("boolean");
+              break;
+          }
+        }
+        implicitTypes[id] ??= [];
+        implicitTypes[id].push(...types);
+      }
+
       if (schema.propertyNames != null) {
-        implicitTypes[schema.propertyNames] = "string";
+        implicitTypes[schema.propertyNames] ??= [];
+        implicitTypes[schema.propertyNames].push("string");
       }
     }
 
@@ -157,12 +180,7 @@ export class SchemaArena extends Arena<SchemaModel> {
               Object.entries(schema.patternProperties).map(([name, id]) => [name, idMap[id]]),
             );
 
-      model.types =
-        schema.types == null
-          ? implicitTypes[id] == null
-            ? undefined
-            : [implicitTypes[id]]
-          : schema.types;
+      model.types = schema.types ?? implicitTypes[id];
 
       return model;
     });

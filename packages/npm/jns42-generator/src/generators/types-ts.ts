@@ -49,6 +49,18 @@ export function* generateTypesTsCode(specification: models.Specification) {
   function* generateTypeDefinition(itemKey: number) {
     const item = typesArena.getItem(itemKey);
 
+    if (item.anyOf != null) {
+      throw new TypeError("encountered anyOf when generating type");
+    }
+
+    if (item.if != null) {
+      throw new TypeError("encountered if when generating type");
+    }
+
+    if (item.not != null) {
+      throw new TypeError("encountered not when generating type");
+    }
+
     if (isAliasSchemaModel(item)) {
       yield generateTypeReference(item.alias);
       return;
