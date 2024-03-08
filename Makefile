@@ -18,10 +18,10 @@ rebuild: \
 
 clean: \
 
-	rm --recursive --force generated
+	rm -rf generated
 
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package $< \
 		--package-directory $@ \
@@ -32,7 +32,7 @@ generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.y
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-draft-04:
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package http://json-schema.org/draft-04/schema\# \
 		--package-directory $@ \
@@ -43,7 +43,7 @@ generated/npm/schema-draft-04:
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-draft-2020-12:
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package https://json-schema.org/draft/2020-12/schema \
 		--package-directory $@ \
@@ -54,7 +54,7 @@ generated/npm/schema-draft-2020-12:
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-oas-v3-1:
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/dialect/base \
 		--package-directory $@ \
@@ -65,7 +65,7 @@ generated/npm/schema-oas-v3-1:
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/swagger-v2:
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package http://swagger.io/v2/schema.json\# \
 		--package-directory $@ \
@@ -76,7 +76,7 @@ generated/npm/swagger-v2:
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/oas-v3-0:
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.0/schema/2021-09-28 \
 		--package-directory $@ \
@@ -87,7 +87,7 @@ generated/npm/oas-v3-0:
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/oas-v3-1:
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	npx jns42-generator package https://spec.openapis.org/oas/3.1/schema/2022-10-07 \
 		--package-directory $@ \
@@ -98,7 +98,7 @@ generated/npm/oas-v3-1:
 	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
-	mkdir --parents $(@D)
+	mkdir -p $(@D)
 
 	cargo run \
 		--package jns42-generator \
