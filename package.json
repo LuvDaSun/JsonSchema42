@@ -12,6 +12,7 @@
     "cspell": "^8.6.0",
     "jns42-generator": "^0.14.2",
     "prettier": "^3.2.5",
+    "rollup": "^4.12.1",
     "typescript": "^5.4.2"
   }
 }

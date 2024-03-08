@@ -4,22 +4,29 @@
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
-  "bin": {
-    "jns42-generator": "bin/jns42-generator"
+  "main": "./bundled/main.cjs",
+  "module": "./bundled/main.js",
+  "types": "./types/main.d.ts",
+  "exports": {
+    ".": {
+      "require": "./bundled/main.cjs",
+      "import": "./bundled/main.js",
+      "types": "./types/main.d.ts"
+    }
   },
-  "main": "out/main.js",
-  "types": "out/main.d.ts",
   "files": [
-    "bin/**",
-    "out/**",
-    "src/**"
+    "./types/**",
+    "./bundled/**"
   ],
+  "bin": {
+    "jns42-generator": "bundled/program.js"
+  },
   "scripts": {
-    "prepack": "tsc --build",
-    "pretest": "tsc --build",
-    "build": "tsc --build",
-    "clean": "rm -rf ./out && tsc --build --clean",
-    "test": "node --test ./out/**/*.test.js"
+    "prepack": "./scripts/build.js",
+    "pretest": "./scripts/build.js",
+    "build": "./scripts/build.js",
+    "clean": "./scripts/clean.js",
+    "test": "node --test ./transpiled/**/*.test.js"
   },
   "repository": {
     "type": "git",
