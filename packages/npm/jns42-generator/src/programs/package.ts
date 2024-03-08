@@ -13,16 +13,16 @@ import { NodeLocation } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(
-    "package [instance-schema-url]",
-    "create package from instance-schema-url",
+    "package [instance-schema-location]",
+    "create package from instance-schema-location",
     (yargs) =>
       yargs
-        .positional("instance-schema-url", {
-          description: "url to download schema from",
+        .positional("instance-schema-location", {
+          description: "location to download schema from",
           type: "string",
           demandOption: true,
         })
-        .option("default-meta-schema-url", {
+        .option("default-meta-schema", {
           description: "the default meta schema to use",
           type: "string",
           choices: [
@@ -70,8 +70,8 @@ export function configurePackageProgram(argv: yargs.Argv) {
 }
 
 interface MainConfiguration {
-  instanceSchemaUrl: string;
-  defaultMetaSchemaUrl: string;
+  instanceSchemaLocation: string;
+  defaultMetaSchema: string;
   packageDirectory: string;
   packageName: string;
   packageVersion: string;
@@ -81,8 +81,8 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaUrl = NodeLocation.parse(configuration.instanceSchemaUrl);
-  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const instanceSchemaLocation = NodeLocation.parse(configuration.instanceSchemaLocation);
+  const defaultMetaSchema = configuration.defaultMetaSchema;
   const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const {
     packageName,
@@ -132,7 +132,12 @@ async function main(configuration: MainConfiguration) {
       new schemaIntermediate.Document(givenUrl, rootNode),
   );
 
-  await context.loadFromUrl(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
+  await context.loadFromUrl(
+    instanceSchemaLocation,
+    instanceSchemaLocation,
+    null,
+    defaultMetaSchema,
+  );
 
   const intermediateDocument = context.getIntermediateData();
 
