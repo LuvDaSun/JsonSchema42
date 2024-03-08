@@ -211,7 +211,7 @@ async function main(configuration: MainConfiguration) {
 
     await test("valid", async () => {
       const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "out", "main.js")
+        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
       );
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
@@ -227,7 +227,7 @@ async function main(configuration: MainConfiguration) {
 
     await test("invalid", async () => {
       const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "out", "main.js")
+        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
       );
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];
