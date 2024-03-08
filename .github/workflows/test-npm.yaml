@@ -21,7 +21,6 @@ jobs:
       - run: npm ci
       - run: npm --workspaces run build
       - run: npm --workspaces test
-      - run: ./packages/npm/jns42-generator/test-fixtures
 
   test-matrix:
     strategy:
@@ -38,7 +37,7 @@ jobs:
       - run: npm ci
       - run: npm --workspaces run build
       - run: npm --workspaces test
-      - run: ./packages/npm/jns42-generator/test-fixtures
+      - run: ./test-fixtures-npm
 
   generated-matrix:
     strategy:

@@ -7,10 +7,10 @@ ERROR=0
 
 npm run build
 
-for F in $(ls ../../../fixtures/testing/*.yaml); do
+for F in $(ls fixtures/testing/*.yaml); do
   echo $(basename $F .yaml)
 
-  ./bin/jns42-generator test \
+  npx jns42-generator test \
     $F \
     --package-directory .package/test \
     --package-name $(basename $F .yaml) \
