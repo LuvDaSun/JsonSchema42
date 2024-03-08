@@ -66,7 +66,9 @@ import {
  * ```
  *
  */
-export const explode: SchemaTransform = (arena, model, modelKey) => {
+export const explode: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   if (isAliasSchemaModel(model)) {
     return model;
   }

@@ -57,7 +57,9 @@ will become
     - 400
 ```
  */
-export const flipAllOfOneOf: SchemaTransform = (arena, model, modelKey) => {
+export const flipAllOfOneOf: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   // we need at least two to merge
   if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
     return model;

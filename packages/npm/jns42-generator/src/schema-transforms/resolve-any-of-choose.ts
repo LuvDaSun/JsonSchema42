@@ -9,7 +9,9 @@ import { choose } from "../utils/index.js";
 /*
 this is the correct implementation of anyof, it may yield an incredible amount of code.
 */
-export const resolveAnyOfChoose: SchemaTransform = (arena, model, modelKey) => {
+export const resolveAnyOfChoose: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
     return model;
   }

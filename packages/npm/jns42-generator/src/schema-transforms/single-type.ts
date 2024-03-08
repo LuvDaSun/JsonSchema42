@@ -31,7 +31,9 @@ import {
  *   - string
  * ```
  */
-export const singleType: SchemaTransform = (arena, model, modelKey) => {
+export const singleType: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   if (isAliasSchemaModel(model)) {
     return model;
   }

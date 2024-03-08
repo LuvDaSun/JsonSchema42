@@ -1,7 +1,9 @@
 import { SchemaTransform } from "../models/index.js";
 import { deepEqual } from "../utils/index.js";
 
-export const unalias: SchemaTransform = (arena, model, modelKey) => {
+export const unalias: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   let newModel = model;
 
   if (model.reference != null) {

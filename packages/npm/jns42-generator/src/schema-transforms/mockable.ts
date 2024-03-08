@@ -10,7 +10,9 @@ import {
 } from "../models/index.js";
 import { booleanMergeAnd, booleanMergeOr } from "../utils/merge.js";
 
-export const mockable: SchemaTransform = (arena, model, modelKey) => {
+export const mockable: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   let mockable = model.mockable;
 
   if (isSingleTypeSchemaModel(model)) {

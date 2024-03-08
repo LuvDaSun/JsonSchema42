@@ -36,7 +36,9 @@ import {
  *   - 500
  * ```
  */
-export const flatten: SchemaTransform = (arena, model, modelKey) => {
+export const flatten: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   if (isAllOfSchemaModel(model)) {
     const newModel: SchemaModel & AllOfSchemaModel = {
       ...model,

@@ -6,7 +6,9 @@ import {
   isSingleTypeSchemaModel,
 } from "../models/index.js";
 
-export const resolveOneOf: SchemaTransform = (arena, model, modelKey) => {
+export const resolveOneOf: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   // we need at least two to merge
   if (!isOneOfSchemaModel(model) || model.oneOf.length < 2) {
     return model;

@@ -8,7 +8,9 @@ import {
 } from "../models/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
 
-export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
+export const resolveAnyOf: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   // we need at least two to merge
   if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
     return model;

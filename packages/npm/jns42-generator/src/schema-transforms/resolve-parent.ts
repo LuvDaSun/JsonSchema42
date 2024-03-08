@@ -23,7 +23,9 @@ import {
  * and then removing the parent relation by setting it to undefined.
  *
  */
-export const resolveParent: SchemaTransform = (arena, model, modelKey) => {
+export const resolveParent: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   // we need to have a parent, we need to be a child
   if (!isChildSchemaModel(model)) {
     return model;

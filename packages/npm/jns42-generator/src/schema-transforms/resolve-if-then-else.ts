@@ -31,7 +31,9 @@ import {
  *   - 300
  * ```
  */
-export const resolveIfThenElse: SchemaTransform = (arena, model, modelKey) => {
+export const resolveIfThenElse: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   // we need at least two to merge
   if (!isIfSchemaModel(model)) {
     return model;

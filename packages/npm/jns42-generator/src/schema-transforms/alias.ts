@@ -21,7 +21,9 @@ import {
  * - alias: 1
  * ```
  */
-export const alias: SchemaTransform = (arena, model, modelKey) => {
+export const alias: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   if (isAliasSchemaModel(model)) {
     return model;
   }

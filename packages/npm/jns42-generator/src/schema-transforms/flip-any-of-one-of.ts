@@ -7,7 +7,9 @@ import {
 } from "../models/index.js";
 import { product } from "../utils/index.js";
 
-export const flipAnyOfOneOf: SchemaTransform = (arena, model, modelKey) => {
+export const flipAnyOfOneOf: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   // we need at least two to merge
   if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
     return model;

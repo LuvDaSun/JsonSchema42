@@ -53,7 +53,9 @@ import {
  *   - "b"
  * ```
  */
-export const flushParent: SchemaTransform = (arena, model, modelKey) => {
+export const flushParent: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   const newModel = {
     ...model,
     not: undefined,

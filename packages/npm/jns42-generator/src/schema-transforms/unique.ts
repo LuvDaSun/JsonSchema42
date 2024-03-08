@@ -8,7 +8,9 @@ import {
 } from "../models/index.js";
 import { deepUnique } from "../utils/index.js";
 
-export const unique: SchemaTransform = (arena, model, modelKey) => {
+export const unique: SchemaTransform = (arena, modelKey) => {
+  const model = arena.getItem(modelKey);
+
   if (isAllOfSchemaModel(model)) {
     const set = [...makeUnique(model.allOf)];
     if (set.length === 0) {
