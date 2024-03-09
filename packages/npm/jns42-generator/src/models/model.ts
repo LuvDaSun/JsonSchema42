@@ -27,10 +27,17 @@ export type SchemaType =
  * the entire SchemaModel, everything is optional!
  */
 export type SchemaModel = {
-  alias?: SchemaKey;
+  // is this model exactly the same as the previous, un-optimized version or is is just similar
+  exact?: boolean;
+
+  // the original parent of this item
   parent?: SchemaKey;
 
-  mockable?: boolean;
+  /**
+   * @deprecated
+   */
+  alias?: SchemaKey;
+
   id?: string;
   title?: string;
   description?: string;
@@ -40,10 +47,6 @@ export type SchemaModel = {
   types?: SchemaType[];
 
   reference?: SchemaKey;
-
-  oneOf?: SchemaKey[];
-  anyOf?: SchemaKey[];
-  allOf?: SchemaKey[];
 
   if?: SchemaKey;
   then?: SchemaKey;
@@ -56,6 +59,9 @@ export type SchemaModel = {
   propertyNames?: SchemaKey;
   contains?: SchemaKey;
 
+  oneOf?: SchemaKey[];
+  anyOf?: SchemaKey[];
+  allOf?: SchemaKey[];
   tupleItems?: SchemaKey[];
 
   objectProperties?: Record<string, SchemaKey>;

@@ -15,6 +15,113 @@ export class SchemaArena extends Arena<SchemaModel> {
     return [resolvedKey, resolvedItem];
   }
 
+  public isMockable(key: number) {
+    const item = this.getItem(key);
+
+    // we can only mock exact items
+    if (!(item.exact ?? false)) {
+      return false;
+    }
+
+    // we might support this one day
+    if (item.uniqueItems != null) {
+      return false;
+    }
+
+    // one day we might support some formats
+    if (item.valueFormat != null) {
+      return false;
+    }
+
+    // anything with a regex cannot be mocked
+    if (item.valuePattern != null) {
+      return false;
+    }
+
+    if (item.types != null) {
+      // we cannot mock never types
+      if (item.types.every((type) => type === "never")) {
+        return false;
+      }
+    }
+
+    if (item.reference != null) {
+      if (!this.isMockable(item.reference)) {
+        return false;
+      }
+    }
+
+    if (item.if != null) {
+      return false;
+    }
+    if (item.then != null) {
+      return false;
+    }
+    if (item.else != null) {
+      return false;
+    }
+    if (item.not != null) {
+      return false;
+    }
+
+    if (item.mapProperties != null) {
+      if (!this.isMockable(item.mapProperties)) {
+        return false;
+      }
+    }
+
+    if (item.arrayItems != null) {
+      if (!this.isMockable(item.arrayItems)) {
+        return false;
+      }
+    }
+
+    if (item.propertyNames != null) {
+      if (!this.isMockable(item.propertyNames)) {
+        return false;
+      }
+    }
+
+    if (item.contains != null) {
+      return false;
+    }
+
+    if (item.oneOf != null && item.oneOf.length > 0) {
+      if (!item.oneOf.some((key) => this.isMockable(key))) {
+        return false;
+      }
+    }
+
+    if (item.anyOf != null && item.anyOf.length > 0) {
+      return false;
+    }
+
+    if (item.allOf != null && item.allOf.length > 0) {
+      return false;
+    }
+
+    if (item.objectProperties != null && Object.keys(item.objectProperties).length > 0) {
+      const required = new Set(item.required);
+      if (
+        !Object.entries(item.objectProperties)
+          .filter(([name, key]) => required.has(name))
+          .every(([name, key]) => this.isMockable(key))
+      ) {
+        return false;
+      }
+    }
+
+    // anything with a regex cannot be mocked
+    if (item.patternProperties != null && Object.keys(item.patternProperties).length > 0) {
+      return false;
+    }
+    if (item.dependentSchemas != null && Object.keys(item.dependentSchemas).length > 0) {
+      return false;
+    }
+
+    return true;
+  }
+
   public clone(): SchemaArena {
     const arena = new SchemaArena();
     for (const item of this) {
