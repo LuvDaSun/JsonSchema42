@@ -59,8 +59,6 @@ export function loadSpecification(
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
-        schemaTransforms.mockable,
-
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
         schemaTransforms.resolveOneOf,

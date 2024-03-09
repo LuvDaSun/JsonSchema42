@@ -88,21 +88,13 @@ export type SchemaModel = {
 };
 
 export type MetaSchemaModel = {
-  mockable?: boolean;
   id?: string;
   title?: string;
   description?: string;
   examples?: any[];
   deprecated?: boolean;
 };
-export const metaSchemaOptional = [
-  "mockable",
-  "id",
-  "title",
-  "description",
-  "examples",
-  "deprecated",
-] as const;
+export const metaSchemaOptional = ["id", "title", "description", "examples", "deprecated"] as const;
 export function isMetaSchemaModel(model: SchemaModel): model is MetaSchemaModel {
   return hasMembers(model, [], metaSchemaOptional);
 }

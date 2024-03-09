@@ -66,7 +66,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    if (item.mockable !== true) {
+    if (!typesArena.isMockable(itemKey)) {
       continue;
     }
 
@@ -131,7 +131,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
       const oneOfMockableEntries = item.oneOf
         .map((key) => [key, typesArena.resolveItem(key)[1]] as const)
-        .filter(([key, item]) => item.mockable);
+        .filter(([key, item]) => typesArena.isMockable(key));
 
       yield itt`
         (() => {
@@ -332,10 +332,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
               }
             }
 
-            if (
-              item.arrayItems != null &&
-              (typesArena.resolveItem(item.arrayItems)[1].mockable ?? false)
-            ) {
+            if (item.arrayItems != null && typesArena.isMockable(item.arrayItems)) {
               yield itt`
               ...new Array(
                 Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
@@ -403,10 +400,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                   ? "configuration.defaultMaximumProperties"
                   : JSON.stringify(item.maximumProperties);
 
-              if (
-                item.mapProperties != null &&
-                typesArena.resolveItem(item.mapProperties)[1].mockable
-              ) {
+              if (item.mapProperties != null && typesArena.isMockable(item.mapProperties)) {
                 yield itt`
                   ...Object.fromEntries(
                     new Array(

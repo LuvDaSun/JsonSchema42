@@ -6,7 +6,6 @@ import {
   isSingleTypeSchemaModel,
 } from "../models/index.js";
 import {
-  booleanMergeAnd,
   booleanMergeOr,
   intersectionMerge,
   mergeKeysArray,
@@ -73,14 +72,12 @@ export const resolveAllOf: SchemaTransform = (arena, modelKey) => {
         description: model.description,
         examples: model.examples,
         deprecated: model.deprecated,
-        mockable: model.mockable,
       };
       continue;
     }
 
     newModel = {
       ...newModel,
-      mockable: booleanMergeAnd(newModel.mockable, elementModel.mockable),
 
       types: intersectionMergeTypes(newModel.types, elementModel.types),
       options: intersectionMerge(newModel.options, elementModel.options),

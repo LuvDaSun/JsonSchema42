@@ -13,14 +13,14 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (const item of typesArena) {
+  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    if (item.mockable !== true) {
+    if (!typesArena.isMockable(key)) {
       continue;
     }
 
