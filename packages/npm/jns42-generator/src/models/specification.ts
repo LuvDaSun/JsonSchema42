@@ -54,14 +54,12 @@ export function loadSpecification(
         schemaTransforms.flattenAnyOf,
         schemaTransforms.flattenOneOf,
 
-        schemaTransforms.resolveIfThenElse,
-
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
-        schemaTransforms.resolveOneOf,
+        schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveParent,
 
         schemaTransforms.flushParent,
