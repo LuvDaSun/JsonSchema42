@@ -226,6 +226,9 @@ export class SchemaArena extends Arena<SchemaModel> {
         parent: parents[id] == null ? undefined : idMap[parents[id]],
       };
 
+      // initially all items are exact
+      itemNew.exact = true;
+
       itemNew.title = schema.title;
       itemNew.description = schema.description;
       itemNew.examples = schema.examples;
