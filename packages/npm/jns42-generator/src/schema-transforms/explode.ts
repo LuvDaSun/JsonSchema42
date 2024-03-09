@@ -110,6 +110,7 @@ export const explode: SchemaTransform = (arena, key) => {
   if (subItems.length > 1) {
     let subKeys = subItems.map((subItem) => arena.addItem(subItem));
     arena.setItem(key, {
+      ...item,
       types: undefined,
       reference: undefined,
       allOf: subKeys,
@@ -118,7 +119,6 @@ export const explode: SchemaTransform = (arena, key) => {
       if: undefined,
       then: undefined,
       else: undefined,
-      ...item,
     });
   }
 };
