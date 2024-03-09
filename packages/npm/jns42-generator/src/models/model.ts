@@ -27,11 +27,11 @@ export type SchemaType =
  * the entire SchemaModel, everything is optional!
  */
 export type SchemaModel = {
-  // is this model exactly the same as the previous, un-optimized version or is is just similar
-  exact?: boolean;
-
   // the original parent of this item
   parent?: SchemaKey;
+
+  // is this model exactly the same as the previous, un-optimized version or is is just similar
+  exact?: boolean;
 
   id?: string;
   title?: string;
@@ -82,20 +82,22 @@ export type SchemaModel = {
   maximumProperties?: number;
 };
 
-export type AliasSchemaModel = Partial<MetaSchemaModel> & {
+export type AliasSchemaModel = {
   reference: SchemaKey;
+
+  exact?: boolean;
+  id?: string;
+  title?: string;
+  description?: string;
+  examples?: any[];
+  deprecated?: boolean;
 };
 export function isAliasSchemaModel(model: SchemaModel): model is AliasSchemaModel {
-  for (const property in model) {
-    switch (property) {
-      case "reference":
-        break;
-
-      default:
-        return false;
-    }
-  }
-  return true;
+  return hasMembers(
+    model,
+    ["reference"],
+    ["exact", "id", "title", "description", "examples", "deprecated"],
+  );
 }
 
 export type MetaSchemaModel = {
