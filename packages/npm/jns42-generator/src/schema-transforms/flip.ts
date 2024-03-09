@@ -78,15 +78,19 @@ function createTransform(
       return;
     }
 
-    const baseEntries = baseKeys.map((baseKey) => [baseKey, arena.getItem(baseKey)] as const);
-    const otherKeysEntries = baseEntries.flatMap(([subKey, subItem]) => {
-      const otherKeys = subItem[otherMember];
-      if (otherKeys == null) {
-        return [];
-      } else {
-        return otherKeys.map((subKey) => [subKey, otherKeys] as const);
-      }
-    });
+    const baseItemsEntries = baseKeys.map((baseKey) => [baseKey, arena.getItem(baseKey)] as const);
+    const otherKeysEntries = baseItemsEntries
+      .map(([subKey, subItem]) => {
+        const otherKeys = subItem[otherMember];
+        if (otherKeys == null) {
+          return [];
+        } else {
+          return otherKeys.map((subKey) => [subKey, otherKeys] as const);
+        }
+      })
+      .filter(([subKey, otherKeys]) => {
+        otherKeys.length > 0;
+      });
 
     if (otherKeysEntries.length == 0) {
       return;
@@ -94,13 +98,13 @@ function createTransform(
 
     const otherKeys = Object.entries(otherKeysEntries);
 
-    const subKeys = baseEntries
+    const subKeys = baseItemsEntries
       .map(([subKey]) => subKey)
       .filter((subKey) => otherKeys[subKey] != null);
 
     const subKeysNew = new Array<number>();
 
-    for (const set of product(Object.values(otherKeys.values))) {
+    for (const set of product(Object.values(otherKeysEntries))) {
       let subItem = {
         parent: key,
         [baseMember]: [...subKeys, ...set],
@@ -109,6 +113,7 @@ function createTransform(
       subKeysNew.push(subKey);
     }
 
-    arena.setItem(key, { ...item, [baseMember]: undefined, [otherMember]: subKeysNew });
+    const itemNew = { ...item, [baseMember]: undefined, [otherMember]: subKeysNew };
+    arena.setItem(key, itemNew);
   };
 }

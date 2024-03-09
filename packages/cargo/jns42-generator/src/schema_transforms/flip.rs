@@ -71,13 +71,13 @@ macro_rules! generate_mod {
         }
 
         // resolve the items
-        let base_entries: BTreeMap<_, _> = base_keys
+        let base_items: BTreeMap<_, _> = base_keys
           .iter()
           .map(|sub_key| (*sub_key, arena.get_item(*sub_key)))
           .collect();
 
         // collect all of the sub sub keys
-        let other_keys: BTreeMap<_, _> = base_entries
+        let other_keys: BTreeMap<_, _> = base_items
           .iter()
           .filter_map(|(sub_key, sub_item)| {
             sub_item
@@ -93,7 +93,7 @@ macro_rules! generate_mod {
         }
 
         // filter out all entries that have no sub sub
-        let sub_keys: Vec<_> = base_entries
+        let sub_keys: Vec<_> = base_items
           .keys()
           .copied()
           .filter(|sub_key| !other_keys.contains_key(sub_key))
