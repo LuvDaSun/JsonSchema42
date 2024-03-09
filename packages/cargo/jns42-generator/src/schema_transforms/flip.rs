@@ -25,11 +25,17 @@ will become
 
 ```yaml
 - oneOf:
-    - 2
-    - 3
     - 4
     - 5
+    - 6
+    - 7
 - type: object
+- oneOf:
+    - 100
+    - 200
+- oneOf:
+    - 300
+    - 400
 - allOf:
     - 1
     - 100

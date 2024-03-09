@@ -28,11 +28,17 @@ will become
 
 ```yaml
 - oneOf:
-    - 2
-    - 3
     - 4
     - 5
+    - 6
+    - 7
 - type: object
+- oneOf:
+    - 100
+    - 200
+- oneOf:
+    - 300
+    - 400
 - allOf:
     - 1
     - 100
@@ -79,18 +85,14 @@ function createTransform(
     }
 
     const baseItemsEntries = baseKeys.map((baseKey) => [baseKey, arena.getItem(baseKey)] as const);
-    const otherKeysEntries = baseItemsEntries
-      .map(([subKey, subItem]) => {
-        const otherKeys = subItem[otherMember];
-        if (otherKeys == null) {
-          return [];
-        } else {
-          return otherKeys.map((subKey) => [subKey, otherKeys] as const);
-        }
-      })
-      .filter(([subKey, otherKeys]) => {
-        otherKeys.length > 0;
-      });
+    const otherKeysEntries = baseItemsEntries.flatMap(([subKey, subItem]) => {
+      const otherKeys = subItem[otherMember];
+      if (otherKeys == null) {
+        return [];
+      } else {
+        return [[subKey, otherKeys] as const];
+      }
+    });
 
     if (otherKeysEntries.length == 0) {
       return;
@@ -104,13 +106,13 @@ function createTransform(
 
     const subKeysNew = new Array<number>();
 
-    for (const set of product(Object.values(otherKeysEntries))) {
-      let subItem = {
+    for (const set of product(otherKeysEntries.map(([subKey, otherKeys]) => otherKeys))) {
+      let subItemNew = {
         parent: key,
         [baseMember]: [...subKeys, ...set],
       };
-      let subKey = arena.addItem(subItem);
-      subKeysNew.push(subKey);
+      let subKeyNew = arena.addItem(subItemNew);
+      subKeysNew.push(subKeyNew);
     }
 
     const itemNew = { ...item, [baseMember]: undefined, [otherMember]: subKeysNew };

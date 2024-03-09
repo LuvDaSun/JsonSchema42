@@ -49,7 +49,7 @@ equals
 ```
 */
 
-test("flip-all-of-one-of 2", () => {
+test("flip-all-of-one-of", () => {
   const arena = new SchemaArena([
     {}, // 0
     {}, // 1
