@@ -1,7 +1,6 @@
 export * from "./explode.js";
 export * from "./flatten.js";
 export * from "./flip-all-of-one-of.js";
-export * from "./flip-any-of-one-of.js";
 export * from "./flush-parent.js";
 export * from "./mockable.js";
 export * from "./resolve-all-of.js";
@@ -13,4 +12,3 @@ export * from "./resolve-parent.js";
 export * from "./resolve-single.js";
 export * from "./single-type.js";
 export * from "./unalias.js";
-export * from "./unique.js";

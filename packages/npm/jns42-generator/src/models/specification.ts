@@ -59,9 +59,6 @@ export function loadSpecification(
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
-        schemaTransforms.unique,
-
-        // order matters!
         schemaTransforms.mockable,
 
         schemaTransforms.resolveAllOf,
