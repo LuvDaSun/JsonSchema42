@@ -54,7 +54,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  * ```
  *
  */
-pub fn explode_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
   let mut sub_items = Vec::new();
 
@@ -168,28 +168,28 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_explode_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
       reference: Some(10),
-      all_of: Some(vec![100, 200]),
-      any_of: Some(vec![300, 400]),
-      one_of: Some(vec![500, 600]),
+      all_of: Some([100, 200].into()),
+      any_of: Some([300, 400].into()),
+      one_of: Some([500, 600].into()),
       r#if: Some(700),
       then: Some(800),
       r#else: Some(900),
       ..Default::default()
     });
 
-    while arena.apply_transform(explode_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
       SchemaNode {
-        all_of: Some(vec![1, 2, 3, 4, 5]),
+        all_of: Some([1, 2, 3, 4, 5].into()),
         ..Default::default()
       },
       SchemaNode {
@@ -201,19 +201,19 @@ mod tests {
       SchemaNode {
         parent: Some(0),
         name: Some("all_of".to_string()),
-        all_of: Some(vec![100, 200]),
+        all_of: Some([100, 200].into()),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
         name: Some("any_of".to_string()),
-        any_of: Some(vec![300, 400]),
+        any_of: Some([300, 400].into()),
         ..Default::default()
       },
       SchemaNode {
         parent: Some(0),
         name: Some("one_of".to_string()),
-        one_of: Some(vec![500, 600]),
+        one_of: Some([500, 600].into()),
         ..Default::default()
       },
       SchemaNode {

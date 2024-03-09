@@ -17,7 +17,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  * - primary: true
  * ```
  */
-pub fn primary_transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
 
   let Some(primary) = item.primary else {
@@ -49,17 +49,17 @@ mod tests {
   use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
-  fn test_primary_transform() {
+  fn test_transform() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaNode {
       primary: Some(true),
-      all_of: Some(vec![1]),
+      all_of: Some([1].into()),
       ..Default::default()
     });
 
     arena.add_item(SchemaNode {
-      all_of: Some(vec![2]),
+      all_of: Some([2].into()),
       ..Default::default()
     });
 
@@ -67,7 +67,7 @@ mod tests {
       ..Default::default()
     });
 
-    while arena.apply_transform(primary_transform) > 0 {
+    while arena.apply_transform(transform) > 0 {
       //
     }
 
@@ -75,12 +75,12 @@ mod tests {
     let expected = vec![
       SchemaNode {
         primary: Some(true),
-        all_of: Some(vec![1]),
+        all_of: Some([1].into()),
         ..Default::default()
       },
       SchemaNode {
         primary: Some(true),
-        all_of: Some(vec![2]),
+        all_of: Some([2].into()),
         ..Default::default()
       },
       SchemaNode {

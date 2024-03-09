@@ -1,11 +1,13 @@
 use super::intermediate::IntermediateType;
-use crate::utils::url::UrlWithPointer;
+use crate::utils::merge::Merger;
+use crate::utils::{merge::merge_option, url::UrlWithPointer};
 use serde_json::Value;
-use std::{collections::HashMap, iter::empty};
+use std::collections::{BTreeSet, HashSet};
+use std::{collections::HashMap, iter::empty, rc::Rc};
 
 pub type SchemaKey = usize;
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum SchemaType {
   Never,
   Any,
@@ -16,6 +18,32 @@ pub enum SchemaType {
   String,
   Array,
   Object,
+}
+
+impl SchemaType {
+  pub fn intersection(&self, other: &Self) -> Self {
+    if self == other {
+      return *self;
+    }
+
+    if self == &Self::Any {
+      return *other;
+    }
+
+    if other == &Self::Any {
+      return *self;
+    }
+
+    if self == &Self::Never {
+      return *self;
+    }
+
+    if other == &Self::Never {
+      return *other;
+    }
+
+    SchemaType::Never
+  }
 }
 
 impl ToString for SchemaType {
@@ -70,9 +98,9 @@ pub struct SchemaNode {
   // applicators
   pub reference: Option<SchemaKey>,
 
-  pub all_of: Option<Vec<SchemaKey>>,
-  pub any_of: Option<Vec<SchemaKey>>,
-  pub one_of: Option<Vec<SchemaKey>>,
+  pub all_of: Option<BTreeSet<SchemaKey>>,
+  pub any_of: Option<BTreeSet<SchemaKey>>,
+  pub one_of: Option<BTreeSet<SchemaKey>>,
 
   pub r#if: Option<SchemaKey>,
   pub then: Option<SchemaKey>,
@@ -106,8 +134,8 @@ pub struct SchemaNode {
   pub value_pattern: Option<String>,
   pub value_format: Option<String>,
 
-  pub maximum_items: Option<usize>,
   pub minimum_items: Option<usize>,
+  pub maximum_items: Option<usize>,
   pub unique_items: Option<bool>,
 
   pub minimum_properties: Option<usize>,
@@ -115,6 +143,166 @@ pub struct SchemaNode {
 }
 
 impl SchemaNode {
+  pub fn intersection<'f>(&'f self, other: &'f Self, merge_key: Merger<'f, SchemaKey>) -> Self {
+    assert!(
+      self
+        .types
+        .as_ref()
+        .map(|value| value.len())
+        .unwrap_or_default()
+        <= 1
+    );
+    assert!(
+      other
+        .types
+        .as_ref()
+        .map(|value| value.len())
+        .unwrap_or_default()
+        <= 1
+    );
+
+    assert_eq!(self.all_of, None);
+    assert_eq!(other.all_of, None);
+
+    assert_eq!(self.any_of, None);
+    assert_eq!(other.any_of, None);
+
+    assert_eq!(self.one_of, None);
+    assert_eq!(other.one_of, None);
+
+    assert_eq!(self.r#if, None);
+    assert_eq!(other.r#if, None);
+
+    assert_eq!(self.then, None);
+    assert_eq!(other.then, None);
+
+    assert_eq!(self.r#else, None);
+    assert_eq!(other.r#else, None);
+
+    macro_rules! generate_merge_option {
+      ($member: ident, $merger: expr) => {
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          Rc::new($merger),
+        )
+      };
+    }
+
+    macro_rules! generate_merge_single_key {
+      ($member: ident) => {
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          merge_key.clone(),
+        )
+      };
+    }
+
+    macro_rules! generate_merge_array_keys {
+      ($member: ident) => {{
+        let merge_key = merge_key.clone();
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          Rc::new(move |base, other| {
+            let length = base.len().max(other.len());
+            (0..length)
+              .map(|index| merge_option(base.get(index), other.get(index), merge_key.clone()))
+              .map(|key| key.unwrap())
+              .collect()
+          }),
+        )
+      }};
+    }
+
+    macro_rules! generate_merge_object_keys {
+      ($member: ident) => {{
+        let merge_key = merge_key.clone();
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          Rc::new(move |base, other| {
+            let properties: HashSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
+            properties
+              .into_iter()
+              .map(|property| {
+                (
+                  property,
+                  merge_option(base.get(property), other.get(property), merge_key.clone()),
+                )
+              })
+              .map(|(property, key)| (property.clone(), key.unwrap()))
+              .collect()
+          }),
+        )
+      }};
+    }
+
+    Self {
+      name: None,
+      primary: None,
+      parent: None,
+      id: None,
+
+      title: None,
+      description: None,
+      examples: None,
+      deprecated: generate_merge_option!(deprecated, |base, other| base & other),
+
+      types: generate_merge_option!(types, |base, other| vec![base
+        .first()
+        .unwrap()
+        .intersection(other.first().unwrap())]),
+
+      reference: None, // TODO
+
+      all_of: None,
+      any_of: None,
+      one_of: None,
+
+      r#if: None,
+      then: None,
+      r#else: None,
+
+      not: generate_merge_single_key!(not),
+
+      map_properties: generate_merge_single_key!(map_properties),
+      array_items: generate_merge_single_key!(array_items),
+      property_names: generate_merge_single_key!(property_names),
+      contains: generate_merge_single_key!(contains),
+
+      tuple_items: generate_merge_array_keys!(tuple_items),
+
+      object_properties: generate_merge_object_keys!(object_properties),
+      pattern_properties: generate_merge_object_keys!(pattern_properties),
+      dependent_schemas: generate_merge_object_keys!(dependent_schemas),
+
+      options: None,  // TODO
+      required: None, // TODO
+
+      minimum_inclusive: generate_merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: generate_merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: generate_merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: generate_merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      multiple_of: None, // TODO
+
+      minimum_length: generate_merge_option!(minimum_length, |base, other| *base.min(other)),
+      maximum_length: generate_merge_option!(maximum_length, |base, other| *base.max(other)),
+      value_pattern: None, // TODO
+      value_format: None,  // TODO
+
+      minimum_items: generate_merge_option!(minimum_items, |base, other| *base.min(other)),
+      maximum_items: generate_merge_option!(maximum_items, |base, other| *base.max(other)),
+      unique_items: generate_merge_option!(unique_items, |base, other| base | other),
+
+      minimum_properties: generate_merge_option!(minimum_properties, |base, other| *base
+        .min(other)),
+      maximum_properties: generate_merge_option!(maximum_properties, |base, other| *base
+        .max(other)),
+    }
+  }
+
   pub fn get_children(&self) -> impl Iterator<Item = SchemaKey> + '_ {
     empty()
       .chain(self.reference)
