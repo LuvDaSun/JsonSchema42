@@ -6,10 +6,6 @@ import { SchemaModel } from "./model.js";
  * @param model the schema to get dependencies
  */
 export function* selectSchemaDependencies(model: SchemaModel) {
-  if (model.alias != null) {
-    yield model.alias;
-  }
-
   if (model.reference != null) {
     yield model.reference;
   }

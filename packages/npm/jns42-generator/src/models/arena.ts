@@ -9,7 +9,7 @@ export class SchemaArena extends Arena<SchemaModel> {
     let resolvedKey = key;
     let resolvedItem = this.getItem(resolvedKey);
     while (isAliasSchemaModel(resolvedItem)) {
-      resolvedKey = resolvedItem.alias;
+      resolvedKey = resolvedItem.reference;
       resolvedItem = this.getItem(resolvedKey);
     }
     return [resolvedKey, resolvedItem];

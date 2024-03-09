@@ -124,7 +124,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     const item = typesArena.getItem(itemKey);
 
     if (isAliasSchemaModel(item)) {
-      yield generateMockReference(item.alias);
+      yield generateMockReference(item.reference);
       return;
     }
 

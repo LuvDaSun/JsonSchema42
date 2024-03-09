@@ -33,11 +33,6 @@ export type SchemaModel = {
   // the original parent of this item
   parent?: SchemaKey;
 
-  /**
-   * @deprecated
-   */
-  alias?: SchemaKey;
-
   id?: string;
   title?: string;
   description?: string;
@@ -86,6 +81,22 @@ export type SchemaModel = {
   minimumProperties?: number;
   maximumProperties?: number;
 };
+
+export type AliasSchemaModel = Partial<MetaSchemaModel> & {
+  reference: SchemaKey;
+};
+export function isAliasSchemaModel(model: SchemaModel): model is AliasSchemaModel {
+  for (const property in model) {
+    switch (property) {
+      case "reference":
+        break;
+
+      default:
+        return false;
+    }
+  }
+  return true;
+}
 
 export type MetaSchemaModel = {
   id?: string;
@@ -197,14 +208,6 @@ export function isChildSchemaModel(model: SchemaModel): model is ChildSchemaMode
     ...ifSchemaRequired,
     ...ifSchemaOptional,
   ]);
-}
-
-export type AliasSchemaModel = Partial<MetaSchemaModel> & {
-  alias: SchemaKey;
-};
-export const aliasSchemaRequired = ["alias"] as const;
-export function isAliasSchemaModel(model: SchemaModel): model is AliasSchemaModel {
-  return hasMembers(model, aliasSchemaRequired, [...metaSchemaOptional]);
 }
 
 export type ReferenceSchemaModel = Partial<MetaSchemaModel> & {

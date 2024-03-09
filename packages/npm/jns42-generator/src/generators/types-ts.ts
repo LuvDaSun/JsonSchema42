@@ -62,7 +62,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     // }
 
     if (isAliasSchemaModel(item)) {
-      yield generateTypeReference(item.alias);
+      yield generateTypeReference(item.reference);
       return;
     }
 

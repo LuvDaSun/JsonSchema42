@@ -134,9 +134,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
   ): Iterable<NestedText> {
     const item = validatorsArena.getItem(itemKey);
 
-    if (item.alias != null) {
+    if (item.reference != null) {
       yield itt`
-        if(!${generateValidatorReference(item.alias, valueExpression)}) {
+        if(!${generateValidatorReference(item.reference, valueExpression)}) {
           return false;
         };
       `;

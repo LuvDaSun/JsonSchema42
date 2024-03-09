@@ -74,7 +74,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     const item = typesArena.getItem(itemKey);
 
     if (isAliasSchemaModel(item)) {
-      yield generateParserReference(item.alias, valueExpression);
+      yield generateParserReference(item.reference, valueExpression);
       return;
     }
 
