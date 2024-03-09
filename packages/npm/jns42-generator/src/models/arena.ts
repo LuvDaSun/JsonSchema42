@@ -122,14 +122,6 @@ export class SchemaArena extends Arena<SchemaModel> {
     return true;
   }
 
-  public clone(): SchemaArena {
-    const arena = new SchemaArena();
-    for (const item of this) {
-      arena.addItem(item);
-    }
-    return arena;
-  }
-
   public static fromIntermediate(document: schemaIntermediate.SchemaDocument): SchemaArena {
     const arena = new SchemaArena();
     /*

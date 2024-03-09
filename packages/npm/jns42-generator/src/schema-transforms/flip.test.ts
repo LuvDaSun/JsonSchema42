@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert";
 import test from "node:test";
 import { SchemaArena } from "../models/index.js";
 import { normalizeObject } from "../utils/index.js";
@@ -50,15 +50,16 @@ equals
 */
 
 test("flip-all-of-one-of 2", () => {
-  const arena = new SchemaArena();
-  arena.addItem({}); // 0
-  arena.addItem({}); // 1
-  arena.addItem({}); // 2
-  arena.addItem({}); // 3
-  arena.addItem({}); // 4
-  arena.addItem({ oneOf: [1, 2] }); // 5
-  arena.addItem({ oneOf: [3, 4] }); // 6
-  arena.addItem({ allOf: [0, 5, 6] }); // 7
+  const arena = new SchemaArena([
+    {}, // 0
+    {}, // 1
+    {}, // 2
+    {}, // 3
+    {}, // 4
+    { oneOf: [1, 2] }, // 5
+    { oneOf: [3, 4] }, // 6
+    { allOf: [0, 5, 6] }, // 7
+  ]);
 
   while (arena.applyTransform(flipAllOfOneOf) > 0);
 

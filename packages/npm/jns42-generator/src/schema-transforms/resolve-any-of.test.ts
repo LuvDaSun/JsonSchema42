@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert";
 import test from "node:test";
 import { SchemaArena } from "../models/index.js";
 import { normalizeObject } from "../utils/index.js";

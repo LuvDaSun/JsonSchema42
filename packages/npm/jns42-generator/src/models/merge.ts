@@ -61,6 +61,7 @@ export function mergeKeyAllOf(
   }
 
   const newModel = {
+    exact: true,
     allOf: [key, otherKey],
   };
   const newKey = arena.addItem(newModel);
@@ -84,7 +85,8 @@ export function mergeKeyAnyOf(
   }
 
   const newModel = {
-    allOf: [key, otherKey],
+    exact: true,
+    anyOf: [key, otherKey],
   };
   const newKey = arena.addItem(newModel);
   return newKey;

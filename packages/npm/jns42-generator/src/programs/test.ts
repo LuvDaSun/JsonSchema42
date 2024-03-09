@@ -1,6 +1,6 @@
+import assert from "assert";
 import camelcase from "camelcase";
 import cp from "child_process";
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import * as path from "node:path";
 import test from "node:test";

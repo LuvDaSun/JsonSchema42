@@ -24,7 +24,7 @@ export function loadSpecification(
 
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
-  const validatorsArena = typesArena.clone();
+  const validatorsArena = new SchemaArena(typesArena);
 
   // transform the validatorsArena
   {

@@ -3,7 +3,11 @@ import immutable from "immutable";
 export type ArenaTransform<T, A extends Arena<T> = Arena<T>> = (arena: A, key: number) => void;
 
 export class Arena<T> {
-  private items = immutable.List<T>();
+  private items: immutable.List<T>;
+
+  constructor(items: Iterable<T> = []) {
+    this.items = immutable.List(items);
+  }
 
   public [Symbol.iterator]() {
     return this.items[Symbol.iterator]();
