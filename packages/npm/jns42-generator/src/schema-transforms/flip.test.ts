@@ -2,9 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { SchemaArena } from "../models/index.js";
 import { normalizeObject } from "../utils/index.js";
-import { flipAllOfOneOf } from "./flip-all-of-one-of.js";
-
-const useTransforms = [flipAllOfOneOf];
+import { flipAllOfOneOf } from "./flip.js";
 
 /*
 so
@@ -62,7 +60,7 @@ test("flip-all-of-one-of 2", () => {
   arena.addItem({ oneOf: [3, 4] }); // 6
   arena.addItem({ allOf: [0, 5, 6] }); // 7
 
-  while (arena.applyTransform(...useTransforms) > 0);
+  while (arena.applyTransform(flipAllOfOneOf) > 0);
 
   assert.deepEqual([...arena].map(normalizeObject), [
     {}, // 0
