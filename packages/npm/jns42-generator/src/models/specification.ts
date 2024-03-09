@@ -54,6 +54,8 @@ export function loadSpecification(
         schemaTransforms.flattenAnyOf,
         schemaTransforms.flattenOneOf,
 
+        schemaTransforms.resolveIfThenElse,
+
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
@@ -62,7 +64,6 @@ export function loadSpecification(
         // order matters!
         schemaTransforms.mockable,
 
-        schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
         schemaTransforms.resolveOneOf,
