@@ -4,7 +4,6 @@ import {
   SchemaModel,
   SchemaTransform,
   TypeSchemaModel,
-  isIfSchemaModel,
 } from "../models/index.js";
 
 /**
@@ -31,42 +30,41 @@ import {
  *   - 300
  * ```
  */
-export const resolveIfThenElse: SchemaTransform = (arena, modelKey) => {
-  const model = arena.getItem(modelKey);
+export const resolveIfThenElse: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
 
-  // we need at least two to merge
-  if (!isIfSchemaModel(model)) {
-    return model;
+  if (item.if == null) {
+    return;
   }
 
-  const newModel: OneOfSchemaModel & SchemaModel = {
-    ...model,
+  const itemNew: OneOfSchemaModel & SchemaModel = {
+    ...item,
     oneOf: [],
     if: undefined,
     then: undefined,
     else: undefined,
   };
 
-  if (model.then != null) {
+  if (item.then != null) {
     const thenModel: AllOfSchemaModel = {
-      allOf: [model.if, model.then],
+      allOf: [item.if, item.then],
     };
     const thenKey = arena.addItem(thenModel);
-    newModel.oneOf.push(thenKey);
+    itemNew.oneOf.push(thenKey);
   }
 
-  if (model.else != null) {
+  if (item.else != null) {
     const notIfModel: TypeSchemaModel = {
-      not: model.if,
+      not: item.if,
     };
     const notIfKey = arena.addItem(notIfModel);
 
     const elseModel: AllOfSchemaModel = {
-      allOf: [notIfKey, model.else],
+      allOf: [notIfKey, item.else],
     };
     const elseKey = arena.addItem(elseModel);
-    newModel.oneOf.push(elseKey);
+    itemNew.oneOf.push(elseKey);
   }
 
-  return newModel;
+  arena.setItem(key, itemNew);
 };
