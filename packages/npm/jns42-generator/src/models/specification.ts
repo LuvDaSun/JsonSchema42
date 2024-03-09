@@ -46,6 +46,10 @@ export function loadSpecification(
         schemaTransforms.singleType,
         schemaTransforms.explode,
 
+        schemaTransforms.resolveSingleAllOf,
+        schemaTransforms.resolveSingleAnyOf,
+        schemaTransforms.resolveSingleOneOf,
+
         schemaTransforms.flattenAllOf,
         schemaTransforms.flattenAnyOf,
         schemaTransforms.flattenOneOf,
@@ -54,7 +58,6 @@ export function loadSpecification(
         schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.unique,
-        schemaTransforms.alias,
 
         // order matters!
         schemaTransforms.mockable,

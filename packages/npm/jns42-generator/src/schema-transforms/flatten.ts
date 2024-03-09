@@ -28,11 +28,11 @@ import { SchemaTransform } from "../models/index.js";
  * ```
  */
 
-export const flattenAllOf = createFlatten("allOf");
-export const flattenAnyOf = createFlatten("anyOf");
-export const flattenOneOf = createFlatten("oneOf");
+export const flattenAllOf = createTransformer("allOf");
+export const flattenAnyOf = createTransformer("anyOf");
+export const flattenOneOf = createTransformer("oneOf");
 
-function createFlatten(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform {
+function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform {
   return (arena, key) => {
     const item = arena.getItem(key);
 
