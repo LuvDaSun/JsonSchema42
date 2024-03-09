@@ -18,6 +18,7 @@ export const resolveAnyOf: SchemaTransform = (arena, modelKey) => {
 
   const newModel: SchemaModel & OneOfSchemaModel = {
     ...model,
+    exact: false,
     oneOf: [],
     anyOf: undefined,
   };
@@ -57,6 +58,7 @@ export const resolveAnyOf: SchemaTransform = (arena, modelKey) => {
         newSubModel = {
           ...subModel,
           // meta fields
+          exact: false,
           id: undefined,
           title: undefined,
           description: undefined,

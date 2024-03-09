@@ -1,10 +1,4 @@
-import {
-  AllOfSchemaModel,
-  OneOfSchemaModel,
-  SchemaModel,
-  SchemaTransform,
-  TypeSchemaModel,
-} from "../models/index.js";
+import { SchemaModel, SchemaTransform } from "../models/index.js";
 
 /**
  * This transformer turns if-then-else into a one-of
@@ -37,34 +31,54 @@ export const resolveIfThenElse: SchemaTransform = (arena, key) => {
     return;
   }
 
-  const itemNew: OneOfSchemaModel & SchemaModel = {
-    ...item,
-    oneOf: [],
-    if: undefined,
-    then: undefined,
-    else: undefined,
-  };
+  if (item.oneOf != null) {
+    return;
+  }
+
+  const subKeys = new Array<number>();
 
   if (item.then != null) {
-    const thenModel: AllOfSchemaModel = {
+    const thenModel: SchemaModel = {
+      exact: false,
       allOf: [item.if, item.then],
     };
     const thenKey = arena.addItem(thenModel);
-    itemNew.oneOf.push(thenKey);
+    subKeys.push(thenKey);
   }
 
   if (item.else != null) {
-    const notIfModel: TypeSchemaModel = {
+    const notIfModel: SchemaModel = {
+      exact: false,
       not: item.if,
     };
     const notIfKey = arena.addItem(notIfModel);
 
-    const elseModel: AllOfSchemaModel = {
+    const elseModel: SchemaModel = {
+      exact: false,
       allOf: [notIfKey, item.else],
     };
     const elseKey = arena.addItem(elseModel);
-    itemNew.oneOf.push(elseKey);
+    subKeys.push(elseKey);
   }
 
+  if (subKeys.length === 0) {
+    const itemNew: SchemaModel = {
+      ...item,
+      if: undefined,
+      then: undefined,
+      else: undefined,
+    };
+    arena.setItem(key, itemNew);
+    return;
+  }
+
+  const itemNew: SchemaModel = {
+    ...item,
+    exact: false,
+    oneOf: subKeys,
+    if: undefined,
+    then: undefined,
+    else: undefined,
+  };
   arena.setItem(key, itemNew);
 };
