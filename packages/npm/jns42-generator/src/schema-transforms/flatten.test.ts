@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { SchemaArena } from "../models/arena.js";
 import { normalizeObject } from "../utils/index.js";
-import { flatten } from "./flatten.js";
+import { flattenAllOf } from "./flatten.js";
 
 test("flatten", () => {
   const arena = new SchemaArena();
@@ -16,7 +16,7 @@ test("flatten", () => {
     allOf: [0, 1],
   });
 
-  while (arena.applyTransform(flatten) > 0);
+  while (arena.applyTransform(flattenAllOf) > 0);
 
   assert.deepEqual(
     [...arena].map(normalizeObject),

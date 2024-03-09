@@ -43,18 +43,21 @@ export function loadSpecification(
     let transformIterations = 0;
     while (
       typesArena.applyTransform(
-        // order matters!
-        schemaTransforms.mockable,
-
         schemaTransforms.singleType,
         schemaTransforms.explode,
+
+        schemaTransforms.flattenAllOf,
+        schemaTransforms.flattenAnyOf,
+        schemaTransforms.flattenOneOf,
 
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
-        schemaTransforms.flatten,
         schemaTransforms.unique,
         schemaTransforms.alias,
+
+        // order matters!
+        schemaTransforms.mockable,
 
         schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveAllOf,
