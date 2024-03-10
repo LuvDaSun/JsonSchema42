@@ -12,6 +12,6 @@ test("single-type", () => {
   assert.deepEqual(
     [...arena].map(normalizeObject),
 
-    [{ oneOf: [1, 2] }, { parent: 0, types: ["string"] }, { parent: 0, types: ["number"] }],
+    [{ oneOf: [1, 2] }, { types: ["string"] }, { types: ["number"] }],
   );
 });

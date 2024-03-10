@@ -72,9 +72,9 @@ test("flip-all-of-one-of", () => {
     { oneOf: [1, 2] }, // 5
     { oneOf: [3, 4] }, // 6
     { oneOf: [8, 9, 10, 11] }, // 7
-    { parent: 7, allOf: [0, 1, 3] }, // 8
-    { parent: 7, allOf: [0, 1, 4] }, // 9
-    { parent: 7, allOf: [0, 2, 3] }, // 10
-    { parent: 7, allOf: [0, 2, 4] }, // 11
+    { allOf: [0, 1, 3] }, // 8
+    { allOf: [0, 1, 4] }, // 9
+    { allOf: [0, 2, 3] }, // 10
+    { allOf: [0, 2, 4] }, // 11
   ]);
 });
