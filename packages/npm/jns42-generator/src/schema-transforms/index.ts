@@ -9,3 +9,4 @@ export * from "./resolve-not.js";
 export * from "./resolve-single.js";
 export * from "./single-type.js";
 export * from "./unalias.js";
+export * from "./unique.js";
