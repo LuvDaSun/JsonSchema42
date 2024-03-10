@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../models/index.js";
+import { SchemaItem, SchemaTransform } from "../models/index.js";
 
 /**
  * This transformer turns if-then-else into a one-of
@@ -38,31 +38,31 @@ export const resolveIfThenElse: SchemaTransform = (arena, key) => {
   const subKeys = new Array<number>();
 
   if (item.then != null) {
-    const thenModel: SchemaModel = {
+    const thenItem: SchemaItem = {
       exact: false,
       allOf: [item.if, item.then],
     };
-    const thenKey = arena.addItem(thenModel);
+    const thenKey = arena.addItem(thenItem);
     subKeys.push(thenKey);
   }
 
   if (item.else != null) {
-    const notIfModel: SchemaModel = {
+    const notIfItem: SchemaItem = {
       exact: false,
       not: item.if,
     };
-    const notIfKey = arena.addItem(notIfModel);
+    const notIfKey = arena.addItem(notIfItem);
 
-    const elseModel: SchemaModel = {
+    const elseItem: SchemaItem = {
       exact: false,
       allOf: [notIfKey, item.else],
     };
-    const elseKey = arena.addItem(elseModel);
+    const elseKey = arena.addItem(elseItem);
     subKeys.push(elseKey);
   }
 
   if (subKeys.length === 0) {
-    const itemNew: SchemaModel = {
+    const itemNew: SchemaItem = {
       ...item,
       if: undefined,
       then: undefined,
@@ -72,7 +72,7 @@ export const resolveIfThenElse: SchemaTransform = (arena, key) => {
     return;
   }
 
-  const itemNew: SchemaModel = {
+  const itemNew: SchemaItem = {
     ...item,
     exact: false,
     oneOf: subKeys,

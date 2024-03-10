@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform, intersectionMergeTypes } from "../models/index.js";
+import { SchemaItem, SchemaTransform, intersectionMergeTypes } from "../models/index.js";
 import {
   booleanMergeAnd,
   booleanMergeOr,
@@ -78,7 +78,7 @@ export const resolveAllOf: SchemaTransform = (arena, key) => {
     return;
   }
 
-  let itemNew: SchemaModel = {
+  let itemNew: SchemaItem = {
     ...item,
     allOf: undefined,
   };
@@ -173,10 +173,10 @@ export const resolveAllOf: SchemaTransform = (arena, key) => {
       return key;
     }
 
-    const newModel = {
+    const itemNew = {
       allOf: [key, otherKey],
     };
-    const newKey = arena.addItem(newModel);
-    return newKey;
+    const keyNew = arena.addItem(itemNew);
+    return keyNew;
   }
 };

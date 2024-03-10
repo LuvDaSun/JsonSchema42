@@ -1,10 +1,10 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import { Arena, ArenaTransform } from "../utils/arena.js";
-import { SchemaModel, SchemaType } from "./model.js";
+import { SchemaItem, SchemaType } from "./item.js";
 
-export type SchemaTransform = ArenaTransform<SchemaModel, SchemaArena>;
+export type SchemaTransform = ArenaTransform<SchemaItem, SchemaArena>;
 
-export class SchemaArena extends Arena<SchemaModel> {
+export class SchemaArena extends Arena<SchemaItem> {
   public isMockable(key: number) {
     const item = this.getItem(key);
 
@@ -123,7 +123,7 @@ export class SchemaArena extends Arena<SchemaModel> {
 
     for (const id in document.schemas) {
       const schema = document.schemas[id];
-      const newItem: SchemaModel = {
+      const newItem: SchemaItem = {
         id,
       };
 
@@ -203,7 +203,7 @@ export class SchemaArena extends Arena<SchemaModel> {
 
       const schema = document.schemas[id];
 
-      const itemNew: SchemaModel = {
+      const itemNew: SchemaItem = {
         id,
         parent: parents[id] == null ? undefined : idMap[parents[id]],
       };

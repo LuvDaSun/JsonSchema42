@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../models/index.js";
+import { SchemaItem, SchemaTransform } from "../models/index.js";
 import { exclude } from "../utils/index.js";
 
 /**
@@ -35,7 +35,7 @@ export const resolveNot: SchemaTransform = (arena, key) => {
 
   const subItem = arena.getItem(item.not);
 
-  const itemNew: SchemaModel = {
+  const itemNew: SchemaItem = {
     ...item,
     exact: false,
     not: undefined,

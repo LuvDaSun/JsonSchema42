@@ -1,11 +1,11 @@
-import { SchemaModel } from "./model.js";
+import { SchemaItem } from "./item.js";
 
 /**
  * retrieves dependencies of a schema model
  *
  * @param model the schema to get dependencies
  */
-export function* selectSchemaDependencies(model: SchemaModel) {
+export function* selectSchemaDependencies(model: SchemaItem) {
   if (model.reference != null) {
     yield model.reference;
   }

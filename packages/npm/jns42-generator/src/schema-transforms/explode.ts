@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../models/index.js";
+import { SchemaItem, SchemaTransform } from "../models/index.js";
 
 /**
  * Turns the model into a single all-of with various
@@ -57,7 +57,7 @@ import { SchemaModel, SchemaTransform } from "../models/index.js";
 export const explode: SchemaTransform = (arena, key) => {
   const item = arena.getItem(key);
 
-  const subItems = new Array<SchemaModel>();
+  const subItems = new Array<SchemaItem>();
 
   if (item.types != null && item.types.length > 0) {
     subItems.push({

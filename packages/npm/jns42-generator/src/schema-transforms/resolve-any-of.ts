@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform } from "../models/index.js";
+import { SchemaItem, SchemaTransform } from "../models/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
 
 export const resolveAnyOf: SchemaTransform = (arena, key) => {
@@ -101,34 +101,34 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
       continue;
     }
 
-    let subModelNew: SchemaModel = {
+    let subItemNew: SchemaItem = {
       exact: false,
     };
     for (const subKey of subKeys) {
       const subItem = arena.getItem(subKey);
 
-      subModelNew = {
-        ...subModelNew,
-        options: intersectionMerge(subModelNew.options, subItem.options),
-        required: intersectionMerge(subModelNew.required, subItem.required),
-        propertyNames: mergeKey(subModelNew.propertyNames, subItem.propertyNames),
-        contains: mergeKey(subModelNew.contains, subItem.contains),
-        tupleItems: mergeKeysArray(subModelNew.tupleItems, subItem.tupleItems, mergeKey),
-        arrayItems: mergeKey(subModelNew.arrayItems, subItem.arrayItems),
+      subItemNew = {
+        ...subItemNew,
+        options: intersectionMerge(subItemNew.options, subItem.options),
+        required: intersectionMerge(subItemNew.required, subItem.required),
+        propertyNames: mergeKey(subItemNew.propertyNames, subItem.propertyNames),
+        contains: mergeKey(subItemNew.contains, subItem.contains),
+        tupleItems: mergeKeysArray(subItemNew.tupleItems, subItem.tupleItems, mergeKey),
+        arrayItems: mergeKey(subItemNew.arrayItems, subItem.arrayItems),
         objectProperties: mergeKeysRecord(
-          subModelNew.objectProperties,
+          subItemNew.objectProperties,
           subItem.objectProperties,
           mergeKey,
         ),
-        mapProperties: mergeKey(subModelNew.mapProperties, subItem.mapProperties),
+        mapProperties: mergeKey(subItemNew.mapProperties, subItem.mapProperties),
       };
     }
 
-    const newSubKey = arena.addItem(subModelNew);
+    const newSubKey = arena.addItem(subItemNew);
     subKeysNew.push(newSubKey);
   }
 
-  const itemNew: SchemaModel = {
+  const itemNew: SchemaItem = {
     ...item,
     exact: false,
     oneOf: subKeysNew,
@@ -148,10 +148,10 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
       return key;
     }
 
-    const newModel = {
+    const itemNey = {
       anyOf: [key, otherKey],
     };
-    const newKey = arena.addItem(newModel);
-    return newKey;
+    const keyNew = arena.addItem(itemNey);
+    return keyNew;
   }
 };

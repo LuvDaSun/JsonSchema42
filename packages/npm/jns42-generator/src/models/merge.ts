@@ -1,4 +1,4 @@
-import { SchemaType } from "./model.js";
+import { SchemaType } from "./item.js";
 
 export function intersectionMergeTypes(
   types: SchemaType[] | undefined,
