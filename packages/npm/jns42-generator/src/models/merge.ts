@@ -1,4 +1,3 @@
-import { SchemaArena } from "./arena.js";
 import { SchemaType } from "./model.js";
 
 export function intersectionMergeTypes(
@@ -42,52 +41,4 @@ export function intersectionMergeTypes(
   }
 
   return ["never"];
-}
-
-export function mergeKeyAllOf(
-  arena: SchemaArena,
-  key: number | undefined,
-  otherKey: number | undefined,
-): number | undefined {
-  if (key === otherKey) {
-    return key;
-  }
-
-  if (key == null) {
-    return otherKey;
-  }
-  if (otherKey == null) {
-    return key;
-  }
-
-  const newModel = {
-    exact: true,
-    allOf: [key, otherKey],
-  };
-  const newKey = arena.addItem(newModel);
-  return newKey;
-}
-
-export function mergeKeyAnyOf(
-  arena: SchemaArena,
-  key: number | undefined,
-  otherKey: number | undefined,
-): number | undefined {
-  if (key === otherKey) {
-    return key;
-  }
-
-  if (key == null) {
-    return otherKey;
-  }
-  if (otherKey == null) {
-    return key;
-  }
-
-  const newModel = {
-    exact: true,
-    anyOf: [key, otherKey],
-  };
-  const newKey = arena.addItem(newModel);
-  return newKey;
 }

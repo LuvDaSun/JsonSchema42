@@ -42,33 +42,20 @@ export function unionMerge<T>(
   return [...set];
 }
 
-export function mergeKeysArray(
-  keys: number[] | undefined,
-  otherKeys: number[] | undefined,
-  mergeKey: (key: number | undefined, otherKey: number | undefined) => number | undefined,
-): number[] | undefined {
-  if (keys === otherKeys) {
-    return keys;
+export function exclude<T>(
+  values: T[] | undefined,
+  excludeValues: T[] | undefined,
+): T[] | undefined {
+  if (values == null) {
+    return;
   }
 
-  if (keys == null) {
-    return otherKeys;
+  if (excludeValues == null) {
+    return values;
   }
 
-  if (otherKeys == null) {
-    return keys;
-  }
-
-  const resultKeys = new Array<number>();
-  const length = Math.max(keys.length, otherKeys.length);
-  for (let index = 0; index < length; index++) {
-    const key = mergeKey(keys[index], otherKeys[index]);
-    if (key == null) {
-      continue;
-    }
-    resultKeys.push(key);
-  }
-  return resultKeys;
+  const set = new Set(excludeValues);
+  return values.filter((value) => !set.has(value));
 }
 
 export function mergeKeysRecord(

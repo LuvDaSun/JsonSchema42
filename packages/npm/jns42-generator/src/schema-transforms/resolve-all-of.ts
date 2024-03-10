@@ -1,11 +1,6 @@
+import { SchemaModel, SchemaTransform, intersectionMergeTypes } from "../models/index.js";
 import {
-  SchemaModel,
-  SchemaTransform,
-  intersectionMergeTypes,
-  isAllOfSchemaModel,
-  isSingleTypeSchemaModel,
-} from "../models/index.js";
-import {
+  booleanMergeAnd,
   booleanMergeOr,
   intersectionMerge,
   mergeKeysArray,
@@ -43,92 +38,128 @@ import {
  *   - 300
  * ```
  */
-export const resolveAllOf: SchemaTransform = (arena, modelKey) => {
-  const model = arena.getItem(modelKey);
+export const resolveAllOf: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
 
   // we need at least two to merge
-  if (!isAllOfSchemaModel(model) || model.allOf.length < 2) {
-    return model;
+  if (item.allOf == null || item.allOf.length < 2) {
+    return;
   }
 
-  let newModel!: SchemaModel;
-  for (const elementKey of model.allOf) {
-    let [, elementModel] = arena.resolveItem(elementKey);
+  if (item.types != null) {
+    return;
+  }
 
-    if (!isSingleTypeSchemaModel(elementModel)) {
-      // we want to only only merge single types this is because the intersectionMergeTypes
-      // function can only merge single types
-      return model;
+  if (item.reference != null) {
+    return;
+  }
+
+  if (item.if != null) {
+    return;
+  }
+
+  if (item.then != null) {
+    return;
+  }
+
+  if (item.else != null) {
+    return;
+  }
+
+  if (item.not != null) {
+    return;
+  }
+
+  if (item.oneOf != null && item.oneOf.length > 0) {
+    return;
+  }
+
+  if (item.anyOf != null && item.anyOf.length > 0) {
+    return;
+  }
+
+  let newItem: SchemaModel = {
+    ...item,
+    allOf: undefined,
+  };
+
+  for (const subKey of item.allOf) {
+    let subItem = arena.getItem(subKey);
+
+    if (subItem.types != null && subItem.types.length > 1) {
+      return;
     }
 
-    // first pass
-    if (newModel == null) {
-      newModel = {
-        ...elementModel,
-        allOf: undefined,
-        // meta fields
-        id: model.id,
-        title: model.title,
-        description: model.description,
-        examples: model.examples,
-        deprecated: model.deprecated,
-      };
-      continue;
+    if (subItem.reference != null) {
+      return;
     }
 
-    newModel = {
-      ...newModel,
+    if (subItem.if != null) {
+      return;
+    }
 
-      types: intersectionMergeTypes(newModel.types, elementModel.types),
-      options: intersectionMerge(newModel.options, elementModel.options),
-      required: unionMerge(newModel.required, elementModel.required),
-      propertyNames: mergeKey(newModel.propertyNames, elementModel.propertyNames),
-      contains: mergeKey(newModel.contains, elementModel.contains),
-      tupleItems: mergeKeysArray(newModel.tupleItems, elementModel.tupleItems, mergeKey),
-      arrayItems: mergeKey(newModel.arrayItems, elementModel.arrayItems),
+    if (subItem.then != null) {
+      return;
+    }
+
+    if (subItem.else != null) {
+      return;
+    }
+
+    if (subItem.not != null) {
+      return;
+    }
+
+    if (subItem.oneOf != null && subItem.oneOf.length > 0) {
+      return;
+    }
+
+    if (subItem.anyOf != null && subItem.anyOf.length > 0) {
+      return;
+    }
+
+    if (subItem.allOf != null && subItem.allOf.length > 0) {
+      return;
+    }
+
+    newItem = {
+      ...newItem,
+
+      // every item needs to be exact
+      exact: booleanMergeAnd(newItem.exact, subItem.exact),
+
+      types: intersectionMergeTypes(newItem.types, subItem.types),
+      options: intersectionMerge(newItem.options, subItem.options),
+      required: unionMerge(newItem.required, subItem.required),
+      propertyNames: mergeKey(newItem.propertyNames, subItem.propertyNames),
+      contains: mergeKey(newItem.contains, subItem.contains),
+      tupleItems: mergeKeysArray(newItem.tupleItems, subItem.tupleItems, mergeKey),
+      arrayItems: mergeKey(newItem.arrayItems, subItem.arrayItems),
       objectProperties: mergeKeysRecord(
-        newModel.objectProperties,
-        elementModel.objectProperties,
+        newItem.objectProperties,
+        subItem.objectProperties,
         mergeKey,
       ),
-      mapProperties: mergeKey(newModel.mapProperties, elementModel.mapProperties),
+      mapProperties: mergeKey(newItem.mapProperties, subItem.mapProperties),
 
-      minimumInclusive: numericMergeMinimum(
-        newModel.minimumInclusive,
-        elementModel.minimumInclusive,
-      ),
-      minimumExclusive: numericMergeMinimum(
-        newModel.minimumExclusive,
-        elementModel.minimumExclusive,
-      ),
-      maximumInclusive: numericMergeMaximum(
-        newModel.maximumInclusive,
-        elementModel.maximumInclusive,
-      ),
-      maximumExclusive: numericMergeMaximum(
-        newModel.maximumExclusive,
-        elementModel.maximumExclusive,
-      ),
-      multipleOf: numericMergeMultipleOf(newModel.multipleOf, elementModel.multipleOf),
-      minimumLength: numericMergeMinimum(newModel.minimumLength, elementModel.minimumLength),
-      maximumLength: numericMergeMaximum(newModel.maximumLength, elementModel.maximumLength),
-      valuePattern: unionMerge(newModel.valuePattern, elementModel.valuePattern),
-      valueFormat: unionMerge(newModel.valueFormat, elementModel.valueFormat),
-      minimumItems: numericMergeMinimum(newModel.minimumItems, elementModel.minimumItems),
-      maximumItems: numericMergeMaximum(newModel.maximumItems, elementModel.maximumItems),
-      uniqueItems: booleanMergeOr(newModel.uniqueItems, elementModel.uniqueItems),
-      minimumProperties: numericMergeMinimum(
-        newModel.minimumProperties,
-        elementModel.minimumProperties,
-      ),
-      maximumProperties: numericMergeMaximum(
-        newModel.maximumProperties,
-        elementModel.maximumProperties,
-      ),
+      minimumInclusive: numericMergeMinimum(newItem.minimumInclusive, subItem.minimumInclusive),
+      minimumExclusive: numericMergeMinimum(newItem.minimumExclusive, subItem.minimumExclusive),
+      maximumInclusive: numericMergeMaximum(newItem.maximumInclusive, subItem.maximumInclusive),
+      maximumExclusive: numericMergeMaximum(newItem.maximumExclusive, subItem.maximumExclusive),
+      multipleOf: numericMergeMultipleOf(newItem.multipleOf, subItem.multipleOf),
+      minimumLength: numericMergeMinimum(newItem.minimumLength, subItem.minimumLength),
+      maximumLength: numericMergeMaximum(newItem.maximumLength, subItem.maximumLength),
+      valuePattern: unionMerge(newItem.valuePattern, subItem.valuePattern),
+      valueFormat: unionMerge(newItem.valueFormat, subItem.valueFormat),
+      minimumItems: numericMergeMinimum(newItem.minimumItems, subItem.minimumItems),
+      maximumItems: numericMergeMaximum(newItem.maximumItems, subItem.maximumItems),
+      uniqueItems: booleanMergeOr(newItem.uniqueItems, subItem.uniqueItems),
+      minimumProperties: numericMergeMinimum(newItem.minimumProperties, subItem.minimumProperties),
+      maximumProperties: numericMergeMaximum(newItem.maximumProperties, subItem.maximumProperties),
     };
   }
 
-  return newModel;
+  arena.setItem(key, newItem);
 
   function mergeKey(key: number | undefined, otherKey: number | undefined): number | undefined {
     if (key === otherKey) {
