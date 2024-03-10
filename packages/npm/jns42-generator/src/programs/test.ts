@@ -186,6 +186,8 @@ async function main(configuration: MainConfiguration) {
     const options = {
       stdio: "inherit",
       shell: true,
+      cwd: packageDirectoryPath,
+      env: process.env,
     } as const;
 
     // install package
