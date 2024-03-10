@@ -21,10 +21,11 @@ test("if-then-else", () => {
     [
       {
         oneOf: [1, 3],
+        exact: false,
       }, // 0
-      { allOf: [100, 200] }, // 1
-      { not: 100 }, // 2
-      { allOf: [2, 300] }, // 3
+      { allOf: [100, 200], exact: false }, // 1
+      { not: 100, exact: false }, // 2
+      { allOf: [2, 300], exact: false }, // 3
     ],
   );
 });
