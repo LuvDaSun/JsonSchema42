@@ -1,9 +1,4 @@
-import {
-  SchemaModel,
-  SchemaTransform,
-  intersectionMergeTypes,
-  isChildSchemaModel,
-} from "../models/index.js";
+import { SchemaModel, SchemaTransform, intersectionMergeTypes } from "../models/index.js";
 import {
   booleanMergeOr,
   intersectionMerge,
@@ -22,57 +17,124 @@ import {
  * and then removing the parent relation by setting it to undefined.
  *
  */
-export const resolveParent: SchemaTransform = (arena, modelKey) => {
-  const model = arena.getItem(modelKey);
+export const resolveParent: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
 
   // we need to have a parent, we need to be a child
-  if (!isChildSchemaModel(model)) {
-    return model;
+  if (item.parent == null) {
+    return;
   }
 
-  const [, parentModel] = arena.resolveItem(model.parent);
+  if (item.types != null && item.types.length > 1) {
+    return;
+  }
+
+  if (item.reference != null) {
+    return;
+  }
+
+  if (item.if != null) {
+    return;
+  }
+
+  if (item.then != null) {
+    return;
+  }
+
+  if (item.else != null) {
+    return;
+  }
+
+  if (item.not != null) {
+    return;
+  }
+
+  if (item.oneOf != null && item.oneOf.length > 0) {
+    return;
+  }
+
+  if (item.anyOf != null && item.anyOf.length > 0) {
+    return;
+  }
+
+  if (item.allOf != null && item.allOf.length > 0) {
+    return;
+  }
+
+  const parentItem = arena.getItem(item.parent);
 
   // we don't want the parent to be a child (aka have a parent)
-  if (isChildSchemaModel(parentModel)) {
-    return model;
+  if (parentItem.parent == null) {
+    return item;
   }
 
-  const newModel: SchemaModel = {
-    ...model,
+  if (parentItem.types != null && parentItem.types.length > 1) {
+    return;
+  }
+
+  if (parentItem.reference != null) {
+    return;
+  }
+
+  if (parentItem.if != null) {
+    return;
+  }
+
+  if (parentItem.then != null) {
+    return;
+  }
+
+  if (parentItem.else != null) {
+    return;
+  }
+
+  if (parentItem.not != null) {
+    return;
+  }
+
+  if (parentItem.oneOf != null && parentItem.oneOf.length > 0) {
+    return;
+  }
+
+  if (parentItem.anyOf != null && parentItem.anyOf.length > 0) {
+    return;
+  }
+
+  if (parentItem.allOf != null && parentItem.allOf.length > 0) {
+    return;
+  }
+
+  const itemNew: SchemaModel = {
+    ...item,
     parent: undefined,
-    not: mergeKey(model.not, parentModel.not),
 
-    types: intersectionMergeTypes(model.types, parentModel.types),
-    options: intersectionMerge(model.options, parentModel.options),
-    required: unionMerge(model.required, parentModel.required),
-    propertyNames: mergeKey(model.propertyNames, parentModel.propertyNames),
-    contains: mergeKey(model.contains, parentModel.contains),
-    tupleItems: mergeKeysArray(model.tupleItems, parentModel.tupleItems, mergeKey),
-    arrayItems: mergeKey(model.arrayItems, parentModel.arrayItems),
-    objectProperties: mergeKeysRecord(
-      model.objectProperties,
-      parentModel.objectProperties,
-      mergeKey,
-    ),
-    mapProperties: mergeKey(model.mapProperties, parentModel.mapProperties),
+    types: intersectionMergeTypes(item.types, parentItem.types),
+    options: intersectionMerge(item.options, parentItem.options),
+    required: unionMerge(item.required, parentItem.required),
+    propertyNames: mergeKey(item.propertyNames, parentItem.propertyNames),
+    contains: mergeKey(item.contains, parentItem.contains),
+    tupleItems: mergeKeysArray(item.tupleItems, parentItem.tupleItems, mergeKey),
+    arrayItems: mergeKey(item.arrayItems, parentItem.arrayItems),
+    objectProperties: mergeKeysRecord(item.objectProperties, parentItem.objectProperties, mergeKey),
+    mapProperties: mergeKey(item.mapProperties, parentItem.mapProperties),
 
-    minimumInclusive: numericMergeMinimum(model.minimumInclusive, parentModel.minimumInclusive),
-    minimumExclusive: numericMergeMinimum(model.minimumExclusive, parentModel.minimumExclusive),
-    maximumInclusive: numericMergeMaximum(model.maximumInclusive, parentModel.maximumInclusive),
-    maximumExclusive: numericMergeMaximum(model.maximumExclusive, parentModel.maximumExclusive),
-    multipleOf: numericMergeMultipleOf(model.multipleOf, parentModel.multipleOf),
-    minimumLength: numericMergeMinimum(model.minimumLength, parentModel.minimumLength),
-    maximumLength: numericMergeMaximum(model.maximumLength, parentModel.maximumLength),
-    valuePattern: unionMerge(model.valuePattern, parentModel.valuePattern),
-    valueFormat: unionMerge(model.valueFormat, parentModel.valueFormat),
-    minimumItems: numericMergeMinimum(model.minimumItems, parentModel.minimumItems),
-    maximumItems: numericMergeMaximum(model.maximumItems, parentModel.maximumItems),
-    uniqueItems: booleanMergeOr(model.uniqueItems, parentModel.uniqueItems),
-    minimumProperties: numericMergeMinimum(model.minimumProperties, parentModel.minimumProperties),
-    maximumProperties: numericMergeMaximum(model.maximumProperties, parentModel.maximumProperties),
+    minimumInclusive: numericMergeMinimum(item.minimumInclusive, parentItem.minimumInclusive),
+    minimumExclusive: numericMergeMinimum(item.minimumExclusive, parentItem.minimumExclusive),
+    maximumInclusive: numericMergeMaximum(item.maximumInclusive, parentItem.maximumInclusive),
+    maximumExclusive: numericMergeMaximum(item.maximumExclusive, parentItem.maximumExclusive),
+    multipleOf: numericMergeMultipleOf(item.multipleOf, parentItem.multipleOf),
+    minimumLength: numericMergeMinimum(item.minimumLength, parentItem.minimumLength),
+    maximumLength: numericMergeMaximum(item.maximumLength, parentItem.maximumLength),
+    valuePattern: unionMerge(item.valuePattern, parentItem.valuePattern),
+    valueFormat: unionMerge(item.valueFormat, parentItem.valueFormat),
+    minimumItems: numericMergeMinimum(item.minimumItems, parentItem.minimumItems),
+    maximumItems: numericMergeMaximum(item.maximumItems, parentItem.maximumItems),
+    uniqueItems: booleanMergeOr(item.uniqueItems, parentItem.uniqueItems),
+    minimumProperties: numericMergeMinimum(item.minimumProperties, parentItem.minimumProperties),
+    maximumProperties: numericMergeMaximum(item.maximumProperties, parentItem.maximumProperties),
   };
 
-  return newModel;
+  arena.setItem(key, itemNew);
 
   function mergeKey(key: number | undefined, otherKey: number | undefined): number | undefined {
     if (key === otherKey) {

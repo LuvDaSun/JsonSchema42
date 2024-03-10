@@ -1,4 +1,4 @@
-import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../models/index.js";
+import { SchemaModel, SchemaTransform } from "../models/index.js";
 
 /**
  * Turns the model into a single all-of with various
@@ -56,10 +56,6 @@ import { SchemaModel, SchemaTransform, isAliasSchemaModel } from "../models/inde
  */
 export const explode: SchemaTransform = (arena, key) => {
   const item = arena.getItem(key);
-
-  if (isAliasSchemaModel(item)) {
-    return item;
-  }
 
   const subItems = new Array<SchemaModel>();
 
