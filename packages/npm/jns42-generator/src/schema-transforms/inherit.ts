@@ -19,6 +19,10 @@ function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform
   return (arena, key) => {
     const item = arena.getItem(key);
 
+    if (item.types != null && item.types.length > 1) {
+      return;
+    }
+
     const subKeys = item[member];
     if (subKeys == null) {
       return;
@@ -26,6 +30,10 @@ function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform
 
     for (const subKey of subKeys) {
       const subItem = arena.getItem(subKey);
+
+      if (subItem.types != null && subItem.types.length > 1) {
+        continue;
+      }
 
       const subItemNew = {
         ...subItem,

@@ -1,5 +1,5 @@
 import { SchemaItem, SchemaTransform, SchemaType } from "../models/index.js";
-import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
+import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
 
 export const resolveAnyOf: SchemaTransform = (arena, key) => {
   const item = arena.getItem(key);
@@ -110,7 +110,7 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
       subItemNew = {
         ...subItemNew,
 
-        options: intersectionMerge(subItemNew.options, subItem.options),
+        options: unionMerge(subItemNew.options, subItem.options),
         required: intersectionMerge(subItemNew.required, subItem.required),
         propertyNames: mergeKey(subItemNew.propertyNames, subItem.propertyNames),
         contains: mergeKey(subItemNew.contains, subItem.contains),

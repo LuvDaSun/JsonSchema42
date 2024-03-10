@@ -55,8 +55,9 @@ export function loadSpecification(
         schemaTransforms.flattenAnyOf,
         schemaTransforms.flattenOneOf,
 
-        schemaTransforms.inheritOneOf,
+        // schemaTransforms.inheritAllOf,
         schemaTransforms.inheritAnyOf,
+        schemaTransforms.inheritOneOf,
 
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
