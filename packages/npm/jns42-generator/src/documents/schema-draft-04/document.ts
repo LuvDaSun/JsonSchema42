@@ -170,6 +170,13 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
+  protected *selectSubNodeDependentSchemasEntries(
+    nodePointer: string[],
+    node: N,
+  ): Iterable<readonly [string[], N]> {
+    //
+  }
+
   //#endregion
 
   //#region schema selectors

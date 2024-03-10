@@ -105,6 +105,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   function* generateMockReference(itemKey: number): Iterable<NestedText> {
+    if (!typesArena.isMockable(itemKey)) {
+      throw new TypeError("cannot mock non-mockable type");
+    }
+
     const item = typesArena.getItem(itemKey);
     if (item.id == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
@@ -124,8 +128,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     if (item.oneOf != null && item.oneOf.length > 0) {
       const oneOfMockableEntries = item.oneOf
-        .map((key) => [key, typesArena.getItem(key)] as const)
-        .filter(([key, item]) => typesArena.isMockable(key));
+        .filter((key) => typesArena.isMockable(key))
+        .map((key) => [key, typesArena.getItem(key)] as const);
 
       yield itt`
         (() => {
@@ -370,6 +374,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
                       [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
                     `;
                   } else {
+                    if (!typesArena.isMockable(objectProperties[name])) {
+                      continue;
+                    }
+
                     yield itt`
                       [${JSON.stringify(name)}]:
                         (depthCounters[${JSON.stringify(objectProperties[name])}] ?? 0) < configuration.maximumDepth ?

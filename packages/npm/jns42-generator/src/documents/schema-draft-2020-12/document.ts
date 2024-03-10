@@ -271,6 +271,18 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
+  protected *selectSubNodeDependentSchemasEntries(
+    nodePointer: string[],
+    node: spec.Schema,
+  ): Iterable<readonly [string[], spec.Schema]> {
+    if (typeof node === "object" && node.dependentSchemas != null) {
+      for (const [key, subNode] of Object.entries(node.dependentSchemas)) {
+        const subNodePointer = [...nodePointer, "dependentSchemas", key];
+        yield [subNodePointer, subNode] as const;
+      }
+    }
+  }
+
   protected *selectSubNodePropertyNamesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.propertyNames != null) {
       const subNode = node.propertyNames;

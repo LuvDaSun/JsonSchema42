@@ -112,6 +112,162 @@ export class SchemaArena extends Arena<SchemaItem> {
     return true;
   }
 
+  public resolveKey(key: number): number {
+    let resolvedKey = key;
+    let resolvedItem = this.getItem(resolvedKey);
+    while (true) {
+      if (resolvedItem.reference == null) {
+        break;
+      }
+
+      // the original parent of this item
+      if (resolvedItem.parent != null) {
+        break;
+      }
+
+      if (resolvedItem.types != null && resolvedItem.types.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.if != null) {
+        break;
+      }
+
+      if (resolvedItem.then != null) {
+        break;
+      }
+
+      if (resolvedItem.else != null) {
+        break;
+      }
+
+      if (resolvedItem.not != null) {
+        break;
+      }
+
+      if (resolvedItem.mapProperties != null) {
+        break;
+      }
+
+      if (resolvedItem.arrayItems != null) {
+        break;
+      }
+
+      if (resolvedItem.propertyNames != null) {
+        break;
+      }
+
+      if (resolvedItem.contains != null) {
+        break;
+      }
+
+      if (resolvedItem.oneOf != null && resolvedItem.oneOf.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.anyOf != null && resolvedItem.anyOf.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.allOf != null && resolvedItem.allOf.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.tupleItems != null && resolvedItem.tupleItems.length > 0) {
+        break;
+      }
+
+      if (
+        resolvedItem.objectProperties != null &&
+        Object.keys(resolvedItem.objectProperties).length > 0
+      ) {
+        break;
+      }
+
+      if (
+        resolvedItem.patternProperties != null &&
+        Object.keys(resolvedItem.patternProperties).length > 0
+      ) {
+        break;
+      }
+
+      if (
+        resolvedItem.dependentSchemas != null &&
+        Object.keys(resolvedItem.dependentSchemas).length > 0
+      ) {
+        break;
+      }
+
+      if (resolvedItem.options != null && resolvedItem.options.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.required != null && resolvedItem.required.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.minimumInclusive != null) {
+        break;
+      }
+
+      if (resolvedItem.minimumExclusive != null) {
+        break;
+      }
+
+      if (resolvedItem.maximumInclusive != null) {
+        break;
+      }
+
+      if (resolvedItem.maximumExclusive != null) {
+        break;
+      }
+
+      if (resolvedItem.multipleOf != null) {
+        break;
+      }
+
+      if (resolvedItem.minimumLength != null) {
+        break;
+      }
+
+      if (resolvedItem.maximumLength != null) {
+        break;
+      }
+
+      if (resolvedItem.valuePattern != null && resolvedItem.valuePattern.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.valueFormat != null && resolvedItem.valueFormat.length > 0) {
+        break;
+      }
+
+      if (resolvedItem.minimumItems != null) {
+        break;
+      }
+
+      if (resolvedItem.maximumItems != null) {
+        break;
+      }
+
+      if (resolvedItem.uniqueItems != null) {
+        break;
+      }
+
+      if (resolvedItem.minimumProperties != null) {
+        break;
+      }
+
+      if (resolvedItem.maximumProperties != null) {
+        break;
+      }
+
+      resolvedKey = resolvedItem.reference;
+      resolvedItem = this.getItem(resolvedKey);
+    }
+    return resolvedKey;
+  }
+
   public static fromIntermediate(document: schemaIntermediate.SchemaDocument): SchemaArena {
     const arena = new SchemaArena();
     /*
