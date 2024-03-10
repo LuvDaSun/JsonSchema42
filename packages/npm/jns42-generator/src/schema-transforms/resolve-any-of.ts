@@ -105,22 +105,22 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
       exact: false,
     };
     for (const subKey of subKeys) {
-      const [, subModel] = arena.resolveItem(subKey);
+      const subItem = arena.getItem(subKey);
 
       subModelNew = {
         ...subModelNew,
-        options: intersectionMerge(subModelNew.options, subModel.options),
-        required: intersectionMerge(subModelNew.required, subModel.required),
-        propertyNames: mergeKey(subModelNew.propertyNames, subModel.propertyNames),
-        contains: mergeKey(subModelNew.contains, subModel.contains),
-        tupleItems: mergeKeysArray(subModelNew.tupleItems, subModel.tupleItems, mergeKey),
-        arrayItems: mergeKey(subModelNew.arrayItems, subModel.arrayItems),
+        options: intersectionMerge(subModelNew.options, subItem.options),
+        required: intersectionMerge(subModelNew.required, subItem.required),
+        propertyNames: mergeKey(subModelNew.propertyNames, subItem.propertyNames),
+        contains: mergeKey(subModelNew.contains, subItem.contains),
+        tupleItems: mergeKeysArray(subModelNew.tupleItems, subItem.tupleItems, mergeKey),
+        arrayItems: mergeKey(subModelNew.arrayItems, subItem.arrayItems),
         objectProperties: mergeKeysRecord(
           subModelNew.objectProperties,
-          subModel.objectProperties,
+          subItem.objectProperties,
           mergeKey,
         ),
-        mapProperties: mergeKey(subModelNew.mapProperties, subModel.mapProperties),
+        mapProperties: mergeKey(subModelNew.mapProperties, subItem.mapProperties),
       };
     }
 

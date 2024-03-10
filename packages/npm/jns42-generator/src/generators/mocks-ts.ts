@@ -1,11 +1,5 @@
 import * as models from "../models/index.js";
 import {
-  isAliasSchemaModel,
-  isOneOfSchemaModel,
-  isSingleTypeSchemaModel,
-  isTypeSchemaModel,
-} from "../models/index.js";
-import {
   NestedText,
   banner,
   generateJsDocComments,
@@ -123,14 +117,14 @@ export function* generateMocksTsCode(specification: models.Specification) {
   function* generateMockDefinition(itemKey: number): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
 
-    if (isAliasSchemaModel(item)) {
+    if (item.reference != null) {
       yield generateMockReference(item.reference);
       return;
     }
 
-    if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    if (item.oneOf != null && item.oneOf.length > 0) {
       const oneOfMockableEntries = item.oneOf
-        .map((key) => [key, typesArena.resolveItem(key)[1]] as const)
+        .map((key) => [key, typesArena.getItem(key)] as const)
         .filter(([key, item]) => typesArena.isMockable(key));
 
       yield itt`
@@ -155,9 +149,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return;
     }
 
-    if (isTypeSchemaModel(item)) {
-      if (item.options != null && item.options.length > 0) {
-        yield itt`
+    if (item.options != null && item.options.length > 0) {
+      yield itt`
           (
             [
               ${joinIterable(
@@ -169,11 +162,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
             nextSeed() % ${JSON.stringify(item.options.length)}
           ]
         `;
-        return;
-      }
+      return;
     }
 
-    if (isSingleTypeSchemaModel(item) && item.types != null) {
+    if (item.types != null && item.types.length == 1) {
       switch (item.types[0]) {
         case "never":
           yield "neverValue";
@@ -373,7 +365,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
                     [${JSON.stringify(name)}]: anyValue,
                   `;
                 } else {
-                  const [resolvedKey] = typesArena.resolveItem(objectProperties[name]);
                   if (required.has(name)) {
                     yield itt`
                       [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
@@ -381,7 +372,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                   } else {
                     yield itt`
                       [${JSON.stringify(name)}]:
-                        (depthCounters[${JSON.stringify(resolvedKey)}] ?? 0) < configuration.maximumDepth ?
+                        (depthCounters[${JSON.stringify(objectProperties[name])}] ?? 0) < configuration.maximumDepth ?
                         ${generateMockReference(objectProperties[name])} :
                         undefined,
                     `;

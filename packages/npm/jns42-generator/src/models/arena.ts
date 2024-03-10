@@ -1,20 +1,10 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import { Arena, ArenaTransform } from "../utils/arena.js";
-import { SchemaModel, SchemaType, isAliasSchemaModel } from "./model.js";
+import { SchemaModel, SchemaType } from "./model.js";
 
 export type SchemaTransform = ArenaTransform<SchemaModel, SchemaArena>;
 
 export class SchemaArena extends Arena<SchemaModel> {
-  public resolveItem(key: number): [number, SchemaModel] {
-    let resolvedKey = key;
-    let resolvedItem = this.getItem(resolvedKey);
-    while (isAliasSchemaModel(resolvedItem)) {
-      resolvedKey = resolvedItem.reference;
-      resolvedItem = this.getItem(resolvedKey);
-    }
-    return [resolvedKey, resolvedItem];
-  }
-
   public isMockable(key: number) {
     const item = this.getItem(key);
 
