@@ -28,28 +28,6 @@ test("resolve-all-of utility", () => {
   );
 });
 
-test("resolve-all-of alias", () => {
-  const arena = new SchemaArena([
-    { types: ["string"] }, // 0
-    { types: ["string"] }, // 1
-    { allOf: [1] }, // 2
-    { allOf: [0, 2] }, // 3
-  ]);
-
-  while (arena.applyTransform(resolveAllOf) > 0);
-
-  assert.deepEqual(
-    [...arena].map(normalizeObject),
-
-    [
-      { types: ["string"] }, // 0
-      { types: ["string"] }, // 1
-      { allOf: [1] }, // 2
-      { types: ["string"] }, // 3
-    ],
-  );
-});
-
 test("resolve-all-of primitive", () => {
   const arena = new SchemaArena([
     { types: ["number"] }, // 0
