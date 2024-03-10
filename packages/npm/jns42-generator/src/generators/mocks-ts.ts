@@ -21,9 +21,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
   yield itt`
     const depthCounters: Record<string, number> = {};
 
-    export const unknownValue: any = {};
-    export const anyValue: any = {};
-    export const neverValue: any = {};
+    export const unknownValue: any = Symbol();
+    export const anyValue: any = Symbol();
+    export const neverValue: any = Symbol();
 
     export interface MockGeneratorOptions {
       maximumDepth?: number;
