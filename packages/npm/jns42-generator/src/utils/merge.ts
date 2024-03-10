@@ -58,6 +58,35 @@ export function exclude<T>(
   return values.filter((value) => !set.has(value));
 }
 
+export function mergeKeysArray(
+  keys: number[] | undefined,
+  otherKeys: number[] | undefined,
+  mergeKey: (key: number | undefined, otherKey: number | undefined) => number | undefined,
+): number[] | undefined {
+  if (keys === otherKeys) {
+    return keys;
+  }
+
+  if (keys == null) {
+    return otherKeys;
+  }
+
+  if (otherKeys == null) {
+    return keys;
+  }
+
+  const resultKeys = new Array<number>();
+  const length = Math.max(keys.length, otherKeys.length);
+  for (let index = 0; index < length; index++) {
+    const key = mergeKey(keys[index], otherKeys[index]);
+    if (key == null) {
+      continue;
+    }
+    resultKeys.push(key);
+  }
+  return resultKeys;
+}
+
 export function mergeKeysRecord(
   keys: Record<string, number> | undefined,
   otherKeys: Record<string, number> | undefined,

@@ -5,12 +5,13 @@ import { normalizeObject } from "../utils/index.js";
 import { resolveIfThenElse } from "./resolve-if-then-else.js";
 
 test("if-then-else", () => {
-  const arena = new SchemaArena();
-  arena.addItem({
-    if: 100,
-    then: 200,
-    else: 300,
-  });
+  const arena = new SchemaArena([
+    {
+      if: 100,
+      then: 200,
+      else: 300,
+    },
+  ]);
 
   while (arena.applyTransform(resolveIfThenElse) > 0);
 

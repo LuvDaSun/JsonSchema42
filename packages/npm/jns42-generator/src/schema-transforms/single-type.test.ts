@@ -5,8 +5,7 @@ import { normalizeObject } from "../utils/index.js";
 import { singleType } from "./single-type.js";
 
 test("single-type", () => {
-  const arena = new SchemaArena();
-  arena.addItem({ types: ["string", "number"] });
+  const arena = new SchemaArena([{ types: ["string", "number"] }]);
 
   while (arena.applyTransform(singleType) > 0);
 

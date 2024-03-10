@@ -6,19 +6,19 @@ import { flattenAllOf } from "./flatten.js";
 
 test("flatten", () => {
   const arena = new SchemaArena([
-    {},
-    {},
-    {},
-    {},
+    {}, // 0
+    {}, // 1
+    {}, // 2
+    {}, // 3
     {
       allOf: [0, 1],
-    },
+    }, // 4
     {
       allOf: [2, 3],
-    },
+    }, // 5
     {
       allOf: [4, 5],
-    },
+    }, // 6
   ]);
 
   while (arena.applyTransform(flattenAllOf) > 0);
@@ -26,6 +26,14 @@ test("flatten", () => {
   assert.deepEqual(
     [...arena].map(normalizeObject),
 
-    [{}, {}, {}, {}, { allOf: [0, 1] }, { allOf: [2, 3] }, { allOf: [0, 1, 2, 3] }],
+    [
+      {}, // 0
+      {}, // 1
+      {}, // 2
+      {}, // 3
+      { allOf: [0, 1] }, // 4
+      { allOf: [2, 3] }, // 5
+      { allOf: [0, 1, 2, 3] }, // 6
+    ],
   );
 });

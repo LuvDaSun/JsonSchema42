@@ -5,8 +5,7 @@ import { normalizeObject } from "../utils/index.js";
 import { resolveSingleAllOf } from "./resolve-single.js";
 
 test("alias", () => {
-  const arena = new SchemaArena();
-  arena.addItem({ allOf: [100] });
+  const arena = new SchemaArena([{ allOf: [100] }]);
 
   while (arena.applyTransform(resolveSingleAllOf) > 0);
 

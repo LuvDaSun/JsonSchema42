@@ -78,7 +78,7 @@ export const resolveAllOf: SchemaTransform = (arena, key) => {
     return;
   }
 
-  let newItem: SchemaModel = {
+  let itemNew: SchemaModel = {
     ...item,
     allOf: undefined,
   };
@@ -122,44 +122,44 @@ export const resolveAllOf: SchemaTransform = (arena, key) => {
       return;
     }
 
-    newItem = {
-      ...newItem,
+    itemNew = {
+      ...itemNew,
 
       // every item needs to be exact
-      exact: booleanMergeAnd(newItem.exact, subItem.exact),
+      exact: booleanMergeAnd(itemNew.exact, subItem.exact),
 
-      types: intersectionMergeTypes(newItem.types, subItem.types),
-      options: intersectionMerge(newItem.options, subItem.options),
-      required: unionMerge(newItem.required, subItem.required),
-      propertyNames: mergeKey(newItem.propertyNames, subItem.propertyNames),
-      contains: mergeKey(newItem.contains, subItem.contains),
-      tupleItems: mergeKeysArray(newItem.tupleItems, subItem.tupleItems, mergeKey),
-      arrayItems: mergeKey(newItem.arrayItems, subItem.arrayItems),
+      types: intersectionMergeTypes(itemNew.types, subItem.types),
+      options: intersectionMerge(itemNew.options, subItem.options),
+      required: unionMerge(itemNew.required, subItem.required),
+      propertyNames: mergeKey(itemNew.propertyNames, subItem.propertyNames),
+      contains: mergeKey(itemNew.contains, subItem.contains),
+      tupleItems: mergeKeysArray(itemNew.tupleItems, subItem.tupleItems, mergeKey),
+      arrayItems: mergeKey(itemNew.arrayItems, subItem.arrayItems),
       objectProperties: mergeKeysRecord(
-        newItem.objectProperties,
+        itemNew.objectProperties,
         subItem.objectProperties,
         mergeKey,
       ),
-      mapProperties: mergeKey(newItem.mapProperties, subItem.mapProperties),
+      mapProperties: mergeKey(itemNew.mapProperties, subItem.mapProperties),
 
-      minimumInclusive: numericMergeMinimum(newItem.minimumInclusive, subItem.minimumInclusive),
-      minimumExclusive: numericMergeMinimum(newItem.minimumExclusive, subItem.minimumExclusive),
-      maximumInclusive: numericMergeMaximum(newItem.maximumInclusive, subItem.maximumInclusive),
-      maximumExclusive: numericMergeMaximum(newItem.maximumExclusive, subItem.maximumExclusive),
-      multipleOf: numericMergeMultipleOf(newItem.multipleOf, subItem.multipleOf),
-      minimumLength: numericMergeMinimum(newItem.minimumLength, subItem.minimumLength),
-      maximumLength: numericMergeMaximum(newItem.maximumLength, subItem.maximumLength),
-      valuePattern: unionMerge(newItem.valuePattern, subItem.valuePattern),
-      valueFormat: unionMerge(newItem.valueFormat, subItem.valueFormat),
-      minimumItems: numericMergeMinimum(newItem.minimumItems, subItem.minimumItems),
-      maximumItems: numericMergeMaximum(newItem.maximumItems, subItem.maximumItems),
-      uniqueItems: booleanMergeOr(newItem.uniqueItems, subItem.uniqueItems),
-      minimumProperties: numericMergeMinimum(newItem.minimumProperties, subItem.minimumProperties),
-      maximumProperties: numericMergeMaximum(newItem.maximumProperties, subItem.maximumProperties),
+      minimumInclusive: numericMergeMinimum(itemNew.minimumInclusive, subItem.minimumInclusive),
+      minimumExclusive: numericMergeMinimum(itemNew.minimumExclusive, subItem.minimumExclusive),
+      maximumInclusive: numericMergeMaximum(itemNew.maximumInclusive, subItem.maximumInclusive),
+      maximumExclusive: numericMergeMaximum(itemNew.maximumExclusive, subItem.maximumExclusive),
+      multipleOf: numericMergeMultipleOf(itemNew.multipleOf, subItem.multipleOf),
+      minimumLength: numericMergeMinimum(itemNew.minimumLength, subItem.minimumLength),
+      maximumLength: numericMergeMaximum(itemNew.maximumLength, subItem.maximumLength),
+      valuePattern: unionMerge(itemNew.valuePattern, subItem.valuePattern),
+      valueFormat: unionMerge(itemNew.valueFormat, subItem.valueFormat),
+      minimumItems: numericMergeMinimum(itemNew.minimumItems, subItem.minimumItems),
+      maximumItems: numericMergeMaximum(itemNew.maximumItems, subItem.maximumItems),
+      uniqueItems: booleanMergeOr(itemNew.uniqueItems, subItem.uniqueItems),
+      minimumProperties: numericMergeMinimum(itemNew.minimumProperties, subItem.minimumProperties),
+      maximumProperties: numericMergeMaximum(itemNew.maximumProperties, subItem.maximumProperties),
     };
   }
 
-  arena.setItem(key, newItem);
+  arena.setItem(key, itemNew);
 
   function mergeKey(key: number | undefined, otherKey: number | undefined): number | undefined {
     if (key === otherKey) {
