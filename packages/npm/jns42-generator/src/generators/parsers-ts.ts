@@ -1,10 +1,5 @@
 import * as models from "../models/index.js";
 import {
-  isAliasSchemaModel,
-  isOneOfSchemaModel,
-  isSingleTypeSchemaModel,
-} from "../models/index.js";
-import {
   NestedText,
   banner,
   generateJsDocComments,
@@ -73,12 +68,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
   function* generateParserDefinition(itemKey: number, valueExpression: string) {
     const item = typesArena.getItem(itemKey);
 
-    if (isAliasSchemaModel(item)) {
+    if (item.reference != null) {
       yield generateParserReference(item.reference, valueExpression);
       return;
     }
 
-    if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    if (item.oneOf != null && item.oneOf.length > 0) {
       yield itt`
         ${joinIterable(
           item.oneOf.map(
@@ -92,7 +87,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
       return;
     }
 
-    if (isSingleTypeSchemaModel(item) && item.types != null) {
+    if (item.types != null && item.types.length === 1) {
       switch (item.types[0]) {
         case "any":
           yield valueExpression;

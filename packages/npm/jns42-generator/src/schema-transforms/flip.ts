@@ -108,7 +108,6 @@ function createTransform(
 
     for (const set of product(otherKeysEntries.map(([subKey, otherKeys]) => otherKeys))) {
       let subItemNew = {
-        parent: key,
         [baseMember]: [...subKeys, ...set],
       };
       let subKeyNew = arena.addItem(subItemNew);

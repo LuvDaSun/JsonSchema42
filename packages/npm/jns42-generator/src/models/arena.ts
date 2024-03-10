@@ -120,11 +120,6 @@ export class SchemaArena extends Arena<SchemaItem> {
         break;
       }
 
-      // the original parent of this item
-      if (resolvedItem.parent != null) {
-        break;
-      }
-
       if (resolvedItem.types != null && resolvedItem.types.length > 0) {
         break;
       }
@@ -274,7 +269,6 @@ export class SchemaArena extends Arena<SchemaItem> {
     the schemas in the arena get a new id
     */
     const idMap: Record<string, number> = {};
-    const parents: Record<string, string> = {};
     const implicitTypes: Record<string, SchemaType[]> = {};
 
     for (const id in document.schemas) {
@@ -285,38 +279,6 @@ export class SchemaArena extends Arena<SchemaItem> {
 
       const newKey = arena.addItem(newItem);
       idMap[id] = newKey;
-
-      if (schema.allOf != null) {
-        for (const child of schema.allOf) {
-          parents[child] = id;
-        }
-      }
-
-      if (schema.anyOf != null) {
-        for (const child of schema.anyOf) {
-          parents[child] = id;
-        }
-      }
-
-      if (schema.oneOf != null) {
-        for (const child of schema.oneOf) {
-          parents[child] = id;
-        }
-      }
-
-      if (schema.if != null) {
-        parents[schema.if] = id;
-      }
-      if (schema.then != null) {
-        parents[schema.then] = id;
-      }
-      if (schema.else != null) {
-        parents[schema.else] = id;
-      }
-
-      if (schema.not != null) {
-        parents[schema.not] = id;
-      }
 
       if (schema.options != null) {
         const types = new Set<SchemaType>();
@@ -361,7 +323,6 @@ export class SchemaArena extends Arena<SchemaItem> {
 
       const itemNew: SchemaItem = {
         id,
-        parent: parents[id] == null ? undefined : idMap[parents[id]],
       };
 
       // initially all items are exact

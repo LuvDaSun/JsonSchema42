@@ -61,7 +61,6 @@ export function loadSpecification(
         schemaTransforms.resolveAnyOf,
         schemaTransforms.resolveNot,
         schemaTransforms.resolveIfThenElse,
-        schemaTransforms.resolveParent,
 
         schemaTransforms.unalias,
       ) > 0

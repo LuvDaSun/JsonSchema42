@@ -31,23 +31,17 @@ import { SchemaItem, SchemaTransform } from "../models/index.js";
  *   - 2
  *   - 3
  *   - 4
- * - parent: 0
- *   reference: 10
+ * - reference: 10
  * - allOf
- *   parent: 0
- *   allOf
  *   - 100
  *   - 200
- * - parent: 0
- *   anyOf
+ * - anyOf
  *   - 300
  *   - 400
- * - parent: 0
- *   oneOf
+ * - oneOf
  *   - 500
  *   - 600
- * - parent: 0
- *   if: 700
+ * - if: 700
  *   then: 800
  *   else: 900
  *
@@ -61,42 +55,36 @@ export const explode: SchemaTransform = (arena, key) => {
 
   if (item.types != null && item.types.length > 0) {
     subItems.push({
-      parent: key,
       types: item.types,
     });
   }
 
   if (item.reference != null) {
     subItems.push({
-      parent: key,
       reference: item.reference,
     });
   }
 
   if (item.allOf != null && item.allOf.length > 0) {
     subItems.push({
-      parent: key,
       allOf: item.allOf,
     });
   }
 
   if (item.anyOf != null && item.anyOf.length > 0) {
     subItems.push({
-      parent: key,
       anyOf: item.anyOf,
     });
   }
 
   if (item.oneOf != null && item.oneOf.length > 0) {
     subItems.push({
-      parent: key,
       oneOf: item.oneOf,
     });
   }
 
   if (item.if != null || item.then != null || item.else != null) {
     subItems.push({
-      parent: key,
       if: item.if,
       then: item.then,
       else: item.else,

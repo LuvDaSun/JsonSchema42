@@ -46,7 +46,7 @@ export const singleType: SchemaTransform = (arena, key) => {
       arena.setItem(key, {
         ...item,
         types: undefined,
-        oneOf: item.types.map((type) => arena.addItem({ parent: key, types: [type] })),
+        oneOf: item.types.map((type) => arena.addItem({ types: [type] })),
       });
     }
   }
