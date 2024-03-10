@@ -37,21 +37,23 @@ function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform
     const item = arena.getItem(key);
 
     const subKeys = item[member];
-    if (subKeys != null) {
-      let subKeysNew = subKeys
-        .map((subKey) => [subKey, arena.getItem(subKey)] as const)
-        .flatMap(([subKey, subItem]) => {
-          const subSubKeys = subItem[member];
-          if (subSubKeys == null) {
-            return [subKey];
-          } else {
-            return subSubKeys;
-          }
-        });
+    if (subKeys == null) {
+      return;
+    }
 
-      if (subKeys.length !== subKeysNew.length) {
-        arena.setItem(key, { ...item, [member]: subKeysNew });
-      }
+    let subKeysNew = subKeys
+      .map((subKey) => [subKey, arena.getItem(subKey)] as const)
+      .flatMap(([subKey, subItem]) => {
+        const subSubKeys = subItem[member];
+        if (subSubKeys == null) {
+          return [subKey];
+        } else {
+          return subSubKeys;
+        }
+      });
+
+    if (subKeys.length !== subKeysNew.length) {
+      arena.setItem(key, { ...item, [member]: subKeysNew });
     }
   };
 }

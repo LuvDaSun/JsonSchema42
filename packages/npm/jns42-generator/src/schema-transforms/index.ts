@@ -1,6 +1,7 @@
 export * from "./explode.js";
 export * from "./flatten.js";
 export * from "./flip.js";
+export * from "./inherit.js";
 export * from "./resolve-all-of.js";
 export * from "./resolve-any-of.js";
 export * from "./resolve-if-then-else.js";
