@@ -320,7 +320,7 @@ export class SchemaArena extends Arena<SchemaItem> {
 
       if (schema.options != null) {
         const types = new Set<SchemaType>();
-        for (const option in schema.options) {
+        for (const option of schema.options) {
           switch (typeof option) {
             case "string":
               types.add("string");
