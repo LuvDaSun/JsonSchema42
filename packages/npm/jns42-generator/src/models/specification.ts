@@ -1,8 +1,9 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { SchemaArena, selectSchemaDependencies } from "../models/index.js";
 import * as schemaTransforms from "../schema-transforms/index.js";
 import { Namer } from "../utils/namer.js";
 import { NodeLocation } from "../utils/node-location.js";
+import { SchemaArena } from "./arena.js";
+import { selectSchemaDependencies } from "./selectors.js";
 
 export interface Specification {
   typesArena: SchemaArena;
@@ -55,6 +56,8 @@ export function loadSpecification(
         schemaTransforms.flattenOneOf,
 
         schemaTransforms.inheritOneOf,
+        schemaTransforms.inheritAnyOf,
+
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
