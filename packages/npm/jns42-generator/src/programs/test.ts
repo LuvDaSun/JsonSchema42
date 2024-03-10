@@ -190,15 +190,9 @@ async function main(configuration: MainConfiguration) {
       env: process.env,
     } as const;
 
-    // install package
-    {
+    test("install package", () => {
       cp.execFileSync("npm", ["install"], options);
-    }
-
-    // build package
-    // {
-    //   cp.execFileSync("npm", ["run", "build"], options);
-    // }
+    });
 
     test("test package", () => {
       cp.execFileSync("npm", ["test"], options);
