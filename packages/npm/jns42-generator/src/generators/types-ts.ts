@@ -1,12 +1,5 @@
 import * as models from "../models/index.js";
 import {
-  isAliasSchemaModel,
-  isAllOfSchemaModel,
-  isOneOfSchemaModel,
-  isSingleTypeSchemaModel,
-  isTypeSchemaModel,
-} from "../models/index.js";
-import {
   NestedText,
   banner,
   generateJsDocComments,
@@ -49,24 +42,24 @@ export function* generateTypesTsCode(specification: models.Specification) {
   function* generateTypeDefinition(itemKey: number) {
     const item = typesArena.getItem(itemKey);
 
-    // if (item.anyOf != null) {
-    //   throw new TypeError("encountered anyOf when generating type");
-    // }
+    if (item.anyOf != null) {
+      throw new TypeError("encountered anyOf when generating type");
+    }
 
-    // if (item.if != null) {
-    //   throw new TypeError("encountered if when generating type");
-    // }
+    if (item.if != null) {
+      throw new TypeError("encountered if when generating type");
+    }
 
-    // if (item.not != null) {
-    //   throw new TypeError("encountered not when generating type");
-    // }
+    if (item.not != null) {
+      throw new TypeError("encountered not when generating type");
+    }
 
-    if (isAliasSchemaModel(item)) {
+    if (item.reference != null) {
       yield generateTypeReference(item.reference);
       return;
     }
 
-    if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    if (item.oneOf != null && item.oneOf.length > 0) {
       yield itt`
       ${joinIterable(
         item.oneOf.map(
@@ -80,7 +73,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       return;
     }
 
-    if (isAllOfSchemaModel(item) && item.allOf.length > 0) {
+    if (item.allOf != null && item.allOf.length > 0) {
       yield itt`
       ${joinIterable(
         item.allOf.map(
@@ -94,7 +87,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       return;
     }
 
-    if (isTypeSchemaModel(item)) {
+    if (item.options !== null) {
       if (item.options != null && item.options.length > 0) {
         yield joinIterable(
           item.options.map((option) => JSON.stringify(option)),
@@ -104,7 +97,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       }
     }
 
-    if (isSingleTypeSchemaModel(item) && item.types != null) {
+    if (item.types != null && item.types.length === 1) {
       switch (item.types[0]) {
         case "never":
           yield "never";

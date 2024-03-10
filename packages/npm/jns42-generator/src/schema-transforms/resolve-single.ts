@@ -30,6 +30,7 @@ function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform
     switch (subKeys.length) {
       case 0: {
         arena.setItem(key, { ...item, [member]: null });
+        break;
       }
 
       case 1: {
@@ -37,6 +38,7 @@ function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform
           return;
         }
         arena.setItem(key, { ...item, reference: subKeys[0], [member]: null });
+        break;
       }
 
       default: {

@@ -58,12 +58,12 @@ export function loadSpecification(
         schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.resolveAllOf,
-        // schemaTransforms.resolveAnyOf,
+        schemaTransforms.resolveAnyOf,
         schemaTransforms.resolveNot,
         schemaTransforms.resolveIfThenElse,
-        // schemaTransforms.resolveParent,
+        schemaTransforms.resolveParent,
 
-        schemaTransforms.unalias,
+        // schemaTransforms.unalias,
       ) > 0
     ) {
       transformIterations++;
