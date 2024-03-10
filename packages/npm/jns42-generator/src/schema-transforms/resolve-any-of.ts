@@ -1,4 +1,4 @@
-import { SchemaItem, SchemaTransform } from "../models/index.js";
+import { SchemaItem, SchemaTransform, SchemaType } from "../models/index.js";
 import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
 
 export const resolveAnyOf: SchemaTransform = (arena, key) => {
@@ -46,7 +46,7 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
   for (const subKey of item.anyOf) {
     const subItem = arena.getItem(subKey);
 
-    if (subItem.types != null && subItem.types.length > 1) {
+    if (subItem.types == null || subItem.types.length !== 1) {
       // we can only work with single types
       return;
     }
@@ -83,8 +83,7 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
       return;
     }
 
-    const type = subItem.types != null && subItem.types.length === 1 ? subItem.types[0] : "";
-
+    const [type] = subItem.types;
     groupedSubKeys[type] ??= [];
     groupedSubKeys[type].push(subKey);
   }
@@ -92,7 +91,7 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
   const subKeysNew = new Array<number>();
 
   // we make a oneOf with every type as it's element
-  for (const [, subKeys] of Object.entries(groupedSubKeys)) {
+  for (const [type, subKeys] of Object.entries(groupedSubKeys)) {
     if (subKeys.length < 2) {
       for (const subKey of subKeys) {
         subKeysNew.push(subKey);
@@ -103,12 +102,14 @@ export const resolveAnyOf: SchemaTransform = (arena, key) => {
 
     let subItemNew: SchemaItem = {
       exact: false,
+      types: [type] as SchemaType[],
     };
     for (const subKey of subKeys) {
       const subItem = arena.getItem(subKey);
 
       subItemNew = {
         ...subItemNew,
+
         options: intersectionMerge(subItemNew.options, subItem.options),
         required: intersectionMerge(subItemNew.required, subItem.required),
         propertyNames: mergeKey(subItemNew.propertyNames, subItem.propertyNames),
