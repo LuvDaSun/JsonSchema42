@@ -1,4 +1,5 @@
 import { SchemaTransform } from "../models/index.js";
+import { deepUnique } from "../utils/index.js";
 
 export const uniqueAllOf = createTransformer("allOf");
 export const uniqueAnyOf = createTransformer("anyOf");
@@ -13,7 +14,7 @@ function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform
       return;
     }
 
-    const subKeySet = [...makeUnique(subKeys)];
+    const subKeySet = [...deepUnique(subKeys)];
     if (subKeys.length > subKeySet.length) {
       const itemNew = {
         ...item,
