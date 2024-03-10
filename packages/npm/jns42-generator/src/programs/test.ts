@@ -183,30 +183,23 @@ async function main(configuration: MainConfiguration) {
       });
     }
 
+    const options = {
+      stdio: "inherit",
+      shell: true,
+    } as const;
+
     // install package
     {
-      cp.execSync("npm install", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
+      cp.execFileSync("npm", ["install"], options);
     }
 
     // build package
     {
-      cp.execSync("npm run build", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
+      cp.execFileSync("npm", ["run", "build"], options);
     }
 
     test("test package", () => {
-      cp.execSync("npm test", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
+      cp.execFileSync("npm", ["test"], options);
     });
 
     await test("valid", async () => {
