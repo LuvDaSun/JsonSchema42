@@ -354,7 +354,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
             }
 
             yield itt`
-              return value;
+              return [name, value];
             `;
           }
         }
