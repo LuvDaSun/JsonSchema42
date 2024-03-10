@@ -78,3 +78,25 @@ test("flip-all-of-one-of", () => {
     { allOf: [0, 2, 4] }, // 11
   ]);
 });
+
+test("flip-all-of-one-of 2", () => {
+  const arena = new SchemaArena([
+    {}, // 0
+    {}, // 1
+    {}, // 2
+    { oneOf: [1, 2] }, // 3
+    { allOf: [0, 3] }, // 4
+  ]);
+
+  while (arena.applyTransform(flipAllOfOneOf) > 0);
+
+  assert.deepEqual([...arena].map(normalizeObject), [
+    {}, // 0
+    {}, // 1
+    {}, // 2
+    { oneOf: [1, 2] }, // 3
+    { oneOf: [5, 6] }, // 4
+    { allOf: [0, 1] }, // 5
+    { allOf: [0, 2] }, // 6
+  ]);
+});

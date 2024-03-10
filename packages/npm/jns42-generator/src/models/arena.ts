@@ -116,9 +116,21 @@ export class SchemaArena extends Arena<SchemaItem> {
     let resolvedKey = key;
     let resolvedItem = this.getItem(resolvedKey);
     while (true) {
-      if (resolvedItem.reference == null) {
-        break;
-      }
+      // if (resolvedItem.reference == null) {
+      //   break;
+      // }
+
+      // if (resolvedItem.oneOf != null && resolvedItem.oneOf.length > 1) {
+      //   break;
+      // }
+
+      // if (resolvedItem.anyOf != null && resolvedItem.anyOf.length > 1) {
+      //   break;
+      // }
+
+      // if (resolvedItem.allOf != null && resolvedItem.allOf.length > 1) {
+      //   break;
+      // }
 
       if (resolvedItem.types != null && resolvedItem.types.length > 0) {
         break;
@@ -153,18 +165,6 @@ export class SchemaArena extends Arena<SchemaItem> {
       }
 
       if (resolvedItem.contains != null) {
-        break;
-      }
-
-      if (resolvedItem.oneOf != null && resolvedItem.oneOf.length > 0) {
-        break;
-      }
-
-      if (resolvedItem.anyOf != null && resolvedItem.anyOf.length > 0) {
-        break;
-      }
-
-      if (resolvedItem.allOf != null && resolvedItem.allOf.length > 0) {
         break;
       }
 
@@ -257,7 +257,18 @@ export class SchemaArena extends Arena<SchemaItem> {
         break;
       }
 
-      resolvedKey = resolvedItem.reference;
+      const subKeys = [
+        resolvedItem.reference,
+        ...(resolvedItem.oneOf ?? []),
+        ...(resolvedItem.anyOf ?? []),
+        ...(resolvedItem.allOf ?? []),
+      ].filter((value) => value != null) as number[];
+
+      if (subKeys.length !== 1) {
+        break;
+      }
+
+      [resolvedKey] = subKeys;
       resolvedItem = this.getItem(resolvedKey);
     }
     return resolvedKey;

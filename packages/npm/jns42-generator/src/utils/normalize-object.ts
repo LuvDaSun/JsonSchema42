@@ -10,7 +10,7 @@ import { PartialDeep } from "type-fest";
  * @param target the object to normalize
  * @returns normalized object
  */
-export function normalizeObject<T>(target: PartialDeep<T>): PartialDeep<T> {
+export function normalizeObject<T>(target: T): PartialDeep<T> {
   if (typeof target === "object" && target !== null) {
     for (const name in target) {
       const value = target[name];
@@ -19,9 +19,9 @@ export function normalizeObject<T>(target: PartialDeep<T>): PartialDeep<T> {
         continue;
       }
 
-      normalizeObject(target[name] as PartialDeep<T>);
+      normalizeObject(target[name]);
     }
   }
 
-  return target;
+  return target as PartialDeep<T>;
 }

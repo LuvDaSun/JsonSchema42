@@ -41,26 +41,33 @@ export function loadSpecification(
 
   // transform the typesArena
   {
+    // console.log(
+    //   Object.fromEntries(
+    //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
+    //   ),
+    // );
+    // debugger;
+
     let transformIterations = 0;
     while (
       typesArena.applyTransform(
         schemaTransforms.singleType,
         schemaTransforms.explode,
 
-        schemaTransforms.resolveSingleAllOf,
-        schemaTransforms.resolveSingleAnyOf,
-        schemaTransforms.resolveSingleOneOf,
+        // schemaTransforms.resolveSingleAllOf,
+        // schemaTransforms.resolveSingleAnyOf,
+        // schemaTransforms.resolveSingleOneOf,
 
         schemaTransforms.flattenAllOf,
         schemaTransforms.flattenAnyOf,
         schemaTransforms.flattenOneOf,
 
+        schemaTransforms.flipAllOfOneOf,
+        schemaTransforms.flipAnyOfOneOf,
+
         // schemaTransforms.inheritAllOf,
         schemaTransforms.inheritAnyOf,
         schemaTransforms.inheritOneOf,
-
-        schemaTransforms.flipAllOfOneOf,
-        schemaTransforms.flipAnyOfOneOf,
 
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
@@ -71,6 +78,14 @@ export function loadSpecification(
       ) > 0
     ) {
       transformIterations++;
+
+      // console.log(
+      //   Object.fromEntries(
+      //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
+      //   ),
+      // );
+      // debugger;
+
       if (transformIterations < transformMaximumIterations) {
         continue;
       }

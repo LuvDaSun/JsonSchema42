@@ -98,11 +98,11 @@ function createTransform(
       return;
     }
 
-    const otherKeys = Object.entries(otherKeysEntries);
+    const otherKeys = Object.fromEntries(otherKeysEntries);
 
     const subKeys = baseItemsEntries
       .map(([subKey]) => subKey)
-      .filter((subKey) => otherKeys[subKey] != null);
+      .filter((subKey) => otherKeys[subKey] == null);
 
     const subKeysNew = new Array<number>();
 
