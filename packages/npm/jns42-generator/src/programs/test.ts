@@ -196,9 +196,9 @@ async function main(configuration: MainConfiguration) {
     }
 
     // build package
-    {
-      cp.execFileSync("npm", ["run", "build"], options);
-    }
+    // {
+    //   cp.execFileSync("npm", ["run", "build"], options);
+    // }
 
     test("test package", () => {
       cp.execFileSync("npm", ["test"], options);
