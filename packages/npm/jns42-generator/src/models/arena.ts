@@ -7,6 +7,9 @@ export type SchemaTransform = ArenaTransform<SchemaItem, SchemaArena>;
 export class SchemaArena extends Arena<SchemaItem> {
   public isMockable(key: number) {
     const item = this.getItem(key);
+    // the counter keeps track of of this item is unknown or not. If the counter is 0
+    // then the item has no meaningful mockable elements (often only validation).
+    let mockableCounter = 0;
 
     // we can only mock exact items
     if (!(item.exact ?? false)) {
@@ -29,16 +32,18 @@ export class SchemaArena extends Arena<SchemaItem> {
     }
 
     if (item.types != null) {
-      // we cannot mock never types
-      if (item.types.every((type) => type === "never")) {
+      // we cannot mock never and any types
+      if (item.types.every((type) => type === "never" || type === "any")) {
         return false;
       }
+      mockableCounter++;
     }
 
     if (item.reference != null) {
       if (!this.isMockable(item.reference)) {
         return false;
       }
+      mockableCounter++;
     }
 
     if (item.if != null) {
@@ -58,18 +63,21 @@ export class SchemaArena extends Arena<SchemaItem> {
       if (!this.isMockable(item.mapProperties)) {
         return false;
       }
+      mockableCounter++;
     }
 
     if (item.arrayItems != null) {
       if (!this.isMockable(item.arrayItems)) {
         return false;
       }
+      mockableCounter++;
     }
 
     if (item.propertyNames != null) {
       if (!this.isMockable(item.propertyNames)) {
         return false;
       }
+      mockableCounter++;
     }
 
     if (item.contains != null) {
@@ -80,6 +88,7 @@ export class SchemaArena extends Arena<SchemaItem> {
       if (!item.oneOf.some((key) => this.isMockable(key))) {
         return false;
       }
+      mockableCounter++;
     }
 
     if (item.anyOf != null && item.anyOf.length > 0) {
@@ -99,6 +108,7 @@ export class SchemaArena extends Arena<SchemaItem> {
       ) {
         return false;
       }
+      mockableCounter++;
     }
 
     // anything with a regex cannot be mocked
@@ -109,7 +119,7 @@ export class SchemaArena extends Arena<SchemaItem> {
       return false;
     }
 
-    return true;
+    return mockableCounter > 0;
   }
 
   public resolveKey(key: number): number {
