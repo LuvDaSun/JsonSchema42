@@ -72,7 +72,7 @@ export function loadSpecification(
         schemaTransforms.inheritAllOf,
         schemaTransforms.inheritAnyOf,
         schemaTransforms.inheritOneOf,
-        // schemaTransforms.inheritReference,
+        schemaTransforms.inheritReference,
 
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
