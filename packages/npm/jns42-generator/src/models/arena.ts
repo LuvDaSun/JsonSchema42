@@ -113,165 +113,144 @@ export class SchemaArena extends Arena<SchemaItem> {
   }
 
   public resolveKey(key: number): number {
-    let resolvedKey = key;
-    let resolvedItem = this.getItem(resolvedKey);
+    let item = this.getItem(key);
     while (true) {
-      // if (resolvedItem.reference == null) {
-      //   break;
-      // }
-
-      // if (resolvedItem.oneOf != null && resolvedItem.oneOf.length > 1) {
-      //   break;
-      // }
-
-      // if (resolvedItem.anyOf != null && resolvedItem.anyOf.length > 1) {
-      //   break;
-      // }
-
-      // if (resolvedItem.allOf != null && resolvedItem.allOf.length > 1) {
-      //   break;
-      // }
-
-      if (resolvedItem.types != null && resolvedItem.types.length > 0) {
+      if (item.reference == null) {
         break;
       }
 
-      if (resolvedItem.if != null) {
+      if (item.oneOf != null && item.oneOf.length > 1) {
         break;
       }
 
-      if (resolvedItem.then != null) {
+      if (item.anyOf != null && item.anyOf.length > 1) {
         break;
       }
 
-      if (resolvedItem.else != null) {
+      if (item.allOf != null && item.allOf.length > 1) {
         break;
       }
 
-      if (resolvedItem.not != null) {
+      if (item.types != null && item.types.length > 0) {
         break;
       }
 
-      if (resolvedItem.mapProperties != null) {
+      if (item.if != null) {
         break;
       }
 
-      if (resolvedItem.arrayItems != null) {
+      if (item.then != null) {
         break;
       }
 
-      if (resolvedItem.propertyNames != null) {
+      if (item.else != null) {
         break;
       }
 
-      if (resolvedItem.contains != null) {
+      if (item.not != null) {
         break;
       }
 
-      if (resolvedItem.tupleItems != null && resolvedItem.tupleItems.length > 0) {
+      if (item.mapProperties != null) {
         break;
       }
 
-      if (
-        resolvedItem.objectProperties != null &&
-        Object.keys(resolvedItem.objectProperties).length > 0
-      ) {
+      if (item.arrayItems != null) {
         break;
       }
 
-      if (
-        resolvedItem.patternProperties != null &&
-        Object.keys(resolvedItem.patternProperties).length > 0
-      ) {
+      if (item.propertyNames != null) {
         break;
       }
 
-      if (
-        resolvedItem.dependentSchemas != null &&
-        Object.keys(resolvedItem.dependentSchemas).length > 0
-      ) {
+      if (item.contains != null) {
         break;
       }
 
-      if (resolvedItem.options != null && resolvedItem.options.length > 0) {
+      if (item.tupleItems != null && item.tupleItems.length > 0) {
         break;
       }
 
-      if (resolvedItem.required != null && resolvedItem.required.length > 0) {
+      if (item.objectProperties != null && Object.keys(item.objectProperties).length > 0) {
         break;
       }
 
-      if (resolvedItem.minimumInclusive != null) {
+      if (item.patternProperties != null && Object.keys(item.patternProperties).length > 0) {
         break;
       }
 
-      if (resolvedItem.minimumExclusive != null) {
+      if (item.dependentSchemas != null && Object.keys(item.dependentSchemas).length > 0) {
         break;
       }
 
-      if (resolvedItem.maximumInclusive != null) {
+      if (item.options != null && item.options.length > 0) {
         break;
       }
 
-      if (resolvedItem.maximumExclusive != null) {
+      if (item.required != null && item.required.length > 0) {
         break;
       }
 
-      if (resolvedItem.multipleOf != null) {
+      if (item.minimumInclusive != null) {
         break;
       }
 
-      if (resolvedItem.minimumLength != null) {
+      if (item.minimumExclusive != null) {
         break;
       }
 
-      if (resolvedItem.maximumLength != null) {
+      if (item.maximumInclusive != null) {
         break;
       }
 
-      if (resolvedItem.valuePattern != null && resolvedItem.valuePattern.length > 0) {
+      if (item.maximumExclusive != null) {
         break;
       }
 
-      if (resolvedItem.valueFormat != null && resolvedItem.valueFormat.length > 0) {
+      if (item.multipleOf != null) {
         break;
       }
 
-      if (resolvedItem.minimumItems != null) {
+      if (item.minimumLength != null) {
         break;
       }
 
-      if (resolvedItem.maximumItems != null) {
+      if (item.maximumLength != null) {
         break;
       }
 
-      if (resolvedItem.uniqueItems != null) {
+      if (item.valuePattern != null && item.valuePattern.length > 0) {
         break;
       }
 
-      if (resolvedItem.minimumProperties != null) {
+      if (item.valueFormat != null && item.valueFormat.length > 0) {
         break;
       }
 
-      if (resolvedItem.maximumProperties != null) {
+      if (item.minimumItems != null) {
         break;
       }
 
-      const subKeys = [
-        resolvedItem.reference,
-        ...(resolvedItem.oneOf ?? []),
-        ...(resolvedItem.anyOf ?? []),
-        ...(resolvedItem.allOf ?? []),
-      ].filter((value) => value != null) as number[];
-
-      if (subKeys.length !== 1) {
+      if (item.maximumItems != null) {
         break;
       }
 
-      [resolvedKey] = subKeys;
-      resolvedItem = this.getItem(resolvedKey);
+      if (item.uniqueItems != null) {
+        break;
+      }
+
+      if (item.minimumProperties != null) {
+        break;
+      }
+
+      if (item.maximumProperties != null) {
+        break;
+      }
+
+      key = item.reference;
+      item = this.getItem(key);
     }
-    return resolvedKey;
+    return key;
   }
 
   public static fromIntermediate(document: schemaIntermediate.SchemaDocument): SchemaArena {

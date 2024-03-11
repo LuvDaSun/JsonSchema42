@@ -54,9 +54,9 @@ export function loadSpecification(
         schemaTransforms.singleType,
         schemaTransforms.explode,
 
-        // schemaTransforms.resolveSingleAllOf,
-        // schemaTransforms.resolveSingleAnyOf,
-        // schemaTransforms.resolveSingleOneOf,
+        schemaTransforms.resolveSingleAllOf,
+        schemaTransforms.resolveSingleAnyOf,
+        schemaTransforms.resolveSingleOneOf,
 
         schemaTransforms.flattenAllOf,
         schemaTransforms.flattenAnyOf,
@@ -69,16 +69,17 @@ export function loadSpecification(
         schemaTransforms.flipAllOfOneOf,
         schemaTransforms.flipAnyOfOneOf,
 
-        // schemaTransforms.inheritAllOf,
+        schemaTransforms.inheritAllOf,
         schemaTransforms.inheritAnyOf,
         schemaTransforms.inheritOneOf,
+        schemaTransforms.inheritReference,
 
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
         schemaTransforms.resolveNot,
         schemaTransforms.resolveIfThenElse,
 
-        schemaTransforms.unalias,
+        // schemaTransforms.unalias,
       ) > 0
     ) {
       transformIterations++;
