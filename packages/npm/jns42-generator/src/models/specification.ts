@@ -79,7 +79,7 @@ export function loadSpecification(
         schemaTransforms.resolveNot,
         schemaTransforms.resolveIfThenElse,
 
-        // schemaTransforms.unalias,
+        schemaTransforms.unalias,
       ) > 0
     ) {
       transformIterations++;
