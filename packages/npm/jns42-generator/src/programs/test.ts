@@ -1,6 +1,6 @@
+import assert from "assert";
 import camelcase from "camelcase";
 import cp from "child_process";
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import * as path from "node:path";
 import test from "node:test";
@@ -16,6 +16,7 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
   return argv.command(
@@ -38,7 +39,7 @@ export function configureTestProgram(argv: yargs.Argv) {
           ] as const,
           default: schema202012.metaSchemaId,
         })
-        .option("output-directory", {
+        .option("package-directory", {
           description: "where to output the packages",
           type: "string",
           demandOption: true,
@@ -53,7 +54,7 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "string",
           demandOption: true,
         })
-        .option("default-name", {
+        .option("default-type-name", {
           description: "default name for types",
           type: "string",
           default: "schema-document",
@@ -75,10 +76,10 @@ export function configureTestProgram(argv: yargs.Argv) {
 interface MainConfiguration {
   pathToTest: string;
   defaultMetaSchemaUrl: string;
-  outputDirectory: string;
+  packageDirectory: string;
   packageName: string;
   packageVersion: string;
-  defaultName: string;
+  defaultTypeName: string;
   nameMaximumIterations: number;
   transformMaximumIterations: number;
 }
@@ -87,16 +88,16 @@ async function main(configuration: MainConfiguration) {
   const pathToTest = path.resolve(configuration.pathToTest);
 
   const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
-  const packageDirectoryRoot = path.resolve(configuration.outputDirectory);
+  const packageDirectoryRoot = path.resolve(configuration.packageDirectory);
   const {
     packageName,
     packageVersion,
     nameMaximumIterations,
     transformMaximumIterations,
-    defaultName,
+    defaultTypeName: defaultName,
   } = configuration;
 
-  const testUrl = new URL(`file://${pathToTest}`);
+  const testUrl = NodeLocation.parse(pathToTest);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
@@ -115,32 +116,53 @@ async function main(configuration: MainConfiguration) {
       const context = new DocumentContext();
       context.registerFactory(
         schemaDraft202012.metaSchemaId,
-        ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft202012.Document(givenUrl, antecedentUrl, rootNode, context),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) =>
+          new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaDraft04.metaSchemaId,
-        ({ givenUrl, antecedentUrl, documentNode: rootNode }) =>
-          new schemaDraft04.Document(givenUrl, antecedentUrl, rootNode, context),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaOasV31.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new schemaOasV31.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         oasV30.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new oasV30.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         swaggerV2.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({
+          retrievalLocation: retrievalUrl,
+          givenLocation: givenUrl,
+          antecedentLocation: antecedentUrl,
+          documentNode: rootNode,
+        }) => new swaggerV2.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
       );
       context.registerFactory(
         schemaIntermediate.metaSchemaId,
-        ({ givenUrl, documentNode: rootNode }) =>
+        ({ givenLocation: givenUrl, documentNode: rootNode }) =>
           new schemaIntermediate.Document(givenUrl, rootNode),
       );
 
@@ -161,34 +183,23 @@ async function main(configuration: MainConfiguration) {
       });
     }
 
-    // install package
-    {
-      cp.execSync("npm install", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
-    }
+    const options = {
+      stdio: "inherit",
+      shell: true,
+      cwd: packageDirectoryPath,
+      env: process.env,
+    } as const;
 
-    // build package
-    {
-      cp.execSync("npm run build", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
-    }
+    cp.execFileSync("npm", ["install"], options);
 
     test("test package", () => {
-      cp.execSync("npm test", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
+      cp.execFileSync("npm", ["test"], options);
     });
 
     await test("valid", async () => {
-      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
+      const packageMain = await import(
+        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
+      );
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
         await test(testName, async () => {
@@ -202,7 +213,9 @@ async function main(configuration: MainConfiguration) {
     });
 
     await test("invalid", async () => {
-      const packageMain = await import(path.join(packageDirectoryPath, "out", "main.js"));
+      const packageMain = await import(
+        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
+      );
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];
         await test(testName, async () => {

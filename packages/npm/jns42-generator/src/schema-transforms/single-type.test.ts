@@ -1,18 +1,17 @@
-import assert from "node:assert/strict";
+import assert from "assert";
 import test from "node:test";
-import { SchemaArena } from "../schema/arena.js";
+import { SchemaArena } from "../models/arena.js";
 import { normalizeObject } from "../utils/index.js";
 import { singleType } from "./single-type.js";
 
 test("single-type", () => {
-  const arena = new SchemaArena();
-  arena.addItem({ types: ["string", "number"] });
+  const arena = new SchemaArena([{ types: ["string", "number"] }]);
 
   while (arena.applyTransform(singleType) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
-    [{ oneOf: [1, 2] }, { parent: 0, types: ["string"] }, { parent: 0, types: ["number"] }],
+    [{ oneOf: [1, 2] }, { types: ["string"] }, { types: ["number"] }],
   );
 });

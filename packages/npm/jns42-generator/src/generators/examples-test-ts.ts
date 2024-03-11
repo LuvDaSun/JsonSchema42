@@ -7,7 +7,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
   const { names, typesArena } = specification;
 
   yield itt`
-    import assert from "node:assert/strict";
+    import assert from "assert";
     import test from "node:test";
     import * as validators from "./validators.js";
   `;

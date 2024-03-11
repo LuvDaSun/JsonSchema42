@@ -3,6 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import * as models from "../models/index.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utils/index.js";
+import { generateBuildJsCode } from "./build-js.js";
+import { generateCleanJsCode } from "./clean-js.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { generateMocksTestTsCode } from "./mocks-test-ts.js";
@@ -28,6 +30,7 @@ export function generatePackage(
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
+  fs.mkdirSync(path.join(packageDirectoryPath, "scripts"), { recursive: true });
 
   {
     const content = generatePackageJsonData(packageName, packageVersion);
@@ -96,9 +99,27 @@ export function generatePackage(
   }
 
   {
+    const content = generateBuildJsCode();
+    const filePath = path.join(packageDirectoryPath, "scripts", "build.js");
+    writeContentToFile(filePath, content);
+    fs.chmodSync(filePath, 0o755);
+  }
+
+  {
+    const content = generateCleanJsCode();
+    const filePath = path.join(packageDirectoryPath, "scripts", "clean.js");
+    writeContentToFile(filePath, content);
+    fs.chmodSync(filePath, 0o755);
+  }
+
+  {
     const content = itt`
+      .*
+      !.gitignore
       *.tsbuildinfo
-      out/
+      transpiled/
+      types/
+      bundled/
     `;
     const filePath = path.join(packageDirectoryPath, ".gitignore");
     writeContentToFile(filePath, content);

@@ -2,17 +2,18 @@
 
 cd $(dirname $0)
 
+npm run build --workspaces
+npm install --no-package-lock
+
 export NODE_ENV=development
 ERROR=0
 
-npm run build
-
-for F in $(ls ../../../fixtures/testing/*.yaml); do
+for F in $(ls fixtures/testing/*.yaml); do
   echo $(basename $F .yaml)
 
-  ./bin/jns42-generator test \
+  npx jns42-generator test \
     $F \
-    --output-directory .package/test \
+    --package-directory .package/test \
     --package-name $(basename $F .yaml) \
     --package-version "0.0.0" \
 

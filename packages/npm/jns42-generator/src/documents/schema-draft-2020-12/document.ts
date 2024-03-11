@@ -1,29 +1,33 @@
 import * as spec from "@jns42/schema-draft-2020-12";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import { NodeLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.Schema;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly anchorMap = new Map<string, string>();
-  private readonly dynamicAnchorMap = new Map<string, string>();
+  private readonly anchorMap = new Map<string, NodeLocation>();
+  private readonly dynamicAnchorMap = new Map<string, NodeLocation>();
 
   constructor(
-    givenUrl: URL,
-    antecedentUrl: URL | null,
+    retrievalUrl: NodeLocation,
+    givenUrl: NodeLocation,
+    antecedentUrl: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
-    super(givenUrl, antecedentUrl, documentNode, context);
+    super(retrievalUrl, givenUrl, antecedentUrl, documentNode, context);
 
-    for (const [nodePointer, node] of this.nodes) {
+    for (const [nodeId, node] of this.nodes) {
+      const nodeUrl = NodeLocation.parse(nodeId);
+
       const nodeAnchor = this.selectNodeAnchor(node);
       if (nodeAnchor != null) {
         if (this.anchorMap.has(nodeAnchor)) {
           throw new TypeError(`duplicate anchor ${nodeAnchor}`);
         }
-        this.anchorMap.set(nodeAnchor, nodePointer);
+        this.anchorMap.set(nodeAnchor, nodeUrl);
       }
 
       const nodeDynamicAnchor = this.selectNodeDynamicAnchor(node);
@@ -31,7 +35,7 @@ export class Document extends SchemaDocumentBase<N> {
         if (this.dynamicAnchorMap.has(nodeDynamicAnchor)) {
           throw new TypeError(`duplicate dynamic anchor ${nodeDynamicAnchor}`);
         }
-        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodePointer);
+        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodeUrl);
       }
     }
   }
@@ -45,11 +49,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeUrls(): Iterable<URL> {
-    yield* super.getNodeUrls();
+  public *getNodeLocations(): Iterable<NodeLocation> {
+    yield* super.getNodeLocations();
 
-    for (const [anchor] of this.anchorMap) {
-      yield this.pointerToNodeUrl(anchor);
+    for (const [anchorId] of this.anchorMap) {
+      yield this.documentNodeLocation.toRoot().setAnchor(anchorId);
     }
 
     /*
@@ -59,35 +63,10 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#endregion
 
-  //#region node
-
-  protected isNodeEmbeddedSchema(node: N): boolean {
-    const nodeId = this.selectNodeId(node);
-    if (nodeId == null) {
-      return false;
-    }
-    return true;
-  }
-
-  public pointerToNodeHash(nodePointer: string): string {
-    return nodePointer === "" ? "" : `#${nodePointer}`;
-  }
-  public nodeHashToPointer(nodeHash: string): string {
-    if (nodeHash === "") {
-      return "";
-    }
-    if (!nodeHash.startsWith("#")) {
-      throw new TypeError("hash should start with #");
-    }
-    return nodeHash.substring(1);
-  }
-
-  //#endregion
-
   //#region intermediate applicators
 
   protected getIntermediateReference(
-    nodePointer: string,
+    nodePointer: string[],
     node: N,
   ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
@@ -109,36 +88,35 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): URL {
-    const resolvedNodeUrl = new URL(nodeRef, this.documentNodeUrl);
+  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
+    const resolvedNodeUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
     if (resolvedDocument instanceof Document) {
-      const resolvedPointer = resolvedDocument.nodeUrlToPointer(resolvedNodeUrl);
-      const anchorResolvedPointer = resolvedDocument.anchorMap.get(resolvedPointer);
-      if (anchorResolvedPointer != null) {
-        const anchorResolvedUrl = resolvedDocument.pointerToNodeUrl(anchorResolvedPointer);
+      const anchor = resolvedNodeUrl.anchor;
+      const anchorResolvedUrl = resolvedDocument.anchorMap.get(anchor);
+      if (anchorResolvedUrl != null) {
         return anchorResolvedUrl;
       }
     }
 
     return resolvedNodeUrl;
   }
-  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): URL {
+  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): NodeLocation {
     const documents = [this, ...this.getAntecedentDocuments()];
     documents.reverse();
+
+    const dynamicUrl = NodeLocation.parse(nodeDynamicRef);
 
     for (const document of documents) {
       if (!(document instanceof Document)) {
         continue;
       }
 
-      const resolvedPointer = this.nodeHashToPointer(nodeDynamicRef);
-      const dynamicAnchorResolvedPointer = document.dynamicAnchorMap.get(resolvedPointer);
+      const resolvedUrl = document.dynamicAnchorMap.get(dynamicUrl.anchor);
 
-      if (dynamicAnchorResolvedPointer != null) {
-        const dynamicAnchorResolvedUrl = document.pointerToNodeUrl(dynamicAnchorResolvedPointer);
-        return dynamicAnchorResolvedUrl;
+      if (resolvedUrl != null) {
+        return resolvedUrl;
       }
     }
 
@@ -227,28 +205,28 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region pointers selectors
 
-  protected *selectNodePropertiesPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodePropertiesPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.properties != null) {
       for (const key of Object.keys(node.properties)) {
-        const subNodePointer = [nodePointer, "properties", key].join("/");
+        const subNodePointer = [...nodePointer, "properties", key];
         yield [key, subNodePointer] as const;
       }
     }
   }
 
-  protected *selectNodeDependentSchemasPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodeDependentSchemasPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.dependentSchemas != null) {
       for (const key of Object.keys(node.dependentSchemas)) {
-        const subNodePointer = [nodePointer, "dependentSchemas", key].join("/");
+        const subNodePointer = [...nodePointer, "dependentSchemas", key];
         yield [key, subNodePointer] as const;
       }
     }
   }
 
-  protected *selectNodePatternPropertyPointerEntries(nodePointer: string, node: N) {
+  protected *selectNodePatternPropertyPointerEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const key of Object.keys(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        const subNodePointer = [...nodePointer, "patternProperties", key];
         yield [key, subNodePointer] as const;
       }
     }
@@ -258,129 +236,141 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region schema selectors
 
-  protected *selectSubNodeDefinitionsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeDefinitionsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.$defs != null) {
       for (const [key, subNode] of Object.entries(node.$defs)) {
-        const subNodePointer = [nodePointer, "$defs", key].join("/");
+        const subNodePointer = [...nodePointer, "$defs", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeObjectPropertyEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeObjectPropertyEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.properties != null) {
       for (const [key, subNode] of Object.entries(node.properties)) {
-        const subNodePointer = [nodePointer, "properties", key].join("/");
+        const subNodePointer = [...nodePointer, "properties", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeMapPropertiesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeMapPropertiesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.additionalProperties != null) {
       const subNode = node.additionalProperties;
-      const subNodePointer = [nodePointer, "additionalProperties"].join("/");
+      const subNodePointer = [...nodePointer, "additionalProperties"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodePatternPropertiesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodePatternPropertiesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.patternProperties != null) {
       for (const [key, subNode] of Object.entries(node.patternProperties)) {
-        const subNodePointer = [nodePointer, "patternProperties", key].join("/");
+        const subNodePointer = [...nodePointer, "patternProperties", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodePropertyNamesEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeDependentSchemasEntries(
+    nodePointer: string[],
+    node: spec.Schema,
+  ): Iterable<readonly [string[], spec.Schema]> {
+    if (typeof node === "object" && node.dependentSchemas != null) {
+      for (const [key, subNode] of Object.entries(node.dependentSchemas)) {
+        const subNodePointer = [...nodePointer, "dependentSchemas", key];
+        yield [subNodePointer, subNode] as const;
+      }
+    }
+  }
+
+  protected *selectSubNodePropertyNamesEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.propertyNames != null) {
       const subNode = node.propertyNames;
-      const subNodePointer = [nodePointer, "propertyNames"].join("/");
+      const subNodePointer = [...nodePointer, "propertyNames"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeTupleItemsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeTupleItemsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.prefixItems != null) {
       for (const [key, subNode] of Object.entries(node.prefixItems)) {
-        const subNodePointer = [nodePointer, "prefixItems", key].join("/");
+        const subNodePointer = [...nodePointer, "prefixItems", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeArrayItemsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeArrayItemsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.items != null) {
       const subNode = node.items;
-      const subNodePointer = [nodePointer, "items"].join("/");
+      const subNodePointer = [...nodePointer, "items"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeContainsEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeContainsEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.contains != null) {
       const subNode = node.contains;
-      const subNodePointer = [nodePointer, "contains"].join("/");
+      const subNodePointer = [...nodePointer, "contains"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeAllOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeAllOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.allOf != null) {
       for (const [key, subNode] of Object.entries(node.allOf)) {
-        const subNodePointer = [nodePointer, "allOf", key].join("/");
+        const subNodePointer = [...nodePointer, "allOf", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeAnyOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeAnyOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.anyOf != null) {
       for (const [key, subNode] of Object.entries(node.anyOf)) {
-        const subNodePointer = [nodePointer, "anyOf", key].join("/");
+        const subNodePointer = [...nodePointer, "anyOf", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeOneOfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeOneOfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.oneOf != null) {
       for (const [key, subNode] of Object.entries(node.oneOf)) {
-        const subNodePointer = [nodePointer, "oneOf", key].join("/");
+        const subNodePointer = [...nodePointer, "oneOf", key];
         yield [subNodePointer, subNode] as const;
       }
     }
   }
 
-  protected *selectSubNodeNotEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeNotEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.not != null) {
       const subNode = node.not;
-      const subNodePointer = [nodePointer, "not"].join("/");
+      const subNodePointer = [...nodePointer, "not"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeIfEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeIfEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.if != null) {
       const subNode = node.if;
-      const subNodePointer = [nodePointer, "if"].join("/");
+      const subNodePointer = [...nodePointer, "if"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeThenEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeThenEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.then != null) {
       const subNode = node.then;
-      const subNodePointer = [nodePointer, "then"].join("/");
+      const subNodePointer = [...nodePointer, "then"];
       yield [subNodePointer, subNode] as const;
     }
   }
 
-  protected *selectSubNodeElseEntries(nodePointer: string, node: N) {
+  protected *selectSubNodeElseEntries(nodePointer: string[], node: N) {
     if (typeof node === "object" && node.else != null) {
       const subNode = node.else;
-      const subNodePointer = [nodePointer, "else"].join("/");
+      const subNodePointer = [...nodePointer, "else"];
       yield [subNodePointer, subNode] as const;
     }
   }

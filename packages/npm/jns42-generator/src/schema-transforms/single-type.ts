@@ -1,11 +1,4 @@
-import {
-  OneOfSchemaModel,
-  SchemaModel,
-  SchemaTransform,
-  isAliasSchemaModel,
-  isSingleTypeSchemaModel,
-  isTypeSchemaModel,
-} from "../schema/index.js";
+import { SchemaTransform } from "../models/index.js";
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -31,42 +24,30 @@ import {
  *   - string
  * ```
  */
-export const singleType: SchemaTransform = (arena, model, modelKey) => {
-  if (isAliasSchemaModel(model)) {
-    return model;
+export const singleType: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
+
+  if (item.types == null) {
+    return;
   }
 
-  if (isSingleTypeSchemaModel(model)) {
-    return model;
+  switch (item.types.length) {
+    case 0: {
+      arena.setItem(key, {
+        ...item,
+        types: undefined,
+      });
+      break;
+    }
+    case 1: {
+      break;
+    }
+    default: {
+      arena.setItem(key, {
+        ...item,
+        types: undefined,
+        oneOf: item.types.map((type) => arena.addItem({ types: [type] })),
+      });
+    }
   }
-
-  if (!isTypeSchemaModel(model)) {
-    return model;
-  }
-
-  if (model.types == null) {
-    return model;
-  }
-
-  if (model.types.length == 0) {
-    return {
-      ...model,
-      types: undefined,
-    };
-  }
-
-  // copy the model
-  const newModel: SchemaModel & OneOfSchemaModel = { ...model, types: undefined, oneOf: [] };
-
-  for (const type of model.types) {
-    const newSubModel: SchemaModel = {
-      parent: modelKey,
-      mockable: model.mockable,
-      types: [type],
-    };
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.oneOf.push(newSubKey);
-  }
-
-  return newModel;
 };

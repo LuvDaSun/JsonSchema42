@@ -1,7 +1,9 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as schemaTransforms from "../schema-transforms/index.js";
-import { SchemaArena, selectSchemaDependencies } from "../schema/index.js";
 import { Namer } from "../utils/namer.js";
+import { NodeLocation } from "../utils/node-location.js";
+import { SchemaArena } from "./arena.js";
+import { selectSchemaDependencies } from "./selectors.js";
 
 export interface Specification {
   typesArena: SchemaArena;
@@ -23,7 +25,7 @@ export function loadSpecification(
 
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
-  const validatorsArena = typesArena.clone();
+  const validatorsArena = new SchemaArena(typesArena);
 
   // transform the validatorsArena
   {
@@ -39,33 +41,56 @@ export function loadSpecification(
 
   // transform the typesArena
   {
+    // console.log(
+    //   Object.fromEntries(
+    //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
+    //   ),
+    // );
+    // debugger;
+
     let transformIterations = 0;
     while (
       typesArena.applyTransform(
-        // order matters!
-        schemaTransforms.mockable,
-
         schemaTransforms.singleType,
         schemaTransforms.explode,
 
+        schemaTransforms.resolveSingleAllOf,
+        schemaTransforms.resolveSingleAnyOf,
+        schemaTransforms.resolveSingleOneOf,
+
+        schemaTransforms.flattenAllOf,
+        schemaTransforms.flattenAnyOf,
+        schemaTransforms.flattenOneOf,
+
+        schemaTransforms.uniqueAllOf,
+        schemaTransforms.uniqueAnyOf,
+        schemaTransforms.uniqueOneOf,
+
         schemaTransforms.flipAllOfOneOf,
-        // schemaTransforms.flipAnyOfOneOf,
+        schemaTransforms.flipAnyOfOneOf,
 
-        schemaTransforms.flatten,
-        schemaTransforms.unique,
-        schemaTransforms.alias,
+        schemaTransforms.inheritAllOf,
+        schemaTransforms.inheritAnyOf,
+        schemaTransforms.inheritOneOf,
+        // schemaTransforms.inheritReference,
 
-        schemaTransforms.resolveIfThenElse,
         schemaTransforms.resolveAllOf,
         schemaTransforms.resolveAnyOf,
-        schemaTransforms.resolveOneOf,
-        schemaTransforms.resolveParent,
+        schemaTransforms.resolveNot,
+        schemaTransforms.resolveIfThenElse,
 
-        schemaTransforms.flushParent,
         schemaTransforms.unalias,
       ) > 0
     ) {
       transformIterations++;
+
+      // console.log(
+      //   Object.fromEntries(
+      //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
+      //   ),
+      // );
+      // debugger;
+
       if (transformIterations < transformMaximumIterations) {
         continue;
       }
@@ -75,7 +100,7 @@ export function loadSpecification(
 
   // figure out which keys are actually in use
   const usedKeys = new Set<number>();
-  for (const [key, item] of typesArena) {
+  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     if (item.id != null) {
       usedKeys.add(key);
     }
@@ -89,8 +114,10 @@ export function loadSpecification(
 
   const namer = new Namer(defaultTypeName, nameMaximumIterations);
   for (const nodeId in document.schemas) {
-    const nodeUrl = new URL(nodeId);
-    const path = nodeUrl.pathname + nodeUrl.hash.replace(/^#/g, "");
+    const nodeLocation = NodeLocation.parse(nodeId);
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
+      .filter((part) => part.length > 0)
+      .join("/");
     namer.registerPath(nodeId, path);
   }
   const names = namer.getNames();

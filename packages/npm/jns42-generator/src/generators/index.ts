@@ -1,3 +1,5 @@
+export * from "./build-js.js";
+export * from "./clean-js.js";
 export * from "./examples-test-ts.js";
 export * from "./mocks-test-ts.js";
 export * from "./mocks-ts.js";

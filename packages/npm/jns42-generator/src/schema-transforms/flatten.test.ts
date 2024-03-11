@@ -1,26 +1,39 @@
-import assert from "node:assert/strict";
+import assert from "assert";
 import test from "node:test";
-import { SchemaArena } from "../schema/arena.js";
+import { SchemaArena } from "../models/arena.js";
 import { normalizeObject } from "../utils/index.js";
-import { flatten } from "./flatten.js";
+import { flattenAllOf } from "./flatten.js";
 
 test("flatten", () => {
-  const arena = new SchemaArena();
-  arena.addItem({
-    allOf: [100, 200],
-  });
-  arena.addItem({
-    allOf: [300, 400],
-  });
-  arena.addItem({
-    allOf: [0, 1],
-  });
+  const arena = new SchemaArena([
+    {}, // 0
+    {}, // 1
+    {}, // 2
+    {}, // 3
+    {
+      allOf: [0, 1],
+    }, // 4
+    {
+      allOf: [2, 3],
+    }, // 5
+    {
+      allOf: [4, 5],
+    }, // 6
+  ]);
 
-  while (arena.applyTransform(flatten) > 0);
+  while (arena.applyTransform(flattenAllOf) > 0);
 
   assert.deepEqual(
-    [...arena].map(([k, v]) => normalizeObject(v)),
+    [...arena].map(normalizeObject),
 
-    [{ allOf: [100, 200] }, { allOf: [300, 400] }, { allOf: [100, 200, 300, 400] }],
+    [
+      {}, // 0
+      {}, // 1
+      {}, // 2
+      {}, // 3
+      { allOf: [0, 1] }, // 4
+      { allOf: [2, 3] }, // 5
+      { allOf: [0, 1, 2, 3] }, // 6
+    ],
   );
 });

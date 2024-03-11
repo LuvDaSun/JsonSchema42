@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert";
 import test from "node:test";
 import { hasProperties } from "./properties.js";
 
@@ -9,7 +9,7 @@ test("has-properties", () => {
   }
 
   {
-    assert.equal(hasProperties({ a: 1 } as any, ["a"], ["b"]), true);
+    assert.equal(hasProperties({ a: 1 } as Record<string, number>, ["a"], ["b"]), true);
     assert.equal(hasProperties({ a: 1, b: 2 }, ["a"], ["b"]), true);
   }
 });

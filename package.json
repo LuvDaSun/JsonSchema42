@@ -2,15 +2,21 @@
   "private": true,
   "packageManager": "npm@10.3.0",
   "workspaces": [
-    "*/npm/*"
+    "generated/npm/*",
+    "packages/npm/jns42-generator"
   ],
   "scripts": {
     "spelling": "cspell",
     "formatting": "prettier --check *"
   },
   "devDependencies": {
-    "cspell": "^8.4.1",
+    "cspell": "^8.6.0",
+    "jns42-generator": "^0.14.3",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "rollup": "^4.12.1",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "immutable": "^5.0.0-beta.5"
   }
 }
