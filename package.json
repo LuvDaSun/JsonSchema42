@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "cspell": "^8.6.0",
-    "jns42-generator": "^0.15.3",
+    "jns42-generator": "^0.15.5",
     "prettier": "^3.2.5",
     "rollup": "^4.12.1",
     "typescript": "^5.4.2"
