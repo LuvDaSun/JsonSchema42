@@ -83,12 +83,12 @@ export class DocumentContext {
     antecedentLocation: NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const retrievalId = retrievalLocation.toString();
-    if (!this.cache.has(retrievalId)) {
-      const rootLocation = retrievalLocation.toRoot();
-      const rootPath = rootLocation.toString(false);
-      const documentNode = await loadYAML(rootPath);
-      this.fillNodeCache(rootLocation, documentNode);
+    const documentLocation = retrievalLocation.toRoot();
+    const documentId = documentLocation.toString();
+    const documentPath = documentLocation.toString(false);
+    if (!this.cache.has(documentId)) {
+      const documentNode = await loadYAML(documentPath);
+      this.fillNodeCache(documentLocation, documentNode);
     }
 
     await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
@@ -101,17 +101,18 @@ export class DocumentContext {
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const retrievalId = retrievalLocation.toString();
-    if (!this.cache.has(retrievalId)) {
-      this.fillNodeCache(retrievalLocation, documentNode);
+    const documentLocation = retrievalLocation.toRoot();
+    const documentId = documentLocation.toString();
+    if (!this.cache.has(documentId)) {
+      this.fillNodeCache(documentLocation, documentNode);
     }
 
     await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
   }
 
-  private fillNodeCache(retrievalLocation: NodeLocation, documentNode: unknown) {
+  private fillNodeCache(documentLocation: NodeLocation, documentNode: unknown) {
     for (const [pointer, node] of readNode([], documentNode)) {
-      const nodeRetrievalLocation = retrievalLocation.pushPointer(...pointer);
+      const nodeRetrievalLocation = documentLocation.pushPointer(...pointer);
       const nodeRetrievalId = nodeRetrievalLocation.toString();
       if (this.cache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);

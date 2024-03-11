@@ -25,8 +25,8 @@ export class Document extends SchemaDocumentBase<N> {
   ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
     if (nodeRef != null) {
-      const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeRef);
-      const resolvedNodeId = resolvedNodeUrl.toString();
+      const resolvedNodeLocation = this.resolveReferenceNodeLocation(nodeRef);
+      const resolvedNodeId = resolvedNodeLocation.toString();
       return resolvedNodeId;
     }
   }
@@ -35,10 +35,10 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
-    const resolvedNodeUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
+  private resolveReferenceNodeLocation(nodeRef: string): NodeLocation {
+    const resolvedNodeLocation = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
 
-    return resolvedNodeUrl;
+    return resolvedNodeLocation;
   }
 
   //#endregion

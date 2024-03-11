@@ -29,7 +29,7 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "string",
           demandOption: true,
         })
-        .option("default-meta-schema-url", {
+        .option("default-meta-schema-location", {
           description: "the default meta schema to use",
           type: "string",
           choices: [
@@ -75,7 +75,7 @@ export function configureTestProgram(argv: yargs.Argv) {
 
 interface MainConfiguration {
   pathToTest: string;
-  defaultMetaSchemaUrl: string;
+  defaultMetaSchemaLocation: string;
   packageDirectory: string;
   packageName: string;
   packageVersion: string;
@@ -87,7 +87,7 @@ interface MainConfiguration {
 async function main(configuration: MainConfiguration) {
   const pathToTest = path.resolve(configuration.pathToTest);
 
-  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaLocation;
   const packageDirectoryRoot = path.resolve(configuration.packageDirectory);
   const {
     packageName,
@@ -97,7 +97,7 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  const testUrl = NodeLocation.parse(pathToTest);
+  const testLocation = NodeLocation.parse(pathToTest);
   const defaultTypeName = camelcase(defaultName, { pascalCase: true });
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
@@ -117,56 +117,90 @@ async function main(configuration: MainConfiguration) {
       context.registerFactory(
         schemaDraft202012.metaSchemaId,
         ({
-          retrievalLocation: retrievalUrl,
-          givenLocation: givenUrl,
-          antecedentLocation: antecedentUrl,
-          documentNode: rootNode,
+          retrievalLocation: retrievalLocation,
+          givenLocation: givenLocation,
+          antecedentLocation: antecedentLocation,
+          documentNode: documentNode,
         }) =>
-          new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+          new schemaDraft202012.Document(
+            retrievalLocation,
+            givenLocation,
+            antecedentLocation,
+            documentNode,
+            context,
+          ),
       );
       context.registerFactory(
         schemaDraft04.metaSchemaId,
         ({
-          retrievalLocation: retrievalUrl,
-          givenLocation: givenUrl,
-          antecedentLocation: antecedentUrl,
-          documentNode: rootNode,
-        }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+          retrievalLocation: retrievalLocation,
+          givenLocation: givenLocation,
+          antecedentLocation: antecedentLocation,
+          documentNode: documentNode,
+        }) =>
+          new schemaDraft04.Document(
+            retrievalLocation,
+            givenLocation,
+            antecedentLocation,
+            documentNode,
+            context,
+          ),
       );
       context.registerFactory(
         schemaOasV31.metaSchemaId,
         ({
-          retrievalLocation: retrievalUrl,
-          givenLocation: givenUrl,
-          antecedentLocation: antecedentUrl,
-          documentNode: rootNode,
-        }) => new schemaOasV31.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+          retrievalLocation: retrievalLocation,
+          givenLocation: givenLocation,
+          antecedentLocation: antecedentLocation,
+          documentNode: documentNode,
+        }) =>
+          new schemaOasV31.Document(
+            retrievalLocation,
+            givenLocation,
+            antecedentLocation,
+            documentNode,
+            context,
+          ),
       );
       context.registerFactory(
         oasV30.metaSchemaId,
         ({
-          retrievalLocation: retrievalUrl,
-          givenLocation: givenUrl,
-          antecedentLocation: antecedentUrl,
-          documentNode: rootNode,
-        }) => new oasV30.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+          retrievalLocation: retrievalLocation,
+          givenLocation: givenLocation,
+          antecedentLocation: antecedentLocation,
+          documentNode: documentNode,
+        }) =>
+          new oasV30.Document(
+            retrievalLocation,
+            givenLocation,
+            antecedentLocation,
+            documentNode,
+            context,
+          ),
       );
       context.registerFactory(
         swaggerV2.metaSchemaId,
         ({
-          retrievalLocation: retrievalUrl,
-          givenLocation: givenUrl,
-          antecedentLocation: antecedentUrl,
-          documentNode: rootNode,
-        }) => new swaggerV2.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+          retrievalLocation: retrievalLocation,
+          givenLocation: givenLocation,
+          antecedentLocation: antecedentLocation,
+          documentNode: documentNode,
+        }) =>
+          new swaggerV2.Document(
+            retrievalLocation,
+            givenLocation,
+            antecedentLocation,
+            documentNode,
+            context,
+          ),
       );
       context.registerFactory(
         schemaIntermediate.metaSchemaId,
-        ({ givenLocation: givenUrl, documentNode: rootNode }) =>
-          new schemaIntermediate.Document(givenUrl, rootNode),
+        ({ givenLocation: givenLocation, documentNode: documentNode }) =>
+          new schemaIntermediate.Document(givenLocation, documentNode),
       );
 
-      await context.loadFromDocument(testUrl, testUrl, null, schema, defaultMetaSchemaId);
+      await context.loadFromDocument(testLocation, testLocation, null, schema, defaultMetaSchemaId);
 
       const intermediateDocument = context.getIntermediateData();
 
