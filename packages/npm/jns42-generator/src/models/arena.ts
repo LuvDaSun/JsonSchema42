@@ -63,21 +63,21 @@ export class SchemaArena extends Arena<SchemaItem> {
       if (!this.isMockable(item.mapProperties)) {
         return false;
       }
-      mockableCounter++;
+
+      // we should not increase the mockableCounter for these kinds of
+      // fields as they are not making the item more mockable
     }
 
     if (item.arrayItems != null) {
       if (!this.isMockable(item.arrayItems)) {
         return false;
       }
-      mockableCounter++;
     }
 
     if (item.propertyNames != null) {
       if (!this.isMockable(item.propertyNames)) {
         return false;
       }
-      mockableCounter++;
     }
 
     if (item.contains != null) {
@@ -108,7 +108,6 @@ export class SchemaArena extends Arena<SchemaItem> {
       ) {
         return false;
       }
-      mockableCounter++;
     }
 
     // anything with a regex cannot be mocked
