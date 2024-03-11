@@ -1,93 +1,141 @@
-import assert from "assert";
-import {
-  OneOfSchemaModel,
-  SchemaModel,
-  SchemaTransform,
-  isAnyOfSchemaModel,
-  isSingleTypeSchemaModel,
-} from "../schema/index.js";
-import { intersectionMerge, mergeKeysArray, mergeKeysRecord } from "../utils/index.js";
+import { SchemaItem, SchemaTransform, SchemaType } from "../models/index.js";
+import { intersectionMerge, mergeKeysArray, mergeKeysRecord, unionMerge } from "../utils/index.js";
 
-export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
+export const resolveAnyOf: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
+
   // we need at least two to merge
-  if (!isAnyOfSchemaModel(model) || model.anyOf.length < 2) {
-    return model;
+  if (item.anyOf == null || item.anyOf.length < 2) {
+    return;
   }
 
-  const newModel: SchemaModel & OneOfSchemaModel = {
-    ...model,
-    mockable: false,
-    oneOf: [],
-    anyOf: undefined,
-  };
+  if (item.types != null) {
+    return;
+  }
+
+  if (item.reference != null) {
+    return;
+  }
+
+  if (item.if != null) {
+    return;
+  }
+
+  if (item.then != null) {
+    return;
+  }
+
+  if (item.else != null) {
+    return;
+  }
+
+  if (item.not != null) {
+    return;
+  }
+
+  if (item.oneOf != null && item.oneOf.length > 0) {
+    return;
+  }
+
+  if (item.allOf != null && item.allOf.length > 0) {
+    return;
+  }
 
   // first we group elements by their type
-  const groupedElements: { [type: string]: number[] } = {};
-  for (const elementKey of model.anyOf) {
-    const [, elementModel] = arena.resolveItem(elementKey);
+  const groupedSubKeys: { [type: string]: number[] } = {};
+  for (const subKey of item.anyOf) {
+    const subItem = arena.getItem(subKey);
 
-    if (!isSingleTypeSchemaModel(elementModel) || elementModel.types == null) {
+    if (subItem.types == null || subItem.types.length !== 1) {
       // we can only work with single types
-      return model;
+      return;
     }
 
-    groupedElements[elementModel.types[0]] ??= [];
-    groupedElements[elementModel.types[0]].push(elementKey);
+    if (subItem.reference != null) {
+      return;
+    }
+
+    if (subItem.if != null) {
+      return;
+    }
+
+    if (subItem.then != null) {
+      return;
+    }
+
+    if (subItem.else != null) {
+      return;
+    }
+
+    if (subItem.not != null) {
+      return;
+    }
+
+    if (subItem.oneOf != null && subItem.oneOf.length > 0) {
+      return;
+    }
+
+    if (subItem.anyOf != null && subItem.anyOf.length > 0) {
+      return;
+    }
+
+    if (subItem.allOf != null && subItem.allOf.length > 0) {
+      return;
+    }
+
+    const [type] = subItem.types;
+    groupedSubKeys[type] ??= [];
+    groupedSubKeys[type].push(subKey);
   }
 
+  const subKeysNew = new Array<number>();
+
   // we make a oneOf with every type as it's element
-  for (const [, subKeys] of Object.entries(groupedElements)) {
+  for (const [type, subKeys] of Object.entries(groupedSubKeys)) {
     if (subKeys.length < 2) {
       for (const subKey of subKeys) {
-        newModel.oneOf.push(subKey);
+        subKeysNew.push(subKey);
       }
+      // we don't need to merge!
       continue;
     }
 
-    let newSubModel!: SchemaModel;
+    let subItemNew: SchemaItem = {
+      exact: false,
+      types: [type] as SchemaType[],
+    };
     for (const subKey of subKeys) {
-      const [, subModel] = arena.resolveItem(subKey);
+      const subItem = arena.getItem(subKey);
 
-      // this will never happen because of the isSingleType guard earlier
-      assert(isSingleTypeSchemaModel(subModel) && subModel.types !== null);
+      subItemNew = {
+        ...subItemNew,
 
-      // first pass
-      if (newSubModel == null) {
-        newSubModel = {
-          ...subModel,
-          // meta fields
-          id: undefined,
-          title: undefined,
-          description: undefined,
-          examples: undefined,
-          deprecated: undefined,
-          mockable: false,
-        };
-        continue;
-      }
-
-      newSubModel = {
-        ...newSubModel,
-        options: intersectionMerge(newSubModel.options, subModel.options),
-        required: intersectionMerge(newSubModel.required, subModel.required),
-        propertyNames: mergeKey(newSubModel.propertyNames, subModel.propertyNames),
-        contains: mergeKey(newSubModel.contains, subModel.contains),
-        tupleItems: mergeKeysArray(newSubModel.tupleItems, subModel.tupleItems, mergeKey),
-        arrayItems: mergeKey(newSubModel.arrayItems, subModel.arrayItems),
+        options: unionMerge(subItemNew.options, subItem.options),
+        required: intersectionMerge(subItemNew.required, subItem.required),
+        propertyNames: mergeKey(subItemNew.propertyNames, subItem.propertyNames),
+        contains: mergeKey(subItemNew.contains, subItem.contains),
+        tupleItems: mergeKeysArray(subItemNew.tupleItems, subItem.tupleItems, mergeKey),
+        arrayItems: mergeKey(subItemNew.arrayItems, subItem.arrayItems),
         objectProperties: mergeKeysRecord(
-          newSubModel.objectProperties,
-          subModel.objectProperties,
+          subItemNew.objectProperties,
+          subItem.objectProperties,
           mergeKey,
         ),
-        mapProperties: mergeKey(newSubModel.mapProperties, subModel.mapProperties),
+        mapProperties: mergeKey(subItemNew.mapProperties, subItem.mapProperties),
       };
     }
 
-    const newSubKey = arena.addItem(newSubModel);
-    newModel.oneOf.push(newSubKey);
+    const newSubKey = arena.addItem(subItemNew);
+    subKeysNew.push(newSubKey);
   }
 
-  return newModel;
+  const itemNew: SchemaItem = {
+    ...item,
+    exact: false,
+    oneOf: subKeysNew,
+    anyOf: undefined,
+  };
+  arena.setItem(key, itemNew);
 
   function mergeKey(key: number | undefined, otherKey: number | undefined): number | undefined {
     if (key === otherKey) {
@@ -101,10 +149,10 @@ export const resolveAnyOf: SchemaTransform = (arena, model, modelKey) => {
       return key;
     }
 
-    const newModel = {
+    const itemNey = {
       anyOf: [key, otherKey],
     };
-    const newKey = arena.addItem(newModel);
-    return newKey;
+    const keyNew = arena.addItem(itemNey);
+    return keyNew;
   }
 };

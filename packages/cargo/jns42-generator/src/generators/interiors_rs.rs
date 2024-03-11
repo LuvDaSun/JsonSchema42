@@ -188,7 +188,7 @@ fn generate_type_token_stream(
   if let Some(one_of) = &item.one_of {
     let mut inner_tokens = quote! {};
     for sub_key in one_of {
-      let sub_identifier = specification.get_type_identifier(sub_key);
+      let sub_identifier = specification.get_identifier(sub_key);
       inner_tokens.append_all(quote! {
           #sub_identifier(#sub_identifier),
       });

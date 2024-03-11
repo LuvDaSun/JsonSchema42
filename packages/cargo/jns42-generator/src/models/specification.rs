@@ -11,7 +11,8 @@ use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
-use std::{collections::HashMap, iter::empty};
+use std::collections::HashMap;
+use std::iter::{empty, once};
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
@@ -101,9 +102,9 @@ impl Specification {
         let types = schema
           .types
           .as_ref()
+          .and_then(|value| if value.is_empty() { None } else { Some(value) })
           .map(|value| value.iter().map(|value| value.into()).collect())
-          .and_then(|value: Vec<_>| if value.is_empty() { None } else { Some(value) })
-          .or_else(|| implicit_types.get(&id).map(|value| vec![*value]));
+          .or_else(|| implicit_types.get(&id).map(|value| once(*value).collect()));
         let reference = schema
           .reference
           .as_ref()
@@ -245,25 +246,33 @@ impl Specification {
     // then optimize the schemas
 
     {
-      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
-        schema_transforms::single_type::single_type_transform(arena, key);
-        schema_transforms::explode::explode_transform(arena, key);
-      }
-
       while arena.apply_transform(transformer) > 0 {
         //
+      }
+
+      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
+        schema_transforms::single_type::transform(arena, key);
+        schema_transforms::explode::transform(arena, key);
+        schema_transforms::resolve_single::all_of::transform(arena, key);
+        schema_transforms::resolve_single::any_of::transform(arena, key);
+        schema_transforms::resolve_single::one_of::transform(arena, key);
+        schema_transforms::flatten::all_of::transform(arena, key);
+        schema_transforms::flatten::any_of::transform(arena, key);
+        schema_transforms::flatten::one_of::transform(arena, key);
+        schema_transforms::flip::all_of_one_of::transform(arena, key);
+        schema_transforms::resolve_if_then_else::transform(arena, key);
       }
     }
 
     // then set schema primary field
 
     {
-      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
-        schema_transforms::primary::primary_transform(arena, key);
-      }
-
       while arena.apply_transform(transformer) > 0 {
         //
+      }
+
+      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
+        schema_transforms::primary::transform(arena, key);
       }
     }
 

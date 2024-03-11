@@ -80,7 +80,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
   `;
 
-  for (const [itemKey, item] of validatorsArena) {
+  for (const [itemKey, item] of [...validatorsArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -134,9 +134,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
   ): Iterable<NestedText> {
     const item = validatorsArena.getItem(itemKey);
 
-    if (item.alias != null) {
+    if (item.reference != null) {
       yield itt`
-        if(!${generateValidatorReference(item.alias, valueExpression)}) {
+        if(!${generateValidatorReference(item.reference, valueExpression)}) {
           return false;
         };
       `;

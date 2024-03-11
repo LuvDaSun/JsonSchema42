@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "assert";
 import test from "node:test";
 import { deepUnique } from "./deep-unique.js";
 

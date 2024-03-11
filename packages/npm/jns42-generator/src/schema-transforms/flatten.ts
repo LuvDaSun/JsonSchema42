@@ -1,13 +1,4 @@
-import {
-  AllOfSchemaModel,
-  AnyOfSchemaModel,
-  OneOfSchemaModel,
-  SchemaModel,
-  SchemaTransform,
-  isAllOfSchemaModel,
-  isAnyOfSchemaModel,
-  isOneOfSchemaModel,
-} from "../schema/index.js";
+import { SchemaTransform } from "../models/index.js";
 
 /**
  * Flattens nested allOf, anyOf, oneOf
@@ -36,63 +27,33 @@ import {
  *   - 500
  * ```
  */
-export const flatten: SchemaTransform = (arena, model, modelKey) => {
-  if (isAllOfSchemaModel(model)) {
-    const newModel: SchemaModel & AllOfSchemaModel = {
-      ...model,
-      allOf: [],
-    };
-    for (const subKey of model.allOf) {
-      const [, subModel] = arena.resolveItem(subKey);
 
-      if (isAllOfSchemaModel(subModel)) {
-        newModel.allOf.push(...subModel.allOf);
-      } else {
-        newModel.allOf.push(subKey);
-      }
-    }
-    if (newModel.allOf.length > model.allOf.length) {
-      return newModel;
-    }
-  }
+export const flattenAllOf = createTransformer("allOf");
+export const flattenAnyOf = createTransformer("anyOf");
+export const flattenOneOf = createTransformer("oneOf");
 
-  if (isAnyOfSchemaModel(model)) {
-    const newModel: SchemaModel & AnyOfSchemaModel = {
-      ...model,
-      anyOf: [],
-    };
-    for (const subKey of model.anyOf) {
-      const [, subModel] = arena.resolveItem(subKey);
+function createTransformer(member: "allOf" | "anyOf" | "oneOf"): SchemaTransform {
+  return (arena, key) => {
+    const item = arena.getItem(key);
 
-      if (isAnyOfSchemaModel(subModel)) {
-        newModel.anyOf.push(...subModel.anyOf);
-      } else {
-        newModel.anyOf.push(subKey);
-      }
+    const subKeys = item[member];
+    if (subKeys == null) {
+      return;
     }
-    if (newModel.anyOf.length > model.anyOf.length) {
-      return newModel;
-    }
-  }
 
-  if (isOneOfSchemaModel(model)) {
-    const newModel: SchemaModel & OneOfSchemaModel = {
-      ...model,
-      oneOf: [],
-    };
-    for (const subKey of model.oneOf) {
-      const [, subModel] = arena.resolveItem(subKey);
+    let subKeysNew = subKeys
+      .map((subKey) => [subKey, arena.getItem(subKey)] as const)
+      .flatMap(([subKey, subItem]) => {
+        const subSubKeys = subItem[member];
+        if (subSubKeys == null) {
+          return [subKey];
+        } else {
+          return subSubKeys;
+        }
+      });
 
-      if (isOneOfSchemaModel(subModel)) {
-        newModel.oneOf.push(...subModel.oneOf);
-      } else {
-        newModel.oneOf.push(subKey);
-      }
+    if (subKeys.length !== subKeysNew.length) {
+      arena.setItem(key, { ...item, [member]: subKeysNew });
     }
-    if (newModel.oneOf.length > model.oneOf.length) {
-      return newModel;
-    }
-  }
-
-  return model;
-};
+  };
+}

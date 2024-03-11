@@ -1,25 +1,32 @@
 {
   "name": "jns42-generator",
-  "version": "0.14.2",
+  "version": "0.14.3",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
-  "bin": {
-    "jns42-generator": "bin/jns42-generator"
+  "main": "./bundled/main.cjs",
+  "module": "./bundled/main.js",
+  "types": "./types/main.d.ts",
+  "exports": {
+    ".": {
+      "require": "./bundled/main.cjs",
+      "import": "./bundled/main.js",
+      "types": "./types/main.d.ts"
+    }
   },
-  "main": "out/main.js",
-  "types": "out/main.d.ts",
   "files": [
-    "bin/**",
-    "out/**",
-    "src/**"
+    "./types/**",
+    "./bundled/**"
   ],
+  "bin": {
+    "jns42-generator": "bundled/program.js"
+  },
   "scripts": {
-    "prepack": "tsc --build",
-    "pretest": "tsc --build",
-    "build": "tsc --build",
-    "clean": "rm -rf ./out && tsc --build --clean",
-    "test": "node --test ./out/**/*.test.js"
+    "prepack": "node ./scripts/build.js",
+    "pretest": "node ./scripts/build.js",
+    "build": "node ./scripts/build.js",
+    "clean": "node ./scripts/clean.js",
+    "test": "node --test ./transpiled/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -42,13 +49,13 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
-    "@jns42/oas-v3-0": "^0.14.1",
-    "@jns42/oas-v3-1": "^0.14.1",
-    "@jns42/schema-draft-04": "^0.14.1",
-    "@jns42/schema-draft-2020-12": "^0.14.1",
-    "@jns42/schema-intermediate": "^0.14.1",
-    "@jns42/schema-oas-v3-1": "^0.14.1",
-    "@jns42/swagger-v2": "^0.14.1",
+    "@jns42/oas-v3-0": "^0.14.3",
+    "@jns42/oas-v3-1": "^0.14.3",
+    "@jns42/schema-draft-04": "^0.14.3",
+    "@jns42/schema-draft-2020-12": "^0.14.3",
+    "@jns42/schema-intermediate": "^0.14.3",
+    "@jns42/schema-oas-v3-1": "^0.14.3",
+    "@jns42/swagger-v2": "^0.14.3",
     "@types/node": "^20.11.25",
     "@types/yargs": "^17.0.32",
     "camelcase": "^8.0.0",

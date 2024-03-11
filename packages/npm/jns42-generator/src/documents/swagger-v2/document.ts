@@ -188,6 +188,13 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
+  protected *selectSubNodeDependentSchemasEntries(
+    nodePointer: string[],
+    node: N,
+  ): Iterable<readonly [string[], N]> {
+    //
+  }
+
   protected *selectSubNodePropertyNamesEntries(
     nodePointer: string[],
     node: N,

@@ -1,6 +1,6 @@
+import assert from "assert";
 import camelcase from "camelcase";
 import cp from "child_process";
-import assert from "node:assert/strict";
 import fs from "node:fs";
 import * as path from "node:path";
 import test from "node:test";
@@ -183,35 +183,22 @@ async function main(configuration: MainConfiguration) {
       });
     }
 
-    // install package
-    {
-      cp.execSync("npm install", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
-    }
+    const options = {
+      stdio: "inherit",
+      shell: true,
+      cwd: packageDirectoryPath,
+      env: process.env,
+    } as const;
 
-    // build package
-    {
-      cp.execSync("npm run build", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
-    }
+    cp.execFileSync("npm", ["install"], options);
 
     test("test package", () => {
-      cp.execSync("npm test", {
-        cwd: packageDirectoryPath,
-        env: process.env,
-        stdio: "inherit",
-      });
+      cp.execFileSync("npm", ["test"], options);
     });
 
     await test("valid", async () => {
       const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "out", "main.js")
+        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
       );
       for (const testName in testData.valid as Record<string, unknown>) {
         let data = testData.valid[testName];
@@ -227,7 +214,7 @@ async function main(configuration: MainConfiguration) {
 
     await test("invalid", async () => {
       const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "out", "main.js")
+        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
       );
       for (const testName in testData.invalid as Record<string, unknown>) {
         let data = testData.invalid[testName];

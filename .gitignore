@@ -12,7 +12,11 @@
 node_modules/
 target/
 coverage/
+transpiled/
+types/
+bundled/
 out/
+
 generated/
 logs/
 

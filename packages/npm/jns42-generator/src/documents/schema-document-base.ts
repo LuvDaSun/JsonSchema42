@@ -42,9 +42,9 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   ) {
     super(documentNode);
 
-    const maybeDocumentNodeUrl = this.getDocumentNodeUrl();
-    const documentNodeUrl = maybeDocumentNodeUrl ?? givenUrl;
-    this.documentNodeLocation = documentNodeUrl;
+    const maybeDocumentNodeLocation = this.getDocumentNodeLocation();
+    const documentNodeLocation = maybeDocumentNodeLocation ?? givenUrl;
+    this.documentNodeLocation = documentNodeLocation;
 
     const queue = new Array<readonly [string[], N]>();
     queue.push([[], this.documentNode]);
@@ -60,17 +60,16 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
         const nodeRefLocation = NodeLocation.parse(nodeRef);
         this.referencedDocuments.push({
           retrievalLocation: retrievalUrl.join(nodeRefLocation),
-          givenLocation: documentNodeUrl.join(nodeRefLocation),
+          givenLocation: documentNodeLocation.join(nodeRefLocation),
         });
       }
 
       for (const [subNodePointer, subNode] of this.selectSubNodes(nodePointer, node)) {
         const subNodeId = this.selectNodeId(subNode);
         if (subNodeId != null) {
-          const subNodeLocation = NodeLocation.parse(subNodeId);
           this.embeddedDocuments.push({
-            retrievalLocation: retrievalUrl.join(subNodeLocation),
-            givenLocation: documentNodeUrl.join(subNodeLocation),
+            retrievalLocation: retrievalUrl.pushPointer(...subNodePointer),
+            givenLocation: documentNodeLocation.pushPointer(...subNodePointer),
           });
           continue;
         }
@@ -80,7 +79,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  protected getDocumentNodeUrl(): NodeLocation | null {
+  protected getDocumentNodeLocation(): NodeLocation | null {
     const nodeId = this.selectNodeId(this.documentNode);
     if (nodeId == null) {
       return null;
@@ -238,19 +237,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   }
   protected getIntermediateApplicatorsPart(nodePointer: string[], node: N) {
     const reference = this.getIntermediateReference(nodePointer, node);
-    const allOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeAllOfEntries(nodePointer, node),
-    ]);
-    const anyOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeAnyOfEntries(nodePointer, node),
-    ]);
-    const oneOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeOneOfEntries(nodePointer, node),
-    ]);
 
-    const not = this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeNotEntries(nodePointer, node),
-    ]);
     const $if = this.mapEntriesToSingleNodeId(nodePointer, node, [
       ...this.selectSubNodeIfEntries(nodePointer, node),
     ]);
@@ -260,51 +247,65 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     const $else = this.mapEntriesToSingleNodeId(nodePointer, node, [
       ...this.selectSubNodeElseEntries(nodePointer, node),
     ]);
-
-    const dependentSchemas = this.mapPointerEntriesRecord(nodePointer, node, [
-      ...this.selectNodeDependentSchemasPointerEntries(nodePointer, node),
+    const not = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeNotEntries(nodePointer, node),
     ]);
 
-    const tupleItems = this.mapEntriesToManyNodeIds(nodePointer, node, [
-      ...this.selectSubNodeTupleItemsEntries(nodePointer, node),
+    const mapProperties = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodeMapPropertiesEntries(nodePointer, node),
     ]);
     const arrayItems = this.mapEntriesToSingleNodeId(nodePointer, node, [
       ...this.selectSubNodeArrayItemsEntries(nodePointer, node),
+    ]);
+    const propertyNames = this.mapEntriesToSingleNodeId(nodePointer, node, [
+      ...this.selectSubNodePropertyNamesEntries(nodePointer, node),
     ]);
     const contains = this.mapEntriesToSingleNodeId(nodePointer, node, [
       ...this.selectSubNodeContainsEntries(nodePointer, node),
     ]);
 
+    const allOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeAllOfEntries(nodePointer, node),
+    ]);
+    const anyOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeAnyOfEntries(nodePointer, node),
+    ]);
+    const oneOf = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeOneOfEntries(nodePointer, node),
+    ]);
+    const tupleItems = this.mapEntriesToManyNodeIds(nodePointer, node, [
+      ...this.selectSubNodeTupleItemsEntries(nodePointer, node),
+    ]);
+
     const objectProperties = this.mapPointerEntriesRecord(nodePointer, node, [
       ...this.selectNodePropertiesPointerEntries(nodePointer, node),
-    ]);
-    const mapProperties = this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodeMapPropertiesEntries(nodePointer, node),
     ]);
     const patternProperties = this.mapPointerEntriesRecord(nodePointer, node, [
       ...this.selectNodePatternPropertyPointerEntries(nodePointer, node),
     ]);
-    const propertyNames = this.mapEntriesToSingleNodeId(nodePointer, node, [
-      ...this.selectSubNodePropertyNamesEntries(nodePointer, node),
+    const dependentSchemas = this.mapPointerEntriesRecord(nodePointer, node, [
+      ...this.selectNodeDependentSchemasPointerEntries(nodePointer, node),
     ]);
 
     return {
       reference,
-      allOf,
-      anyOf,
-      oneOf,
-      not,
       if: $if,
       then,
       else: $else,
-      dependentSchemas,
-      tupleItems,
-      arrayItems,
-      contains,
-      objectProperties,
+      not,
       mapProperties,
-      patternProperties,
+      arrayItems,
       propertyNames,
+      contains,
+
+      allOf,
+      anyOf,
+      oneOf,
+      tupleItems,
+
+      objectProperties,
+      patternProperties,
+      dependentSchemas,
     };
   }
 
@@ -321,20 +322,25 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   protected *selectSubNodes(nodePointer: string[], node: N): Iterable<readonly [string[], N]> {
     yield* this.selectSubNodeDefinitionsEntries(nodePointer, node);
-    yield* this.selectSubNodeObjectPropertyEntries(nodePointer, node);
-    yield* this.selectSubNodeMapPropertiesEntries(nodePointer, node);
-    yield* this.selectSubNodePatternPropertiesEntries(nodePointer, node);
-    yield* this.selectSubNodePropertyNamesEntries(nodePointer, node);
-    yield* this.selectSubNodeTupleItemsEntries(nodePointer, node);
-    yield* this.selectSubNodeArrayItemsEntries(nodePointer, node);
-    yield* this.selectSubNodeContainsEntries(nodePointer, node);
-    yield* this.selectSubNodeAllOfEntries(nodePointer, node);
-    yield* this.selectSubNodeAnyOfEntries(nodePointer, node);
-    yield* this.selectSubNodeOneOfEntries(nodePointer, node);
-    yield* this.selectSubNodeNotEntries(nodePointer, node);
+
     yield* this.selectSubNodeIfEntries(nodePointer, node);
     yield* this.selectSubNodeThenEntries(nodePointer, node);
     yield* this.selectSubNodeElseEntries(nodePointer, node);
+    yield* this.selectSubNodeNotEntries(nodePointer, node);
+
+    yield* this.selectSubNodeMapPropertiesEntries(nodePointer, node);
+    yield* this.selectSubNodeArrayItemsEntries(nodePointer, node);
+    yield* this.selectSubNodePropertyNamesEntries(nodePointer, node);
+    yield* this.selectSubNodeContainsEntries(nodePointer, node);
+
+    yield* this.selectSubNodeAllOfEntries(nodePointer, node);
+    yield* this.selectSubNodeAnyOfEntries(nodePointer, node);
+    yield* this.selectSubNodeOneOfEntries(nodePointer, node);
+    yield* this.selectSubNodeTupleItemsEntries(nodePointer, node);
+
+    yield* this.selectSubNodeObjectPropertyEntries(nodePointer, node);
+    yield* this.selectSubNodePatternPropertiesEntries(nodePointer, node);
+    yield* this.selectSubNodeDependentSchemasEntries(nodePointer, node);
   }
 
   protected abstract selectNodeSchema(node: N): string | undefined;
@@ -392,6 +398,10 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     node: N,
   ): Iterable<readonly [string[], N]>;
   protected abstract selectSubNodePatternPropertiesEntries(
+    nodePointer: string[],
+    node: N,
+  ): Iterable<readonly [string[], N]>;
+  protected abstract selectSubNodeDependentSchemasEntries(
     nodePointer: string[],
     node: N,
   ): Iterable<readonly [string[], N]>;

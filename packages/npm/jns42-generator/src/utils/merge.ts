@@ -42,6 +42,22 @@ export function unionMerge<T>(
   return [...set];
 }
 
+export function exclude<T>(
+  values: T[] | undefined,
+  excludeValues: T[] | undefined,
+): T[] | undefined {
+  if (values == null) {
+    return;
+  }
+
+  if (excludeValues == null) {
+    return values;
+  }
+
+  const set = new Set(excludeValues);
+  return values.filter((value) => !set.has(value));
+}
+
 export function mergeKeysArray(
   keys: number[] | undefined,
   otherKeys: number[] | undefined,

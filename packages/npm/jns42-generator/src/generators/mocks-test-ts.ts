@@ -7,20 +7,20 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
   const { names, typesArena } = specification;
 
   yield itt`
-    import assert from "node:assert/strict";
+    import assert from "assert";
     import test from "node:test";
     import * as validators from "./validators.js";
     import * as mocks from "./mocks.js";
   `;
 
-  for (const [itemKey, item] of typesArena) {
+  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    if (item.mockable !== true) {
+    if (!typesArena.isMockable(key)) {
       continue;
     }
 

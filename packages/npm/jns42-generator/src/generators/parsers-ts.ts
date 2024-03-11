@@ -1,10 +1,5 @@
 import * as models from "../models/index.js";
 import {
-  isAliasSchemaModel,
-  isOneOfSchemaModel,
-  isSingleTypeSchemaModel,
-} from "../schema/index.js";
-import {
   NestedText,
   banner,
   generateJsDocComments,
@@ -34,7 +29,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   `;
 
-  for (const [itemKey, item] of typesArena) {
+  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
@@ -73,12 +68,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
   function* generateParserDefinition(itemKey: number, valueExpression: string) {
     const item = typesArena.getItem(itemKey);
 
-    if (isAliasSchemaModel(item)) {
-      yield generateParserReference(item.alias, valueExpression);
+    if (item.reference != null) {
+      yield generateParserReference(item.reference, valueExpression);
       return;
     }
 
-    if (isOneOfSchemaModel(item) && item.oneOf.length > 0) {
+    if (item.oneOf != null && item.oneOf.length > 0) {
       yield itt`
         ${joinIterable(
           item.oneOf.map(
@@ -92,7 +87,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
       return;
     }
 
-    if (isSingleTypeSchemaModel(item) && item.types != null) {
+    if (item.types != null && item.types.length === 1) {
       switch (item.types[0]) {
         case "any":
           yield valueExpression;
@@ -359,7 +354,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
             }
 
             yield itt`
-              return value;
+              return [name, value];
             `;
           }
         }

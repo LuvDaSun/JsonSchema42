@@ -2,7 +2,7 @@ SHELL:=$(PREFIX)/bin/sh
 
 build: \
 	generated/npm \
-	generated/cargo \
+	# generated/cargo \
 
 generated/npm: \
 	generated/npm/schema-intermediate \

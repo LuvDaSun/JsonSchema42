@@ -1,11 +1,4 @@
-import {
-  AllOfSchemaModel,
-  OneOfSchemaModel,
-  SchemaModel,
-  SchemaTransform,
-  TypeSchemaModel,
-  isIfSchemaModel,
-} from "../schema/index.js";
+import { SchemaItem, SchemaTransform } from "../models/index.js";
 
 /**
  * This transformer turns if-then-else into a one-of
@@ -31,40 +24,61 @@ import {
  *   - 300
  * ```
  */
-export const resolveIfThenElse: SchemaTransform = (arena, model, modelKey) => {
-  // we need at least two to merge
-  if (!isIfSchemaModel(model)) {
-    return model;
+export const resolveIfThenElse: SchemaTransform = (arena, key) => {
+  const item = arena.getItem(key);
+
+  if (item.if == null) {
+    return;
   }
 
-  const newModel: OneOfSchemaModel & SchemaModel = {
-    ...model,
-    oneOf: [],
+  if (item.oneOf != null) {
+    return;
+  }
+
+  const subKeys = new Array<number>();
+
+  if (item.then != null) {
+    const thenItem: SchemaItem = {
+      exact: false,
+      allOf: [item.if, item.then],
+    };
+    const thenKey = arena.addItem(thenItem);
+    subKeys.push(thenKey);
+  }
+
+  if (item.else != null) {
+    const notIfItem: SchemaItem = {
+      exact: false,
+      not: item.if,
+    };
+    const notIfKey = arena.addItem(notIfItem);
+
+    const elseItem: SchemaItem = {
+      exact: false,
+      allOf: [notIfKey, item.else],
+    };
+    const elseKey = arena.addItem(elseItem);
+    subKeys.push(elseKey);
+  }
+
+  if (subKeys.length === 0) {
+    const itemNew: SchemaItem = {
+      ...item,
+      if: undefined,
+      then: undefined,
+      else: undefined,
+    };
+    arena.setItem(key, itemNew);
+    return;
+  }
+
+  const itemNew: SchemaItem = {
+    ...item,
+    exact: false,
+    oneOf: subKeys,
     if: undefined,
     then: undefined,
     else: undefined,
   };
-
-  if (model.then != null) {
-    const thenModel: AllOfSchemaModel = {
-      allOf: [model.if, model.then],
-    };
-    const thenKey = arena.addItem(thenModel);
-    newModel.oneOf.push(thenKey);
-  }
-
-  if (model.else != null) {
-    const notIfModel: TypeSchemaModel = {
-      not: model.if,
-    };
-    const notIfKey = arena.addItem(notIfModel);
-
-    const elseModel: AllOfSchemaModel = {
-      allOf: [notIfKey, model.else],
-    };
-    const elseKey = arena.addItem(elseModel);
-    newModel.oneOf.push(elseKey);
-  }
-
-  return newModel;
+  arena.setItem(key, itemNew);
 };
