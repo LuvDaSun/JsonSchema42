@@ -101,9 +101,10 @@ export class DocumentContext {
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const retrievalId = retrievalLocation.toString();
-    if (!this.cache.has(retrievalId)) {
-      this.fillNodeCache(retrievalLocation, documentNode);
+    const documentLocation = retrievalLocation.toRoot();
+    const documentId = documentLocation.toString();
+    if (!this.cache.has(documentId)) {
+      this.fillNodeCache(documentLocation, documentNode);
     }
 
     await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
