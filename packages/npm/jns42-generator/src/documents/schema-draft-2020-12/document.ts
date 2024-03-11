@@ -11,23 +11,23 @@ export class Document extends SchemaDocumentBase<N> {
   private readonly dynamicAnchorMap = new Map<string, NodeLocation>();
 
   constructor(
-    retrievalUrl: NodeLocation,
-    givenUrl: NodeLocation,
-    antecedentUrl: NodeLocation | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
-    super(retrievalUrl, givenUrl, antecedentUrl, documentNode, context);
+    super(retrievalLocation, givenLocation, antecedentLocation, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
-      const nodeUrl = NodeLocation.parse(nodeId);
+      const nodeLocation = NodeLocation.parse(nodeId);
 
       const nodeAnchor = this.selectNodeAnchor(node);
       if (nodeAnchor != null) {
         if (this.anchorMap.has(nodeAnchor)) {
           throw new TypeError(`duplicate anchor ${nodeAnchor}`);
         }
-        this.anchorMap.set(nodeAnchor, nodeUrl);
+        this.anchorMap.set(nodeAnchor, nodeLocation);
       }
 
       const nodeDynamicAnchor = this.selectNodeDynamicAnchor(node);
@@ -35,7 +35,7 @@ export class Document extends SchemaDocumentBase<N> {
         if (this.dynamicAnchorMap.has(nodeDynamicAnchor)) {
           throw new TypeError(`duplicate dynamic anchor ${nodeDynamicAnchor}`);
         }
-        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodeUrl);
+        this.dynamicAnchorMap.set(nodeDynamicAnchor, nodeLocation);
       }
     }
   }
@@ -71,15 +71,15 @@ export class Document extends SchemaDocumentBase<N> {
   ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
     if (nodeRef != null) {
-      const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeRef);
-      const resolvedNodeId = resolvedNodeUrl.toString();
+      const resolvedNodeLocation = this.resolveReferenceNodeLocation(nodeRef);
+      const resolvedNodeId = resolvedNodeLocation.toString();
       return resolvedNodeId;
     }
 
     const nodeDynamicRef = this.selectNodeDynamicRef(node);
     if (nodeDynamicRef != null) {
-      const resolvedNodeUrl = this.resolveDynamicReferenceNodeUrl(nodeDynamicRef);
-      const resolvedNodeId = resolvedNodeUrl.toString();
+      const resolvedNodeLocation = this.resolveDynamicReferenceNodeLocation(nodeDynamicRef);
+      const resolvedNodeId = resolvedNodeLocation.toString();
       return resolvedNodeId;
     }
   }
@@ -88,35 +88,35 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
-    const resolvedNodeUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
+  private resolveReferenceNodeLocation(nodeRef: string): NodeLocation {
+    const resolvedNodeLocation = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
 
-    const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
+    const resolvedDocument = this.context.getDocumentForNode(resolvedNodeLocation);
     if (resolvedDocument instanceof Document) {
-      const anchor = resolvedNodeUrl.anchor;
-      const anchorResolvedUrl = resolvedDocument.anchorMap.get(anchor);
-      if (anchorResolvedUrl != null) {
-        return anchorResolvedUrl;
+      const anchor = resolvedNodeLocation.anchor;
+      const anchorResolvedLocation = resolvedDocument.anchorMap.get(anchor);
+      if (anchorResolvedLocation != null) {
+        return anchorResolvedLocation;
       }
     }
 
-    return resolvedNodeUrl;
+    return resolvedNodeLocation;
   }
-  private resolveDynamicReferenceNodeUrl(nodeDynamicRef: string): NodeLocation {
+  private resolveDynamicReferenceNodeLocation(nodeDynamicRef: string): NodeLocation {
     const documents = [this, ...this.getAntecedentDocuments()];
     documents.reverse();
 
-    const dynamicUrl = NodeLocation.parse(nodeDynamicRef);
+    const dynamicLocation = NodeLocation.parse(nodeDynamicRef);
 
     for (const document of documents) {
       if (!(document instanceof Document)) {
         continue;
       }
 
-      const resolvedUrl = document.dynamicAnchorMap.get(dynamicUrl.anchor);
+      const resolvedLocation = document.dynamicAnchorMap.get(dynamicLocation.anchor);
 
-      if (resolvedUrl != null) {
-        return resolvedUrl;
+      if (resolvedLocation != null) {
+        return resolvedLocation;
       }
     }
 

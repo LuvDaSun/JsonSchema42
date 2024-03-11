@@ -7,16 +7,16 @@ import { NodeLocation } from "../utils/index.js";
 
 export function configureIntermediateProgram(argv: yargs.Argv) {
   return argv.command(
-    "intermediate [instance-schema-url]",
-    "create intermediate model from instance-schema-url",
+    "intermediate [instance-schema-location]",
+    "create intermediate model from instance-schema-location",
     (yargs) =>
       yargs
-        .positional("instance-schema-url", {
+        .positional("instance-schema-location", {
           description: "url to download schema from",
           type: "string",
           demandOption: true,
         })
-        .option("default-meta-schema-url", {
+        .option("default-meta-schema-location", {
           description: "the default meta schema to use",
           type: "string",
           choices: [
@@ -31,41 +31,60 @@ export function configureIntermediateProgram(argv: yargs.Argv) {
 }
 
 interface MainConfiguration {
-  instanceSchemaUrl: string;
-  defaultMetaSchemaUrl: string;
+  instanceSchemaLocation: string;
+  defaultMetaSchemaLocation: string;
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaUrl = NodeLocation.parse(configuration.instanceSchemaUrl);
+  const instanceSchemaLocation = NodeLocation.parse(configuration.instanceSchemaLocation);
 
-  const defaultMetaSchemaId = configuration.defaultMetaSchemaUrl;
+  const defaultMetaSchemaId = configuration.defaultMetaSchemaLocation;
 
   const context = new DocumentContext();
   context.registerFactory(
     schema202012.metaSchemaId,
     ({
-      retrievalLocation: retrievalUrl,
-      givenLocation: givenUrl,
-      antecedentLocation: antecedentUrl,
-      documentNode: rootNode,
-    }) => new schema202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+      retrievalLocation: retrievalLocation,
+      givenLocation: givenLocation,
+      antecedentLocation: antecedentLocation,
+      documentNode: documentNode,
+    }) =>
+      new schema202012.Document(
+        retrievalLocation,
+        givenLocation,
+        antecedentLocation,
+        documentNode,
+        context,
+      ),
   );
   context.registerFactory(
     schemaDraft04.metaSchemaId,
     ({
-      retrievalLocation: retrievalUrl,
-      givenLocation: givenUrl,
-      antecedentLocation: antecedentUrl,
-      documentNode: rootNode,
-    }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+      retrievalLocation: retrievalLocation,
+      givenLocation: givenLocation,
+      antecedentLocation: antecedentLocation,
+      documentNode: documentNode,
+    }) =>
+      new schemaDraft04.Document(
+        retrievalLocation,
+        givenLocation,
+        antecedentLocation,
+        documentNode,
+        context,
+      ),
   );
   context.registerFactory(
     schemaIntermediate.metaSchemaId,
-    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
-      new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
+      new schemaIntermediate.Document(givenLocation, documentNode),
   );
 
-  await context.loadFromLocation(instanceSchemaUrl, instanceSchemaUrl, null, defaultMetaSchemaId);
+  await context.loadFromLocation(
+    instanceSchemaLocation,
+    instanceSchemaLocation,
+    null,
+    defaultMetaSchemaId,
+  );
 
   const intermediateData = context.getIntermediateData();
 

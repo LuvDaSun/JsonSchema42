@@ -96,40 +96,54 @@ async function main(configuration: MainConfiguration) {
   context.registerFactory(
     schemaDraft202012.metaSchemaId,
     ({
-      retrievalLocation: retrievalUrl,
-      givenLocation: givenUrl,
-      antecedentLocation: antecedentUrl,
-      documentNode: rootNode,
-    }) => new schemaDraft202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+      retrievalLocation: retrievalLocation,
+      givenLocation: givenLocation,
+      antecedentLocation: antecedentLocation,
+      documentNode: documentNode,
+    }) =>
+      new schemaDraft202012.Document(
+        retrievalLocation,
+        givenLocation,
+        antecedentLocation,
+        documentNode,
+        context,
+      ),
   );
   context.registerFactory(
     schemaDraft04.metaSchemaId,
     ({
-      retrievalLocation: retrievalUrl,
-      givenLocation: givenUrl,
-      antecedentLocation: antecedentUrl,
-      documentNode: rootNode,
-    }) => new schemaDraft04.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+      retrievalLocation: retrievalLocation,
+      givenLocation: givenLocation,
+      antecedentLocation: antecedentLocation,
+      documentNode: documentNode,
+    }) =>
+      new schemaDraft04.Document(
+        retrievalLocation,
+        givenLocation,
+        antecedentLocation,
+        documentNode,
+        context,
+      ),
   );
   context.registerFactory(
     schemaOasV31.metaSchemaId,
-    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
-      new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
+      new schemaIntermediate.Document(givenLocation, documentNode),
   );
   context.registerFactory(
     oasV30.metaSchemaId,
-    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
-      new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
+      new schemaIntermediate.Document(givenLocation, documentNode),
   );
   context.registerFactory(
     swaggerV2.metaSchemaId,
-    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
-      new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
+      new schemaIntermediate.Document(givenLocation, documentNode),
   );
   context.registerFactory(
     schemaIntermediate.metaSchemaId,
-    ({ givenLocation: givenUrl, documentNode: rootNode }) =>
-      new schemaIntermediate.Document(givenUrl, rootNode),
+    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
+      new schemaIntermediate.Document(givenLocation, documentNode),
   );
 
   await context.loadFromLocation(
