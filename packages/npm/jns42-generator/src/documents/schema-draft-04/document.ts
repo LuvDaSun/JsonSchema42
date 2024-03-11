@@ -10,24 +10,24 @@ export class Document extends SchemaDocumentBase<N> {
   private readonly aliasMap = new Map<string, NodeLocation>();
 
   constructor(
-    retrievalUrl: NodeLocation,
-    givenUrl: NodeLocation,
-    antecedentUrl: NodeLocation | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    antecedentLocation: NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
-    super(retrievalUrl, givenUrl, antecedentUrl, documentNode, context);
+    super(retrievalLocation, givenLocation, antecedentLocation, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
-      const nodeUrl = NodeLocation.parse(nodeId);
+      const nodeLocation = NodeLocation.parse(nodeId);
       const nodeAliasId = this.selectNodeId(node);
       if (nodeAliasId != null) {
-        const aliasUrl = this.documentNodeLocation.join(NodeLocation.parse(nodeAliasId));
-        const aliasId = aliasUrl.toString();
+        const aliasLocation = this.documentNodeLocation.join(NodeLocation.parse(nodeAliasId));
+        const aliasId = aliasLocation.toString();
         if (this.aliasMap.has(aliasId)) {
           throw new TypeError(`duplicate node alias ${aliasId}`);
         }
-        this.aliasMap.set(aliasId, nodeUrl);
+        this.aliasMap.set(aliasId, nodeLocation);
       }
     }
   }
@@ -59,8 +59,8 @@ export class Document extends SchemaDocumentBase<N> {
   ): schemaIntermediate.Reference | undefined {
     const nodeRef = this.selectNodeRef(node);
     if (nodeRef != null) {
-      const resolvedNodeUrl = this.resolveReferenceNodeUrl(nodeRef);
-      const resolvedNodeId = resolvedNodeUrl.toString();
+      const resolvedNodeLocation = this.resolveReferenceNodeLocation(nodeRef);
+      const resolvedNodeId = resolvedNodeLocation.toString();
       return resolvedNodeId;
     }
   }
@@ -69,21 +69,21 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeUrl(nodeRef: string): NodeLocation {
-    const refUrl = NodeLocation.parse(nodeRef);
-    const resolvedNodeUrl = this.documentNodeLocation.join(refUrl);
+  private resolveReferenceNodeLocation(nodeRef: string): NodeLocation {
+    const refLocation = NodeLocation.parse(nodeRef);
+    const resolvedNodeLocation = this.documentNodeLocation.join(refLocation);
 
-    const resolvedDocument = this.context.getDocumentForNode(resolvedNodeUrl);
+    const resolvedDocument = this.context.getDocumentForNode(resolvedNodeLocation);
     if (resolvedDocument instanceof Document) {
-      const resolvedNodeUrl = resolvedDocument.documentNodeLocation.join(refUrl);
-      const resolvedNodeId = resolvedNodeUrl.toString();
-      const resolvedAliasUrl = resolvedDocument.aliasMap.get(resolvedNodeId);
-      if (resolvedAliasUrl != null) {
-        return resolvedAliasUrl;
+      const resolvedNodeLocation = resolvedDocument.documentNodeLocation.join(refLocation);
+      const resolvedNodeId = resolvedNodeLocation.toString();
+      const resolvedAliasLocation = resolvedDocument.aliasMap.get(resolvedNodeId);
+      if (resolvedAliasLocation != null) {
+        return resolvedAliasLocation;
       }
     }
 
-    return resolvedNodeUrl;
+    return resolvedNodeLocation;
   }
 
   //#endregion

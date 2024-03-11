@@ -8,12 +8,14 @@ test("document-context load-from-document", async () => {
   const context = new DocumentContext();
   context.registerFactory(
     schema202012.metaSchemaId,
-    ({
-      retrievalLocation: retrievalUrl,
-      givenLocation: givenUrl,
-      antecedentLocation: antecedentUrl,
-      documentNode: rootNode,
-    }) => new schema202012.Document(retrievalUrl, givenUrl, antecedentUrl, rootNode, context),
+    ({ retrievalLocation, givenLocation, antecedentLocation, documentNode }) =>
+      new schema202012.Document(
+        retrievalLocation,
+        givenLocation,
+        antecedentLocation,
+        documentNode,
+        context,
+      ),
   );
 
   await context.loadFromDocument(

@@ -15,7 +15,7 @@ export interface ReferencedDocument {
 
 export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   /**
-   * The unique url for this document, possibly derived from the node. This
+   * The unique location for this document, possibly derived from the node. This
    * is not necessarily the location where the document was retrieved from.
    */
   public readonly documentNodeLocation: NodeLocation;
@@ -29,21 +29,21 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   /**
    * Constructor for creating new documents
-   * @param givenUrl url that is derived from the referencing document
-   * @param antecedentUrl url of referencing, parent, preceding document
+   * @param givenLocation location that is derived from the referencing document
+   * @param antecedentLocation location of referencing, parent, preceding document
    * @param documentNode the actual document
    */
   constructor(
-    retrievalUrl: NodeLocation,
-    givenUrl: NodeLocation,
-    public readonly antecedentUrl: NodeLocation | null,
+    retrievalLocation: NodeLocation,
+    givenLocation: NodeLocation,
+    public readonly antecedentLocation: NodeLocation | null,
     documentNode: unknown,
     protected context: DocumentContext,
   ) {
     super(documentNode);
 
     const maybeDocumentNodeLocation = this.getDocumentNodeLocation();
-    const documentNodeLocation = maybeDocumentNodeLocation ?? givenUrl;
+    const documentNodeLocation = maybeDocumentNodeLocation ?? givenLocation;
     this.documentNodeLocation = documentNodeLocation;
 
     const queue = new Array<readonly [string[], N]>();
@@ -59,7 +59,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       if (nodeRef != null) {
         const nodeRefLocation = NodeLocation.parse(nodeRef);
         this.referencedDocuments.push({
-          retrievalLocation: retrievalUrl.join(nodeRefLocation),
+          retrievalLocation: retrievalLocation.join(nodeRefLocation),
           givenLocation: documentNodeLocation.join(nodeRefLocation),
         });
       }
@@ -68,7 +68,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
         const subNodeId = this.selectNodeId(subNode);
         if (subNodeId != null) {
           this.embeddedDocuments.push({
-            retrievalLocation: retrievalUrl.pushPointer(...subNodePointer),
+            retrievalLocation: retrievalLocation.pushPointer(...subNodePointer),
             givenLocation: documentNodeLocation.pushPointer(...subNodePointer),
           });
           continue;
@@ -86,14 +86,14 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
     const nodeLocation = NodeLocation.parse(nodeId);
 
-    const documentNodeUrl =
-      this.antecedentUrl == null ? nodeLocation : this.antecedentUrl.join(nodeLocation);
+    const documentNodeLocation =
+      this.antecedentLocation == null ? nodeLocation : this.antecedentLocation.join(nodeLocation);
 
-    return documentNodeUrl;
+    return documentNodeLocation;
   }
 
   /**
-   * All unique node urls that this document contains
+   * All unique node locations that this document contains
    */
   public *getNodeLocations(): Iterable<NodeLocation> {
     for (const [nodeId] of this.nodes) {
@@ -101,24 +101,24 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  public getNodeByUrl(nodeUrl: NodeLocation) {
-    const nodeId = nodeUrl.toString();
+  public getNodeByLocation(nodeLocation: NodeLocation) {
+    const nodeId = nodeLocation.toString();
     const node = this.nodes.get(nodeId);
     if (node == null) {
-      throw new TypeError(`node not found ${nodeUrl.toString()}`);
+      throw new TypeError(`node not found ${nodeLocation.toString()}`);
     }
     return node;
   }
 
   public getNodeByPointer(nodePointer: string[]) {
-    const nodeUrl = this.documentNodeLocation.pushPointer(...nodePointer);
-    return this.getNodeByUrl(nodeUrl);
+    const nodeLocation = this.documentNodeLocation.pushPointer(...nodePointer);
+    return this.getNodeByLocation(nodeLocation);
   }
 
   protected *getAntecedentDocuments(): Iterable<SchemaDocumentBase> {
     let currentDocument: SchemaDocumentBase = this;
-    while (currentDocument.antecedentUrl != null) {
-      const maybeNextDocument = this.context.getDocument(currentDocument.antecedentUrl);
+    while (currentDocument.antecedentLocation != null) {
+      const maybeNextDocument = this.context.getDocument(currentDocument.antecedentLocation);
       if (!(maybeNextDocument instanceof SchemaDocumentBase)) {
         break;
       }
@@ -129,8 +129,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
 
   public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediate.Node]> {
     for (const [nodeId, node] of this.nodes) {
-      const nodeUrl = NodeLocation.parse(nodeId);
-      const nodePointer = nodeUrl.pointer;
+      const nodeLocation = NodeLocation.parse(nodeId);
+      const nodePointer = nodeLocation.pointer;
 
       const metadata = this.getIntermediateMetadataPart(nodePointer, node);
       const types = this.getIntermediateTypesPart(nodePointer, node);
@@ -462,8 +462,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     if (entries.length > 0) {
       const nodeIds = Object.fromEntries(
         entries.map(([key, nodePointer]) => {
-          const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
-          const nodeId = String(nodeUrl);
+          const nodeLocation = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
+          const nodeId = String(nodeLocation);
           return [key, nodeId];
         }),
       );
@@ -478,8 +478,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   ): Array<string> | undefined {
     if (entries.length > 0) {
       const nodeIds = entries.map(([nodePointer]) => {
-        const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
-        const nodeId = String(nodeUrl);
+        const nodeLocation = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
+        const nodeId = String(nodeLocation);
         return nodeId;
       });
       return nodeIds;
@@ -492,8 +492,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     entries: Array<readonly [string[], N]>,
   ): string | undefined {
     for (const [nodePointer] of entries) {
-      const nodeUrl = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
-      const nodeId = String(nodeUrl);
+      const nodeLocation = this.documentNodeLocation.toRoot().pushPointer(...nodePointer);
+      const nodeId = String(nodeLocation);
       return nodeId;
     }
   }
