@@ -19,7 +19,7 @@ test("document-context load-from-document", async () => {
   );
 
   await context.loadFromDocument(
-    NodeLocation.parse("/retrieval/#/root"),
+    NodeLocation.parse("/retrieval/#"),
     NodeLocation.parse("/root/node#/root"),
     null,
     {
