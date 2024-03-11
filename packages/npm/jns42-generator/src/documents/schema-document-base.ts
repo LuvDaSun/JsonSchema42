@@ -42,9 +42,9 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   ) {
     super(documentNode);
 
-    const maybeDocumentNodeUrl = this.getDocumentNodeUrl();
-    const documentNodeUrl = maybeDocumentNodeUrl ?? givenUrl;
-    this.documentNodeLocation = documentNodeUrl;
+    const maybeDocumentNodeLocation = this.getDocumentNodeLocation();
+    const documentNodeLocation = maybeDocumentNodeLocation ?? givenUrl;
+    this.documentNodeLocation = documentNodeLocation;
 
     const queue = new Array<readonly [string[], N]>();
     queue.push([[], this.documentNode]);
@@ -60,17 +60,16 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
         const nodeRefLocation = NodeLocation.parse(nodeRef);
         this.referencedDocuments.push({
           retrievalLocation: retrievalUrl.join(nodeRefLocation),
-          givenLocation: documentNodeUrl.join(nodeRefLocation),
+          givenLocation: documentNodeLocation.join(nodeRefLocation),
         });
       }
 
       for (const [subNodePointer, subNode] of this.selectSubNodes(nodePointer, node)) {
         const subNodeId = this.selectNodeId(subNode);
         if (subNodeId != null) {
-          const subNodeLocation = NodeLocation.parse(subNodeId);
           this.embeddedDocuments.push({
-            retrievalLocation: retrievalUrl.join(subNodeLocation),
-            givenLocation: documentNodeUrl.join(subNodeLocation),
+            retrievalLocation: retrievalUrl.pushPointer(...subNodePointer),
+            givenLocation: documentNodeLocation.pushPointer(...subNodePointer),
           });
           continue;
         }
@@ -80,7 +79,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     }
   }
 
-  protected getDocumentNodeUrl(): NodeLocation | null {
+  protected getDocumentNodeLocation(): NodeLocation | null {
     const nodeId = this.selectNodeId(this.documentNode);
     if (nodeId == null) {
       return null;
