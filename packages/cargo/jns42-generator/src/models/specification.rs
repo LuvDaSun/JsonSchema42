@@ -260,6 +260,7 @@ impl Specification {
         schema_transforms::flatten::any_of::transform(arena, key);
         schema_transforms::flatten::one_of::transform(arena, key);
         schema_transforms::flip::all_of_one_of::transform(arena, key);
+        schema_transforms::resolve_not::transform(arena, key);
         schema_transforms::resolve_if_then_else::transform(arena, key);
       }
     }

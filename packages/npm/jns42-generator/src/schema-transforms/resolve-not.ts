@@ -2,7 +2,7 @@ import { SchemaItem, SchemaTransform } from "../models/index.js";
 import { exclude } from "../utils/index.js";
 
 /**
- * This transformer turns if-then-else into a one-of
+ * This transformer turns resolves the not field
  *
  * ```yaml
  * - required:
@@ -26,10 +26,6 @@ export const resolveNot: SchemaTransform = (arena, key) => {
   const item = arena.getItem(key);
 
   if (item.not == null) {
-    return;
-  }
-
-  if (item.reference != null) {
     return;
   }
 
