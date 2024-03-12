@@ -11,10 +11,6 @@ jobs:
       - run: npm ci
       - run: npm run build --workspaces
       - run: npm --workspaces test
-      - run: npm install --no-package-lock
-      - run: make generated/npm
-      - run: npm run test --workspaces
-      - run: ./test-fixtures-npm
 
   build-matrix:
     strategy:
@@ -32,6 +28,25 @@ jobs:
       - run: npm run build --workspaces
       - run: npm install --no-package-lock
       - run: make generated/npm
+
+  test-matrix:
+    strategy:
+      matrix:
+        node-version: [21]
+        runs-on: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: corepack enable
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build --workspaces
+      - run: npm install --no-package-lock
+      - run: make generated/npm
+      - run: npm test --workspaces
+      - run: ./test-fixtures-npm
 
   audit:
     runs-on: ubuntu-latest
