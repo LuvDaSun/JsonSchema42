@@ -4,7 +4,7 @@ import { defineConfig } from "rollup";
 
 export default defineConfig([
   {
-    external: [/node_modules/],
+    external: [/.*/],
     input: path.resolve("transpiled", "main.js"),
     output: { file: path.resolve("bundled", "main.js"), format: "module", sourcemap: true },
     plugins: [
@@ -17,7 +17,7 @@ export default defineConfig([
     ],
   },
   {
-    external: [/node_modules/],
+    external: [/.*/],
     input: path.resolve("transpiled", "main.js"),
     output: { file: path.resolve("bundled", "main.cjs"), format: "commonjs", sourcemap: true },
     plugins: [
@@ -31,7 +31,7 @@ export default defineConfig([
     ],
   },
   {
-    external: [/node_modules/],
+    external: [/.*/],
     input: path.resolve("transpiled", "program.js"),
     output: { file: path.resolve("bundled", "program.js"), format: "module", sourcemap: true },
     plugins: [
