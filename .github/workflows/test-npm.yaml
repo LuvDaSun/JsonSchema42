@@ -11,11 +11,15 @@ jobs:
       - run: npm ci
       - run: npm run build --workspaces
       - run: npm --workspaces test
+      - run: npm install --no-package-lock
+      - run: make generated/npm
+      - run: npm run test --workspaces
+      - run: ./test-fixtures-npm
 
-  test-matrix:
+  build-matrix:
     strategy:
       matrix:
-        node-version: [21]
+        node-version: [18, 20]
         runs-on: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.runs-on }}
     steps:
@@ -28,8 +32,6 @@ jobs:
       - run: npm run build --workspaces
       - run: npm install --no-package-lock
       - run: make generated/npm
-      - run: npm run test --workspaces
-      - run: ./test-fixtures-npm
 
   audit:
     runs-on: ubuntu-latest
