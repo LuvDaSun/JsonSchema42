@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.15.5",
+  "version": "0.15.7",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -23,7 +23,7 @@
   },
   "scripts": {
     "prepack": "node ./scripts/build.js",
-    "pretest": "node ./scripts/build.js",
+    "pretest": "tsc",
     "build": "node ./scripts/build.js",
     "clean": "node ./scripts/clean.js",
     "test": "node --test ./transpiled/**/*.test.js"
@@ -46,7 +46,9 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "c8": "^9.1.0",
-    "typescript": "^5.4.2"
+    "rollup": "^4.12.1",
+    "typescript": "^5.4.2",
+    "@rollup/plugin-replace": "^5.0.5"
   },
   "dependencies": {
     "@jns42/oas-v3-0": "^0.15.5",
@@ -66,5 +68,8 @@
     "type-fest": "^4.9.0",
     "yaml": "^2.4.1",
     "yargs": "^17.7.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

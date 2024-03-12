@@ -1,13 +1,5 @@
 on:
   pull_request: {}
-  push:
-    branches:
-      - "*"
-    paths:
-      - Cargo.lock
-      - .github/**
-      - fixtures/**
-      - packages/cargo/**
 
 jobs:
   test:
