@@ -26,7 +26,6 @@ export default defineConfig([
       replace({
         values: {
           "process.env.NODE_ENV": JSON.stringify("production"),
-          "import.meta.dirname": "__dirname",
         },
         preventAssignment: true,
       }),
