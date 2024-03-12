@@ -29,6 +29,9 @@ export function generatePackageJsonData(name: string, version: string) {
     license: "ISC",
     dependencies: withDependencies(["@types/node"]),
     devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
+    engines: {
+      node: ">=18",
+    },
   };
 
   return content;
