@@ -15,7 +15,7 @@ jobs:
   build-matrix:
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [20]
         runs-on: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.runs-on }}
     steps:
