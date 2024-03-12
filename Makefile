@@ -13,6 +13,8 @@ generated/npm: \
 	generated/npm/oas-v3-0 \
 	generated/npm/oas-v3-1 \
 
+	npm run build --workspaces
+
 	# Link the generated code, but don't save those links to the package lock
 	npm install --no-package-lock
 
@@ -34,9 +36,6 @@ generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.y
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
-
 generated/npm/schema-draft-04:
 	mkdir -p $(@D)
 
@@ -44,9 +43,6 @@ generated/npm/schema-draft-04:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
-
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/schema-draft-2020-12:
 	mkdir -p $(@D)
@@ -56,9 +52,6 @@ generated/npm/schema-draft-2020-12:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
-
 generated/npm/schema-oas-v3-1:
 	mkdir -p $(@D)
 
@@ -66,9 +59,6 @@ generated/npm/schema-oas-v3-1:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
-
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/npm/swagger-v2:
 	mkdir -p $(@D)
@@ -78,9 +68,6 @@ generated/npm/swagger-v2:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
-
 generated/npm/oas-v3-0:
 	mkdir -p $(@D)
 
@@ -89,9 +76,6 @@ generated/npm/oas-v3-0:
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
 
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
-
 generated/npm/oas-v3-1:
 	mkdir -p $(@D)
 
@@ -99,9 +83,6 @@ generated/npm/oas-v3-1:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
-
-	npm install --no-package-lock --workspace @jns42/$(notdir $(basename $@))
-	npm run build --workspace @jns42/$(notdir $(basename $@))
 
 generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir -p $(@D)
