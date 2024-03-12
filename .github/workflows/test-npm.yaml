@@ -15,7 +15,7 @@ jobs:
   test-matrix:
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [20]
         runs-on: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.runs-on }}
     steps:
@@ -30,6 +30,24 @@ jobs:
       - run: make generated/npm
       - run: npm test --workspaces
       - run: ./test-fixtures-npm
+
+  # node test runner is not properly supported in node 18, but we can see if the build is working!
+  build-matrix:
+    strategy:
+      matrix:
+        node-version: [18]
+        runs-on: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: corepack enable
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build --workspaces
+      - run: npm install --no-package-lock
+      - run: make generated/npm
 
   audit:
     runs-on: ubuntu-latest
