@@ -1,5 +1,10 @@
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - Cargo.lock
+      - .github/**
+      - fixtures/**
+      - packages/ts/**
 
 jobs:
   test:
