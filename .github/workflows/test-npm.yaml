@@ -1,15 +1,5 @@
 on:
   pull_request: {}
-  push:
-    branches:
-      - "*"
-    paths:
-      - Makefile
-      - package-lock.json
-      - .github/**
-      - fixtures/**
-      - packages/oas/**
-      - packages/npm/**
 
 jobs:
   test:
