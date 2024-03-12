@@ -15,5 +15,8 @@
     "prettier": "^3.2.5",
     "rollup": "^4.12.1",
     "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "@rollup/plugin-replace": "^5.0.5"
   }
 }
