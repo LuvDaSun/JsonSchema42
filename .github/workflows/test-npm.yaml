@@ -25,7 +25,7 @@ jobs:
   test-matrix:
     strategy:
       matrix:
-        node-version: [21.5.0]
+        node-version: [16, 18, 20]
         runs-on: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.runs-on }}
     steps:
