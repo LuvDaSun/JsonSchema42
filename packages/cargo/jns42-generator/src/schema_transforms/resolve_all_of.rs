@@ -1,6 +1,5 @@
-use std::rc::Rc;
-
 use crate::models::{arena::Arena, schema::SchemaNode};
+use std::rc::Rc;
 
 /**
  * This transformer merges all sub schemas in allOf.
@@ -32,77 +31,76 @@ use crate::models::{arena::Arena, schema::SchemaNode};
 pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   let item = arena.get_item(key);
 
-  // let Some(sub_keys) = item.all_of.clone() else {
-  //   return;
-  // };
+  let Some(sub_keys) = item.all_of.clone() else {
+    return;
+  };
 
-  // if sub_keys.len() < 2 {
-  //   return;
-  // };
+  if sub_keys.len() < 2 {
+    return;
+  };
 
-  // // things we cannot merge
-  // if item
-  //   .types
-  //   .as_ref()
-  //   .map(|value| value.len())
-  //   .unwrap_or_default()
-  //   > 1
-  //   || item.reference.is_some()
-  //   || item.any_of.is_some()
-  //   || item.one_of.is_some()
-  //   || item.r#if.is_some()
-  //   || item.then.is_some()
-  //   || item.r#else.is_some()
-  //   || item.not.is_some()
-  // {
-  //   return;
-  // }
+  // things we cannot merge
+  if item
+    .types
+    .as_ref()
+    .map(|value| value.len())
+    .unwrap_or_default()
+    > 1
+    || item.reference.is_some()
+    || item.any_of.is_some()
+    || item.one_of.is_some()
+    || item.r#if.is_some()
+    || item.then.is_some()
+    || item.r#else.is_some()
+    || item.not.is_some()
+  {
+    return;
+  }
 
-  // let mut item_new = SchemaNode {
-  //   all_of: None,
-  //   ..item.clone()
-  // };
+  let mut item_new = SchemaNode {
+    all_of: None,
+    ..item.clone()
+  };
 
-  // let mut merge_key = |key: &usize, other_key: &usize| {
-  //   if key == other_key {
-  //     return key.clone();
-  //   }
+  let merge_key = Rc::new(|key: &usize, other_key: &usize| {
+    if key == other_key {
+      return *key;
+    }
 
-  //   let item_new = SchemaNode {
-  //     all_of: Some([*key, *other_key].into()),
-  //     ..Default::default()
-  //   };
+    let item_new = SchemaNode {
+      all_of: Some([*key, *other_key].into()),
+      ..Default::default()
+    };
+    0
+    // arena.add_item(item_new)
+  });
 
-  //   let key_new = arena.add_item(item_new);
-  //   key_new
-  // };
+  for sub_key in sub_keys {
+    let sub_item = arena.get_item(sub_key);
 
-  // for sub_key in sub_keys {
-  //   let sub_item = arena.get_item(sub_key);
+    // things we cannot merge
+    if sub_item
+      .types
+      .as_ref()
+      .map(|value| value.len())
+      .unwrap_or_default()
+      > 1
+      || sub_item.reference.is_some()
+      || sub_item.all_of.is_some()
+      || sub_item.any_of.is_some()
+      || sub_item.one_of.is_some()
+      || sub_item.r#if.is_some()
+      || sub_item.then.is_some()
+      || sub_item.r#else.is_some()
+      || sub_item.not.is_some()
+    {
+      return;
+    }
 
-  //   // things we cannot merge
-  //   if sub_item
-  //     .types
-  //     .as_ref()
-  //     .map(|value| value.len())
-  //     .unwrap_or_default()
-  //     > 1
-  //     || sub_item.reference.is_some()
-  //     || sub_item.all_of.is_some()
-  //     || sub_item.any_of.is_some()
-  //     || sub_item.one_of.is_some()
-  //     || sub_item.r#if.is_some()
-  //     || sub_item.then.is_some()
-  //     || sub_item.r#else.is_some()
-  //     || sub_item.not.is_some()
-  //   {
-  //     return;
-  //   }
+    item_new = item_new.intersection(sub_item, merge_key.clone());
+  }
 
-  //   item_new = item_new.intersection(sub_item, merge_key);
-  // }
-
-  // arena.replace_item(key, item_new);
+  arena.replace_item(key, item_new);
 }
 
 #[cfg(test)]
