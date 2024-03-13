@@ -71,6 +71,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       all_of: Some([*key, *other_key].into()),
       ..Default::default()
     };
+
     0
     // arena.add_item(item_new)
   });
