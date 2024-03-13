@@ -263,6 +263,8 @@ impl Specification {
         schema_transforms::resolve_not::transform(arena, key);
         schema_transforms::resolve_if_then_else::transform(arena, key);
         schema_transforms::inherit::reference::transform(arena, key);
+        schema_transforms::inherit::one_of::transform(arena, key);
+        schema_transforms::inherit::any_of::transform(arena, key)
       }
     }
 
