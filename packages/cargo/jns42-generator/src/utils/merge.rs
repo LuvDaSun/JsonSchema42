@@ -57,8 +57,7 @@ mod tests {
 
     let merger = |a, b| {
       let r = a + b;
-      let mut sum = sum.borrow_mut();
-      (*sum).add(r);
+      sum.borrow_mut().add(r);
       r
     };
 
