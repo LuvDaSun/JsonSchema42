@@ -26,7 +26,7 @@ macro_rules! generate_mod {
         }
 
         if item != &item_new {
-          arena.set_item(key, item_new);
+          arena.replace_item(key, item_new);
         }
       }
 

@@ -53,7 +53,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     ..item.clone()
   };
 
-  arena.set_item(key, item_new);
+  arena.replace_item(key, item_new);
 }
 
 #[cfg(test)]

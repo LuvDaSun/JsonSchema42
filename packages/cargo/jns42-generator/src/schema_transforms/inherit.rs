@@ -152,7 +152,7 @@ macro_rules! generate_mod {
           ..item.clone()
         };
 
-        arena.set_item(key, item_new);
+        arena.replace_item(key, item_new);
       }
 
       #[cfg(test)]
@@ -361,7 +361,7 @@ pub mod reference {
       ..item.clone()
     };
 
-    arena.set_item(key, item_new);
+    arena.replace_item(key, item_new);
   }
 
   #[cfg(test)]

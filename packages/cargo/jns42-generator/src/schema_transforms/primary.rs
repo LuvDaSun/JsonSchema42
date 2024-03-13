@@ -39,7 +39,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       ..child_item.clone()
     };
 
-    arena.set_item(child_key, child_item);
+    arena.replace_item(child_key, child_item);
   }
 }
 

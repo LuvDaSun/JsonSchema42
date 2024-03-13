@@ -145,7 +145,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       .map(|sub_item| arena.add_item(sub_item))
       .collect();
 
-    arena.set_item(
+    arena.replace_item(
       key,
       SchemaNode {
         types: None,

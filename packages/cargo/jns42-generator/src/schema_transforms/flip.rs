@@ -123,7 +123,7 @@ macro_rules! generate_mod {
           ..item
         };
 
-        arena.set_item(key, item);
+        arena.replace_item(key, item);
       }
 
       #[cfg(test)]

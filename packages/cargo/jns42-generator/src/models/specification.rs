@@ -235,7 +235,7 @@ impl Specification {
           }),
         };
 
-        arena.set_item(key, item);
+        arena.replace_item(key, item);
       };
 
       while arena.apply_transform(transformer) > 0 {
@@ -253,6 +253,7 @@ impl Specification {
       fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
+
         schema_transforms::resolve_single::all_of::transform(arena, key);
         schema_transforms::resolve_single::any_of::transform(arena, key);
         schema_transforms::resolve_single::one_of::transform(arena, key);
@@ -260,11 +261,14 @@ impl Specification {
         schema_transforms::flatten::any_of::transform(arena, key);
         schema_transforms::flatten::one_of::transform(arena, key);
         schema_transforms::flip::all_of_one_of::transform(arena, key);
-        schema_transforms::resolve_not::transform(arena, key);
-        schema_transforms::resolve_if_then_else::transform(arena, key);
+        schema_transforms::flip::all_of_any_of::transform(arena, key);
         schema_transforms::inherit::reference::transform(arena, key);
         schema_transforms::inherit::one_of::transform(arena, key);
-        schema_transforms::inherit::any_of::transform(arena, key)
+        schema_transforms::inherit::any_of::transform(arena, key);
+
+        schema_transforms::resolve_all_of::transform(arena, key);
+        schema_transforms::resolve_not::transform(arena, key);
+        schema_transforms::resolve_if_then_else::transform(arena, key);
       }
     }
 

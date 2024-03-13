@@ -15,7 +15,7 @@ where
     self.0.get(key).unwrap()
   }
 
-  pub fn set_item(&mut self, key: usize, item: T) -> T {
+  pub fn replace_item(&mut self, key: usize, item: T) -> T {
     self.0.set(key, item)
   }
 

@@ -25,7 +25,7 @@ macro_rules! generate_mod {
             0 => {
               let mut item = item.clone();
               item.$member = None;
-              arena.set_item(key, item);
+              arena.replace_item(key, item);
             }
             1 => {
               if item.reference.is_some() {
@@ -35,7 +35,7 @@ macro_rules! generate_mod {
               let mut item = item.clone();
               item.reference = sub_keys.first().copied();
               item.$member = None;
-              arena.set_item(key, item);
+              arena.replace_item(key, item);
             }
             _ => {}
           };
