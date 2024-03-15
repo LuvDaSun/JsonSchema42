@@ -1,6 +1,6 @@
 [package]
 name = "jns42-core"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2021"
 description = "Core of jns42"
 license = "ISC"
@@ -17,4 +17,4 @@ Inflector = "^0.11.4"
 neon = "1"
 
 [lib]
-path = "src/lib.rs"
+crate-type = ["lib", "cdylib"]

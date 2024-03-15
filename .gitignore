@@ -2,6 +2,7 @@
 
 *.tsbuildinfo
 *.tgz
+*.node
 
 !.gitignore
 !.prettierignore

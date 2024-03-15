@@ -1,3 +1,4 @@
+import { toCamel, toPascal } from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
@@ -7,8 +8,6 @@ import {
   itt,
   joinIterable,
   mapIterable,
-  toCamel,
-  toPascal,
 } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {

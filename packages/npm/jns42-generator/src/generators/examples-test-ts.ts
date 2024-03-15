@@ -1,5 +1,6 @@
+import { toCamel } from "@jns42/core";
 import * as models from "../models/index.js";
-import { banner, itt, mapIterable, toCamel } from "../utils/index.js";
+import { banner, itt, mapIterable } from "../utils/index.js";
 
 export function* generateExamplesTestTsCode(specification: models.Specification) {
   yield banner;

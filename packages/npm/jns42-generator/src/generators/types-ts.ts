@@ -1,12 +1,6 @@
+import { toPascal } from "@jns42/core";
 import * as models from "../models/index.js";
-import {
-  NestedText,
-  banner,
-  generateJsDocComments,
-  itt,
-  joinIterable,
-  toPascal,
-} from "../utils/index.js";
+import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
   yield banner;

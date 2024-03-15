@@ -1,5 +1,6 @@
+import { toCamel } from "@jns42/core";
 import * as models from "../models/index.js";
-import { banner, generateJsDocComments, itt, toCamel } from "../utils/index.js";
+import { banner, generateJsDocComments, itt } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;

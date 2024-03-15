@@ -1,5 +1,4 @@
 import assert from "assert";
-import camelcase from "camelcase";
 import cp from "child_process";
 import fs from "node:fs";
 import * as path from "node:path";
@@ -16,7 +15,7 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
-import { NodeLocation } from "../utils/index.js";
+import { NodeLocation, toPascal } from "../utils/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
   return argv.command(
@@ -98,7 +97,7 @@ async function main(configuration: MainConfiguration) {
   } = configuration;
 
   const testLocation = NodeLocation.parse(pathToTest);
-  const defaultTypeName = camelcase(defaultName, { pascalCase: true });
+  const defaultTypeName = toPascal(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);

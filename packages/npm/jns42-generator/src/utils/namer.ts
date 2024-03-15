@@ -1,4 +1,4 @@
-import camelcase from "camelcase";
+import { toPascal } from "@jns42/core";
 
 const startsWithLetterRe = /^[a-zA-Z]/u;
 const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
@@ -65,7 +65,7 @@ export class Namer {
       .map((part) => part.replace(nonIdentifierRe, " "))
       .map((part) => part.trim())
       // camelcase the parts
-      .map((part) => camelcase(part, { pascalCase: true }))
+      .map((part) => toPascal(part))
       // remove all empty parts
       .filter((part) => part.length > 0);
     this.registerNameParts(id, nameParts);
@@ -175,7 +175,7 @@ export class Namer {
 
         iterate = true;
 
-        partInfos[id][0] = camelcase(this.defaultName, { pascalCase: true }) + partInfos[id][0];
+        partInfos[id][0] = toPascal(this.defaultName) + partInfos[id][0];
       }
     }
 
