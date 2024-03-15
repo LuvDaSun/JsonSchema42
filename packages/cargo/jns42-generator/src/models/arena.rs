@@ -1,31 +1,31 @@
 #[derive(Clone, Debug, PartialEq, Default)]
-pub struct Arena<T>(pub(super) im::Vector<T>)
+pub struct Arena<I>(im::Vector<I>)
 where
-  T: Clone + PartialEq;
+  I: Clone + PartialEq;
 
-impl<T> Arena<T>
+impl<I> Arena<I>
 where
-  T: Clone + PartialEq,
+  I: Clone + PartialEq,
 {
   pub fn new() -> Self {
     Self(im::Vector::new())
   }
 
-  pub fn get_item(&self, key: usize) -> &T {
+  pub fn get_item(&self, key: usize) -> &I {
     self.0.get(key).unwrap()
   }
 
-  pub fn replace_item(&mut self, key: usize, item: T) -> T {
+  pub fn replace_item(&mut self, key: usize, item: I) -> I {
     self.0.set(key, item)
   }
 
-  pub fn add_item(&mut self, item: T) -> usize {
+  pub fn add_item(&mut self, item: I) -> usize {
     let key = self.0.len();
     self.0.push_back(item);
     key
   }
 
-  pub fn iter(&self) -> impl Iterator<Item = &T> {
+  pub fn iter(&self) -> impl Iterator<Item = &I> {
     self.0.iter()
   }
 
@@ -45,5 +45,14 @@ where
     }
 
     count
+  }
+}
+
+impl<I> FromIterator<I> for Arena<I>
+where
+  I: Clone + PartialEq,
+{
+  fn from_iter<T: IntoIterator<Item = I>>(iter: T) -> Self {
+    Self(im::Vector::from_iter(iter))
   }
 }
