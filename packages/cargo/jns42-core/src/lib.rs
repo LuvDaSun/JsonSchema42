@@ -1,7 +1,7 @@
 pub mod utils;
 
 #[neon::main]
-pub(crate) fn neon_main(mut cx: neon::context::ModuleContext) -> neon::result::NeonResult<()> {
+fn neon_main(mut cx: neon::context::ModuleContext) -> neon::result::NeonResult<()> {
   neon_register(&mut cx)?;
 
   Ok(())
