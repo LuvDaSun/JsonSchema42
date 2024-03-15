@@ -79,8 +79,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   };
 
   for sub_key in sub_keys {
-    let arena = arena.borrow_mut();
-    let sub_item = arena.get_item(sub_key);
+    let sub_item = arena.borrow().get_item(sub_key).clone();
 
     // things we cannot merge
     if sub_item
@@ -101,7 +100,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       return;
     }
 
-    item_new = item_new.intersection(sub_item, &merge_key);
+    item_new = item_new.intersection(&sub_item, &merge_key);
   }
 
   let arena = arena.into_inner();
@@ -408,7 +407,8 @@ mod tests {
         ..Default::default()
       }, // 4
       SchemaNode {
-        types: Some([SchemaType::Array].into()),
+        types: Some([SchemaType::Object].into()),
+        required: Some(["b".into()].into()),
         object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
         ..Default::default()
       }, // 5
@@ -501,7 +501,6 @@ mod tests {
       SchemaNode {
         types: Some([SchemaType::Object].into()),
         all_of: Some([4, 5].into()),
-        map_properties: Some(8),
         ..Default::default()
       }, // 6
     ]);

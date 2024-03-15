@@ -41,7 +41,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   };
 
   let exclude_required: HashSet<_> = exclude_required.iter().collect();
-  let required_new: Vec<_> = required
+  let required_new = required
     .iter()
     .filter(|value| !exclude_required.contains(value))
     .cloned()

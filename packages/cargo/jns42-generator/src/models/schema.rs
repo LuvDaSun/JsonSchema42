@@ -107,9 +107,9 @@ pub struct SchemaNode {
 
   pub not: Option<SchemaKey>,
 
+  pub property_names: Option<SchemaKey>,
   pub map_properties: Option<SchemaKey>,
   pub array_items: Option<SchemaKey>,
-  pub property_names: Option<SchemaKey>,
   pub contains: Option<SchemaKey>,
 
   pub tuple_items: Option<Vec<SchemaKey>>,
@@ -120,7 +120,7 @@ pub struct SchemaNode {
 
   // assertions
   pub options: Option<Vec<Value>>,
-  pub required: Option<Vec<String>>,
+  pub required: Option<HashSet<String>>,
 
   pub minimum_inclusive: Option<f64>,
   pub minimum_exclusive: Option<f64>,
@@ -232,6 +232,22 @@ impl SchemaNode {
       }};
     }
 
+    macro_rules! generate_union_merge {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            empty()
+              .chain(base.iter())
+              .chain(other.iter())
+              .cloned()
+              .collect()
+          },
+        )
+      }};
+    }
+
     Self {
       name: None,
       primary: None,
@@ -260,9 +276,9 @@ impl SchemaNode {
 
       not: generate_merge_single_key!(not),
 
+      property_names: generate_merge_single_key!(property_names),
       map_properties: generate_merge_single_key!(map_properties),
       array_items: generate_merge_single_key!(array_items),
-      property_names: generate_merge_single_key!(property_names),
       contains: generate_merge_single_key!(contains),
 
       tuple_items: generate_merge_array_keys!(tuple_items),
@@ -271,8 +287,8 @@ impl SchemaNode {
       pattern_properties: generate_merge_object_keys!(pattern_properties),
       dependent_schemas: generate_merge_object_keys!(dependent_schemas),
 
-      options: None,  // TODO
-      required: None, // TODO
+      options: None, // TODO
+      required: generate_union_merge!(required),
 
       minimum_inclusive: generate_merge_option!(minimum_inclusive, |base, other| base.min(*other)),
       minimum_exclusive: generate_merge_option!(minimum_exclusive, |base, other| base.min(*other)),

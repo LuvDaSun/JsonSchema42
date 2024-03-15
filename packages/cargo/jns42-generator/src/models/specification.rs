@@ -143,7 +143,10 @@ impl Specification {
 
           minimum_properties: schema.minimum_properties,
           maximum_properties: schema.maximum_properties,
-          required: schema.required.clone(),
+          required: schema
+            .required
+            .as_ref()
+            .map(|value| value.iter().cloned().collect()),
 
           reference,
 
