@@ -382,4 +382,184 @@ mod tests {
 
     assert_eq!(actual, expected)
   }
+
+  #[test]
+  fn test_object() {
+    let mut arena = Arena::from_iter([
+      SchemaNode {
+        types: Some([SchemaType::Number].into()),
+        ..Default::default()
+      }, // 0
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 1
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 2
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 3
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
+        ..Default::default()
+      }, // 4
+      SchemaNode {
+        types: Some([SchemaType::Array].into()),
+        object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
+        ..Default::default()
+      }, // 5
+      SchemaNode {
+        all_of: Some([4, 5].into()),
+        ..Default::default()
+      }, // 6
+    ]);
+
+    while arena.apply_transform(transform) > 0 {
+      //
+    }
+
+    let actual: Vec<_> = arena.iter().cloned().collect();
+    let expected: Vec<_> = [
+      SchemaNode {
+        types: Some([SchemaType::Number].into()),
+        ..Default::default()
+      }, // 0
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 1
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 2
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 3
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
+        ..Default::default()
+      }, // 4
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        required: Some(["b".into()].into()),
+        object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
+        ..Default::default()
+      }, // 5
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        required: Some(["b".into()].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 7), ("c".into(), 3)].into()),
+        ..Default::default()
+      }, // 6
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 7
+    ]
+    .into();
+
+    assert_eq!(actual, expected)
+  }
+
+  #[test]
+  fn test_map() {
+    let mut arena = Arena::from_iter([
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 0
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 1
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 2
+      SchemaNode {
+        types: Some([SchemaType::Number].into()),
+        ..Default::default()
+      }, // 3
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        property_names: Some(0),
+        map_properties: Some(1),
+        ..Default::default()
+      }, // 4
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        property_names: Some(2),
+        map_properties: Some(3),
+        ..Default::default()
+      }, // 5
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        property_names: Some(7),
+        map_properties: Some(8),
+        ..Default::default()
+      }, // 6
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 7
+      SchemaNode {
+        types: Some([SchemaType::Never].into()),
+        ..Default::default()
+      }, // 8
+    ]);
+
+    while arena.apply_transform(transform) > 0 {
+      //
+    }
+
+    let actual: Vec<_> = arena.iter().cloned().collect();
+    let expected: Vec<_> = [
+      SchemaNode {
+        types: Some([SchemaType::Number].into()),
+        ..Default::default()
+      }, // 0
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 1
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 2
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 3
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
+        ..Default::default()
+      }, // 4
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        required: Some(["b".into()].into()),
+        object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
+        ..Default::default()
+      }, // 5
+      SchemaNode {
+        types: Some([SchemaType::Object].into()),
+        required: Some(["b".into()].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 7), ("c".into(), 3)].into()),
+        ..Default::default()
+      }, // 6
+      SchemaNode {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 7
+    ]
+    .into();
+
+    assert_eq!(actual, expected)
+  }
 }
