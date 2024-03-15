@@ -1,9 +1,8 @@
 use super::intermediate::IntermediateType;
-use crate::utils::merge::Merger;
 use crate::utils::{merge::merge_option, url::UrlWithPointer};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashSet};
-use std::{collections::HashMap, iter::empty, rc::Rc};
+use std::{collections::HashMap, iter::empty};
 
 pub type SchemaKey = usize;
 
@@ -108,9 +107,9 @@ pub struct SchemaNode {
 
   pub not: Option<SchemaKey>,
 
+  pub property_names: Option<SchemaKey>,
   pub map_properties: Option<SchemaKey>,
   pub array_items: Option<SchemaKey>,
-  pub property_names: Option<SchemaKey>,
   pub contains: Option<SchemaKey>,
 
   pub tuple_items: Option<Vec<SchemaKey>>,
@@ -121,7 +120,7 @@ pub struct SchemaNode {
 
   // assertions
   pub options: Option<Vec<Value>>,
-  pub required: Option<Vec<String>>,
+  pub required: Option<HashSet<String>>,
 
   pub minimum_inclusive: Option<f64>,
   pub minimum_exclusive: Option<f64>,
@@ -143,7 +142,11 @@ pub struct SchemaNode {
 }
 
 impl SchemaNode {
-  pub fn intersection<'f>(&'f self, other: &'f Self, merge_key: Merger<'f, SchemaKey>) -> Self {
+  pub fn intersection<'f>(
+    &'f self,
+    other: &'f Self,
+    merge_key: &impl Fn(&'f SchemaKey, &'f SchemaKey) -> SchemaKey,
+  ) -> Self {
     assert!(
       self
         .types
@@ -181,60 +184,66 @@ impl SchemaNode {
 
     macro_rules! generate_merge_option {
       ($member: ident, $merger: expr) => {
-        merge_option(
-          self.$member.as_ref(),
-          other.$member.as_ref(),
-          Rc::new($merger),
-        )
+        merge_option(self.$member.as_ref(), other.$member.as_ref(), $merger)
       };
     }
 
     macro_rules! generate_merge_single_key {
       ($member: ident) => {
-        merge_option(
-          self.$member.as_ref(),
-          other.$member.as_ref(),
-          merge_key.clone(),
-        )
+        merge_option(self.$member.as_ref(), other.$member.as_ref(), merge_key)
       };
     }
 
     macro_rules! generate_merge_array_keys {
       ($member: ident) => {{
-        let merge_key = merge_key.clone();
         merge_option(
           self.$member.as_ref(),
           other.$member.as_ref(),
-          Rc::new(move |base, other| {
+          |base, other| {
             let length = base.len().max(other.len());
             (0..length)
-              .map(|index| merge_option(base.get(index), other.get(index), merge_key.clone()))
+              .map(|index| merge_option(base.get(index), other.get(index), merge_key))
               .map(|key| key.unwrap())
               .collect()
-          }),
+          },
         )
       }};
     }
 
     macro_rules! generate_merge_object_keys {
       ($member: ident) => {{
-        let merge_key = merge_key.clone();
         merge_option(
           self.$member.as_ref(),
           other.$member.as_ref(),
-          Rc::new(move |base, other| {
+          |base, other| {
             let properties: HashSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
             properties
               .into_iter()
               .map(|property| {
                 (
                   property,
-                  merge_option(base.get(property), other.get(property), merge_key.clone()),
+                  merge_option(base.get(property), other.get(property), merge_key),
                 )
               })
               .map(|(property, key)| (property.clone(), key.unwrap()))
               .collect()
-          }),
+          },
+        )
+      }};
+    }
+
+    macro_rules! generate_union_merge {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            empty()
+              .chain(base.iter())
+              .chain(other.iter())
+              .cloned()
+              .collect()
+          },
         )
       }};
     }
@@ -248,7 +257,7 @@ impl SchemaNode {
       title: None,
       description: None,
       examples: None,
-      deprecated: generate_merge_option!(deprecated, |base, other| base & other),
+      deprecated: generate_merge_option!(deprecated, &|base, other| base & other),
 
       types: generate_merge_option!(types, |base, other| vec![base
         .first()
@@ -267,9 +276,9 @@ impl SchemaNode {
 
       not: generate_merge_single_key!(not),
 
+      property_names: generate_merge_single_key!(property_names),
       map_properties: generate_merge_single_key!(map_properties),
       array_items: generate_merge_single_key!(array_items),
-      property_names: generate_merge_single_key!(property_names),
       contains: generate_merge_single_key!(contains),
 
       tuple_items: generate_merge_array_keys!(tuple_items),
@@ -278,8 +287,8 @@ impl SchemaNode {
       pattern_properties: generate_merge_object_keys!(pattern_properties),
       dependent_schemas: generate_merge_object_keys!(dependent_schemas),
 
-      options: None,  // TODO
-      required: None, // TODO
+      options: None, // TODO
+      required: generate_union_merge!(required),
 
       minimum_inclusive: generate_merge_option!(minimum_inclusive, |base, other| base.min(*other)),
       minimum_exclusive: generate_merge_option!(minimum_exclusive, |base, other| base.min(*other)),

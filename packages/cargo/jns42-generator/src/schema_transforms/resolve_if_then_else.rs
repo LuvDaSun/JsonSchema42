@@ -69,7 +69,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key))
   }
 
-  arena.set_item(key, item_new);
+  arena.replace_item(key, item_new);
 }
 
 #[cfg(test)]

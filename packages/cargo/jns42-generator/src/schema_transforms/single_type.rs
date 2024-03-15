@@ -39,7 +39,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
         types: None,
         ..item.clone()
       };
-      arena.set_item(key, item);
+      arena.replace_item(key, item);
     }
     1 => {
       // only one type, this is what we want! let's do nothing
@@ -63,7 +63,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
         ),
         ..Default::default()
       };
-      arena.set_item(key, item);
+      arena.replace_item(key, item);
     }
   }
 }

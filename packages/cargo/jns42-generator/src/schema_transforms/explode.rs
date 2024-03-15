@@ -145,7 +145,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       .map(|sub_item| arena.add_item(sub_item))
       .collect();
 
-    arena.set_item(
+    arena.replace_item(
       key,
       SchemaNode {
         types: None,
@@ -165,7 +165,6 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaNode};
 
   #[test]
   fn test_transform() {

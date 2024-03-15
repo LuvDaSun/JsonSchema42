@@ -25,17 +25,11 @@ will become
 
 ```yaml
 - oneOf:
+    - 2
+    - 3
     - 4
     - 5
-    - 6
-    - 7
 - type: object
-- oneOf:
-    - 100
-    - 200
-- oneOf:
-    - 300
-    - 400
 - allOf:
     - 1
     - 100
@@ -129,7 +123,7 @@ macro_rules! generate_mod {
           ..item
         };
 
-        arena.set_item(key, item);
+        arena.replace_item(key, item);
       }
 
       #[cfg(test)]

@@ -123,6 +123,34 @@ export function inheritReference(arena: SchemaArena, key: number) {
     return;
   }
 
+  if (
+    item.types == null &&
+    item.options == null &&
+    item.required == null &&
+    item.propertyNames == null &&
+    item.contains == null &&
+    item.tupleItems == null &&
+    item.arrayItems == null &&
+    item.objectProperties == null &&
+    item.mapProperties == null &&
+    item.minimumInclusive == null &&
+    item.minimumExclusive == null &&
+    item.maximumInclusive == null &&
+    item.maximumExclusive == null &&
+    item.multipleOf == null &&
+    item.minimumLength == null &&
+    item.maximumLength == null &&
+    item.valuePattern == null &&
+    item.valueFormat == null &&
+    item.minimumItems == null &&
+    item.maximumItems == null &&
+    item.uniqueItems == null &&
+    item.minimumProperties == null &&
+    item.maximumProperties == null
+  ) {
+    return;
+  }
+
   const baseItemNew = {
     types: item.types,
     options: item.options,
@@ -149,34 +177,6 @@ export function inheritReference(arena: SchemaArena, key: number) {
     minimumProperties: item.minimumProperties,
     maximumProperties: item.maximumProperties,
   };
-
-  if (
-    baseItemNew.types == null &&
-    baseItemNew.options == null &&
-    baseItemNew.required == null &&
-    baseItemNew.propertyNames == null &&
-    baseItemNew.contains == null &&
-    baseItemNew.tupleItems == null &&
-    baseItemNew.arrayItems == null &&
-    baseItemNew.objectProperties == null &&
-    baseItemNew.mapProperties == null &&
-    baseItemNew.minimumInclusive == null &&
-    baseItemNew.minimumExclusive == null &&
-    baseItemNew.maximumInclusive == null &&
-    baseItemNew.maximumExclusive == null &&
-    baseItemNew.multipleOf == null &&
-    baseItemNew.minimumLength == null &&
-    baseItemNew.maximumLength == null &&
-    baseItemNew.valuePattern == null &&
-    baseItemNew.valueFormat == null &&
-    baseItemNew.minimumItems == null &&
-    baseItemNew.maximumItems == null &&
-    baseItemNew.uniqueItems == null &&
-    baseItemNew.minimumProperties == null &&
-    baseItemNew.maximumProperties == null
-  ) {
-    return;
-  }
 
   const baseKeyNew = arena.addItem(baseItemNew);
 

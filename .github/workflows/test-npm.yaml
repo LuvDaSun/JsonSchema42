@@ -1,5 +1,10 @@
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - package-lock.json
+      - .github/**
+      - fixtures/**
+      - packages/ts/**
 
 jobs:
   test:
