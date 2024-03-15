@@ -1,6 +1,6 @@
+import { product } from "@jns42/core";
 import assert from "assert";
 import test from "node:test";
-import { product } from "./product.js";
 
 test("product", () => {
   {

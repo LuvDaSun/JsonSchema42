@@ -52,10 +52,8 @@ will become
 macro_rules! generate_mod {
   ( $name: ident, $base_member: ident, $other_member: ident  ) => {
     pub mod $name {
-      use crate::{
-        models::{arena::Arena, schema::SchemaNode},
-        utils::product::product,
-      };
+      use crate::models::{arena::Arena, schema::SchemaNode};
+      use jns42_core::utils::product::product;
       use std::collections::{BTreeMap, BTreeSet};
 
       pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
