@@ -5,8 +5,9 @@ use super::{
 };
 use crate::{
   schema_transforms::{self},
-  utils::{name::to_pascal, names::optimize_names, url::UrlWithPointer},
+  utils::{names::optimize_names, url::UrlWithPointer},
 };
+use jns42_core::utils::name::to_pascal;
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};

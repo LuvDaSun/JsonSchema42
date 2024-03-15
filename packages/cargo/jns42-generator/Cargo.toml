@@ -7,13 +7,12 @@ license = "ISC"
 authors = ["Elmer Bulthuis"]
 homepage = "https://www.JsonSchema42.org"
 keywords = ["json", "schema", "generator"]
-repository = "git@github.com:LuvDaSun/jns42-generator-ts"
+repository = "git@github.com:LuvDaSun/JsonSchema42"
 
 [badges]
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-Inflector = "^0.11.4"
 clap = { version = "^4.1.14", features = ["derive"] }
 futures-util = "^0.3.30"
 http-body-util = "^0.1.0"
@@ -33,6 +32,7 @@ tokio = { version = "^1.36.0", features = ["full"] }
 toml = "^0.8.10"
 url = "^2.3.1"
 urlencoding = "^2.1.2"
+jns42-core = { path = "../jns42-core" }
 
 [lib]
 path = "src/lib.rs"

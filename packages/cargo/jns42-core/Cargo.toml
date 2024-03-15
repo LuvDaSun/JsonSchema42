@@ -1,0 +1,20 @@
+[package]
+name = "jns42-core"
+version = "0.0.0"
+edition = "2021"
+description = "Core of jns42"
+license = "ISC"
+authors = ["Elmer Bulthuis"]
+homepage = "https://www.JsonSchema42.org"
+keywords = ["json", "schema"]
+repository = "git@github.com:LuvDaSun/JsonSchema42"
+
+[badges]
+maintenance = { status = "actively-developed" }
+
+[dependencies]
+Inflector = "^0.11.4"
+neon = "1"
+
+[lib]
+path = "src/lib.rs"

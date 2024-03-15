@@ -5,9 +5,16 @@
       "request": "launch",
       "name": "Debug unit tests",
       "cargo": {
-        "args": ["test", "--no-run", "--lib", "--package=jns42-generator", "--all-targets"],
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package",
+          "${workspaceFolderBasename}",
+          "--all-targets"
+        ],
         "filter": {
-          "name": "jns42-generator",
+          "name": "${workspaceFolderBasename}",
           "kind": "lib"
         }
       },
@@ -19,9 +26,15 @@
       "request": "launch",
       "name": "package file",
       "cargo": {
-        "args": ["build", "--bin=jns42-generator", "--package=jns42-generator"],
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ],
         "filter": {
-          "name": "jns42-generator",
+          "name": "${workspaceFolderBasename}",
           "kind": "bin"
         }
       },

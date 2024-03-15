@@ -1,7 +1,5 @@
-use crate::{
-  models::{schema::SchemaNode, specification::Specification},
-  utils::name::to_snake,
-};
+use crate::models::{schema::SchemaNode, specification::Specification};
+use jns42_core::utils::name::to_snake;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};
 use std::{collections::HashSet, error::Error};
