@@ -1,3 +1,4 @@
+import { toPascal } from "@jns42/core";
 import assert from "assert";
 import cp from "child_process";
 import fs from "node:fs";
@@ -15,7 +16,7 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
-import { NodeLocation, toPascal } from "../utils/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
   return argv.command(
