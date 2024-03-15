@@ -1,5 +1,5 @@
 use crate::models::{arena::Arena, schema::SchemaNode};
-use std::rc::Rc;
+use std::cell::RefCell;
 
 /**
  * This transformer merges all sub schemas in allOf.
@@ -62,7 +62,10 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     ..item.clone()
   };
 
-  let merge_key = Rc::new(|key: &usize, other_key: &usize| {
+  // this is so that the following closures don't have to be FnMut
+  let arena = RefCell::new(arena);
+
+  let merge_key = |key: &usize, other_key: &usize| {
     if key == other_key {
       return *key;
     }
@@ -72,11 +75,11 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       ..Default::default()
     };
 
-    0
-    // arena.add_item(item_new)
-  });
+    arena.borrow_mut().add_item(item_new)
+  };
 
   for sub_key in sub_keys {
+    let arena = arena.borrow_mut();
     let sub_item = arena.get_item(sub_key);
 
     // things we cannot merge
@@ -98,8 +101,10 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       return;
     }
 
-    item_new = item_new.intersection(sub_item, merge_key.clone());
+    item_new = item_new.intersection(sub_item, &merge_key);
   }
+
+  let arena = arena.into_inner();
 
   arena.replace_item(key, item_new);
 }

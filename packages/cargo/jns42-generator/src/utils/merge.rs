@@ -1,23 +1,4 @@
-use std::rc::Rc;
-
-pub type Merger<'t, T> = Rc<dyn Fn(&'t T, &'t T) -> T + 't>;
-
 pub fn merge_option<'f, T>(
-  base: Option<&'f T>,
-  other: Option<&'f T>,
-  merger: Merger<'f, T>,
-) -> Option<T>
-where
-  T: Clone + PartialEq,
-{
-  match (base, other) {
-    (None, None) => None,
-    (Some(value), None) | (None, Some(value)) => Some(value.clone()),
-    (Some(one_value), Some(other_value)) => Some(merger(one_value, other_value)),
-  }
-}
-
-pub fn merge_option_2<'f, T>(
   base: Option<&'f T>,
   other: Option<&'f T>,
   merger: impl FnOnce(&'f T, &'f T) -> T,
@@ -38,7 +19,7 @@ where
 
 #[cfg(test)]
 mod tests {
-  use super::merge_option_2;
+  use super::merge_option;
   use std::cell::RefCell;
 
   #[test]
@@ -61,9 +42,9 @@ mod tests {
       r
     };
 
-    let d = merge_option_2(a.as_ref(), b.as_ref(), merger);
-    let e = merge_option_2(c.as_ref(), b.as_ref(), merger);
+    let _d = merge_option(a.as_ref(), b.as_ref(), merger);
+    let _e = merge_option(c.as_ref(), b.as_ref(), merger);
 
-    let sum = sum.into_inner();
+    let _sum = sum.into_inner();
   }
 }
