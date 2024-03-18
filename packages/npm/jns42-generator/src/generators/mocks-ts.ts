@@ -1,4 +1,4 @@
-import { toCamel, toPascal } from "@jns42/core";
+import { toCamel, toPascal } from "@jns42/jns42-core";
 import * as models from "../models/index.js";
 import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
@@ -57,8 +57,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = toPascal(names[nodeId]);
-    const functionName = toCamel("mock", names[nodeId]);
+    const typeName = toPascal([names[nodeId]]);
+    const functionName = toCamel(["mock", names[nodeId]]);
     const definition = generateMockDefinition(itemKey);
 
     yield itt`
@@ -106,7 +106,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     if (item.id == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
-      const functionName = toCamel("mock", names[item.id]);
+      const functionName = toCamel(["mock", names[item.id]]);
       yield itt`${functionName}()`;
     }
   }

@@ -1,4 +1,4 @@
-import { toPascal } from "@jns42/core";
+import { toPascal } from "@jns42/jns42-core";
 import * as models from "../models/index.js";
 import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
@@ -14,7 +14,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = toPascal(names[nodeId]);
+    const typeName = toPascal([names[nodeId]]);
     const definition = generateTypeDefinition(itemKey);
 
     yield itt`
@@ -28,7 +28,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     if (item.id == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      const typeName = toPascal(names[item.id]);
+      const typeName = toPascal([names[item.id]]);
       yield typeName;
     }
   }

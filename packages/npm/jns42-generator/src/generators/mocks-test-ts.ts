@@ -1,4 +1,4 @@
-import { toCamel } from "@jns42/core";
+import { toCamel } from "@jns42/jns42-core";
 import * as models from "../models/index.js";
 import { banner, generateJsDocComments, itt } from "../utils/index.js";
 
@@ -26,8 +26,8 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     }
 
     const typeName = names[nodeId];
-    const validatorFunctionName = toCamel("is", names[nodeId]);
-    const mockFunctionName = toCamel("mock", names[nodeId]);
+    const validatorFunctionName = toCamel(["is", names[nodeId]]);
+    const mockFunctionName = toCamel(["mock", names[nodeId]]);
 
     yield itt`
       ${generateJsDocComments(item)}

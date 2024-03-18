@@ -2,7 +2,7 @@ SHELL:=$(PREFIX)/bin/sh
 
 build: \
 	generated/npm \
-	# generated/cargo \
+	generated/cargo \
 
 rebuild: \
 	clean build
@@ -12,6 +12,7 @@ clean: \
 	rm -rf generated
 
 generated/npm: \
+	generated/npm/jns42-core \
 	generated/npm/schema-intermediate \
 	generated/npm/schema-draft-04 \
 	generated/npm/schema-draft-2020-12 \
@@ -33,10 +34,10 @@ generated/npm/jns42-core: \
 
 	~/.cargo/bin/wasm-pack \
 		build $< \
-		--scope @jns42 \
+		--scope jns42 \
 		--target nodejs \
 		--out-dir $(PWD)/$@ \
-		--out-name core-wasm \
+		--out-name main \
 		
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir -p $(@D)

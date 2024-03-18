@@ -31,17 +31,17 @@ pub fn to_camel(parts: impl IntoIterator<Item = impl ToString>) -> String {
 mod wasm {
   use wasm_bindgen::prelude::*;
 
-  #[wasm_bindgen]
+  #[wasm_bindgen(js_name = "toSnake")]
   pub fn to_snake(parts: Vec<String>) -> String {
     super::to_snake(parts)
   }
 
-  #[wasm_bindgen]
+  #[wasm_bindgen(js_name = "toPascal")]
   pub fn to_pascal(parts: Vec<String>) -> String {
     super::to_pascal(parts)
   }
 
-  #[wasm_bindgen]
+  #[wasm_bindgen(js_name = "toCamel")]
   pub fn to_camel(parts: Vec<String>) -> String {
     super::to_camel(parts)
   }

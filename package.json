@@ -3,7 +3,6 @@
   "packageManager": "npm@10.3.0",
   "workspaces": [
     "generated/npm/*",
-    "packages/cargo/jns42-core",
     "packages/npm/jns42-generator"
   ],
   "scripts": {

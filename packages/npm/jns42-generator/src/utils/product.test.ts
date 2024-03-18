@@ -1,4 +1,4 @@
-import { product } from "@jns42/core";
+import { product } from "@jns42/jns42-core";
 import assert from "assert";
 import test from "node:test";
 
