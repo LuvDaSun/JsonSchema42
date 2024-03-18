@@ -4,6 +4,13 @@ build: \
 	generated/npm \
 	# generated/cargo \
 
+rebuild: \
+	clean build
+
+clean: \
+
+	rm -rf generated
+
 generated/npm: \
 	generated/npm/schema-intermediate \
 	generated/npm/schema-draft-04 \
@@ -21,13 +28,16 @@ generated/npm: \
 generated/cargo: \
 	generated/cargo/schema-intermediate \
 
-rebuild: \
-	clean build
+generated/npm/jns42-core: \
+	packages/cargo/jns42-core \
 
-clean: \
-
-	rm -rf generated
-
+	~/.cargo/bin/wasm-pack \
+		build $< \
+		--scope @jns42 \
+		--target nodejs \
+		--out-dir $(PWD)/$@ \
+		--out-name core-wasm \
+		
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir -p $(@D)
 

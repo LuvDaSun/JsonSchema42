@@ -42,43 +42,16 @@ where
   result
 }
 
-pub(crate) fn neon_register(cx: &mut neon::context::ModuleContext) -> neon::result::NeonResult<()> {
-  use neon::prelude::*;
+// #[cfg(target_arch = "wasm32")]
+mod wasm {
+  use wasm_bindgen::prelude::*;
 
-  fn product_js(mut cx: FunctionContext) -> JsResult<JsArray> {
-    let sets_js: Handle<JsArray> = cx.argument(0)?;
-    let sets_length = sets_js.len(&mut cx) as usize;
-    let mut sets = Vec::with_capacity(sets_length);
-    for index in 0..sets_length {
-      let sub_sets_js: Handle<JsArray> = sets_js.get(&mut cx, index as u32)?;
-      let sub_sets_length = sub_sets_js.len(&mut cx) as usize;
-      let mut sub_sets = Vec::with_capacity(sub_sets_length);
-      for sub_index in 0..sub_sets_length {
-        let value_js: Handle<JsValue> = sub_sets_js.get(&mut cx, sub_index as u32)?;
-        sub_sets.push(value_js)
-      }
-      sets.push(sub_sets);
-    }
-
-    let result = product(sets);
-
-    let result_js = JsArray::new(&mut cx, result.len());
-    for (index, sub_result) in result.into_iter().enumerate() {
-      let sub_result_js = JsArray::new(&mut cx, sub_result.len());
-
-      for (sub_index, item) in sub_result.into_iter().enumerate() {
-        sub_result_js.set(&mut cx, sub_index as u32, item)?;
-      }
-
-      result_js.set(&mut cx, index as u32, sub_result_js)?;
-    }
-
-    Ok(result_js)
+  #[wasm_bindgen]
+  pub fn product(sets: JsValue) -> Result<JsValue, JsValue> {
+    let sets: Vec<Vec<usize>> = serde_wasm_bindgen::from_value(sets)?;
+    let result = super::product(sets);
+    Ok(serde_wasm_bindgen::to_value(&result)?)
   }
-
-  cx.export_function("product", product_js)?;
-
-  Ok(())
 }
 
 #[cfg(test)]
