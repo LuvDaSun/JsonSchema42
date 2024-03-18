@@ -47,10 +47,38 @@ mod wasm {
   use wasm_bindgen::prelude::*;
 
   #[wasm_bindgen]
-  pub fn product(sets: JsValue) -> Result<JsValue, JsValue> {
-    let sets: Vec<Vec<usize>> = serde_wasm_bindgen::from_value(sets)?;
+  pub fn product(sets_js: &JsValue) -> Result<JsValue, JsValue> {
+    let mut sets = Vec::new();
+
+    let Some(sets_js) = sets_js.dyn_ref::<js_sys::Array>() else {
+      return Err(JsValue::from_str("expected array"));
+    };
+    for sets_index in 0..sets_js.length() {
+      let mut sub_sets = Vec::new();
+      let sub_sets_js = sets_js.get(sets_index);
+      let Some(sub_sets_js) = sub_sets_js.dyn_ref::<js_sys::Array>() else {
+        return Err(JsValue::from_str("expected array"));
+      };
+      for sub_sets_index in 0..sub_sets_js.length() {
+        let item = sub_sets_js.get(sub_sets_index);
+
+        sub_sets.push(item);
+      }
+      sets.push(sub_sets);
+    }
+
     let result = super::product(sets);
-    Ok(serde_wasm_bindgen::to_value(&result)?)
+
+    let result_js = js_sys::Array::new();
+    for sub_result in result {
+      let sub_result_js = js_sys::Array::new();
+      for item in sub_result {
+        sub_result_js.push(&item);
+      }
+      result_js.push(&JsValue::from(sub_result_js));
+    }
+
+    Ok(JsValue::from(result_js))
   }
 }
 
