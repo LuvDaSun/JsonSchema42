@@ -1,5 +1,72 @@
 use inflector::Inflector;
 
+pub fn split_name(input: &str) -> Vec<String> {
+  #[derive(Debug, Clone, Copy)]
+  enum CharType {
+    Unknown,
+    Lower,
+    Upper,
+    Number,
+  }
+
+  impl From<char> for CharType {
+    fn from(value: char) -> Self {
+      if value.is_alphabetic() && value.is_uppercase() {
+        return Self::Upper;
+      }
+
+      if value.is_alphabetic() && value.is_lowercase() {
+        return Self::Lower;
+      }
+
+      if value.is_numeric() {
+        return Self::Number;
+      }
+
+      Self::Unknown
+    }
+  }
+
+  let mut parts = Vec::new();
+  let mut buffer = String::new();
+  let mut char_type_last = CharType::Unknown;
+
+  for ch in input.chars() {
+    let char_type: CharType = ch.into();
+
+    match (char_type_last, char_type) {
+      (_, CharType::Unknown) => {
+        if !buffer.is_empty() {
+          parts.push(buffer);
+          buffer = String::new()
+        }
+      }
+      (CharType::Lower, CharType::Upper)
+      | (CharType::Lower, CharType::Number)
+      | (CharType::Number, CharType::Lower)
+      | (CharType::Number, CharType::Upper) => {
+        {
+          if !buffer.is_empty() {
+            parts.push(buffer);
+            buffer = String::new()
+          }
+        }
+        buffer.push(ch);
+      }
+      (_, _) => buffer.push(ch),
+    }
+
+    char_type_last = char_type;
+  }
+
+  if !buffer.is_empty() {
+    parts.push(buffer);
+    buffer = String::new()
+  }
+
+  parts
+}
+
 pub fn to_snake(parts: impl IntoIterator<Item = impl ToString>) -> String {
   parts
     .into_iter()
