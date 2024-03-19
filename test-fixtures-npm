@@ -2,10 +2,11 @@
 
 cd $(dirname $0)
 
+export NODE_ENV=development
+
 npm run build --workspaces --if-present
 npm install --no-package-lock
 
-export NODE_ENV=development
 ERROR=0
 
 for F in $(ls fixtures/testing/*.yaml); do

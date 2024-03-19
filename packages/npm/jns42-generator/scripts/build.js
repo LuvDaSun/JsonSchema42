@@ -3,7 +3,7 @@
 import cp from "child_process";
 import path from "path";
 
-const options = { shell: true, stdio: "inherit" };
+const options = { shell: true, stdio: "inherit", env: process.env };
 
 cp.execFileSync("tsc", [], options);
 
