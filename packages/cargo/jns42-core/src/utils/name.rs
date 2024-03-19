@@ -31,27 +31,26 @@ pub fn split_name(input: &str) -> Vec<String> {
   let mut buffer = String::new();
   let mut char_type_last = CharType::Unknown;
 
+  macro_rules! flush_buffer {
+    () => {
+      if !buffer.is_empty() {
+        parts.push(buffer);
+        buffer = String::new();
+      }
+    };
+  }
+
   for ch in input.chars() {
     let char_type: CharType = ch.into();
 
     match (char_type_last, char_type) {
-      (_, CharType::Unknown) => {
-        if !buffer.is_empty() {
-          parts.push(buffer);
-          buffer = String::new()
-        }
-      }
+      (_, CharType::Unknown) => flush_buffer!(),
       (CharType::Lower, CharType::Upper)
       | (CharType::Lower, CharType::Number)
       | (CharType::Number, CharType::Lower)
       | (CharType::Number, CharType::Upper) => {
-        {
-          if !buffer.is_empty() {
-            parts.push(buffer);
-            buffer = String::new()
-          }
-        }
-        buffer.push(ch);
+        flush_buffer!();
+        buffer.push(ch.to_ascii_lowercase());
       }
       (_, _) => buffer.push(ch),
     }
@@ -59,10 +58,7 @@ pub fn split_name(input: &str) -> Vec<String> {
     char_type_last = char_type;
   }
 
-  if !buffer.is_empty() {
-    parts.push(buffer);
-    buffer = String::new()
-  }
+  flush_buffer!();
 
   parts
 }
@@ -111,5 +107,17 @@ mod wasm {
   #[wasm_bindgen(js_name = "toCamel")]
   pub fn to_camel(parts: Vec<String>) -> String {
     super::to_camel(parts)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_split_name() {
+    let actual = split_name(" a b c dEf");
+    let expected = vec!["a", "b", "c", "d", "ef"];
+    assert_eq!(actual, expected)
   }
 }
