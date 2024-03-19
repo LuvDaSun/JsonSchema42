@@ -1,5 +1,7 @@
 $schema: "./schema.json"
 
+rootTypeName: NestedAllOfOneOf
+
 schemas:
   original:
     allOf:

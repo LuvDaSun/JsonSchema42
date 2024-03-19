@@ -1,5 +1,8 @@
 $schema: "./schema.json"
 
+rootTypeName: Parse
+parse: true
+
 schemas:
   draft_2020-12:
     $schema: "https://json-schema.org/draft/2020-12/schema"
@@ -18,8 +21,6 @@ schemas:
         type: array
         items:
           type: number
-
-parse: true
 
 valid:
   one: "1"
