@@ -27,7 +27,7 @@ pub fn to_camel(parts: impl IntoIterator<Item = impl ToString>) -> String {
     .to_camel_case()
 }
 
-// #[cfg(target_arch = "wasm32")]
+#[cfg(target_arch = "wasm32")]
 mod wasm {
   use wasm_bindgen::prelude::*;
 
