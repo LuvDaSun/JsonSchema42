@@ -31,6 +31,12 @@ impl<'s> Ord for PartInfo<'s> {
       _ => {}
     };
 
+    // match self.value.len().cmp(&other.value.len()) {
+    //   Ordering::Less => return Ordering::Less,
+    //   Ordering::Greater => return Ordering::Greater,
+    //   _ => {}
+    // };
+
     match self.index.cmp(&other.index) {
       Ordering::Less => return Ordering::Less,
       Ordering::Greater => return Ordering::Greater,
@@ -345,6 +351,63 @@ mod tests {
       (1, vec!["cat".to_string(), "id".to_string()]),
       (2, vec!["dog".to_string(), "id".to_string()]),
       (3, vec!["goat".to_string(), "id".to_string()]),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = optimize_names(
+      [
+        (1, vec!["a"]),
+        (2, vec!["a", "b"]),
+        (3, vec!["a", "b", "c"]),
+      ],
+      5,
+    )
+    .into_iter()
+    .collect();
+    let expected: BTreeSet<_> = [
+      (1, vec!["a".to_string()]),
+      (2, vec!["b".to_string()]),
+      (3, vec!["c".to_string()]),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = optimize_names(
+      [
+        (1, vec!["a"]),
+        (2, vec!["b", "a"]),
+        (3, vec!["c", "b", "a"]),
+      ],
+      5,
+    )
+    .into_iter()
+    .collect();
+    let expected: BTreeSet<_> = [
+      (1, vec!["a".to_string()]),
+      (2, vec!["b".to_string(), "a".to_string()]),
+      (3, vec!["c".to_string(), "a".to_string()]),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = optimize_names(
+      [
+        (1, vec!["a", "b", "c"]),
+        (2, vec!["b", "c", "a"]),
+        (3, vec!["c", "a", "b"]),
+      ],
+      5,
+    )
+    .into_iter()
+    .collect();
+    let expected: BTreeSet<_> = [
+      (1, vec!["c".to_string()]),
+      (2, vec!["a".to_string()]),
+      (3, vec!["b".to_string()]),
     ]
     .into_iter()
     .collect();
