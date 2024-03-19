@@ -38,9 +38,6 @@ generated/npm/jns42-core: \
 		--target nodejs \
 		--out-dir $(PWD)/$@ \
 		--out-name main \
-		--no-typescript \
-
-	cp $</*.d.ts $@/
 
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir -p $(@D)
