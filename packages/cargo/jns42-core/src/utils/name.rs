@@ -46,13 +46,14 @@ pub fn split_name(input: &str) -> Vec<String> {
     match (char_type_last, char_type) {
       (_, CharType::Unknown) => flush_buffer!(),
       (CharType::Lower, CharType::Upper)
+      | (CharType::Upper, CharType::Number)
       | (CharType::Lower, CharType::Number)
-      | (CharType::Number, CharType::Lower)
-      | (CharType::Number, CharType::Upper) => {
+      | (CharType::Number, CharType::Upper)
+      | (CharType::Number, CharType::Lower) => {
         flush_buffer!();
         buffer.push(ch.to_ascii_lowercase());
       }
-      (_, _) => buffer.push(ch),
+      (_, _) => buffer.push(ch.to_ascii_lowercase()),
     }
 
     char_type_last = char_type;
@@ -116,8 +117,8 @@ mod tests {
 
   #[test]
   fn test_split_name() {
-    let actual = split_name(" a b c dEf");
-    let expected = vec!["a", "b", "c", "d", "ef"];
+    let actual = split_name(" a b c dEf - 123abcDEF456");
+    let expected = vec!["a", "b", "c", "d", "ef", "123", "abc", "def", "456"];
     assert_eq!(actual, expected)
   }
 }
