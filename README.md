@@ -6,6 +6,8 @@ Because JsonSchema is the answer to everything!
 
 First, install dependencies via `npm install`.
 
+Install `wasm-pack` via `cargo install wasm-pack`.
+
 ## Building
 
 You might want to build The project via `npm --workspaces run build`. This is automatically done before testing and packaging.
