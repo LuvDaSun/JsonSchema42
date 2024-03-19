@@ -1,8 +1,5 @@
-use crate::{
-  documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument},
-  models::intermediate::IntermediateNode,
-  utils::url::UrlWithPointer,
-};
+use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
+use jns42_core::{models::intermediate::IntermediateNode, utils::url::UrlWithPointer};
 
 pub struct Document {}
 

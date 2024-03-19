@@ -599,7 +599,15 @@ name = "jns42-core"
 version = "0.1.0"
 dependencies = [
  "Inflector",
+ "im",
  "js-sys",
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "serde",
+ "serde_json",
+ "url",
  "wasm-bindgen",
 ]
 

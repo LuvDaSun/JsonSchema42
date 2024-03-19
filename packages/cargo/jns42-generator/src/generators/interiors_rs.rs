@@ -1,5 +1,10 @@
-use crate::models::{schema::SchemaNode, specification::Specification};
-use jns42_core::utils::name::to_snake;
+use jns42_core::{
+  models::{
+    schema::{SchemaNode, SchemaType},
+    specification::Specification,
+  },
+  utils::name::to_snake,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};
 use std::{collections::HashSet, error::Error};
@@ -60,42 +65,42 @@ fn generate_type_token_stream(
     if types.len() == 1 {
       let r#type = types.first().unwrap();
       match r#type {
-        crate::models::schema::SchemaType::Never => {
+        SchemaType::Never => {
           tokens.append_all(quote! {
             pub type #identifier = ();
           });
         }
-        crate::models::schema::SchemaType::Any => {
+        SchemaType::Any => {
           tokens.append_all(quote! {
             pub type #identifier = std::any:Any;
           });
         }
-        crate::models::schema::SchemaType::Null => {
+        SchemaType::Null => {
           tokens.append_all(quote! {
             pub type #identifier = ();
           });
         }
-        crate::models::schema::SchemaType::Boolean => {
+        SchemaType::Boolean => {
           tokens.append_all(quote! {
             pub type #identifier = bool;
           });
         }
-        crate::models::schema::SchemaType::Integer => {
+        SchemaType::Integer => {
           tokens.append_all(quote! {
             pub type #identifier = i64;
           });
         }
-        crate::models::schema::SchemaType::Number => {
+        SchemaType::Number => {
           tokens.append_all(quote! {
             pub type #identifier = f64;
           });
         }
-        crate::models::schema::SchemaType::String => {
+        SchemaType::String => {
           tokens.append_all(quote! {
             pub type #identifier = String;
           });
         }
-        crate::models::schema::SchemaType::Array => {
+        SchemaType::Array => {
           if let Some(tuple_items_keys) = &item.tuple_items {
             let inner_tokens = tuple_items_keys
               .iter()
@@ -124,7 +129,7 @@ fn generate_type_token_stream(
             });
           }
         }
-        crate::models::schema::SchemaType::Object => {
+        SchemaType::Object => {
           if let Some(object_properties_entries) = &item.object_properties {
             let required: HashSet<_> = item
               .required

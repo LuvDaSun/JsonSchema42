@@ -1,4 +1,7 @@
-use crate::models::{schema::SchemaNode, specification::Specification};
+use jns42_core::models::{
+  schema::{SchemaNode, SchemaType},
+  specification::Specification,
+};
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;
@@ -101,10 +104,7 @@ fn generate_type_token_stream(
       if types.len() == 1 {
         let r#type = types.first().unwrap();
         match r#type {
-          crate::models::schema::SchemaType::Boolean
-          | crate::models::schema::SchemaType::Integer
-          | crate::models::schema::SchemaType::Number
-          | crate::models::schema::SchemaType::String => {
+          SchemaType::Boolean | SchemaType::Integer | SchemaType::Number | SchemaType::String => {
             tokens.append_all(quote! {
               impl ToString for #identifier {
                   fn to_string(&self) -> String {

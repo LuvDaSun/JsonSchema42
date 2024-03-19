@@ -1,7 +1,8 @@
 use serde_json::Value;
 
 use super::Node;
-use crate::{models::intermediate::IntermediateType, utils::json_pointer::JsonPointer};
+use jns42_core::models::intermediate::IntermediateType;
+use jns42_core::utils::json_pointer::JsonPointer;
 
 pub trait Selectors {
   fn select_schema(&self) -> Option<&str>;
