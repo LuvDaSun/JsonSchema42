@@ -162,6 +162,83 @@ where
   result
 }
 
+#[cfg(target_arch = "wasm32")]
+mod wasm {
+  use std::collections::HashMap;
+
+  use wasm_bindgen::prelude::*;
+
+  #[wasm_bindgen(js_name = "optimizeNames")]
+  pub fn optimize_names_js(
+    names_js: &JsValue,
+    maximum_iterations: usize,
+  ) -> Result<JsValue, JsValue> {
+    let mut names = HashMap::new();
+
+    let Some(names_js) = names_js.dyn_ref::<js_sys::Array>() else {
+      return Err(JsValue::from_str("expected array"));
+    };
+
+    for names_index in 0..names_js.length() {
+      let tuple_js = names_js.get(names_index);
+      let Some(tuple_js) = tuple_js.dyn_ref::<js_sys::Array>() else {
+        return Err(JsValue::from_str("expected array"));
+      };
+      if tuple_js.length() != 2 {
+        return Err(JsValue::from_str("expected tuple of 2"));
+      }
+
+      let key_js = tuple_js.get(0);
+      let Some(key) = key_js.as_string() else {
+        return Err(JsValue::from_str("could not get as string"));
+      };
+
+      let mut name_parts = Vec::new();
+      let name_parts_js = tuple_js.get(1);
+      let Some(name_parts_js) = name_parts_js.dyn_ref::<js_sys::Array>() else {
+        return Err(JsValue::from_str("expected array"));
+      };
+      for name_parts_index in 0..name_parts_js.length() {
+        let name_part_js = name_parts_js.get(name_parts_index);
+        let name_part = name_part_js.as_string();
+        let Some(name_part) = name_part else {
+          return Err(JsValue::from_str("not a string"));
+        };
+
+        name_parts.push(name_part);
+      }
+
+      if names.insert(key, name_parts).is_some() {
+        return Err(JsValue::from_str("duplicate key"));
+      }
+    }
+
+    let result = super::optimize_names(names, maximum_iterations);
+
+    let result_js = js_sys::Array::new();
+    for (key, name_parts) in result {
+      let key_js = JsValue::from_str(&key);
+
+      let name_parts_js = js_sys::Array::new();
+      for name_part in name_parts {
+        let name_part_js = JsValue::from_str(&name_part);
+        name_parts_js.push(&name_part_js);
+      }
+
+      let tuple_js = js_sys::Array::new();
+      tuple_js.push(&key_js);
+      tuple_js.push(&name_parts_js);
+
+      let tuple_js = JsValue::from(tuple_js);
+      result_js.push(&tuple_js);
+    }
+
+    let result_js = JsValue::from(result_js);
+
+    Ok(result_js)
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

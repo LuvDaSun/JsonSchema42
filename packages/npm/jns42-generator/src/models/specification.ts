@@ -1,6 +1,6 @@
+import * as core from "@jns42/jns42-core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as schemaTransforms from "../schema-transforms/index.js";
-import { Namer } from "../utils/namer.js";
 import { NodeLocation } from "../utils/node-location.js";
 import { SchemaArena } from "./arena.js";
 import { selectSchemaDependencies } from "./selectors.js";
@@ -112,15 +112,21 @@ export function loadSpecification(
 
   // generate names
 
-  const namer = new Namer(defaultTypeName, nameMaximumIterations);
+  const namesInput: Record<string, string[]> = {};
   for (const nodeId in document.schemas) {
     const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
-      .filter((part) => part.length > 0)
-      .join("/");
-    namer.registerPath(nodeId, path);
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer].filter(
+      (part) => part.length > 0,
+    );
+    namesInput[nodeId] = path;
   }
-  const names = namer.getNames();
+  const names = Object.fromEntries(
+    (
+      core.optimizeNames(Object.entries(namesInput), nameMaximumIterations) as Array<
+        [string, string[]]
+      >
+    ).map(([key, parts]) => [key, core.toSnake(parts)] as const),
+  );
 
   return { typesArena, validatorsArena, names };
 }

@@ -75,10 +75,12 @@ mod wasm {
       for item in sub_result {
         sub_result_js.push(&item);
       }
-      result_js.push(&JsValue::from(sub_result_js));
+      let sub_result_js = JsValue::from(sub_result_js);
+      result_js.push(&sub_result_js);
     }
+    let result_js = JsValue::from(result_js);
 
-    Ok(JsValue::from(result_js))
+    Ok(result_js)
   }
 }
 

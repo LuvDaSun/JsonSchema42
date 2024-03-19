@@ -2,7 +2,7 @@
 
 cd $(dirname $0)
 
-npm run build --workspaces
+npm run build --workspaces --if-present
 npm install --no-package-lock
 
 export NODE_ENV=development
