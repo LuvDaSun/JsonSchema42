@@ -111,13 +111,17 @@ export function loadSpecification(
   }
 
   // generate names
+  const isIdentifierRe = /^[a-zA-Z]/gu;
+  const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
 
   const namesInput: Record<string, string[]> = {};
   for (const nodeId in document.schemas) {
     const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer].filter(
-      (part) => part.length > 0,
-    );
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
+      .map((part) => part.replace(nonIdentifierRe, " "))
+      .map((part) => part.trim())
+      .filter((part) => isIdentifierRe.test(part))
+      .filter((part) => part.length > 0);
     namesInput[nodeId] = path;
   }
   const names = Object.fromEntries(
