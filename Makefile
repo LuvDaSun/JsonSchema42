@@ -31,6 +31,10 @@ generated/cargo: \
 
 generated/npm/jns42-core: \
 	packages/cargo/jns42-core \
+	$(wildcard packages/cargo/jns42-core/*) \
+	$(wildcard packages/cargo/jns42-core/src/*.rs) \
+	$(wildcard packages/cargo/jns42-core/src/*/*.rs) \
+	$(wildcard packages/cargo/jns42-core/src/*/*/*.rs) \
 
 	~/.cargo/bin/wasm-pack \
 		build $< \
