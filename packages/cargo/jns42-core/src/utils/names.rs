@@ -5,7 +5,7 @@ use std::{
 
 #[derive(Debug, Default, PartialEq, Eq)]
 struct PartInfo<'s> {
-  value: &'s str,
+  value: Vec<&'s str>,
   index: usize,
   cardinality: usize,
   is_head: bool,
@@ -48,24 +48,29 @@ impl<'s> Ord for PartInfo<'s> {
 }
 
 pub fn optimize_names<'f, K>(
-  names: impl IntoIterator<Item = (K, impl IntoIterator<Item = impl ToString>)>,
+  names: impl IntoIterator<
+    Item = (
+      K,
+      impl IntoIterator<Item = impl IntoIterator<Item = impl AsRef<str>>>,
+    ),
+  >,
   maximum_iterations: usize,
-) -> Vec<(K, Vec<String>)>
+) -> Vec<(K, Vec<Vec<String>>)>
 where
   K: Clone + PartialOrd + Ord + 'f,
 {
-  let names = names
+  let names: Vec<(K, Vec<Vec<&str>>)> = names
     .into_iter()
-    .map(|(key, value)| {
+    .map(|(key, name)| {
       (
         key,
-        value
+        name
           .into_iter()
-          .map(|value| value.to_string())
-          .collect::<Vec<_>>(),
+          .map(|part| part.into_iter().map(|word| word.as_ref()).collect())
+          .collect(),
       )
     })
-    .collect::<Vec<_>>();
+    .collect();
 
   // first we calculate the cardinality of each name-part we use this hashmap to keep
   // count
@@ -83,14 +88,14 @@ where
   // then we create part info's that we can optimize. The key is the original key, then the
   // value is a tuple where the first element is the optimized name and the second part are
   // the ordered part info's. Those are ordered!
-  let mut part_info_map: BTreeMap<_, (Vec<&str>, BTreeSet<_>)> = BTreeMap::new();
+  let mut part_info_map: BTreeMap<_, (Vec<_>, BTreeSet<_>)> = BTreeMap::new();
   for (key, name) in names.iter() {
     let part_info_entry = part_info_map.entry(key.clone()).or_default();
     for (index, part) in name.iter().enumerate() {
       let part_info = PartInfo {
         cardinality: *cardinality_counters.entry(part).or_default(),
         index,
-        value: part,
+        value: part.clone(),
         is_head: index == name.len() - 1,
       };
       part_info_entry.1.insert(part_info);
@@ -101,7 +106,7 @@ where
   // Ideally there is only one element in the vector that is the value. This means that the
   // optimized name references only one original key and that we can use it as a replacement
   // for the original name.
-  let mut optimized_names: HashMap<Vec<_>, BTreeSet<_>> = Default::default();
+  let mut optimized_names: HashMap<Vec<Vec<_>>, BTreeSet<_>> = Default::default();
   // then run the optimization process! we keep on iterating the optimization until we reach the
   // maximum number of iterations, or if there is nothing more to optimize.
 
@@ -255,31 +260,31 @@ mod tests {
       cardinality: 100,
       index: 1,
       is_head: false,
-      value: "A",
+      value: ["A"].into(),
     };
     let part_info_b = PartInfo {
       cardinality: 1,
       index: 2,
       is_head: false,
-      value: "B",
+      value: ["B"].into(),
     };
     let part_info_c = PartInfo {
       cardinality: 100,
       index: 3,
       is_head: false,
-      value: "C",
+      value: ["C"].into(),
     };
     let part_info_d = PartInfo {
       cardinality: 10,
       index: 4,
       is_head: false,
-      value: "D",
+      value: ["D"].into(),
     };
     let part_info_e = PartInfo {
       cardinality: 1000,
       index: 5,
       is_head: true,
-      value: "E",
+      value: ["E"].into(),
     };
 
     let mut actual: Vec<_> = [
@@ -306,32 +311,20 @@ mod tests {
 
   #[test]
   fn test_names() {
-    let actual: BTreeSet<_> = optimize_names([(1, vec!["A"]), (2, vec![""])], 5)
+    let actual: BTreeSet<_> = optimize_names([(1, vec![vec!["A"]]), (2, vec![])], 5)
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [(1, vec!["A".to_string()]), (2, vec!["".to_string()])]
-      .into_iter()
-      .collect();
-    assert_eq!(actual, expected);
-
-    let actual: BTreeSet<_> = optimize_names([(1, vec!["A"]), (2, vec!["B"])], 5)
-      .into_iter()
-      .collect();
-    let expected: BTreeSet<_> = [(1, vec!["A".to_string()]), (2, vec!["B".to_string()])]
+    let expected: BTreeSet<_> = [(1, vec![vec!["A".to_string()]]), (2, vec![vec![]])]
       .into_iter()
       .collect();
     assert_eq!(actual, expected);
 
-    let actual: BTreeSet<_> = optimize_names(
-      [(1, vec!["A"]), (2, vec!["B", "C"]), (3, vec!["B", "D"])],
-      5,
-    )
-    .into_iter()
-    .collect();
+    let actual: BTreeSet<_> = optimize_names([(1, vec![vec!["A"]]), (2, vec![vec!["B"]])], 5)
+      .into_iter()
+      .collect();
     let expected: BTreeSet<_> = [
-      (1, vec!["A".to_string()]),
-      (2, vec!["C".to_string()]),
-      (3, vec!["D".to_string()]),
+      (1, vec![vec!["A".to_string()]]),
+      (2, vec![vec!["B".to_string()]]),
     ]
     .into_iter()
     .collect();
@@ -339,18 +332,18 @@ mod tests {
 
     let actual: BTreeSet<_> = optimize_names(
       [
-        (1, vec!["cat", "properties", "id"]),
-        (2, vec!["dog", "properties", "id"]),
-        (3, vec!["goat", "properties", "id"]),
+        (1, vec![vec!["A"]]),
+        (2, vec![vec!["B"], vec!["C"]]),
+        (3, vec![vec!["B"], vec!["D"]]),
       ],
       5,
     )
     .into_iter()
     .collect();
     let expected: BTreeSet<_> = [
-      (1, vec!["cat".to_string(), "id".to_string()]),
-      (2, vec!["dog".to_string(), "id".to_string()]),
-      (3, vec!["goat".to_string(), "id".to_string()]),
+      (1, vec![vec!["A".to_string()]]),
+      (2, vec![vec!["C".to_string()]]),
+      (3, vec![vec!["D".to_string()]]),
     ]
     .into_iter()
     .collect();
@@ -358,18 +351,18 @@ mod tests {
 
     let actual: BTreeSet<_> = optimize_names(
       [
-        (1, vec!["a"]),
-        (2, vec!["a", "b"]),
-        (3, vec!["a", "b", "c"]),
+        (1, vec![vec!["cat"], vec!["properties"], vec!["id"]]),
+        (2, vec![vec!["dog"], vec!["properties"], vec!["id"]]),
+        (3, vec![vec!["goat"], vec!["properties"], vec!["id"]]),
       ],
       5,
     )
     .into_iter()
     .collect();
     let expected: BTreeSet<_> = [
-      (1, vec!["a".to_string()]),
-      (2, vec!["b".to_string()]),
-      (3, vec!["c".to_string()]),
+      (1, vec![vec!["cat".to_string()], vec!["id".to_string()]]),
+      (2, vec![vec!["dog".to_string()], vec!["id".to_string()]]),
+      (3, vec![vec!["goat".to_string()], vec!["id".to_string()]]),
     ]
     .into_iter()
     .collect();
@@ -377,18 +370,18 @@ mod tests {
 
     let actual: BTreeSet<_> = optimize_names(
       [
-        (1, vec!["a"]),
-        (2, vec!["b", "a"]),
-        (3, vec!["c", "b", "a"]),
+        (1, vec![vec!["a"]]),
+        (2, vec![vec!["a"], vec!["b"]]),
+        (3, vec![vec!["a"], vec!["b"], vec!["c"]]),
       ],
       5,
     )
     .into_iter()
     .collect();
     let expected: BTreeSet<_> = [
-      (1, vec!["a".to_string()]),
-      (2, vec!["b".to_string(), "a".to_string()]),
-      (3, vec!["c".to_string(), "a".to_string()]),
+      (1, vec![vec!["a".to_string()]]),
+      (2, vec![vec!["b".to_string()]]),
+      (3, vec![vec!["c".to_string()]]),
     ]
     .into_iter()
     .collect();
@@ -396,18 +389,37 @@ mod tests {
 
     let actual: BTreeSet<_> = optimize_names(
       [
-        (1, vec!["a", "b", "c"]),
-        (2, vec!["b", "c", "a"]),
-        (3, vec!["c", "a", "b"]),
+        (1, vec![vec!["a"]]),
+        (2, vec![vec!["b"], vec!["a"]]),
+        (3, vec![vec!["c"], vec!["b"], vec!["a"]]),
       ],
       5,
     )
     .into_iter()
     .collect();
     let expected: BTreeSet<_> = [
-      (1, vec!["c".to_string()]),
-      (2, vec!["a".to_string()]),
-      (3, vec!["b".to_string()]),
+      (1, vec![vec!["a".to_string()]]),
+      (2, vec![vec!["b".to_string()], vec!["a".to_string()]]),
+      (3, vec![vec!["c".to_string()], vec!["a".to_string()]]),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = optimize_names(
+      [
+        (1, vec![vec!["a"], vec!["b"], vec!["c"]]),
+        (2, vec![vec!["b"], vec!["c"], vec!["a"]]),
+        (3, vec![vec!["c"], vec!["a"], vec!["b"]]),
+      ],
+      5,
+    )
+    .into_iter()
+    .collect();
+    let expected: BTreeSet<_> = [
+      (1, vec![vec!["c".to_string()]]),
+      (2, vec![vec!["a".to_string()]]),
+      (3, vec![vec!["b".to_string()]]),
     ]
     .into_iter()
     .collect();
