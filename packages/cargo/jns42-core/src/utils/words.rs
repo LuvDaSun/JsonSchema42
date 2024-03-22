@@ -10,12 +10,12 @@ impl Word {
     &self.0
   }
 
-  pub fn as_upper(&self) -> &str {
-    &self.0.to_uppercase()
+  pub fn to_upper(&self) -> String {
+    self.0.to_uppercase()
   }
 
-  pub fn as_pascal(&self) -> &str {
-    &(self.0[0..1].to_uppercase() + &self.0[1..])
+  pub fn to_pascal(&self) -> String {
+    self.0[0..1].to_uppercase() + &self.0[1..]
   }
 
   pub fn from_str(input: &str) -> Vec<Word> {
@@ -64,6 +64,12 @@ impl Word {
   }
 }
 
+impl AsRef<str> for Word {
+  fn as_ref(&self) -> &str {
+    return &self.0;
+  }
+}
+
 #[derive(Debug, Clone, Copy)]
 enum CharType {
   Unknown,
@@ -95,7 +101,7 @@ pub fn to_pascal_case(words: impl IntoIterator<Item = Word>) -> String {
   let mut output = String::new();
 
   for word in words {
-    output.push_str(word.as_pascal());
+    output.push_str(&word.to_pascal());
   }
 
   output
@@ -109,7 +115,7 @@ pub fn to_camel_case(words: impl IntoIterator<Item = Word>) -> String {
     if output.is_empty() {
       output.push_str(word.as_lower());
     } else {
-      output.push_str(word.as_pascal());
+      output.push_str(&word.to_pascal());
     }
   }
 
@@ -140,7 +146,7 @@ pub fn to_screaming_snake_case(words: impl IntoIterator<Item = Word>) -> String 
       output += "_";
     }
 
-    output.push_str(word.as_upper());
+    output.push_str(&word.to_upper());
   }
 
   output
@@ -154,7 +160,7 @@ mod tests {
   fn test_split_words() {
     let actual: Vec<_> = Word::from_str(" a-b c dEf - 123abcDEF456")
       .into_iter()
-      .map(|word| word.as_lower())
+      .map(|word| word.as_ref())
       .collect();
     let expected = vec!["a", "b", "c", "d", "ef", "123", "abc", "def", "456"];
     assert_eq!(actual, expected)
