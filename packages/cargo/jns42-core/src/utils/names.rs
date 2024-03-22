@@ -59,13 +59,9 @@ where
     Self(BTreeMap::new())
   }
 
-  pub fn add(&mut self, key: K, input: impl IntoIterator<Item = impl AsRef<str>>) -> &mut Self {
-    let sentences = input
-      .into_iter()
-      .map(|input| Sentence::new(input.as_ref()))
-      .collect();
-
-    self.0.insert(key, sentences);
+  pub fn add(&mut self, key: K, input: impl AsRef<str>) -> &mut Self {
+    let sentences = self.0.entry(key).or_default();
+    sentences.push(Sentence::new(input.as_ref()));
     self
   }
 
@@ -215,7 +211,7 @@ pub mod ffi {
 
     #[no_mangle]
     pub extern "C" fn add(&mut self, key: usize, input: safer_ffi::string::String) -> &mut Self {
-      self.0.add(key, [input.to_string()]);
+      self.0.add(key, input.to_string());
       self
     }
 
@@ -308,8 +304,8 @@ mod tests {
   #[test]
   fn test_names() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["A"])
-      .add(2, [""])
+      .add(1, "A")
+      .add(2, "")
       .build(5)
       .into_iter()
       .collect();
@@ -319,8 +315,8 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["A"])
-      .add(2, vec!["B"])
+      .add(1, "A")
+      .add(2, "B")
       .build(5)
       .into_iter()
       .collect();
@@ -330,9 +326,11 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["A"])
-      .add(2, ["B", "C"])
-      .add(3, ["B", "D"])
+      .add(1, "A")
+      .add(2, "B")
+      .add(2, "C")
+      .add(3, "B")
+      .add(3, "D")
       .build(5)
       .into_iter()
       .collect();
@@ -346,9 +344,9 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["cat properties id"])
-      .add(2, ["dog properties id"])
-      .add(3, ["goat properties id"])
+      .add(1, "cat properties id")
+      .add(2, "dog properties id")
+      .add(3, "goat properties id")
       .build(5)
       .into_iter()
       .collect();
@@ -362,9 +360,9 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["a"])
-      .add(2, ["a b"])
-      .add(3, ["a b c"])
+      .add(1, "a")
+      .add(2, "a b")
+      .add(3, "a b c")
       .build(5)
       .into_iter()
       .collect();
@@ -378,9 +376,9 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["a"])
-      .add(2, ["b a"])
-      .add(3, ["c b a"])
+      .add(1, "a")
+      .add(2, "b a")
+      .add(3, "c b a")
       .build(5)
       .into_iter()
       .collect();
@@ -394,9 +392,9 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, ["a b c"])
-      .add(2, ["b c a"])
-      .add(3, ["c a b"])
+      .add(1, "a b c")
+      .add(2, "b c a")
+      .add(3, "c a b")
       .build(5)
       .into_iter()
       .collect();
