@@ -196,54 +196,6 @@ impl<K> IntoIterator for Names<K> {
     self.0.into_iter()
   }
 }
-
-pub mod ffi {
-
-  #[repr(C)]
-  pub struct NamesBuilder(Box<super::NamesBuilder<usize>>);
-
-  impl NamesBuilder {
-    #[allow(clippy::new_without_default)]
-    #[no_mangle]
-    pub extern "C" fn new() -> NamesBuilder {
-      super::NamesBuilder::new().into()
-    }
-
-    #[no_mangle]
-    pub extern "C" fn add(&mut self, key: usize, input: safer_ffi::string::String) -> &mut Self {
-      self.0.add(key, input.to_string());
-      self
-    }
-
-    #[no_mangle]
-    pub extern "C" fn build(&self, maximum_iterations: usize) -> Names {
-      Names(Box::new(self.0.build(maximum_iterations)))
-    }
-  }
-
-  impl From<super::NamesBuilder<usize>> for NamesBuilder {
-    fn from(value: super::NamesBuilder<usize>) -> Self {
-      Self(Box::new(value))
-    }
-  }
-
-  #[repr(C)]
-  pub struct Names(Box<super::Names<usize>>);
-
-  impl Names {
-    #[no_mangle]
-    pub extern "C" fn get_name(&self, key: usize) -> crate::utils::sentence::ffi::Sentence {
-      self.0.get_name(&key).clone().into()
-    }
-  }
-
-  impl From<super::Names<usize>> for Names {
-    fn from(value: super::Names<usize>) -> Self {
-      Self(Box::new(value))
-    }
-  }
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;

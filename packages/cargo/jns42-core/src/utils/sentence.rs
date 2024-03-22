@@ -197,39 +197,6 @@ impl FromIterator<Word> for Sentence {
   }
 }
 
-pub mod ffi {
-  #[repr(C)]
-  pub struct Sentence(Box<super::Sentence>);
-
-  impl Sentence {
-    /// ToPascalCase
-    pub fn to_pascal_case(&self) -> safer_ffi::string::String {
-      self.0.to_pascal_case().into()
-    }
-
-    /// toCamelCase
-    pub fn to_camel_case(&self) -> safer_ffi::string::String {
-      self.0.to_camel_case().into()
-    }
-
-    /// to_snake_case
-    pub fn to_snake_case(&self) -> safer_ffi::string::String {
-      self.0.to_snake_case().into()
-    }
-
-    /// TO_SCREAMING_SNAKE_CASE
-    pub fn to_screaming_snake_case(&self) -> safer_ffi::string::String {
-      self.0.to_screaming_snake_case().into()
-    }
-  }
-
-  impl From<super::Sentence> for Sentence {
-    fn from(value: super::Sentence) -> Self {
-      Self(Box::new(value))
-    }
-  }
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;
