@@ -3,7 +3,7 @@ use jns42_core::{
     schema::{SchemaNode, SchemaType},
     specification::Specification,
   },
-  utils::name::to_snake,
+  utils::sentence::Sentence,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};
@@ -139,7 +139,8 @@ fn generate_type_token_stream(
             let inner_tokens = object_properties_entries
               .iter()
               .map(|(member_name, object_properties_key)| {
-                let member_identifier = format_ident!("r#{}", to_snake([member_name]));
+                let member_identifier =
+                  format_ident!("r#{}", Sentence::new(member_name).to_snake_case());
                 let object_properties_identifier =
                   specification.get_type_identifier(object_properties_key);
 
