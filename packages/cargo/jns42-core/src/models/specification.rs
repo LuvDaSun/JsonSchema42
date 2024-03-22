@@ -292,17 +292,20 @@ impl Specification {
     let mut primary_names = NamesBuilder::new();
     let mut secondary_names = NamesBuilder::new();
     for (key, item) in arena.iter().enumerate() {
-      let name = arena.get_name_parts(key).map(|part| {
+      let parts = arena.get_name_parts(key).map(|part| {
         NON_IDENTIFIER_REGEX
           .replace_all(part, " ")
           .into_owned()
           .trim()
           .to_string()
       });
-      if item.primary.unwrap_or_default() {
-        primary_names.add(key, name);
-      } else {
-        secondary_names.add(key, name);
+
+      for part in parts {
+        if item.primary.unwrap_or_default() {
+          primary_names.add(key, part);
+        } else {
+          secondary_names.add(key, part);
+        }
       }
     }
 
