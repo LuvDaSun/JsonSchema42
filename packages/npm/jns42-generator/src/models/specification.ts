@@ -9,6 +9,7 @@ export interface Specification {
   typesArena: SchemaArena;
   validatorsArena: SchemaArena;
   names: core.Names;
+  [Symbol.dispose]: () => void;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -114,8 +115,15 @@ export function loadSpecification(
   const isIdentifierRe = /^[a-zA-Z]/u;
   const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
 
-  const namesInput: Record<string, string[]> = {};
-  for (const nodeId in document.schemas) {
+  using namesBuilder = core.NamesBuilder.new();
+
+  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
+    const { id: nodeId } = item;
+
+    if (nodeId == null) {
+      continue;
+    }
+
     const nodeLocation = NodeLocation.parse(nodeId);
     const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
       .map((part) => core.toSnakeCase(part))
@@ -123,11 +131,20 @@ export function loadSpecification(
       .map((part) => part.trim())
       .filter((part) => isIdentifierRe.test(part))
       .filter((part) => part.length > 0);
-    namesInput[nodeId] = path;
+
+    for (const sentence of path) {
+      namesBuilder.add(itemKey, sentence);
+    }
   }
-  using namesBuilder = core.NamesBuilder.new();
 
   const names = namesBuilder.build(nameMaximumIterations);
 
-  return { typesArena, validatorsArena, names };
+  return {
+    typesArena,
+    validatorsArena,
+    names,
+    [Symbol.dispose]() {
+      names[Symbol.dispose]();
+    },
+  };
 }

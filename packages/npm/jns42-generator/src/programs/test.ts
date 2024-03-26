@@ -204,7 +204,7 @@ async function main(configuration: MainConfiguration) {
 
       const intermediateDocument = context.getIntermediateData();
 
-      const specification = models.loadSpecification(intermediateDocument, {
+      using specification = models.loadSpecification(intermediateDocument, {
         transformMaximumIterations,
         nameMaximumIterations,
         defaultTypeName,
