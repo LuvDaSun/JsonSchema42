@@ -20,7 +20,7 @@ type Pointer = number;
 const wasmBytes = fs.readFileSync(path.join(projectRoot, "bin", "main.wasm"));
 const wasmModule = new WebAssembly.Module(wasmBytes);
 const wasmInstance = new WebAssembly.Instance(wasmModule, {});
-const wasmExports = wasmInstance.exports as unknown as WasmExports;
+export const wasmExports = wasmInstance.exports as unknown as WasmExports;
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {
@@ -56,9 +56,9 @@ interface WasmExports {
 
 //#endregion
 
-//#region ffi
+//#region structures
 
-class PascalString {
+export class PascalString {
   private constructor(private readonly pointer: Pointer) {}
 
   public static fromPointer(pointer: Pointer) {
@@ -104,7 +104,7 @@ class PascalString {
   }
 }
 
-class Out {
+export class Out {
   private constructor(private readonly pointer: Pointer) {}
 
   public static createNullReference() {
