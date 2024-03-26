@@ -1,8 +1,8 @@
 {
-  "name": "jns42-generator",
-  "version": "0.15.7",
+  "name": "@jns42/core",
+  "version": "0.1.0",
   "sideEffects": false,
-  "description": "generate interfaces and validators from a json schema",
+  "description": "core library",
   "type": "module",
   "main": "./bundled/main.cjs",
   "module": "./bundled/main.js",
@@ -16,11 +16,9 @@
   },
   "files": [
     "./types/**",
-    "./bundled/**"
+    "./bundled/**",
+    "./bin/**"
   ],
-  "bin": {
-    "jns42-generator": "bundled/program.js"
-  },
   "scripts": {
     "prepack": "node ./scripts/build.js",
     "pretest": "tsc",
@@ -40,7 +38,7 @@
   "keywords": [
     "json",
     "schema",
-    "generator"
+    "core"
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
@@ -51,23 +49,9 @@
     "@rollup/plugin-replace": "^5.0.5"
   },
   "dependencies": {
-    "@jns42/oas-v3-0": "^0.15.5",
-    "@jns42/oas-v3-1": "^0.15.5",
-    "@jns42/schema-draft-04": "^0.15.5",
-    "@jns42/schema-draft-2020-12": "^0.15.5",
-    "@jns42/schema-intermediate": "^0.15.5",
-    "@jns42/schema-oas-v3-1": "^0.15.5",
-    "@jns42/swagger-v2": "^0.15.5",
-    "@jns42/core": "^0.1.0",
     "@types/node": "^20.11.25",
-    "@types/yargs": "^17.0.32",
-    "entities": "^4.5.0",
-    "hash.js": "^1.1.7",
-    "immutable": "^5.0.0-beta.5",
     "tslib": "^2.6.2",
-    "type-fest": "^4.9.0",
-    "yaml": "^2.4.1",
-    "yargs": "^17.7.2"
+    "type-fest": "^4.9.0"
   },
   "engines": {
     "node": ">=18"

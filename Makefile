@@ -1,6 +1,7 @@
 SHELL:=$(PREFIX)/bin/sh
 
 build: \
+	packages/npm/jns42-core/bin/main.wasm \
 	generated/npm \
 	generated/cargo \
 
@@ -10,6 +11,28 @@ rebuild: \
 clean: \
 
 	rm -rf generated
+
+target/wasm32-unknown-unknown/release/jns42_core.wasm: \
+	packages/cargo/jns42-core \
+	$(wildcard packages/cargo/jns42-core/Cargo.toml) \
+	$(wildcard packages/cargo/jns42-core/src/*.rs) \
+	$(wildcard packages/cargo/jns42-core/src/*/*.rs) \
+	$(wildcard packages/cargo/jns42-core/src/*/*/*.rs) \
+	Cargo.lock \
+
+	cargo \
+		build \
+		--package jns42-core \
+		--target wasm32-unknown-unknown \
+		--release \
+
+
+packages/npm/jns42-core/bin/main.wasm: \
+	target/wasm32-unknown-unknown/release/jns42_core.wasm \
+
+	@mkdir -p $(@D)
+	cp $< $@
+
 
 generated/npm: \
 	generated/npm/jns42-core \

@@ -17,6 +17,7 @@ transpiled/
 types/
 bundled/
 out/
+bin/
 
 generated/
 logs/

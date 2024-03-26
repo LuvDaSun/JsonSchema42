@@ -13,6 +13,10 @@
       "path": "packages/npm/jns42-generator",
     },
     {
+      "name": "npm/jns42-core",
+      "path": "packages/npm/jns42-core",
+    },
+    {
       "name": "cargo/jns42-generator",
       "path": "packages/cargo/jns42-generator",
     },

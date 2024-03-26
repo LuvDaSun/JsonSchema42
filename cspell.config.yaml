@@ -6,6 +6,7 @@ words:
   - camelcase
   - cdylib
   - clippy
+  - dealloc
   - Deque
   - endregion
   - esbenp
@@ -15,6 +16,7 @@ words:
   - luvdasun
   - notdir
   - presolved
+  - realloc
   - repr
   - reqwest
   - rlib
