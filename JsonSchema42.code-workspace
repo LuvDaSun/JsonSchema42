@@ -42,7 +42,6 @@
     "[toml]": {
       "editor.defaultFormatter": "tamasfe.even-better-toml",
     },
-    "rust-analyzer.linkedProjects": ["./Cargo.toml"],
   },
   "extensions": {
     "recommendations": [

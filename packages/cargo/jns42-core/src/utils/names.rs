@@ -131,7 +131,7 @@ where
           let (optimized_name, parts) = part_map.get_mut(key).unwrap();
           let part = parts.pop_first();
           if let Some(part) = part {
-            *optimized_name = optimized_name.join(&part.value);
+            *optimized_name = part.value.join(optimized_name);
           }
         }
       }
@@ -303,9 +303,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("dog id")),
-      (3, Sentence::new("goat id")),
+      (1, Sentence::new("cat properties id")),
+      (2, Sentence::new("dog properties id")),
+      (3, Sentence::new("goat properties id")),
     ]
     .into_iter()
     .collect();
@@ -320,8 +320,8 @@ mod tests {
       .collect();
     let expected: BTreeSet<_> = [
       (1, Sentence::new("a")),
-      (2, Sentence::new("b")),
-      (3, Sentence::new("c")),
+      (2, Sentence::new("a b")),
+      (3, Sentence::new("a b c")),
     ]
     .into_iter()
     .collect();
@@ -337,7 +337,7 @@ mod tests {
     let expected: BTreeSet<_> = [
       (1, Sentence::new("a")),
       (2, Sentence::new("b a")),
-      (3, Sentence::new("c a")),
+      (3, Sentence::new("c b a")),
     ]
     .into_iter()
     .collect();
@@ -351,9 +351,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("c")),
-      (2, Sentence::new("a")),
-      (3, Sentence::new("b")),
+      (1, Sentence::new("a b c")),
+      (2, Sentence::new("b c a")),
+      (3, Sentence::new("c a b")),
     ]
     .into_iter()
     .collect();

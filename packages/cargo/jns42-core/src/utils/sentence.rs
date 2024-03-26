@@ -212,28 +212,28 @@ mod tests {
   #[test]
   fn test_to_pascal_case() {
     let actual = Sentence::new("   Aa  bc dE_f    ").to_pascal_case();
-    let expected = "AbCdEf";
+    let expected = "AaBcDEF";
     assert_eq!(actual, expected)
   }
 
   #[test]
   fn test_to_camel_case() {
     let actual = Sentence::new("   Aa  bc dE_f    ").to_camel_case();
-    let expected = "abCdEf";
+    let expected = "aaBcDEF";
     assert_eq!(actual, expected)
   }
 
   #[test]
   fn test_to_snake_case() {
     let actual = Sentence::new("   Aa  bc dE_f    ").to_snake_case();
-    let expected = "ab_cd_ef";
+    let expected = "aa_bc_d_e_f";
     assert_eq!(actual, expected)
   }
 
   #[test]
   fn test_to_screaming_snake_case() {
     let actual = Sentence::new("   Aa  bc dE_f    ").to_screaming_snake_case();
-    let expected = "AB_CD_EF";
+    let expected = "AA_BC_D_E_F";
     assert_eq!(actual, expected)
   }
 }
