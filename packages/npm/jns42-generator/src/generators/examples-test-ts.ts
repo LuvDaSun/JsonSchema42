@@ -1,4 +1,4 @@
-import { toCamelCase } from "@jns42/core";
+import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { banner, itt, mapIterable } from "../utils/index.js";
 
@@ -20,8 +20,9 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
-    const typeName = names.toPascalCase(key);
-    const validatorFunctionName = toCamelCase(`is ${typeName}`);
+    const typeIdentifier = names.toSnakeCase(key);
+    const typeName = toPascalCase(typeIdentifier);
+    const validatorFunctionName = toCamelCase(`is ${typeIdentifier}`);
 
     yield mapIterable(
       item.examples ?? [],

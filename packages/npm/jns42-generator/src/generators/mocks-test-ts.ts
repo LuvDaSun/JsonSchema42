@@ -1,4 +1,4 @@
-import { toCamelCase } from "@jns42/core";
+import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { banner, generateJsDocComments, itt } from "../utils/index.js";
 
@@ -25,9 +25,10 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.toPascalCase(key);
-    const validatorFunctionName = toCamelCase(`is ${typeName}`);
-    const mockFunctionName = toCamelCase(`mock ${typeName}`);
+    const typeIdentifier = names.toSnakeCase(key);
+    const typeName = toPascalCase(typeIdentifier);
+    const validatorFunctionName = toCamelCase(`is ${typeIdentifier}`);
+    const mockFunctionName = toCamelCase(`mock ${typeIdentifier}`);
 
     yield itt`
       ${generateJsDocComments(item)}
