@@ -22,7 +22,7 @@ const textDecoder = new TextDecoder("utf-8", {
 let memoryUint8Cache: Uint8Array;
 function getMemoryUint8() {
   // if not defined or detached. For some reason the array automatically detaches.
-  if (memoryUint8Cache == null || memoryUint8Cache.byteLength === 0) {
+  if (memoryUint8Cache == null || memoryUint8Cache.buffer.byteLength === 0) {
     memoryUint8Cache = new Uint8Array(wasmExports.memory.buffer);
   }
   return memoryUint8Cache;
@@ -31,7 +31,7 @@ function getMemoryUint8() {
 let memoryViewCache: DataView;
 function getMemoryView() {
   // if not defined or detached. For some reason the view automatically detaches
-  if (memoryViewCache == null || memoryViewCache.byteLength === 0) {
+  if (memoryViewCache == null || memoryViewCache.buffer.byteLength === 0) {
     memoryViewCache = new DataView(wasmExports.memory.buffer);
   }
   return memoryViewCache;
