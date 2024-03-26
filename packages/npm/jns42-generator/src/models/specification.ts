@@ -1,7 +1,8 @@
 import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import assert from "assert";
 import * as schemaTransforms from "../schema-transforms/index.js";
-import { NodeLocation } from "../utils/node-location.js";
+import { NodeLocation } from "../utils/index.js";
 import { SchemaArena } from "./arena.js";
 import { selectSchemaDependencies } from "./selectors.js";
 
@@ -27,6 +28,25 @@ export function loadSpecification(
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
   const validatorsArena = new SchemaArena(typesArena);
+
+  // generate names
+
+  using namesBuilder = core.NamesBuilder.new();
+
+  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
+    const { id: nodeId } = item;
+
+    assert(nodeId != null);
+
+    const nodeLocation = NodeLocation.parse(nodeId);
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer];
+
+    for (const sentence of path) {
+      namesBuilder.add(itemKey, sentence);
+    }
+  }
+
+  const names = namesBuilder.build(nameMaximumIterations);
 
   // transform the validatorsArena
   {
@@ -110,27 +130,6 @@ export function loadSpecification(
       usedKeys.add(key);
     }
   }
-
-  // generate names
-
-  using namesBuilder = core.NamesBuilder.new();
-
-  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
-
-    const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer];
-
-    for (const sentence of path) {
-      namesBuilder.add(itemKey, sentence);
-    }
-  }
-
-  const names = namesBuilder.build(nameMaximumIterations);
 
   return {
     typesArena,
