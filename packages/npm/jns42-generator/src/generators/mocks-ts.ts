@@ -1,4 +1,4 @@
-import { toCamelCase, toPascalCase } from "@jns42/core";
+import { toCamelCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
@@ -57,8 +57,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = toPascalCase([names[nodeId]].join(" "));
-    const functionName = toCamelCase(["mock", names[nodeId]].join(" "));
+    const typeName = names.toPascalCase(itemKey);
+    const functionName = toCamelCase(`mock ${typeName}`);
     const definition = generateMockDefinition(itemKey);
 
     yield itt`
@@ -103,10 +103,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
+    const typeName = names.toPascalCase(itemKey);
     if (item.id == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
-      const functionName = toCamelCase(["mock", names[item.id]].join(" "));
+      const functionName = toCamelCase(`mock ${typeName}`);
       yield itt`${functionName}()`;
     }
   }

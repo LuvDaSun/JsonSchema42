@@ -1,5 +1,5 @@
-import { product } from "@jns42/core";
 import { SchemaTransform } from "../models/index.js";
+import { product } from "../utils/index.js";
 
 /**
  * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform

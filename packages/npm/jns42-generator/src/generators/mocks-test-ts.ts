@@ -25,9 +25,9 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names[nodeId];
-    const validatorFunctionName = toCamelCase(["is", names[nodeId]].join(" "));
-    const mockFunctionName = toCamelCase(["mock", names[nodeId]].join(" "));
+    const typeName = names.toPascalCase(key);
+    const validatorFunctionName = toCamelCase(`is ${typeName}`);
+    const mockFunctionName = toCamelCase(`mock ${typeName}`);
 
     yield itt`
       ${generateJsDocComments(item)}

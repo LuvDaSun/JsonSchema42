@@ -8,7 +8,7 @@ import { selectSchemaDependencies } from "./selectors.js";
 export interface Specification {
   typesArena: SchemaArena;
   validatorsArena: SchemaArena;
-  names: Record<string, string>;
+  names: core.Names;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -125,13 +125,9 @@ export function loadSpecification(
       .filter((part) => part.length > 0);
     namesInput[nodeId] = path;
   }
-  const names = Object.fromEntries(
-    (
-      core.optimizeNames(Object.entries(namesInput), nameMaximumIterations) as Array<
-        [string, string[]]
-      >
-    ).map(([key, parts]) => [key, core.toSnakeCase(parts.join(" "))] as const),
-  );
+  using namesBuilder = core.NamesBuilder.new();
+
+  const names = namesBuilder.build(nameMaximumIterations);
 
   return { typesArena, validatorsArena, names };
 }

@@ -1,4 +1,4 @@
-import { toCamelCase, toPascalCase } from "@jns42/core";
+import { toCamelCase } from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
@@ -86,8 +86,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = toPascalCase([names[nodeId]].join(" "));
-    const functionName = toCamelCase(["is", names[nodeId]].join(" "));
+    const typeName = names.toPascalCase(itemKey);
+    const functionName = toCamelCase(`is ${typeName}`);
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
@@ -122,7 +122,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         })(${valueExpression})
       `;
     } else {
-      const functionName = toCamelCase(["is", names[typeItem.id]].join(" "));
+      const typeName = names.toPascalCase(typeKey);
+      const functionName = toCamelCase(`is ${typeName}`);
       yield itt`${functionName}(${valueExpression})`;
     }
   }

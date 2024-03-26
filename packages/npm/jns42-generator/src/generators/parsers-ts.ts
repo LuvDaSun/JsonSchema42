@@ -30,7 +30,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
       continue;
     }
 
-    const functionName = toCamelCase(["parse", names[nodeId]].join(" "));
+    const typeName = names.toPascalCase(itemKey);
+    const functionName = toCamelCase(`parse ${typeName}`);
     const definition = generateParserDefinition(itemKey, "value");
 
     yield itt`
@@ -54,7 +55,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
     if (item.id == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
-      const functionName = toCamelCase(["parse", names[item.id]].join(" "));
+      const typeName = names.toPascalCase(itemKey);
+      const functionName = toCamelCase(`parse ${typeName}`);
       yield itt`${functionName}(${valueExpression}, configuration)`;
     }
   }

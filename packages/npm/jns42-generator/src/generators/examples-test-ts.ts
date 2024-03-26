@@ -13,15 +13,15 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     import * as validators from "./validators.js";
   `;
 
-  for (const [itemKey, item] of Object.entries(typesArena)) {
+  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    const typeName = names[nodeId];
-    const validatorFunctionName = toCamelCase(["is", names[nodeId]].join(" "));
+    const typeName = names.toPascalCase(key);
+    const validatorFunctionName = toCamelCase(`is ${typeName}`);
 
     yield mapIterable(
       item.examples ?? [],
