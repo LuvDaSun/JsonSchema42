@@ -1,163 +1,131 @@
-// use crate::utils::names::{Names, NamesBuilder};
+use crate::utils::names::{Names, NamesBuilder};
 
-// /// Create a new NamesBuilder instance
-// #[no_mangle]
-// pub extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
-//   Box::into_raw(Box::new(NamesBuilder::new()))
-// }
+/// Create a new NamesBuilder instance
+#[no_mangle]
+pub extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
+  let names_builder = NamesBuilder::new();
+  let names_builder = Box::new(names_builder);
+  Box::into_raw(names_builder)
+}
 
-// /// # Safety
-// /// Please only pass pointers to NamesBuilder instances!
-// /// and pass valid cstr pointers
-// #[no_mangle]
-// pub extern "C" fn names_builder_add(
-//   ptr: *mut NamesBuilder<usize>,
-//   key: usize,
-//   input: *const std::ffi::c_char,
-// ) {
-//   let names_builder = unsafe {
-//     assert!(!ptr.is_null());
-//     &mut *ptr
-//   };
-//   let input = unsafe {
-//     assert!(!input.is_null());
-//     std::ffi::CStr::from_ptr(input)
-//   };
+/// # Safety
+/// Please only pass pointers to NamesBuilder instances!
+/// and pass valid cstr pointers
+#[no_mangle]
+pub extern "C" fn names_builder_add(
+  names_builder: *mut NamesBuilder<usize>,
+  key: usize,
+  value: *const PascalString,
+) {
+  assert!(!names_builder.is_null());
+  assert!(!value.is_null());
 
-//   let input = input.to_str().unwrap();
+  let names_builder = unsafe { &mut *names_builder };
+  let value = unsafe { &*value };
+  let value = value.as_str();
 
-//   names_builder.add(key, input);
-// }
+  names_builder.add(key, value);
+}
 
-// /// # Safety
-// /// Please only pass pointers to NamesBuilder instances!
-// /// and pass valid cstr pointers
-// #[no_mangle]
-// pub extern "C" fn names_builder_build(
-//   ptr: *mut NamesBuilder<usize>,
-//   maximum_iterations: usize,
-// ) -> *mut Names<usize> {
-//   let names_builder = unsafe {
-//     assert!(!ptr.is_null());
-//     &mut *ptr
-//   };
+/// # Safety
+/// Please only pass pointers to NamesBuilder instances!
+/// and pass valid cstr pointers
+#[no_mangle]
+pub extern "C" fn names_builder_build(
+  names_builder: *mut NamesBuilder<usize>,
+  maximum_iterations: usize,
+) -> *mut Names<usize> {
+  let names_builder = unsafe {
+    assert!(!names_builder.is_null());
+    &mut *names_builder
+  };
 
-//   let names = names_builder.build(maximum_iterations);
+  let names = names_builder.build(maximum_iterations);
+  let names = Box::new(names);
+  Box::into_raw(names)
+}
 
-//   Box::into_raw(Box::new(names))
-// }
+#[no_mangle]
+pub extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *const PascalString {
+  assert!(!names.is_null());
+  let names = unsafe { &mut *names };
 
-// /// Gets a name in camel case
-// ///
-// /// # Safety
-// /// Please only pass pointers to Names instances!
-// #[no_mangle]
-// pub extern "C" fn names_to_camel_case(ptr: *mut Names<usize>, key: usize) -> *mut std::ffi::c_char {
-//   let names = unsafe {
-//     assert!(!ptr.is_null());
-//     &mut *ptr
-//   };
+  let sentence = names.get_name(&key).clone();
+  let result = sentence.to_camel_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
 
-//   let sentence = names.get_name(&key).clone();
-//   let result = sentence.to_camel_case();
-//   let result = std::ffi::CString::new(result).unwrap();
-//   result.into_raw()
-// }
+#[no_mangle]
+pub extern "C" fn names_to_pascal_case(
+  names: *mut Names<usize>,
+  key: usize,
+) -> *const PascalString {
+  assert!(!names.is_null());
+  let names = unsafe { &mut *names };
 
-// /// Gets a name in pascal case
-// ///
-// /// # Safety
-// /// Please only pass pointers to Names instances!
-// #[no_mangle]
-// pub extern "C" fn names_to_pascal_case(
-//   ptr: *mut Names<usize>,
-//   key: usize,
-// ) -> *mut std::ffi::c_char {
-//   let names = unsafe {
-//     assert!(!ptr.is_null());
-//     &mut *ptr
-//   };
+  let sentence = names.get_name(&key).clone();
+  let result = sentence.to_pascal_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
 
-//   let sentence = names.get_name(&key).clone();
-//   let result = sentence.to_pascal_case();
-//   let result = std::ffi::CString::new(result).unwrap();
-//   result.into_raw()
-// }
+#[no_mangle]
+pub extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *const PascalString {
+  assert!(!names.is_null());
+  let names = unsafe { &mut *names };
 
-// /// Gets a name in snake case
-// ///
-// /// # Safety
-// /// Please only pass pointers to Names instances!
-// #[no_mangle]
-// pub extern "C" fn names_to_snake_case(ptr: *mut Names<usize>, key: usize) -> *mut std::ffi::c_char {
-//   let names = unsafe {
-//     assert!(!ptr.is_null());
-//     &mut *ptr
-//   };
+  let sentence = names.get_name(&key).clone();
+  let result = sentence.to_snake_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
 
-//   let sentence = names.get_name(&key).clone();
-//   let result = sentence.to_snake_case();
-//   let result = std::ffi::CString::new(result).unwrap();
-//   result.into_raw()
-// }
+#[no_mangle]
+pub extern "C" fn names_to_screaming_snake_case(
+  names: *mut Names<usize>,
+  key: usize,
+) -> *const PascalString {
+  assert!(!names.is_null());
+  let names = unsafe { &mut *names };
 
-// /// Gets a name in screaming snake case
-// ///
-// /// # Safety
-// /// Please only pass pointers to Names instances!
-// #[no_mangle]
-// pub extern "C" fn names_to_screaming_snake_case(
-//   ptr: *mut Names<usize>,
-//   key: usize,
-// ) -> *mut std::ffi::c_char {
-//   let names = unsafe {
-//     assert!(!ptr.is_null());
-//     &mut *ptr
-//   };
+  let sentence = names.get_name(&key).clone();
+  let result = sentence.to_screaming_snake_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
 
-//   let sentence = names.get_name(&key).clone();
-//   let result = sentence.to_screaming_snake_case();
-//   let result = std::ffi::CString::new(result).unwrap();
-//   result.into_raw()
-// }
+/// Free NamesBuilder instance
+///
+/// # Safety
+/// Please only pass pointers to NamesBuilder instances!
+#[no_mangle]
+pub extern "C" fn names_builder_free(names_builder: *mut NamesBuilder<usize>) {
+  if names_builder.is_null() {
+    return;
+  }
+  unsafe {
+    let _ = Box::from_raw(names_builder);
+  }
+}
 
-// /// Free NamesBuilder instance
-// ///
-// /// # Safety
-// /// Please only pass pointers to NamesBuilder instances!
-// #[no_mangle]
-// pub extern "C" fn names_builder_free(ptr: *mut NamesBuilder<usize>) {
-//   if ptr.is_null() {
-//     return;
-//   }
-//   unsafe {
-//     let _ = Box::from_raw(ptr);
-//   }
-// }
-
-// /// Free Names instance
-// ///
-// /// # Safety
-// /// Please only pass pointers to Names instances!
-// #[no_mangle]
-// pub extern "C" fn names_free(ptr: *mut Names<usize>) {
-//   if ptr.is_null() {
-//     return;
-//   }
-//   unsafe {
-//     let _ = Box::from_raw(ptr);
-//   }
-// }
-
-// #[no_mangle]
-// pub extern "C" fn string_free(s: *mut std::ffi::c_char) {
-//   unsafe {
-//     if s.is_null() {
-//       return;
-//     }
-//     let _ = std::ffi::CString::from_raw(s);
-//   }
-// }
+/// Free Names instance
+///
+/// # Safety
+/// Please only pass pointers to Names instances!
+#[no_mangle]
+pub extern "C" fn names_free(names: *mut Names<usize>) {
+  if names.is_null() {
+    return;
+  }
+  unsafe {
+    let _ = Box::from_raw(names);
+  }
+}
 
 #[no_mangle]
 extern "C" fn reverse(value: *const PascalString, result_out: *mut Out<PascalString>) {
@@ -176,7 +144,7 @@ extern "C" fn reverse(value: *const PascalString, result_out: *mut Out<PascalStr
 //#region data
 
 #[repr(C)]
-struct PascalString {
+pub struct PascalString {
   size: usize,
   data: *const u8,
 }
@@ -200,7 +168,7 @@ impl PascalString {
 }
 
 #[repr(C)]
-struct Out<T>(*const T);
+pub struct Out<T>(*const T);
 
 impl<T> Out<T> {
   pub fn set(&mut self, value: *const T) {

@@ -5,8 +5,8 @@ import { projectRoot } from "./root.js";
 
 //#region wasm
 
-type Size = number;
-type Pointer = number;
+export type Size = number;
+export type Pointer = number;
 
 const wasmBytes = fs.readFileSync(path.join(projectRoot, "bin", "main.wasm"));
 const wasmModule = new WebAssembly.Module(wasmBytes);
@@ -43,6 +43,16 @@ interface WasmExports {
   dealloc(pointer: Pointer, size: Size): void;
 
   reverse(value: Pointer, result: Pointer): void;
+
+  names_builder_new(): Pointer;
+  names_builder_add(names_builder: Pointer, key: number, value: Pointer): void;
+  names_builder_free(names_builder: Pointer): void;
+  names_builder_build(names_builder: Pointer, maximum_iterations: number): Pointer;
+  names_to_camel_case(names: Pointer, key: number): Pointer;
+  names_to_pascal_case(names: Pointer, key: number): Pointer;
+  names_to_snake_case(names: Pointer, key: number): Pointer;
+  names_to_screaming_snake_case(names: Pointer, key: number): Pointer;
+  names_free(names: Pointer): void;
 }
 
 //#endregion
