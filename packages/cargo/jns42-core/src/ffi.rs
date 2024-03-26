@@ -237,6 +237,7 @@ pub struct Out<T>(*const T);
 impl<T> Out<T> {
   pub fn set(&mut self, value: *const T) {
     debug_assert!(self.0.is_null());
+
     self.0 = value;
   }
 }
@@ -259,7 +260,7 @@ extern "C" fn alloc(size: usize) -> *const u8 {
 
   let pointer = unsafe { std::alloc::alloc(layout) };
   if pointer.is_null() {
-    panic!("pointer is null")
+    panic!("could not get pointer")
   }
 
   pointer
@@ -268,6 +269,10 @@ extern "C" fn alloc(size: usize) -> *const u8 {
 #[no_mangle]
 extern "C" fn dealloc(pointer: *mut u8, size: usize) {
   if size == 0 {
+    return;
+  }
+
+  if pointer.is_null() {
     return;
   }
 
