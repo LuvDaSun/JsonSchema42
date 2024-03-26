@@ -39,12 +39,6 @@ export function generatePackage(
   }
 
   {
-    const content = specification.names;
-    const filePath = path.join(packageDirectoryPath, "names.json");
-    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
-  }
-
-  {
     const content = document;
     const filePath = path.join(packageDirectoryPath, "intermediate.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
