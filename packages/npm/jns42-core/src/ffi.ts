@@ -78,12 +78,17 @@ export class PascalString {
 
     const dataBytes = textEncoder.encode(value);
     const dataSize = dataBytes.length;
-    const dataPointer = wasmExports.alloc(dataSize);
-    assert(dataPointer > 0);
-    getMemoryUint8().set(dataBytes, dataPointer);
+    if (dataSize > 0) {
+      const dataPointer = wasmExports.alloc(dataSize);
+      assert(dataPointer > 0);
+      getMemoryUint8().set(dataBytes, dataPointer);
 
-    getMemoryView().setInt32(metaPointer + 0 * 4, dataSize, true);
-    getMemoryView().setInt32(metaPointer + 1 * 4, dataPointer, true);
+      getMemoryView().setInt32(metaPointer + 0 * 4, dataSize, true);
+      getMemoryView().setInt32(metaPointer + 1 * 4, dataPointer, true);
+    } else {
+      getMemoryView().setInt32(metaPointer + 0 * 4, 0, true);
+      getMemoryView().setInt32(metaPointer + 1 * 4, 0, true);
+    }
 
     const instance = new PascalString(metaPointer);
     return instance;
@@ -105,7 +110,9 @@ export class PascalString {
   [Symbol.dispose]() {
     const dataSize = getMemoryView().getInt32(this.pointer + 0 * 4, true);
     const dataPointer = getMemoryView().getInt32(this.pointer + 1 * 4, true);
-    wasmExports.dealloc(dataPointer, dataSize);
+    if (dataSize > 0) {
+      wasmExports.dealloc(dataPointer, dataSize);
+    }
     wasmExports.dealloc(this.pointer, 2 * 4);
   }
 }

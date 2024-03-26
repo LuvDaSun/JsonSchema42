@@ -249,7 +249,9 @@ const ALIGN: usize = std::mem::align_of::<usize>();
 
 #[no_mangle]
 extern "C" fn alloc(size: usize) -> *const u8 {
-  debug_assert!(size > 0);
+  if size == 0 {
+    return std::ptr::null();
+  }
 
   let Ok(layout) = std::alloc::Layout::from_size_align(size, ALIGN) else {
     panic!("could not get layout")
@@ -265,7 +267,9 @@ extern "C" fn alloc(size: usize) -> *const u8 {
 
 #[no_mangle]
 extern "C" fn dealloc(pointer: *mut u8, size: usize) {
-  debug_assert!(size > 0);
+  if size == 0 {
+    return;
+  }
 
   let Ok(layout) = std::alloc::Layout::from_size_align(size, ALIGN) else {
     panic!("could not get layout")
