@@ -1,4 +1,4 @@
-import * as core from "@jns42/jns42-core";
+import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as schemaTransforms from "../schema-transforms/index.js";
 import { NodeLocation } from "../utils/node-location.js";
@@ -118,7 +118,7 @@ export function loadSpecification(
   for (const nodeId in document.schemas) {
     const nodeLocation = NodeLocation.parse(nodeId);
     const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
-      .map((part) => core.toSnake([part]))
+      .map((part) => core.toSnakeCase(part))
       .flatMap((part) => part.split(nonIdentifierRe))
       .map((part) => part.trim())
       .filter((part) => isIdentifierRe.test(part))
@@ -130,7 +130,7 @@ export function loadSpecification(
       core.optimizeNames(Object.entries(namesInput), nameMaximumIterations) as Array<
         [string, string[]]
       >
-    ).map(([key, parts]) => [key, core.toSnake(parts)] as const),
+    ).map(([key, parts]) => [key, core.toSnakeCase(parts.join(" "))] as const),
   );
 
   return { typesArena, validatorsArena, names };

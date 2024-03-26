@@ -12,7 +12,8 @@ export class NamesBuilder {
 
   public add(key: number, value: string) {
     using valuePs = PascalString.fromString(value);
-    wasmExports.names_builder_add(this.pointer, key, valuePs.asPointer());
+    const valuePointer = valuePs.asPointer();
+    wasmExports.names_builder_add(this.pointer, key, valuePointer);
     return this;
   }
 
@@ -62,4 +63,40 @@ export class Names {
   [Symbol.dispose]() {
     wasmExports.names_free(this.pointer);
   }
+}
+
+export function toCamelCase(value: string) {
+  using valuePs = PascalString.fromString(value);
+  const valuePointer = valuePs.asPointer();
+  const resultPointer = wasmExports.to_camel_case(valuePointer);
+  using resultPs = PascalString.fromPointer(resultPointer);
+  const result = resultPs.toString();
+  return result;
+}
+
+export function toPascalCase(value: string) {
+  using valuePs = PascalString.fromString(value);
+  const valuePointer = valuePs.asPointer();
+  const resultPointer = wasmExports.to_pascal_case(valuePointer);
+  using resultPs = PascalString.fromPointer(resultPointer);
+  const result = resultPs.toString();
+  return result;
+}
+
+export function toSnakeCase(value: string) {
+  using valuePs = PascalString.fromString(value);
+  const valuePointer = valuePs.asPointer();
+  const resultPointer = wasmExports.to_snake_case(valuePointer);
+  using resultPs = PascalString.fromPointer(resultPointer);
+  const result = resultPs.toString();
+  return result;
+}
+
+export function toScreamingSnakeCase(value: string) {
+  using valuePs = PascalString.fromString(value);
+  const valuePointer = valuePs.asPointer();
+  const resultPointer = wasmExports.to_screaming_snake_case(valuePointer);
+  using resultPs = PascalString.fromPointer(resultPointer);
+  const result = resultPs.toString();
+  return result;
 }

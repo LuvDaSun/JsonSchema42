@@ -1,4 +1,7 @@
-use crate::utils::names::{Names, NamesBuilder};
+use crate::utils::{
+  names::{Names, NamesBuilder},
+  sentence::Sentence,
+};
 
 /// Create a new NamesBuilder instance
 #[no_mangle]
@@ -8,9 +11,7 @@ pub extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
   Box::into_raw(names_builder)
 }
 
-/// # Safety
-/// Please only pass pointers to NamesBuilder instances!
-/// and pass valid cstr pointers
+/// add a sentence to a key
 #[no_mangle]
 pub extern "C" fn names_builder_add(
   names_builder: *mut NamesBuilder<usize>,
@@ -27,27 +28,26 @@ pub extern "C" fn names_builder_add(
   names_builder.add(key, value);
 }
 
-/// # Safety
-/// Please only pass pointers to NamesBuilder instances!
-/// and pass valid cstr pointers
+/// create a names struct from the builder
 #[no_mangle]
 pub extern "C" fn names_builder_build(
   names_builder: *mut NamesBuilder<usize>,
   maximum_iterations: usize,
 ) -> *mut Names<usize> {
-  let names_builder = unsafe {
-    assert!(!names_builder.is_null());
-    &mut *names_builder
-  };
+  assert!(!names_builder.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
 
   let names = names_builder.build(maximum_iterations);
   let names = Box::new(names);
   Box::into_raw(names)
 }
 
+/// get the name as camelCase
 #[no_mangle]
 pub extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *const PascalString {
   assert!(!names.is_null());
+
   let names = unsafe { &mut *names };
 
   let sentence = names.get_name(&key).clone();
@@ -57,42 +57,51 @@ pub extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *
   Box::into_raw(result)
 }
 
+/// get the name as PascalCase
 #[no_mangle]
 pub extern "C" fn names_to_pascal_case(
   names: *mut Names<usize>,
   key: usize,
 ) -> *const PascalString {
   assert!(!names.is_null());
+
   let names = unsafe { &mut *names };
 
   let sentence = names.get_name(&key).clone();
+
   let result = sentence.to_pascal_case();
   let result = PascalString::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
+/// get the name as snake_case
 #[no_mangle]
 pub extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *const PascalString {
   assert!(!names.is_null());
+
   let names = unsafe { &mut *names };
 
   let sentence = names.get_name(&key).clone();
+
   let result = sentence.to_snake_case();
   let result = PascalString::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
+/// get the name as SCREAMING_SNAKE_CASE
 #[no_mangle]
 pub extern "C" fn names_to_screaming_snake_case(
   names: *mut Names<usize>,
   key: usize,
 ) -> *const PascalString {
   assert!(!names.is_null());
+
   let names = unsafe { &mut *names };
 
   let sentence = names.get_name(&key).clone();
+
   let result = sentence.to_screaming_snake_case();
   let result = PascalString::new(result);
   let result = Box::new(result);
@@ -100,28 +109,20 @@ pub extern "C" fn names_to_screaming_snake_case(
 }
 
 /// Free NamesBuilder instance
-///
-/// # Safety
-/// Please only pass pointers to NamesBuilder instances!
 #[no_mangle]
 pub extern "C" fn names_builder_free(names_builder: *mut NamesBuilder<usize>) {
-  if names_builder.is_null() {
-    return;
-  }
+  assert!(!names_builder.is_null());
+
   unsafe {
     let _ = Box::from_raw(names_builder);
   }
 }
 
 /// Free Names instance
-///
-/// # Safety
-/// Please only pass pointers to Names instances!
 #[no_mangle]
 pub extern "C" fn names_free(names: *mut Names<usize>) {
-  if names.is_null() {
-    return;
-  }
+  assert!(!names.is_null());
+
   unsafe {
     let _ = Box::from_raw(names);
   }
@@ -139,6 +140,69 @@ extern "C" fn reverse(value: *const PascalString, result_out: *mut Out<PascalStr
 
   let result_out = unsafe { &mut *result_out };
   result_out.set(Box::into_raw(result));
+}
+
+/// get the name as camelCase
+#[no_mangle]
+pub extern "C" fn to_camel_case(value: *const PascalString) -> *const PascalString {
+  assert!(!value.is_null());
+
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  let sentence = Sentence::new(value);
+  let result = sentence.to_camel_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
+
+/// get the name as PascalCase
+#[no_mangle]
+pub extern "C" fn to_pascal_case(value: *const PascalString) -> *const PascalString {
+  assert!(!value.is_null());
+
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  let sentence = Sentence::new(value);
+
+  let result = sentence.to_pascal_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
+
+/// get the name as snake_case
+#[no_mangle]
+pub extern "C" fn to_snake_case(value: *const PascalString) -> *const PascalString {
+  assert!(!value.is_null());
+
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  let sentence = Sentence::new(value);
+
+  let result = sentence.to_snake_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
+
+/// get the name as SCREAMING_SNAKE_CASE
+#[no_mangle]
+pub extern "C" fn to_screaming_snake_case(value: *const PascalString) -> *const PascalString {
+  assert!(!value.is_null());
+
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  let sentence = Sentence::new(value);
+
+  let result = sentence.to_screaming_snake_case();
+  let result = PascalString::new(result);
+  let result = Box::new(result);
+  Box::into_raw(result)
 }
 
 //#region data

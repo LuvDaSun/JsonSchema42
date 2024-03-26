@@ -1,4 +1,4 @@
-import { toCamel } from "@jns42/jns42-core";
+import { toCamelCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { banner, itt, mapIterable } from "../utils/index.js";
 
@@ -21,7 +21,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     }
 
     const typeName = names[nodeId];
-    const validatorFunctionName = toCamel(["is", names[nodeId]]);
+    const validatorFunctionName = toCamelCase(["is", names[nodeId]].join(" "));
 
     yield mapIterable(
       item.examples ?? [],

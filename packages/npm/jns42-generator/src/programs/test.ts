@@ -1,4 +1,4 @@
-import { toPascal } from "@jns42/jns42-core";
+import { toPascalCase } from "@jns42/core";
 import assert from "assert";
 import cp from "child_process";
 import fs from "node:fs";
@@ -98,7 +98,7 @@ async function main(configuration: MainConfiguration) {
   } = configuration;
 
   const testLocation = NodeLocation.parse(pathToTest);
-  const defaultTypeName = toPascal([defaultName]);
+  const defaultTypeName = toPascalCase(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);

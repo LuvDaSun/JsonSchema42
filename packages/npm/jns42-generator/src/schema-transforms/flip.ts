@@ -1,4 +1,4 @@
-import { product } from "@jns42/jns42-core";
+import { product } from "@jns42/core";
 import { SchemaTransform } from "../models/index.js";
 
 /**

@@ -14,6 +14,7 @@ export * from "./merge.js";
 export * from "./node-location.js";
 export * from "./normalize-object.js";
 export * from "./package.js";
+export * from "./product.js";
 export * from "./properties.js";
 export * from "./read-node.js";
 export * from "./schema.js";
