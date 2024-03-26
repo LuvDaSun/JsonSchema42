@@ -104,10 +104,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
-    const typeIdentifier = names.toSnakeCase(itemKey);
     if (item.id == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
+      const typeIdentifier = names.toSnakeCase(itemKey);
       const functionName = toCamelCase(`mock ${typeIdentifier}`);
       yield itt`${functionName}()`;
     }

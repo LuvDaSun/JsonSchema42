@@ -112,8 +112,6 @@ export function loadSpecification(
   }
 
   // generate names
-  const isIdentifierRe = /^[a-zA-Z]/u;
-  const nonIdentifierRe = /[^a-zA-Z0-9]/gu;
 
   using namesBuilder = core.NamesBuilder.new();
 
@@ -125,12 +123,7 @@ export function loadSpecification(
     }
 
     const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
-      .map((part) => core.toSnakeCase(part))
-      .flatMap((part) => part.split(nonIdentifierRe))
-      .map((part) => part.trim())
-      .filter((part) => isIdentifierRe.test(part))
-      .filter((part) => part.length > 0);
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer];
 
     for (const sentence of path) {
       namesBuilder.add(itemKey, sentence);
