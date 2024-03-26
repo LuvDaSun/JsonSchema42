@@ -21,7 +21,7 @@ const textDecoder = new TextDecoder("utf-8", {
 
 let memoryUint8Cache: Uint8Array;
 function getMemoryUint8() {
-  // if not defined or detached. For some reason the array automatically detaches.
+  // if not defined or detached. For some reason (if the memory grows?) the array automatically detaches.
   if (memoryUint8Cache == null || memoryUint8Cache.buffer.byteLength === 0) {
     memoryUint8Cache = new Uint8Array(wasmExports.memory.buffer);
   }
