@@ -22,7 +22,7 @@ Then first we derive sentences from this url. they are:
 
 If this model would also have a contextual name, that would simply be added to the list of sentences.
 
-We do this for every model. So we have a list of sentences for every model. Now, for every sentence we can calculate it's cardinality. We sort the sentences for every model base on their cardinality (and possibly some extra properties). We could come up with a list like this:
+We do this for every model. So we have a list of sentences for every model. Now, for every sentence we can calculate it's cardinality and possible some other metadata. We call the sentence and the meta data a name part. We sort the parts for every model bases on their cardinality (and possibly some other metadata). We could come up with a list like this:
 
 ```yaml
 - sentence: schema json
@@ -37,11 +37,11 @@ We do this for every model. So we have a list of sentences for every model. Now,
   cardinality: 2
 ```
 
-Now we are going to build unique names for every model. We start with an empty name. And we calculate the cardinality of that unique name. If there are many models this cardinality is more than 1.
+Now we build unique names for every model. We start with an empty name. And we calculate the cardinality of that unique name. If there are many models this cardinality is more than 1.
 
-If that is the case then we pop a sentence from the list and make that the unique name. We recalculate the cardinality of the unique names. If cardinality of a name is 1 then we have found a unique name for that model.
+If that is the case then we pop a name part from the list and make the sentence of the part unique name. We recalculate the cardinality of the unique names. If cardinality of a name is 1 then we have found a unique name for that model.
 
-If it is more than one then we pop another name from the sentences list and prepend it to the unique name. We calculate the cardinality again and keep on doing this until either we have no sentences anymore or we found a unique name.
+If it is more than one then we pop another part from the list and prepend the sentence to the unique name. We calculate the cardinality again and keep on doing this until either we have no parts anymore or we found a unique name.
 
 Now it may be possible that prepending a sentence did not decrease cardinality! Is this is the case then we revert to the last name.
 
