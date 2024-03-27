@@ -3,7 +3,7 @@ use jns42_core::{
     schema::{SchemaNode, SchemaType},
     specification::Specification,
   },
-  utils::sentence::Sentence,
+  names::Sentence,
 };
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote, TokenStreamExt};

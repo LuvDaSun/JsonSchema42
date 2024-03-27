@@ -1,4 +1,4 @@
-use super::sentence::Sentence;
+use crate::names::Sentence;
 use std::{
   cmp::Ordering,
   collections::{BTreeMap, BTreeSet},

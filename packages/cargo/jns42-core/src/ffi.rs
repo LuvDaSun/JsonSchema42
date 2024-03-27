@@ -1,7 +1,5 @@
-use crate::utils::{
-  names::{Names, NamesBuilder},
-  sentence::Sentence,
-};
+use crate::names::Sentence;
+use crate::utils::names::{Names, NamesBuilder};
 
 /// Create a new NamesBuilder instance
 #[no_mangle]
