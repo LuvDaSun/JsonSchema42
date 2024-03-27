@@ -1,13 +1,8 @@
-import {
-  Node,
-  SchemaDocument,
-  getLastValidationError,
-  isSchemaDocument,
-} from "@jns42/schema-intermediate";
+import { Node, SchemaJson, getLastValidationError, isSchemaJson } from "@jns42/schema-intermediate";
 import { NodeLocation } from "../../utils/index.js";
 import { DocumentBase } from "../document-base.js";
 
-export class Document extends DocumentBase<SchemaDocument> {
+export class Document extends DocumentBase<SchemaJson> {
   constructor(
     public readonly documentNodeLocation: NodeLocation,
     documentNode: unknown,
@@ -15,8 +10,8 @@ export class Document extends DocumentBase<SchemaDocument> {
     super(documentNode);
   }
 
-  protected assertDocumentNode(node: unknown): asserts node is SchemaDocument {
-    if (!isSchemaDocument(node)) {
+  protected assertDocumentNode(node: unknown): asserts node is SchemaJson {
+    if (!isSchemaJson(node)) {
       const validationError = getLastValidationError();
       throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
     }

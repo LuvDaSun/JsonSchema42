@@ -46,7 +46,7 @@ export class DocumentContext {
     this.factories.set(schema, factory);
   }
 
-  public getIntermediateData(): schemaIntermediate.SchemaDocument {
+  public getIntermediateData(): schemaIntermediate.SchemaJson {
     return {
       $schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json",
       schemas: Object.fromEntries(this.getIntermediateSchemaEntries()),

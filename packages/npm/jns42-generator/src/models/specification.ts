@@ -19,7 +19,7 @@ export interface LoadSpecificationConfiguration {
 }
 
 export function loadSpecification(
-  document: schemaIntermediate.SchemaDocument,
+  document: schemaIntermediate.SchemaJson,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;

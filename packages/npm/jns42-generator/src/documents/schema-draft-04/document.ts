@@ -4,7 +4,7 @@ import { NodeLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
-type N = spec.SchemaDocument | boolean;
+type N = spec.Schema | boolean;
 
 export class Document extends SchemaDocumentBase<N> {
   private readonly aliasMap = new Map<string, NodeLocation>();
@@ -35,7 +35,7 @@ export class Document extends SchemaDocumentBase<N> {
   //#region document
 
   protected assertDocumentNode(node: unknown): asserts node is N {
-    if (!spec.isSchemaDocument(node) && typeof node !== "boolean") {
+    if (!spec.isSchema(node) && typeof node !== "boolean") {
       const validationError = spec.getLastValidationError();
       throw new TypeError(`rule ${validationError.rule} failed for ${validationError.path}`);
     }

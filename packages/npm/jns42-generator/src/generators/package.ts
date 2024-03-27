@@ -22,7 +22,7 @@ export interface PackageConfiguration {
 }
 
 export function generatePackage(
-  document: schemaIntermediate.SchemaDocument,
+  document: schemaIntermediate.SchemaJson,
   specification: models.Specification,
   configuration: PackageConfiguration,
 ) {
