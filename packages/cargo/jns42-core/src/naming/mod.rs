@@ -1,10 +1,10 @@
+mod name_part;
 mod names;
 mod names_builder;
-mod part;
 mod sentence;
 mod word;
 
-use part::*;
+use name_part::*;
 use word::*;
 
 pub use names::*;

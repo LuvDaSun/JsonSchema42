@@ -7,7 +7,7 @@ impl<K> Names<K>
 where
   K: PartialOrd + Ord,
 {
-  pub(super) fn new(interior: BTreeMap<K, Sentence>) -> Self {
+  pub fn new(interior: BTreeMap<K, Sentence>) -> Self {
     Self(interior)
   }
 

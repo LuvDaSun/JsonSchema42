@@ -2,7 +2,7 @@
 pub struct Word(String);
 
 impl Word {
-  pub(super) fn new(value: &str) -> Self {
+  pub fn new(value: &str) -> Self {
     assert!(!value.is_empty());
 
     Self(value.to_lowercase())

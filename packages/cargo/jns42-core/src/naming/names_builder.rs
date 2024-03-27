@@ -1,4 +1,4 @@
-use super::{Names, Part, Sentence};
+use super::{NamePart, Names, Sentence};
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug)]
@@ -39,7 +39,7 @@ where
     for (key, sentences) in self.0.iter() {
       let part_entry = part_map.entry(key.clone()).or_default();
       for (index, sentence) in sentences.iter().enumerate() {
-        let part_info = Part {
+        let part_info = NamePart {
           cardinality: *cardinality_counters.entry(sentence).or_default(),
           index,
           value: sentence.clone(),

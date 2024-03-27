@@ -2,20 +2,20 @@ use super::Sentence;
 use std::cmp::Ordering;
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct Part {
+pub struct NamePart {
   pub value: Sentence,
   pub index: usize,
   pub cardinality: usize,
   pub is_head: bool,
 }
 
-impl PartialOrd for Part {
+impl PartialOrd for NamePart {
   fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
     Some(self.cmp(other))
   }
 }
 
-impl Ord for Part {
+impl Ord for NamePart {
   fn cmp(&self, other: &Self) -> Ordering {
     match self.is_head.cmp(&other.is_head) {
       Ordering::Less => return Ordering::Greater,
@@ -51,31 +51,31 @@ mod tests {
 
   #[test]
   fn test_part_order() {
-    let part_info_a = Part {
+    let part_info_a = NamePart {
       cardinality: 100,
       index: 1,
       is_head: false,
       value: Sentence::new("A"),
     };
-    let part_info_b = Part {
+    let part_info_b = NamePart {
       cardinality: 1,
       index: 2,
       is_head: false,
       value: Sentence::new("B"),
     };
-    let part_info_c = Part {
+    let part_info_c = NamePart {
       cardinality: 100,
       index: 3,
       is_head: false,
       value: Sentence::new("C"),
     };
-    let part_info_d = Part {
+    let part_info_d = NamePart {
       cardinality: 10,
       index: 4,
       is_head: false,
       value: Sentence::new("D"),
     };
-    let part_info_e = Part {
+    let part_info_e = NamePart {
       cardinality: 1000,
       index: 5,
       is_head: true,
