@@ -1,29 +1,30 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { Pointer } from "../utils/ffi.js";
+import { Structure } from "./structure.js";
 
-export class Out {
-  private constructor(private readonly pointer: Pointer) {}
+const SIZE = 1 * 4;
 
-  public static createNullReference() {
-    const pointer = mainFfi.exports.alloc(1 * 4);
+export class Out extends Structure {
+  public get reference() {
+    return mainFfi.memoryView.getInt32(this.pointer + 0 * 4, true);
+  }
+  private set reference(value: Pointer) {
+    mainFfi.memoryView.setInt32(this.pointer + 0 * 4, value, true);
+  }
+
+  protected constructor(pointer: Pointer) {
+    super(pointer, SIZE);
+  }
+
+  public static createNull() {
+    const pointer = mainFfi.exports.alloc(SIZE);
     assert(pointer > 0);
-    mainFfi.memoryView.setInt32(pointer, 0, true);
 
     const instance = new Out(pointer);
+
+    instance.reference = 0;
+
     return instance;
-  }
-
-  public getReference() {
-    const reference = mainFfi.memoryView.getInt32(this.pointer, true);
-    return reference;
-  }
-
-  public asPointer() {
-    return this.pointer;
-  }
-
-  [Symbol.dispose]() {
-    mainFfi.exports.dealloc(this.pointer, 1 * 4);
   }
 }

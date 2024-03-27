@@ -1,9 +1,28 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { Pointer } from "../utils/ffi.js";
+import { Pointer, Size } from "../utils/ffi.js";
+import { Structure } from "./structure.js";
 
-export class PascalString {
-  private constructor(private readonly pointer: Pointer) {}
+const SIZE = 2 * 4;
+
+export class PascalString extends Structure {
+  private get dataSize() {
+    return mainFfi.memoryView.getInt32(this.pointer + 0 * 4, true);
+  }
+  private set dataSize(value: Size) {
+    mainFfi.memoryView.setInt32(this.pointer + 0 * 4, value, true);
+  }
+
+  private get dataPointer() {
+    return mainFfi.memoryView.getInt32(this.pointer + 1 * 4, true);
+  }
+  private set dataPointer(value: Pointer) {
+    mainFfi.memoryView.setInt32(this.pointer + 1 * 4, value, true);
+  }
+
+  protected constructor(pointer: Pointer) {
+    super(pointer, SIZE);
+  }
 
   public static fromPointer(pointer: Pointer) {
     const instance = new PascalString(pointer);
@@ -11,8 +30,10 @@ export class PascalString {
   }
 
   public static fromString(value: string) {
-    const metaPointer = mainFfi.exports.alloc(2 * 4);
+    const metaPointer = mainFfi.exports.alloc(SIZE);
     assert(metaPointer > 0);
+
+    const instance = new PascalString(metaPointer);
 
     const dataBytes = mainFfi.textEncoder.encode(value);
     const dataSize = dataBytes.length;
@@ -21,36 +42,31 @@ export class PascalString {
       assert(dataPointer > 0);
       mainFfi.memoryUint8.set(dataBytes, dataPointer);
 
-      mainFfi.memoryView.setInt32(metaPointer + 0 * 4, dataSize, true);
-      mainFfi.memoryView.setInt32(metaPointer + 1 * 4, dataPointer, true);
+      instance.dataSize = dataSize;
+      instance.dataPointer = dataPointer;
     } else {
-      mainFfi.memoryView.setInt32(metaPointer + 0 * 4, 0, true);
-      mainFfi.memoryView.setInt32(metaPointer + 1 * 4, 0, true);
+      instance.dataSize = 0;
+      instance.dataPointer = 0;
     }
 
-    const instance = new PascalString(metaPointer);
     return instance;
   }
 
   public toString() {
-    const dataSize = mainFfi.memoryView.getInt32(this.pointer + 0 * 4, true);
-    const dataPointer = mainFfi.memoryView.getInt32(this.pointer + 1 * 4, true);
+    const dataSize = this.dataSize;
+    const dataPointer = this.dataPointer;
 
     const slice = mainFfi.memoryUint8.slice(dataPointer, dataPointer + dataSize);
     const value = mainFfi.textDecoder.decode(slice, { stream: false });
     return value;
   }
 
-  public asPointer() {
-    return this.pointer;
-  }
-
   [Symbol.dispose]() {
-    const dataSize = mainFfi.memoryView.getInt32(this.pointer + 0 * 4, true);
-    const dataPointer = mainFfi.memoryView.getInt32(this.pointer + 1 * 4, true);
+    const dataSize = this.dataSize;
+    const dataPointer = this.dataPointer;
     if (dataSize > 0) {
       mainFfi.exports.dealloc(dataPointer, dataSize);
     }
-    mainFfi.exports.dealloc(this.pointer, 2 * 4);
+    super[Symbol.dispose]();
   }
 }
