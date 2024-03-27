@@ -3,14 +3,10 @@ import { Pointer, Size } from "../utils/index.js";
 
 export abstract class Structure {
   protected constructor(
-    protected readonly pointer: Pointer,
+    public readonly pointer: Pointer,
     protected readonly size: Size,
   ) {
     //
-  }
-
-  public asPointer() {
-    return this.pointer;
   }
 
   public isNull() {

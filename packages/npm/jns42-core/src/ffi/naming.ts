@@ -14,14 +14,14 @@ export class NamesBuilder {
 
   public add(key: number, value: string) {
     using valuePs = PascalString.fromString(value);
-    const valuePointer = valuePs.asPointer();
+    const valuePointer = valuePs.pointer;
     mainFfi.exports.names_builder_add(this.pointer, key, valuePointer);
     return this;
   }
 
   public setDefaultName(value: string) {
     using valuePs = PascalString.fromString(value);
-    const valuePointer = valuePs.asPointer();
+    const valuePointer = valuePs.pointer;
     mainFfi.exports.names_builder_set_default_name(this.pointer, valuePointer);
     return this;
   }
@@ -76,7 +76,7 @@ export class Names {
 
 export function toCamelCase(value: string) {
   using valuePs = PascalString.fromString(value);
-  const valuePointer = valuePs.asPointer();
+  const valuePointer = valuePs.pointer;
   const resultPointer = mainFfi.exports.to_camel_case(valuePointer);
   using resultPs = PascalString.fromPointer(resultPointer);
   const result = resultPs.toString();
@@ -85,7 +85,7 @@ export function toCamelCase(value: string) {
 
 export function toPascalCase(value: string) {
   using valuePs = PascalString.fromString(value);
-  const valuePointer = valuePs.asPointer();
+  const valuePointer = valuePs.pointer;
   const resultPointer = mainFfi.exports.to_pascal_case(valuePointer);
   using resultPs = PascalString.fromPointer(resultPointer);
   const result = resultPs.toString();
@@ -94,7 +94,7 @@ export function toPascalCase(value: string) {
 
 export function toSnakeCase(value: string) {
   using valuePs = PascalString.fromString(value);
-  const valuePointer = valuePs.asPointer();
+  const valuePointer = valuePs.pointer;
   const resultPointer = mainFfi.exports.to_snake_case(valuePointer);
   using resultPs = PascalString.fromPointer(resultPointer);
   const result = resultPs.toString();
@@ -103,7 +103,7 @@ export function toSnakeCase(value: string) {
 
 export function toScreamingSnakeCase(value: string) {
   using valuePs = PascalString.fromString(value);
-  const valuePointer = valuePs.asPointer();
+  const valuePointer = valuePs.pointer;
   const resultPointer = mainFfi.exports.to_screaming_snake_case(valuePointer);
   using resultPs = PascalString.fromPointer(resultPointer);
   const result = resultPs.toString();

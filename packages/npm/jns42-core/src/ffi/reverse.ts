@@ -5,7 +5,7 @@ import { PascalString } from "./pascal-string.js";
 export function reverse(value: string): string {
   using resultOut = Out.createNull();
   using valuePascalString = PascalString.fromString(value);
-  mainFfi.exports.reverse(valuePascalString.asPointer(), resultOut.asPointer());
+  mainFfi.exports.reverse(valuePascalString.pointer, resultOut.pointer);
   using resultPascalString = PascalString.fromPointer(resultOut.reference);
   const result = resultPascalString.toString();
   return result;
