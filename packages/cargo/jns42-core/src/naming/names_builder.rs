@@ -165,6 +165,11 @@ where
       }
 
       for keys in optimized_names.values() {
+        if keys.len() == 1 {
+          // hurray! this name is unique!
+          continue;
+        }
+
         // add a name part to the optimized names. For every optimized name, take the first
         // part info and add it to the optimized name. The part infos are ordered by cardinality
         // so unique names are more likely to popup. More unique names (lower cardinality) will
@@ -300,7 +305,7 @@ mod tests {
     let expected: BTreeSet<_> = vec![
       (1, Sentence::new("a")),
       (2, Sentence::new("b")),
-      (3, Sentence::new("b c")),
+      (3, Sentence::new("c")),
     ]
     .into_iter()
     .collect();
@@ -351,16 +356,22 @@ mod tests {
   #[test]
   fn test_names_2() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "cat properties id")
-      .add(2, "dog properties id")
-      .add(3, "goat properties id")
+      .add(1, "cat")
+      .add(1, "properties")
+      .add(1, "id")
+      .add(2, "dog")
+      .add(2, "properties")
+      .add(2, "id")
+      .add(3, "goat")
+      .add(3, "properties")
+      .add(3, "id")
       .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("dog id")),
-      (3, Sentence::new("goat id")),
+      (1, Sentence::new("cat")),
+      (2, Sentence::new("dog")),
+      (3, Sentence::new("goat")),
     ]
     .into_iter()
     .collect();
