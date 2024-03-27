@@ -10,6 +10,7 @@ rebuild: \
 
 clean: \
 
+	rm -f packages/npm/jns42-core/bin/main.wasm
 	rm -rf generated
 
 target/wasm32-unknown-unknown/release/jns42_core.wasm: \
