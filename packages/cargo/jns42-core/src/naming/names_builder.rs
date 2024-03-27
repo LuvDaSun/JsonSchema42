@@ -171,7 +171,7 @@ where
         // be at the beginning of the set.
         for key in keys {
           let (optimized_name, parts) = optimization_map.get_mut(key).unwrap();
-          let part = parts.pop_first();
+          let part = parts.pop_last();
           let Some(part) = part else {
             continue;
           };
@@ -286,47 +286,70 @@ mod tests {
   }
 
   #[test]
-  fn test_names() {
+  fn test_names_1() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "A")
-      .add(2, "")
+      .add(1, "a")
+      .add(2, "a")
+      .add(2, "b")
+      .add(3, "a")
+      .add(3, "b")
+      .add(3, "c")
       .build()
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [(1, Sentence::new("a")), (2, Sentence::empty())]
-      .into_iter()
-      .collect();
-    assert_eq!(actual, expected);
-
-    let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "A")
-      .add(2, "B")
-      .build()
-      .into_iter()
-      .collect();
-    let expected: BTreeSet<_> = [(1, Sentence::new("A")), (2, Sentence::new("B"))]
-      .into_iter()
-      .collect();
-    assert_eq!(actual, expected);
-
-    let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "A")
-      .add(2, "B")
-      .add(2, "C")
-      .add(3, "B")
-      .add(3, "D")
-      .build()
-      .into_iter()
-      .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("A")),
-      (2, Sentence::new("b C")),
-      (3, Sentence::new("b D")),
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("a")),
+      (2, Sentence::new("b")),
+      (3, Sentence::new("b c")),
     ]
     .into_iter()
     .collect();
     assert_eq!(actual, expected);
 
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, "a")
+      .add(2, "b")
+      .add(2, "a")
+      .add(3, "c")
+      .add(3, "b")
+      .add(3, "a")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = [
+      (1, Sentence::new("a")),
+      (2, Sentence::new("b")),
+      (3, Sentence::new("c b")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, "b")
+      .add(1, "c")
+      .add(1, "a")
+      .add(2, "c")
+      .add(2, "a")
+      .add(2, "b")
+      .add(3, "a")
+      .add(3, "b")
+      .add(3, "c")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = [
+      (1, Sentence::new("a")),
+      (2, Sentence::new("b")),
+      (3, Sentence::new("c")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn test_names_2() {
     let actual: BTreeSet<_> = NamesBuilder::new()
       .add(1, "cat properties id")
       .add(2, "dog properties id")
@@ -335,57 +358,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat properties id")),
-      (2, Sentence::new("dog properties id")),
-      (3, Sentence::new("goat properties id")),
-    ]
-    .into_iter()
-    .collect();
-    assert_eq!(actual, expected);
-
-    let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "a")
-      .add(2, "a b")
-      .add(3, "a b c")
-      .build()
-      .into_iter()
-      .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("a")),
-      (2, Sentence::new("a b")),
-      (3, Sentence::new("a b c")),
-    ]
-    .into_iter()
-    .collect();
-    assert_eq!(actual, expected);
-
-    let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "a")
-      .add(2, "b a")
-      .add(3, "c b a")
-      .build()
-      .into_iter()
-      .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("a")),
-      (2, Sentence::new("b a")),
-      (3, Sentence::new("c b a")),
-    ]
-    .into_iter()
-    .collect();
-    assert_eq!(actual, expected);
-
-    let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "a b c")
-      .add(2, "b c a")
-      .add(3, "c a b")
-      .build()
-      .into_iter()
-      .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("a b c")),
-      (2, Sentence::new("b c a")),
-      (3, Sentence::new("c a b")),
+      (1, Sentence::new("cat id")),
+      (2, Sentence::new("dog id")),
+      (3, Sentence::new("goat id")),
     ]
     .into_iter()
     .collect();

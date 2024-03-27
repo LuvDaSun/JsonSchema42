@@ -18,26 +18,20 @@ impl PartialOrd for NamePart {
 impl Ord for NamePart {
   fn cmp(&self, other: &Self) -> Ordering {
     match self.is_head.cmp(&other.is_head) {
+      Ordering::Less => return Ordering::Less,
+      Ordering::Greater => return Ordering::Greater,
+      _ => {}
+    };
+
+    match self.cardinality.cmp(&other.cardinality) {
       Ordering::Less => return Ordering::Greater,
       Ordering::Greater => return Ordering::Less,
       _ => {}
     };
 
-    match self.cardinality.cmp(&other.cardinality) {
-      Ordering::Less => return Ordering::Less,
-      Ordering::Greater => return Ordering::Greater,
-      _ => {}
-    };
-
-    // match self.value.len().cmp(&other.value.len()) {
-    //   Ordering::Less => return Ordering::Less,
-    //   Ordering::Greater => return Ordering::Greater,
-    //   _ => {}
-    // };
-
     match self.index.cmp(&other.index) {
-      Ordering::Less => return Ordering::Less,
-      Ordering::Greater => return Ordering::Greater,
+      Ordering::Less => return Ordering::Greater,
+      Ordering::Greater => return Ordering::Less,
       _ => {}
     };
 
@@ -92,11 +86,11 @@ mod tests {
     actual.sort();
 
     let expected: Vec<_> = vec![
-      &part_info_e,
-      &part_info_b,
-      &part_info_d,
-      &part_info_a,
       &part_info_c,
+      &part_info_a,
+      &part_info_d,
+      &part_info_b,
+      &part_info_e,
     ];
 
     assert_eq!(actual, expected);
