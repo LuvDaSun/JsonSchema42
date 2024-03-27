@@ -320,8 +320,8 @@ mod tests {
       .collect();
     let expected: BTreeSet<_> = [
       (1, Sentence::new("A")),
-      (2, Sentence::new("C")),
-      (3, Sentence::new("D")),
+      (2, Sentence::new("b C")),
+      (3, Sentence::new("b D")),
     ]
     .into_iter()
     .collect();
