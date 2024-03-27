@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "shell",
+      "type": "process",
       "command": "cargo",
       "args": ["build", "--package", "${workspaceFolderBasename}"],
       "problemMatcher": ["$rustc"],
