@@ -1,4 +1,4 @@
-use crate::names::{Names, NamesBuilder, Sentence};
+use crate::naming::{Names, NamesBuilder, Sentence};
 
 /// Create a new NamesBuilder instance
 #[no_mangle]

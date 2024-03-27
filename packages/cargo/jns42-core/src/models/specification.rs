@@ -4,7 +4,7 @@ use super::{
   schema::{SchemaNode, SchemaType},
 };
 use crate::{
-  names::{NamesBuilder, Sentence},
+  naming::{NamesBuilder, Sentence},
   schema_transforms,
   utils::url::UrlWithPointer,
 };

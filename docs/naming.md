@@ -1,7 +1,4 @@
-## Names
-
-- [NamesBuilder](../packages/cargo/jns42-core/src/utils/names.rs)
-- [Sentence](../packages/cargo/jns42-core/src/utils/sentence.rs)
+## Naming
 
 From the schema we generate models, every model needs a name! Names are derived from a few sentences that are unique for the model. These sentences are derives from the identifying url of the model and optionally it's contextual name. These properties are fed to the names builder, together with a unique key per model.
 
