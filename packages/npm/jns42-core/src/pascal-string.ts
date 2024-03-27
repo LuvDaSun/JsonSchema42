@@ -1,5 +1,6 @@
 import assert from "assert";
-import { ffi, Pointer } from "./ffi.js";
+import { Pointer } from "./ffi-wrapper.js";
+import { ffi } from "./ffi.js";
 
 export class PascalString {
   private constructor(private readonly pointer: Pointer) {}

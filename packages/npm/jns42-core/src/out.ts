@@ -1,5 +1,6 @@
 import assert from "assert";
-import { Pointer, ffi } from "./ffi.js";
+import { Pointer } from "./ffi-wrapper.js";
+import { ffi } from "./ffi.js";
 
 export class Out {
   private constructor(private readonly pointer: Pointer) {}
