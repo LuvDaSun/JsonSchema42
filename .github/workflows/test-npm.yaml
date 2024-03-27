@@ -7,15 +7,15 @@ on:
       - packages/npm/**
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    container: node:21.5.0-alpine3.19
-    steps:
-      - run: corepack enable
-      - uses: actions/checkout@v4
-      - run: npm ci
-      - run: npm run build --workspaces
-      - run: npm --workspaces test
+  # test:
+  #   runs-on: ubuntu-latest
+  #   container: node:21.5.0-alpine3.19
+  #   steps:
+  #     - run: corepack enable
+  #     - uses: actions/checkout@v4
+  #     - run: npm ci
+  #     - run: npm run build --workspaces
+  #     - run: npm --workspaces test
 
   test-lts:
     strategy:
@@ -29,6 +29,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: corepack enable
       - uses: actions/checkout@v4
+      - run: make packages/npm/jns42-core/bin/main.wasm
       - run: npm ci
       - run: npm run build --workspaces
       - run: npm install --no-package-lock
