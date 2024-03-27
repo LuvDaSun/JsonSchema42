@@ -48,7 +48,8 @@ where
     let mut cardinality_counters = BTreeMap::<Sentence, usize>::new();
 
     loop {
-      let mut maximum_cardinality = 0;
+      let mut done = true;
+
       // calculate unique cardinality for every sentence
       for sentences in sentences_map.values() {
         // we ignore empty sentences
@@ -59,16 +60,21 @@ where
         // make sentences unique
         let sentences: BTreeSet<Sentence> = sentences.iter().cloned().collect();
         for sentence in sentences {
+          if sentence.is_empty() {
+            continue;
+          }
+
           // for every unique name part add 1 to cardinality
           let cardinality = cardinality_counters.entry(sentence).or_default();
           *cardinality += 1;
 
-          maximum_cardinality = maximum_cardinality.max(*cardinality);
+          if *cardinality >= key_count {
+            done = false
+          }
         }
       }
 
-      // if the maximum cardinality is smaller than the number of keys then we are done here
-      if maximum_cardinality < key_count {
+      if done {
         break;
       }
 
@@ -92,8 +98,13 @@ where
         *sentences = sentences
           .iter()
           .filter(|sentence| {
-            sentence_count -= 1;
-            !(remove_sentences.remove(sentence) && sentence_count > 0)
+            if remove_sentences.remove(sentence) {
+              sentence_count -= 1;
+              // only keep the last sentence
+              sentence_count == 0
+            } else {
+              true
+            }
           })
           .cloned()
           .collect();
@@ -154,11 +165,6 @@ where
       }
 
       for keys in optimized_names.values() {
-        if keys.len() == 1 {
-          // hurray optimization for this name is done!
-          continue;
-        }
-
         // add a name part to the optimized names. For every optimized name, take the first
         // part info and add it to the optimized name. The part infos are ordered by cardinality
         // so unique names are more likely to popup. More unique names (lower cardinality) will
