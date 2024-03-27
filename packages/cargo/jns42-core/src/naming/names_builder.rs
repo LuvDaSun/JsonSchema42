@@ -77,11 +77,14 @@ where
     sentences_map
       .iter()
       .map(|(key, sentences)| {
+        let mut sentences_set: BTreeSet<_> = sentences.iter().collect();
         (
           key.clone(),
           sentences
             .iter()
             .enumerate()
+            // unique sentences, but keep the order
+            .filter(|(_index, sentence)| sentences_set.remove(sentence))
             .map(|(index, sentence)| {
               // how many times does this sentence occur in our sentences
               let local_cardinality = sentences
