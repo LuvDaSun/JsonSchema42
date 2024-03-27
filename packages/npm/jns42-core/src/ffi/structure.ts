@@ -1,0 +1,51 @@
+import assert from "assert";
+import { mainFfi } from "../main-ffi.js";
+import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
+
+export abstract class Structure {
+  private disposed = false;
+
+  public readonly pointer: Pointer;
+  protected readonly size: Size;
+
+  protected constructor(pointer: Pointer, size: Size) {
+    assert(size > 0);
+    this.size = size;
+    if (pointer === NULL_POINTER) {
+      this.pointer = this.allocate();
+    } else {
+      this.pointer = pointer;
+      this.load();
+    }
+  }
+
+  protected load() {
+    //
+  }
+
+  protected allocate() {
+    return mainFfi.exports.alloc(this.size);
+  }
+
+  protected deallocate() {
+    mainFfi.exports.dealloc(this.pointer, this.size);
+  }
+
+  // protected setBytes(bytes: Uint8Array, offset = 0) {
+  //   assert(offset + bytes.length <= this.size);
+  //   mainFfi.memoryUint8.set(bytes, this.pointer + offset);
+  // }
+
+  // protected getBytes(offset = 0, size = this.size) {
+  //   assert(offset + size <= this.size);
+  //   return mainFfi.memoryUint8.slice(this.pointer + offset, this.pointer + offset + size);
+  // }
+
+  [Symbol.dispose]() {
+    assert(!this.disposed);
+    if (this.size > 0) {
+      this.deallocate();
+    }
+    this.disposed = true;
+  }
+}

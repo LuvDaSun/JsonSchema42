@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import test from "node:test";
-import { wasmExports } from "./ffi.js";
+import { mainFfi } from "../main-ffi.js";
 import { NamesBuilder } from "./naming.js";
 
 test("names", () => {
@@ -16,7 +16,7 @@ test("names", () => {
 
   {
     const actual = names.toSnakeCase(1);
-    const expected = "id_cat";
+    const expected = "cat_id";
     assert.equal(actual, expected);
   }
 
@@ -28,7 +28,7 @@ test("names", () => {
 
   {
     const actual = names.toSnakeCase(3);
-    const expected = "id_dog";
+    const expected = "dog_id";
     assert.equal(actual, expected);
   }
 });
@@ -47,7 +47,7 @@ test("names leak test", () => {
 
     {
       const actual = names.toSnakeCase(1);
-      const expected = "id_cat";
+      const expected = "cat_id";
       assert.equal(actual, expected);
     }
 
@@ -59,14 +59,14 @@ test("names leak test", () => {
 
     {
       const actual = names.toSnakeCase(3);
-      const expected = "id_dog";
+      const expected = "dog_id";
       assert.equal(actual, expected);
     }
   }
-  const byteLength = wasmExports.memory.buffer.byteLength;
+  const byteLength = mainFfi.exports.memory.buffer.byteLength;
   for (let index = 0; index < 100000; index++) {
     runTest();
 
-    assert.equal(wasmExports.memory.buffer.byteLength, byteLength);
+    assert.equal(mainFfi.exports.memory.buffer.byteLength, byteLength);
   }
 });
