@@ -82,9 +82,9 @@ where
           key.clone(),
           sentences
             .iter()
-            // unique sentences, but keep the order
-            .filter(|sentence| sentences_set.remove(sentence))
             .enumerate()
+            // unique sentences, but keep the order
+            .filter(|(_index, sentence)| sentences_set.remove(sentence))
             .map(|(index, sentence)| {
               // how many times does this sentence occur in our sentences
               let local_cardinality = sentences
