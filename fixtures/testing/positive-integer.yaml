@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: PositiveInteger
+rootTypeName: PositiveIntegerYaml
 
 schemas:
   draft-04:

@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: OneOfObject
+rootTypeName: OneOfObjectYaml
 
 schemas:
   draft_2020-12:

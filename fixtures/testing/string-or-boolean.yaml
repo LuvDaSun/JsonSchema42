@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: StringOrBoolean
+rootTypeName: StringOrBooleanYaml
 
 schemas:
   draft_2020-12:

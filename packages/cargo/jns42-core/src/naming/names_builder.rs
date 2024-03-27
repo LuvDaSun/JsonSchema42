@@ -14,7 +14,7 @@ where
   pub fn new() -> Self {
     Self {
       sentences_map: Default::default(),
-      default_sentence: Sentence::new("no name"),
+      default_sentence: Sentence::empty(),
     }
   }
 
@@ -86,16 +86,17 @@ where
         .collect();
 
       for sentences in &mut sentences_map.values_mut() {
-        for remove_sentence in &remove_sentences {
-          let Some(index) = sentences
-            .iter()
-            .position(|sentence| sentence == remove_sentence)
-          else {
-            continue;
-          };
+        let mut remove_sentences = remove_sentences.clone();
+        let mut sentence_count = sentences.len();
 
-          sentences.remove(index);
-        }
+        *sentences = sentences
+          .iter()
+          .filter(|sentence| {
+            sentence_count -= 1;
+            !(remove_sentences.remove(sentence) && sentence_count > 0)
+          })
+          .cloned()
+          .collect();
       }
 
       cardinality_counters = BTreeMap::new();
@@ -263,13 +264,14 @@ mod tests {
       (2, vec![Sentence::new("b")]),
       (3, vec![Sentence::new("a b")]),
       (4, vec![Sentence::new("a b")]),
-      (5, vec![]),
+      (5, vec![Sentence::new("c")]),
     ]
     .into();
     let cardinality_counters_expected: BTreeMap<Sentence, usize> = [
       (Sentence::new("a"), 1),
       (Sentence::new("b"), 1),
       (Sentence::new("a b"), 2),
+      (Sentence::new("c"), 1),
     ]
     .into();
 
@@ -285,7 +287,7 @@ mod tests {
       .build()
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [(1, Sentence::new("a")), (2, Sentence::new(""))]
+    let expected: BTreeSet<_> = [(1, Sentence::new("a")), (2, Sentence::empty())]
       .into_iter()
       .collect();
     assert_eq!(actual, expected);

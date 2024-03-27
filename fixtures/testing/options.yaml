@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: Options
+rootTypeName: OptionsYaml
 
 schemas:
   draft_2020-12:

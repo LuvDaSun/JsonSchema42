@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: Fallthrough
+rootTypeName: FallthroughYaml
 
 schemas:
   schema:

@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: Parse
+rootTypeName: ParseYaml
 parse: true
 
 schemas:

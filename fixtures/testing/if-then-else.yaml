@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: IfThenElse
+rootTypeName: IfThenElseYaml
 
 schemas:
   original:
