@@ -129,8 +129,8 @@ where
         (*keys).insert(key.clone());
       }
 
-      for keys in optimized_names.values() {
-        if keys.len() == 1 {
+      for (name, keys) in &optimized_names {
+        if !name.is_empty() && keys.len() == 1 {
           // hurray! this name is unique!
           continue;
         }
