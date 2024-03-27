@@ -77,10 +77,13 @@ where
     sentences_map
       .iter()
       .map(|(key, sentences)| {
+        let mut sentences_set: BTreeSet<_> = sentences.iter().collect();
         (
           key.clone(),
           sentences
             .iter()
+            // unique sentences, but keep the order
+            .filter(|sentence| sentences_set.remove(sentence))
             .enumerate()
             .map(|(index, sentence)| {
               // how many times does this sentence occur in our sentences
