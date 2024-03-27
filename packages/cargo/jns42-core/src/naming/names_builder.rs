@@ -92,8 +92,12 @@ where
               let adjust_cardinality = (local_cardinality - 1) * key_count;
 
               // maximum cardinality is the number of keys
-              let cardinality =
-                key_count.min(cardinality_counters.get(sentence).unwrap() - adjust_cardinality);
+              let cardinality = key_count.min(
+                cardinality_counters
+                  .get(sentence)
+                  .unwrap()
+                  .saturating_sub(adjust_cardinality),
+              );
 
               NamePart {
                 cardinality,
@@ -307,6 +311,28 @@ mod tests {
       .add(1, "cat")
       .add(1, "id")
       .add(2, "schema")
+      .add(2, "schema")
+      .add(2, "id")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = [
+      (1, Sentence::new("cat id")),
+      (2, Sentence::new("schema id")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn test_names_4() {
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, "cat")
+      .add(1, "cat")
+      .add(1, "cat")
+      .add(2, "schema")
+      .add(1, "id")
       .add(2, "schema")
       .add(2, "id")
       .build()
