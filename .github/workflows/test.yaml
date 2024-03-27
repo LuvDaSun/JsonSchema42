@@ -16,11 +16,13 @@ jobs:
       - run: corepack enable
       - run: rustup default ${{ matrix.rust-version }}
       - run: rustup target add wasm32-unknown-unknown
+
       - uses: actions/checkout@v4
       - run: make packages/npm/jns42-core/bin/main.wasm
       - run: npm ci
       - run: npm run build --workspaces
       - run: npm install --no-package-lock
+
       # node test runner seems to support globs since v21
       - if: ${{ matrix.node-version >= 21 }}
         run: npm --workspaces test
