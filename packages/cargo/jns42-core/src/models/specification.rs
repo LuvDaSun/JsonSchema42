@@ -4,9 +4,9 @@ use super::{
   schema::{SchemaNode, SchemaType},
 };
 use crate::{
-  names::Sentence,
+  names::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::{names::NamesBuilder, url::UrlWithPointer},
+  utils::url::UrlWithPointer,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
