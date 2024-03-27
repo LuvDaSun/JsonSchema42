@@ -1,10 +1,10 @@
 import assert from "assert";
-import * as ffi from "./ffi.js";
+import { ffi, Pointer } from "./ffi.js";
 
 export class PascalString {
-  private constructor(private readonly pointer: ffi.Pointer) {}
+  private constructor(private readonly pointer: Pointer) {}
 
-  public static fromPointer(pointer: ffi.Pointer) {
+  public static fromPointer(pointer: Pointer) {
     const instance = new PascalString(pointer);
     return instance;
   }
@@ -18,13 +18,13 @@ export class PascalString {
     if (dataSize > 0) {
       const dataPointer = ffi.exports.alloc(dataSize);
       assert(dataPointer > 0);
-      ffi.getMemoryUint8().set(dataBytes, dataPointer);
+      ffi.memoryUint8.set(dataBytes, dataPointer);
 
-      ffi.getMemoryView().setInt32(metaPointer + 0 * 4, dataSize, true);
-      ffi.getMemoryView().setInt32(metaPointer + 1 * 4, dataPointer, true);
+      ffi.memoryView.setInt32(metaPointer + 0 * 4, dataSize, true);
+      ffi.memoryView.setInt32(metaPointer + 1 * 4, dataPointer, true);
     } else {
-      ffi.getMemoryView().setInt32(metaPointer + 0 * 4, 0, true);
-      ffi.getMemoryView().setInt32(metaPointer + 1 * 4, 0, true);
+      ffi.memoryView.setInt32(metaPointer + 0 * 4, 0, true);
+      ffi.memoryView.setInt32(metaPointer + 1 * 4, 0, true);
     }
 
     const instance = new PascalString(metaPointer);
@@ -32,10 +32,10 @@ export class PascalString {
   }
 
   public toString() {
-    const dataSize = ffi.getMemoryView().getInt32(this.pointer + 0 * 4, true);
-    const dataPointer = ffi.getMemoryView().getInt32(this.pointer + 1 * 4, true);
+    const dataSize = ffi.memoryView.getInt32(this.pointer + 0 * 4, true);
+    const dataPointer = ffi.memoryView.getInt32(this.pointer + 1 * 4, true);
 
-    const slice = ffi.getMemoryUint8().slice(dataPointer, dataPointer + dataSize);
+    const slice = ffi.memoryUint8.slice(dataPointer, dataPointer + dataSize);
     const value = ffi.textDecoder.decode(slice, { stream: false });
     return value;
   }
@@ -45,8 +45,8 @@ export class PascalString {
   }
 
   [Symbol.dispose]() {
-    const dataSize = ffi.getMemoryView().getInt32(this.pointer + 0 * 4, true);
-    const dataPointer = ffi.getMemoryView().getInt32(this.pointer + 1 * 4, true);
+    const dataSize = ffi.memoryView.getInt32(this.pointer + 0 * 4, true);
+    const dataPointer = ffi.memoryView.getInt32(this.pointer + 1 * 4, true);
     if (dataSize > 0) {
       ffi.exports.dealloc(dataPointer, dataSize);
     }

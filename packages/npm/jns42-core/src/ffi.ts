@@ -1,41 +1,8 @@
-import fs from "node:fs";
 import path from "path";
+import { FfiExports, FfiWrapper, Pointer, Size } from "./ffi-wrapper.js";
 import { projectRoot } from "./root.js";
 
-export type Size = number;
-export type Pointer = number;
-
-const wasmBytes = fs.readFileSync(path.join(projectRoot, "bin", "main.wasm"));
-const wasmModule = new WebAssembly.Module(wasmBytes);
-const wasmInstance = new WebAssembly.Instance(wasmModule, {});
-export const exports = wasmInstance.exports as unknown as WasmExports;
-
-export const textEncoder = new TextEncoder();
-export const textDecoder = new TextDecoder("utf-8", {
-  ignoreBOM: true,
-  fatal: true,
-});
-
-let memoryUint8Cache: Uint8Array;
-export function getMemoryUint8() {
-  // if not defined or detached. For some reason (if the memory grows?) the array automatically detaches.
-  if (memoryUint8Cache == null || memoryUint8Cache.buffer.byteLength === 0) {
-    memoryUint8Cache = new Uint8Array(exports.memory.buffer);
-  }
-  return memoryUint8Cache;
-}
-
-let memoryViewCache: DataView;
-export function getMemoryView() {
-  // if not defined or detached. For some reason the view automatically detaches
-  if (memoryViewCache == null || memoryViewCache.buffer.byteLength === 0) {
-    memoryViewCache = new DataView(exports.memory.buffer);
-  }
-  return memoryViewCache;
-}
-
-interface WasmExports {
-  memory: WebAssembly.Memory;
+export interface Exports extends FfiExports {
   alloc(size: Size): Pointer;
   dealloc(pointer: Pointer, size: Size): void;
 
@@ -57,3 +24,5 @@ interface WasmExports {
   to_snake_case(value: Pointer): Pointer;
   to_screaming_snake_case(value: Pointer): Pointer;
 }
+
+export const ffi = FfiWrapper.fromFile<Exports>(path.join(projectRoot, "bin", "main.wasm"));
