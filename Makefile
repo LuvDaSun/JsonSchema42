@@ -35,7 +35,6 @@ packages/npm/jns42-core/bin/main.wasm: \
 
 
 generated/npm: \
-	generated/npm/jns42-core \
 	generated/npm/schema-intermediate \
 	generated/npm/schema-draft-04 \
 	generated/npm/schema-draft-2020-12 \
@@ -52,19 +51,6 @@ generated/npm: \
 generated/cargo: \
 	generated/cargo/schema-intermediate \
 
-generated/npm/jns42-core: \
-	packages/cargo/jns42-core \
-	$(wildcard packages/cargo/jns42-core/*) \
-	$(wildcard packages/cargo/jns42-core/src/*.rs) \
-	$(wildcard packages/cargo/jns42-core/src/*/*.rs) \
-	$(wildcard packages/cargo/jns42-core/src/*/*/*.rs) \
-
-	~/.cargo/bin/wasm-pack \
-		build $< \
-		--scope jns42 \
-		--target nodejs \
-		--out-dir $(PWD)/$@ \
-		--out-name main \
 
 generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
 	mkdir -p $(@D)
