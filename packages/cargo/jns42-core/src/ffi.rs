@@ -25,6 +25,21 @@ pub extern "C" fn names_builder_add(
   names_builder.add(key, value);
 }
 
+/// add a sentence to a key
+#[no_mangle]
+pub extern "C" fn names_builder_set_default_name(
+  names_builder: *mut NamesBuilder<usize>,
+  value: *const PascalString,
+) {
+  assert!(!value.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  names_builder.set_default_name(value);
+}
+
 /// create a names struct from the builder
 #[no_mangle]
 pub extern "C" fn names_builder_build(

@@ -8,6 +8,10 @@ use std::{
 pub struct Sentence(Vec<Word>);
 
 impl Sentence {
+  pub fn empty() -> Self {
+    Self(Vec::new())
+  }
+
   pub fn new(input: &str) -> Self {
     #[derive(Debug, Clone, Copy)]
     enum CharType {
@@ -77,6 +81,10 @@ impl Sentence {
     flush_buffer!();
 
     Self(words)
+  }
+
+  pub fn is_empty(&self) -> bool {
+    self.0.is_empty()
   }
 
   pub fn join(&self, other: &Self) -> Self {

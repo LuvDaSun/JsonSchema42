@@ -2,26 +2,50 @@ use super::{NamePart, Names, Sentence};
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug)]
-pub struct NamesBuilder<K>(BTreeMap<K, Vec<Sentence>>);
+pub struct NamesBuilder<K> {
+  sentences_map: BTreeMap<K, Vec<Sentence>>,
+  default_sentence: Sentence,
+}
 
 impl<K> NamesBuilder<K>
 where
   K: Clone + PartialOrd + Ord,
 {
   pub fn new() -> Self {
-    Self(BTreeMap::new())
+    Self {
+      sentences_map: Default::default(),
+      default_sentence: Sentence::new("no name"),
+    }
   }
 
-  pub fn add(&mut self, key: K, input: impl AsRef<str>) -> &mut Self {
-    let sentences = self.0.entry(key).or_default();
-    sentences.push(Sentence::new(input.as_ref()));
+  pub fn add(&mut self, key: K, value: impl AsRef<str>) -> &mut Self {
+    let sentences = self.sentences_map.entry(key).or_default();
+    sentences.push(Sentence::new(value.as_ref()));
+    self
+  }
+
+  pub fn set_default_name(&mut self, value: impl AsRef<str>) -> &mut Self {
+    self.default_sentence = Sentence::new(value.as_ref());
     self
   }
 
   pub fn build(&self) -> Names<K> {
-    let key_count = self.0.len();
-    let mut sentences_map = self.0.clone();
-    let mut cardinality_counters = BTreeMap::<_, usize>::new();
+    let (sentences_map, cardinality_counters) =
+      Self::make_sentences_map_and_cardinality_counters(self.sentences_map.clone());
+    let part_map = Self::make_parts_map(sentences_map, cardinality_counters);
+    let optimized_names = Self::make_optimized_names(part_map);
+    let optimized_names = Self::make_default_names(optimized_names, self.default_sentence.clone());
+    let names = Self::make_names(optimized_names);
+
+    Names::new(names)
+  }
+
+  /// create a new, normalized, sentences map and cardinality counters
+  fn make_sentences_map_and_cardinality_counters(
+    mut sentences_map: BTreeMap<K, Vec<Sentence>>,
+  ) -> (BTreeMap<K, Vec<Sentence>>, BTreeMap<Sentence, usize>) {
+    let key_count = sentences_map.len();
+    let mut cardinality_counters = BTreeMap::<Sentence, usize>::new();
 
     loop {
       let mut maximum_cardinality = 0;
@@ -33,7 +57,7 @@ where
         }
 
         // make sentences unique
-        let sentences: BTreeSet<_> = sentences.iter().collect();
+        let sentences: BTreeSet<Sentence> = sentences.iter().cloned().collect();
         for sentence in sentences {
           // for every unique name part add 1 to cardinality
           let cardinality = cardinality_counters.entry(sentence).or_default();
@@ -54,9 +78,9 @@ where
         .into_iter()
         .filter_map(|(sentence, cardinality)| {
           if cardinality < key_count {
-            Some(sentence.clone())
-          } else {
             None
+          } else {
+            Some(sentence.clone())
           }
         })
         .collect();
@@ -70,10 +94,6 @@ where
             continue;
           };
 
-          // if it is the last element, we won't remove
-          if index == sentences.len() - 1 {
-            continue;
-          }
           sentences.remove(index);
         }
       }
@@ -81,36 +101,53 @@ where
       cardinality_counters = BTreeMap::new();
     }
 
-    // then we create part's that we can optimize. The key is the original key, then the
-    // value is a tuple where the first element is the optimized name and the second part are
-    // the ordered part info's. Those are ordered!
-    let mut part_map: BTreeMap<_, (Sentence, BTreeSet<_>)> = BTreeMap::new();
-    for (key, sentences) in self.0.iter() {
-      let part_entry = part_map.entry(key.clone()).or_default();
-      for (index, sentence) in sentences.iter().enumerate() {
-        let part_info = NamePart {
-          cardinality: *cardinality_counters.entry(sentence).or_default(),
-          index,
-          value: sentence.clone(),
-          is_head: index == sentences.len() - 1,
-        };
-        part_entry.1.insert(part_info);
-      }
-    }
+    (sentences_map, cardinality_counters)
+  }
 
-    // this is where we keep the optimized names as the key, the original keys are in the value.
-    // Ideally there is only one element in the vector that is the value. This means that the
-    // optimized name references only one original key and that we can use it as a replacement
-    // for the original name.
-    let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = Default::default();
-    // then run the optimization process! we keep on iterating the optimization until we reach the
-    // maximum number of iterations, or if there is nothing more to optimize.
+  /// Create a map with a value of a tuple where the first element is the optimized
+  /// name (initially empty) and then an ordered set of name parts
+  fn make_parts_map(
+    sentences_map: BTreeMap<K, Vec<Sentence>>,
+    cardinality_counters: BTreeMap<Sentence, usize>,
+  ) -> BTreeMap<K, BTreeSet<NamePart>> {
+    let parts_map = sentences_map
+      .into_iter()
+      .map(|(key, sentences)| {
+        (
+          key,
+          sentences
+            .iter()
+            .enumerate()
+            .map(|(index, sentence)| NamePart {
+              cardinality: cardinality_counters
+                .get(sentence)
+                .copied()
+                .unwrap_or_default(),
+              index,
+              sentence: sentence.clone(),
+              is_head: index == sentences.len() - 1,
+            })
+            .collect(),
+        )
+      })
+      .collect();
+
+    parts_map
+  }
+
+  fn make_optimized_names(
+    part_map: BTreeMap<K, BTreeSet<NamePart>>,
+  ) -> BTreeMap<Sentence, BTreeSet<K>> {
+    let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
+    let mut optimization_map: BTreeMap<K, (Sentence, BTreeSet<NamePart>)> = part_map
+      .into_iter()
+      .map(|(key, name_parts)| (key, (Sentence::empty(), name_parts)))
+      .collect();
 
     loop {
       let mut done = true;
-      optimized_names = Default::default();
 
-      for (key, part) in &part_map {
+      for (key, part) in &optimization_map {
         let keys = optimized_names.entry(part.0.clone()).or_default();
         (*keys).insert(key.clone());
       }
@@ -121,31 +158,50 @@ where
           continue;
         }
 
-        // if we get to here then one of the names is not unique! this means we need
-        // another iteration after this one. We are not done!
-        done = false;
-
         // add a name part to the optimized names. For every optimized name, take the first
         // part info and add it to the optimized name. The part infos are ordered by cardinality
         // so unique names are more likely to popup. More unique names (lower cardinality) will
         // be at the beginning of the set.
         for key in keys {
-          let (optimized_name, parts) = part_map.get_mut(key).unwrap();
+          let (optimized_name, parts) = optimization_map.get_mut(key).unwrap();
           let part = parts.pop_first();
-          if let Some(part) = part {
-            *optimized_name = part.value.join(optimized_name);
-          }
+          let Some(part) = part else {
+            continue;
+          };
+
+          *optimized_name = part.sentence.join(optimized_name);
+
+          done = false;
         }
       }
 
       if done {
         break;
       }
+
+      optimized_names = BTreeMap::new();
     }
 
-    // return the optimized names. If the original names vector has a length of 1 then
-    // it is  unique and can safely be returned. If not, then we need to make it unique
-    // by adding an index to it.
+    optimized_names
+  }
+
+  fn make_default_names(
+    optimized_names: BTreeMap<Sentence, BTreeSet<K>>,
+    default_sentence: Sentence,
+  ) -> BTreeMap<Sentence, BTreeSet<K>> {
+    optimized_names
+      .into_iter()
+      .map(|(sentence, keys)| {
+        if sentence.is_empty() {
+          (default_sentence.clone(), keys)
+        } else {
+          (sentence, keys)
+        }
+      })
+      .collect()
+  }
+
+  fn make_names(optimized_names: BTreeMap<Sentence, BTreeSet<K>>) -> BTreeMap<K, Sentence> {
     let names = optimized_names
       .into_iter()
       .flat_map(|(optimized_name, keys)| {
@@ -160,8 +216,7 @@ where
         })
       })
       .collect();
-
-    Names::new(names)
+    names
   }
 }
 
@@ -177,6 +232,50 @@ where
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn test_make_sentences_map_and_cardinality_counters() {
+    let sentences_map = [
+      (
+        1,
+        vec![Sentence::new("a"), Sentence::new("a"), Sentence::new("c")],
+      ),
+      (
+        2,
+        vec![Sentence::new("a"), Sentence::new("b"), Sentence::new("c")],
+      ),
+      (
+        3,
+        vec![Sentence::new("a"), Sentence::new("a b"), Sentence::new("c")],
+      ),
+      (
+        4,
+        vec![Sentence::new("a"), Sentence::new("a b"), Sentence::new("c")],
+      ),
+      (5, vec![Sentence::new("a"), Sentence::new("c")]),
+    ]
+    .into();
+    let (sentences_map_actual, cardinality_counters_actual) =
+      NamesBuilder::make_sentences_map_and_cardinality_counters(sentences_map);
+
+    let sentences_map_expected: BTreeMap<_, Vec<Sentence>> = [
+      (1, vec![Sentence::new("a")]),
+      (2, vec![Sentence::new("b")]),
+      (3, vec![Sentence::new("a b")]),
+      (4, vec![Sentence::new("a b")]),
+      (5, vec![]),
+    ]
+    .into();
+    let cardinality_counters_expected: BTreeMap<Sentence, usize> = [
+      (Sentence::new("a"), 1),
+      (Sentence::new("b"), 1),
+      (Sentence::new("a b"), 2),
+    ]
+    .into();
+
+    assert_eq!(sentences_map_actual, sentences_map_expected);
+    assert_eq!(cardinality_counters_actual, cardinality_counters_expected);
+  }
 
   #[test]
   fn test_names() {

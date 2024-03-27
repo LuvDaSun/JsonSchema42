@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct NamePart {
-  pub value: Sentence,
+  pub sentence: Sentence,
   pub index: usize,
   pub cardinality: usize,
   pub is_head: bool,
@@ -55,31 +55,31 @@ mod tests {
       cardinality: 100,
       index: 1,
       is_head: false,
-      value: Sentence::new("A"),
+      sentence: Sentence::new("A"),
     };
     let part_info_b = NamePart {
       cardinality: 1,
       index: 2,
       is_head: false,
-      value: Sentence::new("B"),
+      sentence: Sentence::new("B"),
     };
     let part_info_c = NamePart {
       cardinality: 100,
       index: 3,
       is_head: false,
-      value: Sentence::new("C"),
+      sentence: Sentence::new("C"),
     };
     let part_info_d = NamePart {
       cardinality: 10,
       index: 4,
       is_head: false,
-      value: Sentence::new("D"),
+      sentence: Sentence::new("D"),
     };
     let part_info_e = NamePart {
       cardinality: 1000,
       index: 5,
       is_head: true,
-      value: Sentence::new("E"),
+      sentence: Sentence::new("E"),
     };
 
     let mut actual: Vec<_> = vec![

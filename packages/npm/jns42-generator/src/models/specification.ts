@@ -31,6 +31,7 @@ export function loadSpecification(
   // generate names
 
   using namesBuilder = core.NamesBuilder.new();
+  namesBuilder.setDefaultName(defaultTypeName);
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
@@ -38,7 +39,9 @@ export function loadSpecification(
     assert(nodeId != null);
 
     const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer];
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer].filter(
+      (part) => /^[a-zA-Z]/.test(part),
+    );
 
     for (const sentence of path) {
       namesBuilder.add(itemKey, sentence);

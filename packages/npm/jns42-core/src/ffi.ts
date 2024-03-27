@@ -46,6 +46,7 @@ interface WasmExports {
 
   names_builder_new(): Pointer;
   names_builder_add(names_builder: Pointer, key: number, value: Pointer): void;
+  names_builder_set_default_name(names_builder: Pointer, value: Pointer): void;
   names_builder_free(names_builder: Pointer): void;
   names_builder_build(names_builder: Pointer): Pointer;
   names_to_camel_case(names: Pointer, key: number): Pointer;

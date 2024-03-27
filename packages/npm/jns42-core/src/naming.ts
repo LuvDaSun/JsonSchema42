@@ -17,6 +17,13 @@ export class NamesBuilder {
     return this;
   }
 
+  public setDefaultName(value: string) {
+    using valuePs = PascalString.fromString(value);
+    const valuePointer = valuePs.asPointer();
+    wasmExports.names_builder_set_default_name(this.pointer, valuePointer);
+    return this;
+  }
+
   public build() {
     const pointer = wasmExports.names_builder_build(this.pointer);
     return new Names(pointer);
