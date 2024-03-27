@@ -3,6 +3,8 @@ import fs from "node:fs";
 export type Size = number;
 export type Pointer = number;
 
+export const NULL_POINTER = 0;
+
 export interface Exports {
   memory: WebAssembly.Memory;
 }

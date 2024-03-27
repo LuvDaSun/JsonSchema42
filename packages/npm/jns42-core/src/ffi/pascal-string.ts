@@ -1,6 +1,6 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { Pointer, Size } from "../utils/ffi.js";
+import { NULL_POINTER, Pointer, Size } from "../utils/ffi.js";
 import { Structure } from "./structure.js";
 
 const SIZE = 2 * 4;
@@ -20,33 +20,30 @@ export class PascalString extends Structure {
     mainFfi.memoryView.setInt32(this.pointer + 1 * 4, value, true);
   }
 
-  protected constructor(pointer: Pointer) {
+  protected constructor(pointer: Pointer = NULL_POINTER) {
     super(pointer, SIZE);
   }
 
   public static fromPointer(pointer: Pointer) {
+    assert(pointer !== NULL_POINTER);
+
     const instance = new PascalString(pointer);
     return instance;
   }
 
   public static fromString(value: string) {
-    const metaPointer = mainFfi.exports.alloc(SIZE);
-    assert(metaPointer > 0);
-
-    const instance = new PascalString(metaPointer);
+    const instance = new PascalString(NULL_POINTER);
 
     const dataBytes = mainFfi.textEncoder.encode(value);
     const dataSize = dataBytes.length;
+    instance.dataSize = dataSize;
     if (dataSize > 0) {
       const dataPointer = mainFfi.exports.alloc(dataSize);
-      assert(dataPointer > 0);
+      assert(dataPointer !== NULL_POINTER);
+
       mainFfi.memoryUint8.set(dataBytes, dataPointer);
 
-      instance.dataSize = dataSize;
       instance.dataPointer = dataPointer;
-    } else {
-      instance.dataSize = 0;
-      instance.dataPointer = 0;
     }
 
     return instance;

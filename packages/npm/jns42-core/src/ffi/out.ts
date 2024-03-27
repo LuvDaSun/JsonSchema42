@@ -1,6 +1,5 @@
-import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { Pointer } from "../utils/ffi.js";
+import { NULL_POINTER, Pointer } from "../utils/ffi.js";
 import { Structure } from "./structure.js";
 
 const SIZE = 1 * 4;
@@ -18,12 +17,9 @@ export class Out extends Structure {
   }
 
   public static createNull() {
-    const pointer = mainFfi.exports.alloc(SIZE);
-    assert(pointer > 0);
+    const instance = new Out(NULL_POINTER);
 
-    const instance = new Out(pointer);
-
-    instance.reference = 0;
+    instance.reference = NULL_POINTER;
 
     return instance;
   }
