@@ -3,7 +3,7 @@ SHELL:=$(PREFIX)/bin/sh
 build: \
 	packages/npm/jns42-core/bin/main.wasm \
 	generated/npm \
-	generated/cargo \
+	# generated/cargo \
 
 rebuild: \
 	clean build
