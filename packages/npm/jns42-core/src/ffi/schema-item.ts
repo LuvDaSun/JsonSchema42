@@ -5,9 +5,12 @@ import { Structure } from "./structure.js";
 
 const SIZE = 2 * 4;
 
+const ID_OFFSET = 0 * 4;
+const NAME_OFFSET = 1 * 4;
+
 export class SchemaItem extends Structure {
-  private id = PascalString.fromPointer(this.pointer + 0 * 4);
-  private name = PascalString.fromPointer(this.pointer + 1 * 4);
+  private id = PascalString.fromPointer(this.pointer + ID_OFFSET);
+  private name = PascalString.fromPointer(this.pointer + NAME_OFFSET);
 
   protected constructor(pointer: Pointer) {
     super(pointer, SIZE);

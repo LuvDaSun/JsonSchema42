@@ -9,30 +9,41 @@ export abstract class Structure {
   protected readonly size: Size;
 
   protected constructor(pointer: Pointer, size: Size) {
+    assert(size > 0);
     this.size = size;
-    if (pointer === NULL_POINTER && size > 0) {
+    if (pointer === NULL_POINTER) {
       this.pointer = this.allocate();
     } else {
       this.pointer = pointer;
+      this.load();
     }
   }
 
+  protected load() {
+    //
+  }
+
   protected allocate() {
-    assert(this.size > 0);
-    const pointer = mainFfi.exports.alloc(this.size);
-    assert(pointer !== NULL_POINTER);
-    return pointer;
+    return mainFfi.exports.alloc(this.size);
   }
 
   protected deallocate() {
-    assert(this.size > 0);
-    assert(this.pointer !== NULL_POINTER);
     mainFfi.exports.dealloc(this.pointer, this.size);
   }
 
+  // protected setBytes(bytes: Uint8Array, offset = 0) {
+  //   assert(offset + bytes.length <= this.size);
+  //   mainFfi.memoryUint8.set(bytes, this.pointer + offset);
+  // }
+
+  // protected getBytes(offset = 0, size = this.size) {
+  //   assert(offset + size <= this.size);
+  //   return mainFfi.memoryUint8.slice(this.pointer + offset, this.pointer + offset + size);
+  // }
+
   [Symbol.dispose]() {
     assert(!this.disposed);
-    if (this.pointer !== NULL_POINTER && this.size > 0) {
+    if (this.size > 0) {
       this.deallocate();
     }
     this.disposed = true;

@@ -5,19 +5,22 @@ import { Structure } from "./structure.js";
 
 const SIZE = 2 * 4;
 
+const DATA_SIZE_OFFSET = 0 * 4;
+const DATA_POINTER_OFFSET = 1 * 4;
+
 export class PascalString extends Structure {
   private get dataSize() {
-    return mainFfi.memoryView.getInt32(this.pointer + 0 * 4, true);
+    return mainFfi.memoryView.getInt32(this.pointer + DATA_SIZE_OFFSET, true);
   }
   private set dataSize(value: Size) {
-    mainFfi.memoryView.setInt32(this.pointer + 0 * 4, value, true);
+    mainFfi.memoryView.setInt32(this.pointer + DATA_SIZE_OFFSET, value, true);
   }
 
   private get dataPointer() {
-    return mainFfi.memoryView.getInt32(this.pointer + 1 * 4, true);
+    return mainFfi.memoryView.getInt32(this.pointer + DATA_POINTER_OFFSET, true);
   }
   private set dataPointer(value: Pointer) {
-    mainFfi.memoryView.setInt32(this.pointer + 1 * 4, value, true);
+    mainFfi.memoryView.setInt32(this.pointer + DATA_POINTER_OFFSET, value, true);
   }
 
   protected constructor(pointer: Pointer) {
