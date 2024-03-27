@@ -16,7 +16,7 @@ test("names", () => {
 
   {
     const actual = names.toSnakeCase(1);
-    const expected = "id_cat";
+    const expected = "cat_id";
     assert.equal(actual, expected);
   }
 
@@ -28,7 +28,7 @@ test("names", () => {
 
   {
     const actual = names.toSnakeCase(3);
-    const expected = "id_dog";
+    const expected = "dog_id";
     assert.equal(actual, expected);
   }
 });
@@ -47,7 +47,7 @@ test("names leak test", () => {
 
     {
       const actual = names.toSnakeCase(1);
-      const expected = "id_cat";
+      const expected = "cat_id";
       assert.equal(actual, expected);
     }
 
@@ -59,7 +59,7 @@ test("names leak test", () => {
 
     {
       const actual = names.toSnakeCase(3);
-      const expected = "id_dog";
+      const expected = "dog_id";
       assert.equal(actual, expected);
     }
   }

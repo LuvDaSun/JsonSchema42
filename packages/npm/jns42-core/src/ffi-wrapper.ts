@@ -22,7 +22,7 @@ export class FfiWrapper<E extends FfiExports> {
   public get memoryUint8() {
     // if not defined or detached. For some reason (if the memory grows?) the array automatically detaches.
     if (this.memoryUint8Cache == null || this.memoryUint8Cache.buffer.byteLength === 0) {
-      this.memoryUint8Cache = new Uint8Array(exports.memory.buffer);
+      this.memoryUint8Cache = new Uint8Array(this.exports.memory.buffer);
     }
     return this.memoryUint8Cache;
   }
