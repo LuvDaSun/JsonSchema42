@@ -1,5 +1,5 @@
+import { toPascalCase } from "@jns42/core";
 import assert from "assert";
-import camelcase from "camelcase";
 import cp from "child_process";
 import fs from "node:fs";
 import * as path from "node:path";
@@ -59,11 +59,6 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "string",
           default: "schema-document",
         })
-        .option("name-maximum-iterations", {
-          description: "maximum number of iterations for finding unique names",
-          type: "number",
-          default: 5,
-        })
         .option("transform-maximum-iterations", {
           description: "maximum number of iterations for transforming",
           type: "number",
@@ -80,7 +75,6 @@ interface MainConfiguration {
   packageName: string;
   packageVersion: string;
   defaultTypeName: string;
-  nameMaximumIterations: number;
   transformMaximumIterations: number;
 }
 
@@ -92,13 +86,12 @@ async function main(configuration: MainConfiguration) {
   const {
     packageName,
     packageVersion,
-    nameMaximumIterations,
     transformMaximumIterations,
     defaultTypeName: defaultName,
   } = configuration;
 
   const testLocation = NodeLocation.parse(pathToTest);
-  const defaultTypeName = camelcase(defaultName, { pascalCase: true });
+  const defaultTypeName = toPascalCase(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);
@@ -204,9 +197,8 @@ async function main(configuration: MainConfiguration) {
 
       const intermediateDocument = context.getIntermediateData();
 
-      const specification = models.loadSpecification(intermediateDocument, {
+      using specification = models.loadSpecification(intermediateDocument, {
         transformMaximumIterations,
-        nameMaximumIterations,
         defaultTypeName,
       });
 

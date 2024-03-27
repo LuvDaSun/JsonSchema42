@@ -1,9 +1,12 @@
 version: "0.2"
 words:
   - automagically
+  - bindgen
   - Bulthuis
   - camelcase
+  - cdylib
   - clippy
+  - dealloc
   - Deque
   - endregion
   - esbenp
@@ -13,7 +16,10 @@ words:
   - luvdasun
   - notdir
   - presolved
+  - realloc
+  - repr
   - reqwest
+  - rlib
   - ryanluker
   - serde
   - snakecase

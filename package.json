@@ -3,6 +3,7 @@
   "packageManager": "npm@10.3.0",
   "workspaces": [
     "generated/npm/*",
+    "packages/npm/jns42-core",
     "packages/npm/jns42-generator"
   ],
   "scripts": {
@@ -10,8 +11,8 @@
     "formatting": "prettier --check *"
   },
   "devDependencies": {
-    "cspell": "^8.6.0",
-    "jns42-generator": "^0.15.5",
+    "cspell": "^8.6.1",
+    "jns42-generator": "^0.16.1",
     "prettier": "^3.2.5"
   }
 }

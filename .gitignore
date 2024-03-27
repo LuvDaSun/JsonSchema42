@@ -2,6 +2,7 @@
 
 *.tsbuildinfo
 *.tgz
+*.node
 
 !.gitignore
 !.prettierignore
@@ -16,6 +17,7 @@ transpiled/
 types/
 bundled/
 out/
+bin/
 
 generated/
 logs/

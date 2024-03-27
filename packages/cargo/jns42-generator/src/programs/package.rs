@@ -1,8 +1,8 @@
 use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
 use crate::documents::{DocumentContext, MetaSchemaId};
 use crate::generators::package::{generate_package, PackageConfiguration};
-use crate::models::specification::Specification;
 use clap::Parser;
+use jns42_core::models::specification::Specification;
 use std::error::Error;
 use std::path::PathBuf;
 use std::rc::Rc;

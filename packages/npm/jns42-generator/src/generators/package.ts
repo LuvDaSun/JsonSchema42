@@ -22,7 +22,7 @@ export interface PackageConfiguration {
 }
 
 export function generatePackage(
-  document: schemaIntermediate.SchemaDocument,
+  document: schemaIntermediate.SchemaJson,
   specification: models.Specification,
   configuration: PackageConfiguration,
 ) {
@@ -35,12 +35,6 @@ export function generatePackage(
   {
     const content = generatePackageJsonData(packageName, packageVersion);
     const filePath = path.join(packageDirectoryPath, "package.json");
-    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
-  }
-
-  {
-    const content = specification.names;
-    const filePath = path.join(packageDirectoryPath, "names.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 

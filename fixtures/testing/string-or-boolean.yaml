@@ -1,5 +1,7 @@
 $schema: "./schema.json"
 
+rootTypeName: StringOrBooleanYaml
+
 schemas:
   draft_2020-12:
     $schema: "http://json-schema.org/draft-04/schema#"

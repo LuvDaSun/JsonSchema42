@@ -7,7 +7,7 @@ jobs:
     container: node:21.5.0-alpine3.19
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
+      - run: npm ci --workspace-root
       - run: npm run formatting
 
   spelling:
@@ -15,5 +15,5 @@ jobs:
     container: node:21.5.0-alpine3.19
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci
+      - run: npm ci --workspace-root
       - run: npm run spelling

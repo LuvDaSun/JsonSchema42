@@ -262,7 +262,7 @@ export class SchemaArena extends Arena<SchemaItem> {
     return key;
   }
 
-  public static fromIntermediate(document: schemaIntermediate.SchemaDocument): SchemaArena {
+  public static fromIntermediate(document: schemaIntermediate.SchemaJson): SchemaArena {
     const arena = new SchemaArena();
     /*
     the schemas in the arena get a new id

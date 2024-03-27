@@ -4,8 +4,9 @@ use super::{
   schema::{SchemaNode, SchemaType},
 };
 use crate::{
-  schema_transforms::{self},
-  utils::{name::to_pascal, names::optimize_names, url::UrlWithPointer},
+  naming::{NamesBuilder, Sentence},
+  schema_transforms,
+  utils::url::UrlWithPointer,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
@@ -18,7 +19,7 @@ pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-
 
 pub struct Specification {
   pub arena: Arena<SchemaNode>,
-  pub names: HashMap<usize, (bool, Vec<String>)>,
+  pub names: HashMap<usize, (bool, Sentence)>,
 }
 
 impl Specification {
@@ -289,46 +290,28 @@ impl Specification {
 
     // generate names
 
-    let primary_name_entries = arena
-      .iter()
-      .enumerate()
-      .filter(|(_key, item)| item.primary.unwrap_or_default())
-      .map(|(key, _item)| {
-        (
-          key,
-          arena
-            .get_name_parts(key)
-            .map(|part| {
-              NON_IDENTIFIER_REGEX
-                .replace_all(part, " ")
-                .into_owned()
-                .trim()
-                .to_string()
-            })
-            .filter(|part| !part.is_empty()),
-        )
+    let mut primary_names = NamesBuilder::new();
+    let mut secondary_names = NamesBuilder::new();
+    for (key, item) in arena.iter().enumerate() {
+      let parts = arena.get_name_parts(key).map(|part| {
+        NON_IDENTIFIER_REGEX
+          .replace_all(part, " ")
+          .into_owned()
+          .trim()
+          .to_string()
       });
-    let secondary_name_entries = arena
-      .iter()
-      .enumerate()
-      .filter(|(_key, item)| !item.primary.unwrap_or_default())
-      .map(|(key, _item)| {
-        (
-          key,
-          arena
-            .get_name_parts(key)
-            .map(|part| {
-              NON_IDENTIFIER_REGEX
-                .replace_all(part, " ")
-                .into_owned()
-                .trim()
-                .to_string()
-            })
-            .filter(|part| !part.is_empty()),
-        )
-      });
-    let primary_names = optimize_names(primary_name_entries, 5).into_iter();
-    let secondary_names = optimize_names(secondary_name_entries, 5).into_iter();
+
+      for part in parts {
+        if item.primary.unwrap_or_default() {
+          primary_names.add(key, part);
+        } else {
+          secondary_names.add(key, part);
+        }
+      }
+    }
+
+    let primary_names = primary_names.build().into_iter();
+    let secondary_names = secondary_names.build().into_iter();
 
     let names = empty()
       .chain(primary_names.map(|(key, parts)| (key, (true, parts))))
@@ -347,8 +330,8 @@ impl Specification {
   }
 
   fn get_is_primary_and_name(&self, key: &usize) -> (bool, String) {
-    let (is_primary, parts) = self.names.get(key).unwrap();
-    let name = format!("T{}", to_pascal(parts));
+    let (is_primary, sentence) = self.names.get(key).unwrap();
+    let name = format!("T{}", sentence.to_pascal_case());
     (*is_primary, name)
   }
 

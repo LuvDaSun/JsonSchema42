@@ -1,31 +1,54 @@
+import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
+import assert from "assert";
 import * as schemaTransforms from "../schema-transforms/index.js";
-import { Namer } from "../utils/namer.js";
-import { NodeLocation } from "../utils/node-location.js";
+import { NodeLocation } from "../utils/index.js";
 import { SchemaArena } from "./arena.js";
 import { selectSchemaDependencies } from "./selectors.js";
 
 export interface Specification {
   typesArena: SchemaArena;
   validatorsArena: SchemaArena;
-  names: Record<string, string>;
+  names: core.Names;
+  [Symbol.dispose]: () => void;
 }
 
 export interface LoadSpecificationConfiguration {
   transformMaximumIterations: number;
-  nameMaximumIterations: number;
   defaultTypeName: string;
 }
 
 export function loadSpecification(
-  document: schemaIntermediate.SchemaDocument,
+  document: schemaIntermediate.SchemaJson,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
-  const { transformMaximumIterations, nameMaximumIterations, defaultTypeName } = configuration;
+  const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
   const validatorsArena = new SchemaArena(typesArena);
+
+  // generate names
+
+  using namesBuilder = core.NamesBuilder.new();
+  namesBuilder.setDefaultName(defaultTypeName);
+
+  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
+    const { id: nodeId } = item;
+
+    assert(nodeId != null);
+
+    const nodeLocation = NodeLocation.parse(nodeId);
+    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer].filter(
+      (part) => /^[a-zA-Z]/.test(part),
+    );
+
+    for (const sentence of path) {
+      namesBuilder.add(itemKey, sentence);
+    }
+  }
+
+  const names = namesBuilder.build();
 
   // transform the validatorsArena
   {
@@ -110,17 +133,12 @@ export function loadSpecification(
     }
   }
 
-  // generate names
-
-  const namer = new Namer(defaultTypeName, nameMaximumIterations);
-  for (const nodeId in document.schemas) {
-    const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer]
-      .filter((part) => part.length > 0)
-      .join("/");
-    namer.registerPath(nodeId, path);
-  }
-  const names = namer.getNames();
-
-  return { typesArena, validatorsArena, names };
+  return {
+    typesArena,
+    validatorsArena,
+    names,
+    [Symbol.dispose]() {
+      names[Symbol.dispose]();
+    },
+  };
 }

@@ -1,4 +1,5 @@
-use crate::{models::intermediate::IntermediateNode, utils::url::UrlWithPointer};
+use jns42_core::models::intermediate::IntermediateNode;
+use jns42_core::utils::url::UrlWithPointer;
 
 pub struct EmbeddedDocument {
   pub retrieval_url: UrlWithPointer,

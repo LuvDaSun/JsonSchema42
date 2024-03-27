@@ -1,8 +1,8 @@
 use super::Node;
-use crate::{
-  documents::{
-    draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument,
-  },
+use crate::documents::{
+  draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument,
+};
+use jns42_core::{
   models::intermediate::IntermediateNode,
   utils::{json_pointer::JsonPointer, url::UrlWithPointer},
 };

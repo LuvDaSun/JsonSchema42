@@ -1,12 +1,6 @@
+import { toCamelCase } from "@jns42/core";
 import * as models from "../models/index.js";
-import {
-  NestedText,
-  banner,
-  generateJsDocComments,
-  itt,
-  joinIterable,
-  toCamel,
-} from "../utils/index.js";
+import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
 export function* generateParsersTsCode(specification: models.Specification) {
   yield banner;
@@ -36,7 +30,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
       continue;
     }
 
-    const functionName = toCamel("parse", names[nodeId]);
+    const typeIdentifier = names.toSnakeCase(itemKey);
+    const functionName = toCamelCase(`parse ${typeIdentifier}`);
     const definition = generateParserDefinition(itemKey, "value");
 
     yield itt`
@@ -60,7 +55,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
     if (item.id == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
-      const functionName = toCamel("parse", names[item.id]);
+      const typeIdentifier = names.toSnakeCase(itemKey);
+      const functionName = toCamelCase(`parse ${typeIdentifier}`);
       yield itt`${functionName}(${valueExpression}, configuration)`;
     }
   }

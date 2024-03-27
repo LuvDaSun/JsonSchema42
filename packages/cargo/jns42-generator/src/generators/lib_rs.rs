@@ -1,4 +1,4 @@
-use crate::models::specification::Specification;
+use jns42_core::models::specification::Specification;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;

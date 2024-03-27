@@ -1,3 +1,4 @@
+import { toCamelCase, toPascalCase } from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
@@ -7,8 +8,6 @@ import {
   itt,
   joinIterable,
   mapIterable,
-  toCamel,
-  toPascal,
 } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
@@ -87,8 +86,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = toPascal(names[nodeId]);
-    const functionName = toCamel("is", names[nodeId]);
+    const typeIdentifier = names.toSnakeCase(itemKey);
+    const typeName = toPascalCase(typeIdentifier);
+    const functionName = toCamelCase(`is ${typeIdentifier}`);
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
@@ -123,7 +123,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         })(${valueExpression})
       `;
     } else {
-      const functionName = toCamel("is", names[typeItem.id]);
+      const typeIdentifier = names.toSnakeCase(typeKey);
+      const functionName = toCamelCase(`is ${typeIdentifier}`);
       yield itt`${functionName}(${valueExpression})`;
     }
   }

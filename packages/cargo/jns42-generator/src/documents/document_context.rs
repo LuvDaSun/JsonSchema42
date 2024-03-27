@@ -1,12 +1,9 @@
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
-use crate::{
-  models::intermediate::{IntermediateNode, IntermediateSchema},
-  utils::{
-    read_json_node::read_json_node,
-    url::{ServerUrl, UrlWithPointer},
-    yaml::load_yaml,
-  },
-};
+use crate::utils::{read_json_node::read_json_node, yaml::load_yaml};
+use jns42_core::models::intermediate::IntermediateNode;
+use jns42_core::models::intermediate::IntermediateSchema;
+use jns42_core::utils::url::ServerUrl;
+use jns42_core::utils::url::UrlWithPointer;
 use serde_json::Value;
 use std::{
   cell::RefCell,

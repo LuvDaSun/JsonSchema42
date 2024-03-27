@@ -4,7 +4,7 @@ on:
       - Cargo.lock
       - .github/**
       - fixtures/**
-      - packages/ts/**
+      - packages/cargo/**
 
 jobs:
   test:

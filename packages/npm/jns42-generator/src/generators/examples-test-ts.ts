@@ -1,5 +1,6 @@
+import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
-import { banner, itt, mapIterable, toCamel } from "../utils/index.js";
+import { banner, itt, mapIterable } from "../utils/index.js";
 
 export function* generateExamplesTestTsCode(specification: models.Specification) {
   yield banner;
@@ -12,15 +13,16 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     import * as validators from "./validators.js";
   `;
 
-  for (const [itemKey, item] of Object.entries(typesArena)) {
+  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
     const { id: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    const typeName = names[nodeId];
-    const validatorFunctionName = toCamel("is", names[nodeId]);
+    const typeIdentifier = names.toSnakeCase(key);
+    const typeName = toPascalCase(typeIdentifier);
+    const validatorFunctionName = toCamelCase(`is ${typeIdentifier}`);
 
     yield mapIterable(
       item.examples ?? [],

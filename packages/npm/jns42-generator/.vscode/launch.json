@@ -5,8 +5,6 @@
       "type": "node",
       "request": "launch",
       "name": "run file",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["c8", "--reporter", "lcov", "node"],
       "program": "${file}",
       "args": [],
       "env": {
@@ -14,7 +12,7 @@
       },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/../*/transpiled/**/*.js"],
+      "outFiles": ["${workspaceFolder}/transpiled/**/*.js"],
       "preLaunchTask": "build",
       "outputCapture": "std"
     },
@@ -22,8 +20,6 @@
       "type": "node",
       "request": "launch",
       "name": "package file",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["c8", "--reporter", "lcov", "node"],
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "package",
@@ -40,7 +36,7 @@
       },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/../*/transpiled/**/*.js"],
+      "outFiles": ["${workspaceFolder}/transpiled/**/*.js"],
       "preLaunchTask": "build",
       "outputCapture": "std"
     },
@@ -48,8 +44,6 @@
       "type": "node",
       "request": "launch",
       "name": "test fixture",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["c8", "--reporter", "lcov", "node"],
       "program": "${workspaceFolder}/src/program.ts",
       "args": [
         "test",
@@ -66,7 +60,7 @@
       },
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/../*/transpiled/**/*.js"],
+      "outFiles": ["${workspaceFolder}/transpiled/**/*.js"],
       "preLaunchTask": "build",
       "outputCapture": "std"
     }
