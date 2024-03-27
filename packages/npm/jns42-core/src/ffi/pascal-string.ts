@@ -20,7 +20,7 @@ export class PascalString extends Structure {
     mainFfi.memoryView.setInt32(this.pointer + 1 * 4, value, true);
   }
 
-  protected constructor(pointer: Pointer = NULL_POINTER) {
+  protected constructor(pointer: Pointer) {
     super(pointer, SIZE);
   }
 
