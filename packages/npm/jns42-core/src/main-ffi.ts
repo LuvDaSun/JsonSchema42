@@ -1,8 +1,8 @@
 import path from "path";
-import { FfiExports, FfiWrapper, Pointer, Size } from "./ffi-wrapper.js";
 import { projectRoot } from "./root.js";
+import { Exports, Ffi, Pointer, Size } from "./utils/index.js";
 
-export interface Exports extends FfiExports {
+export interface MainExports extends Exports {
   alloc(size: Size): Pointer;
   dealloc(pointer: Pointer, size: Size): void;
 
@@ -25,4 +25,8 @@ export interface Exports extends FfiExports {
   to_screaming_snake_case(value: Pointer): Pointer;
 }
 
-export const ffi = FfiWrapper.fromFile<Exports>(path.join(projectRoot, "bin", "main.wasm"));
+export type MainFfi = Ffi<MainExports>;
+
+export const mainFfi: MainFfi = Ffi.fromFile<MainExports>(
+  path.join(projectRoot, "bin", "main.wasm"),
+);

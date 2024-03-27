@@ -1,6 +1,6 @@
 import assert from "node:assert";
 import test from "node:test";
-import { ffi } from "./ffi.js";
+import { mainFfi } from "../main-ffi.js";
 import { NamesBuilder } from "./naming.js";
 
 test("names", () => {
@@ -63,10 +63,10 @@ test("names leak test", () => {
       assert.equal(actual, expected);
     }
   }
-  const byteLength = ffi.exports.memory.buffer.byteLength;
+  const byteLength = mainFfi.exports.memory.buffer.byteLength;
   for (let index = 0; index < 100000; index++) {
     runTest();
 
-    assert.equal(ffi.exports.memory.buffer.byteLength, byteLength);
+    assert.equal(mainFfi.exports.memory.buffer.byteLength, byteLength);
   }
 });

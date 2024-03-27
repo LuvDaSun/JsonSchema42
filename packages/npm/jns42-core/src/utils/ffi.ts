@@ -3,11 +3,11 @@ import fs from "node:fs";
 export type Size = number;
 export type Pointer = number;
 
-export interface FfiExports {
+export interface Exports {
   memory: WebAssembly.Memory;
 }
 
-export class FfiWrapper<E extends FfiExports> {
+export class Ffi<E extends Exports> {
   public readonly textEncoder = new TextEncoder();
   public readonly textDecoder = new TextDecoder("utf-8", {
     ignoreBOM: true,
@@ -36,23 +36,23 @@ export class FfiWrapper<E extends FfiExports> {
     return this.memoryViewCache;
   }
 
-  public static fromFile<E extends FfiExports>(path: string) {
+  public static fromFile<E extends Exports>(path: string) {
     const buffer = fs.readFileSync(path);
-    return FfiWrapper.fromBuffer<E>(buffer);
+    return Ffi.fromBuffer<E>(buffer);
   }
 
-  public static fromBuffer<E extends FfiExports>(buffer: BufferSource) {
+  public static fromBuffer<E extends Exports>(buffer: BufferSource) {
     const module = new WebAssembly.Module(buffer);
-    return FfiWrapper.fromModule<E>(module);
+    return Ffi.fromModule<E>(module);
   }
 
-  public static fromModule<E extends FfiExports>(module: WebAssembly.Module) {
+  public static fromModule<E extends Exports>(module: WebAssembly.Module) {
     const instance = new WebAssembly.Instance(module, {});
-    return FfiWrapper.fromInstance<E>(instance);
+    return Ffi.fromInstance<E>(instance);
   }
 
-  public static fromInstance<E extends FfiExports>(instance: WebAssembly.Instance) {
-    return new FfiWrapper<E>(instance);
+  public static fromInstance<E extends Exports>(instance: WebAssembly.Instance) {
+    return new Ffi<E>(instance);
   }
 
   private constructor(private readonly instance: WebAssembly.Instance) {

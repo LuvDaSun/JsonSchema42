@@ -1,21 +1,21 @@
 import assert from "assert";
-import { Pointer } from "./ffi-wrapper.js";
-import { ffi } from "./ffi.js";
+import { mainFfi } from "../main-ffi.js";
+import { Pointer } from "../utils/ffi.js";
 
 export class Out {
   private constructor(private readonly pointer: Pointer) {}
 
   public static createNullReference() {
-    const pointer = ffi.exports.alloc(1 * 4);
+    const pointer = mainFfi.exports.alloc(1 * 4);
     assert(pointer > 0);
-    ffi.memoryView.setInt32(pointer, 0, true);
+    mainFfi.memoryView.setInt32(pointer, 0, true);
 
     const instance = new Out(pointer);
     return instance;
   }
 
   public getReference() {
-    const reference = ffi.memoryView.getInt32(this.pointer, true);
+    const reference = mainFfi.memoryView.getInt32(this.pointer, true);
     return reference;
   }
 
@@ -24,6 +24,6 @@ export class Out {
   }
 
   [Symbol.dispose]() {
-    ffi.exports.dealloc(this.pointer, 1 * 4);
+    mainFfi.exports.dealloc(this.pointer, 1 * 4);
   }
 }
