@@ -22,9 +22,7 @@ Then first we derive sentences from this url. they are:
 
 If this model would also have a contextual name, that would simply be added to the list of sentences.
 
-We do this for every model. So we have a list of sentences for every model. Now, for every unique sentence we can calculate it's cardinality. If a sentence has a cardinality that is equal to the number of models then we remove it from the original list of sentences and recalculate the cardinality of unique sentences until every sentence has a cardinality lower than the number of models.
-
-We do this as an optimization and to remove non-identifying double sentences. In our example every model in the schema has `employee` as a sentence. But is is only identifying in our example model.
+We do this for every model. So we have a list of sentences for every model. Now, for every unique sentence we can calculate it's cardinality.
 
 We call the sentence and the meta data a name part. We remove any parts with a double sentence. We sort the parts for every model bases on their cardinality (and possibly other metadata, like index). We could come up with a list like this:
 

@@ -72,6 +72,8 @@ where
     sentences_map: &BTreeMap<K, Vec<Sentence>>,
     cardinality_counters: &BTreeMap<Sentence, usize>,
   ) -> BTreeMap<K, BTreeSet<NamePart>> {
+    let key_count = sentences_map.len();
+
     sentences_map
       .iter()
       .map(|(key, sentences)| {
@@ -80,14 +82,25 @@ where
           sentences
             .iter()
             .enumerate()
-            .map(|(index, sentence)| NamePart {
-              cardinality: cardinality_counters
-                .get(sentence)
-                .copied()
-                .unwrap_or_default(),
-              index,
-              sentence: sentence.clone(),
-              is_head: index == sentences.len() - 1,
+            .map(|(index, sentence)| {
+              // how many times does this sentence occur in our sentences
+              let local_cardinality = sentences
+                .iter()
+                .filter(|current_sentence| *current_sentence == sentence)
+                .count();
+              // adjust cardinality if this sentence occurs multiple times
+              let adjust_cardinality = (local_cardinality - 1) * key_count;
+
+              // maximum cardinality is the number of keys
+              let cardinality =
+                key_count.min(cardinality_counters.get(sentence).unwrap() - adjust_cardinality);
+
+              NamePart {
+                cardinality,
+                index,
+                sentence: sentence.clone(),
+                is_head: index == sentences.len() - 1,
+              }
             })
             .collect(),
         )
@@ -259,14 +272,20 @@ mod tests {
   #[test]
   fn test_names_2() {
     let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, "x")
       .add(1, "cat")
-      .add(1, "properties")
+      .add(1, "a")
+      .add(1, "b ")
       .add(1, "id")
+      .add(2, "x")
       .add(2, "dog")
-      .add(2, "properties")
+      .add(2, "a")
+      .add(2, "b")
       .add(2, "id")
+      .add(3, "x")
       .add(3, "goat")
-      .add(3, "properties")
+      .add(3, "a")
+      .add(3, "b")
       .add(3, "id")
       .build()
       .into_iter()
@@ -275,6 +294,27 @@ mod tests {
       (1, Sentence::new("cat id")),
       (2, Sentence::new("dog id")),
       (3, Sentence::new("goat id")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn test_names_3() {
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, "schema")
+      .add(1, "cat")
+      .add(1, "id")
+      .add(2, "schema")
+      .add(2, "schema")
+      .add(2, "id")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = [
+      (1, Sentence::new("cat id")),
+      (2, Sentence::new("schema id")),
     ]
     .into_iter()
     .collect();
