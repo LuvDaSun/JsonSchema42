@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: corepack enable
+      - run: rustup add target wasm32-unknown-unknown
       - uses: actions/checkout@v4
       - run: make packages/npm/jns42-core/bin/main.wasm
       - run: npm ci
