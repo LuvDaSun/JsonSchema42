@@ -30,9 +30,8 @@ where
   }
 
   pub fn build(&self) -> Names<K> {
-    let (sentences_map, cardinality_counters) =
-      Self::make_sentences_map_and_cardinality_counters(self.sentences_map.clone());
-    let part_map = Self::make_parts_map(sentences_map, cardinality_counters);
+    let cardinality_counters = Self::make_cardinality_counters(&self.sentences_map);
+    let part_map = Self::make_parts_map(&self.sentences_map, &cardinality_counters);
     let optimized_names = Self::make_optimized_names(part_map);
     let optimized_names = Self::make_default_names(optimized_names, self.default_sentence.clone());
     let names = Self::make_names(optimized_names);
@@ -41,92 +40,43 @@ where
   }
 
   /// create a new, normalized, sentences map and cardinality counters
-  fn make_sentences_map_and_cardinality_counters(
-    mut sentences_map: BTreeMap<K, Vec<Sentence>>,
-  ) -> (BTreeMap<K, Vec<Sentence>>, BTreeMap<Sentence, usize>) {
-    let key_count = sentences_map.len();
+  fn make_cardinality_counters(
+    sentences_map: &BTreeMap<K, Vec<Sentence>>,
+  ) -> BTreeMap<Sentence, usize> {
     let mut cardinality_counters = BTreeMap::<Sentence, usize>::new();
 
-    loop {
-      let mut done = true;
+    // calculate unique cardinality for every sentence
+    for sentences in sentences_map.values() {
+      // we ignore empty sentences
+      if sentences.is_empty() {
+        continue;
+      }
 
-      // calculate unique cardinality for every sentence
-      for sentences in sentences_map.values() {
-        // we ignore empty sentences
-        if sentences.is_empty() {
+      for sentence in sentences {
+        if sentence.is_empty() {
           continue;
         }
 
-        // make sentences unique
-        let sentences: BTreeSet<Sentence> = sentences.iter().cloned().collect();
-        for sentence in sentences {
-          if sentence.is_empty() {
-            continue;
-          }
-
-          // for every unique name part add 1 to cardinality
-          let cardinality = cardinality_counters.entry(sentence).or_default();
-          *cardinality += 1;
-
-          if *cardinality >= key_count {
-            done = false
-          }
-        }
+        // for every unique name part add 1 to cardinality
+        let cardinality = cardinality_counters.entry(sentence.clone()).or_default();
+        *cardinality += 1;
       }
-
-      if done {
-        break;
-      }
-
-      // if we get to here we need to reduce cardinality for some sentences, so let's figure out
-      // which ones we need to remove
-      let remove_sentences: BTreeSet<_> = cardinality_counters
-        .into_iter()
-        .filter_map(|(sentence, cardinality)| {
-          if cardinality < key_count {
-            None
-          } else {
-            Some(sentence.clone())
-          }
-        })
-        .collect();
-
-      for sentences in &mut sentences_map.values_mut() {
-        let mut remove_sentences = remove_sentences.clone();
-        let mut sentence_count = sentences.len();
-
-        *sentences = sentences
-          .iter()
-          .filter(|sentence| {
-            if remove_sentences.remove(sentence) {
-              sentence_count -= 1;
-              // only keep the last sentence
-              sentence_count == 0
-            } else {
-              true
-            }
-          })
-          .cloned()
-          .collect();
-      }
-
-      cardinality_counters = BTreeMap::new();
     }
 
-    (sentences_map, cardinality_counters)
+    cardinality_counters
   }
 
   /// Create a map with a value of a tuple where the first element is the optimized
   /// name (initially empty) and then an ordered set of name parts
   fn make_parts_map(
-    sentences_map: BTreeMap<K, Vec<Sentence>>,
-    cardinality_counters: BTreeMap<Sentence, usize>,
+    sentences_map: &BTreeMap<K, Vec<Sentence>>,
+    cardinality_counters: &BTreeMap<Sentence, usize>,
   ) -> BTreeMap<K, BTreeSet<NamePart>> {
-    let parts_map = sentences_map
-      .into_iter()
+    sentences_map
+      .iter()
       .map(|(key, sentences)| {
         (
-          key,
+          key.clone(),
           sentences
             .iter()
             .enumerate()
@@ -142,9 +92,7 @@ where
             .collect(),
         )
       })
-      .collect();
-
-    parts_map
+      .collect()
   }
 
   fn make_optimized_names(
@@ -246,51 +194,6 @@ mod tests {
   use super::*;
 
   #[test]
-  fn test_make_sentences_map_and_cardinality_counters() {
-    let sentences_map = [
-      (
-        1,
-        vec![Sentence::new("a"), Sentence::new("a"), Sentence::new("c")],
-      ),
-      (
-        2,
-        vec![Sentence::new("a"), Sentence::new("b"), Sentence::new("c")],
-      ),
-      (
-        3,
-        vec![Sentence::new("a"), Sentence::new("a b"), Sentence::new("c")],
-      ),
-      (
-        4,
-        vec![Sentence::new("a"), Sentence::new("a b"), Sentence::new("c")],
-      ),
-      (5, vec![Sentence::new("a"), Sentence::new("c")]),
-    ]
-    .into();
-    let (sentences_map_actual, cardinality_counters_actual) =
-      NamesBuilder::make_sentences_map_and_cardinality_counters(sentences_map);
-
-    let sentences_map_expected: BTreeMap<_, Vec<Sentence>> = [
-      (1, vec![Sentence::new("a")]),
-      (2, vec![Sentence::new("b")]),
-      (3, vec![Sentence::new("a b")]),
-      (4, vec![Sentence::new("a b")]),
-      (5, vec![Sentence::new("c")]),
-    ]
-    .into();
-    let cardinality_counters_expected: BTreeMap<Sentence, usize> = [
-      (Sentence::new("a"), 1),
-      (Sentence::new("b"), 1),
-      (Sentence::new("a b"), 2),
-      (Sentence::new("c"), 1),
-    ]
-    .into();
-
-    assert_eq!(sentences_map_actual, sentences_map_expected);
-    assert_eq!(cardinality_counters_actual, cardinality_counters_expected);
-  }
-
-  #[test]
   fn test_names_1() {
     let actual: BTreeSet<_> = NamesBuilder::new()
       .add(1, "a")
@@ -323,8 +226,8 @@ mod tests {
       .collect();
     let expected: BTreeSet<_> = [
       (1, Sentence::new("a")),
-      (2, Sentence::new("b")),
-      (3, Sentence::new("c b")),
+      (2, Sentence::new("b a")),
+      (3, Sentence::new("c a")),
     ]
     .into_iter()
     .collect();
@@ -369,9 +272,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat")),
-      (2, Sentence::new("dog")),
-      (3, Sentence::new("goat")),
+      (1, Sentence::new("cat id")),
+      (2, Sentence::new("dog id")),
+      (3, Sentence::new("goat id")),
     ]
     .into_iter()
     .collect();
