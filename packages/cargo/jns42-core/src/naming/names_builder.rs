@@ -18,18 +18,67 @@ where
     self
   }
 
-  pub fn build(&self, maximum_iterations: usize) -> Names<K> {
-    // first we calculate the cardinality of each name-part we use this map to keep
-    // count
+  pub fn build(&self) -> Names<K> {
+    let key_count = self.0.len();
+    let mut sentences_map = self.0.clone();
     let mut cardinality_counters = BTreeMap::<_, usize>::new();
-    for (_key, sentences) in self.0.iter() {
-      // unique name parts
-      let sentences: BTreeSet<_> = sentences.iter().collect();
-      for sentence in sentences {
-        // for every unique name part add 1 to cardinality
-        let cardinality = cardinality_counters.entry(sentence).or_default();
-        *cardinality += 1;
+
+    loop {
+      let mut maximum_cardinality = 0;
+      // calculate unique cardinality for every sentence
+      for sentences in sentences_map.values() {
+        // we ignore empty sentences
+        if sentences.is_empty() {
+          continue;
+        }
+
+        // make sentences unique
+        let sentences: BTreeSet<_> = sentences.iter().collect();
+        for sentence in sentences {
+          // for every unique name part add 1 to cardinality
+          let cardinality = cardinality_counters.entry(sentence).or_default();
+          *cardinality += 1;
+
+          maximum_cardinality = maximum_cardinality.max(*cardinality);
+        }
       }
+
+      // if the maximum cardinality is smaller than the number of keys then we are done here
+      if maximum_cardinality < key_count {
+        break;
+      }
+
+      // if we get to here we need to reduce cardinality for some sentences, so let's figure out
+      // which ones we need to remove
+      let remove_sentences: BTreeSet<_> = cardinality_counters
+        .into_iter()
+        .filter_map(|(sentence, cardinality)| {
+          if cardinality < key_count {
+            Some(sentence.clone())
+          } else {
+            None
+          }
+        })
+        .collect();
+
+      for sentences in &mut sentences_map.values_mut() {
+        for remove_sentence in &remove_sentences {
+          let Some(index) = sentences
+            .iter()
+            .position(|sentence| sentence == remove_sentence)
+          else {
+            continue;
+          };
+
+          // if it is the last element, we won't remove
+          if index == sentences.len() - 1 {
+            continue;
+          }
+          sentences.remove(index);
+        }
+      }
+
+      cardinality_counters = BTreeMap::new();
     }
 
     // then we create part's that we can optimize. The key is the original key, then the
@@ -57,7 +106,7 @@ where
     // then run the optimization process! we keep on iterating the optimization until we reach the
     // maximum number of iterations, or if there is nothing more to optimize.
 
-    for _iteration in 0..maximum_iterations {
+    loop {
       let mut done = true;
       optimized_names = Default::default();
 
@@ -134,7 +183,7 @@ mod tests {
     let actual: BTreeSet<_> = NamesBuilder::new()
       .add(1, "A")
       .add(2, "")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [(1, Sentence::new("a")), (2, Sentence::new(""))]
@@ -145,7 +194,7 @@ mod tests {
     let actual: BTreeSet<_> = NamesBuilder::new()
       .add(1, "A")
       .add(2, "B")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [(1, Sentence::new("A")), (2, Sentence::new("B"))]
@@ -159,7 +208,7 @@ mod tests {
       .add(2, "C")
       .add(3, "B")
       .add(3, "D")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
@@ -175,7 +224,7 @@ mod tests {
       .add(1, "cat properties id")
       .add(2, "dog properties id")
       .add(3, "goat properties id")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
@@ -191,7 +240,7 @@ mod tests {
       .add(1, "a")
       .add(2, "a b")
       .add(3, "a b c")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
@@ -207,7 +256,7 @@ mod tests {
       .add(1, "a")
       .add(2, "b a")
       .add(3, "c b a")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
@@ -223,7 +272,7 @@ mod tests {
       .add(1, "a b c")
       .add(2, "b c a")
       .add(3, "c a b")
-      .build(5)
+      .build()
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [

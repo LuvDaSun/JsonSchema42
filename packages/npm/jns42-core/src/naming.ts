@@ -17,8 +17,8 @@ export class NamesBuilder {
     return this;
   }
 
-  public build(maximumIterations: number) {
-    const pointer = wasmExports.names_builder_build(this.pointer, maximumIterations);
+  public build() {
+    const pointer = wasmExports.names_builder_build(this.pointer);
     return new Names(pointer);
   }
 

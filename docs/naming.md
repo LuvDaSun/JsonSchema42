@@ -5,12 +5,14 @@ From the schema we generate models, every model needs a name! Names are derived 
 For instance if we have a model with key `25` that has the following url:
 
 ```yaml
-- http://example.com/schema.json/#/$defs/Employee/properties/FirstName
+- http://example.com/schemas/employee/schema.json/#/$defs/Employee/properties/FirstName
 ```
 
 Then first we derive sentences from this url. they are:
 
 ```yaml
+- schemas
+- employee
 - schema json
 - defs
 - employee
@@ -20,19 +22,31 @@ Then first we derive sentences from this url. they are:
 
 If this model would also have a contextual name, that would simply be added to the list of sentences.
 
-We do this for every model. So we have a list of sentences for every model. Now, for every sentence we can calculate it's cardinality and possible some other metadata. We call the sentence and the meta data a name part. We sort the parts for every model bases on their cardinality (and possibly some other metadata). We could come up with a list like this:
+We do this for every model. So we have a list of sentences for every model. Now, for every unique sentence we can calculate it's cardinality. If a sentence has a cardinality that is equal to the number of models then we remove it from the original list of sentences and recalculate the cardinality of unique sentences until every sentence has a cardinality lower than the number of models.
+
+We do this as an optimization and to remove non-identifying double sentences. In our example every model in the schema has `employee` as a sentence. But is is only identifying in our example model.
+
+We call the sentence and the meta data a name part. We remove any parts with a double sentence. We sort the parts for every model bases on their cardinality (and possibly other metadata, like index). We could come up with a list like this:
 
 ```yaml
-- sentence: schema json
-  cardinality: 100
-- sentence: properties
-  cardinality: 80
-- sentence: defs
-  cardinality: 70
-- sentence: employee
-  cardinality: 10
 - sentence: first name
   cardinality: 2
+  index: 6
+- sentence: employee
+  cardinality: 10
+  index: 4
+- sentence: defs
+  cardinality: 70
+  index: 3
+- sentence: properties
+  cardinality: 80
+  index: 5
+- sentence: schema json
+  cardinality: 100
+  index: 2
+- sentence: schemas
+  cardinality: 100
+  index: 0
 ```
 
 Now we build unique names for every model. We start with an empty name. And we calculate the cardinality of that unique name. If there are many models this cardinality is more than 1.
@@ -62,5 +76,3 @@ It is possible that we can not find a unique name for every model! If this is th
 ```
 
 The ordering is based on the key of the model.
-
-An optimization of the process could be to drop the sentences that have the same cardinality as the number of models.

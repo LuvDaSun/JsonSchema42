@@ -29,13 +29,12 @@ pub extern "C" fn names_builder_add(
 #[no_mangle]
 pub extern "C" fn names_builder_build(
   names_builder: *mut NamesBuilder<usize>,
-  maximum_iterations: usize,
 ) -> *mut Names<usize> {
   assert!(!names_builder.is_null());
 
   let names_builder = unsafe { &mut *names_builder };
 
-  let names = names_builder.build(maximum_iterations);
+  let names = names_builder.build();
   let names = Box::new(names);
   Box::into_raw(names)
 }

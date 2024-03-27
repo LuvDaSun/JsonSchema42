@@ -15,7 +15,6 @@ export interface Specification {
 
 export interface LoadSpecificationConfiguration {
   transformMaximumIterations: number;
-  nameMaximumIterations: number;
   defaultTypeName: string;
 }
 
@@ -23,7 +22,7 @@ export function loadSpecification(
   document: schemaIntermediate.SchemaDocument,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
-  const { transformMaximumIterations, nameMaximumIterations, defaultTypeName } = configuration;
+  const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
@@ -46,7 +45,7 @@ export function loadSpecification(
     }
   }
 
-  const names = namesBuilder.build(nameMaximumIterations);
+  const names = namesBuilder.build();
 
   // transform the validatorsArena
   {

@@ -310,8 +310,8 @@ impl Specification {
       }
     }
 
-    let primary_names = primary_names.build(5).into_iter();
-    let secondary_names = secondary_names.build(5).into_iter();
+    let primary_names = primary_names.build().into_iter();
+    let secondary_names = secondary_names.build().into_iter();
 
     let names = empty()
       .chain(primary_names.map(|(key, parts)| (key, (true, parts))))

@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { wasmExports } from "./ffi.js";
-import { NamesBuilder } from "./names.js";
+import { NamesBuilder } from "./naming.js";
 
 test("names", () => {
   using namesBuilder = NamesBuilder.new()
@@ -12,7 +12,7 @@ test("names", () => {
     .add(3, "dog")
     .add(3, "id");
 
-  using names = namesBuilder.build(5);
+  using names = namesBuilder.build();
 
   {
     const actual = names.toSnakeCase(1);
@@ -43,7 +43,7 @@ test("names leak test", () => {
       .add(3, "dog")
       .add(3, "id");
 
-    using names = namesBuilder.build(5);
+    using names = namesBuilder.build();
 
     {
       const actual = names.toSnakeCase(1);

@@ -59,11 +59,6 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "string",
           default: "schema-document",
         })
-        .option("name-maximum-iterations", {
-          description: "maximum number of iterations for finding unique names",
-          type: "number",
-          default: 5,
-        })
         .option("transform-maximum-iterations", {
           description: "maximum number of iterations for transforming",
           type: "number",
@@ -80,7 +75,6 @@ interface MainConfiguration {
   packageName: string;
   packageVersion: string;
   defaultTypeName: string;
-  nameMaximumIterations: number;
   transformMaximumIterations: number;
 }
 
@@ -92,7 +86,6 @@ async function main(configuration: MainConfiguration) {
   const {
     packageName,
     packageVersion,
-    nameMaximumIterations,
     transformMaximumIterations,
     defaultTypeName: defaultName,
   } = configuration;
@@ -206,7 +199,6 @@ async function main(configuration: MainConfiguration) {
 
       using specification = models.loadSpecification(intermediateDocument, {
         transformMaximumIterations,
-        nameMaximumIterations,
         defaultTypeName,
       });
 
