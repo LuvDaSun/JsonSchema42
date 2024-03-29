@@ -6,7 +6,7 @@ export abstract class Structure {
   private disposed = false;
 
   public readonly pointer: Pointer;
-  protected readonly size: Size;
+  public readonly size: Size;
   private owning = true;
 
   protected constructor(pointer: Pointer, size: Size) {
