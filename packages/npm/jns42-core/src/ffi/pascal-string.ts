@@ -10,17 +10,17 @@ const DATA_POINTER_OFFSET = 1 * 4;
 
 export class PascalString extends Structure {
   private get dataSize() {
-    return this.getInt32(DATA_SIZE_OFFSET);
+    return this.getUint32(DATA_SIZE_OFFSET);
   }
   private set dataSize(value: Size) {
-    this.setInt32(DATA_SIZE_OFFSET, value);
+    this.setUint32(DATA_SIZE_OFFSET, value);
   }
 
   private get dataPointer() {
-    return this.getInt32(DATA_POINTER_OFFSET);
+    return this.getUint32(DATA_POINTER_OFFSET);
   }
   private set dataPointer(value: Pointer) {
-    this.setInt32(DATA_POINTER_OFFSET, value);
+    this.setUint32(DATA_POINTER_OFFSET, value);
   }
 
   protected constructor(pointer: Pointer) {

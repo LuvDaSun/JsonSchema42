@@ -7,6 +7,7 @@ export abstract class Structure {
 
   public readonly pointer: Pointer;
   protected readonly size: Size;
+  private owning = true;
 
   protected constructor(pointer: Pointer, size: Size) {
     assert(size > 0);
@@ -16,6 +17,14 @@ export abstract class Structure {
     } else {
       this.pointer = pointer;
     }
+  }
+
+  public release() {
+    this.owning = false;
+  }
+
+  public acquire() {
+    this.owning = true;
   }
 
   protected allocate() {
@@ -36,6 +45,16 @@ export abstract class Structure {
     return mainFfi.memoryUint8.slice(this.pointer + offset, this.pointer + offset + size);
   }
 
+  protected setUint32(offset: number, value: number) {
+    assert(offset <= this.size);
+    mainFfi.memoryView.setUint32(this.pointer + offset, value, true);
+  }
+
+  protected getUint32(offset: number) {
+    assert(offset <= this.size);
+    return mainFfi.memoryView.getUint32(this.pointer + offset, true);
+  }
+
   protected setInt32(offset: number, value: number) {
     assert(offset <= this.size);
     mainFfi.memoryView.setInt32(this.pointer + offset, value, true);
@@ -48,8 +67,10 @@ export abstract class Structure {
 
   [Symbol.dispose]() {
     assert(!this.disposed);
-    if (this.size > 0) {
-      this.deallocate();
+    if (this.owning) {
+      if (this.size > 0) {
+        this.deallocate();
+      }
     }
     this.disposed = true;
   }
