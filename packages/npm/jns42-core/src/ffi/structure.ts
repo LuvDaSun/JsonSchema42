@@ -15,12 +15,7 @@ export abstract class Structure {
       this.pointer = this.allocate();
     } else {
       this.pointer = pointer;
-      this.load();
     }
-  }
-
-  protected load() {
-    //
   }
 
   protected allocate() {
@@ -31,15 +26,25 @@ export abstract class Structure {
     mainFfi.exports.dealloc(this.pointer, this.size);
   }
 
-  // protected setBytes(bytes: Uint8Array, offset = 0) {
-  //   assert(offset + bytes.length <= this.size);
-  //   mainFfi.memoryUint8.set(bytes, this.pointer + offset);
-  // }
+  protected setBytes(bytes: Uint8Array, offset = 0) {
+    assert(offset + bytes.length <= this.size);
+    mainFfi.memoryUint8.set(bytes, this.pointer + offset);
+  }
 
-  // protected getBytes(offset = 0, size = this.size) {
-  //   assert(offset + size <= this.size);
-  //   return mainFfi.memoryUint8.slice(this.pointer + offset, this.pointer + offset + size);
-  // }
+  protected getBytes(offset = 0, size = this.size) {
+    assert(offset + size <= this.size);
+    return mainFfi.memoryUint8.slice(this.pointer + offset, this.pointer + offset + size);
+  }
+
+  protected setInt32(offset: number, value: number) {
+    assert(offset <= this.size);
+    mainFfi.memoryView.setInt32(this.pointer + offset, value, true);
+  }
+
+  protected getInt32(offset: number) {
+    assert(offset <= this.size);
+    return mainFfi.memoryView.getInt32(this.pointer + offset, true);
+  }
 
   [Symbol.dispose]() {
     assert(!this.disposed);

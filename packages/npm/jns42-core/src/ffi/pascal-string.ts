@@ -10,17 +10,17 @@ const DATA_POINTER_OFFSET = 1 * 4;
 
 export class PascalString extends Structure {
   private get dataSize() {
-    return mainFfi.memoryView.getInt32(this.pointer + DATA_SIZE_OFFSET, true);
+    return this.getInt32(DATA_SIZE_OFFSET);
   }
   private set dataSize(value: Size) {
-    mainFfi.memoryView.setInt32(this.pointer + DATA_SIZE_OFFSET, value, true);
+    this.setInt32(DATA_SIZE_OFFSET, value);
   }
 
   private get dataPointer() {
-    return mainFfi.memoryView.getInt32(this.pointer + DATA_POINTER_OFFSET, true);
+    return this.getInt32(DATA_POINTER_OFFSET);
   }
   private set dataPointer(value: Pointer) {
-    mainFfi.memoryView.setInt32(this.pointer + DATA_POINTER_OFFSET, value, true);
+    this.setInt32(DATA_POINTER_OFFSET, value);
   }
 
   protected constructor(pointer: Pointer) {
