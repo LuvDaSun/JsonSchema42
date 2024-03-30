@@ -1,36 +1,24 @@
-import assert from "assert";
 import { NULL_POINTER, Pointer } from "../utils/ffi.js";
-import { Structure } from "./structure.js";
+import { Structure2 } from "./structure-2.js";
 
-const VALUE_OFFSET = 0;
-
-const SIZE = 1;
-
-export class BooleanStructure extends Structure {
-  protected get value() {
-    return Boolean(this.getInt8(VALUE_OFFSET));
+export class BooleanStructure extends Structure2 {
+  public get value(): boolean | undefined {
+    if (this.pointer === NULL_POINTER) {
+      return undefined;
+    } else {
+      return Boolean(this.getInt8(0));
+    }
   }
-  protected set value(value: boolean) {
-    this.setInt8(VALUE_OFFSET, Number(value));
+  public set value(value: boolean | undefined) {
+    if (value == null) {
+      this.allocate(0);
+    } else {
+      this.allocate(1);
+      this.setInt8(0, Number(value));
+    }
   }
 
   protected constructor(pointer: Pointer) {
-    super(pointer, SIZE);
-  }
-
-  public static fromPointer(pointer: Pointer) {
-    assert(pointer !== NULL_POINTER);
-
-    return new BooleanStructure(pointer);
-  }
-
-  public static fromValue(value: boolean) {
-    const instance = new BooleanStructure(NULL_POINTER);
-    instance.value = value;
-    return instance;
-  }
-
-  public toValue() {
-    return this.value;
+    super(pointer, 1);
   }
 }
