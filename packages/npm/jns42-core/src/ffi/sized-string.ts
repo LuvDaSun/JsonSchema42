@@ -8,11 +8,11 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class Utf8String extends Slice {
+export class SizedString extends Slice {
   public static fromPointer(pointer: Pointer) {
     assert(pointer !== NULL_POINTER);
 
-    const instance = new Utf8String(pointer);
+    const instance = new SizedString(pointer);
     return instance;
   }
 
@@ -20,7 +20,7 @@ export class Utf8String extends Slice {
     const bytes = textEncoder.encode(value);
     const slice = Slice.fromBytes(bytes);
 
-    const instance = Utf8String.fromPointer(slice.pointer);
+    const instance = SizedString.fromPointer(slice.pointer);
     return instance;
   }
 
