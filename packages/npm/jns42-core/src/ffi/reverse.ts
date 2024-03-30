@@ -1,12 +1,12 @@
 import { mainFfi } from "../main-ffi.js";
 import { Out } from "./out.js";
-import { PascalString } from "./pascal-string.js";
+import { Utf8String } from "./string.js";
 
 export function reverse(value: string): string {
   using resultOut = Out.createNull();
-  using valuePascalString = PascalString.fromString(value);
-  mainFfi.exports.reverse(valuePascalString.pointer, resultOut.pointer);
-  using resultPascalString = PascalString.fromPointer(resultOut.reference);
-  const result = resultPascalString.toString();
+  using valueString = Utf8String.fromString(value);
+  mainFfi.exports.reverse(valueString.pointer, resultOut.pointer);
+  using resultString = Utf8String.fromPointer(resultOut.reference);
+  const result = resultString.toString();
   return result;
 }

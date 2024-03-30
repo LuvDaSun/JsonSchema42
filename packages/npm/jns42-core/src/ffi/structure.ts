@@ -2,7 +2,7 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
-export abstract class Structure {
+export class Structure {
   private disposed = false;
 
   public readonly pointer: Pointer;

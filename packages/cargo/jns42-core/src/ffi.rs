@@ -13,7 +13,7 @@ pub extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
 pub extern "C" fn names_builder_add(
   names_builder: *mut NamesBuilder<usize>,
   key: usize,
-  value: *const PascalString,
+  value: *const Utf8String,
 ) {
   assert!(!names_builder.is_null());
   assert!(!value.is_null());
@@ -29,7 +29,7 @@ pub extern "C" fn names_builder_add(
 #[no_mangle]
 pub extern "C" fn names_builder_set_default_name(
   names_builder: *mut NamesBuilder<usize>,
-  value: *const PascalString,
+  value: *const Utf8String,
 ) {
   assert!(!value.is_null());
 
@@ -56,24 +56,21 @@ pub extern "C" fn names_builder_build(
 
 /// get the name as camelCase
 #[no_mangle]
-pub extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *const PascalString {
+pub extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *const Utf8String {
   assert!(!names.is_null());
 
   let names = unsafe { &mut *names };
 
   let sentence = names.get_name(&key).clone();
   let result = sentence.to_camel_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
 /// get the name as PascalCase
 #[no_mangle]
-pub extern "C" fn names_to_pascal_case(
-  names: *mut Names<usize>,
-  key: usize,
-) -> *const PascalString {
+pub extern "C" fn names_to_pascal_case(names: *mut Names<usize>, key: usize) -> *const Utf8String {
   assert!(!names.is_null());
 
   let names = unsafe { &mut *names };
@@ -81,14 +78,14 @@ pub extern "C" fn names_to_pascal_case(
   let sentence = names.get_name(&key).clone();
 
   let result = sentence.to_pascal_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
 /// get the name as snake_case
 #[no_mangle]
-pub extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *const PascalString {
+pub extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *const Utf8String {
   assert!(!names.is_null());
 
   let names = unsafe { &mut *names };
@@ -96,7 +93,7 @@ pub extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *
   let sentence = names.get_name(&key).clone();
 
   let result = sentence.to_snake_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
@@ -106,7 +103,7 @@ pub extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *
 pub extern "C" fn names_to_screaming_snake_case(
   names: *mut Names<usize>,
   key: usize,
-) -> *const PascalString {
+) -> *const Utf8String {
   assert!(!names.is_null());
 
   let names = unsafe { &mut *names };
@@ -114,7 +111,7 @@ pub extern "C" fn names_to_screaming_snake_case(
   let sentence = names.get_name(&key).clone();
 
   let result = sentence.to_screaming_snake_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
@@ -140,13 +137,13 @@ pub extern "C" fn names_free(names: *mut Names<usize>) {
 }
 
 #[no_mangle]
-extern "C" fn reverse(value: *const PascalString, result_out: *mut Out<PascalString>) {
+extern "C" fn reverse(value: *const Utf8String, result_out: *mut Out<Utf8String>) {
   let value = unsafe { &*value };
   let value = value.as_str();
 
   let result: String = value.chars().rev().collect();
 
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
 
   let result_out = unsafe { &mut *result_out };
@@ -155,7 +152,7 @@ extern "C" fn reverse(value: *const PascalString, result_out: *mut Out<PascalStr
 
 /// get the name as camelCase
 #[no_mangle]
-pub extern "C" fn to_camel_case(value: *const PascalString) -> *const PascalString {
+pub extern "C" fn to_camel_case(value: *const Utf8String) -> *const Utf8String {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
@@ -163,14 +160,14 @@ pub extern "C" fn to_camel_case(value: *const PascalString) -> *const PascalStri
 
   let sentence = Sentence::new(value);
   let result = sentence.to_camel_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
 /// get the name as PascalCase
 #[no_mangle]
-pub extern "C" fn to_pascal_case(value: *const PascalString) -> *const PascalString {
+pub extern "C" fn to_pascal_case(value: *const Utf8String) -> *const Utf8String {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
@@ -179,14 +176,14 @@ pub extern "C" fn to_pascal_case(value: *const PascalString) -> *const PascalStr
   let sentence = Sentence::new(value);
 
   let result = sentence.to_pascal_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
 /// get the name as snake_case
 #[no_mangle]
-pub extern "C" fn to_snake_case(value: *const PascalString) -> *const PascalString {
+pub extern "C" fn to_snake_case(value: *const Utf8String) -> *const Utf8String {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
@@ -195,14 +192,14 @@ pub extern "C" fn to_snake_case(value: *const PascalString) -> *const PascalStri
   let sentence = Sentence::new(value);
 
   let result = sentence.to_snake_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
 
 /// get the name as SCREAMING_SNAKE_CASE
 #[no_mangle]
-pub extern "C" fn to_screaming_snake_case(value: *const PascalString) -> *const PascalString {
+pub extern "C" fn to_screaming_snake_case(value: *const Utf8String) -> *const Utf8String {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
@@ -211,7 +208,7 @@ pub extern "C" fn to_screaming_snake_case(value: *const PascalString) -> *const 
   let sentence = Sentence::new(value);
 
   let result = sentence.to_screaming_snake_case();
-  let result = PascalString::new(result);
+  let result = Utf8String::new(result);
   let result = Box::new(result);
   Box::into_raw(result)
 }
@@ -219,12 +216,12 @@ pub extern "C" fn to_screaming_snake_case(value: *const PascalString) -> *const 
 //#region data
 
 #[repr(C)]
-pub struct PascalString {
-  size: usize,
+pub struct Utf8String {
   data: *const u8,
+  size: usize,
 }
 
-impl PascalString {
+impl Utf8String {
   pub fn new(value: String) -> Self {
     let bytes = value.into_bytes();
     let data = bytes.into_boxed_slice();

@@ -10,12 +10,6 @@ export interface Exports {
 }
 
 export class Ffi<E extends Exports> {
-  public readonly textEncoder = new TextEncoder();
-  public readonly textDecoder = new TextDecoder("utf-8", {
-    ignoreBOM: true,
-    fatal: true,
-  });
-
   public get exports() {
     return this.instance.exports as unknown as E;
   }
