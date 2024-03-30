@@ -4,14 +4,14 @@ import { Structure } from "./structure.js";
 
 const SIZE = 1 * 4;
 
-const REFERENCE_OFFSET = 0 * 4;
+const TARGET_OFFSET = 0 * 4;
 
-export class Out extends Structure {
-  public get reference() {
-    return mainFfi.memoryView.getInt32(this.pointer + REFERENCE_OFFSET, true);
+export class Output extends Structure {
+  public get target() {
+    return mainFfi.memoryView.getInt32(this.pointer + TARGET_OFFSET, true);
   }
-  private set reference(value: Pointer) {
-    mainFfi.memoryView.setInt32(this.pointer + REFERENCE_OFFSET, value, true);
+  private set target(value: Pointer) {
+    mainFfi.memoryView.setInt32(this.pointer + TARGET_OFFSET, value, true);
   }
 
   protected constructor(pointer: Pointer) {
@@ -19,10 +19,8 @@ export class Out extends Structure {
   }
 
   public static createNull() {
-    const instance = new Out(NULL_POINTER);
-
-    instance.reference = NULL_POINTER;
-
+    const instance = new Output(NULL_POINTER);
+    instance.target = NULL_POINTER;
     return instance;
   }
 }

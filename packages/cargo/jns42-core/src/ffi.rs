@@ -137,7 +137,7 @@ pub extern "C" fn names_free(names: *mut Names<usize>) {
 }
 
 #[no_mangle]
-extern "C" fn reverse(value: *const SizedString, result_out: *mut Out<SizedString>) {
+extern "C" fn reverse(value: *const SizedString, result_output: *mut Output<SizedString>) {
   let value = unsafe { &*value };
   let value = value.as_str();
 
@@ -146,7 +146,7 @@ extern "C" fn reverse(value: *const SizedString, result_out: *mut Out<SizedStrin
   let result = SizedString::new(result);
   let result = Box::new(result);
 
-  let result_out = unsafe { &mut *result_out };
+  let result_out = unsafe { &mut *result_output };
   result_out.set(Box::into_raw(result));
 }
 
@@ -240,9 +240,9 @@ impl SizedString {
 }
 
 #[repr(C)]
-pub struct Out<T>(*const T);
+pub struct Output<T>(*const T);
 
-impl<T> Out<T> {
+impl<T> Output<T> {
   pub fn set(&mut self, value: *const T) {
     debug_assert!(self.0.is_null());
 
