@@ -228,7 +228,7 @@ impl SizedString {
     let size = data.len();
     let data = Box::into_raw(data) as *const u8;
 
-    Self { size, data }
+    Self { data, size }
   }
 
   pub fn as_str(&self) -> &str {
