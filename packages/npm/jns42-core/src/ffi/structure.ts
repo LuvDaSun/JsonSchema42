@@ -5,9 +5,8 @@ import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 export class Structure {
   private disposed = false;
 
-  public readonly pointer: Pointer;
+  public pointer: Pointer;
   public readonly size: Size;
-  private owning = true;
 
   protected constructor(pointer: Pointer, size: Size) {
     assert(size > 0);
@@ -19,19 +18,11 @@ export class Structure {
     }
   }
 
-  public release() {
-    this.owning = false;
-  }
-
-  public acquire() {
-    this.owning = true;
-  }
-
-  protected allocate() {
+  private allocate() {
     return mainFfi.exports.alloc(this.size);
   }
 
-  protected deallocate() {
+  private deallocate() {
     mainFfi.exports.dealloc(this.pointer, this.size);
   }
 
@@ -107,10 +98,9 @@ export class Structure {
 
   [Symbol.dispose]() {
     assert(!this.disposed);
-    if (this.owning) {
-      if (this.size > 0) {
-        this.deallocate();
-      }
+    if (this.size > 0) {
+      this.deallocate();
+      this.pointer = NULL_POINTER;
     }
     this.disposed = true;
   }
