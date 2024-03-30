@@ -1,3 +1,4 @@
+export * from "./boolean.js";
 export * from "./naming.js";
 export * from "./output.js";
 export * from "./reverse.js";

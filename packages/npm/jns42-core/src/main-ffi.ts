@@ -4,6 +4,7 @@ import { Exports, Ffi, Pointer, Size } from "./utils/index.js";
 
 export interface MainExports extends Exports {
   alloc(size: Size): Pointer;
+  realloc(pointer: Pointer, size_old: Size, size: Size): Pointer;
   dealloc(pointer: Pointer, size: Size): void;
 
   reverse(value: Pointer, result: Pointer): void;

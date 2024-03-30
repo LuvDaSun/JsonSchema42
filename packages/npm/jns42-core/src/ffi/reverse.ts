@@ -4,9 +4,9 @@ import { SizedString } from "./sized-string.js";
 
 export function reverse(value: string): string {
   using resultOutput = Output.createNull();
-  using valueString = SizedString.fromString(value);
+  using valueString = SizedString.fromValue(value);
   mainFfi.exports.reverse(valueString.pointer, resultOutput.pointer);
   using resultString = SizedString.fromPointer(resultOutput.targetPointer);
-  const result = resultString.toString();
+  const result = resultString.toValue();
   return result;
 }

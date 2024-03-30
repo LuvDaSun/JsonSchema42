@@ -10,7 +10,7 @@ const DEPRECATED_OFFSET = 8;
 const SIZE = 9;
 
 export class SchemaItem extends Structure {
-  protected get id() {
+  protected get idPointer() {
     const pointer = this.getInt32(this.pointer + ID_OFFSET);
     if (pointer === NULL_POINTER) {
       return undefined;
@@ -18,7 +18,7 @@ export class SchemaItem extends Structure {
       return SizedString.fromPointer(pointer);
     }
   }
-  protected set id(value: SizedString | undefined) {
+  protected set idPointer(value: SizedString | undefined) {
     if (value == null) {
       this.setInt32(this.pointer + ID_OFFSET, NULL_POINTER);
     } else {
@@ -26,7 +26,7 @@ export class SchemaItem extends Structure {
     }
   }
 
-  protected get title() {
+  protected get titlePointer() {
     const pointer = this.getInt32(this.pointer + TITLE_OFFSET);
     if (pointer === NULL_POINTER) {
       return undefined;
@@ -34,7 +34,7 @@ export class SchemaItem extends Structure {
       return SizedString.fromPointer(pointer);
     }
   }
-  protected set title(value: SizedString | undefined) {
+  protected set titlePointer(value: SizedString | undefined) {
     if (value == null) {
       this.setInt32(this.pointer + TITLE_OFFSET, NULL_POINTER);
     } else {
@@ -62,23 +62,23 @@ export class SchemaItem extends Structure {
   public static fromObject(object: SchemaItemObject) {
     const instance = new SchemaItem(NULL_POINTER);
 
-    instance.id = object.id == null ? undefined : SizedString.fromString(object.id);
-    instance.title = object.title == null ? undefined : SizedString.fromString(object.title);
+    instance.idPointer = object.id == null ? undefined : SizedString.fromValue(object.id);
+    instance.titlePointer = object.title == null ? undefined : SizedString.fromValue(object.title);
 
     return instance;
   }
 
   public toObject() {
     return {
-      id: this.id?.toString(),
-      title: this.title?.toString(),
+      id: this.idPointer?.toValue(),
+      title: this.titlePointer?.toValue(),
       deprecated: this.deprecated,
     };
   }
 
   [Symbol.dispose]() {
-    this.id?.[Symbol.dispose]();
-    this.title?.[Symbol.dispose]();
+    this.idPointer?.[Symbol.dispose]();
+    this.titlePointer?.[Symbol.dispose]();
 
     super[Symbol.dispose]();
   }

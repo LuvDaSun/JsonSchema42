@@ -28,7 +28,7 @@ export class CString extends Structure {
     return instance;
   }
 
-  public static fromString(value: string) {
+  public static fromValue(value: string) {
     const bytes = textEncoder.encode(value);
     const bytesSize = bytes.length;
     const instance = new CString(NULL_POINTER, bytesSize + 1);
@@ -37,7 +37,7 @@ export class CString extends Structure {
     return instance;
   }
 
-  public toString() {
+  public toValue() {
     const bytes = this.getBytes();
     const value = textDecoder.decode(bytes, { stream: false });
     return value;

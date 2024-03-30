@@ -16,7 +16,7 @@ export class SizedString extends Slice {
     return instance;
   }
 
-  public static fromString(value: string) {
+  public static fromValue(value: string) {
     const bytes = textEncoder.encode(value);
     const slice = Slice.fromBytes(bytes);
 
@@ -24,7 +24,7 @@ export class SizedString extends Slice {
     return instance;
   }
 
-  public toString() {
+  public toValue() {
     const bytes = this.toBytes();
     const value = textDecoder.decode(bytes, { stream: false });
     return value;
