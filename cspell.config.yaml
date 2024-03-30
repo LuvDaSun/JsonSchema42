@@ -6,6 +6,7 @@ words:
   - camelcase
   - cdylib
   - clippy
+  - cstring
   - dealloc
   - Deque
   - endregion

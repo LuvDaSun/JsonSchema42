@@ -45,6 +45,46 @@ export class Structure {
     return mainFfi.memoryUint8.slice(this.pointer + offset, this.pointer + offset + size);
   }
 
+  protected setUint8(offset: number, value: number) {
+    assert(offset <= this.size);
+    mainFfi.memoryView.setUint8(this.pointer + offset, value);
+  }
+
+  protected getUint8(offset: number) {
+    assert(offset <= this.size);
+    return mainFfi.memoryView.getUint8(this.pointer + offset);
+  }
+
+  protected setInt8(offset: number, value: number) {
+    assert(offset <= this.size);
+    mainFfi.memoryView.setInt8(this.pointer + offset, value);
+  }
+
+  protected getInt8(offset: number) {
+    assert(offset <= this.size);
+    return mainFfi.memoryView.getInt8(this.pointer + offset);
+  }
+
+  protected setUint16(offset: number, value: number) {
+    assert(offset <= this.size);
+    mainFfi.memoryView.setUint16(this.pointer + offset, value, true);
+  }
+
+  protected getUint16(offset: number) {
+    assert(offset <= this.size);
+    return mainFfi.memoryView.getUint16(this.pointer + offset, true);
+  }
+
+  protected setInt16(offset: number, value: number) {
+    assert(offset <= this.size);
+    mainFfi.memoryView.setInt16(this.pointer + offset, value, true);
+  }
+
+  protected getInt16(offset: number) {
+    assert(offset <= this.size);
+    return mainFfi.memoryView.getInt16(this.pointer + offset, true);
+  }
+
   protected setUint32(offset: number, value: number) {
     assert(offset <= this.size);
     mainFfi.memoryView.setUint32(this.pointer + offset, value, true);
