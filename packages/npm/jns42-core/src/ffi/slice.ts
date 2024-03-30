@@ -3,10 +3,10 @@ import { NULL_POINTER, Pointer, Size } from "../utils/ffi.js";
 import { Payload } from "./payload.js";
 import { Structure } from "./structure.js";
 
-const SIZE = 2 * 4;
+const SIZE = 8;
 
-const PAYLOAD_POINTER_OFFSET = 0 * 4;
-const PAYLOAD_SIZE_OFFSET = 1 * 4;
+const PAYLOAD_POINTER_OFFSET = 0;
+const PAYLOAD_SIZE_OFFSET = 4;
 
 export class Slice extends Structure {
   protected get payloadPointer() {

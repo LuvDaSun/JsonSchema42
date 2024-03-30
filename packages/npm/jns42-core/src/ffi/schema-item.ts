@@ -10,7 +10,7 @@ const DEPRECATED_OFFSET = 8;
 const SIZE = 9;
 
 export class SchemaItem extends Structure {
-  public get id() {
+  protected get id() {
     const pointer = this.getInt32(this.pointer + ID_OFFSET);
     if (pointer === NULL_POINTER) {
       return undefined;
@@ -18,7 +18,7 @@ export class SchemaItem extends Structure {
       return SizedString.fromPointer(pointer);
     }
   }
-  public set id(value: SizedString | undefined) {
+  protected set id(value: SizedString | undefined) {
     if (value == null) {
       this.setInt32(this.pointer + ID_OFFSET, NULL_POINTER);
     } else {
@@ -26,7 +26,7 @@ export class SchemaItem extends Structure {
     }
   }
 
-  public get title() {
+  protected get title() {
     const pointer = this.getInt32(this.pointer + TITLE_OFFSET);
     if (pointer === NULL_POINTER) {
       return undefined;
@@ -34,7 +34,7 @@ export class SchemaItem extends Structure {
       return SizedString.fromPointer(pointer);
     }
   }
-  public set title(value: SizedString | undefined) {
+  protected set title(value: SizedString | undefined) {
     if (value == null) {
       this.setInt32(this.pointer + TITLE_OFFSET, NULL_POINTER);
     } else {
@@ -42,10 +42,10 @@ export class SchemaItem extends Structure {
     }
   }
 
-  public get deprecated() {
+  protected get deprecated() {
     return Boolean(this.getInt8(DEPRECATED_OFFSET));
   }
-  public set deprecated(value: boolean) {
+  protected set deprecated(value: boolean) {
     this.setInt8(DEPRECATED_OFFSET, Number(value));
   }
 
