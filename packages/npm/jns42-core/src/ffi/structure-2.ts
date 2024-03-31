@@ -25,6 +25,7 @@ export class Structure2 {
   [Symbol.dispose]() {
     assert(!this.disposed);
 
+    // this will call detach if needed and that will eventually deallocate
     this.resize(0);
     this.disposed = true;
   }
@@ -131,10 +132,12 @@ export class Structure2 {
     this.onAttach();
     this.attached = true;
 
+    // if someone forgets to cleanup, then the garbage collector will do it
     finalizationRegistry.register(this, [this.pointer, this.size], this.token);
   }
 
   private detach() {
+    // we don't need to clean up detached memory
     finalizationRegistry.unregister(this.token);
 
     assert(this.attached);
