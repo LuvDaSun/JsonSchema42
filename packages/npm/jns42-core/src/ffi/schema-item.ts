@@ -58,10 +58,10 @@ export class SchemaItem extends Structure2 {
   }
 
   protected detach() {
+    super.detach();
+
     this.id[Symbol.dispose]();
     this.title[Symbol.dispose]();
-
-    super.detach();
   }
 }
 

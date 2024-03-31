@@ -4,6 +4,7 @@ import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
 export class Structure2 {
   private disposed = false;
+  private attached = false;
 
   public constructor(
     public pointer: Pointer,
@@ -21,11 +22,13 @@ export class Structure2 {
   }
 
   protected attach() {
-    //
+    assert(!this.attached);
+    this.attached = true;
   }
 
   protected detach() {
-    //
+    assert(this.attached);
+    this.attached = false;
   }
 
   protected resize(size: Size) {
