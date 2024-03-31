@@ -21,12 +21,12 @@ export class Structure2 {
     this.disposed = true;
   }
 
-  protected attach() {
+  protected onAttach() {
     assert(!this.attached);
     this.attached = true;
   }
 
-  protected detach() {
+  protected onDetach() {
     assert(this.attached);
     this.attached = false;
   }
@@ -55,14 +55,6 @@ export class Structure2 {
         }
       }
     }
-  }
-
-  private allocate(size: number) {
-    assert(this.pointer === NULL_POINTER);
-    assert(size > 0);
-
-    this.pointer = mainFfi.exports.alloc(size);
-    this.size = size;
   }
 
   protected setBytes(bytes: Uint8Array, offset = 0) {
@@ -128,6 +120,14 @@ export class Structure2 {
     return mainFfi.memoryView.getInt32(this.pointer + offset, true);
   }
 
+  private allocate(size: number) {
+    assert(this.pointer === NULL_POINTER);
+    assert(size > 0);
+
+    this.pointer = mainFfi.exports.alloc(size);
+    this.size = size;
+  }
+
   private reallocate(size: number) {
     assert(this.pointer !== NULL_POINTER);
     assert(this.size > 0);
@@ -144,5 +144,17 @@ export class Structure2 {
     mainFfi.exports.dealloc(this.pointer, this.size);
     this.pointer = NULL_POINTER;
     // leave size for what it is
+  }
+
+  private attach() {
+    assert(!this.attached);
+    this.onAttach();
+    this.attached = true;
+  }
+
+  private detach() {
+    assert(this.attached);
+    this.onDetach();
+    this.attached = false;
   }
 }

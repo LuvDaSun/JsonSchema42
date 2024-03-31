@@ -23,14 +23,14 @@ export class Slice2 extends Structure2 {
     super(pointer, 8);
   }
 
-  protected attach() {
-    super.attach();
+  protected onAttach() {
+    super.onAttach();
 
     this.payload = new Payload2(this.payloadPointer, this.payloadSize);
   }
 
-  protected detach() {
-    super.detach();
+  protected onDetach() {
+    super.onDetach();
 
     this.payload[Symbol.dispose]();
   }
