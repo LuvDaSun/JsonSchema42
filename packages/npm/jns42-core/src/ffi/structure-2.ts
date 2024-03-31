@@ -34,8 +34,7 @@ export class Structure2 {
     // we can only dispose once!
     assert(!this.disposed);
 
-    // this will call detach if needed and that will eventually detach
-    // and deallocate
+    // this will eventually detach and deallocate
     this.resize(0);
     this.disposed = true;
   }
