@@ -12,9 +12,9 @@ export class Payload2 extends Structure2 {
   }
   public set value(value: Uint8Array | undefined) {
     if (value == null) {
-      this.allocate(0);
+      this.reallocate(0);
     } else {
-      this.allocate(value.length);
+      this.reallocate(value.length);
       this.setBytes(value);
     }
   }

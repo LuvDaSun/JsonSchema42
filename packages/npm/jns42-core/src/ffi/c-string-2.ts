@@ -20,11 +20,11 @@ export class CString2 extends Structure2 {
   }
   public set value(value: string | undefined) {
     if (value == null) {
-      this.allocate(0);
+      this.reallocate(0);
     } else {
       const bytes = textEncoder.encode(value);
       const bytesSize = bytes.length;
-      this.allocate(bytesSize);
+      this.reallocate(bytesSize);
       this.setBytes(bytes);
       this.setUint8(bytesSize + 0, 0);
     }

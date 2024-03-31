@@ -11,9 +11,9 @@ export class BooleanStructure extends Structure2 {
   }
   public set value(value: boolean | undefined) {
     if (value == null) {
-      this.allocate(0);
+      this.reallocate(0);
     } else {
-      this.allocate(1);
+      this.reallocate(1);
       this.setInt8(0, Number(value));
     }
   }

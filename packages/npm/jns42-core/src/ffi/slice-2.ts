@@ -1,8 +1,8 @@
 import { NULL_POINTER, Pointer, Size } from "../utils/ffi.js";
 import { Payload2 } from "./payload-2.js";
-import { Structure } from "./structure.js";
+import { Structure2 } from "./structure-2.js";
 
-export class Slice2 extends Structure {
+export class Slice2 extends Structure2 {
   protected get payload(): Payload2 | undefined {
     if (this.payloadPointer === NULL_POINTER) {
       return undefined;
@@ -19,9 +19,11 @@ export class Slice2 extends Structure {
     }
 
     if (value == null) {
+      this.reallocate(0);
       this.payloadPointer = NULL_POINTER;
       this.payloadSize = 0;
     } else {
+      this.reallocate(8);
       this.payloadPointer = value.pointer;
       this.payloadSize = value.size;
     }

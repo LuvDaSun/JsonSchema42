@@ -12,27 +12,51 @@ export class Structure2 {
     //
   }
 
-  protected allocate(size: Size) {
+  protected resize(size: Size) {
     if (this.pointer === NULL_POINTER) {
+      // we have nothing allocated yet!
       if (size === 0) {
         // want to deallocate but already deallocated
       } else {
-        this.pointer = mainFfi.exports.alloc(size);
-        this.size = size;
+        this.allocate(size);
       }
     } else {
+      // already allocated, either reallocate or deallocate
       if (size === 0) {
-        mainFfi.exports.dealloc(this.pointer, this.size);
-        this.pointer = NULL_POINTER;
+        this.deallocate();
       } else {
-        if (size !== this.size) {
-          this.pointer = mainFfi.exports.realloc(this.pointer, this.size, size);
-          this.size = size;
-        } else {
+        if (size === this.size) {
           // already at the requested size
+        } else {
+          this.reallocate(size);
         }
       }
     }
+  }
+
+  protected allocate(size: number) {
+    assert(this.pointer === NULL_POINTER);
+    assert(size > 0);
+
+    this.pointer = mainFfi.exports.alloc(size);
+    this.size = size;
+  }
+
+  protected reallocate(size: number) {
+    assert(this.pointer !== NULL_POINTER);
+    assert(this.size > 0);
+    assert(size > 0);
+
+    this.pointer = mainFfi.exports.realloc(this.pointer, this.size, size);
+    this.size = size;
+  }
+
+  protected deallocate() {
+    assert(this.pointer !== NULL_POINTER);
+    assert(this.size > 0);
+
+    mainFfi.exports.dealloc(this.pointer, this.size);
+    this.pointer = NULL_POINTER;
   }
 
   protected setBytes(bytes: Uint8Array, offset = 0) {
@@ -100,7 +124,9 @@ export class Structure2 {
 
   [Symbol.dispose]() {
     assert(!this.disposed);
-    this.allocate(0);
+    if (this.pointer !== NULL_POINTER) {
+      this.deallocate();
+    }
     this.disposed = true;
   }
 }
