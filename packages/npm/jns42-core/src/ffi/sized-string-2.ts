@@ -13,7 +13,7 @@ export class SizedString2 extends Slice2 {
       return undefined;
     } else {
       const bytes = this.payload.value;
-      const value = textDecoder.decode(bytes);
+      const value = textDecoder.decode(bytes, { stream: false });
       return value;
     }
   }

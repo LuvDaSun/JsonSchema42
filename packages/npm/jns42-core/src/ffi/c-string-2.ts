@@ -23,10 +23,10 @@ export class CString2 extends Structure2 {
       this.resize(0);
     } else {
       const bytes = textEncoder.encode(value);
-      const bytesSize = bytes.length;
-      this.resize(bytesSize);
+      const size = bytes.length + 1;
+      this.resize(size);
       this.setBytes(bytes);
-      this.setUint8(bytesSize + 0, 0);
+      this.setUint8(size + 0, 0);
     }
   }
 
