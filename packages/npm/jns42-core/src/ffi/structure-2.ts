@@ -9,8 +9,12 @@ const finalizationRegistry = new FinalizationRegistry<[Pointer, Size]>(([pointer
 });
 
 export class Structure2 {
+  // keep track of being disposed, we an only dispose once
   private disposed = false;
+  // keep track of being attached we can not detach when unattached
+  // and we can not attach then already attached
   private attached = false;
+  // token ro use to deregister the finalizationRegistry.
   private token = Symbol();
 
   public constructor(
@@ -18,14 +22,18 @@ export class Structure2 {
     public size: Size,
   ) {
     if (pointer !== NULL_POINTER) {
+      // if a pointer is provided, attach to the memory that the
+      // pointer points to
       this.attach();
     }
   }
 
   [Symbol.dispose]() {
+    // we can only dispose once!
     assert(!this.disposed);
 
-    // this will call detach if needed and that will eventually deallocate
+    // this will call detach if needed and that will eventually detach
+    // and deallocate
     this.resize(0);
     this.disposed = true;
   }
@@ -38,6 +46,11 @@ export class Structure2 {
     //
   }
 
+  /**
+   * Resize the memory that this structures occupies, this might
+   * involve allocation, reallocation or deallocation
+   * @param size the new size
+   */
   protected resize(size: Size) {
     if (this.pointer === NULL_POINTER) {
       // we have nothing allocated yet!
@@ -137,7 +150,7 @@ export class Structure2 {
   }
 
   private detach() {
-    // we don't need to clean up detached memory
+    // we don't need to clean up when detached
     finalizationRegistry.unregister(this.token);
 
     assert(this.attached);
