@@ -2,18 +2,21 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
-const finalizationRegistry = new FinalizationRegistry<Structure2>((value) => value[Symbol.dispose]);
+const finalizationRegistry = new FinalizationRegistry<[Pointer, Size]>(([pointer, size]) => {
+  if (pointer !== NULL_POINTER) {
+    mainFfi.exports.dealloc(pointer, size);
+  }
+});
 
 export class Structure2 {
   private disposed = false;
   private attached = false;
+  private weak = new WeakRef(this);
 
   public constructor(
     public pointer: Pointer,
     public size: Size,
   ) {
-    finalizationRegistry.register(new WeakRef(this), this, this);
-
     if (pointer !== NULL_POINTER) {
       this.attach();
     }
@@ -22,20 +25,18 @@ export class Structure2 {
   [Symbol.dispose]() {
     assert(!this.disposed);
 
-    finalizationRegistry.unregister(this);
+    finalizationRegistry.unregister(this.weak);
 
     this.resize(0);
     this.disposed = true;
   }
 
   protected onAttach() {
-    assert(!this.attached);
-    this.attached = true;
+    //
   }
 
   protected onDetach() {
-    assert(this.attached);
-    this.attached = false;
+    //
   }
 
   protected resize(size: Size) {
@@ -131,9 +132,13 @@ export class Structure2 {
     assert(!this.attached);
     this.onAttach();
     this.attached = true;
+
+    finalizationRegistry.register(this, [this.pointer, this.size], this.weak);
   }
 
   private detach() {
+    finalizationRegistry.unregister(this.weak);
+
     assert(this.attached);
     this.onDetach();
     this.attached = false;
