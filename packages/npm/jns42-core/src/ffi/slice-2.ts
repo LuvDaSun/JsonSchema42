@@ -1,4 +1,4 @@
-import { Pointer, Size } from "../utils/ffi.js";
+import { NULL_POINTER, Pointer, Size } from "../utils/ffi.js";
 import { Payload2 } from "./payload-2.js";
 import { Structure2 } from "./structure-2.js";
 
@@ -19,7 +19,7 @@ export class Slice2 extends Structure2 {
 
   protected payload!: Payload2;
 
-  public constructor(pointer: Pointer) {
+  public constructor(pointer: Pointer = NULL_POINTER) {
     super(pointer, 8);
   }
 

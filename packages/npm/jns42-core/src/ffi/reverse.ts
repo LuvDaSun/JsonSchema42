@@ -1,12 +1,13 @@
 import { mainFfi } from "../main-ffi.js";
 import { Output } from "./output.js";
-import { SizedString } from "./sized-string.js";
+import { SizedString2 } from "./sized-string-2.js";
 
 export function reverse(value: string): string {
   using resultOutput = Output.createNull();
-  using valueString = SizedString.fromValue(value);
+  using valueString = new SizedString2();
+  valueString.value = value;
   mainFfi.exports.reverse(valueString.pointer, resultOutput.pointer);
-  using resultString = SizedString.fromPointer(resultOutput.targetPointer);
-  const result = resultString.toValue();
+  using resultString = new SizedString2(resultOutput.targetPointer);
+  const result = resultString.value!;
   return result;
 }
