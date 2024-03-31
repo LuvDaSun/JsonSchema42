@@ -2,13 +2,15 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
-const finalizationRegistry = new FinalizationRegistry<[Pointer, Size]>(([pointer, size]) => {
-  if (pointer !== NULL_POINTER) {
-    mainFfi.exports.dealloc(pointer, size);
-  }
-});
-
 export class Structure2 {
+  private static finalizationRegistry = new FinalizationRegistry<[Pointer, Size]>(
+    ([pointer, size]) => {
+      if (pointer !== NULL_POINTER) {
+        mainFfi.exports.dealloc(pointer, size);
+      }
+    },
+  );
+
   // keep track of being disposed, we an only dispose once
   private disposed = false;
   // keep track of being attached we can not detach when unattached
@@ -146,12 +148,12 @@ export class Structure2 {
     this.attached = true;
 
     // if someone forgets to cleanup, then the garbage collector will do it
-    finalizationRegistry.register(this, [this.pointer, this.size], this.token);
+    Structure2.finalizationRegistry.register(this, [this.pointer, this.size], this.token);
   }
 
   private detach() {
     // we don't need to clean up when detached
-    finalizationRegistry.unregister(this.token);
+    Structure2.finalizationRegistry.unregister(this.token);
 
     assert(this.attached);
     this.onDetach();
