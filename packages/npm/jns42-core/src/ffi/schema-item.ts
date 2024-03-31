@@ -50,18 +50,18 @@ export class SchemaItem extends Structure2 {
     super(pointer, SIZE);
   }
 
-  protected setup() {
-    super.setup();
+  protected attach() {
+    super.attach();
 
     this.id = new SizedString2(this.idPointer);
     this.title = new SizedString2(this.titlePointer);
   }
 
-  protected teardown() {
+  protected detach() {
     this.id[Symbol.dispose]();
     this.title[Symbol.dispose]();
 
-    super.teardown();
+    super.detach();
   }
 }
 

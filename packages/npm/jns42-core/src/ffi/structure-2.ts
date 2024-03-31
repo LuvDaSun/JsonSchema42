@@ -10,7 +10,7 @@ export class Structure2 {
     public size: Size,
   ) {
     if (pointer !== NULL_POINTER) {
-      this.setup();
+      this.attach();
     }
   }
 
@@ -20,11 +20,11 @@ export class Structure2 {
     this.disposed = true;
   }
 
-  protected setup() {
+  protected attach() {
     //
   }
 
-  protected teardown() {
+  protected detach() {
     //
   }
 
@@ -35,20 +35,20 @@ export class Structure2 {
         // want to deallocate but already deallocated
       } else {
         this.allocate(size);
-        this.setup();
+        this.attach();
       }
     } else {
       // already allocated, either reallocate or deallocate
       if (size === 0) {
-        this.teardown();
+        this.detach();
         this.deallocate();
       } else {
         if (size === this.size) {
           // already at the requested size
         } else {
-          this.teardown();
+          this.detach();
           this.reallocate(size);
-          this.setup();
+          this.attach();
         }
       }
     }
