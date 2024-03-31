@@ -21,6 +21,7 @@ export class SizedString2 extends Slice2 {
     if (value == null) {
       this.resize(0);
     } else {
+      this.resize(this.size);
       const bytes = textEncoder.encode(value);
       this.payload.value = bytes;
     }
