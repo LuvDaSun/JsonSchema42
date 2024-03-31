@@ -120,6 +120,18 @@ export class Structure2 {
     return mainFfi.memoryView.getInt32(this.pointer + offset, true);
   }
 
+  private attach() {
+    assert(!this.attached);
+    this.onAttach();
+    this.attached = true;
+  }
+
+  private detach() {
+    assert(this.attached);
+    this.onDetach();
+    this.attached = false;
+  }
+
   private allocate(size: number) {
     assert(this.pointer === NULL_POINTER);
     assert(size > 0);
@@ -144,17 +156,5 @@ export class Structure2 {
     mainFfi.exports.dealloc(this.pointer, this.size);
     this.pointer = NULL_POINTER;
     // leave size for what it is
-  }
-
-  private attach() {
-    assert(!this.attached);
-    this.onAttach();
-    this.attached = true;
-  }
-
-  private detach() {
-    assert(this.attached);
-    this.onDetach();
-    this.attached = false;
   }
 }
