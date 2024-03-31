@@ -30,8 +30,8 @@ export class Slice2 extends Structure2 {
   }
 
   protected onDetach() {
-    super.onDetach();
-
     this.payload[Symbol.dispose]();
+
+    super.onDetach();
   }
 }
