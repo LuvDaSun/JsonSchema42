@@ -25,8 +25,6 @@ export class Structure2 {
   [Symbol.dispose]() {
     assert(!this.disposed);
 
-    finalizationRegistry.unregister(this.weak);
-
     this.resize(0);
     this.disposed = true;
   }
