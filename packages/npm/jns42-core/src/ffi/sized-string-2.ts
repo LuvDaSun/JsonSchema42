@@ -1,3 +1,4 @@
+import { NULL_POINTER } from "../utils/ffi.js";
 import { Slice2 } from "./slice-2.js";
 
 const textEncoder = new TextEncoder();
@@ -7,13 +8,21 @@ const textDecoder = new TextDecoder("utf-8", {
 });
 
 export class SizedString2 extends Slice2 {
-  protected get value(): string {
-    const bytes = this.payload.value;
-    const value = textDecoder.decode(bytes);
-    return value;
+  protected get value(): string | undefined {
+    if (this.pointer === NULL_POINTER) {
+      return undefined;
+    } else {
+      const bytes = this.payload.value;
+      const value = textDecoder.decode(bytes);
+      return value;
+    }
   }
-  protected set value(value: string) {
-    const bytes = textEncoder.encode(value);
-    this.payload.value = bytes;
+  protected set value(value: string | undefined) {
+    if (value == null) {
+      this.resize(0);
+    } else {
+      const bytes = textEncoder.encode(value);
+      this.payload.value = bytes;
+    }
   }
 }

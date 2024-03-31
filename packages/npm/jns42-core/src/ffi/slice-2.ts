@@ -3,8 +3,6 @@ import { Payload2 } from "./payload-2.js";
 import { Structure2 } from "./structure-2.js";
 
 export class Slice2 extends Structure2 {
-  protected payload = new Payload2();
-
   protected get payloadPointer() {
     return this.getUint32(0);
   }
@@ -19,16 +17,21 @@ export class Slice2 extends Structure2 {
     this.setUint32(4, value);
   }
 
+  protected payload!: Payload2;
+
   protected constructor(pointer: Pointer) {
     super(pointer, 8);
-
-    this.payload.pointer = this.payloadPointer;
-    this.payload.size = this.payloadSize;
   }
 
-  [Symbol.dispose]() {
+  protected setup() {
+    this.payload = new Payload2(this.payloadPointer, this.payloadSize);
+
+    super.setup();
+  }
+
+  protected teardown() {
     this.payload[Symbol.dispose]();
 
-    super[Symbol.dispose]();
+    super.teardown();
   }
 }

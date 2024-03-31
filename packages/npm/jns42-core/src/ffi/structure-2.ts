@@ -9,55 +9,57 @@ export class Structure2 {
     public pointer: Pointer,
     public size: Size,
   ) {
+    if (pointer !== NULL_POINTER) {
+      this.setup();
+    }
+  }
+
+  [Symbol.dispose]() {
+    assert(!this.disposed);
+    this.resize(0);
+    this.disposed = true;
+  }
+
+  protected setup() {
     //
   }
 
-  protected initialize(size: Size) {
+  protected teardown() {
+    //
+  }
+
+  protected resize(size: Size) {
     if (this.pointer === NULL_POINTER) {
       // we have nothing allocated yet!
       if (size === 0) {
         // want to deallocate but already deallocated
       } else {
         this.allocate(size);
+        this.setup();
       }
     } else {
       // already allocated, either reallocate or deallocate
       if (size === 0) {
+        this.teardown();
         this.deallocate();
       } else {
         if (size === this.size) {
           // already at the requested size
         } else {
+          this.teardown();
           this.reallocate(size);
+          this.setup();
         }
       }
     }
   }
 
-  protected allocate(size: number) {
+  private allocate(size: number) {
     assert(this.pointer === NULL_POINTER);
     assert(size > 0);
 
     this.pointer = mainFfi.exports.alloc(size);
     this.size = size;
-  }
-
-  protected reallocate(size: number) {
-    assert(this.pointer !== NULL_POINTER);
-    assert(this.size > 0);
-    assert(size > 0);
-
-    this.pointer = mainFfi.exports.realloc(this.pointer, this.size, size);
-    this.size = size;
-  }
-
-  protected deallocate() {
-    assert(this.pointer !== NULL_POINTER);
-    assert(this.size > 0);
-
-    mainFfi.exports.dealloc(this.pointer, this.size);
-    this.pointer = NULL_POINTER;
-    // leave size for what it is
   }
 
   protected setBytes(bytes: Uint8Array, offset = 0) {
@@ -123,11 +125,21 @@ export class Structure2 {
     return mainFfi.memoryView.getInt32(this.pointer + offset, true);
   }
 
-  [Symbol.dispose]() {
-    assert(!this.disposed);
-    if (this.pointer !== NULL_POINTER) {
-      this.deallocate();
-    }
-    this.disposed = true;
+  private reallocate(size: number) {
+    assert(this.pointer !== NULL_POINTER);
+    assert(this.size > 0);
+    assert(size > 0);
+
+    this.pointer = mainFfi.exports.realloc(this.pointer, this.size, size);
+    this.size = size;
+  }
+
+  private deallocate() {
+    assert(this.pointer !== NULL_POINTER);
+    assert(this.size > 0);
+
+    mainFfi.exports.dealloc(this.pointer, this.size);
+    this.pointer = NULL_POINTER;
+    // leave size for what it is
   }
 }
