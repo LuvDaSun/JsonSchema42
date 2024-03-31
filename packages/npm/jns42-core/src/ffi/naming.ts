@@ -1,11 +1,24 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { Pointer } from "../utils/ffi.js";
+import { NULL_POINTER, Pointer } from "../utils/ffi.js";
 import { SizedString2 } from "./sized-string-2.js";
 
 export class NamesBuilder {
+  private static finalizationRegistry = new FinalizationRegistry<Pointer>((pointer) => {
+    mainFfi.exports.names_builder_free(pointer);
+  });
+  private token = Symbol();
+
   constructor(private readonly pointer: Pointer) {
-    //
+    assert(pointer !== NULL_POINTER);
+
+    NamesBuilder.finalizationRegistry.register(this, pointer, this.token);
+  }
+
+  [Symbol.dispose]() {
+    NamesBuilder.finalizationRegistry.unregister(this.token);
+
+    mainFfi.exports.names_builder_free(this.pointer);
   }
 
   public static new() {
@@ -33,15 +46,24 @@ export class NamesBuilder {
     const pointer = mainFfi.exports.names_builder_build(this.pointer);
     return new Names(pointer);
   }
-
-  [Symbol.dispose]() {
-    mainFfi.exports.names_builder_free(this.pointer);
-  }
 }
 
 export class Names {
+  private static finalizationRegistry = new FinalizationRegistry<Pointer>((pointer) => {
+    mainFfi.exports.names_free(pointer);
+  });
+  private token = Symbol();
+
   constructor(private readonly pointer: Pointer) {
-    //
+    assert(pointer !== NULL_POINTER);
+
+    Names.finalizationRegistry.register(this, pointer, this.token);
+  }
+
+  [Symbol.dispose]() {
+    Names.finalizationRegistry.unregister(this.token);
+
+    mainFfi.exports.names_free(this.pointer);
   }
 
   public toCamelCase(key: number) {
@@ -74,10 +96,6 @@ export class Names {
     const result = resultStructure.value;
     assert(result != null);
     return result;
-  }
-
-  [Symbol.dispose]() {
-    mainFfi.exports.names_free(this.pointer);
   }
 }
 
