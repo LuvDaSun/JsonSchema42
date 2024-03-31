@@ -1,7 +1,6 @@
-import assert from "assert";
-import { NULL_POINTER, Pointer } from "../utils/ffi.js";
-import { SizedString } from "./sized-string.js";
-import { Structure } from "./structure.js";
+import { Pointer } from "../utils/ffi.js";
+import { SizedString2 } from "./sized-string-2.js";
+import { Structure2 } from "./structure-2.js";
 
 const ID_OFFSET = 0;
 const TITLE_OFFSET = 4;
@@ -9,37 +8,32 @@ const DEPRECATED_OFFSET = 8;
 
 const SIZE = 9;
 
-export class SchemaItem extends Structure {
-  protected get idPointer() {
-    const pointer = this.getInt32(this.pointer + ID_OFFSET);
-    if (pointer === NULL_POINTER) {
-      return undefined;
-    } else {
-      return SizedString.fromPointer(pointer);
-    }
+export class SchemaItem extends Structure2 {
+  public get value(): SchemaItemObject {
+    return {
+      id: this.id.value,
+      title: this.title.value,
+      deprecated: this.deprecated,
+    };
   }
-  protected set idPointer(value: SizedString | undefined) {
-    if (value == null) {
-      this.setInt32(this.pointer + ID_OFFSET, NULL_POINTER);
-    } else {
-      this.setInt32(this.pointer + ID_OFFSET, value.pointer);
-    }
+  public set value(value: SchemaItemObject) {
+    this.id.value = value.id;
+    this.title.value = value.title;
+    this.deprecated = value.deprecated;
+  }
+
+  protected get idPointer() {
+    return this.getInt32(this.pointer + ID_OFFSET);
+  }
+  protected set idPointer(value: Pointer) {
+    this.setInt32(this.pointer + ID_OFFSET, value);
   }
 
   protected get titlePointer() {
-    const pointer = this.getInt32(this.pointer + TITLE_OFFSET);
-    if (pointer === NULL_POINTER) {
-      return undefined;
-    } else {
-      return SizedString.fromPointer(pointer);
-    }
+    return this.getInt32(this.pointer + TITLE_OFFSET);
   }
-  protected set titlePointer(value: SizedString | undefined) {
-    if (value == null) {
-      this.setInt32(this.pointer + TITLE_OFFSET, NULL_POINTER);
-    } else {
-      this.setInt32(this.pointer + TITLE_OFFSET, value.pointer);
-    }
+  protected set titlePointer(value: Pointer) {
+    this.setInt32(this.pointer + TITLE_OFFSET, value);
   }
 
   protected get deprecated() {
@@ -49,43 +43,30 @@ export class SchemaItem extends Structure {
     this.setInt8(DEPRECATED_OFFSET, Number(value));
   }
 
+  protected id!: SizedString2;
+  protected title!: SizedString2;
+
   protected constructor(pointer: Pointer) {
     super(pointer, SIZE);
   }
 
-  public static fromPointer(pointer: Pointer) {
-    assert(pointer !== NULL_POINTER);
+  protected setup() {
+    super.setup();
 
-    return new SchemaItem(pointer);
+    this.id = new SizedString2(this.idPointer);
+    this.title = new SizedString2(this.titlePointer);
   }
 
-  public static fromObject(object: SchemaItemObject) {
-    const instance = new SchemaItem(NULL_POINTER);
+  protected teardown() {
+    this.id[Symbol.dispose]();
+    this.title[Symbol.dispose]();
 
-    instance.idPointer = object.id == null ? undefined : SizedString.fromValue(object.id);
-    instance.titlePointer = object.title == null ? undefined : SizedString.fromValue(object.title);
-
-    return instance;
-  }
-
-  public toObject() {
-    return {
-      id: this.idPointer?.toValue(),
-      title: this.titlePointer?.toValue(),
-      deprecated: this.deprecated,
-    };
-  }
-
-  [Symbol.dispose]() {
-    this.idPointer?.[Symbol.dispose]();
-    this.titlePointer?.[Symbol.dispose]();
-
-    super[Symbol.dispose]();
+    super.teardown();
   }
 }
 
 export interface SchemaItemObject {
   id?: string;
   title?: string;
-  deprecated?: boolean;
+  deprecated: boolean;
 }

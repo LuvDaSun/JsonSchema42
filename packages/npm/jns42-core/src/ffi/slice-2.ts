@@ -19,14 +19,14 @@ export class Slice2 extends Structure2 {
 
   protected payload!: Payload2;
 
-  protected constructor(pointer: Pointer) {
+  public constructor(pointer: Pointer) {
     super(pointer, 8);
   }
 
   protected setup() {
-    this.payload = new Payload2(this.payloadPointer, this.payloadSize);
-
     super.setup();
+
+    this.payload = new Payload2(this.payloadPointer, this.payloadSize);
   }
 
   protected teardown() {

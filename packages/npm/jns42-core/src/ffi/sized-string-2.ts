@@ -8,7 +8,7 @@ const textDecoder = new TextDecoder("utf-8", {
 });
 
 export class SizedString2 extends Slice2 {
-  protected get value(): string | undefined {
+  public get value(): string | undefined {
     if (this.pointer === NULL_POINTER) {
       return undefined;
     } else {
@@ -17,7 +17,7 @@ export class SizedString2 extends Slice2 {
       return value;
     }
   }
-  protected set value(value: string | undefined) {
+  public set value(value: string | undefined) {
     if (value == null) {
       this.resize(0);
     } else {
