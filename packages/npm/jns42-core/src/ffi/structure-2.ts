@@ -11,7 +11,7 @@ const finalizationRegistry = new FinalizationRegistry<[Pointer, Size]>(([pointer
 export class Structure2 {
   private disposed = false;
   private attached = false;
-  private weak = new WeakRef(this);
+  private token = Symbol();
 
   public constructor(
     public pointer: Pointer,
@@ -131,11 +131,11 @@ export class Structure2 {
     this.onAttach();
     this.attached = true;
 
-    finalizationRegistry.register(this, [this.pointer, this.size], this.weak);
+    finalizationRegistry.register(this, [this.pointer, this.size], this.token);
   }
 
   private detach() {
-    finalizationRegistry.unregister(this.weak);
+    finalizationRegistry.unregister(this.token);
 
     assert(this.attached);
     this.onDetach();
