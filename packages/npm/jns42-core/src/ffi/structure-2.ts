@@ -2,6 +2,8 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
+const finalizationRegistry = new FinalizationRegistry<Structure2>((value) => value[Symbol.dispose]);
+
 export class Structure2 {
   private disposed = false;
   private attached = false;
@@ -10,6 +12,8 @@ export class Structure2 {
     public pointer: Pointer,
     public size: Size,
   ) {
+    finalizationRegistry.register(new WeakRef(this), this, this);
+
     if (pointer !== NULL_POINTER) {
       this.attach();
     }
@@ -17,6 +21,9 @@ export class Structure2 {
 
   [Symbol.dispose]() {
     assert(!this.disposed);
+
+    finalizationRegistry.unregister(this);
+
     this.resize(0);
     this.disposed = true;
   }
