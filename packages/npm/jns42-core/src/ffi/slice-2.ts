@@ -17,7 +17,7 @@ export class Slice2 extends Structure2 {
     this.setUint32(4, value);
   }
 
-  protected payload!: Payload2;
+  protected payload?: Payload2;
 
   public constructor(pointer: Pointer = NULL_POINTER) {
     super(pointer, 8);
@@ -30,7 +30,8 @@ export class Slice2 extends Structure2 {
   }
 
   protected onDetach() {
-    this.payload[Symbol.dispose]();
+    this.payload![Symbol.dispose]();
+    this.payload = undefined;
 
     super.onDetach();
   }

@@ -12,7 +12,7 @@ export class SizedString2 extends Slice2 {
     if (this.pointer === NULL_POINTER) {
       return undefined;
     } else {
-      const bytes = this.payload.value;
+      const bytes = this.payload!.value;
       const value = textDecoder.decode(bytes, { stream: false });
       return value;
     }
@@ -23,7 +23,7 @@ export class SizedString2 extends Slice2 {
     } else {
       this.resize(this.size);
       const bytes = textEncoder.encode(value);
-      this.payload.value = bytes;
+      this.payload!.value = bytes;
     }
   }
 }
