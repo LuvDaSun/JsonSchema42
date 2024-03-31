@@ -12,7 +12,7 @@ export class Structure2 {
     //
   }
 
-  protected resize(size: Size) {
+  protected initialize(size: Size) {
     if (this.pointer === NULL_POINTER) {
       // we have nothing allocated yet!
       if (size === 0) {
@@ -57,6 +57,7 @@ export class Structure2 {
 
     mainFfi.exports.dealloc(this.pointer, this.size);
     this.pointer = NULL_POINTER;
+    // leave size for what it is
   }
 
   protected setBytes(bytes: Uint8Array, offset = 0) {
