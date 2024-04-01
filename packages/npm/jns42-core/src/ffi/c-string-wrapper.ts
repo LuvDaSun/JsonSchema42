@@ -16,23 +16,26 @@ export class CStringWrapper {
     if (value == null) {
       const pointer = NULL_POINTER;
       return new CStringWrapper(pointer);
+    } else {
+      const pointer = allocateCString(value);
+      return new CStringWrapper(pointer);
     }
-    const pointer = allocateCString(value);
-    return new CStringWrapper(pointer);
   }
   public read(): string | undefined {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {
-      return;
+      return undefined;
+    } else {
+      return readCString(pointer);
     }
-    return dereferenceCString(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {
-      return;
+      //
+    } else {
+      deallocateCString(pointer);
     }
-    return deallocateCString(pointer);
   }
 }
 
@@ -46,7 +49,7 @@ function allocateCString(value: string): Pointer {
   return pointer;
 }
 
-function dereferenceCString(pointer: Pointer): string {
+function readCString(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);

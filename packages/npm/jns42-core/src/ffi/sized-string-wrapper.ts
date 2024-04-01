@@ -16,23 +16,26 @@ export class SizedStringWrapper {
     if (value == null) {
       const pointer = NULL_POINTER;
       return new SizedStringWrapper(pointer);
+    } else {
+      const pointer = allocateSizedString(value);
+      return new SizedStringWrapper(pointer);
     }
-    const pointer = allocateSizedString(value);
-    return new SizedStringWrapper(pointer);
   }
   public read(): string | undefined {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {
-      return;
+      return undefined;
+    } else {
+      return readSizedString(pointer);
     }
-    return dereferenceSizedString(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {
-      return;
+      //
+    } else {
+      deallocateSizedString(pointer);
     }
-    return deallocateSizedString(pointer);
   }
 }
 
@@ -51,7 +54,7 @@ function allocateSizedString(value: string): Pointer {
   return pointer;
 }
 
-function dereferenceSizedString(pointer: Pointer): string {
+function readSizedString(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);
