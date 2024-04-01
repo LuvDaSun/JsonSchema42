@@ -41,6 +41,8 @@ export type SchemaType =
 export type SchemaItem = {
   // is this model exactly the same as the previous, un-optimized version or is is just similar
   exact?: boolean;
+  primart?: boolean;
+  name?: string;
 
   id?: string;
   title?: string;

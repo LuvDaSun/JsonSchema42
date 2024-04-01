@@ -82,66 +82,108 @@ impl From<&IntermediateType> for SchemaType {
 #[derive(Clone, PartialEq, Default, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SchemaItem {
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub name: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub exact: Option<bool>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub primary: Option<bool>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub parent: Option<SchemaKey>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub id: Option<UrlWithPointer>,
 
   // metadata
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub title: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub description: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub examples: Option<Vec<Value>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub deprecated: Option<bool>,
 
   // types
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub types: Option<Vec<SchemaType>>,
 
   // applicators
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub reference: Option<SchemaKey>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub all_of: Option<BTreeSet<SchemaKey>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub any_of: Option<BTreeSet<SchemaKey>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub one_of: Option<BTreeSet<SchemaKey>>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub r#if: Option<SchemaKey>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub then: Option<SchemaKey>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub r#else: Option<SchemaKey>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub not: Option<SchemaKey>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub property_names: Option<SchemaKey>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub map_properties: Option<SchemaKey>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub array_items: Option<SchemaKey>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub contains: Option<SchemaKey>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub tuple_items: Option<Vec<SchemaKey>>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub object_properties: Option<HashMap<String, SchemaKey>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub pattern_properties: Option<HashMap<String, SchemaKey>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub dependent_schemas: Option<HashMap<String, SchemaKey>>,
 
   // assertions
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub options: Option<Vec<Value>>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub required: Option<HashSet<String>>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub minimum_inclusive: Option<f64>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub minimum_exclusive: Option<f64>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub maximum_inclusive: Option<f64>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub maximum_exclusive: Option<f64>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub multiple_of: Option<f64>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub minimum_length: Option<usize>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub maximum_length: Option<usize>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub value_pattern: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub value_format: Option<String>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub minimum_items: Option<usize>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub maximum_items: Option<usize>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub unique_items: Option<bool>,
 
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub minimum_properties: Option<usize>,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub maximum_properties: Option<usize>,
 }
 
