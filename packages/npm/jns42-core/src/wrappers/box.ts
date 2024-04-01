@@ -43,7 +43,7 @@ function allocate(value: Pointer): Pointer {
 function read(pointer: Pointer): Pointer {
   assert(pointer !== NULL_POINTER);
 
-  const value = mainFfi.memoryView.getUint32(pointer);
+  const value = mainFfi.memoryView.getUint32(pointer, true);
   return value;
 }
 
