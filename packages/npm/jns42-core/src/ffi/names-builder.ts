@@ -2,7 +2,7 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 import { Names } from "./names.js";
-import { SizedString } from "./sized-string.js";
+import { SizedStringWrapper } from "./sized-string-wrapper.js";
 
 export class NamesBuilder {
   constructor(private readonly pointer: Pointer) {
@@ -19,13 +19,13 @@ export class NamesBuilder {
   }
 
   public add(key: number, value: string) {
-    using valueWrapper = SizedString.allocate(value);
+    using valueWrapper = SizedStringWrapper.allocate(value);
     mainFfi.exports.names_builder_add(this.pointer, key, valueWrapper.pointer);
     return this;
   }
 
   public setDefaultName(value: string) {
-    using valueWrapper = SizedString.allocate(value);
+    using valueWrapper = SizedStringWrapper.allocate(value);
     mainFfi.exports.names_builder_set_default_name(this.pointer, valueWrapper.pointer);
     return this;
   }

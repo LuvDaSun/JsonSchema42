@@ -8,17 +8,17 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class SizedString {
+export class SizedStringWrapper {
   public constructor(public readonly pointer: Pointer) {
     //
   }
   public static allocate(value: string | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
-      return new SizedString(pointer);
+      return new SizedStringWrapper(pointer);
     }
     const pointer = allocateSizedString(value);
-    return new SizedString(pointer);
+    return new SizedStringWrapper(pointer);
   }
   public read(): string | undefined {
     const { pointer } = this;

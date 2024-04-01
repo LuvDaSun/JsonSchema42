@@ -2,13 +2,13 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 
-export class Output {
+export class OutputWrapper {
   public constructor(public readonly pointer: number) {
     //
   }
   public static allocate(value: number) {
     const pointer = allocateOutput(value);
-    return new Output(pointer);
+    return new OutputWrapper(pointer);
   }
   public read(): number {
     const { pointer } = this;

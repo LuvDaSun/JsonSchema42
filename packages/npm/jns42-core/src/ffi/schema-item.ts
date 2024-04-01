@@ -1,7 +1,7 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
-import { SizedString } from "./sized-string.js";
+import { SizedStringWrapper } from "./sized-string-wrapper.js";
 
 export class SchemaItem {
   constructor(private readonly pointer: Pointer) {
@@ -19,10 +19,10 @@ export class SchemaItem {
 
   public read(): SchemaItemObject {
     const idPointer = mainFfi.exports.schema_item_id(this.pointer);
-    using idWrapper = new SizedString(idPointer);
+    using idWrapper = new SizedStringWrapper(idPointer);
 
     const titlePointer = mainFfi.exports.schema_item_title(this.pointer);
-    using titleWrapper = new SizedString(titlePointer);
+    using titleWrapper = new SizedStringWrapper(titlePointer);
 
     const deprecatedPointer = mainFfi.exports.schema_item_deprecated(this.pointer);
 
