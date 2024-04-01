@@ -11,13 +11,13 @@ test("schema-arena", () => {
   }
 
   for (let count = 0; count < 1000; count++) {
-    const itemPrevious = schemaArena.replaceItem(count, { name: String(count) });
+    const itemPrevious = schemaArena.replaceItem(count, { id: `#/${count}` });
     assert.deepEqual(itemPrevious, {});
   }
 
   for (let count = 0; count < 1000; count++) {
     const item = schemaArena.getItem(count);
-    assert.deepEqual(item, { name: String(count) });
+    assert.deepEqual(item, { id: `#/${count}` });
   }
 
   assert.equal(1000, schemaArena.count());
