@@ -36,7 +36,7 @@ export class SizedStringWrapper {
   }
 }
 
-export function allocateSizedString(value: string): Pointer {
+function allocateSizedString(value: string): Pointer {
   const pointer = mainFfi.exports.alloc(8);
   const data = textEncoder.encode(value);
   const dataSize = data.length;
@@ -51,7 +51,7 @@ export function allocateSizedString(value: string): Pointer {
   return pointer;
 }
 
-export function readSizedString(pointer: Pointer): string {
+function readSizedString(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);
@@ -66,7 +66,7 @@ export function readSizedString(pointer: Pointer): string {
   }
 }
 
-export function freeSizedString(pointer: Pointer) {
+function freeSizedString(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);

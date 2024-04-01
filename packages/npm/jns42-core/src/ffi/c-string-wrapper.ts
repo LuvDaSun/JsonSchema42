@@ -36,7 +36,7 @@ export class CStringWrapper {
   }
 }
 
-export function allocateCString(value: string): Pointer {
+function allocateCString(value: string): Pointer {
   const data = textEncoder.encode(value);
   const dataSize = data.length;
   const size = dataSize + 1;
@@ -46,7 +46,7 @@ export function allocateCString(value: string): Pointer {
   return pointer;
 }
 
-export function readCString(pointer: Pointer): string {
+function readCString(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);
@@ -56,7 +56,7 @@ export function readCString(pointer: Pointer): string {
   return value;
 }
 
-export function freeCString(pointer: Pointer) {
+function freeCString(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);

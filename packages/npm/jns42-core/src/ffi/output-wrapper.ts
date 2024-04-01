@@ -20,20 +20,20 @@ export class OutputWrapper {
   }
 }
 
-export function allocateOutput(value: Pointer): Pointer {
+function allocateOutput(value: Pointer): Pointer {
   const pointer = mainFfi.exports.alloc(4);
   mainFfi.memoryView.setUint32(pointer + 0, value, true);
   return pointer;
 }
 
-export function readOutput(pointer: Pointer): Pointer {
+function readOutput(pointer: Pointer): Pointer {
   assert(pointer !== NULL_POINTER);
 
   const value = mainFfi.memoryView.getUint32(pointer);
   return value;
 }
 
-export function freeOutput(pointer: Pointer) {
+function freeOutput(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   mainFfi.exports.dealloc(pointer, 4);
