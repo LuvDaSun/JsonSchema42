@@ -78,7 +78,7 @@ impl From<&IntermediateType> for SchemaType {
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
-pub struct SchemaNode {
+pub struct SchemaItem {
   pub name: Option<String>,
 
   pub primary: Option<bool>,
@@ -141,7 +141,7 @@ pub struct SchemaNode {
   pub maximum_properties: Option<usize>,
 }
 
-impl SchemaNode {
+impl SchemaItem {
   pub fn intersection<'f>(
     &'f self,
     other: &'f Self,

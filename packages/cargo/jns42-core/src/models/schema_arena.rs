@@ -1,14 +1,14 @@
 use super::{
   arena::Arena,
-  schema::{SchemaKey, SchemaNode},
+  schema::{SchemaItem, SchemaKey},
 };
 use std::iter::empty;
 
-impl Arena<SchemaNode> {
+impl Arena<SchemaItem> {
   pub fn get_ancestors(
     &self,
     key: SchemaKey,
-  ) -> impl DoubleEndedIterator<Item = (SchemaKey, &SchemaNode)> {
+  ) -> impl DoubleEndedIterator<Item = (SchemaKey, &SchemaItem)> {
     let mut result = Vec::new();
 
     let mut key_maybe = Some(key);
@@ -70,24 +70,24 @@ mod tests {
   fn test_get_name_parts() {
     let mut arena = Arena::new();
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       id: Some(UrlWithPointer::parse("http://id.com#/a/0").unwrap()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       parent: Some(0),
       id: Some(UrlWithPointer::parse("http://id.com#/b/1").unwrap()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       parent: Some(1),
       name: Some("2".to_string()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       parent: Some(2),
       name: Some("3".to_string()),
       ..Default::default()

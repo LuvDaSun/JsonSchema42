@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::models::{arena::Arena, schema::SchemaNode};
+use crate::models::{arena::Arena, schema::SchemaItem};
 
 /**
  * This transformer turns resolves the not field
@@ -23,7 +23,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  *   - a
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   let item = arena.get_item(key);
 
   let Some(not) = item.not else {
@@ -47,7 +47,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
     .cloned()
     .collect();
 
-  let item_new = SchemaNode {
+  let item_new = SchemaItem {
     not: None,
     required: Some(required_new),
     ..item.clone()
@@ -59,18 +59,18 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaNode};
+  use crate::models::{arena::Arena, schema::SchemaItem};
 
   #[test]
   fn test_transform() {
     let mut arena = Arena::new();
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       required: Some(["a"].map(|value| value.to_string()).into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       required: Some(["a", "b"].map(|value| value.to_string()).into()),
       not: Some(0),
       ..Default::default()
@@ -82,11 +82,11 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaNode {
+      SchemaItem {
         required: Some(["a"].map(|value| value.to_string()).into()),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         required: Some(["b"].map(|value| value.to_string()).into()),
         ..Default::default()
       },

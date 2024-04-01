@@ -1,7 +1,7 @@
 use super::{
   arena::Arena,
   intermediate::IntermediateSchema,
-  schema::{SchemaNode, SchemaType},
+  schema::{SchemaItem, SchemaType},
 };
 use crate::{
   naming::{NamesBuilder, Sentence},
@@ -18,7 +18,7 @@ use std::iter::{empty, once};
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
 pub struct Specification {
-  pub arena: Arena<SchemaNode>,
+  pub arena: Arena<SchemaItem>,
   pub names: HashMap<usize, (bool, Sentence)>,
 }
 
@@ -35,7 +35,7 @@ impl Specification {
       for (id, schema) in &intermediate_document.schemas {
         let id = UrlWithPointer::parse(id).unwrap();
 
-        let item = SchemaNode {
+        let item = SchemaItem {
           id: Some(UrlWithPointer::parse(id.as_str()).unwrap()),
           ..Default::default()
         };
@@ -95,7 +95,7 @@ impl Specification {
         }
       }
 
-      let transformer = |arena: &mut Arena<SchemaNode>, key: usize| {
+      let transformer = |arena: &mut Arena<SchemaItem>, key: usize| {
         let item = arena.get_item(key).clone();
         let id = item.id.unwrap();
         let schema = intermediate_document.schemas.get(id.as_str()).unwrap();
@@ -113,7 +113,7 @@ impl Specification {
 
         let primary = if id == root_id { Some(true) } else { None };
 
-        let item = SchemaNode {
+        let item = SchemaItem {
           name: None,
           primary,
           parent,
@@ -254,7 +254,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
+      fn transformer(arena: &mut Arena<SchemaItem>, key: usize) {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
 
@@ -283,7 +283,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<SchemaNode>, key: usize) {
+      fn transformer(arena: &mut Arena<SchemaItem>, key: usize) {
         schema_transforms::primary::transform(arena, key);
       }
     }

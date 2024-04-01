@@ -1,4 +1,9 @@
-use crate::naming::{Names, NamesBuilder, Sentence};
+use std::ptr::null;
+
+use crate::{
+  models::schema::SchemaItem,
+  naming::{Names, NamesBuilder, Sentence},
+};
 
 /// Create a new NamesBuilder instance
 #[no_mangle]
@@ -137,6 +142,37 @@ pub extern "C" fn names_free(names: *mut Names<usize>) {
 }
 
 #[no_mangle]
+pub extern "C" fn schema_item_new() -> *const SchemaItem {
+  let schema_item = SchemaItem::default();
+  let schema_item = Box::new(schema_item);
+  Box::into_raw(schema_item)
+}
+
+#[no_mangle]
+pub extern "C" fn schema_item_free(schema_item: *mut SchemaItem) {
+  assert!(!schema_item.is_null());
+
+  unsafe {
+    let _ = Box::from_raw(schema_item);
+  }
+}
+
+#[no_mangle]
+pub extern "C" fn schema_item_get_id(schema_item: *const SchemaItem) -> *const StringView {
+  assert!(!schema_item.is_null());
+  let schema_item = unsafe { &*schema_item };
+
+  let Some(value) = &schema_item.id else {
+    return null();
+  };
+  let value = value.as_str();
+  let value = StringView::new(value);
+  let value = Box::new(value);
+
+  Box::into_raw(value)
+}
+
+#[no_mangle]
 extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
   let value = unsafe { &*value };
   let value = value.as_str();
@@ -226,6 +262,30 @@ impl SizedString {
     let data = bytes.into_boxed_slice();
     let size = data.len();
     let data = Box::into_raw(data) as *const u8;
+
+    Self { data, size }
+  }
+
+  pub fn as_str(&self) -> &str {
+    unsafe {
+      let slice = std::slice::from_raw_parts(self.data, self.size);
+      std::str::from_utf8_unchecked(slice)
+    }
+  }
+}
+
+#[repr(C)]
+pub struct StringView {
+  data: *const u8,
+  size: usize,
+}
+
+impl StringView {
+  pub fn new(value: &str) -> Self {
+    let bytes = value.as_bytes();
+    let size = bytes.len();
+    let bytes = Box::new(bytes);
+    let data = Box::into_raw(bytes) as *const u8;
 
     Self { data, size }
   }
