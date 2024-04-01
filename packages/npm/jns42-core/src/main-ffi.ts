@@ -20,6 +20,9 @@ export interface MainExports extends Exports {
   names_to_screaming_snake_case(names: Pointer, key: number): Pointer;
   names_free(names: Pointer): void;
 
+  schema_item_new(): Pointer;
+  schema_item_free(names: Pointer): void;
+
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;
   to_snake_case(value: Pointer): Pointer;

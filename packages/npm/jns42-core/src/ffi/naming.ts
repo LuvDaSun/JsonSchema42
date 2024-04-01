@@ -1,6 +1,6 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { NULL_POINTER, Pointer } from "../utils/ffi.js";
+import { NULL_POINTER, Pointer } from "../utils/index.js";
 import { SizedString } from "./sized-string.js";
 
 export class NamesBuilder {
@@ -27,18 +27,14 @@ export class NamesBuilder {
   }
 
   public add(key: number, value: string) {
-    using valueStructure = new SizedString();
-    valueStructure.value = value;
-    const valuePointer = valueStructure.getPointer();
-    mainFfi.exports.names_builder_add(this.pointer, key, valuePointer);
+    using valueWrapper = SizedString.create(value);
+    mainFfi.exports.names_builder_add(this.pointer, key, valueWrapper.pointer);
     return this;
   }
 
   public setDefaultName(value: string) {
-    using valueStructure = new SizedString();
-    valueStructure.value = value;
-    const valuePointer = valueStructure.getPointer();
-    mainFfi.exports.names_builder_set_default_name(this.pointer, valuePointer);
+    using valueWrapper = SizedString.create(value);
+    mainFfi.exports.names_builder_set_default_name(this.pointer, valueWrapper.pointer);
     return this;
   }
 
@@ -68,77 +64,61 @@ export class Names {
 
   public toCamelCase(key: number) {
     const resultPointer = mainFfi.exports.names_to_camel_case(this.pointer, key);
-    using resultStructure = new SizedString(resultPointer);
-    const result = resultStructure.value;
-    assert(result != null);
+    using resultWrapper = new SizedString(resultPointer);
+    const result = resultWrapper.read();
     return result;
   }
 
   public toPascalCase(key: number) {
     const resultPointer = mainFfi.exports.names_to_pascal_case(this.pointer, key);
-    using resultStructure = new SizedString(resultPointer);
-    const result = resultStructure.value;
-    assert(result != null);
+    using resultWrapper = new SizedString(resultPointer);
+    const result = resultWrapper.read();
     return result;
   }
 
   public toSnakeCase(key: number) {
     const resultPointer = mainFfi.exports.names_to_snake_case(this.pointer, key);
-    using resultStructure = new SizedString(resultPointer);
-    const result = resultStructure.value;
-    assert(result != null);
+    using resultWrapper = new SizedString(resultPointer);
+    const result = resultWrapper.read();
     return result;
   }
 
   public toScreamingSnakeCase(key: number) {
     const resultPointer = mainFfi.exports.names_to_screaming_snake_case(this.pointer, key);
-    using resultStructure = new SizedString(resultPointer);
-    const result = resultStructure.value;
-    assert(result != null);
+    using resultWrapper = new SizedString(resultPointer);
+    const result = resultWrapper.read();
     return result;
   }
 }
 
 export function toCamelCase(value: string) {
-  using valueStructure = new SizedString();
-  valueStructure.value = value;
-  const valuePointer = valueStructure.getPointer();
-  const resultPointer = mainFfi.exports.to_camel_case(valuePointer);
-  using resultStructure = new SizedString(resultPointer);
-  const result = resultStructure.value;
-  assert(result != null);
+  using valueWrapper = SizedString.create(value);
+  const resultPointer = mainFfi.exports.to_camel_case(valueWrapper.pointer);
+  using resultWrapper = new SizedString(resultPointer);
+  const result = resultWrapper.read();
   return result;
 }
 
 export function toPascalCase(value: string) {
-  using valueStructure = new SizedString();
-  valueStructure.value = value;
-  const valuePointer = valueStructure.getPointer();
-  const resultPointer = mainFfi.exports.to_pascal_case(valuePointer);
-  using resultStructure = new SizedString(resultPointer);
-  const result = resultStructure.value;
-  assert(result != null);
+  using valueWrapper = SizedString.create(value);
+  const resultPointer = mainFfi.exports.to_pascal_case(valueWrapper.pointer);
+  using resultWrapper = new SizedString(resultPointer);
+  const result = resultWrapper.read();
   return result;
 }
 
 export function toSnakeCase(value: string) {
-  using valueStructure = new SizedString();
-  valueStructure.value = value;
-  const valuePointer = valueStructure.getPointer();
-  const resultPointer = mainFfi.exports.to_snake_case(valuePointer);
-  using resultStructure = new SizedString(resultPointer);
-  const result = resultStructure.value;
-  assert(result != null);
+  using valueWrapper = SizedString.create(value);
+  const resultPointer = mainFfi.exports.to_snake_case(valueWrapper.pointer);
+  using resultWrapper = new SizedString(resultPointer);
+  const result = resultWrapper.read();
   return result;
 }
 
 export function toScreamingSnakeCase(value: string) {
-  using valueStructure = new SizedString();
-  valueStructure.value = value;
-  const valuePointer = valueStructure.getPointer();
-  const resultPointer = mainFfi.exports.to_screaming_snake_case(valuePointer);
-  using resultStructure = new SizedString(resultPointer);
-  const result = resultStructure.value;
-  assert(result != null);
+  using valueWrapper = SizedString.create(value);
+  const resultPointer = mainFfi.exports.to_screaming_snake_case(valueWrapper.pointer);
+  using resultWrapper = new SizedString(resultPointer);
+  const result = resultWrapper.read();
   return result;
 }

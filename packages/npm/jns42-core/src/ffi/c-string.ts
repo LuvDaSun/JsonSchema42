@@ -1,6 +1,5 @@
 import { mainFfi } from "../main-ffi.js";
-import { NULL_POINTER, Pointer } from "../utils/ffi.js";
-import { Structure } from "./structure.js";
+import { Pointer, Size } from "../utils/index.js";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {
@@ -8,44 +7,53 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class CString extends Structure {
-  public get value(): string | undefined {
-    if (this.getPointer() === NULL_POINTER) {
-      return undefined;
-    } else {
-      const bytes = this.getBytes(0, this.getSize() - 1);
-      const value = textDecoder.decode(bytes, { stream: false });
-      return value;
-    }
+export class CString {
+  public constructor(public readonly pointer: Pointer) {
+    //
   }
-  public set value(value: string | undefined) {
-    if (value == null) {
-      this.setSize(0);
-    } else {
-      const bytes = textEncoder.encode(value);
-      const size = bytes.length + 1;
-      this.setSize(size);
-      this.setBytes(bytes);
-      this.setUint8(size + 0, 0);
-    }
+  public static create(value: string) {
+    const pointer = createCString(value);
+    return new CString(pointer);
   }
+  public read(): string {
+    const { pointer } = this;
+    return readCString(pointer);
+  }
+  [Symbol.dispose]() {
+    const { pointer } = this;
+    return freeCString(pointer);
+  }
+}
 
-  public constructor(pointer: Pointer = NULL_POINTER) {
-    if (pointer === NULL_POINTER) {
-      super(pointer, 0);
-    } else {
-      const size = CString.findSize(pointer);
-      super(pointer, size);
-    }
-  }
+export function createCString(value: string): Pointer {
+  const data = textEncoder.encode(value);
+  const dataSize = data.length;
+  const size = dataSize + 1;
+  const pointer = mainFfi.exports.alloc(size);
+  mainFfi.memoryUint8.set(data, pointer);
+  mainFfi.memoryView.setUint8(pointer + size + 0, 0);
+  return pointer;
+}
 
-  private static findSize(pointer: Pointer) {
-    const index = mainFfi.memoryUint8.indexOf(0, pointer);
-    if (index < 0) {
-      throw new TypeError("cstring size not found");
-    }
-    const bytesSize = index - pointer;
-    const size = bytesSize + 1;
-    return size;
+export function readCString(pointer: Pointer): string {
+  const size = findCStringSize(pointer);
+  const dataSize = size - 1;
+  const data = mainFfi.memoryUint8.subarray(pointer, pointer + dataSize);
+  const value = textDecoder.decode(data);
+  return value;
+}
+
+export function freeCString(pointer: Pointer) {
+  const size = findCStringSize(pointer);
+  mainFfi.exports.dealloc(pointer, size);
+}
+
+function findCStringSize(pointer: Pointer): Size {
+  const index = mainFfi.memoryUint8.indexOf(0, pointer);
+  if (index < 0) {
+    throw new TypeError("cstring size not found");
   }
+  const dataSize = index - pointer;
+  const size = dataSize + 1;
+  return size;
 }
