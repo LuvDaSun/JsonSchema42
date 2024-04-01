@@ -35,30 +35,6 @@ impl SizedString {
   }
 }
 
-#[repr(C)]
-pub struct StringView {
-  data: *const u8,
-  size: usize,
-}
-
-impl StringView {
-  pub fn new(value: &str) -> Self {
-    let bytes = value.as_bytes();
-    let size = bytes.len();
-    let bytes = Box::new(bytes);
-    let data = Box::into_raw(bytes) as *const u8;
-
-    Self { data, size }
-  }
-
-  pub fn as_str(&self) -> &str {
-    unsafe {
-      let slice = std::slice::from_raw_parts(self.data, self.size);
-      std::str::from_utf8_unchecked(slice)
-    }
-  }
-}
-
 const ALIGN: usize = std::mem::align_of::<usize>();
 
 #[no_mangle]
