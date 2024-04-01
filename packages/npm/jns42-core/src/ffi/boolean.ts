@@ -1,7 +1,7 @@
 import { NULL_POINTER, Pointer } from "../utils/ffi.js";
-import { Structure2 } from "./structure-2.js";
+import { Structure } from "./structure.js";
 
-export class BooleanStructure extends Structure2 {
+export class BooleanStructure extends Structure {
   public get value(): boolean | undefined {
     if (this.getPointer() === NULL_POINTER) {
       return undefined;

@@ -1,6 +1,6 @@
 import { Pointer } from "../utils/ffi.js";
-import { SizedString2 } from "./sized-string-2.js";
-import { Structure2 } from "./structure-2.js";
+import { SizedString } from "./sized-string.js";
+import { Structure } from "./structure.js";
 
 const ID_OFFSET = 0;
 const TITLE_OFFSET = 4;
@@ -8,7 +8,7 @@ const DEPRECATED_OFFSET = 8;
 
 const SIZE = 9;
 
-export class SchemaItem extends Structure2 {
+export class SchemaItem extends Structure {
   public get value(): SchemaItemObject {
     return {
       id: this.id.value,
@@ -43,8 +43,8 @@ export class SchemaItem extends Structure2 {
     this.setInt8(DEPRECATED_OFFSET, Number(value));
   }
 
-  protected id!: SizedString2;
-  protected title!: SizedString2;
+  protected id!: SizedString;
+  protected title!: SizedString;
 
   protected constructor(pointer: Pointer) {
     super(pointer, SIZE);
@@ -53,8 +53,8 @@ export class SchemaItem extends Structure2 {
   protected onAttach() {
     super.onAttach();
 
-    this.id = new SizedString2(this.idPointer);
-    this.title = new SizedString2(this.titlePointer);
+    this.id = new SizedString(this.idPointer);
+    this.title = new SizedString(this.titlePointer);
   }
 
   protected onDetach() {

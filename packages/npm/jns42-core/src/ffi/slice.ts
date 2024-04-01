@@ -1,70 +1,38 @@
-import assert from "assert";
 import { NULL_POINTER, Pointer, Size } from "../utils/ffi.js";
 import { Payload } from "./payload.js";
 import { Structure } from "./structure.js";
 
-const SIZE = 8;
-
-const PAYLOAD_POINTER_OFFSET = 0;
-const PAYLOAD_SIZE_OFFSET = 4;
-
 export class Slice extends Structure {
   protected get payloadPointer() {
-    return this.getUint32(PAYLOAD_POINTER_OFFSET);
+    return this.getUint32(0);
   }
   protected set payloadPointer(value: Pointer) {
-    this.setUint32(PAYLOAD_POINTER_OFFSET, value);
+    this.setUint32(0, value);
   }
 
   protected get payloadSize() {
-    return this.getUint32(PAYLOAD_SIZE_OFFSET);
+    return this.getUint32(4);
   }
   protected set payloadSize(value: Size) {
-    this.setUint32(PAYLOAD_SIZE_OFFSET, value);
+    this.setUint32(4, value);
   }
 
-  protected constructor(pointer: Pointer) {
-    super(pointer, SIZE);
+  protected payload?: Payload;
+
+  public constructor(pointer: Pointer = NULL_POINTER) {
+    super(pointer, 8);
   }
 
-  public static fromPointer(pointer: Pointer) {
-    assert(pointer !== NULL_POINTER);
+  protected onAttach() {
+    super.onAttach();
 
-    const instance = new Slice(pointer);
-    return instance;
+    this.payload = new Payload(this.payloadPointer, this.payloadSize);
   }
 
-  public static fromBytes(value: Uint8Array) {
-    const instance = new Slice(NULL_POINTER);
+  protected onDetach() {
+    this.payload![Symbol.dispose]();
+    this.payload = undefined;
 
-    const payloadSize = value.length;
-    instance.payloadSize = payloadSize;
-    if (payloadSize > 0) {
-      const payload = new Payload(NULL_POINTER, payloadSize);
-      instance.payloadPointer = payload.pointer;
-    }
-    return instance;
-  }
-
-  public toBytes() {
-    const payloadSize = this.payloadSize;
-    if (payloadSize > 0) {
-      const payloadPointer = this.payloadPointer;
-      const payload = new Payload(payloadPointer, payloadSize);
-      return payload.toBytes();
-    } else {
-      return new Uint8Array(0);
-    }
-  }
-
-  [Symbol.dispose]() {
-    const payloadSize = this.payloadSize;
-    if (payloadSize > 0) {
-      const payloadPointer = this.payloadPointer;
-      const payload = new Payload(payloadPointer, payloadSize);
-      return payload[Symbol.dispose]();
-    }
-
-    super[Symbol.dispose]();
+    super.onDetach();
   }
 }

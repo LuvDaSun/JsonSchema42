@@ -3,26 +3,88 @@ import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
 export class Structure {
+  private static finalizationRegistry = new FinalizationRegistry<[Pointer, Size]>(
+    ([pointer, size]) => {
+      if (pointer !== NULL_POINTER) {
+        mainFfi.exports.dealloc(pointer, size);
+      }
+    },
+  );
+
+  // keep track of being disposed, we an only dispose once
   private disposed = false;
+  // keep track of being attached we can not detach when unattached
+  // and we can not attach then already attached
+  private attached = false;
+  // token ro use to deregister the finalizationRegistry.
+  private token = Symbol();
 
-  public pointer: Pointer;
-  public readonly size: Size;
-
-  protected constructor(pointer: Pointer, size: Size) {
-    assert(size > 0);
-    this.size = size;
-    if (pointer === NULL_POINTER) {
-      this.pointer = this.allocate();
+  public constructor(
+    private pointer: Pointer,
+    private size: Size,
+  ) {
+    if (pointer !== NULL_POINTER) {
+      // if a pointer is provided, attach to the memory that the
+      // pointer points to
+      this.attach();
     } else {
-      this.pointer = pointer;
+      this.setSize(size);
     }
   }
 
-  private allocate() {
-    return mainFfi.exports.alloc(this.size);
+  [Symbol.dispose]() {
+    // we can only dispose once!
+    assert(!this.disposed);
+
+    // this will eventually detach and deallocate
+    this.setSize(0);
+    this.disposed = true;
   }
-  private deallocate() {
-    mainFfi.exports.dealloc(this.pointer, this.size);
+
+  protected onAttach() {
+    //
+  }
+
+  protected onDetach() {
+    //
+  }
+
+  /**
+   * Resize the memory that this structures occupies, this might
+   * involve allocation, reallocation or deallocation
+   * @param size the new size
+   */
+  protected setSize(size: Size) {
+    if (this.pointer === NULL_POINTER) {
+      // we have nothing allocated yet!
+      if (size === 0) {
+        // want to deallocate but already deallocated
+      } else {
+        this.allocate(size);
+        this.attach();
+      }
+    } else {
+      // already allocated, either reallocate or deallocate
+      if (size === 0) {
+        this.detach();
+        this.deallocate();
+      } else {
+        if (size === this.size) {
+          // already at the requested size
+        } else {
+          this.detach();
+          this.reallocate(size);
+          this.attach();
+        }
+      }
+    }
+  }
+  public getSize() {
+    return this.size;
+  }
+
+  public getPointer() {
+    return this.pointer;
   }
 
   protected setBytes(bytes: Uint8Array, offset = 0) {
@@ -88,12 +150,47 @@ export class Structure {
     return mainFfi.memoryView.getInt32(this.pointer + offset, true);
   }
 
-  [Symbol.dispose]() {
-    assert(!this.disposed);
-    if (this.size > 0) {
-      this.deallocate();
-      this.pointer = NULL_POINTER;
-    }
-    this.disposed = true;
+  private attach() {
+    assert(!this.attached);
+    this.onAttach();
+    this.attached = true;
+
+    // if someone forgets to cleanup, then the garbage collector will do it
+    Structure.finalizationRegistry.register(this, [this.pointer, this.size], this.token);
+  }
+
+  private detach() {
+    // we don't need to clean up when detached
+    Structure.finalizationRegistry.unregister(this.token);
+
+    assert(this.attached);
+    this.onDetach();
+    this.attached = false;
+  }
+
+  private allocate(size: number) {
+    assert(this.pointer === NULL_POINTER);
+    assert(size > 0);
+
+    this.pointer = mainFfi.exports.alloc(size);
+    this.size = size;
+  }
+
+  private reallocate(size: number) {
+    assert(this.pointer !== NULL_POINTER);
+    assert(this.size > 0);
+    assert(size > 0);
+
+    this.pointer = mainFfi.exports.realloc(this.pointer, this.size, size);
+    this.size = size;
+  }
+
+  private deallocate() {
+    assert(this.pointer !== NULL_POINTER);
+    assert(this.size > 0);
+
+    mainFfi.exports.dealloc(this.pointer, this.size);
+    this.pointer = NULL_POINTER;
+    // leave size for what it is
   }
 }
