@@ -6,3 +6,4 @@ export * from "./pointer-wrapper.js";
 export * from "./reverse.js";
 export * from "./schema-item.js";
 export * from "./sized-string-wrapper.js";
+export * from "./uint8-wrapper.js";
