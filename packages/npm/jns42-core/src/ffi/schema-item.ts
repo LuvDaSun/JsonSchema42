@@ -31,7 +31,7 @@ export class SchemaItemProxy {
 
   public get deprecated(): boolean | undefined {
     const pointer = mainFfi.exports.schema_item_deprecated(this.pointer);
-    using wrapper = new wrappers.Reference(pointer);
+    using wrapper = new wrappers.Box(pointer);
     const valuePointer = wrapper.read();
     if (valuePointer == null) {
       return undefined;

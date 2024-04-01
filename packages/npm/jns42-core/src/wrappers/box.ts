@@ -2,17 +2,17 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 
-export class Reference {
+export class Box {
   public constructor(public readonly pointer: number) {
     //
   }
   public static allocate(value: Pointer | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
-      return new Reference(pointer);
+      return new Box(pointer);
     } else {
       const pointer = allocate(value);
-      return new Reference(pointer);
+      return new Box(pointer);
     }
   }
   public read(): Pointer | undefined {

@@ -137,7 +137,7 @@ pub extern "C" fn names_free(names: *mut Names<usize>) {
 }
 
 #[no_mangle]
-extern "C" fn reverse(value: *const SizedString, result_output: *mut Reference<SizedString>) {
+extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
   let value = unsafe { &*value };
   let value = value.as_str();
 
@@ -146,8 +146,7 @@ extern "C" fn reverse(value: *const SizedString, result_output: *mut Reference<S
   let result = SizedString::new(result);
   let result = Box::new(result);
 
-  let result_out = unsafe { &mut *result_output };
-  result_out.set(Box::into_raw(result));
+  unsafe { *result_output = Box::into_raw(result) };
 }
 
 /// get the name as camelCase
@@ -236,17 +235,6 @@ impl SizedString {
       let slice = std::slice::from_raw_parts(self.data, self.size);
       std::str::from_utf8_unchecked(slice)
     }
-  }
-}
-
-#[repr(C)]
-pub struct Reference<T>(*const T);
-
-impl<T> Reference<T> {
-  pub fn set(&mut self, value: *const T) {
-    debug_assert!(self.0.is_null());
-
-    self.0 = value;
   }
 }
 
