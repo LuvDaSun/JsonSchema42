@@ -91,7 +91,7 @@ extern "C" fn names_to_screaming_snake_case(
 
 /// Free Names instance
 #[no_mangle]
-extern "C" fn names_free(names: *mut Names<usize>) {
+extern "C" fn names_drop(names: *mut Names<usize>) {
   assert!(!names.is_null());
 
   unsafe {

@@ -220,7 +220,7 @@ extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
 
 /// Free NamesBuilder instance
 #[no_mangle]
-extern "C" fn names_builder_free(names_builder: *mut NamesBuilder<usize>) {
+extern "C" fn names_builder_drop(names_builder: *mut NamesBuilder<usize>) {
   assert!(!names_builder.is_null());
 
   unsafe {

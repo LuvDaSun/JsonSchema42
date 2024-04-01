@@ -61,6 +61,22 @@ impl Arena<SchemaItem> {
   }
 }
 
+#[no_mangle]
+extern "C" fn schema_arena_new() -> *const Arena<SchemaItem> {
+  let arena = Arena::new();
+  let arena = Box::new(arena);
+  Box::into_raw(arena)
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
+  assert!(!arena.is_null());
+
+  unsafe {
+    let _ = Box::from_raw(arena);
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

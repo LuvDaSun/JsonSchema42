@@ -9,7 +9,7 @@ export class NamesProxy {
   }
 
   [Symbol.dispose]() {
-    mainFfi.exports.names_free(this.pointer);
+    mainFfi.exports.names_drop(this.pointer);
   }
 
   public toCamelCase(key: number) {

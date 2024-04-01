@@ -361,7 +361,7 @@ extern "C" fn schema_item_new() -> *const SchemaItem {
 }
 
 #[no_mangle]
-extern "C" fn schema_item_free(schema_item: *mut SchemaItem) {
+extern "C" fn schema_item_drop(schema_item: *mut SchemaItem) {
   assert!(!schema_item.is_null());
 
   unsafe {

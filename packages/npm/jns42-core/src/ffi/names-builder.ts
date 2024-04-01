@@ -10,7 +10,7 @@ export class NamesBuilderProxy {
   }
 
   [Symbol.dispose]() {
-    mainFfi.exports.names_builder_free(this.pointer);
+    mainFfi.exports.names_builder_drop(this.pointer);
   }
 
   public static new() {
