@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { mainFfi } from "../main-ffi.js";
-import { NamesBuilder } from "./naming.js";
+import { NamesBuilder } from "./names-builder.js";
 
 test("names", () => {
   using namesBuilder = NamesBuilder.new()
