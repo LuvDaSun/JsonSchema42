@@ -70,7 +70,6 @@ function findCStringSize(pointer: Pointer): Size {
   if (index < 0) {
     throw new TypeError("cstring size not found");
   }
-  const dataSize = index - pointer;
-  const size = dataSize + 1;
+  const size = index - pointer;
   return size;
 }
