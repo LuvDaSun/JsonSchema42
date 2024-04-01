@@ -3,7 +3,7 @@ import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 import * as wrappers from "../wrappers/index.js";
 
-export class SchemaItem {
+export class SchemaItemProxy {
   constructor(private readonly pointer: Pointer) {
     assert(pointer !== NULL_POINTER);
   }
@@ -14,7 +14,7 @@ export class SchemaItem {
 
   public static new() {
     const pointer = mainFfi.exports.schema_item_new();
-    return new SchemaItem(pointer);
+    return new SchemaItemProxy(pointer);
   }
 
   public get id(): string | undefined {

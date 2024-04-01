@@ -2,9 +2,9 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 import * as wrappers from "../wrappers/index.js";
-import { Names } from "./names.js";
+import { NamesProxy } from "./names.js";
 
-export class NamesBuilder {
+export class NamesBuilderProxy {
   constructor(private readonly pointer: Pointer) {
     assert(pointer !== NULL_POINTER);
   }
@@ -15,7 +15,7 @@ export class NamesBuilder {
 
   public static new() {
     const pointer = mainFfi.exports.names_builder_new();
-    return new NamesBuilder(pointer);
+    return new NamesBuilderProxy(pointer);
   }
 
   public add(key: number, value: string) {
@@ -32,6 +32,6 @@ export class NamesBuilder {
 
   public build() {
     const pointer = mainFfi.exports.names_builder_build(this.pointer);
-    return new Names(pointer);
+    return new NamesProxy(pointer);
   }
 }

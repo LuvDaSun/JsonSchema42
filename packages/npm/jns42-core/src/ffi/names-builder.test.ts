@@ -1,10 +1,10 @@
 import assert from "node:assert";
 import test from "node:test";
 import { mainFfi } from "../main-ffi.js";
-import { NamesBuilder } from "./names-builder.js";
+import { NamesBuilderProxy } from "./names-builder.js";
 
 test("names", () => {
-  using namesBuilder = NamesBuilder.new()
+  using namesBuilder = NamesBuilderProxy.new()
     .add(1, "cat")
     .add(1, "id")
     .add(2, "cat")
@@ -35,7 +35,7 @@ test("names", () => {
 
 test("names leak test", () => {
   function runTest() {
-    using namesBuilder = NamesBuilder.new()
+    using namesBuilder = NamesBuilderProxy.new()
       .add(1, "cat")
       .add(1, "id")
       .add(2, "cat")

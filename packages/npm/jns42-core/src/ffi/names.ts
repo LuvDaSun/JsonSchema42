@@ -3,7 +3,7 @@ import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 import * as wrappers from "../wrappers/index.js";
 
-export class Names {
+export class NamesProxy {
   constructor(private readonly pointer: Pointer) {
     assert(pointer !== NULL_POINTER);
   }
