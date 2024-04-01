@@ -2,21 +2,21 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 
-export class OutputWrapper {
+export class PointerWrapper {
   public constructor(public readonly pointer: number) {
     //
   }
-  public static allocate(value: number) {
+  public static allocate(value: Pointer) {
     const pointer = allocateOutput(value);
-    return new OutputWrapper(pointer);
+    return new PointerWrapper(pointer);
   }
-  public read(): number {
+  public read(): Pointer {
     const { pointer } = this;
     return readOutput(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
-    return freeOutput(pointer);
+    return deallocateOutput(pointer);
   }
 }
 
@@ -33,7 +33,7 @@ function readOutput(pointer: Pointer): Pointer {
   return value;
 }
 
-function freeOutput(pointer: Pointer) {
+function deallocateOutput(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   mainFfi.exports.dealloc(pointer, 4);

@@ -32,7 +32,7 @@ export class CStringWrapper {
     if (pointer === NULL_POINTER) {
       return;
     }
-    return freeCString(pointer);
+    return deallocateCString(pointer);
   }
 }
 
@@ -56,7 +56,7 @@ function readCString(pointer: Pointer): string {
   return value;
 }
 
-function freeCString(pointer: Pointer) {
+function deallocateCString(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);

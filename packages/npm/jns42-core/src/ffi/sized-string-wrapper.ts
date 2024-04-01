@@ -32,7 +32,7 @@ export class SizedStringWrapper {
     if (pointer === NULL_POINTER) {
       return;
     }
-    return freeSizedString(pointer);
+    return deallocateSizedString(pointer);
   }
 }
 
@@ -66,7 +66,7 @@ function readSizedString(pointer: Pointer): string {
   }
 }
 
-function freeSizedString(pointer: Pointer) {
+function deallocateSizedString(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);
