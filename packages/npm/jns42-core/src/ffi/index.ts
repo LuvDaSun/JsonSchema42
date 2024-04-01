@@ -1,4 +1,5 @@
 export * from "./c-string-wrapper.js";
+export * from "./int32-wrapper.js";
 export * from "./names-builder.js";
 export * from "./names.js";
 export * from "./naming.js";
@@ -6,4 +7,5 @@ export * from "./pointer-wrapper.js";
 export * from "./reverse.js";
 export * from "./schema-item.js";
 export * from "./sized-string-wrapper.js";
+export * from "./uint32-wrapper.js";
 export * from "./uint8-wrapper.js";
