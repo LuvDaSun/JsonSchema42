@@ -1,7 +1,9 @@
 use super::intermediate::IntermediateType;
+use crate::ffi::StringView;
 use crate::utils::{merge::merge_option, url::UrlWithPointer};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashSet};
+use std::ptr::null;
 use std::{collections::HashMap, iter::empty};
 
 pub type SchemaKey = usize;
@@ -349,4 +351,35 @@ impl SchemaItem {
           .copied(),
       )
   }
+}
+
+#[no_mangle]
+extern "C" fn schema_item_new() -> *const SchemaItem {
+  let schema_item = SchemaItem::default();
+  let schema_item = Box::new(schema_item);
+  Box::into_raw(schema_item)
+}
+
+#[no_mangle]
+extern "C" fn schema_item_free(schema_item: *mut SchemaItem) {
+  assert!(!schema_item.is_null());
+
+  unsafe {
+    let _ = Box::from_raw(schema_item);
+  }
+}
+
+#[no_mangle]
+extern "C" fn schema_item_get_id(schema_item: *const SchemaItem) -> *const StringView {
+  assert!(!schema_item.is_null());
+  let schema_item = unsafe { &*schema_item };
+
+  let Some(value) = &schema_item.id else {
+    return null();
+  };
+  let value = value.as_str();
+  let value = StringView::new(value);
+  let value = Box::new(value);
+
+  Box::into_raw(value)
 }

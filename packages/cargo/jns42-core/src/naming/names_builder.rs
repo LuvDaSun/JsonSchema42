@@ -1,4 +1,5 @@
 use super::{NamePart, Names, Sentence};
+use crate::ffi::SizedString;
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug)]
@@ -207,6 +208,68 @@ where
   fn default() -> Self {
     Self::new()
   }
+}
+
+/// Create a new NamesBuilder instance
+#[no_mangle]
+extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
+  let names_builder = NamesBuilder::new();
+  let names_builder = Box::new(names_builder);
+  Box::into_raw(names_builder)
+}
+
+/// Free NamesBuilder instance
+#[no_mangle]
+extern "C" fn names_builder_free(names_builder: *mut NamesBuilder<usize>) {
+  assert!(!names_builder.is_null());
+
+  unsafe {
+    let _ = Box::from_raw(names_builder);
+  }
+}
+
+/// add a sentence to a key
+#[no_mangle]
+extern "C" fn names_builder_add(
+  names_builder: *mut NamesBuilder<usize>,
+  key: usize,
+  value: *const SizedString,
+) {
+  assert!(!names_builder.is_null());
+  assert!(!value.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  names_builder.add(key, value);
+}
+
+/// add a sentence to a key
+#[no_mangle]
+extern "C" fn names_builder_set_default_name(
+  names_builder: *mut NamesBuilder<usize>,
+  value: *const SizedString,
+) {
+  assert!(!value.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+  let value = unsafe { &*value };
+  let value = value.as_str();
+
+  names_builder.set_default_name(value);
+}
+
+/// create a names struct from the builder
+#[no_mangle]
+extern "C" fn names_builder_build(names_builder: *mut NamesBuilder<usize>) -> *mut Names<usize> {
+  assert!(!names_builder.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+
+  let names = names_builder.build();
+  let names = Box::new(names);
+  Box::into_raw(names)
 }
 
 #[cfg(test)]
