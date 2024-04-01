@@ -129,7 +129,7 @@ fn generate_type_token_stream(
             });
           }
         }
-        SchemaType::Object => {
+        SchemaType::Map => {
           if let Some(object_properties_entries) = &item.object_properties {
             let required: HashSet<_> = item
               .required

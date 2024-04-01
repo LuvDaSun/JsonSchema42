@@ -8,6 +8,7 @@ use std::{collections::HashMap, iter::empty};
 pub type SchemaKey = usize;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum SchemaType {
   Never,
   Any,
@@ -17,7 +18,7 @@ pub enum SchemaType {
   Number,
   String,
   Array,
-  Object,
+  Map,
 }
 
 impl SchemaType {
@@ -57,7 +58,7 @@ impl ToString for SchemaType {
       Self::Number => "number".to_string(),
       Self::String => "string".to_string(),
       Self::Array => "array".to_string(),
-      Self::Object => "object".to_string(),
+      Self::Map => "object".to_string(),
     }
   }
 }
@@ -73,14 +74,16 @@ impl From<&IntermediateType> for SchemaType {
       IntermediateType::Number => Self::Number,
       IntermediateType::String => Self::String,
       IntermediateType::Array => Self::Array,
-      IntermediateType::Object => Self::Object,
+      IntermediateType::Object => Self::Map,
     }
   }
 }
 
 #[derive(Clone, PartialEq, Default, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SchemaItem {
   pub name: Option<String>,
+  pub exact: Option<bool>,
 
   pub primary: Option<bool>,
   pub parent: Option<SchemaKey>,
@@ -251,6 +254,7 @@ impl SchemaItem {
 
     Self {
       name: None,
+      exact: None,
       primary: None,
       parent: None,
       id: None,

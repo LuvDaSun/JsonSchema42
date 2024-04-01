@@ -115,6 +115,7 @@ impl Specification {
 
         let item = SchemaItem {
           name: None,
+          exact: None,
           primary,
           parent,
           types,
