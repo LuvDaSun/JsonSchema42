@@ -1,12 +1,13 @@
 use super::intermediate::IntermediateType;
 use crate::utils::{merge::merge_option, url::UrlWithPointer};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashSet};
 use std::{collections::HashMap, iter::empty};
 
 pub type SchemaKey = usize;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize)]
 pub enum SchemaType {
   Never,
   Any,
@@ -77,7 +78,7 @@ impl From<&IntermediateType> for SchemaType {
   }
 }
 
-#[derive(Clone, PartialEq, Default, Debug)]
+#[derive(Clone, PartialEq, Default, Debug, Serialize, Deserialize)]
 pub struct SchemaItem {
   pub name: Option<String>,
 

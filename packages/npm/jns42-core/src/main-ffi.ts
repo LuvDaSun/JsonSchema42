@@ -26,6 +26,10 @@ export interface MainExports extends Exports {
 
   schema_arena_new(): Pointer;
   schema_arena_drop(schema_arena: Pointer): void;
+  schema_arena_count(schema_arena: Pointer): number;
+  schema_arena_add_item(schema_arena: Pointer, item: Pointer): number;
+  schema_arena_replace_item(schema_arena: Pointer, key: number, item: Pointer): Pointer;
+  schema_arena_get_item(schema_arena: Pointer, key: number): Pointer;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;

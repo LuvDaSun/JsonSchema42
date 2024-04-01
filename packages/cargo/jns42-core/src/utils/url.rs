@@ -1,4 +1,5 @@
 use super::json_pointer::JsonPointer;
+use serde::{Deserialize, Serialize};
 use url::{ParseError, Url};
 
 #[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq, Hash)]
@@ -12,7 +13,9 @@ impl From<UrlWithPointer> for ServerUrl {
   }
 }
 
-#[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq, Hash)]
+#[derive(Clone, Debug, PartialOrd, Ord, Eq, PartialEq, Hash, Serialize, Deserialize)]
+#[serde(from = "String")]
+#[serde(into = "String")]
 pub struct UrlWithPointer(Url, JsonPointer);
 
 impl UrlWithPointer {
@@ -52,6 +55,19 @@ impl From<Url> for UrlWithPointer {
     let fragment = pointer.to_string();
     url.set_fragment(Some(&fragment));
     Self(url, pointer)
+  }
+}
+
+impl From<String> for UrlWithPointer {
+  fn from(url: String) -> Self {
+    let url: Url = url.parse().unwrap();
+    url.into()
+  }
+}
+
+impl From<UrlWithPointer> for String {
+  fn from(val: UrlWithPointer) -> Self {
+    val.to_string()
   }
 }
 

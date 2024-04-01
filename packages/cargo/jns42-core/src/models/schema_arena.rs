@@ -1,3 +1,5 @@
+use crate::ffi::SizedString;
+
 use super::{
   arena::Arena,
   schema::{SchemaItem, SchemaKey},
@@ -75,6 +77,68 @@ extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
   unsafe {
     let _ = Box::from_raw(arena);
   }
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_count(arena: *const Arena<SchemaItem>) -> usize {
+  assert!(!arena.is_null());
+
+  let arena = unsafe { &*arena };
+  arena.count()
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_add_item(
+  arena: *mut Arena<SchemaItem>,
+  item: *const SizedString,
+) -> usize {
+  assert!(!arena.is_null());
+  assert!(!item.is_null());
+
+  let arena = unsafe { &mut *arena };
+  let item = unsafe { &*item };
+  let item = item.as_str();
+  let item = serde_json::from_str(item).unwrap();
+
+  arena.add_item(item)
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_replace_item(
+  arena: *mut Arena<SchemaItem>,
+  key: usize,
+  item: *const SizedString,
+) -> *const SizedString {
+  assert!(!arena.is_null());
+  assert!(!item.is_null());
+
+  let arena = unsafe { &mut *arena };
+  let item = unsafe { &*item };
+  let item = item.as_str();
+  let item = serde_json::from_str(item).unwrap();
+
+  let item_previous = arena.replace_item(key, item);
+  let item_previous = serde_json::to_string(&item_previous).unwrap();
+  let item_previous = SizedString::new(item_previous);
+  let item_previous = Box::new(item_previous);
+
+  Box::into_raw(item_previous)
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_get_item(
+  arena: *mut Arena<SchemaItem>,
+  key: usize,
+) -> *const SizedString {
+  assert!(!arena.is_null());
+
+  let arena = unsafe { &mut *arena };
+  let item = arena.get_item(key);
+  let item = serde_json::to_string(item).unwrap();
+  let item = SizedString::new(item);
+  let item = Box::new(item);
+
+  Box::into_raw(item)
 }
 
 #[cfg(test)]
