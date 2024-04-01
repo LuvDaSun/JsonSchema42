@@ -25,7 +25,7 @@ export class CStringWrapper {
     if (pointer === NULL_POINTER) {
       return;
     }
-    return readCString(pointer);
+    return dereferenceCString(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
@@ -46,7 +46,7 @@ function allocateCString(value: string): Pointer {
   return pointer;
 }
 
-function readCString(pointer: Pointer): string {
+function dereferenceCString(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);

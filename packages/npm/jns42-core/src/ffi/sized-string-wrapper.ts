@@ -25,7 +25,7 @@ export class SizedStringWrapper {
     if (pointer === NULL_POINTER) {
       return;
     }
-    return readSizedString(pointer);
+    return dereferenceSizedString(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
@@ -51,7 +51,7 @@ function allocateSizedString(value: string): Pointer {
   return pointer;
 }
 
-function readSizedString(pointer: Pointer): string {
+function dereferenceSizedString(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);

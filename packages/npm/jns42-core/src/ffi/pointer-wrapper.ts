@@ -12,7 +12,7 @@ export class PointerWrapper {
   }
   public read(): Pointer {
     const { pointer } = this;
-    return readOutput(pointer);
+    return dereferenceOutput(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
@@ -26,7 +26,7 @@ function allocateOutput(value: Pointer): Pointer {
   return pointer;
 }
 
-function readOutput(pointer: Pointer): Pointer {
+function dereferenceOutput(pointer: Pointer): Pointer {
   assert(pointer !== NULL_POINTER);
 
   const value = mainFfi.memoryView.getUint32(pointer);
