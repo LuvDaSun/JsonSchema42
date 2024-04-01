@@ -9,6 +9,7 @@ import { selectSchemaDependencies } from "./selectors.js";
 export interface Specification {
   typesArena: SchemaArena;
   validatorsArena: SchemaArena;
+  arenaProxy: core.SchemaArenaProxy;
   names: core.NamesProxy;
   [Symbol.dispose]: () => void;
 }
@@ -27,6 +28,8 @@ export function loadSpecification(
   // load the arena
   const typesArena = SchemaArena.fromIntermediate(document);
   const validatorsArena = new SchemaArena(typesArena);
+
+  const arenaProxy = core.SchemaArenaProxy.fromIntermediate(document);
 
   // generate names
 
@@ -136,8 +139,10 @@ export function loadSpecification(
   return {
     typesArena,
     validatorsArena,
+    arenaProxy,
     names,
     [Symbol.dispose]() {
+      arenaProxy[Symbol.dispose]();
       names[Symbol.dispose]();
     },
   };
