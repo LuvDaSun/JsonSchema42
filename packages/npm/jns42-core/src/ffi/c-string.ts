@@ -1,5 +1,6 @@
+import { assert } from "console";
 import { mainFfi } from "../main-ffi.js";
-import { Pointer, Size } from "../utils/index.js";
+import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {
@@ -36,6 +37,8 @@ export function createCString(value: string): Pointer {
 }
 
 export function readCString(pointer: Pointer): string {
+  assert(pointer !== NULL_POINTER);
+
   const size = findCStringSize(pointer);
   const dataSize = size - 1;
   const data = mainFfi.memoryUint8.subarray(pointer, pointer + dataSize);
@@ -44,11 +47,15 @@ export function readCString(pointer: Pointer): string {
 }
 
 export function freeCString(pointer: Pointer) {
+  assert(pointer !== NULL_POINTER);
+
   const size = findCStringSize(pointer);
   mainFfi.exports.dealloc(pointer, size);
 }
 
 function findCStringSize(pointer: Pointer): Size {
+  assert(pointer !== NULL_POINTER);
+
   const index = mainFfi.memoryUint8.indexOf(0, pointer);
   if (index < 0) {
     throw new TypeError("cstring size not found");
