@@ -3,7 +3,7 @@ import { Structure2 } from "./structure-2.js";
 
 export class BooleanStructure extends Structure2 {
   public get value(): boolean | undefined {
-    if (this.pointer === NULL_POINTER) {
+    if (this.getPointer() === NULL_POINTER) {
       return undefined;
     } else {
       return Boolean(this.getInt8(0));
@@ -11,9 +11,9 @@ export class BooleanStructure extends Structure2 {
   }
   public set value(value: boolean | undefined) {
     if (value == null) {
-      this.resize(0);
+      this.setSize(0);
     } else {
-      this.resize(1);
+      this.setSize(1);
       this.setInt8(0, Number(value));
     }
   }

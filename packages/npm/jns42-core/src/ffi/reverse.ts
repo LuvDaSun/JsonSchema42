@@ -7,7 +7,7 @@ export function reverse(value: string): string {
   using resultOutput = Output.createNull();
   using valueString = new SizedString2();
   valueString.value = value;
-  mainFfi.exports.reverse(valueString.pointer, resultOutput.pointer);
+  mainFfi.exports.reverse(valueString.getPointer(), resultOutput.pointer);
   using resultString = new SizedString2(resultOutput.targetPointer);
   const result = resultString.value;
   assert(result != null);

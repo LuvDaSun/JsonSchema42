@@ -10,27 +10,27 @@ const textDecoder = new TextDecoder("utf-8", {
 
 export class CString2 extends Structure2 {
   public get value(): string | undefined {
-    if (this.pointer === NULL_POINTER) {
+    if (this.getPointer() === NULL_POINTER) {
       return undefined;
     } else {
-      const bytes = this.getBytes(0, this.size - 1);
+      const bytes = this.getBytes(0, this.getSize() - 1);
       const value = textDecoder.decode(bytes, { stream: false });
       return value;
     }
   }
   public set value(value: string | undefined) {
     if (value == null) {
-      this.resize(0);
+      this.setSize(0);
     } else {
       const bytes = textEncoder.encode(value);
       const size = bytes.length + 1;
-      this.resize(size);
+      this.setSize(size);
       this.setBytes(bytes);
       this.setUint8(size + 0, 0);
     }
   }
 
-  public constructor(public pointer: Pointer = NULL_POINTER) {
+  public constructor(pointer: Pointer = NULL_POINTER) {
     if (pointer === NULL_POINTER) {
       super(pointer, 0);
     } else {

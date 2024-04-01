@@ -7,7 +7,7 @@ export class Payload2 extends Structure2 {
     return value;
   }
   public set value(value: Uint8Array) {
-    this.resize(value.length);
+    this.setSize(value.length);
     this.setBytes(value);
   }
 

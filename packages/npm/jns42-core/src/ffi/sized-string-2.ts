@@ -9,7 +9,7 @@ const textDecoder = new TextDecoder("utf-8", {
 
 export class SizedString2 extends Slice2 {
   public get value(): string | undefined {
-    if (this.pointer === NULL_POINTER) {
+    if (this.getPointer() === NULL_POINTER) {
       return undefined;
     } else {
       const bytes = this.payload!.value;
@@ -19,9 +19,9 @@ export class SizedString2 extends Slice2 {
   }
   public set value(value: string | undefined) {
     if (value == null) {
-      this.resize(0);
+      this.setSize(0);
     } else {
-      this.resize(this.size);
+      this.setSize(8);
       const bytes = textEncoder.encode(value);
       this.payload!.value = bytes;
     }

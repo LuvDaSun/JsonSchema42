@@ -23,17 +23,17 @@ export class SchemaItem extends Structure2 {
   }
 
   protected get idPointer() {
-    return this.getInt32(this.pointer + ID_OFFSET);
+    return this.getInt32(this.getPointer() + ID_OFFSET);
   }
   protected set idPointer(value: Pointer) {
-    this.setInt32(this.pointer + ID_OFFSET, value);
+    this.setInt32(this.getPointer() + ID_OFFSET, value);
   }
 
   protected get titlePointer() {
-    return this.getInt32(this.pointer + TITLE_OFFSET);
+    return this.getInt32(this.getPointer() + TITLE_OFFSET);
   }
   protected set titlePointer(value: Pointer) {
-    this.setInt32(this.pointer + TITLE_OFFSET, value);
+    this.setInt32(this.getPointer() + TITLE_OFFSET, value);
   }
 
   protected get deprecated() {

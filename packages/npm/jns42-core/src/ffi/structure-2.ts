@@ -20,8 +20,8 @@ export class Structure2 {
   private token = Symbol();
 
   public constructor(
-    public pointer: Pointer,
-    public size: Size,
+    private pointer: Pointer,
+    private size: Size,
   ) {
     if (pointer !== NULL_POINTER) {
       // if a pointer is provided, attach to the memory that the
@@ -35,7 +35,7 @@ export class Structure2 {
     assert(!this.disposed);
 
     // this will eventually detach and deallocate
-    this.resize(0);
+    this.setSize(0);
     this.disposed = true;
   }
 
@@ -52,7 +52,7 @@ export class Structure2 {
    * involve allocation, reallocation or deallocation
    * @param size the new size
    */
-  protected resize(size: Size) {
+  protected setSize(size: Size) {
     if (this.pointer === NULL_POINTER) {
       // we have nothing allocated yet!
       if (size === 0) {
@@ -76,6 +76,13 @@ export class Structure2 {
         }
       }
     }
+  }
+  public getSize() {
+    return this.size;
+  }
+
+  public getPointer() {
+    return this.pointer;
   }
 
   protected setBytes(bytes: Uint8Array, offset = 0) {
