@@ -12,16 +12,26 @@ export class CString {
   public constructor(public readonly pointer: Pointer) {
     //
   }
-  public static allocate(value: string) {
+  public static allocate(value: string | undefined) {
+    if (value == null) {
+      const pointer = NULL_POINTER;
+      return new CString(pointer);
+    }
     const pointer = allocateCString(value);
     return new CString(pointer);
   }
-  public read(): string {
+  public read(): string | undefined {
     const { pointer } = this;
+    if (pointer === NULL_POINTER) {
+      return;
+    }
     return readCString(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
+    if (pointer === NULL_POINTER) {
+      return;
+    }
     return freeCString(pointer);
   }
 }

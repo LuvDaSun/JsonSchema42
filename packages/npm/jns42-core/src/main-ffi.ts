@@ -14,6 +14,7 @@ export interface MainExports extends Exports {
   names_builder_set_default_name(names_builder: Pointer, value: Pointer): void;
   names_builder_free(names_builder: Pointer): void;
   names_builder_build(names_builder: Pointer): Pointer;
+
   names_to_camel_case(names: Pointer, key: number): Pointer;
   names_to_pascal_case(names: Pointer, key: number): Pointer;
   names_to_snake_case(names: Pointer, key: number): Pointer;
@@ -21,7 +22,10 @@ export interface MainExports extends Exports {
   names_free(names: Pointer): void;
 
   schema_item_new(): Pointer;
-  schema_item_free(names: Pointer): void;
+  schema_item_free(schema_item: Pointer): void;
+  schema_item_id(schema_item: Pointer): Pointer;
+  schema_item_title(schema_item: Pointer): Pointer;
+  schema_item_deprecated(schema_item: Pointer): Pointer;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;

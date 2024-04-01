@@ -12,16 +12,26 @@ export class SizedString {
   public constructor(public readonly pointer: Pointer) {
     //
   }
-  public static allocate(value: string) {
+  public static allocate(value: string | undefined) {
+    if (value == null) {
+      const pointer = NULL_POINTER;
+      return new SizedString(pointer);
+    }
     const pointer = allocateSizedString(value);
     return new SizedString(pointer);
   }
-  public read(): string {
+  public read(): string | undefined {
     const { pointer } = this;
+    if (pointer === NULL_POINTER) {
+      return;
+    }
     return readSizedString(pointer);
   }
   [Symbol.dispose]() {
     const { pointer } = this;
+    if (pointer === NULL_POINTER) {
+      return;
+    }
     return freeSizedString(pointer);
   }
 }
