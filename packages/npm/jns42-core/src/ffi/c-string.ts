@@ -12,8 +12,8 @@ export class CString {
   public constructor(public readonly pointer: Pointer) {
     //
   }
-  public static create(value: string) {
-    const pointer = createCString(value);
+  public static allocate(value: string) {
+    const pointer = allocateCString(value);
     return new CString(pointer);
   }
   public read(): string {
@@ -26,7 +26,7 @@ export class CString {
   }
 }
 
-export function createCString(value: string): Pointer {
+export function allocateCString(value: string): Pointer {
   const data = textEncoder.encode(value);
   const dataSize = data.length;
   const size = dataSize + 1;

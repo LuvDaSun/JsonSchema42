@@ -6,8 +6,8 @@ export class Output {
   public constructor(public readonly pointer: number) {
     //
   }
-  public static create(value: number) {
-    const pointer = createOutput(value);
+  public static allocate(value: number) {
+    const pointer = allocateOutput(value);
     return new Output(pointer);
   }
   public read(): number {
@@ -20,7 +20,7 @@ export class Output {
   }
 }
 
-export function createOutput(value: Pointer): Pointer {
+export function allocateOutput(value: Pointer): Pointer {
   const pointer = mainFfi.exports.alloc(4);
   mainFfi.memoryView.setUint32(pointer + 0, value, true);
   return pointer;

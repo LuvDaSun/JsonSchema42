@@ -12,8 +12,8 @@ export class SizedString {
   public constructor(public readonly pointer: Pointer) {
     //
   }
-  public static create(value: string) {
-    const pointer = createSizedString(value);
+  public static allocate(value: string) {
+    const pointer = allocateSizedString(value);
     return new SizedString(pointer);
   }
   public read(): string {
@@ -26,7 +26,7 @@ export class SizedString {
   }
 }
 
-export function createSizedString(value: string): Pointer {
+export function allocateSizedString(value: string): Pointer {
   const pointer = mainFfi.exports.alloc(8);
   const data = textEncoder.encode(value);
   const dataSize = data.length;

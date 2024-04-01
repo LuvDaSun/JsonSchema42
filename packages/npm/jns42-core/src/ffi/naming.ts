@@ -27,13 +27,13 @@ export class NamesBuilder {
   }
 
   public add(key: number, value: string) {
-    using valueWrapper = SizedString.create(value);
+    using valueWrapper = SizedString.allocate(value);
     mainFfi.exports.names_builder_add(this.pointer, key, valueWrapper.pointer);
     return this;
   }
 
   public setDefaultName(value: string) {
-    using valueWrapper = SizedString.create(value);
+    using valueWrapper = SizedString.allocate(value);
     mainFfi.exports.names_builder_set_default_name(this.pointer, valueWrapper.pointer);
     return this;
   }
@@ -92,7 +92,7 @@ export class Names {
 }
 
 export function toCamelCase(value: string) {
-  using valueWrapper = SizedString.create(value);
+  using valueWrapper = SizedString.allocate(value);
   const resultPointer = mainFfi.exports.to_camel_case(valueWrapper.pointer);
   using resultWrapper = new SizedString(resultPointer);
   const result = resultWrapper.read();
@@ -100,7 +100,7 @@ export function toCamelCase(value: string) {
 }
 
 export function toPascalCase(value: string) {
-  using valueWrapper = SizedString.create(value);
+  using valueWrapper = SizedString.allocate(value);
   const resultPointer = mainFfi.exports.to_pascal_case(valueWrapper.pointer);
   using resultWrapper = new SizedString(resultPointer);
   const result = resultWrapper.read();
@@ -108,7 +108,7 @@ export function toPascalCase(value: string) {
 }
 
 export function toSnakeCase(value: string) {
-  using valueWrapper = SizedString.create(value);
+  using valueWrapper = SizedString.allocate(value);
   const resultPointer = mainFfi.exports.to_snake_case(valueWrapper.pointer);
   using resultWrapper = new SizedString(resultPointer);
   const result = resultWrapper.read();
@@ -116,7 +116,7 @@ export function toSnakeCase(value: string) {
 }
 
 export function toScreamingSnakeCase(value: string) {
-  using valueWrapper = SizedString.create(value);
+  using valueWrapper = SizedString.allocate(value);
   const resultPointer = mainFfi.exports.to_screaming_snake_case(valueWrapper.pointer);
   using resultWrapper = new SizedString(resultPointer);
   const result = resultWrapper.read();
