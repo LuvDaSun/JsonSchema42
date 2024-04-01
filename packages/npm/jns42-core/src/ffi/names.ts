@@ -16,6 +16,7 @@ export class NamesProxy {
     const resultPointer = mainFfi.exports.names_to_camel_case(this.pointer, key);
     using resultWrapper = new wrappers.SizedString(resultPointer);
     const result = resultWrapper.read();
+    assert(result != null);
     return result;
   }
 
@@ -23,6 +24,7 @@ export class NamesProxy {
     const resultPointer = mainFfi.exports.names_to_pascal_case(this.pointer, key);
     using resultWrapper = new wrappers.SizedString(resultPointer);
     const result = resultWrapper.read();
+    assert(result != null);
     return result;
   }
 
@@ -30,6 +32,7 @@ export class NamesProxy {
     const resultPointer = mainFfi.exports.names_to_snake_case(this.pointer, key);
     using resultWrapper = new wrappers.SizedString(resultPointer);
     const result = resultWrapper.read();
+    assert(result != null);
     return result;
   }
 
@@ -37,6 +40,7 @@ export class NamesProxy {
     const resultPointer = mainFfi.exports.names_to_screaming_snake_case(this.pointer, key);
     using resultWrapper = new wrappers.SizedString(resultPointer);
     const result = resultWrapper.read();
+    assert(result != null);
     return result;
   }
 }
