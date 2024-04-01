@@ -31,7 +31,13 @@ export class SchemaItem {
 
   public get deprecated(): boolean | undefined {
     const pointer = mainFfi.exports.schema_item_deprecated(this.pointer);
-    using wrapper = new wrappers.Uint8(pointer);
-    return Boolean(wrapper.read());
+    using wrapper = new wrappers.Box(pointer);
+    const valuePointer = wrapper.read();
+    if (valuePointer == null) {
+      return undefined;
+    } else {
+      const value = mainFfi.memoryView.getInt8(valuePointer);
+      return Boolean(value);
+    }
   }
 }
