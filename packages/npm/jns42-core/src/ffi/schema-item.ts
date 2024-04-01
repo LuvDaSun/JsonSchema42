@@ -1,8 +1,7 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
-import { SizedStringWrapper } from "./sized-string-wrapper.js";
-import { Uint8Wrapper } from "./uint8-wrapper.js";
+import * as wrappers from "../wrappers/index.js";
 
 export class SchemaItem {
   constructor(private readonly pointer: Pointer) {
@@ -20,19 +19,19 @@ export class SchemaItem {
 
   public get id(): string | undefined {
     const pointer = mainFfi.exports.schema_item_id(this.pointer);
-    using wrapper = new SizedStringWrapper(pointer);
+    using wrapper = new wrappers.StringViewWrapper(pointer);
     return wrapper.read();
   }
 
   public get title(): string | undefined {
     const pointer = mainFfi.exports.schema_item_title(this.pointer);
-    using wrapper = new SizedStringWrapper(pointer);
+    using wrapper = new wrappers.StringViewWrapper(pointer);
     return wrapper.read();
   }
 
   public get deprecated(): boolean | undefined {
     const pointer = mainFfi.exports.schema_item_deprecated(this.pointer);
-    using wrapper = new Uint8Wrapper(pointer);
+    using wrapper = new wrappers.Uint8(pointer);
     return Boolean(wrapper.read());
   }
 }

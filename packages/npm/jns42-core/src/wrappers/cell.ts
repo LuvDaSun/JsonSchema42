@@ -2,17 +2,17 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
 
-export class PointerWrapper {
+export class Cell {
   public constructor(public readonly pointer: number) {
     //
   }
   public static allocate(value: Pointer | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
-      return new PointerWrapper(pointer);
+      return new Cell(pointer);
     } else {
-      const pointer = allocatePointer(value);
-      return new PointerWrapper(pointer);
+      const pointer = allocate(value);
+      return new Cell(pointer);
     }
   }
   public read(): Pointer | undefined {
@@ -20,7 +20,7 @@ export class PointerWrapper {
     if (pointer === NULL_POINTER) {
       return undefined;
     } else {
-      return readPointer(pointer);
+      return read(pointer);
     }
   }
   [Symbol.dispose]() {
@@ -28,25 +28,25 @@ export class PointerWrapper {
     if (pointer === NULL_POINTER) {
       //
     } else {
-      deallocatePointer(pointer);
+      deallocate(pointer);
     }
   }
 }
 
-function allocatePointer(value: Pointer): Pointer {
+function allocate(value: Pointer): Pointer {
   const pointer = mainFfi.exports.alloc(4);
   mainFfi.memoryView.setUint32(pointer + 0, value, true);
   return pointer;
 }
 
-function readPointer(pointer: Pointer): Pointer {
+function read(pointer: Pointer): Pointer {
   assert(pointer !== NULL_POINTER);
 
   const value = mainFfi.memoryView.getUint32(pointer);
   return value;
 }
 
-function deallocatePointer(pointer: Pointer) {
+function deallocate(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   mainFfi.exports.dealloc(pointer, 4);

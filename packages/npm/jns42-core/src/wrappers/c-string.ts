@@ -8,17 +8,17 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class CStringWrapper {
+export class CString {
   public constructor(public readonly pointer: Pointer) {
     //
   }
   public static allocate(value: string | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
-      return new CStringWrapper(pointer);
+      return new CString(pointer);
     } else {
       const pointer = allocateCString(value);
-      return new CStringWrapper(pointer);
+      return new CString(pointer);
     }
   }
   public read(): string | undefined {
