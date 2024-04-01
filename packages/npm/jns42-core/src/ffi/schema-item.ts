@@ -19,13 +19,13 @@ export class SchemaItemProxy {
 
   public get id(): string | undefined {
     const pointer = mainFfi.exports.schema_item_id(this.pointer);
-    using wrapper = new wrappers.StringViewWrapper(pointer);
+    using wrapper = new wrappers.StringView(pointer);
     return wrapper.read();
   }
 
   public get title(): string | undefined {
     const pointer = mainFfi.exports.schema_item_title(this.pointer);
-    using wrapper = new wrappers.StringViewWrapper(pointer);
+    using wrapper = new wrappers.StringView(pointer);
     return wrapper.read();
   }
 

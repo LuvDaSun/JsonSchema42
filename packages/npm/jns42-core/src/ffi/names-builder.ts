@@ -19,13 +19,13 @@ export class NamesBuilderProxy {
   }
 
   public add(key: number, value: string) {
-    using valueWrapper = wrappers.SizedStringWrapper.allocate(value);
+    using valueWrapper = wrappers.SizedString.allocate(value);
     mainFfi.exports.names_builder_add(this.pointer, key, valueWrapper.pointer);
     return this;
   }
 
   public setDefaultName(value: string) {
-    using valueWrapper = wrappers.SizedStringWrapper.allocate(value);
+    using valueWrapper = wrappers.SizedString.allocate(value);
     mainFfi.exports.names_builder_set_default_name(this.pointer, valueWrapper.pointer);
     return this;
   }

@@ -8,7 +8,7 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class StringViewWrapper {
+export class StringView {
   public constructor(public readonly pointer: Pointer) {
     //
   }
