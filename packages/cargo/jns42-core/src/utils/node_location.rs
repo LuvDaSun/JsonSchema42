@@ -46,6 +46,19 @@ impl NodeLocation {
     }
   }
 
+  pub fn to_retrieval_location(&self) -> String {
+    let origin = &self.origin;
+    let path = self
+      .path
+      .iter()
+      .map(|part| utf8_percent_encode(part, NON_ALPHANUMERIC).to_string())
+      .collect::<Vec<_>>()
+      .join("/");
+    let query = &self.query;
+
+    return origin.to_string() + path.as_str() + query.as_str();
+  }
+
   pub fn join(&self, other: &NodeLocation) -> Self {
     if !other.origin.is_empty() {
       return other.clone();
