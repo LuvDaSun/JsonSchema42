@@ -34,16 +34,24 @@ impl NodeLocation {
     }
   }
 
-  pub fn anchor(&self) -> Option<&str> {
+  pub fn get_anchor(&self) -> Option<&str> {
     return self.hash.first().map(|part| part.as_str());
   }
 
-  pub fn pointer(&self) -> Option<Vec<&str>> {
+  pub fn get_pointer(&self) -> Option<Vec<&str>> {
     if self.hash.len() > 1 {
       Some(self.hash.iter().skip(1).map(|part| part.as_str()).collect())
     } else {
       None
     }
+  }
+
+  pub fn get_path(&self) -> Vec<&str> {
+    self.path.iter().map(|value| value.as_str()).collect()
+  }
+
+  pub fn get_hash(&self) -> Vec<&str> {
+    self.hash.iter().map(|value| value.as_str()).collect()
   }
 
   pub fn to_retrieval_location(&self) -> String {
