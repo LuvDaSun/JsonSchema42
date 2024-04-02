@@ -139,4 +139,58 @@ mod tests {
 
     assert_eq!(actual, expected);
   }
+
+  #[test]
+  fn test_url_regex() {
+    let actual = create_actual("http://www.example.com");
+    let expected = vec!["http://www.example.com", "", "", ""];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("http://www.example.com/");
+    let expected = vec!["http://www.example.com", "/", "", ""];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("http://www.example.com/a/b/c");
+    let expected = vec!["http://www.example.com", "/a/b/c", "", ""];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("http://www.example.com/a/b/c?123");
+    let expected = vec!["http://www.example.com", "/a/b/c", "?123", ""];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("http://www.example.com/a/b/c?123#xxx");
+    let expected = vec!["http://www.example.com", "/a/b/c", "?123", "#xxx"];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("http://www.example.com/a/b/c#xxx");
+    let expected = vec!["http://www.example.com", "/a/b/c", "", "#xxx"];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("/a/b/c#xxx");
+    let expected = vec!["", "/a/b/c", "", "#xxx"];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("a/b/c?xxx");
+    let expected = vec!["", "a/b/c", "?xxx", ""];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("whoop");
+    let expected = vec!["", "whoop", "", ""];
+    assert_eq!(actual, expected);
+
+    let actual = create_actual("#");
+    let expected = vec!["", "", "", "#"];
+    assert_eq!(actual, expected);
+
+    fn create_actual(input: &str) -> Vec<&str> {
+      URL_REGEX
+        .captures(input)
+        .unwrap()
+        .iter()
+        .skip(1)
+        .map(|capture| capture.map(|capture| capture.as_str()))
+        .map(|capture| capture.unwrap_or_default())
+        .collect()
+    }
+  }
 }

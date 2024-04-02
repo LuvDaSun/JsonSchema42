@@ -55,22 +55,22 @@ extern "C" fn alloc(size: usize) -> *const u8 {
   pointer
 }
 
-#[no_mangle]
-extern "C" fn realloc(pointer: *mut u8, size_previous: usize, size: usize) -> *const u8 {
-  debug_assert!(size_previous > 0);
-  debug_assert!(size > 0);
+// #[no_mangle]
+// extern "C" fn realloc(pointer: *mut u8, size_previous: usize, size: usize) -> *const u8 {
+//   debug_assert!(size_previous > 0);
+//   debug_assert!(size > 0);
 
-  let Ok(layout) = std::alloc::Layout::from_size_align(size_previous, ALIGN) else {
-    panic!("could not get layout")
-  };
+//   let Ok(layout) = std::alloc::Layout::from_size_align(size_previous, ALIGN) else {
+//     panic!("could not get layout")
+//   };
 
-  let pointer = unsafe { std::alloc::realloc(pointer, layout, size) };
-  if pointer.is_null() {
-    panic!("pointer is null")
-  }
+//   let pointer = unsafe { std::alloc::realloc(pointer, layout, size) };
+//   if pointer.is_null() {
+//     panic!("pointer is null")
+//   }
 
-  pointer
-}
+//   pointer
+// }
 
 #[no_mangle]
 extern "C" fn dealloc(pointer: *mut u8, size: usize) {
