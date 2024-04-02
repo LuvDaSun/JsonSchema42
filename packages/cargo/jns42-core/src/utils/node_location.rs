@@ -1,12 +1,12 @@
 use once_cell::sync::Lazy;
-use percent_encoding::percent_decode_str;
+use percent_encoding::{percent_decode_str, utf8_percent_encode, NON_ALPHANUMERIC};
 use regex::{Regex, RegexBuilder};
 use std::{error::Error, fmt::Display, str::FromStr};
 
 pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
   RegexBuilder::new(r"^([a-z]+\:(?:\/\/)?[^\/]*)?([^\?\#]*?)?(\?.*?)?(\#.*?)?$")
     .unicode(true)
-    .ignore_whitespace(true)
+    .case_insensitive(true)
     .build()
     .unwrap()
 });
@@ -22,6 +22,63 @@ pub struct NodeLocation {
   path: Vec<String>,
   query: String,
   pointer: Vec<String>,
+}
+
+impl NodeLocation {
+  fn new(origin: String, path: Vec<String>, query: String, pointer: Vec<String>) -> Self {
+    Self {
+      origin,
+      path: normalize_path(path),
+      query,
+      pointer,
+    }
+  }
+
+  pub fn join(&self, other: &NodeLocation) -> Self {
+    if !other.origin.is_empty() {
+      return other.clone();
+    }
+
+    if !other.path.is_empty() {
+      if other.path.first().unwrap().is_empty() {
+        return NodeLocation::new(
+          self.origin.clone(),
+          other.path.clone(),
+          other.query.clone(),
+          other.pointer.clone(),
+        );
+      } else {
+        return NodeLocation::new(
+          self.origin.clone(),
+          self
+            .path
+            .iter()
+            .take(self.path.len() - 1)
+            .chain(other.path.iter())
+            .cloned()
+            .collect(),
+          other.query.clone(),
+          other.pointer.clone(),
+        );
+      }
+    }
+
+    if !other.query.is_empty() {
+      return NodeLocation::new(
+        self.origin.clone(),
+        self.path.clone(),
+        other.query.clone(),
+        other.pointer.clone(),
+      );
+    }
+
+    NodeLocation::new(
+      self.origin.clone(),
+      self.path.clone(),
+      self.query.clone(),
+      other.pointer.clone(),
+    )
+  }
 }
 
 impl TryFrom<String> for NodeLocation {
@@ -40,7 +97,24 @@ impl From<NodeLocation> for String {
 
 impl ToString for NodeLocation {
   fn to_string(&self) -> String {
-    todo!()
+    let origin = &self.origin;
+    let path = self
+      .path
+      .iter()
+      .map(|part| utf8_percent_encode(part, NON_ALPHANUMERIC).to_string())
+      .collect::<Vec<_>>()
+      .join("/");
+    let query = &self.query;
+    let hash = "#".to_string()
+      + &self
+        .pointer
+        .iter()
+        .map(escape_pointer)
+        .map(|part| utf8_percent_encode(part.as_str(), NON_ALPHANUMERIC).to_string())
+        .collect::<Vec<_>>()
+        .join("/");
+
+    return origin.to_string() + path.as_str() + query.as_str() + hash.as_str();
   }
 }
 
@@ -64,12 +138,17 @@ impl FromStr for NodeLocation {
 
     let path = path_capture
       .map(|capture| capture.as_str())
-      .unwrap_or_default()
-      .split('/')
-      .map(percent_decode_str)
-      .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
-      .map(|part| part.map(unescape_pointer))
-      .collect::<Result<_, _>>()?;
+      .unwrap_or_default();
+    let path = if path.is_empty() {
+      Default::default()
+    } else {
+      path
+        .split('/')
+        .map(percent_decode_str)
+        .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
+        .map(|part| part.map(unescape_pointer))
+        .collect::<Result<_, _>>()?
+    };
 
     let query = query_capture
       .map(|capture| capture.as_str())
@@ -79,19 +158,19 @@ impl FromStr for NodeLocation {
     let pointer = hash_capture
       .map(|capture| capture.as_str())
       .map(|capture| capture.trim_start_matches('#'))
-      .unwrap_or_default()
-      .split('/')
-      .map(percent_decode_str)
-      .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
-      .map(|part| part.map(unescape_pointer))
-      .collect::<Result<_, _>>()?;
+      .unwrap_or_default();
+    let pointer = if pointer.is_empty() {
+      Default::default()
+    } else {
+      pointer
+        .split('/')
+        .map(percent_decode_str)
+        .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
+        .map(|part| part.map(unescape_pointer))
+        .collect::<Result<_, _>>()?
+    };
 
-    Ok(Self {
-      origin,
-      path,
-      query,
-      pointer,
-    })
+    Ok(Self::new(origin, path, query, pointer))
   }
 }
 
@@ -120,6 +199,42 @@ fn unescape_pointer(input: impl AsRef<str>) -> String {
   input.as_ref().replace("~1", "/").replace("~0", "~")
 }
 
+fn normalize_path(path: impl IntoIterator<Item = impl ToString>) -> Vec<String> {
+  let mut path: Vec<_> = path.into_iter().map(|part| part.to_string()).collect();
+
+  let mut path_index = 0;
+
+  while path_index < path.len() {
+    // first or last parts may be empty
+    if (path_index == 0 || path_index == path.len() - 1) && path[path_index].is_empty() {
+      path_index += 1;
+      continue;
+    }
+
+    // empty parts, or paths that are a dot are removed
+    if path[path_index].is_empty() || path[path_index] == "." {
+      path.remove(path_index);
+      continue;
+    }
+
+    if path[path_index] == ".." && path_index > 0 && path[path_index - 1].is_empty() {
+      path.remove(path_index);
+      continue;
+    }
+
+    if path[path_index] == ".." && path_index > 0 && path[path_index - 1] != ".." {
+      path.remove(path_index);
+      path_index -= 1;
+      path.remove(path_index);
+      continue;
+    }
+
+    path_index += 1;
+  }
+
+  path
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -141,56 +256,170 @@ mod tests {
   }
 
   #[test]
+  fn test_normalize_path() {
+    do_test(vec!["", "a", "b", "..", "c"], vec!["", "a", "c"]);
+
+    do_test(vec!["", "..", "..", "a", "b", "c"], vec!["", "a", "b", "c"]);
+
+    do_test(
+      vec!["..", "..", "a", "b", "c"],
+      vec!["..", "..", "a", "b", "c"],
+    );
+
+    do_test(
+      vec!["a", "b", "c", "..", "..", "..", "..", "x"],
+      vec!["..", "x"],
+    );
+
+    fn do_test(actual: Vec<&str>, expected: Vec<&str>) {
+      let actual = normalize_path(actual);
+      assert_eq!(actual, expected);
+    }
+  }
+
+  #[test]
   fn test_url_regex() {
-    let actual = create_actual("http://www.example.com");
-    let expected = vec!["http://www.example.com", "", "", ""];
-    assert_eq!(actual, expected);
+    do_test(
+      "http://www.example.com",
+      vec!["http://www.example.com", "", "", ""],
+    );
 
-    let actual = create_actual("http://www.example.com/");
-    let expected = vec!["http://www.example.com", "/", "", ""];
-    assert_eq!(actual, expected);
+    do_test(
+      "http://www.example.com/",
+      vec!["http://www.example.com", "/", "", ""],
+    );
 
-    let actual = create_actual("http://www.example.com/a/b/c");
-    let expected = vec!["http://www.example.com", "/a/b/c", "", ""];
-    assert_eq!(actual, expected);
+    do_test(
+      "http://www.example.com/a/b/c",
+      vec!["http://www.example.com", "/a/b/c", "", ""],
+    );
 
-    let actual = create_actual("http://www.example.com/a/b/c?123");
-    let expected = vec!["http://www.example.com", "/a/b/c", "?123", ""];
-    assert_eq!(actual, expected);
+    do_test(
+      "http://www.example.com/a/b/c?123",
+      vec!["http://www.example.com", "/a/b/c", "?123", ""],
+    );
 
-    let actual = create_actual("http://www.example.com/a/b/c?123#xxx");
-    let expected = vec!["http://www.example.com", "/a/b/c", "?123", "#xxx"];
-    assert_eq!(actual, expected);
+    do_test(
+      "http://www.example.com/a/b/c?123#xxx",
+      vec!["http://www.example.com", "/a/b/c", "?123", "#xxx"],
+    );
 
-    let actual = create_actual("http://www.example.com/a/b/c#xxx");
-    let expected = vec!["http://www.example.com", "/a/b/c", "", "#xxx"];
-    assert_eq!(actual, expected);
+    do_test(
+      "http://www.example.com/a/b/c#xxx",
+      vec!["http://www.example.com", "/a/b/c", "", "#xxx"],
+    );
 
-    let actual = create_actual("/a/b/c#xxx");
-    let expected = vec!["", "/a/b/c", "", "#xxx"];
-    assert_eq!(actual, expected);
+    do_test("/a/b/c#xxx", vec!["", "/a/b/c", "", "#xxx"]);
 
-    let actual = create_actual("a/b/c?xxx");
-    let expected = vec!["", "a/b/c", "?xxx", ""];
-    assert_eq!(actual, expected);
+    do_test("a/b/c?xxx", vec!["", "a/b/c", "?xxx", ""]);
 
-    let actual = create_actual("whoop");
-    let expected = vec!["", "whoop", "", ""];
-    assert_eq!(actual, expected);
+    do_test("whoop", vec!["", "whoop", "", ""]);
 
-    let actual = create_actual("#");
-    let expected = vec!["", "", "", "#"];
-    assert_eq!(actual, expected);
+    do_test("#", vec!["", "", "", "#"]);
 
-    fn create_actual(input: &str) -> Vec<&str> {
-      URL_REGEX
-        .captures(input)
+    fn do_test(actual: &str, expected: Vec<&str>) {
+      let actual: Vec<_> = URL_REGEX
+        .captures(actual)
         .unwrap()
         .iter()
         .skip(1)
         .map(|capture| capture.map(|capture| capture.as_str()))
         .map(|capture| capture.unwrap_or_default())
-        .collect()
+        .collect();
+
+      assert_eq!(actual, expected);
+    }
+  }
+
+  #[test]
+  fn node_location_parse_path() {
+    do_test("a", vec!["a"]);
+
+    do_test("a#", vec!["a"]);
+
+    do_test("a#/", vec!["a"]);
+
+    do_test("a#/1/2/3", vec!["a"]);
+
+    do_test("a#/1/2/3#", vec!["a"]);
+
+    fn do_test(actual: &str, expected: Vec<&str>) {
+      let actual = actual.parse::<NodeLocation>().unwrap().path;
+      assert_eq!(actual, expected);
+    }
+  }
+
+  #[test]
+  fn node_location_parse_pointer() {
+    do_test("", vec![]);
+
+    do_test("#", vec![]);
+
+    do_test("#/", vec!["", ""]);
+
+    do_test("#/1/2/3", vec!["", "1", "2", "3"]);
+
+    fn do_test(actual: &str, expected: Vec<&str>) {
+      let actual = actual.parse::<NodeLocation>().unwrap().pointer;
+      assert_eq!(actual, expected);
+    }
+  }
+
+  #[test]
+  fn node_location_join() {
+    do_test(
+      "http://a.b.c/d/e/f#/g/h/i",
+      "http://x.y.z/",
+      "http://x.y.z/",
+    );
+
+    do_test("http://a.b.c/d/e/f#/g/h/i", "c:\\x", "c:/x");
+
+    do_test("http://a.b.c/d/e/f#/g/h/i", "/x/y/z", "http://a.b.c/x/y/z#");
+
+    do_test(
+      "http://a.b.c/d/e/f#/g/h/i",
+      "/x/y/z/",
+      "http://a.b.c/x/y/z/#",
+    );
+
+    do_test("c:\\a\\d\\e\\f", "/x/y/z/", "c:/x/y/z/#");
+
+    do_test(
+      "http://a.b.c/d/e/f#/g/h/i",
+      "x/y/z/",
+      "http://a.b.c/d/e/x/y/z/#",
+    );
+
+    do_test("c:\\a\\d\\e\\f", "x/y/z/", "c:/a/d/e/x/y/z/#");
+
+    do_test(
+      "http://a.b.c/d/e/f/#/g/h/i",
+      "x/y/z/",
+      "http://a.b.c/d/e/f/x/y/z/#",
+    );
+
+    do_test(
+      "http://a.b.c/d/e/f/#/g/h/i",
+      "#/x/y/z/",
+      "http://a.b.c/d/e/f/#/x/y/z/",
+    );
+
+    do_test(
+      "http://a.b.c/d/e/f/#/g/h/i",
+      "?x=y",
+      "http://a.b.c/d/e/f/?x=y",
+    );
+
+    do_test("http://a.b.c/d/e?f#/g/h/i", "?x=y", "http://a.b.c/d/e?x=y");
+
+    fn do_test(base: &str, other: &str, expected: &str) {
+      let actual = base
+        .parse::<NodeLocation>()
+        .unwrap()
+        .join(&other.parse().unwrap());
+      let expected = expected.parse::<NodeLocation>().unwrap();
+      assert_eq!(actual, expected);
     }
   }
 }
