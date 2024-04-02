@@ -21,16 +21,28 @@ pub struct NodeLocation {
   origin: String,
   path: Vec<String>,
   query: String,
-  pointer: Vec<String>,
+  hash: Vec<String>,
 }
 
 impl NodeLocation {
-  fn new(origin: String, path: Vec<String>, query: String, pointer: Vec<String>) -> Self {
+  fn new(origin: String, path: Vec<String>, query: String, hash: Vec<String>) -> Self {
     Self {
       origin,
       path: normalize_path(path),
       query,
-      pointer,
+      hash,
+    }
+  }
+
+  pub fn anchor(&self) -> Option<&str> {
+    return self.hash.first().map(|part| part.as_str());
+  }
+
+  pub fn pointer(&self) -> Option<Vec<&str>> {
+    if self.hash.len() > 1 {
+      Some(self.hash.iter().skip(1).map(|part| part.as_str()).collect())
+    } else {
+      None
     }
   }
 
@@ -45,7 +57,7 @@ impl NodeLocation {
           self.origin.clone(),
           other.path.clone(),
           other.query.clone(),
-          other.pointer.clone(),
+          other.hash.clone(),
         );
       } else {
         return NodeLocation::new(
@@ -58,7 +70,7 @@ impl NodeLocation {
             .cloned()
             .collect(),
           other.query.clone(),
-          other.pointer.clone(),
+          other.hash.clone(),
         );
       }
     }
@@ -68,7 +80,7 @@ impl NodeLocation {
         self.origin.clone(),
         self.path.clone(),
         other.query.clone(),
-        other.pointer.clone(),
+        other.hash.clone(),
       );
     }
 
@@ -76,7 +88,7 @@ impl NodeLocation {
       self.origin.clone(),
       self.path.clone(),
       self.query.clone(),
-      other.pointer.clone(),
+      other.hash.clone(),
     )
   }
 }
@@ -107,9 +119,9 @@ impl ToString for NodeLocation {
     let query = &self.query;
     let hash = "#".to_string()
       + &self
-        .pointer
+        .hash
         .iter()
-        .map(escape_pointer)
+        .map(escape_hash)
         .map(|part| utf8_percent_encode(part.as_str(), NON_ALPHANUMERIC).to_string())
         .collect::<Vec<_>>()
         .join("/");
@@ -146,7 +158,7 @@ impl FromStr for NodeLocation {
         .split('/')
         .map(percent_decode_str)
         .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
-        .map(|part| part.map(unescape_pointer))
+        .map(|part| part.map(unescape_hash))
         .collect::<Result<_, _>>()?
     };
 
@@ -155,22 +167,22 @@ impl FromStr for NodeLocation {
       .map(|capture| capture.to_string())
       .unwrap_or_default();
 
-    let pointer = hash_capture
+    let hash = hash_capture
       .map(|capture| capture.as_str())
       .map(|capture| capture.trim_start_matches('#'))
       .unwrap_or_default();
-    let pointer = if pointer.is_empty() {
+    let hash = if hash.is_empty() {
       Default::default()
     } else {
-      pointer
+      hash
         .split('/')
         .map(percent_decode_str)
         .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
-        .map(|part| part.map(unescape_pointer))
+        .map(|part| part.map(unescape_hash))
         .collect::<Result<_, _>>()?
     };
 
-    Ok(Self::new(origin, path, query, pointer))
+    Ok(Self::new(origin, path, query, hash))
   }
 }
 
@@ -191,11 +203,11 @@ impl Display for ParseError {
 
 impl Error for ParseError {}
 
-fn escape_pointer(input: impl AsRef<str>) -> String {
+fn escape_hash(input: impl AsRef<str>) -> String {
   input.as_ref().replace('~', "~0").replace('/', "~1")
 }
 
-fn unescape_pointer(input: impl AsRef<str>) -> String {
+fn unescape_hash(input: impl AsRef<str>) -> String {
   input.as_ref().replace("~1", "/").replace("~0", "~")
 }
 
@@ -240,16 +252,16 @@ mod tests {
   use super::*;
 
   #[test]
-  fn test_escape_pointer() {
-    let actual = escape_pointer("~~//:-)");
+  fn test_escape_hash() {
+    let actual = escape_hash("~~//:-)");
     let expected = "~0~0~1~1:-)".to_string();
 
     assert_eq!(actual, expected);
   }
 
   #[test]
-  fn test_unescape_pointer() {
-    let actual = unescape_pointer("~~~0~~~1~01:-)");
+  fn test_unescape_hash() {
+    let actual = unescape_hash("~~~0~~~1~01:-)");
     let expected = "~~~~~/~1:-)".to_string();
 
     assert_eq!(actual, expected);
@@ -360,7 +372,7 @@ mod tests {
     do_test("#/1/2/3", vec!["", "1", "2", "3"]);
 
     fn do_test(actual: &str, expected: Vec<&str>) {
-      let actual = actual.parse::<NodeLocation>().unwrap().pointer;
+      let actual = actual.parse::<NodeLocation>().unwrap().hash;
       assert_eq!(actual, expected);
     }
   }
