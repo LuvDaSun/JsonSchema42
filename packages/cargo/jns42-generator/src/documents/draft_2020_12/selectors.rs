@@ -41,10 +41,6 @@ pub trait Selectors {
 
   fn select_definition_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
 
-  fn select_additional_properties_entries(
-    &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>>;
   fn select_all_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
   fn select_any_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
   fn select_one_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
@@ -67,7 +63,6 @@ pub trait Selectors {
     pointer: &JsonPointer,
   ) -> Option<Vec<(JsonPointer, Node)>>;
 
-  fn select_property_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
   fn select_dependent_schemas_entries(
     &self,
     pointer: &JsonPointer,
@@ -142,10 +137,6 @@ impl Selectors for Node {
       self.select_then_entries(pointer).unwrap_or_default(),
       self.select_else_entries(pointer).unwrap_or_default(),
       self.select_not_entries(pointer).unwrap_or_default(),
-      self.select_property_entries(pointer).unwrap_or_default(),
-      self
-        .select_additional_properties_entries(pointer)
-        .unwrap_or_default(),
       self.select_array_items_entries(pointer).unwrap_or_default(),
       self.select_contains_entries(pointer).unwrap_or_default(),
       self.select_tuple_items_entries(pointer).unwrap_or_default(),
@@ -170,266 +161,78 @@ impl Selectors for Node {
   //
 
   fn select_reference_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "$ref";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "$ref")
   }
   fn select_definition_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "$defs";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_object()?
-      .iter()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_map(self, pointer, "$defs")
   }
-  fn select_property_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "properties";
-    let selected = self.as_object()?.get(select_name)?;
 
-    let result = selected
-      .as_object()?
-      .iter()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
-  }
-  fn select_additional_properties_entries(
-    &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "additionalProperties";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
-  }
   fn select_all_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "allOf";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_array()?
-      .iter()
-      .enumerate()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_many(self, pointer, "allOf")
   }
   fn select_any_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "anyOf";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_array()?
-      .iter()
-      .enumerate()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_many(self, pointer, "anyOf")
   }
   fn select_one_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "oneOf";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_array()?
-      .iter()
-      .enumerate()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_many(self, pointer, "oneOf")
   }
 
   fn select_tuple_items_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "prefixItems";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_array()?
-      .iter()
-      .enumerate()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_many(self, pointer, "prefixItems")
   }
 
   fn select_if_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "if";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "if")
   }
 
   fn select_then_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "then";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "then")
   }
 
   fn select_else_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "else";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "else")
   }
 
   fn select_not_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "not";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "not")
   }
 
   fn select_contains_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "contains";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "contains")
   }
   fn select_array_items_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "items";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "items")
   }
   fn select_property_names_entries(
     &self,
     pointer: &JsonPointer,
   ) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "propertyNames";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "propertyNames")
   }
   fn select_map_properties_entries(
     &self,
     pointer: &JsonPointer,
   ) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "additionalProperties";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = vec![(pointer.push(select_name.to_string()), selected.clone())];
-
-    Some(result)
+    select_entries_one(self, pointer, "additionalProperties")
   }
 
   fn select_dependent_schemas_entries(
     &self,
     pointer: &JsonPointer,
   ) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "dependentSchemas";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_object()?
-      .iter()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_map(self, pointer, "dependentSchemas")
   }
   fn select_object_properties_entries(
     &self,
     pointer: &JsonPointer,
   ) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "properties";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_object()?
-      .iter()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_map(self, pointer, "properties")
   }
   fn select_pattern_properties_entries(
     &self,
     pointer: &JsonPointer,
   ) -> Option<Vec<(JsonPointer, Node)>> {
-    let select_name = "patternProperties";
-    let selected = self.as_object()?.get(select_name)?;
-
-    let result = selected
-      .as_object()?
-      .iter()
-      .map(|(key, sub_node)| {
-        (
-          pointer.push(select_name.to_string()).push(key.to_string()),
-          sub_node.clone(),
-        )
-      })
-      .collect();
-
-    Some(result)
+    select_entries_map(self, pointer, "patternProperties")
   }
 
   fn select_options(&self) -> Option<Vec<Value>> {
@@ -437,90 +240,145 @@ impl Selectors for Node {
   }
 
   fn select_minimum_inclusive(&self) -> Option<f64> {
-    self.as_object()?.get("minimumInclusive")?.as_float()
+    select_float(self, "minimumInclusive")
   }
 
   fn select_minimum_exclusive(&self) -> Option<f64> {
-    self.as_object()?.get("minimumExclusive")?.as_float()
+    select_float(self, "minimumExclusive")
   }
 
   fn select_maximum_inclusive(&self) -> Option<f64> {
-    self.as_object()?.get("maximumInclusive")?.as_float()
+    select_float(self, "maximumInclusive")
   }
 
   fn select_maximum_exclusive(&self) -> Option<f64> {
-    self.as_object()?.get("maximumExclusive")?.as_float()
+    select_float(self, "maximumExclusive")
   }
 
   fn select_multiple_of(&self) -> Option<f64> {
-    self.as_object()?.get("multipleOf")?.as_float()
+    select_float(self, "multipleOf")
   }
 
   fn select_minimum_length(&self) -> Option<usize> {
-    self
-      .as_object()?
-      .get("minimumLength")?
-      .as_float()
-      .map(|value| value as usize)
+    select_usize(self, "minimumLength")
   }
 
   fn select_maximum_length(&self) -> Option<usize> {
-    self
-      .as_object()?
-      .get("maximumLength")?
-      .as_float()
-      .map(|value| value as usize)
+    select_usize(self, "maximumLength")
   }
 
   fn select_value_pattern(&self) -> Option<&str> {
-    self.as_object()?.get("valuePattern")?.as_str()
+    select_str(self, "valuePattern")
   }
 
   fn select_value_format(&self) -> Option<&str> {
-    self.as_object()?.get("valueFormat")?.as_str()
+    select_str(self, "valueFormat")
   }
 
   fn select_maximum_items(&self) -> Option<usize> {
-    self
-      .as_object()?
-      .get("maximumItems")?
-      .as_float()
-      .map(|value| value as usize)
+    select_usize(self, "maximumItems")
   }
 
   fn select_minimum_items(&self) -> Option<usize> {
-    self
-      .as_object()?
-      .get("minimumLength")?
-      .as_float()
-      .map(|value| value as usize)
+    select_usize(self, "minimumLength")
   }
 
   fn select_unique_items(&self) -> Option<bool> {
-    self.as_object()?.get("uniqueItems")?.as_bool()
+    select_bool(self, "uniqueItems")
   }
 
   fn select_minimum_properties(&self) -> Option<usize> {
-    self
-      .as_object()?
-      .get("minimumProperties")?
-      .as_float()
-      .map(|value| value as usize)
+    select_usize(self, "minimumProperties")
   }
 
   fn select_maximum_properties(&self) -> Option<usize> {
-    self
-      .as_object()?
-      .get("maximumProperties")?
-      .as_float()
-      .map(|value| value as usize)
+    select_usize(self, "maximumProperties")
   }
 
   fn select_required(&self) -> Option<Vec<&str>> {
-    self
-      .as_object()?
-      .get("minimumLength")?
-      .as_array()
-      .map(|value| value.iter().filter_map(|value| value.as_str()).collect())
+    select_vec_str(self, "required")
   }
+}
+
+fn select_vec_str<'n>(node: &'n Node, field: &str) -> Option<Vec<&'n str>> {
+  node
+    .as_object()?
+    .get(field)?
+    .as_array()
+    .map(|value| value.iter().filter_map(|value| value.as_str()).collect())
+}
+
+fn select_usize(node: &Node, field: &str) -> Option<usize> {
+  node
+    .as_object()?
+    .get(field)?
+    .as_float()
+    .map(|value| value as usize)
+}
+
+fn select_float(node: &Node, field: &str) -> Option<f64> {
+  node.as_object()?.get(field)?.as_float()
+}
+
+fn select_bool(node: &Node, field: &str) -> Option<bool> {
+  node.as_object()?.get(field)?.as_bool()
+}
+
+fn select_str<'n>(node: &'n Node, field: &str) -> Option<&'n str> {
+  node.as_object()?.get(field)?.as_str()
+}
+
+fn select_entries_map(
+  node: &Node,
+  pointer: &JsonPointer,
+  field: &str,
+) -> Option<Vec<(JsonPointer, Node)>> {
+  let selected = node.as_object()?.get(field)?;
+
+  let result = selected
+    .as_object()?
+    .iter()
+    .map(|(key, sub_node)| {
+      (
+        pointer.push(field.to_string()).push(key.to_string()),
+        sub_node.clone(),
+      )
+    })
+    .collect();
+
+  Some(result)
+}
+
+fn select_entries_one(
+  node: &Node,
+  pointer: &JsonPointer,
+  field: &str,
+) -> Option<Vec<(JsonPointer, Node)>> {
+  let selected = node.as_object()?.get(field)?;
+
+  let result = vec![(pointer.push(field.to_string()), selected.clone())];
+
+  Some(result)
+}
+
+fn select_entries_many(
+  node: &Node,
+  pointer: &JsonPointer,
+  field: &str,
+) -> Option<Vec<(JsonPointer, Node)>> {
+  let selected = node.as_object()?.get(field)?;
+
+  let result = selected
+    .as_array()?
+    .iter()
+    .enumerate()
+    .map(|(key, sub_node)| {
+      (
+        pointer.push(field.to_string()).push(key.to_string()),
+        sub_node.clone(),
+      )
+    })
+    .collect();
+
+  Some(result)
 }
