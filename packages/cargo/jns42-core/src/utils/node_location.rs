@@ -1,7 +1,7 @@
 use once_cell::sync::Lazy;
 use percent_encoding::{percent_decode_str, utf8_percent_encode, NON_ALPHANUMERIC};
 use regex::{Regex, RegexBuilder};
-use std::{error::Error, fmt::Display, str::FromStr};
+use std::{error::Error, fmt::Display, iter::once, str::FromStr};
 
 pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
   RegexBuilder::new(r"^([a-z]+\:(?:\/\/)?[^\/]*)?([^\?\#]*?)?(\?.*?)?(\#.*?)?$")
@@ -38,12 +38,22 @@ impl NodeLocation {
     return self.hash.first().map(|part| part.as_str());
   }
 
+  pub fn set_anchor(&mut self, value: impl ToString) {
+    self.hash = once(value).map(|part| part.to_string()).collect();
+  }
+
   pub fn get_pointer(&self) -> Option<Vec<&str>> {
     if self.hash.len() > 1 {
       Some(self.hash.iter().skip(1).map(|part| part.as_str()).collect())
     } else {
       None
     }
+  }
+
+  pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl ToString>) {
+    self.hash = once(String::new())
+      .chain(value.into_iter().map(|part| part.to_string()))
+      .collect();
   }
 
   pub fn get_path(&self) -> Vec<&str> {
