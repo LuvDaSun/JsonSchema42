@@ -1,8 +1,8 @@
-use serde_json::Value;
+use std::iter::once;
 
 use super::Node;
 use jns42_core::models::intermediate::IntermediateType;
-use jns42_core::utils::json_pointer::JsonPointer;
+use serde_json::Value;
 
 pub trait Selectors {
   fn select_schema(&self) -> Option<&str>;
@@ -36,45 +36,84 @@ pub trait Selectors {
   fn select_maximum_properties(&self) -> Option<usize>;
   fn select_required(&self) -> Option<Vec<&str>>;
 
-  fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)>;
-  fn select_reference_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+  fn select_sub_nodes(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Vec<(Vec<String>, Node)>;
+  fn select_reference_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 
-  fn select_definition_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+  fn select_definition_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 
-  fn select_all_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
-  fn select_any_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
-  fn select_one_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
-  fn select_tuple_items_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+  fn select_all_of_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
+  fn select_any_of_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
+  fn select_one_of_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
+  fn select_tuple_items_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 
-  fn select_if_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
-  fn select_then_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
-  fn select_else_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+  fn select_if_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
+  fn select_then_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
+  fn select_else_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 
-  fn select_not_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+  fn select_not_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 
-  fn select_contains_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
-  fn select_array_items_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>>;
+  fn select_contains_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
+  fn select_array_items_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
   fn select_property_names_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>>;
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
   fn select_map_properties_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>>;
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 
   fn select_dependent_schemas_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>>;
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
   fn select_object_properties_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>>;
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
   fn select_pattern_properties_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>>;
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>>;
 }
 
 impl Selectors for Node {
@@ -126,7 +165,10 @@ impl Selectors for Node {
     self.as_object()?.get("$ref")?.as_str()
   }
 
-  fn select_sub_nodes(&self, pointer: &JsonPointer) -> Vec<(JsonPointer, Node)> {
+  fn select_sub_nodes(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Vec<(Vec<String>, Node)> {
     vec![
       self.select_reference_entries(pointer).unwrap_or_default(),
       self.select_definition_entries(pointer).unwrap_or_default(),
@@ -160,78 +202,114 @@ impl Selectors for Node {
 
   //
 
-  fn select_reference_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_reference_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "$ref")
   }
-  fn select_definition_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_definition_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_map(self, pointer, "$defs")
   }
 
-  fn select_all_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_all_of_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_many(self, pointer, "allOf")
   }
-  fn select_any_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_any_of_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_many(self, pointer, "anyOf")
   }
-  fn select_one_of_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_one_of_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_many(self, pointer, "oneOf")
   }
 
-  fn select_tuple_items_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_tuple_items_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_many(self, pointer, "prefixItems")
   }
 
-  fn select_if_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_if_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "if")
   }
 
-  fn select_then_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_then_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "then")
   }
 
-  fn select_else_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_else_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "else")
   }
 
-  fn select_not_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_not_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "not")
   }
 
-  fn select_contains_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_contains_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "contains")
   }
-  fn select_array_items_entries(&self, pointer: &JsonPointer) -> Option<Vec<(JsonPointer, Node)>> {
+  fn select_array_items_entries(
+    &self,
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "items")
   }
   fn select_property_names_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>> {
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "propertyNames")
   }
   fn select_map_properties_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>> {
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_one(self, pointer, "additionalProperties")
   }
 
   fn select_dependent_schemas_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>> {
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_map(self, pointer, "dependentSchemas")
   }
   fn select_object_properties_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>> {
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_map(self, pointer, "properties")
   }
   fn select_pattern_properties_entries(
     &self,
-    pointer: &JsonPointer,
-  ) -> Option<Vec<(JsonPointer, Node)>> {
+    pointer: impl IntoIterator<Item = impl ToString>,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
     select_entries_map(self, pointer, "patternProperties")
   }
 
@@ -330,17 +408,22 @@ fn select_str<'n>(node: &'n Node, field: &str) -> Option<&'n str> {
 
 fn select_entries_map(
   node: &Node,
-  pointer: &JsonPointer,
+  pointer: impl IntoIterator<Item = impl ToString>,
   field: &str,
-) -> Option<Vec<(JsonPointer, Node)>> {
+) -> Option<Vec<(Vec<String>, Node)>> {
   let selected = node.as_object()?.get(field)?;
+  let pointer: Vec<_> = pointer
+    .into_iter()
+    .map(|part| part.to_string())
+    .chain(once(field.to_string()))
+    .collect();
 
   let result = selected
     .as_object()?
     .iter()
     .map(|(key, sub_node)| {
       (
-        pointer.push(field.to_string()).push(key.to_string()),
+        pointer.into_iter().chain(once(key.to_string())).collect(),
         sub_node.clone(),
       )
     })
@@ -351,22 +434,32 @@ fn select_entries_map(
 
 fn select_entries_one(
   node: &Node,
-  pointer: &JsonPointer,
+  pointer: impl IntoIterator<Item = impl ToString>,
   field: &str,
-) -> Option<Vec<(JsonPointer, Node)>> {
+) -> Option<Vec<(Vec<String>, Node)>> {
   let selected = node.as_object()?.get(field)?;
+  let pointer: Vec<_> = pointer
+    .into_iter()
+    .map(|part| part.to_string())
+    .chain(once(field.to_string()))
+    .collect();
 
-  let result = vec![(pointer.push(field.to_string()), selected.clone())];
+  let result = vec![(pointer, selected.clone())];
 
   Some(result)
 }
 
 fn select_entries_many(
   node: &Node,
-  pointer: &JsonPointer,
+  pointer: impl IntoIterator<Item = impl ToString>,
   field: &str,
-) -> Option<Vec<(JsonPointer, Node)>> {
+) -> Option<Vec<(Vec<String>, Node)>> {
   let selected = node.as_object()?.get(field)?;
+  let pointer: Vec<_> = pointer
+    .into_iter()
+    .map(|part| part.to_string())
+    .chain(once(field.to_string()))
+    .collect();
 
   let result = selected
     .as_array()?
@@ -374,7 +467,7 @@ fn select_entries_many(
     .enumerate()
     .map(|(key, sub_node)| {
       (
-        pointer.push(field.to_string()).push(key.to_string()),
+        pointer.into_iter().chain(once(key.to_string())).collect(),
         sub_node.clone(),
       )
     })
