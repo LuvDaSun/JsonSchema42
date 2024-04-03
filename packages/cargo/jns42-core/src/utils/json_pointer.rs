@@ -10,6 +10,10 @@ impl JsonPointer {
     pointer
   }
 
+  pub fn vec(&self) -> &Vec<String> {
+    &self.0
+  }
+
   pub fn tip(&self) -> Option<&str> {
     self.0.last().map(String::as_str)
   }
@@ -43,6 +47,12 @@ impl From<&Url> for JsonPointer {
     } else {
       Self(Default::default())
     }
+  }
+}
+
+impl From<Vec<String>> for JsonPointer {
+  fn from(value: Vec<String>) -> Self {
+    Self(value)
   }
 }
 

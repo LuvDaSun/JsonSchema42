@@ -2,10 +2,7 @@ use super::Node;
 use crate::documents::{
   draft_2020_12::Selectors, DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument,
 };
-use jns42_core::{
-  models::intermediate::IntermediateNode,
-  utils::{json_pointer::JsonPointer, url::UrlWithPointer},
-};
+use jns42_core::{models::intermediate::IntermediateNode, utils::url::UrlWithPointer};
 use std::{collections::HashMap, rc::Weak};
 
 pub struct Document {
@@ -15,7 +12,7 @@ pub struct Document {
   document_url: UrlWithPointer,
   _document_node: Node,
 
-  nodes: HashMap<JsonPointer, Node>,
+  nodes: HashMap<Vec<String>, Node>,
   referenced_documents: Vec<ReferencedDocument>,
   embedded_documents: Vec<EmbeddedDocument>,
 }
@@ -38,7 +35,7 @@ impl Document {
     });
     let document_url = node_url.unwrap_or(given_url.clone());
 
-    let document_node_pointer: &JsonPointer = document_url.get_pointer();
+    let document_node_pointer: &Vec<String> = document_url.get_pointer();
 
     let mut nodes = HashMap::new();
     let mut referenced_documents = Vec::new();
@@ -299,7 +296,7 @@ impl SchemaDocument for Document {
                 .map(|(pointer, _node)| {
                   let mut sub_url = node_url.clone();
                   sub_url.set_pointer(pointer.clone());
-                  (pointer.tip().unwrap().to_string(), sub_url.to_string())
+                  (pointer.last().unwrap().to_string(), sub_url.to_string())
                 })
                 .collect()
             }),
@@ -311,7 +308,7 @@ impl SchemaDocument for Document {
                 .map(|(pointer, _node)| {
                   let mut sub_url = node_url.clone();
                   sub_url.set_pointer(pointer.clone());
-                  (pointer.tip().unwrap().to_string(), sub_url.to_string())
+                  (pointer.last().unwrap().to_string(), sub_url.to_string())
                 })
                 .collect()
             }),
@@ -323,7 +320,7 @@ impl SchemaDocument for Document {
                 .map(|(pointer, _node)| {
                   let mut sub_url = node_url.clone();
                   sub_url.set_pointer(pointer.clone());
-                  (pointer.tip().unwrap().to_string(), sub_url.to_string())
+                  (pointer.last().unwrap().to_string(), sub_url.to_string())
                 })
                 .collect()
             }),

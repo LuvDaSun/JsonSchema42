@@ -51,7 +51,7 @@ impl Arena<SchemaItem> {
           .chain(item.id.as_ref().map(|id| {
             empty()
               .chain(id.get_url().path_segments().into_iter().flatten())
-              .chain(id.get_pointer().as_ref().iter().map(|value| value.as_str()))
+              .chain(id.get_pointer().iter().map(|value| value.as_str()))
           }))
           .flatten()
           .chain(item.name.as_deref())

@@ -33,11 +33,12 @@ impl UrlWithPointer {
     &self.0
   }
 
-  pub fn get_pointer(&self) -> &JsonPointer {
-    &self.1
+  pub fn get_pointer(&self) -> &Vec<String> {
+    self.1.vec()
   }
 
-  pub fn set_pointer(&mut self, pointer: JsonPointer) {
+  pub fn set_pointer(&mut self, pointer: Vec<String>) {
+    let pointer: JsonPointer = pointer.into();
     let fragment = pointer.to_string();
     self.0.set_fragment(Some(&fragment));
     self.1 = pointer;
