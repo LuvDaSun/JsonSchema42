@@ -6,7 +6,7 @@ use super::{
 use crate::{
   naming::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::url::UrlWithPointer,
+  utils::node_location::NodeLocation,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
@@ -23,20 +23,18 @@ pub struct Specification {
 }
 
 impl Specification {
-  pub fn new(root_id: UrlWithPointer, intermediate_document: IntermediateSchema) -> Self {
-    let mut parents = HashMap::new();
-    let mut implicit_types = HashMap::new();
+  pub fn new(root_id: NodeLocation, intermediate_document: IntermediateSchema) -> Self {
+    let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
+    let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
 
     // first load schemas in the arena
 
     let mut arena = Arena::new();
     {
-      let mut key_map: HashMap<UrlWithPointer, usize> = HashMap::new();
+      let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
       for (id, schema) in &intermediate_document.schemas {
-        let id = UrlWithPointer::parse(id).unwrap();
-
         let item = SchemaItem {
-          id: Some(UrlWithPointer::parse(id.as_str()).unwrap()),
+          id: Some(id.clone()),
           ..Default::default()
         };
 
@@ -45,52 +43,52 @@ impl Specification {
 
         for child_id in &schema.all_of {
           for child_id in child_id {
-            let child_id = UrlWithPointer::parse(child_id).unwrap();
+            let child_id = child_id.parse().unwrap();
             parents.insert(child_id, id.clone());
           }
         }
 
         for child_id in &schema.any_of {
           for child_id in child_id {
-            let child_id = UrlWithPointer::parse(child_id).unwrap();
+            let child_id = child_id.parse().unwrap();
             parents.insert(child_id, id.clone());
           }
         }
 
         for child_id in &schema.one_of {
           for child_id in child_id {
-            let child_id = UrlWithPointer::parse(child_id).unwrap();
+            let child_id = child_id.parse().unwrap();
             parents.insert(child_id, id.clone());
           }
         }
 
         if let Some(child_id) = &schema.r#if {
-          let child_id = UrlWithPointer::parse(child_id).unwrap();
+          let child_id = child_id.parse().unwrap();
           parents.insert(child_id, id.clone());
         }
 
         if let Some(child_id) = &schema.then {
-          let child_id = UrlWithPointer::parse(child_id).unwrap();
+          let child_id = child_id.parse().unwrap();
           parents.insert(child_id, id.clone());
         }
 
         if let Some(child_id) = &schema.r#else {
-          let child_id = UrlWithPointer::parse(child_id).unwrap();
+          let child_id = child_id.parse().unwrap();
           parents.insert(child_id, id.clone());
         }
 
         if let Some(child_id) = &schema.not {
-          let child_id = UrlWithPointer::parse(child_id).unwrap();
+          let child_id = child_id.parse().unwrap();
           parents.insert(child_id, id.clone());
         }
 
         if let Some(child_id) = &schema.property_names {
-          let child_id = UrlWithPointer::parse(child_id).unwrap();
+          let child_id = child_id.parse().unwrap();
           parents.insert(child_id, id.clone());
         }
 
         if let Some(child_id) = &schema.property_names {
-          let child_id = UrlWithPointer::parse(child_id).unwrap();
+          let child_id = child_id.parse().unwrap();
           implicit_types.insert(child_id, SchemaType::String);
         }
       }
@@ -98,7 +96,7 @@ impl Specification {
       let transformer = |arena: &mut Arena<SchemaItem>, key: usize| {
         let item = arena.get_item(key).clone();
         let id = item.id.unwrap();
-        let schema = intermediate_document.schemas.get(id.as_str()).unwrap();
+        let schema = intermediate_document.schemas.get(&id).unwrap();
         let parent = parents.get(&id).map(|id| *key_map.get(id).unwrap());
         let types = schema
           .types
@@ -109,7 +107,7 @@ impl Specification {
         let reference = schema
           .reference
           .as_ref()
-          .map(|url| *key_map.get(&id.join(url).unwrap()).unwrap());
+          .map(|url| *key_map.get(&id.join(&url.parse().unwrap())).unwrap());
 
         let primary = if id == root_id { Some(true) } else { None };
 
@@ -155,87 +153,72 @@ impl Specification {
           contains: schema
             .r#contains
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           property_names: schema
             .r#property_names
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           map_properties: schema
             .r#map_properties
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           array_items: schema
             .r#array_items
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           r#if: schema
             .r#if
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           then: schema
             .then
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           r#else: schema
             .r#else
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
           not: schema
             .r#not
             .as_ref()
-            .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap()),
+            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
 
           tuple_items: None, // TODO
           all_of: schema.all_of.as_ref().map(|value| {
             value
               .iter()
-              .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap())
+              .map(|url| *key_map.get(&url.parse().unwrap()).unwrap())
               .collect()
           }),
           any_of: schema.any_of.as_ref().map(|value| {
             value
               .iter()
-              .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap())
+              .map(|url| *key_map.get(&url.parse().unwrap()).unwrap())
               .collect()
           }),
           one_of: schema.one_of.as_ref().map(|value| {
             value
               .iter()
-              .map(|url| *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap())
+              .map(|url| *key_map.get(&url.parse().unwrap()).unwrap())
               .collect()
           }),
 
           dependent_schemas: schema.dependent_schemas.as_ref().map(|value| {
             value
               .iter()
-              .map(|(name, url)| {
-                (
-                  name.clone(),
-                  *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap(),
-                )
-              })
+              .map(|(name, url)| (name.clone(), *key_map.get(&url.parse().unwrap()).unwrap()))
               .collect()
           }),
           object_properties: schema.object_properties.as_ref().map(|value| {
             value
               .iter()
-              .map(|(name, url)| {
-                (
-                  name.clone(),
-                  *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap(),
-                )
-              })
+              .map(|(name, url)| (name.clone(), *key_map.get(&url.parse().unwrap()).unwrap()))
               .collect()
           }),
           pattern_properties: schema.pattern_properties.as_ref().map(|value| {
             value
               .iter()
-              .map(|(name, url)| {
-                (
-                  name.clone(),
-                  *key_map.get(&UrlWithPointer::parse(url).unwrap()).unwrap(),
-                )
-              })
+              .map(|(name, url)| (name.clone(), *key_map.get(&url.parse().unwrap()).unwrap()))
               .collect()
           }),
         };

@@ -37,7 +37,7 @@ fn generate_type_token_stream(
   let documentation: Vec<_> = [
     item.title.clone(),
     item.description.clone(),
-    item.id.as_ref().map(|id| id.get_url().to_string()),
+    item.id.as_ref().map(|id| id.to_string()),
   ]
   .into_iter()
   .flatten()

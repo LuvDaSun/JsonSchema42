@@ -1,5 +1,6 @@
 use super::intermediate::IntermediateType;
-use crate::utils::{merge::merge_option, url::UrlWithPointer};
+use crate::utils::merge::merge_option;
+use crate::utils::node_location::NodeLocation;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeSet, HashSet};
@@ -92,7 +93,7 @@ pub struct SchemaItem {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub parent: Option<SchemaKey>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub id: Option<UrlWithPointer>,
+  pub id: Option<NodeLocation>,
 
   // metadata
   #[serde(skip_serializing_if = "Option::is_none")]

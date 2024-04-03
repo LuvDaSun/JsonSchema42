@@ -7,8 +7,9 @@ use url::Url;
 pub type ReadUrlItem = Result<Vec<u8>, Box<dyn Error>>;
 
 pub async fn read_url(
-  url: &Url,
+  url: &str,
 ) -> Result<Box<dyn Stream<Item = ReadUrlItem> + Unpin>, Box<dyn Error>> {
+  let url: Url = url.parse().unwrap();
   let scheme = url.scheme();
   match scheme {
     "file" => {

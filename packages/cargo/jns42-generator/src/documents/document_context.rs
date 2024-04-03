@@ -2,8 +2,7 @@ use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::utils::{read_json_node::read_json_node, yaml::load_yaml};
 use jns42_core::models::intermediate::IntermediateNode;
 use jns42_core::models::intermediate::IntermediateSchema;
-use jns42_core::utils::url::ServerUrl;
-use jns42_core::utils::url::UrlWithPointer;
+use jns42_core::utils::node_location::NodeLocation;
 use serde_json::Value;
 use std::{
   cell::RefCell,
@@ -12,9 +11,9 @@ use std::{
 };
 
 pub struct DocumentInitializer<'a> {
-  pub retrieval_url: UrlWithPointer,
-  pub given_url: UrlWithPointer,
-  pub antecedent_url: Option<UrlWithPointer>,
+  pub retrieval_url: NodeLocation,
+  pub given_url: NodeLocation,
+  pub antecedent_url: Option<NodeLocation>,
   pub document_node: &'a Value,
 }
 
@@ -31,27 +30,27 @@ pub struct DocumentContext {
   /**
    * all documents, indexed by document id
    */
-  documents: RefCell<HashMap<UrlWithPointer, Rc<dyn SchemaDocument>>>,
+  documents: RefCell<HashMap<NodeLocation, Rc<dyn SchemaDocument>>>,
 
   /**
    * maps node urls to their documents
    */
-  node_documents: RefCell<HashMap<UrlWithPointer, UrlWithPointer>>,
+  node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
   /**
    * all loaded nodes
    */
-  cache: RefCell<HashMap<UrlWithPointer, serde_json::Value>>,
+  cache: RefCell<HashMap<NodeLocation, serde_json::Value>>,
 
   /**
    * keep track of what we have been loading (so we only load it once)
    */
-  loaded: RefCell<HashSet<ServerUrl>>,
+  loaded: RefCell<HashSet<String>>,
 
   /**
    * maps retrieval url to document url
    */
-  resolved: RefCell<HashMap<UrlWithPointer, UrlWithPointer>>,
+  resolved: RefCell<HashMap<NodeLocation, NodeLocation>>,
 }
 
 impl DocumentContext {
@@ -67,7 +66,7 @@ impl DocumentContext {
     self.factories.insert(schema.clone(), factory);
   }
 
-  pub fn resolve_retrieval_url(&self, retrieval_url: &UrlWithPointer) -> Option<UrlWithPointer> {
+  pub fn resolve_retrieval_url(&self, retrieval_url: &NodeLocation) -> Option<NodeLocation> {
     self.resolved.borrow().get(retrieval_url).cloned()
   }
 
@@ -78,7 +77,7 @@ impl DocumentContext {
     }
   }
 
-  pub fn get_intermediate_schema_map(&self) -> HashMap<String, IntermediateNode> {
+  pub fn get_intermediate_schema_map(&self) -> HashMap<NodeLocation, IntermediateNode> {
     let documents = self.documents.borrow();
 
     documents
@@ -87,7 +86,7 @@ impl DocumentContext {
       .collect()
   }
 
-  pub fn get_document(&self, document_url: &UrlWithPointer) -> Rc<dyn SchemaDocument> {
+  pub fn get_document(&self, document_url: &NodeLocation) -> Rc<dyn SchemaDocument> {
     let documents = self.documents.borrow();
 
     let document = documents.get(document_url).unwrap().clone();
@@ -95,7 +94,7 @@ impl DocumentContext {
     document
   }
 
-  pub fn get_document_for_node(&self, node_url: &UrlWithPointer) -> Rc<dyn SchemaDocument> {
+  pub fn get_document_for_node(&self, node_url: &NodeLocation) -> Rc<dyn SchemaDocument> {
     let node_documents = self.node_documents.borrow();
 
     let document_url = node_documents.get(node_url).unwrap();
@@ -105,9 +104,9 @@ impl DocumentContext {
 
   pub async fn load_from_url(
     self: &Rc<Self>,
-    retrieval_url: &UrlWithPointer,
-    given_url: &UrlWithPointer,
-    antecedent_url: Option<&UrlWithPointer>,
+    retrieval_url: &NodeLocation,
+    given_url: &NodeLocation,
+    antecedent_url: Option<&NodeLocation>,
     default_schema_uri: &MetaSchemaId,
   ) {
     let mut queue = Default::default();
@@ -125,14 +124,14 @@ impl DocumentContext {
 
   async fn load_from_url_with_queue(
     self: &Rc<Self>,
-    retrieval_url: &UrlWithPointer,
-    given_url: &UrlWithPointer,
-    antecedent_url: Option<&UrlWithPointer>,
+    retrieval_url: &NodeLocation,
+    given_url: &NodeLocation,
+    antecedent_url: Option<&NodeLocation>,
     default_schema_uri: &MetaSchemaId,
     queue: &mut Vec<(
-      UrlWithPointer,
-      UrlWithPointer,
-      Option<UrlWithPointer>,
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
       MetaSchemaId,
     )>,
   ) {
@@ -143,7 +142,9 @@ impl DocumentContext {
     };
 
     if document_node_is_none {
-      let document_node = load_yaml(retrieval_url.get_url()).await.unwrap();
+      let document_node = load_yaml(&retrieval_url.to_retrieval_location())
+        .await
+        .unwrap();
 
       self.fill_node_cache(retrieval_url, document_node.unwrap());
     }
@@ -158,9 +159,9 @@ impl DocumentContext {
 
   pub async fn load_from_document(
     self: &Rc<Self>,
-    retrieval_url: &UrlWithPointer,
-    given_url: &UrlWithPointer,
-    antecedent_url: Option<&UrlWithPointer>,
+    retrieval_url: &NodeLocation,
+    given_url: &NodeLocation,
+    antecedent_url: Option<&NodeLocation>,
     document_node: serde_json::Value,
     default_schema_uri: &MetaSchemaId,
   ) {
@@ -180,15 +181,15 @@ impl DocumentContext {
 
   async fn load_from_document_with_queue(
     self: &Rc<Self>,
-    retrieval_url: &UrlWithPointer,
-    given_url: &UrlWithPointer,
-    antecedent_url: Option<&UrlWithPointer>,
+    retrieval_url: &NodeLocation,
+    given_url: &NodeLocation,
+    antecedent_url: Option<&NodeLocation>,
     document_node: serde_json::Value,
     default_schema_uri: &MetaSchemaId,
     queue: &mut Vec<(
-      UrlWithPointer,
-      UrlWithPointer,
-      Option<UrlWithPointer>,
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
       MetaSchemaId,
     )>,
   ) {
@@ -209,9 +210,10 @@ impl DocumentContext {
     ));
   }
 
-  fn fill_node_cache(&self, retrieval_url: &UrlWithPointer, document_node: serde_json::Value) {
-    for (pointer, node) in read_json_node("".into(), document_node) {
-      let node_url = retrieval_url.join(&format!("#{}", pointer)).unwrap();
+  fn fill_node_cache(&self, retrieval_url: &NodeLocation, document_node: serde_json::Value) {
+    for (pointer, node) in read_json_node(&[], document_node) {
+      let mut node_url = retrieval_url.clone();
+      node_url.set_pointer(pointer);
       assert!(self.cache.borrow_mut().insert(node_url, node).is_none())
     }
   }
@@ -219,9 +221,9 @@ impl DocumentContext {
   async fn load_from_cache_queue(
     self: &Rc<Self>,
     queue: &mut Vec<(
-      UrlWithPointer,
-      UrlWithPointer,
-      Option<UrlWithPointer>,
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
       MetaSchemaId,
     )>,
   ) {
@@ -240,14 +242,14 @@ impl DocumentContext {
 
   async fn load_from_cache_with_queue(
     self: &Rc<Self>,
-    retrieval_url: &UrlWithPointer,
-    given_url: &UrlWithPointer,
-    antecedent_url: Option<&UrlWithPointer>,
+    retrieval_url: &NodeLocation,
+    given_url: &NodeLocation,
+    antecedent_url: Option<&NodeLocation>,
     default_schema_uri: &MetaSchemaId,
     queue: &mut Vec<(
-      UrlWithPointer,
-      UrlWithPointer,
-      Option<UrlWithPointer>,
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
       MetaSchemaId,
     )>,
   ) {
@@ -255,7 +257,7 @@ impl DocumentContext {
       return;
     }
 
-    let server_url = retrieval_url.clone().into();
+    let server_url = retrieval_url.to_retrieval_location();
     if !self.loaded.borrow_mut().insert(server_url) {
       return;
     }

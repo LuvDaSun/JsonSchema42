@@ -48,11 +48,12 @@ impl Arena<SchemaItem> {
       })
       .map(|(_item_previous, item)| {
         empty()
-          .chain(item.id.as_ref().map(|id| {
-            empty()
-              .chain(id.get_url().path_segments().into_iter().flatten())
-              .chain(id.get_pointer().iter().map(|value| value.as_str()))
-          }))
+          .chain(
+            item
+              .id
+              .as_ref()
+              .map(|id| empty().chain(id.get_path()).chain(id.get_path())),
+          )
           .flatten()
           .chain(item.name.as_deref())
           .filter(|part| !part.is_empty())
@@ -144,20 +145,19 @@ extern "C" fn schema_arena_get_item(
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::utils::url::UrlWithPointer;
 
   #[test]
   fn test_get_name_parts() {
     let mut arena = Arena::new();
 
     arena.add_item(SchemaItem {
-      id: Some(UrlWithPointer::parse("http://id.com#/a/0").unwrap()),
+      id: Some("http://id.com#/a/0".parse().unwrap()),
       ..Default::default()
     });
 
     arena.add_item(SchemaItem {
       parent: Some(0),
-      id: Some(UrlWithPointer::parse("http://id.com#/b/1").unwrap()),
+      id: Some("http://id.com#/b/1".parse().unwrap()),
       ..Default::default()
     });
 
