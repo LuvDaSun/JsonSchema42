@@ -1,14 +1,10 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { NULL_POINTER, Pointer } from "../utils/index.js";
 import * as wrappers from "../wrappers/index.js";
+import { Wrapper } from "./wrapper.js";
 
-export class NamesProxy {
-  constructor(private readonly pointer: Pointer) {
-    assert(pointer !== NULL_POINTER);
-  }
-
-  [Symbol.dispose]() {
+export class NamesProxy extends Wrapper {
+  protected drop() {
     mainFfi.exports.names_drop(this.pointer);
   }
 

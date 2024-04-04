@@ -1,11 +1,12 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { NULL_POINTER, Pointer } from "../utils/index.js";
 import * as wrappers from "../wrappers/index.js";
 import { SchemaItem, SchemaType } from "./schema-item.js";
+import { VecUsizeProxy } from "./vec-usize.js";
+import { Wrapper } from "./wrapper.js";
 
-export class SchemaArenaProxy {
+export class SchemaArenaProxy extends Wrapper {
   public static fromIntermediate(document: schemaIntermediate.SchemaJson): SchemaArenaProxy {
     const arena = SchemaArenaProxy.new();
     /*
@@ -140,11 +141,7 @@ export class SchemaArenaProxy {
     return arena;
   }
 
-  constructor(private readonly pointer: Pointer) {
-    assert(pointer !== NULL_POINTER);
-  }
-
-  [Symbol.dispose]() {
+  protected drop() {
     mainFfi.exports.schema_arena_drop(this.pointer);
   }
 
@@ -187,5 +184,10 @@ export class SchemaArenaProxy {
     assert(itemString != null);
     const item = JSON.parse(itemString);
     return item;
+  }
+
+  public transform(transforms: VecUsizeProxy) {
+    const result = mainFfi.exports.schema_arena_transform(this.pointer, transforms.pointer);
+    return result;
   }
 }

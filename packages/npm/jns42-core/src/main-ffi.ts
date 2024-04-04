@@ -30,6 +30,12 @@ export interface MainExports extends Exports {
   schema_arena_add_item(schema_arena: Pointer, item: Pointer): number;
   schema_arena_replace_item(schema_arena: Pointer, key: number, item: Pointer): Pointer;
   schema_arena_get_item(schema_arena: Pointer, key: number): Pointer;
+  schema_arena_transform(schema_arena: Pointer, vec: Pointer): number;
+
+  vec_usize_new(capacity: number): Pointer;
+  vec_usize_drop(vec_usize: Pointer): void;
+  vec_usize_len(vec_usize: Pointer): number;
+  vec_usize_push(vec_usize: Pointer, value: number): void;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;

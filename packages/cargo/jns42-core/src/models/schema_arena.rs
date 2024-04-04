@@ -1,4 +1,7 @@
-use crate::ffi::SizedString;
+use crate::{
+  ffi::SizedString,
+  schema_transforms::{BoxedSchemaTransform, SchemaTransform},
+};
 
 use super::{
   arena::Arena,
@@ -61,6 +64,15 @@ impl Arena<SchemaItem> {
       .collect();
 
     ancestors.into_iter().rev().flatten()
+  }
+
+  pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
+    self.apply_transform(|arena: &mut Arena<SchemaItem>, key: usize| {
+      for transform in &transforms {
+        let transform: BoxedSchemaTransform = transform.into();
+        transform(arena, key)
+      }
+    })
   }
 }
 
@@ -140,6 +152,24 @@ extern "C" fn schema_arena_get_item(
   let item = Box::new(item);
 
   Box::into_raw(item)
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_transform(
+  arena: *mut Arena<SchemaItem>,
+  transforms: *const Vec<usize>,
+) -> usize {
+  assert!(!arena.is_null());
+  assert!(!transforms.is_null());
+
+  let arena = unsafe { &mut *arena };
+  let transforms = unsafe { &*transforms };
+  let transforms = transforms
+    .iter()
+    .map(|transform| (*transform).into())
+    .collect();
+
+  arena.transform(transforms)
 }
 
 #[cfg(test)]

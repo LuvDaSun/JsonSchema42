@@ -4,3 +4,6 @@ export * from "./naming.js";
 export * from "./reverse.js";
 export * from "./schema-arena.js";
 export * from "./schema-item.js";
+export * from "./schema-transform.js";
+export * from "./vec-usize.js";
+export * from "./wrapper.js";
