@@ -10,7 +10,7 @@ const textDecoder = new TextDecoder("utf-8", {
 });
 
 export class SizedString extends ForeignObject {
-  public static allocate(value: string | undefined) {
+  public static fromString(value: string | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
       return new SizedString(pointer);
@@ -19,7 +19,7 @@ export class SizedString extends ForeignObject {
       return new SizedString(pointer);
     }
   }
-  public read(): string | undefined {
+  public toString(): string | undefined {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {
       return undefined;

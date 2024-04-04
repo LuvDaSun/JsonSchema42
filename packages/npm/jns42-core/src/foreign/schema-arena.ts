@@ -157,21 +157,21 @@ export class SchemaArena extends ForeignObject {
 
   public addItem(item: SchemaItemValue): number {
     const itemString = JSON.stringify(item);
-    using itemWrapper = SizedString.allocate(itemString);
+    using itemWrapper = SizedString.fromString(itemString);
     const key = mainFfi.exports.schema_arena_add_item(this.pointer, itemWrapper.pointer);
     return key;
   }
 
   public replaceItem(key: number, item: SchemaItemValue): SchemaItemValue {
     const itemString = JSON.stringify(item);
-    using itemWrapper = SizedString.allocate(itemString);
+    using itemWrapper = SizedString.fromString(itemString);
     const itemPreviousPointer = mainFfi.exports.schema_arena_replace_item(
       this.pointer,
       key,
       itemWrapper.pointer,
     );
     using itemPreviousWrapper = new SizedString(itemPreviousPointer);
-    const itemPreviousString = itemPreviousWrapper.read();
+    const itemPreviousString = itemPreviousWrapper.toString();
     assert(itemPreviousString != null);
     const itemPrevious = JSON.parse(itemPreviousString);
     return itemPrevious;
@@ -180,7 +180,7 @@ export class SchemaArena extends ForeignObject {
   public getItem(key: number): SchemaItemValue {
     const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
     using itemWrapper = new SizedString(itemPointer);
-    const itemString = itemWrapper.read();
+    const itemString = itemWrapper.toString();
     assert(itemString != null);
     const item = JSON.parse(itemString);
     return item;

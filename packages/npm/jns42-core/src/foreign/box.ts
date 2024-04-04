@@ -3,7 +3,7 @@ import { NULL_POINTER, Pointer } from "../utils/index.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class Box extends ForeignObject {
-  public static allocate(value: Pointer | undefined) {
+  public static fromTargetPointer(value: Pointer | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
       return new Box(pointer);
@@ -13,7 +13,7 @@ export class Box extends ForeignObject {
       return new Box(pointer);
     }
   }
-  public read(): Pointer | undefined {
+  public toTargetPointer(): Pointer | undefined {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {
       return undefined;
