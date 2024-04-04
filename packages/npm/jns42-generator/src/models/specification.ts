@@ -57,6 +57,18 @@ export function loadSpecification(
 
   // transform the validatorsArena
   {
+    using transformers = core.VecUsize.fromArray([]);
+    let transformIterations = 0;
+    while (validatorsArena2.transform(transformers) > 0) {
+      transformIterations++;
+      if (transformIterations < transformMaximumIterations) {
+        continue;
+      }
+      throw new Error("maximum number of iterations reached");
+    }
+  }
+
+  {
     let transformIterations = 0;
     while (validatorsArena.applyTransform() > 0) {
       transformIterations++;
@@ -68,6 +80,60 @@ export function loadSpecification(
   }
 
   // transform the typesArena
+  {
+    // console.log(
+    //   Object.fromEntries(
+    //     [...typesArena2].map(normalizeObject).map((value, key) => [key, value] as const),
+    //   ),
+    // );
+    // debugger;
+
+    using transformers = core.VecUsize.fromArray([
+      core.SchemaTransform.explode,
+      core.SchemaTransform.singleType,
+
+      core.SchemaTransform.resolveSingleAllOf,
+      core.SchemaTransform.resolveSingleAnyOf,
+      core.SchemaTransform.resolveSingleOneOf,
+
+      core.SchemaTransform.flattenAllOf,
+      core.SchemaTransform.flattenAnyOf,
+      core.SchemaTransform.flattenOneOf,
+
+      core.SchemaTransform.flipAllOfOneOf,
+      core.SchemaTransform.flipAnyOfOneOf,
+
+      core.SchemaTransform.inheritAllOf,
+      core.SchemaTransform.inheritAnyOf,
+      core.SchemaTransform.inheritOneOf,
+
+      core.SchemaTransform.resolveAllOf,
+      // core.SchemaTransform.resolveAnyOf,
+      core.SchemaTransform.resolveNot,
+      core.SchemaTransform.resolveIfThenElse,
+
+      core.SchemaTransform.resolveSingleAllOf,
+      core.SchemaTransform.resolveSingleAnyOf,
+      core.SchemaTransform.resolveSingleOneOf,
+    ]);
+    let transformIterations = 0;
+    while (typesArena2.transform(transformers) > 0) {
+      transformIterations++;
+
+      // console.log(
+      //   Object.fromEntries(
+      //     [...typesArena2].map(normalizeObject).map((value, key) => [key, value] as const),
+      //   ),
+      // );
+      // debugger;
+
+      if (transformIterations < transformMaximumIterations) {
+        continue;
+      }
+      throw new Error("maximum number of iterations reached");
+    }
+  }
+
   {
     // console.log(
     //   Object.fromEntries(

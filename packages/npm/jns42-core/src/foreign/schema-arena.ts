@@ -195,4 +195,11 @@ export class SchemaArena extends ForeignObject {
     const result = mainFfi.exports.schema_arena_transform(this.pointer, transforms.pointer);
     return result;
   }
+
+  public *[Symbol.iterator]() {
+    const count = this.count();
+    for (let key = 0; key < count; key++) {
+      yield this.getItem(key);
+    }
+  }
 }
