@@ -116,7 +116,7 @@ export class DocumentContext {
   private fillNodeCache(documentLocation: core.NodeLocation, documentNode: unknown) {
     for (const [pointer, node] of readNode([], documentNode)) {
       const nodeRetrievalLocation = documentLocation.clone();
-      nodeRetrievalLocation.setPointer(pointer);
+      nodeRetrievalLocation.setPointer([...(nodeRetrievalLocation.getPointer() ?? []), ...pointer]);
       const nodeRetrievalId = nodeRetrievalLocation.toString();
       if (this.cache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);

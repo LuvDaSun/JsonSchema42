@@ -296,7 +296,7 @@ extern "C" fn node_location_drop(node_location: *mut NodeLocation) {
 }
 
 #[no_mangle]
-extern "C" fn node_location_clone(node_location: *mut NodeLocation) -> *mut NodeLocation {
+extern "C" fn node_location_clone(node_location: *const NodeLocation) -> *mut NodeLocation {
   assert!(!node_location.is_null());
 
   let node_location = unsafe { &*node_location };
