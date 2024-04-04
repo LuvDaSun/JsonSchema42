@@ -84,7 +84,7 @@ export class DocumentContext {
     antecedentLocation: core.NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const documentLocation = retrievalLocation;
+    const documentLocation = retrievalLocation.setRoot();
     const documentId = documentLocation.toString();
     const documentPath = documentLocation.toRetrievalString();
     if (!this.cache.has(documentId)) {

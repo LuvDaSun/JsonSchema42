@@ -39,10 +39,6 @@ impl NodeLocation {
     return self.hash.first().map(|part| part.as_str());
   }
 
-  pub fn set_anchor(&mut self, value: impl ToString) {
-    self.hash = once(value).map(|part| part.to_string()).collect();
-  }
-
   pub fn get_pointer(&self) -> Option<Vec<&str>> {
     if self.hash.len() > 1 {
       Some(self.hash.iter().skip(1).map(|part| part.as_str()).collect())
@@ -51,18 +47,26 @@ impl NodeLocation {
     }
   }
 
-  pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
-    self.hash = once(String::new())
-      .chain(value.into_iter().map(|part| part.into()))
-      .collect();
-  }
-
   pub fn get_path(&self) -> Vec<&str> {
     self.path.iter().map(|value| value.as_str()).collect()
   }
 
   pub fn get_hash(&self) -> Vec<&str> {
     self.hash.iter().map(|value| value.as_str()).collect()
+  }
+
+  pub fn set_anchor(&mut self, value: impl ToString) {
+    self.hash = once(value).map(|part| part.to_string()).collect();
+  }
+
+  pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
+    self.hash = once(String::new())
+      .chain(value.into_iter().map(|part| part.into()))
+      .collect();
+  }
+
+  pub fn set_root(&mut self) {
+    self.hash = Vec::new();
   }
 
   pub fn to_retrieval_string(&self) -> String {
@@ -367,21 +371,6 @@ extern "C" fn node_location_get_anchor(node_location: *mut NodeLocation) -> *con
 }
 
 #[no_mangle]
-extern "C" fn node_location_set_anchor(
-  node_location: *mut NodeLocation,
-  anchor: *const SizedString,
-) {
-  assert!(!node_location.is_null());
-  assert!(!anchor.is_null());
-
-  let node_location = unsafe { &mut *node_location };
-  let anchor = unsafe { &*anchor };
-  let anchor = anchor.as_ref();
-
-  node_location.set_anchor(anchor);
-}
-
-#[no_mangle]
 extern "C" fn node_location_get_pointer(
   node_location: *mut NodeLocation,
 ) -> *const Vec<SizedString> {
@@ -398,20 +387,6 @@ extern "C" fn node_location_get_pointer(
   let result = Box::new(result);
 
   Box::into_raw(result)
-}
-
-#[no_mangle]
-extern "C" fn node_location_set_pointer(
-  node_location: *mut NodeLocation,
-  pointer: *const Vec<SizedString>,
-) {
-  assert!(!node_location.is_null());
-  assert!(!pointer.is_null());
-
-  let node_location = unsafe { &mut *node_location };
-  let pointer = unsafe { &*pointer };
-
-  node_location.set_pointer(pointer);
 }
 
 #[no_mangle]
@@ -440,6 +415,44 @@ extern "C" fn node_location_get_hash(node_location: *mut NodeLocation) -> *const
   let result = Box::new(result);
 
   Box::into_raw(result)
+}
+
+#[no_mangle]
+extern "C" fn node_location_set_anchor(
+  node_location: *mut NodeLocation,
+  anchor: *const SizedString,
+) {
+  assert!(!node_location.is_null());
+  assert!(!anchor.is_null());
+
+  let node_location = unsafe { &mut *node_location };
+  let anchor = unsafe { &*anchor };
+  let anchor = anchor.as_ref();
+
+  node_location.set_anchor(anchor);
+}
+
+#[no_mangle]
+extern "C" fn node_location_set_pointer(
+  node_location: *mut NodeLocation,
+  pointer: *const Vec<SizedString>,
+) {
+  assert!(!node_location.is_null());
+  assert!(!pointer.is_null());
+
+  let node_location = unsafe { &mut *node_location };
+  let pointer = unsafe { &*pointer };
+
+  node_location.set_pointer(pointer);
+}
+
+#[no_mangle]
+extern "C" fn node_location_set_root(node_location: *mut NodeLocation) {
+  assert!(!node_location.is_null());
+
+  let node_location = unsafe { &mut *node_location };
+
+  node_location.set_root();
 }
 
 #[cfg(test)]

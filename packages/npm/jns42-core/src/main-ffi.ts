@@ -50,11 +50,12 @@ export interface MainExports extends Exports {
   node_location_to_string(node_location: Pointer): Pointer;
   node_location_to_retrieval_string(node_location: Pointer): Pointer;
   node_location_get_anchor(node_location: Pointer): Pointer;
-  node_location_set_anchor(node_location: Pointer, anchor: Pointer): void;
   node_location_get_pointer(node_location: Pointer): Pointer;
-  node_location_set_pointer(node_location: Pointer, pointer: Pointer): void;
   node_location_get_path(node_location: Pointer): Pointer;
   node_location_get_hash(node_location: Pointer): Pointer;
+  node_location_set_anchor(node_location: Pointer, anchor: Pointer): void;
+  node_location_set_pointer(node_location: Pointer, pointer: Pointer): void;
+  node_location_set_root(node_location: Pointer): void;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;
