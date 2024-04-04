@@ -35,6 +35,12 @@ impl SizedString {
   }
 }
 
+impl AsRef<str> for SizedString {
+  fn as_ref(&self) -> &str {
+    self.as_str()
+  }
+}
+
 const ALIGN: usize = std::mem::align_of::<usize>();
 
 #[no_mangle]

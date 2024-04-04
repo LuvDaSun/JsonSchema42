@@ -5,12 +5,9 @@ import { NamesBuilder } from "./names-builder.js";
 
 test("names", () => {
   using namesBuilder = NamesBuilder.new()
-    .add(1, "cat")
-    .add(1, "id")
-    .add(2, "cat")
-    .add(2, "name")
-    .add(3, "dog")
-    .add(3, "id");
+    .add(1, ["cat", "id"])
+    .add(2, ["cat", "name"])
+    .add(3, ["dog", "id"]);
 
   using names = namesBuilder.build();
 
@@ -36,12 +33,9 @@ test("names", () => {
 test("names leak test", () => {
   function runTest() {
     using namesBuilder = NamesBuilder.new()
-      .add(1, "cat")
-      .add(1, "id")
-      .add(2, "cat")
-      .add(2, "name")
-      .add(3, "dog")
-      .add(3, "id");
+      .add(1, ["cat", "id"])
+      .add(2, ["cat", "name"])
+      .add(3, ["dog", "id"]);
 
     using names = namesBuilder.build();
 

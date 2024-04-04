@@ -285,12 +285,10 @@ impl Specification {
           .to_string()
       });
 
-      for part in parts {
-        if item.primary.unwrap_or_default() {
-          primary_names.add(key, part);
-        } else {
-          secondary_names.add(key, part);
-        }
+      if item.primary.unwrap_or_default() {
+        primary_names.add(key, parts);
+      } else {
+        secondary_names.add(key, parts);
       }
     }
 

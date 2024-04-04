@@ -48,9 +48,7 @@ export function loadSpecification(
       (part) => /^[a-zA-Z]/.test(part),
     );
 
-    for (const sentence of path) {
-      namesBuilder.add(itemKey, sentence);
-    }
+    namesBuilder.add(itemKey, path);
   }
 
   const names = namesBuilder.build();

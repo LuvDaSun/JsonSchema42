@@ -11,7 +11,7 @@ export interface MainExports extends Exports {
 
   names_builder_drop(names_builder: Pointer): void;
   names_builder_new(): Pointer;
-  names_builder_add(names_builder: Pointer, key: number, value: Pointer): void;
+  names_builder_add(names_builder: Pointer, key: number, values: Pointer): void;
   names_builder_set_default_name(names_builder: Pointer, value: Pointer): void;
   names_builder_build(names_builder: Pointer): Pointer;
 
@@ -37,6 +37,11 @@ export interface MainExports extends Exports {
   vec_usize_new(capacity: number): Pointer;
   vec_usize_len(vec_usize: Pointer): number;
   vec_usize_push(vec_usize: Pointer, value: number): void;
+
+  vec_sized_string_drop(vec_usize: Pointer): void;
+  vec_sized_string_new(capacity: number): Pointer;
+  vec_sized_string_len(vec_usize: Pointer): number;
+  vec_sized_string_push(vec_usize: Pointer, value: Pointer): void;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;

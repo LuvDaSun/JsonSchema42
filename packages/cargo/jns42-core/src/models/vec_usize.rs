@@ -2,6 +2,7 @@
 extern "C" fn vec_usize_new(capacity: usize) -> *const Vec<usize> {
   let vec = Vec::with_capacity(capacity);
   let vec = Box::new(vec);
+
   Box::into_raw(vec)
 }
 
@@ -17,6 +18,7 @@ extern "C" fn vec_usize_len(vec: *const Vec<usize>) -> usize {
   assert!(!vec.is_null());
 
   let vec = unsafe { &*vec };
+
   vec.len()
 }
 
@@ -25,5 +27,6 @@ extern "C" fn vec_usize_push(vec: *mut Vec<usize>, value: usize) {
   assert!(!vec.is_null());
 
   let vec = unsafe { &mut *vec };
+
   vec.push(value);
 }
