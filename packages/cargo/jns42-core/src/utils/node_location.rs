@@ -1,4 +1,3 @@
-use core::hash::Hash;
 use once_cell::sync::Lazy;
 use percent_encoding::{percent_decode_str, utf8_percent_encode, NON_ALPHANUMERIC};
 use regex::{Regex, RegexBuilder};
@@ -12,7 +11,9 @@ pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
     .unwrap()
 });
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(
+  Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
+)]
 #[serde(try_from = "&str")]
 #[serde(into = "String")]
 
@@ -21,23 +22,15 @@ pub struct NodeLocation {
   path: Vec<String>,
   query: String,
   hash: Vec<String>,
-  keep_hash: bool,
 }
 
 impl NodeLocation {
-  fn new(
-    origin: String,
-    path: Vec<String>,
-    query: String,
-    hash: Vec<String>,
-    keep_hash: bool,
-  ) -> Self {
+  fn new(origin: String, path: Vec<String>, query: String, hash: Vec<String>) -> Self {
     Self {
       origin,
       path: normalize_path(path),
       query,
       hash,
-      keep_hash,
     }
   }
 
@@ -96,7 +89,6 @@ impl NodeLocation {
           other.path.clone(),
           other.query.clone(),
           other.hash.clone(),
-          self.keep_hash,
         );
       } else {
         return NodeLocation::new(
@@ -110,7 +102,6 @@ impl NodeLocation {
             .collect(),
           other.query.clone(),
           other.hash.clone(),
-          self.keep_hash,
         );
       }
     }
@@ -121,7 +112,6 @@ impl NodeLocation {
         self.path.clone(),
         other.query.clone(),
         other.hash.clone(),
-        self.keep_hash,
       );
     }
 
@@ -130,7 +120,6 @@ impl NodeLocation {
       self.path.clone(),
       self.query.clone(),
       other.hash.clone(),
-      self.keep_hash,
     )
   }
 }
@@ -172,11 +161,6 @@ impl TryFrom<&str> for NodeLocation {
       .map(|capture| capture.to_string())
       .unwrap_or_default();
 
-    let keep_hash = hash_capture
-      .map(|capture| capture.as_str())
-      .map(|capture| capture.starts_with('#'))
-      .unwrap_or_default();
-
     let hash = hash_capture
       .map(|capture| capture.as_str())
       .map(|capture| capture.trim_start_matches('#'))
@@ -192,7 +176,7 @@ impl TryFrom<&str> for NodeLocation {
         .collect::<Result<_, _>>()?
     };
 
-    Ok(Self::new(origin, path, query, hash, keep_hash))
+    Ok(Self::new(origin, path, query, hash))
   }
 }
 
@@ -207,17 +191,14 @@ impl From<&NodeLocation> for String {
       .join("/");
     let query = &value.query;
 
-    let hash = if value.keep_hash || !value.hash.is_empty() {
-      "#".to_string()
-    } else {
-      String::new()
-    } + &value
-      .hash
-      .iter()
-      .map(escape_hash)
-      .map(|part| utf8_percent_encode(part.as_str(), NON_ALPHANUMERIC).to_string())
-      .collect::<Vec<_>>()
-      .join("/");
+    let hash = "#".to_string()
+      + &value
+        .hash
+        .iter()
+        .map(escape_hash)
+        .map(|part| utf8_percent_encode(part.as_str(), NON_ALPHANUMERIC).to_string())
+        .collect::<Vec<_>>()
+        .join("/");
 
     return origin.to_string() + path.as_str() + query.as_str() + hash.as_str();
   }
@@ -241,52 +222,6 @@ impl FromStr for NodeLocation {
 
   fn from_str(input: &str) -> Result<Self, Self::Err> {
     input.try_into()
-  }
-}
-
-impl Hash for NodeLocation {
-  fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-    self.origin.hash(state);
-    self.path.hash(state);
-    self.query.hash(state);
-    self.hash.hash(state);
-  }
-}
-
-impl Eq for NodeLocation {}
-impl PartialEq for NodeLocation {
-  fn eq(&self, other: &Self) -> bool {
-    self.origin == other.origin
-      && self.path == other.path
-      && self.query == other.query
-      && self.hash == other.hash
-  }
-}
-
-impl Ord for NodeLocation {
-  fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-    match self.origin.cmp(&other.origin) {
-      core::cmp::Ordering::Equal => {}
-      ord => return ord,
-    }
-    match self.path.cmp(&other.path) {
-      core::cmp::Ordering::Equal => {}
-      ord => return ord,
-    }
-    match self.query.cmp(&other.query) {
-      core::cmp::Ordering::Equal => {}
-      ord => return ord,
-    }
-    match self.hash.cmp(&other.hash) {
-      core::cmp::Ordering::Equal => {}
-      ord => return ord,
-    }
-    core::cmp::Ordering::Equal
-  }
-}
-impl PartialOrd for NodeLocation {
-  fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-    Some(self.cmp(other))
   }
 }
 
