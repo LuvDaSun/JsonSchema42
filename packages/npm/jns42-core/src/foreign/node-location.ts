@@ -1,12 +1,14 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { Pointer } from "../utils/index.js";
+import { NULL_POINTER, Pointer } from "../utils/index.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
 import { VecSizedString } from "./vec-sized-string.js";
 
 const finalizationRegistry = new FinalizationRegistry<Pointer>((pointer) => {
-  mainFfi.exports.node_location_drop(pointer);
+  if (pointer !== NULL_POINTER) {
+    mainFfi.exports.node_location_drop(pointer);
+  }
 });
 
 /**
@@ -23,9 +25,13 @@ export class NodeLocation extends ForeignObject {
     finalizationRegistry.register(this, pointer, this.token);
   }
 
-  protected drop() {
+  [Symbol.dispose]() {
     finalizationRegistry.unregister(this.token);
 
+    super[Symbol.dispose]();
+  }
+
+  protected drop() {
     mainFfi.exports.node_location_drop(this.pointer);
   }
 
