@@ -84,7 +84,7 @@ export function loadSpecification(
       core.SchemaTransform.inheritOneOf,
       core.SchemaTransform.inheritReference,
       core.SchemaTransform.resolveAllOf,
-      // core.SchemaTransform.resolveAnyOf,
+      core.SchemaTransform.resolveAnyOf,
       core.SchemaTransform.resolveNot,
       core.SchemaTransform.resolveIfThenElse,
       core.SchemaTransform.resolveSingleAllOf,

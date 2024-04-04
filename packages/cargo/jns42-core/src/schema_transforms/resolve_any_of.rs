@@ -1,37 +1,12 @@
 use crate::models::{arena::Arena, schema::SchemaItem};
-use std::{cell::RefCell, collections::HashMap};
+use im::HashMap;
+use itertools::Itertools;
+use std::{cell::RefCell, collections::BTreeSet};
 
-/**
- * This transformer merges all sub schemas in allOf.
- *
- * ```yaml
- * - allOf
- *   - required: ["a", "b"]
- *     objectProperties:
- *       a: 100
- *       b: 200
- *   - objectProperties:
- *       b: 300
- *       c: 400
- * ```
- *
- * will become
- *
- * ```yaml
- * - required: ["a", "b"]
- *   objectProperties:
- *     a: 100
- *     b: 1
- *     c: 400
- * - allOf
- *   - 200
- *   - 300
- * ```
- */
 pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
-  let item = arena.get_item(key);
+  let item = arena.get_item(key).clone();
 
-  let Some(sub_keys) = item.all_of.clone() else {
+  let Some(sub_keys) = item.any_of.clone() else {
     return;
   };
 
@@ -40,14 +15,9 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   };
 
   // things we cannot merge
-  if item
-    .types
-    .as_ref()
-    .map(|value| value.len())
-    .unwrap_or_default()
-    > 1
+  if item.types.is_some()
     || item.reference.is_some()
-    || item.any_of.is_some()
+    || item.all_of.is_some()
     || item.one_of.is_some()
     || item.r#if.is_some()
     || item.then.is_some()
@@ -68,24 +38,30 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
       .as_ref()
       .map(|value| value.len())
       .unwrap_or_default()
-      > 1
-      || sub_item.reference.is_some()
-      || sub_item.all_of.is_some()
-      || sub_item.any_of.is_some()
-      || sub_item.one_of.is_some()
-      || sub_item.r#if.is_some()
-      || sub_item.then.is_some()
-      || sub_item.r#else.is_some()
-      || sub_item.not.is_some()
+      != 1
+      || item.reference.is_some()
+      || item.all_of.is_some()
+      || item.one_of.is_some()
+      || item.r#if.is_some()
+      || item.then.is_some()
+      || item.r#else.is_some()
+      || item.not.is_some()
     {
       return;
     }
   }
 
-  let mut item_new = SchemaItem {
-    all_of: None,
-    ..item.clone()
-  };
+  let grouped_sub_entries = sub_entries
+    .into_iter()
+    .map(|(key, item)| (*item.types.as_ref().unwrap().first().unwrap(), key, item))
+    .sorted_by_key(|(r#type, _key, _item)| *r#type)
+    .group_by(|(r#type, _key, _item)| *r#type);
+
+  let grouped_sub_entries = grouped_sub_entries
+    .into_iter()
+    .map(|(r#type, group)| (r#type, group.map(|(_type, key, item)| (key, item))));
+
+  let mut sub_keys_new = BTreeSet::new();
 
   // this is so that the following closures don't have to be FnMut
   let arena = RefCell::new(arena);
@@ -96,35 +72,41 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
     }
 
     let item_new = SchemaItem {
-      all_of: Some([*key, *other_key].into()),
+      any_of: Some([*key, *other_key].into()),
       ..Default::default()
     };
 
     arena.borrow_mut().add_item(item_new)
   };
 
-  for sub_item in sub_entries.values() {
-    // things we cannot merge
-    if sub_item
-      .types
-      .as_ref()
-      .map(|value| value.len())
-      .unwrap_or_default()
-      > 1
-      || sub_item.reference.is_some()
-      || sub_item.all_of.is_some()
-      || sub_item.any_of.is_some()
-      || sub_item.one_of.is_some()
-      || sub_item.r#if.is_some()
-      || sub_item.then.is_some()
-      || sub_item.r#else.is_some()
-      || sub_item.not.is_some()
-    {
-      return;
+  for (r#type, sub_entries) in grouped_sub_entries.into_iter() {
+    let sub_entries: HashMap<_, _> = sub_entries.collect();
+    if sub_entries.len() < 2 {
+      for sub_key in sub_entries.keys() {
+        sub_keys_new.insert(*sub_key);
+      }
+      continue;
     }
 
-    item_new = item_new.intersection(sub_item, &merge_key);
+    let mut sub_item_new = SchemaItem {
+      exact: Some(false),
+      types: Some(vec![r#type]),
+      ..Default::default()
+    };
+
+    for sub_item in sub_entries.values() {
+      sub_item_new = sub_item_new.intersection(sub_item, &merge_key);
+    }
+
+    let sub_key_new = arena.borrow_mut().add_item(sub_item_new);
+    sub_keys_new.insert(sub_key_new);
   }
+
+  let item_new = SchemaItem {
+    any_of: None,
+    one_of: Some(sub_keys_new),
+    ..item.clone()
+  };
 
   arena.borrow_mut().replace_item(key, item_new);
 }

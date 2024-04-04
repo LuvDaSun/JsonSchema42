@@ -13,6 +13,7 @@ words:
   - esbenp
   - Hasher
   - Inflector
+  - Itertools
   - lcov
   - luvdasun
   - notdir

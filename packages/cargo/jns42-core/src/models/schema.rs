@@ -1,14 +1,14 @@
 use super::intermediate::IntermediateType;
 use crate::utils::merge::merge_option;
 use crate::utils::node_location::NodeLocation;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::collections::{BTreeSet, HashSet};
 use std::{collections::HashMap, iter::empty};
 
 pub type SchemaKey = usize;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Serialize, Deserialize)]
+#[derive(
+  Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, Debug, serde::Serialize, serde::Deserialize,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum SchemaType {
   Never,
@@ -80,7 +80,7 @@ impl From<&IntermediateType> for SchemaType {
   }
 }
 
-#[derive(Clone, PartialEq, Default, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SchemaItem {
   #[serde(skip_serializing_if = "Option::is_none")]
@@ -101,7 +101,7 @@ pub struct SchemaItem {
   #[serde(skip_serializing_if = "Option::is_none")]
   pub description: Option<String>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub examples: Option<Vec<Value>>,
+  pub examples: Option<Vec<serde_json::Value>>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub deprecated: Option<bool>,
 
@@ -151,7 +151,7 @@ pub struct SchemaItem {
 
   // assertions
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub options: Option<Vec<Value>>,
+  pub options: Option<Vec<serde_json::Value>>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub required: Option<HashSet<String>>,
 
