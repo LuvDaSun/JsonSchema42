@@ -3,21 +3,21 @@ import { NULL_POINTER, Pointer } from "../utils/index.js";
 
 export abstract class ForeignObject {
   private disposed = false;
-  private owned = true;
+  private responsible = true;
 
   constructor(public readonly pointer: Pointer) {
     //
   }
 
-  public letGo() {
-    this.owned = false;
+  public abandon() {
+    this.responsible = false;
   }
 
   protected abstract drop(): void;
 
   [Symbol.dispose]() {
     assert.equal(this.disposed, false);
-    if (this.owned) {
+    if (this.responsible) {
       if (this.pointer !== NULL_POINTER) {
         this.drop();
       }

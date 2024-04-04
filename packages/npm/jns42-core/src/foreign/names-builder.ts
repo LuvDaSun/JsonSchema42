@@ -1,7 +1,7 @@
 import { mainFfi } from "../main-ffi.js";
+import { ForeignObject } from "./foreign-object.js";
 import { Names } from "./names.js";
 import { SizedString } from "./sized-string.js";
-import { ForeignObject } from "./wrapper.js";
 
 export class NamesBuilder extends ForeignObject {
   protected drop() {

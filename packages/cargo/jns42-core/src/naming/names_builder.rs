@@ -30,7 +30,7 @@ where
     self
   }
 
-  pub fn build(&self) -> Names<K> {
+  pub fn build(&mut self) -> Names<K> {
     let cardinality_counters = Self::make_cardinality_counters(&self.sentences_map);
     let part_map = Self::make_parts_map(&self.sentences_map, &cardinality_counters);
     let optimized_names = Self::make_optimized_names(part_map);
@@ -223,9 +223,7 @@ extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
 extern "C" fn names_builder_drop(names_builder: *mut NamesBuilder<usize>) {
   assert!(!names_builder.is_null());
 
-  unsafe {
-    let _ = Box::from_raw(names_builder);
-  }
+  drop(unsafe { Box::from_raw(names_builder) });
 }
 
 /// add a sentence to a key

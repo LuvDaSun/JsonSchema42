@@ -9,9 +9,7 @@ extern "C" fn vec_usize_new(capacity: usize) -> *const Vec<usize> {
 extern "C" fn vec_usize_drop(vec: *mut Vec<usize>) {
   assert!(!vec.is_null());
 
-  unsafe {
-    let _ = Box::from_raw(vec);
-  }
+  drop(unsafe { Box::from_raw(vec) });
 }
 
 #[no_mangle]

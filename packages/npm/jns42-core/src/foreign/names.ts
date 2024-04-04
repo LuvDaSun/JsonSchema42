@@ -1,7 +1,7 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
+import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
-import { ForeignObject } from "./wrapper.js";
 
 export class Names extends ForeignObject {
   protected drop() {

@@ -1,7 +1,7 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
-import { ForeignObject } from "./wrapper.js";
+import { ForeignObject } from "./foreign-object.js";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {

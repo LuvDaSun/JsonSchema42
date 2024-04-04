@@ -410,7 +410,5 @@ extern "C" fn schema_item_new() -> *const SchemaItem {
 extern "C" fn schema_item_drop(schema_item: *mut SchemaItem) {
   assert!(!schema_item.is_null());
 
-  unsafe {
-    let _ = Box::from_raw(schema_item);
-  }
+  drop(unsafe { Box::from_raw(schema_item) });
 }

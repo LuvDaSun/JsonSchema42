@@ -1,10 +1,10 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
+import { ForeignObject } from "./foreign-object.js";
 import { SchemaItemValue, SchemaType } from "./schema-item.js";
 import { SizedString } from "./sized-string.js";
 import { VecUsize } from "./vec-usize.js";
-import { ForeignObject } from "./wrapper.js";
 
 export class SchemaArena extends ForeignObject {
   public static fromIntermediate(document: schemaIntermediate.SchemaJson): SchemaArena {

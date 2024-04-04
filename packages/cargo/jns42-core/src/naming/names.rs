@@ -94,7 +94,5 @@ extern "C" fn names_to_screaming_snake_case(
 extern "C" fn names_drop(names: *mut Names<usize>) {
   assert!(!names.is_null());
 
-  unsafe {
-    let _ = Box::from_raw(names);
-  }
+  drop(unsafe { Box::from_raw(names) });
 }

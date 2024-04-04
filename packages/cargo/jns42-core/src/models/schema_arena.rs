@@ -87,9 +87,7 @@ extern "C" fn schema_arena_new() -> *const Arena<SchemaItem> {
 extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
   assert!(!arena.is_null());
 
-  unsafe {
-    let _ = Box::from_raw(arena);
-  }
+  drop(unsafe { Box::from_raw(arena) });
 }
 
 #[no_mangle]

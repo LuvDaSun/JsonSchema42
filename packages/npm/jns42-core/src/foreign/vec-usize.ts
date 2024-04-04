@@ -1,6 +1,6 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { ForeignObject } from "./wrapper.js";
+import { ForeignObject } from "./foreign-object.js";
 
 export class VecUsize extends ForeignObject {
   public static fromArray(array: number[]) {
