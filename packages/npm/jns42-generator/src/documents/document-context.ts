@@ -85,7 +85,7 @@ export class DocumentContext {
   ) {
     const documentLocation = retrievalLocation.toRoot();
     const documentId = documentLocation.toString();
-    const documentPath = documentLocation.toString(false);
+    const documentPath = documentLocation.toRetrievalString();
     if (!this.cache.has(documentId)) {
       const documentNode = await loadYAML(documentPath);
       this.fillNodeCache(documentLocation, documentNode);

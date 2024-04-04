@@ -298,7 +298,7 @@ impl DocumentContext {
         .insert(node_url.clone(), document_uri.clone())
         .is_none();
       if !ok {
-        println!("{} -> {}", node_url.to_string(), document_uri.to_string());
+        println!("{} -> {}", node_url, document_uri);
       }
     }
 

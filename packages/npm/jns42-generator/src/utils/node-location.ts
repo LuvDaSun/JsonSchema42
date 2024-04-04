@@ -142,7 +142,7 @@ export class NodeLocation {
     return new NodeLocation(this.origin, this.path, "", [], "");
   }
 
-  public toString(alwaysIncludeHashSign = true) {
+  public toString() {
     const origin = this.origin;
     const path = this.path.map((part) => encodeURI(part)).join("/");
     const query = this.query;
@@ -158,11 +158,17 @@ export class NodeLocation {
     } else {
       hash = encodeURI(this.anchor);
     }
-    if (alwaysIncludeHashSign || hash.length > 0) {
-      hash = "#" + hash;
-    }
+    hash = "#" + hash;
 
     return origin + path + query + hash;
+  }
+
+  public toRetrievalString() {
+    const origin = this.origin;
+    const path = this.path.map((part) => encodeURI(part)).join("/");
+    const query = this.query;
+
+    return origin + path + query;
   }
 
   public static escapePointer(input: string) {
