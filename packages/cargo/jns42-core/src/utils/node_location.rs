@@ -375,7 +375,7 @@ extern "C" fn node_location_get_anchor(node_location: *mut NodeLocation) -> *con
   let Some(result) = result else {
     return null();
   };
-  let result = SizedString::new(result.to_string());
+  let result = SizedString::new(result.to_owned());
   let result = Box::new(result);
 
   Box::into_raw(result)

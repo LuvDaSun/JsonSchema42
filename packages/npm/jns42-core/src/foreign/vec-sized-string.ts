@@ -47,6 +47,7 @@ export class VecSizedString extends ForeignObject {
   public get(index: number) {
     const resultPointer = mainFfi.exports.vec_sized_string_get(this.pointer, index);
     using resultForeign = new SizedString(resultPointer);
+    resultForeign.abandon();
     const result = resultForeign.toString();
     assert(result != null);
     return result;
