@@ -144,7 +144,7 @@ export class NodeLocation {
 
   public toString() {
     const origin = this.origin;
-    const path = this.path.map((part) => encodeURI(part)).join("/");
+    const path = this.path.map((part) => encodeURIComponent(part)).join("/");
     const query = this.query;
 
     let hash;
@@ -153,10 +153,10 @@ export class NodeLocation {
         "/" +
         this.pointer
           .map((part) => NodeLocation.escapePointer(part))
-          .map((part) => encodeURI(part))
+          .map((part) => encodeURIComponent(part))
           .join("/");
     } else {
-      hash = encodeURI(this.anchor);
+      hash = encodeURIComponent(this.anchor);
     }
     hash = "#" + hash;
 
@@ -165,7 +165,7 @@ export class NodeLocation {
 
   public toRetrievalString() {
     const origin = this.origin;
-    const path = this.path.map((part) => encodeURI(part)).join("/");
+    const path = this.path.map((part) => encodeURIComponent(part)).join("/");
     const query = this.query;
 
     return origin + path + query;

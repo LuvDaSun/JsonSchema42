@@ -590,13 +590,13 @@ version = "0.1.0"
 dependencies = [
  "im",
  "once_cell",
- "percent-encoding",
  "proc-macro2",
  "quote",
  "regex",
  "serde",
  "serde_json",
  "url",
+ "urlencoding",
 ]
 
 [[package]]

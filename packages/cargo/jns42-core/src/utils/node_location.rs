@@ -1,5 +1,4 @@
 use once_cell::sync::Lazy;
-use percent_encoding::{percent_decode_str, utf8_percent_encode, NON_ALPHANUMERIC};
 use regex::{Regex, RegexBuilder};
 use std::{error::Error, fmt::Display, iter::once, str::FromStr};
 
@@ -69,7 +68,7 @@ impl NodeLocation {
     let path = self
       .path
       .iter()
-      .map(|part| utf8_percent_encode(part, NON_ALPHANUMERIC).to_string())
+      .map(|part| urlencoding::encode(part))
       .collect::<Vec<_>>()
       .join("/");
     let query = &self.query;
@@ -150,8 +149,7 @@ impl TryFrom<&str> for NodeLocation {
     } else {
       path
         .split('/')
-        .map(percent_decode_str)
-        .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
+        .map(|part| urlencoding::decode(part).map_err(|_error| ParseError::DecodeError))
         .map(|part| part.map(unescape_hash))
         .collect::<Result<_, _>>()?
     };
@@ -170,8 +168,7 @@ impl TryFrom<&str> for NodeLocation {
     } else {
       hash
         .split('/')
-        .map(percent_decode_str)
-        .map(|part| part.decode_utf8().map_err(|_error| ParseError::DecodeError))
+        .map(|part| urlencoding::decode(part).map_err(|_error| ParseError::DecodeError))
         .map(|part| part.map(unescape_hash))
         .collect::<Result<_, _>>()?
     };
@@ -186,7 +183,7 @@ impl From<&NodeLocation> for String {
     let path = value
       .path
       .iter()
-      .map(|part| utf8_percent_encode(part, NON_ALPHANUMERIC).to_string())
+      .map(|part| urlencoding::encode(part))
       .collect::<Vec<_>>()
       .join("/");
     let query = &value.query;
@@ -196,7 +193,7 @@ impl From<&NodeLocation> for String {
         .hash
         .iter()
         .map(escape_hash)
-        .map(|part| utf8_percent_encode(part.as_str(), NON_ALPHANUMERIC).to_string())
+        .map(|part| urlencoding::encode(&part).into_owned())
         .collect::<Vec<_>>()
         .join("/");
 
