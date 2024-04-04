@@ -85,7 +85,7 @@ export class DocumentContext {
     defaultSchemaId: string,
   ) {
     const documentLocation = retrievalLocation.clone();
-    retrievalLocation.setRoot();
+    // documentLocation.setRoot();
     const documentId = documentLocation.toString();
     const documentPath = documentLocation.toRetrievalString();
     if (!this.cache.has(documentId)) {
@@ -104,7 +104,7 @@ export class DocumentContext {
     defaultSchemaId: string,
   ) {
     const documentLocation = retrievalLocation.clone();
-    documentLocation.setRoot();
+    // documentLocation.setRoot();
     const documentId = documentLocation.toString();
     if (!this.cache.has(documentId)) {
       this.fillNodeCache(documentLocation, documentNode);

@@ -1,8 +1,7 @@
+use crate::ffi::SizedString;
 use once_cell::sync::Lazy;
 use regex::{Regex, RegexBuilder};
-use std::{error::Error, fmt::Display, iter::once, ptr::null, str::FromStr};
-
-use crate::ffi::SizedString;
+use std::{error::Error, fmt::Display, hash::Hash, iter::once, ptr::null, str::FromStr};
 
 pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
   RegexBuilder::new(r"^([a-z]+\:(?:\/\/)?[^\/]*)?([^\?\#]*?)?(\?.*?)?(\#.*?)?$")
