@@ -36,11 +36,9 @@ export function loadSpecification(
     assert(nodeId != null);
 
     const nodeLocation = core.NodeLocation.parse(nodeId);
-    const path = [
-      ...nodeLocation.getPath(),
-      ...nodeLocation.getAnchor(),
-      ...nodeLocation.getPointer(),
-    ].filter((part) => /^[a-zA-Z]/.test(part));
+    const path = [...nodeLocation.getPath(), ...nodeLocation.getHash()].filter((part) =>
+      /^[a-zA-Z]/.test(part),
+    );
 
     namesBuilder.add(itemKey, path);
   }

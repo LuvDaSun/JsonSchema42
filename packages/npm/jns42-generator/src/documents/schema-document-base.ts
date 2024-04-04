@@ -130,7 +130,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   public *getIntermediateNodeEntries(): Iterable<readonly [string, schemaIntermediate.Node]> {
     for (const [nodeId, node] of this.nodes) {
       const nodeLocation = core.NodeLocation.parse(nodeId);
-      const nodePointer = nodeLocation.getPointer();
+      const nodePointer = nodeLocation.getPointer() ?? [];
 
       const metadata = this.getIntermediateMetadataPart(nodePointer, node);
       const types = this.getIntermediateTypesPart(nodePointer, node);
