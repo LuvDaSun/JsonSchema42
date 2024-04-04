@@ -12,6 +12,7 @@ export enum SchemaTransform {
   inheritAllOf = 41,
   inheritAnyOf = 42,
   inheritOneOf = 43,
+  inheritReference = 44,
   primary = 50,
   resolveAllOf = 60,
   resolveIfThenElse = 70,

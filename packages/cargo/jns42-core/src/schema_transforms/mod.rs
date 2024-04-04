@@ -27,6 +27,7 @@ impl SchemaTransform {
   pub const INHERIT_ALL_OF: Self = Self(41);
   pub const INHERIT_ANY_OF: Self = Self(42);
   pub const INHERIT_ONE_OF: Self = Self(43);
+  pub const INHERIT_REFERENCE: Self = Self(44);
   pub const PRIMARY: Self = Self(50);
   pub const RESOLVE_ALL_OF: Self = Self(60);
   pub const RESOLVE_IF_THEN_ELSE: Self = Self(70);
@@ -67,6 +68,7 @@ impl From<&SchemaTransform> for BoxedSchemaTransform {
       SchemaTransform::INHERIT_ALL_OF => inherit::all_of::transform,
       SchemaTransform::INHERIT_ANY_OF => inherit::any_of::transform,
       SchemaTransform::INHERIT_ONE_OF => inherit::one_of::transform,
+      SchemaTransform::INHERIT_REFERENCE => inherit::reference::transform,
       SchemaTransform::PRIMARY => primary::transform,
       SchemaTransform::RESOLVE_ALL_OF => resolve_all_of::transform,
       SchemaTransform::RESOLVE_IF_THEN_ELSE => resolve_if_then_else::transform,

@@ -66,7 +66,7 @@ export function loadSpecification(
         [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
       ),
     );
-    debugger;
+    // debugger;
 
     using transformers = core.VecUsize.fromArray([
       core.SchemaTransform.explode,
@@ -82,6 +82,7 @@ export function loadSpecification(
       core.SchemaTransform.inheritAllOf,
       core.SchemaTransform.inheritAnyOf,
       core.SchemaTransform.inheritOneOf,
+      core.SchemaTransform.inheritReference,
       core.SchemaTransform.resolveAllOf,
       // core.SchemaTransform.resolveAnyOf,
       core.SchemaTransform.resolveNot,
@@ -99,7 +100,7 @@ export function loadSpecification(
           [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
         ),
       );
-      debugger;
+      // debugger;
 
       if (transformIterations < transformMaximumIterations) {
         continue;
