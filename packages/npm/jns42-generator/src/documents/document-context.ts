@@ -102,7 +102,7 @@ export class DocumentContext {
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const documentLocation = retrievalLocation;
+    const documentLocation = retrievalLocation.setRoot();
     const documentId = documentLocation.toString();
     if (!this.cache.has(documentId)) {
       this.fillNodeCache(documentLocation, documentNode);
