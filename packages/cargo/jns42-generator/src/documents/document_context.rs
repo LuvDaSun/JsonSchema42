@@ -86,7 +86,7 @@ impl DocumentContext {
       .collect()
   }
 
-  pub fn get_document(&self, document_url: &NodeLocation) -> Rc<dyn SchemaDocument> {
+  pub fn _get_document(&self, document_url: &NodeLocation) -> Rc<dyn SchemaDocument> {
     let documents = self.documents.borrow();
 
     let document = documents.get(document_url).unwrap().clone();
@@ -94,12 +94,12 @@ impl DocumentContext {
     document
   }
 
-  pub fn get_document_for_node(&self, node_url: &NodeLocation) -> Rc<dyn SchemaDocument> {
+  pub fn _get_document_for_node(&self, node_url: &NodeLocation) -> Rc<dyn SchemaDocument> {
     let node_documents = self.node_documents.borrow();
 
     let document_url = node_documents.get(node_url).unwrap();
 
-    self.get_document(document_url)
+    self._get_document(document_url)
   }
 
   pub async fn load_from_url(
@@ -157,7 +157,7 @@ impl DocumentContext {
     ));
   }
 
-  pub async fn load_from_document(
+  pub async fn _load_from_document(
     self: &Rc<Self>,
     retrieval_url: &NodeLocation,
     given_url: &NodeLocation,

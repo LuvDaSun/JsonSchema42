@@ -9,8 +9,8 @@ import { selectSchemaDependencies } from "./selectors.js";
 export interface Specification {
   typesArena: SchemaArena;
   validatorsArena: SchemaArena;
-  arenaProxy: core.SchemaArenaProxy;
-  names: core.NamesProxy;
+  arenaProxy: core.SchemaArena;
+  names: core.Names;
   [Symbol.dispose]: () => void;
 }
 
@@ -29,11 +29,11 @@ export function loadSpecification(
   const typesArena = SchemaArena.fromIntermediate(document);
   const validatorsArena = new SchemaArena(typesArena);
 
-  const arenaProxy = core.SchemaArenaProxy.fromIntermediate(document);
+  const arenaProxy = core.SchemaArena.fromIntermediate(document);
 
   // generate names
 
-  using namesBuilder = core.NamesBuilderProxy.new();
+  using namesBuilder = core.NamesBuilder.new();
   namesBuilder.setDefaultName(defaultTypeName);
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
