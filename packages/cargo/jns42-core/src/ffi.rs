@@ -13,7 +13,7 @@ extern "C" fn reverse(value: *const SizedString, result_output: *mut *const Size
 
 #[repr(C)]
 pub struct SizedString {
-  data: *const u8,
+  data: *mut u8,
   size: usize,
 }
 
@@ -22,7 +22,7 @@ impl SizedString {
     let bytes = value.into_bytes();
     let data = bytes.into_boxed_slice();
     let size = data.len();
-    let data = Box::into_raw(data) as *const u8;
+    let data = Box::into_raw(data) as *mut u8;
 
     Self { data, size }
   }
@@ -32,6 +32,12 @@ impl SizedString {
       let slice = std::slice::from_raw_parts(self.data, self.size);
       std::str::from_utf8_unchecked(slice)
     }
+  }
+}
+
+impl Drop for SizedString {
+  fn drop(&mut self) {
+    dealloc(self.data, self.size)
   }
 }
 
