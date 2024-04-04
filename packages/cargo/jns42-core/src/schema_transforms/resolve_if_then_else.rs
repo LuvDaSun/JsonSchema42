@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use crate::models::{arena::Arena, schema::SchemaItem};
 
 /**
@@ -37,37 +39,43 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 
   let item = item.clone();
 
-  let mut item_new = SchemaItem {
-    r#if: None,
-    then: None,
-    r#else: None,
-    one_of: Some(Default::default()),
-    ..item
-  };
+  let mut sub_keys = BTreeSet::new();
 
   if let Some(then) = item.then {
     let new_sub_item = SchemaItem {
+      exact: Some(false),
       all_of: Some([r#if, then].into()),
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key));
+    sub_keys.insert(new_sub_key);
   }
 
   if let Some(r#else) = item.r#else {
     let new_sub_sub_item = SchemaItem {
+      exact: Some(false),
       not: Some(r#if),
       ..Default::default()
     };
     let new_sub_sub_key = arena.add_item(new_sub_sub_item);
 
     let new_sub_item = SchemaItem {
+      exact: Some(false),
       all_of: Some([new_sub_sub_key, r#else].into()),
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key))
+    sub_keys.insert(new_sub_key);
   }
+
+  let item_new = SchemaItem {
+    exact: Some(false),
+    r#if: None,
+    then: None,
+    r#else: None,
+    one_of: Some(sub_keys),
+    ..item
+  };
 
   arena.replace_item(key, item_new);
 }
