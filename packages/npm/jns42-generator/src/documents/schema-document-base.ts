@@ -478,7 +478,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       const nodeIds = Object.fromEntries(
         entries.map(([key, nodePointer]) => {
           const nodeLocation = this.documentNodeLocation.clone();
-          nodeLocation.setPointer([...(nodeLocation.getPointer() ?? []), ...nodePointer]);
+          nodeLocation.setPointer(nodePointer);
           const nodeId = nodeLocation.toString();
           return [key, nodeId];
         }),
@@ -495,7 +495,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     if (entries.length > 0) {
       const nodeIds = entries.map(([nodePointer]) => {
         const nodeLocation = this.documentNodeLocation.clone();
-        nodeLocation.setPointer([...(nodeLocation.getPointer() ?? []), ...nodePointer]);
+        nodeLocation.setPointer(nodePointer);
 
         const nodeId = nodeLocation.toString();
         return nodeId;
@@ -511,7 +511,7 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   ): string | undefined {
     for (const [nodePointer] of entries) {
       const nodeLocation = this.documentNodeLocation.clone();
-      nodeLocation.setPointer([...(nodeLocation.getPointer() ?? []), ...nodePointer]);
+      nodeLocation.setPointer(nodePointer);
       const nodeId = nodeLocation.toString();
       return nodeId;
     }
