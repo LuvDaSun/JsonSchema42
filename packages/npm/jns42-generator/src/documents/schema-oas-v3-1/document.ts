@@ -54,7 +54,9 @@ export class Document extends SchemaDocumentBase<N> {
     yield* super.getNodeLocations();
 
     for (const [anchorId] of this.anchorMap) {
-      yield this.documentNodeLocation.setAnchor(anchorId);
+      const nodeLocation = this.documentNodeLocation.clone();
+      nodeLocation.setAnchor(anchorId);
+      yield nodeLocation;
     }
 
     /*

@@ -53,7 +53,9 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
     while ((pair = queue.shift()) != null) {
       const [nodePointer, node] = pair;
 
-      this.nodes.set(this.documentNodeLocation.setPointer(nodePointer).toString(), node);
+      const nodeLocation = this.documentNodeLocation.clone();
+      nodeLocation.setPointer(nodePointer);
+      this.nodes.set(nodeLocation.toString(), node);
 
       const nodeRef = this.selectNodeRef(node);
       if (nodeRef != null) {
@@ -67,9 +69,15 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
       for (const [subNodePointer, subNode] of this.selectSubNodes(nodePointer, node)) {
         const subNodeId = this.selectNodeId(subNode);
         if (subNodeId != null) {
+          const documentRetrievalLocation = retrievalLocation.clone();
+          const documentGivenLocation = documentNodeLocation.clone();
+
+          documentRetrievalLocation.setPointer(subNodePointer);
+          documentGivenLocation.setPointer(subNodePointer);
+
           this.embeddedDocuments.push({
-            retrievalLocation: retrievalLocation.setPointer(subNodePointer),
-            givenLocation: documentNodeLocation.setPointer(subNodePointer),
+            retrievalLocation: documentRetrievalLocation,
+            givenLocation: documentGivenLocation,
           });
           continue;
         }
@@ -111,7 +119,8 @@ export abstract class SchemaDocumentBase<N = unknown> extends DocumentBase<N> {
   }
 
   public getNodeByPointer(nodePointer: string[]) {
-    const nodeLocation = this.documentNodeLocation.setPointer(nodePointer);
+    const nodeLocation = this.documentNodeLocation.clone();
+    nodeLocation.setPointer(nodePointer);
     return this.getNodeByLocation(nodeLocation);
   }
 

@@ -35,9 +35,18 @@ export class NodeLocation extends ForeignObject {
     return new NodeLocation(pointer);
   }
 
+  public clone() {
+    const pointer = mainFfi.exports.node_location_clone(this.pointer);
+    return new NodeLocation(pointer);
+  }
+
   public join(other: NodeLocation) {
     const pointer = mainFfi.exports.node_location_join(this.pointer, other.pointer);
     return new NodeLocation(pointer);
+  }
+
+  public get debug() {
+    return this.toString();
   }
 
   public toString() {
@@ -89,17 +98,14 @@ export class NodeLocation extends ForeignObject {
   public setPointer(pointer: string[]) {
     using pointerForeign = VecSizedString.fromArray(pointer);
     mainFfi.exports.node_location_set_pointer(this.pointer, pointerForeign.pointer);
-    return this;
   }
 
   public setAnchor(anchor: string) {
     using anchorForeign = SizedString.fromString(anchor);
     mainFfi.exports.node_location_set_anchor(this.pointer, anchorForeign.pointer);
-    return this;
   }
 
   public setRoot() {
     mainFfi.exports.node_location_set_root(this.pointer);
-    return this;
   }
 }

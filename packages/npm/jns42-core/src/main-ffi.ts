@@ -25,8 +25,8 @@ export interface MainExports extends Exports {
   schema_item_new(): Pointer;
 
   schema_arena_drop(schema_arena: Pointer): void;
-  schema_arena_new(): Pointer;
   schema_arena_clone(schema_arena: Pointer): Pointer;
+  schema_arena_new(): Pointer;
   schema_arena_count(schema_arena: Pointer): number;
   schema_arena_add_item(schema_arena: Pointer, item: Pointer): number;
   schema_arena_replace_item(schema_arena: Pointer, key: number, item: Pointer): Pointer;
@@ -45,6 +45,7 @@ export interface MainExports extends Exports {
   vec_sized_string_push(vec_usize: Pointer, value: Pointer): void;
 
   node_location_drop(node_location: Pointer): void;
+  node_location_clone(node_location: Pointer): Pointer;
   node_location_parse(input: Pointer): Pointer;
   node_location_join(node_location: Pointer, other_node_location: Pointer): Pointer;
   node_location_to_string(node_location: Pointer): Pointer;
