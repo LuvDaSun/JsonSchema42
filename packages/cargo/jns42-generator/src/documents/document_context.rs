@@ -142,7 +142,7 @@ impl DocumentContext {
     };
 
     if document_node_is_none {
-      let document_node = load_yaml(&retrieval_url.to_retrieval_location())
+      let document_node = load_yaml(&retrieval_url.to_retrieval_string())
         .await
         .unwrap();
 
@@ -257,7 +257,7 @@ impl DocumentContext {
       return;
     }
 
-    let server_url = retrieval_url.to_retrieval_location();
+    let server_url = retrieval_url.to_retrieval_string();
     if !self.loaded.borrow_mut().insert(server_url) {
       return;
     }

@@ -1,7 +1,7 @@
+import * as core from "@jns42/core";
 import * as spec from "@jns42/oas-v3-0";
 import { getLastValidationError, isOasSchema } from "@jns42/oas-v3-0";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { NodeLocation } from "../../utils/index.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.DefinitionsSchema | spec.Reference | boolean;
@@ -36,8 +36,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeLocation(nodeRef: string): NodeLocation {
-    const resolvedNodeLocation = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
+  private resolveReferenceNodeLocation(nodeRef: string): core.NodeLocation {
+    const resolvedNodeLocation = this.documentNodeLocation.join(core.NodeLocation.parse(nodeRef));
 
     return resolvedNodeLocation;
   }

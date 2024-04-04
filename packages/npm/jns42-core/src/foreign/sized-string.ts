@@ -19,6 +19,7 @@ export class SizedString extends ForeignObject {
       return new SizedString(pointer);
     }
   }
+
   public toString(): string | undefined {
     const { pointer } = this;
     if (pointer === NULL_POINTER) {

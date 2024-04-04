@@ -185,7 +185,7 @@ extern "C" fn to_camel_case(value: *const SizedString) -> *const SizedString {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
-  let value = value.as_str();
+  let value = value.as_ref();
 
   let sentence = Sentence::new(value);
   let result = sentence.to_camel_case();
@@ -200,7 +200,7 @@ extern "C" fn to_pascal_case(value: *const SizedString) -> *const SizedString {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
-  let value = value.as_str();
+  let value = value.as_ref();
 
   let sentence = Sentence::new(value);
 
@@ -216,7 +216,7 @@ extern "C" fn to_snake_case(value: *const SizedString) -> *const SizedString {
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
-  let value = value.as_str();
+  let value = value.as_ref();
 
   let sentence = Sentence::new(value);
 
@@ -232,7 +232,7 @@ extern "C" fn to_screaming_snake_case(value: *const SizedString) -> *const Sized
   assert!(!value.is_null());
 
   let value = unsafe { &*value };
-  let value = value.as_str();
+  let value = value.as_ref();
 
   let sentence = Sentence::new(value);
 

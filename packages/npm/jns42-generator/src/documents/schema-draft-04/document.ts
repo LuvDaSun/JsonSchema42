@@ -1,28 +1,28 @@
+import * as core from "@jns42/core";
 import * as spec from "@jns42/schema-draft-04";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { NodeLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.Schema | boolean;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly aliasMap = new Map<string, NodeLocation>();
+  private readonly aliasMap = new Map<string, core.NodeLocation>();
 
   constructor(
-    retrievalLocation: NodeLocation,
-    givenLocation: NodeLocation,
-    antecedentLocation: NodeLocation | null,
+    retrievalLocation: core.NodeLocation,
+    givenLocation: core.NodeLocation,
+    antecedentLocation: core.NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
     super(retrievalLocation, givenLocation, antecedentLocation, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
-      const nodeLocation = NodeLocation.parse(nodeId);
+      const nodeLocation = core.NodeLocation.parse(nodeId);
       const nodeAliasId = this.selectNodeId(node);
       if (nodeAliasId != null) {
-        const aliasLocation = this.documentNodeLocation.join(NodeLocation.parse(nodeAliasId));
+        const aliasLocation = this.documentNodeLocation.join(core.NodeLocation.parse(nodeAliasId));
         const aliasId = aliasLocation.toString();
         if (this.aliasMap.has(aliasId)) {
           throw new TypeError(`duplicate node alias ${aliasId}`);
@@ -41,11 +41,11 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeLocations(): Iterable<NodeLocation> {
+  public *getNodeLocations(): Iterable<core.NodeLocation> {
     yield* super.getNodeLocations();
 
     for (const [nodeName] of this.aliasMap) {
-      yield NodeLocation.parse(nodeName);
+      yield core.NodeLocation.parse(nodeName);
     }
   }
 
@@ -69,8 +69,8 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeLocation(nodeRef: string): NodeLocation {
-    const refLocation = NodeLocation.parse(nodeRef);
+  private resolveReferenceNodeLocation(nodeRef: string): core.NodeLocation {
+    const refLocation = core.NodeLocation.parse(nodeRef);
     const resolvedNodeLocation = this.documentNodeLocation.join(refLocation);
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeLocation);

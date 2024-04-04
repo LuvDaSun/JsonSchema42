@@ -1,7 +1,7 @@
 #[no_mangle]
 extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
   let value = unsafe { &*value };
-  let value = value.as_str();
+  let value = value.as_ref();
 
   let result: String = value.chars().rev().collect();
 
@@ -26,13 +26,6 @@ impl SizedString {
 
     Self { data, size }
   }
-
-  pub fn as_str(&self) -> &str {
-    unsafe {
-      let slice = std::slice::from_raw_parts(self.data, self.size);
-      std::str::from_utf8_unchecked(slice)
-    }
-  }
 }
 
 impl Drop for SizedString {
@@ -41,9 +34,24 @@ impl Drop for SizedString {
   }
 }
 
+impl From<SizedString> for String {
+  fn from(value: SizedString) -> Self {
+    value.as_ref().to_string()
+  }
+}
+
+impl From<&SizedString> for String {
+  fn from(value: &SizedString) -> Self {
+    value.as_ref().to_string()
+  }
+}
+
 impl AsRef<str> for SizedString {
   fn as_ref(&self) -> &str {
-    self.as_str()
+    unsafe {
+      let slice = std::slice::from_raw_parts(self.data, self.size);
+      std::str::from_utf8_unchecked(slice)
+    }
   }
 }
 

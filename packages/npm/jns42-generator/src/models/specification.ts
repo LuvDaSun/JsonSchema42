@@ -1,7 +1,6 @@
 import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
-import { NodeLocation } from "../utils/index.js";
 
 export interface Specification {
   typesArena: core.SchemaArena;
@@ -36,10 +35,12 @@ export function loadSpecification(
 
     assert(nodeId != null);
 
-    const nodeLocation = NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.path, ...nodeLocation.anchor, ...nodeLocation.pointer].filter(
-      (part) => /^[a-zA-Z]/.test(part),
-    );
+    const nodeLocation = core.NodeLocation.parse(nodeId);
+    const path = [
+      ...nodeLocation.getPath(),
+      ...nodeLocation.getAnchor(),
+      ...nodeLocation.getPointer(),
+    ].filter((part) => /^[a-zA-Z]/.test(part));
 
     namesBuilder.add(itemKey, path);
   }

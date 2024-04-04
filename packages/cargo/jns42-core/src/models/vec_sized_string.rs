@@ -25,6 +25,18 @@ extern "C" fn vec_sized_string_len(vec: *const Vec<SizedString>) -> usize {
 }
 
 #[no_mangle]
+extern "C" fn vec_sized_string_get(
+  vec: *const Vec<SizedString>,
+  index: usize,
+) -> *const SizedString {
+  assert!(!vec.is_null());
+
+  let vec = unsafe { &*vec };
+
+  vec.get(index).unwrap()
+}
+
+#[no_mangle]
 extern "C" fn vec_sized_string_push(vec: *mut Vec<SizedString>, value: *mut SizedString) {
   assert!(!vec.is_null());
   assert!(!value.is_null());

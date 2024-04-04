@@ -213,20 +213,20 @@ where
   }
 }
 
-/// Create a new NamesBuilder instance
-#[no_mangle]
-extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
-  let names_builder = NamesBuilder::new();
-  let names_builder = Box::new(names_builder);
-  Box::into_raw(names_builder)
-}
-
 /// Free NamesBuilder instance
 #[no_mangle]
 extern "C" fn names_builder_drop(names_builder: *mut NamesBuilder<usize>) {
   assert!(!names_builder.is_null());
 
   drop(unsafe { Box::from_raw(names_builder) });
+}
+
+/// Create a new NamesBuilder instance
+#[no_mangle]
+extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
+  let names_builder = NamesBuilder::new();
+  let names_builder = Box::new(names_builder);
+  Box::into_raw(names_builder)
 }
 
 /// add a sentence to a key
@@ -255,7 +255,7 @@ extern "C" fn names_builder_set_default_name(
 
   let names_builder = unsafe { &mut *names_builder };
   let value = unsafe { &*value };
-  let value = value.as_str();
+  let value = value.as_ref();
 
   names_builder.set_default_name(value);
 }

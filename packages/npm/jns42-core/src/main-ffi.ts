@@ -41,7 +41,20 @@ export interface MainExports extends Exports {
   vec_sized_string_drop(vec_usize: Pointer): void;
   vec_sized_string_new(capacity: number): Pointer;
   vec_sized_string_len(vec_usize: Pointer): number;
+  vec_sized_string_get(vec_usize: Pointer, index: number): Pointer;
   vec_sized_string_push(vec_usize: Pointer, value: Pointer): void;
+
+  node_location_drop(node_location: Pointer): void;
+  node_location_parse(input: Pointer): Pointer;
+  node_location_join(node_location: Pointer, other_node_location: Pointer): Pointer;
+  node_location_to_string(node_location: Pointer): Pointer;
+  node_location_to_retrieval_string(node_location: Pointer): Pointer;
+  node_location_get_anchor(node_location: Pointer): Pointer;
+  node_location_set_anchor(node_location: Pointer, anchor: Pointer): void;
+  node_location_get_pointer(node_location: Pointer): Pointer;
+  node_location_set_pointer(node_location: Pointer, pointer: Pointer): void;
+  node_location_get_path(node_location: Pointer): Pointer;
+  node_location_get_hash(node_location: Pointer): Pointer;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;

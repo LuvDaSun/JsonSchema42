@@ -1,5 +1,6 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
+import { NULL_POINTER } from "../utils/index.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
 
@@ -11,6 +12,22 @@ export class VecSizedString extends ForeignObject {
     }
     assert.equal(vec.len(), array.length);
     return vec;
+  }
+
+  public toArray(): string[] | undefined {
+    const { pointer } = this;
+    if (pointer === NULL_POINTER) {
+      return undefined;
+    } else {
+      const len = this.len();
+      const result = new Array(len);
+      for (let index = 0; index < len; index++) {
+        const value = this.get(index);
+        assert(value != null);
+        result[index] = value;
+      }
+      return result;
+    }
   }
 
   public static new(capacity: number) {
@@ -27,9 +44,16 @@ export class VecSizedString extends ForeignObject {
     return result;
   }
 
+  public get(index: number) {
+    const resultPointer = mainFfi.exports.vec_sized_string_get(this.pointer, index);
+    using resultForeign = new SizedString(resultPointer);
+    const result = resultForeign.toString();
+    assert(result != null);
+    return result;
+  }
+
   public push(value: string) {
     using valueForeign = SizedString.fromString(value);
-
     valueForeign.abandon();
     mainFfi.exports.vec_sized_string_push(this.pointer, valueForeign.pointer);
   }

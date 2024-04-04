@@ -118,7 +118,7 @@ extern "C" fn schema_arena_add_item(
 
   let arena = unsafe { &mut *arena };
   let item = unsafe { &*item };
-  let item = item.as_str();
+  let item = item.as_ref();
   let item = serde_json::from_str(item).unwrap();
 
   arena.add_item(item)
@@ -135,7 +135,7 @@ extern "C" fn schema_arena_replace_item(
 
   let arena = unsafe { &mut *arena };
   let item = unsafe { &*item };
-  let item = item.as_str();
+  let item = item.as_ref();
   let item = serde_json::from_str(item).unwrap();
 
   let item_previous = arena.replace_item(key, item);

@@ -1,3 +1,4 @@
+import * as core from "@jns42/core";
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
@@ -9,7 +10,6 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
-import { NodeLocation } from "../utils/index.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(
@@ -75,7 +75,7 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaLocation = NodeLocation.parse(configuration.instanceSchemaLocation);
+  const instanceSchemaLocation = core.NodeLocation.parse(configuration.instanceSchemaLocation);
   const defaultMetaSchema = configuration.defaultMetaSchema;
   const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
