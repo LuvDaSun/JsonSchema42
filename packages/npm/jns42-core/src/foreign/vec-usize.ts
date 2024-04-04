@@ -1,10 +1,10 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { Wrapper } from "./wrapper.js";
+import { ForeignObject } from "./wrapper.js";
 
-export class VecUsizeProxy extends Wrapper {
+export class VecUsize extends ForeignObject {
   public static fromArray(array: number[]) {
-    const vec = VecUsizeProxy.new(array.length);
+    const vec = VecUsize.new(array.length);
     for (const item of array) {
       vec.push(item);
     }
@@ -14,7 +14,7 @@ export class VecUsizeProxy extends Wrapper {
 
   public static new(capacity: number) {
     const pointer = mainFfi.exports.vec_usize_new(capacity);
-    return new VecUsizeProxy(pointer);
+    return new VecUsize(pointer);
   }
 
   protected drop() {

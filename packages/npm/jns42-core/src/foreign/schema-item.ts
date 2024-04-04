@@ -1,14 +1,14 @@
 import { mainFfi } from "../main-ffi.js";
-import { Wrapper } from "./wrapper.js";
+import { ForeignObject } from "./wrapper.js";
 
-export class SchemaItemProxy extends Wrapper {
+export class SchemaItem extends ForeignObject {
   protected drop() {
     mainFfi.exports.schema_item_drop(this.pointer);
   }
 
   public static new() {
     const pointer = mainFfi.exports.schema_item_new();
-    return new SchemaItemProxy(pointer);
+    return new SchemaItem(pointer);
   }
 }
 
@@ -33,10 +33,10 @@ export type SchemaType =
 /**
  * the entire SchemaItem, everything is optional!
  */
-export type SchemaItem = {
+export type SchemaItemValue = {
   // is this model exactly the same as the previous, un-optimized version or is is just similar
   exact?: boolean;
-  primart?: boolean;
+  primary?: boolean;
   name?: string;
 
   id?: string;

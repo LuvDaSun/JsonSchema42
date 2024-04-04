@@ -1,6 +1,7 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer } from "../utils/index.js";
+import { ForeignObject } from "./wrapper.js";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {
@@ -8,10 +9,7 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class SizedString {
-  public constructor(public readonly pointer: Pointer) {
-    //
-  }
+export class SizedString extends ForeignObject {
   public static allocate(value: string | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
@@ -29,13 +27,9 @@ export class SizedString {
       return read(pointer);
     }
   }
-  [Symbol.dispose]() {
+  protected drop() {
     const { pointer } = this;
-    if (pointer === NULL_POINTER) {
-      //
-    } else {
-      deallocate(pointer);
-    }
+    deallocate(pointer);
   }
 }
 

@@ -1,9 +1,9 @@
 import assert from "node:assert";
 import test from "node:test";
-import { SchemaArenaProxy } from "./schema-arena.js";
+import { SchemaArena } from "./schema-arena.js";
 
 test("schema-arena", () => {
-  using schemaArena = SchemaArenaProxy.new();
+  using schemaArena = SchemaArena.new();
 
   for (let count = 0; count < 1000; count++) {
     const key = schemaArena.addItem({});

@@ -1,32 +1,32 @@
 import { mainFfi } from "../main-ffi.js";
-import * as wrappers from "../wrappers/index.js";
-import { NamesProxy } from "./names.js";
-import { Wrapper } from "./wrapper.js";
+import { Names } from "./names.js";
+import { SizedString } from "./sized-string.js";
+import { ForeignObject } from "./wrapper.js";
 
-export class NamesBuilderProxy extends Wrapper {
+export class NamesBuilder extends ForeignObject {
   protected drop() {
     mainFfi.exports.names_builder_drop(this.pointer);
   }
 
   public static new() {
     const pointer = mainFfi.exports.names_builder_new();
-    return new NamesBuilderProxy(pointer);
+    return new NamesBuilder(pointer);
   }
 
   public add(key: number, value: string) {
-    using valueWrapper = wrappers.SizedString.allocate(value);
+    using valueWrapper = SizedString.allocate(value);
     mainFfi.exports.names_builder_add(this.pointer, key, valueWrapper.pointer);
     return this;
   }
 
   public setDefaultName(value: string) {
-    using valueWrapper = wrappers.SizedString.allocate(value);
+    using valueWrapper = SizedString.allocate(value);
     mainFfi.exports.names_builder_set_default_name(this.pointer, valueWrapper.pointer);
     return this;
   }
 
   public build() {
     const pointer = mainFfi.exports.names_builder_build(this.pointer);
-    return new NamesProxy(pointer);
+    return new Names(pointer);
   }
 }

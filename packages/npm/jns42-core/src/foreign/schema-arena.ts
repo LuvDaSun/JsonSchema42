@@ -1,14 +1,14 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import * as wrappers from "../wrappers/index.js";
-import { SchemaItem, SchemaType } from "./schema-item.js";
-import { VecUsizeProxy } from "./vec-usize.js";
-import { Wrapper } from "./wrapper.js";
+import { SchemaItemValue, SchemaType } from "./schema-item.js";
+import { SizedString } from "./sized-string.js";
+import { VecUsize } from "./vec-usize.js";
+import { ForeignObject } from "./wrapper.js";
 
-export class SchemaArenaProxy extends Wrapper {
-  public static fromIntermediate(document: schemaIntermediate.SchemaJson): SchemaArenaProxy {
-    const arena = SchemaArenaProxy.new();
+export class SchemaArena extends ForeignObject {
+  public static fromIntermediate(document: schemaIntermediate.SchemaJson): SchemaArena {
+    const arena = SchemaArena.new();
     /*
     the schemas in the arena get a new id
     */
@@ -17,7 +17,7 @@ export class SchemaArenaProxy extends Wrapper {
 
     for (const id in document.schemas) {
       const schema = document.schemas[id];
-      const newItem: SchemaItem = {
+      const newItem: SchemaItemValue = {
         id,
       };
 
@@ -64,7 +64,7 @@ export class SchemaArenaProxy extends Wrapper {
 
       const schema = document.schemas[id];
 
-      const itemNew: SchemaItem = {
+      const itemNew: SchemaItemValue = {
         id,
       };
 
@@ -147,7 +147,7 @@ export class SchemaArenaProxy extends Wrapper {
 
   public static new() {
     const pointer = mainFfi.exports.schema_arena_new();
-    return new SchemaArenaProxy(pointer);
+    return new SchemaArena(pointer);
   }
 
   public count() {
@@ -155,38 +155,38 @@ export class SchemaArenaProxy extends Wrapper {
     return count;
   }
 
-  public addItem(item: SchemaItem): number {
+  public addItem(item: SchemaItemValue): number {
     const itemString = JSON.stringify(item);
-    using itemWrapper = wrappers.SizedString.allocate(itemString);
+    using itemWrapper = SizedString.allocate(itemString);
     const key = mainFfi.exports.schema_arena_add_item(this.pointer, itemWrapper.pointer);
     return key;
   }
 
-  public replaceItem(key: number, item: SchemaItem): SchemaItem {
+  public replaceItem(key: number, item: SchemaItemValue): SchemaItemValue {
     const itemString = JSON.stringify(item);
-    using itemWrapper = wrappers.SizedString.allocate(itemString);
+    using itemWrapper = SizedString.allocate(itemString);
     const itemPreviousPointer = mainFfi.exports.schema_arena_replace_item(
       this.pointer,
       key,
       itemWrapper.pointer,
     );
-    using itemPreviousWrapper = new wrappers.SizedString(itemPreviousPointer);
+    using itemPreviousWrapper = new SizedString(itemPreviousPointer);
     const itemPreviousString = itemPreviousWrapper.read();
     assert(itemPreviousString != null);
     const itemPrevious = JSON.parse(itemPreviousString);
     return itemPrevious;
   }
 
-  public getItem(key: number): SchemaItem {
+  public getItem(key: number): SchemaItemValue {
     const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
-    using itemWrapper = new wrappers.SizedString(itemPointer);
+    using itemWrapper = new SizedString(itemPointer);
     const itemString = itemWrapper.read();
     assert(itemString != null);
     const item = JSON.parse(itemString);
     return item;
   }
 
-  public transform(transforms: VecUsizeProxy) {
+  public transform(transforms: VecUsize) {
     const result = mainFfi.exports.schema_arena_transform(this.pointer, transforms.pointer);
     return result;
   }

@@ -1,6 +1,7 @@
 import { assert } from "console";
 import { mainFfi } from "../main-ffi.js";
 import { NULL_POINTER, Pointer, Size } from "../utils/index.js";
+import { ForeignObject } from "./wrapper.js";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {
@@ -8,16 +9,13 @@ const textDecoder = new TextDecoder("utf-8", {
   fatal: true,
 });
 
-export class CString {
-  public constructor(public readonly pointer: Pointer) {
-    //
-  }
+export class CString extends ForeignObject {
   public static allocate(value: string | undefined) {
     if (value == null) {
       const pointer = NULL_POINTER;
       return new CString(pointer);
     } else {
-      const pointer = allocateCString(value);
+      const pointer = allocate(value);
       return new CString(pointer);
     }
   }
@@ -26,20 +24,16 @@ export class CString {
     if (pointer === NULL_POINTER) {
       return undefined;
     } else {
-      return readCString(pointer);
+      return read(pointer);
     }
   }
-  [Symbol.dispose]() {
+  protected drop() {
     const { pointer } = this;
-    if (pointer === NULL_POINTER) {
-      //
-    } else {
-      deallocateCString(pointer);
-    }
+    deallocate(pointer);
   }
 }
 
-function allocateCString(value: string): Pointer {
+function allocate(value: string): Pointer {
   const data = textEncoder.encode(value);
   const dataSize = data.length;
   const size = dataSize + 1;
@@ -49,7 +43,7 @@ function allocateCString(value: string): Pointer {
   return pointer;
 }
 
-function readCString(pointer: Pointer): string {
+function read(pointer: Pointer): string {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);
@@ -59,7 +53,7 @@ function readCString(pointer: Pointer): string {
   return value;
 }
 
-function deallocateCString(pointer: Pointer) {
+function deallocate(pointer: Pointer) {
   assert(pointer !== NULL_POINTER);
 
   const size = findCStringSize(pointer);
