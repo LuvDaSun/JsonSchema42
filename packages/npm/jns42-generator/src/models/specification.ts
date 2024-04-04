@@ -1,7 +1,7 @@
 import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
-import { NodeLocation, normalizeObject } from "../utils/index.js";
+import { NodeLocation } from "../utils/index.js";
 
 export interface Specification {
   typesArena: core.SchemaArena;
@@ -61,11 +61,11 @@ export function loadSpecification(
 
   // transform the typesArena
   {
-    console.log(
-      Object.fromEntries(
-        [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
-      ),
-    );
+    // console.log(
+    //   Object.fromEntries(
+    //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
+    //   ),
+    // );
     // debugger;
 
     using transformers = core.VecUsize.fromArray([
@@ -95,11 +95,11 @@ export function loadSpecification(
     while (typesArena.transform(transformers) > 0) {
       transformIterations++;
 
-      console.log(
-        Object.fromEntries(
-          [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
-        ),
-      );
+      // console.log(
+      //   Object.fromEntries(
+      //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
+      //   ),
+      // );
       // debugger;
 
       if (transformIterations < transformMaximumIterations) {
