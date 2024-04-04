@@ -1,16 +1,11 @@
 import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
-import * as schemaTransforms from "../schema-transforms/index.js";
 import { NodeLocation } from "../utils/index.js";
-import { SchemaArena } from "./arena.js";
-import { selectSchemaDependencies } from "./selectors.js";
 
 export interface Specification {
-  typesArena: SchemaArena;
-  validatorsArena: SchemaArena;
-  typesArena2: core.SchemaArena;
-  validatorsArena2: core.SchemaArena;
+  typesArena: core.SchemaArena;
+  validatorsArena: core.SchemaArena;
   names: core.Names;
   [Symbol.dispose]: () => void;
 }
@@ -27,11 +22,9 @@ export function loadSpecification(
   const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
-  const typesArena = SchemaArena.fromIntermediate(document);
-  const validatorsArena = new SchemaArena(typesArena);
 
-  const typesArena2 = core.SchemaArena.fromIntermediate(document);
-  const validatorsArena2 = typesArena2.clone();
+  const typesArena = core.SchemaArena.fromIntermediate(document);
+  const validatorsArena = typesArena.clone();
 
   // generate names
 
@@ -57,18 +50,7 @@ export function loadSpecification(
   {
     using transformers = core.VecUsize.fromArray([]);
     let transformIterations = 0;
-    while (validatorsArena2.transform(transformers) > 0) {
-      transformIterations++;
-      if (transformIterations < transformMaximumIterations) {
-        continue;
-      }
-      throw new Error("maximum number of iterations reached");
-    }
-  }
-
-  {
-    let transformIterations = 0;
-    while (validatorsArena.applyTransform() > 0) {
+    while (validatorsArena.transform(transformers) > 0) {
       transformIterations++;
       if (transformIterations < transformMaximumIterations) {
         continue;
@@ -109,7 +91,7 @@ export function loadSpecification(
       core.SchemaTransform.resolveSingleOneOf,
     ]);
     let transformIterations = 0;
-    while (typesArena2.transform(transformers) > 0) {
+    while (typesArena.transform(transformers) > 0) {
       transformIterations++;
 
       // console.log(
@@ -126,85 +108,13 @@ export function loadSpecification(
     }
   }
 
-  {
-    // console.log(
-    //   Object.fromEntries(
-    //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
-    //   ),
-    // );
-    // debugger;
-
-    let transformIterations = 0;
-    while (
-      typesArena.applyTransform(
-        schemaTransforms.singleType,
-        schemaTransforms.explode,
-
-        schemaTransforms.resolveSingleAllOf,
-        schemaTransforms.resolveSingleAnyOf,
-        schemaTransforms.resolveSingleOneOf,
-
-        schemaTransforms.flattenAllOf,
-        schemaTransforms.flattenAnyOf,
-        schemaTransforms.flattenOneOf,
-
-        schemaTransforms.uniqueAllOf,
-        schemaTransforms.uniqueAnyOf,
-        schemaTransforms.uniqueOneOf,
-
-        schemaTransforms.flipAllOfOneOf,
-        schemaTransforms.flipAnyOfOneOf,
-
-        schemaTransforms.inheritAllOf,
-        schemaTransforms.inheritAnyOf,
-        schemaTransforms.inheritOneOf,
-        schemaTransforms.inheritReference,
-
-        schemaTransforms.resolveAllOf,
-        schemaTransforms.resolveAnyOf,
-        schemaTransforms.resolveNot,
-        schemaTransforms.resolveIfThenElse,
-
-        schemaTransforms.unalias,
-      ) > 0
-    ) {
-      transformIterations++;
-
-      // console.log(
-      //   Object.fromEntries(
-      //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
-      //   ),
-      // );
-      // debugger;
-
-      if (transformIterations < transformMaximumIterations) {
-        continue;
-      }
-      throw new Error("maximum number of iterations reached");
-    }
-  }
-
-  // figure out which keys are actually in use
-  const usedKeys = new Set<number>();
-  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    if (item.id != null) {
-      usedKeys.add(key);
-    }
-
-    for (const key of selectSchemaDependencies(item)) {
-      usedKeys.add(key);
-    }
-  }
-
   return {
     typesArena,
     validatorsArena,
-    typesArena2,
-    validatorsArena2,
     names,
     [Symbol.dispose]() {
-      typesArena2[Symbol.dispose]();
-      validatorsArena2[Symbol.dispose]();
+      typesArena[Symbol.dispose]();
+      validatorsArena[Symbol.dispose]();
       names[Symbol.dispose]();
     },
   };

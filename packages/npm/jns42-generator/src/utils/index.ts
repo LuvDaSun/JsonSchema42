@@ -11,6 +11,7 @@ export * from "./iterable.js";
 export * from "./load.js";
 export * from "./math.js";
 export * from "./merge.js";
+export * from "./mockable.js";
 export * from "./node-location.js";
 export * from "./normalize-object.js";
 export * from "./package.js";
