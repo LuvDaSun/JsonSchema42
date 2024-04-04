@@ -28,9 +28,15 @@ use std::iter::once;
 pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   let item = arena.get_item(key);
 
+  // ew got nothing to do if there are no types
   let Some(types) = &item.types else {
     return;
   };
+
+  // we would overwrite this, so let's not!
+  if item.one_of.is_some() {
+    return;
+  }
 
   match types.len() {
     0 => {
@@ -45,6 +51,8 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
       // only one type, this is what we want! let's do nothing
     }
     _ => {
+      // we will be creating a new schema with every type as an element in one_of
+      let item = item.clone();
       let item = SchemaItem {
         types: None,
         one_of: Some(
@@ -61,7 +69,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
             })
             .collect(),
         ),
-        ..Default::default()
+        ..item
       };
       arena.replace_item(key, item);
     }
