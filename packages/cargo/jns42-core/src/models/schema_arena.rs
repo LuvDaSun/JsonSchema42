@@ -77,6 +77,13 @@ impl Arena<SchemaItem> {
 }
 
 #[no_mangle]
+extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
+  assert!(!arena.is_null());
+
+  drop(unsafe { Box::from_raw(arena) });
+}
+
+#[no_mangle]
 extern "C" fn schema_arena_new() -> *const Arena<SchemaItem> {
   let arena = Arena::new();
   let arena = Box::new(arena);
@@ -84,10 +91,13 @@ extern "C" fn schema_arena_new() -> *const Arena<SchemaItem> {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
+extern "C" fn schema_arena_clone(arena: *const Arena<SchemaItem>) -> *const Arena<SchemaItem> {
   assert!(!arena.is_null());
 
-  drop(unsafe { Box::from_raw(arena) });
+  let arena = unsafe { &*arena };
+  let arena = arena.clone();
+  let arena = Box::new(arena);
+  Box::into_raw(arena)
 }
 
 #[no_mangle]

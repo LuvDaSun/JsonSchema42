@@ -150,6 +150,11 @@ export class SchemaArena extends ForeignObject {
     return new SchemaArena(pointer);
   }
 
+  public clone() {
+    const pointer = mainFfi.exports.schema_arena_clone(this.pointer);
+    return new SchemaArena(pointer);
+  }
+
   public count() {
     const count = mainFfi.exports.schema_arena_count(this.pointer);
     return count;
