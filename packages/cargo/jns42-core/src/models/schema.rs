@@ -296,16 +296,16 @@ impl SchemaItem {
     }
 
     Self {
-      name: None,
-      exact: None,
-      primary: None,
-      parent: None,
-      id: None,
+      name: self.name.clone(),
+      exact: generate_merge_option!(exact, &|base, other| base & other),
+      primary: self.primary,
+      parent: self.parent,
+      id: self.id.clone(),
 
-      title: None,
-      description: None,
-      examples: None,
-      deprecated: generate_merge_option!(deprecated, &|base, other| base & other),
+      title: self.title.clone(),
+      description: self.description.clone(),
+      examples: self.examples.clone(),
+      deprecated: generate_merge_option!(deprecated, &|base, other| base | other),
 
       types: generate_merge_option!(types, |base, other| vec![base
         .first()
