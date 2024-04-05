@@ -142,6 +142,6 @@ extern "C" {
 pub static MANUAL_EXECUTOR: Lazy<Arc<ManualExecutor>> = Lazy::new(ManualExecutor::new);
 
 #[no_mangle]
-extern "C" fn wake() {
+extern "C" fn wake_host() {
   MANUAL_EXECUTOR.wake()
 }

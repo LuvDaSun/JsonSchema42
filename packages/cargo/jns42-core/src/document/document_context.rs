@@ -87,5 +87,6 @@ mod ffi {
     };
 
     MANUAL_EXECUTOR.spawn(future);
+    MANUAL_EXECUTOR.wake();
   }
 }
