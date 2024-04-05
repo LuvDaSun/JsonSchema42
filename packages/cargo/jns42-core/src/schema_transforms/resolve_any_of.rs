@@ -103,6 +103,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   }
 
   let item_new = SchemaItem {
+    exact: Some(false),
     any_of: None,
     one_of: Some(sub_keys_new),
     ..item.clone()
@@ -135,11 +136,11 @@ mod tests {
         ..Default::default()
       }, // 2
       SchemaItem {
-        all_of: Some([2, 0].into()),
+        any_of: Some([2, 0].into()),
         ..Default::default()
       }, // 3
       SchemaItem {
-        all_of: Some([2, 1].into()),
+        any_of: Some([2, 1].into()),
         ..Default::default()
       }, // 4
     ]);
@@ -163,11 +164,13 @@ mod tests {
         ..Default::default()
       }, // 2
       SchemaItem {
-        types: Some([SchemaType::Never].into()),
+        exact: Some(false),
+        one_of: Some([2, 0].into()),
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Number].into()),
+        exact: Some(false),
+        one_of: Some([2, 1].into()),
         ..Default::default()
       }, // 4
     ]
@@ -192,13 +195,17 @@ mod tests {
         ..Default::default()
       }, // 2
       SchemaItem {
-        all_of: Some([0, 1].into()),
+        types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 3
       SchemaItem {
-        all_of: Some([1, 2].into()),
+        any_of: Some([0, 1].into()),
         ..Default::default()
       }, // 4
+      SchemaItem {
+        any_of: Some([2, 3].into()),
+        ..Default::default()
+      }, // 5
     ]);
 
     while arena.apply_transform(transform) > 0 {
@@ -220,13 +227,24 @@ mod tests {
         ..Default::default()
       }, // 2
       SchemaItem {
-        types: Some([SchemaType::Never].into()),
+        types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::String].into()),
+        exact: Some(false),
+        one_of: Some([0, 1].into()),
         ..Default::default()
       }, // 4
+      SchemaItem {
+        exact: Some(false),
+        one_of: Some([6].into()),
+        ..Default::default()
+      }, // 5
+      SchemaItem {
+        exact: Some(false),
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 6
     ]
     .into();
 
@@ -263,7 +281,7 @@ mod tests {
         ..Default::default()
       }, // 5
       SchemaItem {
-        all_of: Some([4, 5].into()),
+        any_of: Some([4, 5].into()),
         ..Default::default()
       }, // 6
     ]);
@@ -301,18 +319,31 @@ mod tests {
         ..Default::default()
       }, // 5
       SchemaItem {
-        types: Some([SchemaType::Array].into()),
-        tuple_items: Some([7, 8].into()),
+        exact: Some(false),
+        one_of: Some([9].into()),
         ..Default::default()
       }, // 6
       SchemaItem {
-        types: Some([SchemaType::Never].into()),
+        exact: Some(false),
+        one_of: Some([0, 2].into()),
         ..Default::default()
       }, // 7
       SchemaItem {
-        types: Some([SchemaType::String].into()),
+        exact: Some(false),
+        one_of: Some([10].into()),
         ..Default::default()
       }, // 8
+      SchemaItem {
+        exact: Some(false),
+        types: Some([SchemaType::Array].into()),
+        tuple_items: Some([7, 8].into()),
+        ..Default::default()
+      }, // 9
+      SchemaItem {
+        exact: Some(false),
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 10
     ]
     .into();
 
@@ -341,7 +372,7 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        all_of: Some([2, 3].into()),
+        any_of: Some([2, 3].into()),
         ..Default::default()
       }, // 4
     ]);
@@ -371,14 +402,21 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Array].into()),
-        array_items: Some(5),
+        exact: Some(false),
+        one_of: Some([6].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Never].into()),
+        exact: Some(false),
+        one_of: Some([0, 1].into()),
         ..Default::default()
       }, // 5
+      SchemaItem {
+        exact: Some(false),
+        types: Some([SchemaType::Array].into()),
+        array_items: Some(5),
+        ..Default::default()
+      }, // 6
     ]
     .into();
 
@@ -406,17 +444,17 @@ mod tests {
       }, // 3
       SchemaItem {
         types: Some([SchemaType::Map].into()),
-        object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
+        object_properties: Some([("a".to_owned(), 0), ("b".to_owned(), 1)].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
         types: Some([SchemaType::Map].into()),
-        required: Some(["b".into()].into()),
-        object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
+        required: Some(["b".to_owned()].into()),
+        object_properties: Some([("b".to_owned(), 2), ("c".to_owned(), 3)].into()),
         ..Default::default()
       }, // 5
       SchemaItem {
-        all_of: Some([4, 5].into()),
+        any_of: Some([4, 5].into()),
         ..Default::default()
       }, // 6
     ]);
@@ -445,25 +483,44 @@ mod tests {
       }, // 3
       SchemaItem {
         types: Some([SchemaType::Map].into()),
-        object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
+        object_properties: Some([("a".to_owned(), 0), ("b".to_owned(), 1)].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
         types: Some([SchemaType::Map].into()),
-        required: Some(["b".into()].into()),
-        object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
+        required: Some(["b".to_owned()].into()),
+        object_properties: Some([("b".to_owned(), 2), ("c".to_owned(), 3)].into()),
         ..Default::default()
       }, // 5
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
-        required: Some(["b".into()].into()),
-        object_properties: Some([("a".into(), 0), ("b".into(), 7), ("c".into(), 3)].into()),
+        exact: Some(false),
+        one_of: Some([8].into()),
         ..Default::default()
       }, // 6
       SchemaItem {
-        types: Some([SchemaType::String].into()),
+        exact: Some(false),
+        one_of: Some([9].into()),
         ..Default::default()
       }, // 7
+      SchemaItem {
+        exact: Some(false),
+        types: Some([SchemaType::Map].into()),
+        required: Some(["b".to_owned()].into()),
+        object_properties: Some(
+          [
+            ("a".to_owned(), 0),
+            ("b".to_owned(), 7),
+            ("c".to_owned(), 3),
+          ]
+          .into(),
+        ),
+        ..Default::default()
+      }, // 8
+      SchemaItem {
+        exact: Some(false),
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 9
     ]
     .into();
 
@@ -502,8 +559,7 @@ mod tests {
         ..Default::default()
       }, // 5
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
-        all_of: Some([4, 5].into()),
+        any_of: Some([4, 5].into()),
         ..Default::default()
       }, // 6
     ]);
@@ -543,19 +599,32 @@ mod tests {
         ..Default::default()
       }, // 5
       SchemaItem {
+        exact: Some(false),
+        one_of: Some([9].into()),
+        ..Default::default()
+      }, // 6
+      SchemaItem {
+        exact: Some(false),
+        one_of: Some([10].into()),
+        ..Default::default()
+      }, // 7
+      SchemaItem {
+        exact: Some(false),
+        one_of: Some([1, 3].into()),
+        ..Default::default()
+      }, // 8
+      SchemaItem {
+        exact: Some(false),
         types: Some([SchemaType::Map].into()),
         property_names: Some(7),
         map_properties: Some(8),
         ..Default::default()
-      }, // 6
+      }, // 9
       SchemaItem {
+        exact: Some(false),
         types: Some([SchemaType::String].into()),
         ..Default::default()
-      }, // 7
-      SchemaItem {
-        types: Some([SchemaType::Never].into()),
-        ..Default::default()
-      }, // 8
+      }, // 10
     ]
     .into();
 
