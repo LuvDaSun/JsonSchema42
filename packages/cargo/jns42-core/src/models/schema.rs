@@ -229,13 +229,13 @@ impl SchemaItem {
     assert_eq!(self.r#else, None);
     assert_eq!(other.r#else, None);
 
-    macro_rules! generate_merge_option {
+    macro_rules! merge_option {
       ($member: ident, $merger: expr) => {
         merge_option(self.$member.as_ref(), other.$member.as_ref(), $merger)
       };
     }
 
-    macro_rules! generate_merge_single_key {
+    macro_rules! merge_single_key {
       ($member: ident) => {
         merge_option(self.$member.as_ref(), other.$member.as_ref(), merge_key)
       };
@@ -257,7 +257,7 @@ impl SchemaItem {
       }};
     }
 
-    macro_rules! generate_merge_object_keys {
+    macro_rules! merge_object_keys {
       ($member: ident) => {{
         merge_option(
           self.$member.as_ref(),
@@ -279,7 +279,7 @@ impl SchemaItem {
       }};
     }
 
-    macro_rules! generate_union_merge {
+    macro_rules! union_merge {
       ($member: ident) => {{
         merge_option(
           self.$member.as_ref(),
@@ -297,7 +297,7 @@ impl SchemaItem {
 
     Self {
       name: self.name.clone(),
-      exact: generate_merge_option!(exact, &|base, other| base & other),
+      exact: merge_option!(exact, &|base, other| base & other),
       primary: self.primary,
       parent: self.parent,
       id: self.id.clone(),
@@ -305,9 +305,9 @@ impl SchemaItem {
       title: self.title.clone(),
       description: self.description.clone(),
       examples: self.examples.clone(),
-      deprecated: generate_merge_option!(deprecated, &|base, other| base | other),
+      deprecated: merge_option!(deprecated, &|base, other| base | other),
 
-      types: generate_merge_option!(types, |base, other| vec![base
+      types: merge_option!(types, |base, other| vec![base
         .first()
         .unwrap()
         .intersection(other.first().unwrap())]),
@@ -322,41 +322,39 @@ impl SchemaItem {
       then: None,
       r#else: None,
 
-      not: generate_merge_single_key!(not),
+      not: merge_single_key!(not),
 
-      property_names: generate_merge_single_key!(property_names),
-      map_properties: generate_merge_single_key!(map_properties),
-      array_items: generate_merge_single_key!(array_items),
-      contains: generate_merge_single_key!(contains),
+      property_names: merge_single_key!(property_names),
+      map_properties: merge_single_key!(map_properties),
+      array_items: merge_single_key!(array_items),
+      contains: merge_single_key!(contains),
 
       tuple_items: generate_merge_array_keys!(tuple_items),
 
-      object_properties: generate_merge_object_keys!(object_properties),
-      pattern_properties: generate_merge_object_keys!(pattern_properties),
-      dependent_schemas: generate_merge_object_keys!(dependent_schemas),
+      object_properties: merge_object_keys!(object_properties),
+      pattern_properties: merge_object_keys!(pattern_properties),
+      dependent_schemas: merge_object_keys!(dependent_schemas),
 
-      options: None, // TODO
-      required: generate_union_merge!(required),
+      options: union_merge!(options), // TODO
+      required: union_merge!(required),
 
-      minimum_inclusive: generate_merge_option!(minimum_inclusive, |base, other| base.min(*other)),
-      minimum_exclusive: generate_merge_option!(minimum_exclusive, |base, other| base.min(*other)),
-      maximum_inclusive: generate_merge_option!(maximum_inclusive, |base, other| base.max(*other)),
-      maximum_exclusive: generate_merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: merge_option!(maximum_exclusive, |base, other| base.max(*other)),
       multiple_of: None, // TODO
 
-      minimum_length: generate_merge_option!(minimum_length, |base, other| *base.min(other)),
-      maximum_length: generate_merge_option!(maximum_length, |base, other| *base.max(other)),
+      minimum_length: merge_option!(minimum_length, |base, other| *base.min(other)),
+      maximum_length: merge_option!(maximum_length, |base, other| *base.max(other)),
       value_pattern: None, // TODO
       value_format: None,  // TODO
 
-      minimum_items: generate_merge_option!(minimum_items, |base, other| *base.min(other)),
-      maximum_items: generate_merge_option!(maximum_items, |base, other| *base.max(other)),
-      unique_items: generate_merge_option!(unique_items, |base, other| base | other),
+      minimum_items: merge_option!(minimum_items, |base, other| *base.min(other)),
+      maximum_items: merge_option!(maximum_items, |base, other| *base.max(other)),
+      unique_items: merge_option!(unique_items, |base, other| base | other),
 
-      minimum_properties: generate_merge_option!(minimum_properties, |base, other| *base
-        .min(other)),
-      maximum_properties: generate_merge_option!(maximum_properties, |base, other| *base
-        .max(other)),
+      minimum_properties: merge_option!(minimum_properties, |base, other| *base.min(other)),
+      maximum_properties: merge_option!(maximum_properties, |base, other| *base.max(other)),
     }
   }
 
