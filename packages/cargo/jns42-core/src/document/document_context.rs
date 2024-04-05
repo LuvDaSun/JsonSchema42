@@ -19,10 +19,8 @@ impl DocumentContext {
 }
 
 mod ffi {
-  use futures::{executor::LocalPool, task::LocalSpawnExt};
-
   use super::*;
-  use crate::ffi::SizedString;
+  use crate::ffi::{SizedString, MANUAL_EXECUTOR};
 
   #[no_mangle]
   extern "C" fn document_context_drop(document_context: *mut DocumentContext) {
@@ -77,8 +75,6 @@ mod ffi {
     let location = unsafe { &*location };
     let location = location.as_ref();
 
-    let mut pool = LocalPool::new();
-    let spawner = pool.spawner();
     let future = async {
       let result = document_context.load(location).await;
       let result = SizedString::new(result);
@@ -89,7 +85,7 @@ mod ffi {
         crate::ffi::invoke_host_callback(0, result);
       }
     };
-    spawner.spawn_local(future).unwrap();
-    pool.run_until_stalled();
+
+    MANUAL_EXECUTOR.spawn(future);
   }
 }

@@ -32,7 +32,6 @@ let environment: MainEnvironment = {
           mainFfi.exports.invoke_callback(callback, dataForeign.pointer);
         }
       }
-      debugger;
     })();
   },
 
@@ -44,6 +43,7 @@ let environment: MainEnvironment = {
 
 export interface MainExports extends ExportsBase {
   invoke_callback(callback: number, data: Pointer): void;
+  wake(): void;
 
   alloc(size: Size): Pointer;
   realloc(pointer: Pointer, size_old: Size, size: Size): Pointer;

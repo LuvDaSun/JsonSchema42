@@ -1,7 +1,9 @@
-use crate::utils::key::Key;
-use futures::executor::LocalPool;
+use crate::utils::{key::Key, manual_executor::ManualExecutor};
 use once_cell::sync::Lazy;
-use std::{collections::BTreeMap, sync::Mutex};
+use std::{
+  collections::BTreeMap,
+  sync::{Arc, Mutex},
+};
 
 #[no_mangle]
 extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
@@ -135,4 +137,11 @@ pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key
 extern "C" {
   pub fn fetch(argument: *mut SizedString, key: Key);
   pub fn invoke_host_callback(key: usize, argument: *mut u8);
+}
+
+pub static MANUAL_EXECUTOR: Lazy<Arc<ManualExecutor>> = Lazy::new(ManualExecutor::new);
+
+#[no_mangle]
+extern "C" fn wake() {
+  MANUAL_EXECUTOR.wake()
 }
