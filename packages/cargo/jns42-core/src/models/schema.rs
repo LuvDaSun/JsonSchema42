@@ -397,6 +397,47 @@ impl SchemaItem {
           .copied(),
       )
   }
+
+  pub fn get_alias_key(&self) -> Option<SchemaKey> {
+    let is_alias_maybe = self.types.is_none()
+      && self.all_of.is_none()
+      && self.any_of.is_none()
+      && self.one_of.is_none()
+      && self.r#if.is_none()
+      && self.then.is_none()
+      && self.r#else.is_none()
+      && self.not.is_none()
+      && self.property_names.is_none()
+      && self.map_properties.is_none()
+      && self.array_items.is_none()
+      && self.contains.is_none()
+      && self.tuple_items.is_none()
+      && self.object_properties.is_none()
+      && self.pattern_properties.is_none()
+      && self.dependent_schemas.is_none()
+      && self.options.is_none()
+      && self.required.is_none()
+      && self.minimum_inclusive.is_none()
+      && self.minimum_exclusive.is_none()
+      && self.maximum_inclusive.is_none()
+      && self.maximum_exclusive.is_none()
+      && self.multiple_of.is_none()
+      && self.minimum_length.is_none()
+      && self.maximum_length.is_none()
+      && self.value_pattern.is_none()
+      && self.value_format.is_none()
+      && self.minimum_items.is_none()
+      && self.maximum_items.is_none()
+      && self.unique_items.is_none()
+      && self.minimum_properties.is_none()
+      && self.maximum_properties.is_none();
+
+    if is_alias_maybe {
+      self.reference
+    } else {
+      None
+    }
+  }
 }
 
 #[no_mangle]

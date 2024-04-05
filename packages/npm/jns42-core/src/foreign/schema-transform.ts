@@ -29,4 +29,6 @@ export enum SchemaTransform {
   resolveSingleOneOf = 73,
 
   singleType = 80,
+
+  unalias = 90,
 }

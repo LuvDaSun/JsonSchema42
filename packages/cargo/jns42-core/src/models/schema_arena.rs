@@ -10,6 +10,21 @@ use super::{
 use std::iter::empty;
 
 impl Arena<SchemaItem> {
+  pub fn resolve_entry(&self, key: SchemaKey) -> (SchemaKey, &SchemaItem) {
+    let mut resolved_key = key;
+    let mut resolved_item = self.get_item(resolved_key);
+
+    loop {
+      let Some(alias_key) = resolved_item.get_alias_key() else {
+        break;
+      };
+      resolved_key = alias_key;
+      resolved_item = self.get_item(resolved_key);
+    }
+
+    (resolved_key, resolved_item)
+  }
+
   pub fn get_ancestors(
     &self,
     key: SchemaKey,

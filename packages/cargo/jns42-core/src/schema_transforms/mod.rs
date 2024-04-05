@@ -11,6 +11,7 @@ pub mod resolve_if_then_else;
 pub mod resolve_not;
 pub mod resolve_single;
 pub mod single_type;
+pub mod unalias;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub struct SchemaTransform(usize);
@@ -45,6 +46,8 @@ impl SchemaTransform {
   pub const RESOLVE_SINGLE_ONE_OF: Self = Self(73);
 
   pub const SINGLE_TYPE: Self = Self(80);
+
+  pub const UNALIAS: Self = Self(90);
 }
 
 impl From<usize> for SchemaTransform {
@@ -94,6 +97,8 @@ impl From<&SchemaTransform> for BoxedSchemaTransform {
       SchemaTransform::RESOLVE_SINGLE_ONE_OF => resolve_single::one_of::transform,
 
       SchemaTransform::SINGLE_TYPE => single_type::transform,
+
+      SchemaTransform::UNALIAS => unalias::transform,
       _ => unreachable!(),
     };
     Box::new(transform)

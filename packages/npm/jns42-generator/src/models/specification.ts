@@ -89,6 +89,7 @@ export function loadSpecification(
       core.SchemaTransform.resolveSingleAllOf,
       core.SchemaTransform.resolveSingleAnyOf,
       core.SchemaTransform.resolveSingleOneOf,
+      core.SchemaTransform.unalias,
     ]);
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
