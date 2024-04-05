@@ -58,6 +58,9 @@ export interface MainExports extends Exports {
   node_location_set_pointer(node_location: Pointer, pointer: Pointer): void;
   node_location_set_root(node_location: Pointer): void;
 
+  document_context_drop(document_context: Pointer): void;
+  document_context_new(): Pointer;
+
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;
   to_snake_case(value: Pointer): Pointer;

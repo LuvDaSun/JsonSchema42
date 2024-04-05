@@ -1,3 +1,4 @@
+pub mod document;
 mod ffi;
 pub mod models;
 pub mod naming;
