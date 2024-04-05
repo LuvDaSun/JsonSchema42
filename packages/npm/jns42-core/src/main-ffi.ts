@@ -10,27 +10,35 @@ export interface MainEnvironment extends EnvironmentBase {
 }
 
 let environment: MainEnvironment = {
-  async fetch(locationPointer, callback) {
-    let data: string | undefined;
-    try {
-      using locationForeign = new SizedString(locationPointer);
-      const location = locationForeign.toString();
-      assert(location != null);
-      const locationLower = location.toLowerCase();
-      if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
-        const result = await fetch(location);
-        data = await result.text();
-      } else {
-        data = await fs.readFile(location, "utf-8");
+  fetch(locationPointer, callback) {
+    (async () => {
+      let data: string | undefined;
+      try {
+        using locationForeign = new SizedString(locationPointer);
+        const location = locationForeign.toString();
+        assert(location != null);
+        const locationLower = location.toLowerCase();
+        if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
+          const result = await fetch(location);
+          data = await result.text();
+        } else {
+          data = await fs.readFile(location, "utf-8");
+        }
+      } finally {
+        if (data == null) {
+          mainFfi.exports.invoke_callback(callback, NULL_POINTER);
+        } else {
+          using dataForeign = SizedString.fromString(data);
+          mainFfi.exports.invoke_callback(callback, dataForeign.pointer);
+        }
       }
-    } finally {
-      if (data == null) {
-        mainFfi.exports.invoke_callback(callback, NULL_POINTER);
-      } else {
-        using dataForeign = SizedString.fromString(data);
-        mainFfi.exports.invoke_callback(callback, dataForeign.pointer);
-      }
-    }
+      debugger;
+    })();
+  },
+
+  invoke_host_callback(key: number, argument: Pointer) {
+    console.log(key, argument);
+    debugger;
   },
 };
 
@@ -94,6 +102,7 @@ export interface MainExports extends ExportsBase {
 
   document_context_drop(document_context: Pointer): void;
   document_context_new(): Pointer;
+  document_context_load(document_context: Pointer, location: Pointer): void;
 
   to_camel_case(value: Pointer): Pointer;
   to_pascal_case(value: Pointer): Pointer;

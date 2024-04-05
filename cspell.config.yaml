@@ -17,6 +17,7 @@ words:
   - lcov
   - luvdasun
   - notdir
+  - oneshot
   - presolved
   - realloc
   - repr

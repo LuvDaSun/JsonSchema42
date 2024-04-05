@@ -1,5 +1,6 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
+import { SizedString } from "./sized-string.js";
 
 export class DocumentContext extends ForeignObject {
   protected drop() {
@@ -9,5 +10,10 @@ export class DocumentContext extends ForeignObject {
   public static new() {
     const pointer = mainFfi.exports.document_context_new();
     return new DocumentContext(pointer);
+  }
+
+  public load(location: string) {
+    using locationForeign = SizedString.fromString(location);
+    mainFfi.exports.document_context_load(this.pointer, locationForeign.pointer);
   }
 }
