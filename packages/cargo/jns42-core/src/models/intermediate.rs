@@ -1,3 +1,5 @@
+use crate::utils::node_location::NodeLocation;
+
 use super::schema::SchemaType;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -5,7 +7,7 @@ use std::collections::HashMap;
 #[derive(Clone, Debug)]
 pub struct IntermediateSchema {
   pub schema: String,
-  pub schemas: HashMap<String, IntermediateNode>,
+  pub schemas: HashMap<NodeLocation, IntermediateNode>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -51,7 +53,7 @@ impl From<&SchemaType> for IntermediateType {
       SchemaType::Number => Self::Number,
       SchemaType::String => Self::String,
       SchemaType::Array => Self::Array,
-      SchemaType::Object => Self::Object,
+      SchemaType::Map => Self::Object,
     }
   }
 }

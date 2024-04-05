@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 cd $(dirname $0)
 
 export NODE_ENV=development
@@ -7,19 +9,20 @@ export NODE_ENV=development
 npm run build --workspaces --if-present
 npm install --no-package-lock
 
+set +e
+
 ERROR=0
 
 for F in $(ls fixtures/testing/*.yaml); do
   echo $(basename $F .yaml)
 
-  npx jns42-generator test \
+  if ! npx jns42-generator test \
     $F \
     --package-directory .package/test \
     --package-name $(basename $F .yaml) \
     --package-version "0.0.0" \
-
-  if [ $? -ne 0 ]; then
-    ERROR=1
+  ; then 
+    ERROR=1;
   fi;
 
 done;

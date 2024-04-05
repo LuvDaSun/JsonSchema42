@@ -6,12 +6,14 @@ words:
   - camelcase
   - cdylib
   - clippy
+  - cstring
   - dealloc
   - Deque
   - endregion
   - esbenp
   - Hasher
   - Inflector
+  - Itertools
   - lcov
   - luvdasun
   - notdir

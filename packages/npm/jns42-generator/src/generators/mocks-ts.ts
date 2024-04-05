@@ -1,6 +1,13 @@
 import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
-import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
+import {
+  NestedText,
+  banner,
+  generateJsDocComments,
+  isMockable,
+  itt,
+  joinIterable,
+} from "../utils/index.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
   yield banner;
@@ -53,7 +60,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    if (!typesArena.isMockable(itemKey)) {
+    if (!isMockable(typesArena, itemKey)) {
       continue;
     }
 
@@ -99,7 +106,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   function* generateMockReference(itemKey: number): Iterable<NestedText> {
-    if (!typesArena.isMockable(itemKey)) {
+    if (!isMockable(typesArena, itemKey)) {
       throw new TypeError("cannot mock non-mockable type");
     }
 
@@ -123,7 +130,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     if (item.oneOf != null && item.oneOf.length > 0) {
       const oneOfMockableEntries = item.oneOf
-        .filter((key) => typesArena.isMockable(key))
+        .filter((key) => isMockable(typesArena, key))
         .map((key) => [key, typesArena.getItem(key)] as const);
 
       yield itt`
@@ -323,7 +330,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
               }
             }
 
-            if (item.arrayItems != null && typesArena.isMockable(item.arrayItems)) {
+            if (item.arrayItems != null && isMockable(typesArena, item.arrayItems)) {
               yield itt`
               ...new Array(
                 Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
@@ -369,7 +376,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                       [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
                     `;
                   } else {
-                    if (!typesArena.isMockable(objectProperties[name])) {
+                    if (!isMockable(typesArena, objectProperties[name])) {
                       continue;
                     }
 
@@ -394,7 +401,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                   ? "configuration.defaultMaximumProperties"
                   : JSON.stringify(item.maximumProperties);
 
-              if (item.mapProperties != null && typesArena.isMockable(item.mapProperties)) {
+              if (item.mapProperties != null && isMockable(typesArena, item.mapProperties)) {
                 yield itt`
                   ...Object.fromEntries(
                     new Array(

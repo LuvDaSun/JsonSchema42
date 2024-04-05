@@ -1,9 +1,9 @@
+import * as core from "@jns42/core";
 import * as yargs from "yargs";
 import { DocumentContext } from "../documents/document-context.js";
 import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
 import * as schema202012 from "../documents/schema-draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
-import { NodeLocation } from "../utils/index.js";
 
 export function configureIntermediateProgram(argv: yargs.Argv) {
   return argv.command(
@@ -36,7 +36,7 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaLocation = NodeLocation.parse(configuration.instanceSchemaLocation);
+  const instanceSchemaLocation = core.NodeLocation.parse(configuration.instanceSchemaLocation);
 
   const defaultMetaSchemaId = configuration.defaultMetaSchemaLocation;
 

@@ -1,12 +1,13 @@
+import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import { NodeLocation, discoverSchemaId, loadYAML, readNode } from "../utils/index.js";
+import { discoverSchemaId, loadYAML, readNode } from "../utils/index.js";
 import { DocumentBase } from "./document-base.js";
 import { SchemaDocumentBase } from "./schema-document-base.js";
 
 export interface DocumentInitializer<N = unknown> {
-  retrievalLocation: NodeLocation;
-  givenLocation: NodeLocation;
-  antecedentLocation: NodeLocation | null;
+  retrievalLocation: core.NodeLocation;
+  givenLocation: core.NodeLocation;
+  antecedentLocation: core.NodeLocation | null;
   documentNode: N;
 }
 
@@ -24,7 +25,7 @@ export class DocumentContext {
   /**
    * maps node urls to their documents
    */
-  private nodeDocuments = new Map<string, NodeLocation>();
+  private nodeDocuments = new Map<string, core.NodeLocation>();
   /**
    * all loaded nodes
    */
@@ -36,7 +37,7 @@ export class DocumentContext {
   /**
    * maps retrieval url to document url
    */
-  private resolved = new Map<string, NodeLocation>();
+  private resolved = new Map<string, core.NodeLocation>();
 
   public registerFactory(schema: string, factory: DocumentFactory) {
     /**
@@ -59,7 +60,7 @@ export class DocumentContext {
     }
   }
 
-  public getDocument(documentLocation: NodeLocation) {
+  public getDocument(documentLocation: core.NodeLocation) {
     const documentId = documentLocation.toString();
     const document = this.documents.get(documentId);
     if (document == null) {
@@ -68,7 +69,7 @@ export class DocumentContext {
     return document;
   }
 
-  public getDocumentForNode(nodeLocation: NodeLocation) {
+  public getDocumentForNode(nodeLocation: core.NodeLocation) {
     const nodeId = nodeLocation.toString();
     const documentLocation = this.nodeDocuments.get(nodeId);
     if (documentLocation == null) {
@@ -78,14 +79,15 @@ export class DocumentContext {
   }
 
   public async loadFromLocation(
-    retrievalLocation: NodeLocation,
-    givenLocation: NodeLocation,
-    antecedentLocation: NodeLocation | null,
+    retrievalLocation: core.NodeLocation,
+    givenLocation: core.NodeLocation,
+    antecedentLocation: core.NodeLocation | null,
     defaultSchemaId: string,
   ) {
-    const documentLocation = retrievalLocation.toRoot();
+    const documentLocation = retrievalLocation.clone();
+    documentLocation.setRoot();
     const documentId = documentLocation.toString();
-    const documentPath = documentLocation.toString(false);
+    const documentPath = documentLocation.toRetrievalString();
     if (!this.cache.has(documentId)) {
       const documentNode = await loadYAML(documentPath);
       this.fillNodeCache(documentLocation, documentNode);
@@ -95,13 +97,14 @@ export class DocumentContext {
   }
 
   public async loadFromDocument(
-    retrievalLocation: NodeLocation,
-    givenLocation: NodeLocation,
-    antecedentLocation: NodeLocation | null,
+    retrievalLocation: core.NodeLocation,
+    givenLocation: core.NodeLocation,
+    antecedentLocation: core.NodeLocation | null,
     documentNode: unknown,
     defaultSchemaId: string,
   ) {
-    const documentLocation = retrievalLocation.toRoot();
+    const documentLocation = retrievalLocation.clone();
+    documentLocation.setRoot();
     const documentId = documentLocation.toString();
     if (!this.cache.has(documentId)) {
       this.fillNodeCache(documentLocation, documentNode);
@@ -110,9 +113,10 @@ export class DocumentContext {
     await this.loadFromCache(retrievalLocation, givenLocation, antecedentLocation, defaultSchemaId);
   }
 
-  private fillNodeCache(documentLocation: NodeLocation, documentNode: unknown) {
+  private fillNodeCache(documentLocation: core.NodeLocation, documentNode: unknown) {
     for (const [pointer, node] of readNode([], documentNode)) {
-      const nodeRetrievalLocation = documentLocation.pushPointer(...pointer);
+      const nodeRetrievalLocation = documentLocation.clone();
+      nodeRetrievalLocation.setPointer([...(nodeRetrievalLocation.getPointer() ?? []), ...pointer]);
       const nodeRetrievalId = nodeRetrievalLocation.toString();
       if (this.cache.has(nodeRetrievalId)) {
         throw new TypeError(`duplicate node with id ${nodeRetrievalId}`);
@@ -123,9 +127,9 @@ export class DocumentContext {
   }
 
   private async loadFromCache(
-    retrievalLocation: NodeLocation,
-    givenLocation: NodeLocation,
-    antecedentLocation: NodeLocation | null,
+    retrievalLocation: core.NodeLocation,
+    givenLocation: core.NodeLocation,
+    antecedentLocation: core.NodeLocation | null,
     defaultSchemaId: string,
   ) {
     const retrievalId = retrievalLocation.toString();

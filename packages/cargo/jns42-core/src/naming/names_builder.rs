@@ -1,4 +1,5 @@
 use super::{NamePart, Names, Sentence};
+use crate::ffi::SizedString;
 use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug)]
@@ -18,9 +19,12 @@ where
     }
   }
 
-  pub fn add(&mut self, key: K, value: impl AsRef<str>) -> &mut Self {
-    let sentences = self.sentences_map.entry(key).or_default();
-    sentences.push(Sentence::new(value.as_ref()));
+  pub fn add(&mut self, key: K, values: impl IntoIterator<Item = impl AsRef<str>>) -> &mut Self {
+    let values = values
+      .into_iter()
+      .map(|value| Sentence::new(value.as_ref()))
+      .collect();
+    self.sentences_map.insert(key, values);
     self
   }
 
@@ -29,7 +33,7 @@ where
     self
   }
 
-  pub fn build(&self) -> Names<K> {
+  pub fn build(&mut self) -> Names<K> {
     let cardinality_counters = Self::make_cardinality_counters(&self.sentences_map);
     let part_map = Self::make_parts_map(&self.sentences_map, &cardinality_counters);
     let optimized_names = Self::make_optimized_names(part_map);
@@ -209,6 +213,65 @@ where
   }
 }
 
+/// Free NamesBuilder instance
+#[no_mangle]
+extern "C" fn names_builder_drop(names_builder: *mut NamesBuilder<usize>) {
+  assert!(!names_builder.is_null());
+
+  drop(unsafe { Box::from_raw(names_builder) });
+}
+
+/// Create a new NamesBuilder instance
+#[no_mangle]
+extern "C" fn names_builder_new() -> *mut NamesBuilder<usize> {
+  let names_builder = NamesBuilder::new();
+  let names_builder = Box::new(names_builder);
+  Box::into_raw(names_builder)
+}
+
+/// add a sentence to a key
+#[no_mangle]
+extern "C" fn names_builder_add(
+  names_builder: *mut NamesBuilder<usize>,
+  key: usize,
+  values: *const Vec<SizedString>,
+) {
+  assert!(!names_builder.is_null());
+  assert!(!values.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+  let values = unsafe { &*values };
+
+  names_builder.add(key, values);
+}
+
+/// add a sentence to a key
+#[no_mangle]
+extern "C" fn names_builder_set_default_name(
+  names_builder: *mut NamesBuilder<usize>,
+  value: *const SizedString,
+) {
+  assert!(!value.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+  let value = unsafe { &*value };
+  let value = value.as_ref();
+
+  names_builder.set_default_name(value);
+}
+
+/// create a names struct from the builder
+#[no_mangle]
+extern "C" fn names_builder_build(names_builder: *mut NamesBuilder<usize>) -> *mut Names<usize> {
+  assert!(!names_builder.is_null());
+
+  let names_builder = unsafe { &mut *names_builder };
+
+  let names = names_builder.build();
+  let names = Box::new(names);
+  Box::into_raw(names)
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
@@ -216,12 +279,9 @@ mod tests {
   #[test]
   fn test_names_1() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "a")
-      .add(2, "a")
-      .add(2, "b")
-      .add(3, "a")
-      .add(3, "b")
-      .add(3, "c")
+      .add(1, ["a"])
+      .add(2, ["a", "b"])
+      .add(3, ["a", "b", "c"])
       .build()
       .into_iter()
       .collect();
@@ -235,12 +295,9 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "a")
-      .add(2, "b")
-      .add(2, "a")
-      .add(3, "c")
-      .add(3, "b")
-      .add(3, "a")
+      .add(1, ["a"])
+      .add(2, ["b", "a"])
+      .add(3, ["c", "b", "a"])
       .build()
       .into_iter()
       .collect();
@@ -254,15 +311,9 @@ mod tests {
     assert_eq!(actual, expected);
 
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "b")
-      .add(1, "c")
-      .add(1, "a")
-      .add(2, "c")
-      .add(2, "a")
-      .add(2, "b")
-      .add(3, "a")
-      .add(3, "b")
-      .add(3, "c")
+      .add(1, ["b", "c", "a"])
+      .add(2, ["c", "a", "b"])
+      .add(3, ["a", "b", "c"])
       .build()
       .into_iter()
       .collect();
@@ -279,21 +330,9 @@ mod tests {
   #[test]
   fn test_names_2() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "x")
-      .add(1, "cat")
-      .add(1, "a")
-      .add(1, "b ")
-      .add(1, "id")
-      .add(2, "x")
-      .add(2, "dog")
-      .add(2, "a")
-      .add(2, "b")
-      .add(2, "id")
-      .add(3, "x")
-      .add(3, "goat")
-      .add(3, "a")
-      .add(3, "b")
-      .add(3, "id")
+      .add(1, ["x", "cat", "a", "b", "id"])
+      .add(2, ["x", "dog", "a", "b", "id"])
+      .add(3, ["x", "goat", "a", "b", "id"])
       .build()
       .into_iter()
       .collect();
@@ -310,12 +349,8 @@ mod tests {
   #[test]
   fn test_names_3() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "schema")
-      .add(1, "cat")
-      .add(1, "id")
-      .add(2, "schema")
-      .add(2, "schema")
-      .add(2, "id")
+      .add(1, ["schema", "cat", "id"])
+      .add(2, ["schema", "schema", "id"])
       .build()
       .into_iter()
       .collect();
@@ -331,13 +366,8 @@ mod tests {
   #[test]
   fn test_names_4() {
     let actual: BTreeSet<_> = NamesBuilder::new()
-      .add(1, "cat")
-      .add(1, "cat")
-      .add(1, "cat")
-      .add(2, "schema")
-      .add(1, "id")
-      .add(2, "schema")
-      .add(2, "id")
+      .add(1, ["cat", "cat", "cat", "id"])
+      .add(2, ["schema", "schema", "id"])
       .build()
       .into_iter()
       .collect();

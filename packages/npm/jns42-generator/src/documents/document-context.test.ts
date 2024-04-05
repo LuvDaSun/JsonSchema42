@@ -1,7 +1,8 @@
+import * as core from "@jns42/core";
 import assert from "node:assert";
 import test from "node:test";
 import * as schema202012 from "../documents/schema-draft-2020-12/index.js";
-import { NodeLocation, normalizeObject } from "../utils/index.js";
+import { normalizeObject } from "../utils/index.js";
 import { DocumentContext } from "./document-context.js";
 
 test("document-context load-from-document", async () => {
@@ -19,8 +20,8 @@ test("document-context load-from-document", async () => {
   );
 
   await context.loadFromDocument(
-    NodeLocation.parse("/retrieval/#"),
-    NodeLocation.parse("/root/node#/root"),
+    core.NodeLocation.parse("/retrieval/#"),
+    core.NodeLocation.parse("/root/node#/root"),
     null,
     {
       type: "string",

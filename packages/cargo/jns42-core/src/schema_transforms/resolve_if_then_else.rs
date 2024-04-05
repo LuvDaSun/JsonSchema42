@@ -1,4 +1,5 @@
-use crate::models::{arena::Arena, schema::SchemaNode};
+use crate::models::{arena::Arena, schema::SchemaItem};
+use std::collections::BTreeSet;
 
 /**
  * This transformer turns if-then-else into a one-of
@@ -24,7 +25,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  *   - 300
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   let item = arena.get_item(key);
 
   if item.one_of.is_some() {
@@ -37,37 +38,39 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 
   let item = item.clone();
 
-  let mut item_new = SchemaNode {
-    r#if: None,
-    then: None,
-    r#else: None,
-    one_of: Some(Default::default()),
-    ..item
-  };
+  let mut sub_keys = BTreeSet::new();
 
   if let Some(then) = item.then {
-    let new_sub_item = SchemaNode {
+    let new_sub_item = SchemaItem {
       all_of: Some([r#if, then].into()),
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key));
+    sub_keys.insert(new_sub_key);
   }
 
   if let Some(r#else) = item.r#else {
-    let new_sub_sub_item = SchemaNode {
+    let new_sub_sub_item = SchemaItem {
       not: Some(r#if),
       ..Default::default()
     };
     let new_sub_sub_key = arena.add_item(new_sub_sub_item);
 
-    let new_sub_item = SchemaNode {
+    let new_sub_item = SchemaItem {
       all_of: Some([new_sub_sub_key, r#else].into()),
       ..Default::default()
     };
     let new_sub_key = arena.add_item(new_sub_item);
-    assert!(item_new.one_of.as_mut().unwrap().insert(new_sub_key))
+    sub_keys.insert(new_sub_key);
   }
+
+  let item_new = SchemaItem {
+    r#if: None,
+    then: None,
+    r#else: None,
+    one_of: Some(sub_keys),
+    ..item
+  };
 
   arena.replace_item(key, item_new);
 }
@@ -75,13 +78,13 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaNode};
+  use crate::models::{arena::Arena, schema::SchemaItem};
 
   #[test]
   fn test_transform() {
     let mut arena = Arena::new();
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       r#if: Some(100),
       then: Some(200),
       r#else: Some(300),
@@ -94,19 +97,19 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaNode {
+      SchemaItem {
         one_of: Some([1, 3].into()),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         all_of: Some([100, 200].into()),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         not: Some(100),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         all_of: Some([2, 300].into()),
         ..Default::default()
       },

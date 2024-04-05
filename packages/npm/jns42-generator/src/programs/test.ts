@@ -1,3 +1,4 @@
+import * as core from "@jns42/core";
 import { toPascalCase } from "@jns42/core";
 import assert from "assert";
 import cp from "child_process";
@@ -16,7 +17,6 @@ import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
 import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
-import { NodeLocation } from "../utils/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
   return argv.command(
@@ -90,7 +90,7 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  const testLocation = NodeLocation.parse(pathToTest);
+  const testLocation = core.NodeLocation.parse(pathToTest);
   const defaultTypeName = toPascalCase(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");

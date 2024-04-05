@@ -11,6 +11,10 @@ where
     Self(im::Vector::new())
   }
 
+  pub fn count(&self) -> usize {
+    self.0.len()
+  }
+
   pub fn get_item(&self, key: usize) -> &I {
     self.0.get(key).unwrap()
   }

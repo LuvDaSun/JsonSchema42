@@ -1,6 +1,6 @@
 import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
-import { banner, generateJsDocComments, itt } from "../utils/index.js";
+import { banner, generateJsDocComments, isMockable, itt } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield banner;
@@ -21,7 +21,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
-    if (!typesArena.isMockable(key)) {
+    if (!isMockable(typesArena, key)) {
       continue;
     }
 

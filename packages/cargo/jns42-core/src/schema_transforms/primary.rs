@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaNode};
+use crate::models::{arena::Arena, schema::SchemaItem};
 
 /**
  * This sets the primary field on all relevant schemas
@@ -17,7 +17,7 @@ use crate::models::{arena::Arena, schema::SchemaNode};
  * - primary: true
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   let item = arena.get_item(key);
 
   let Some(primary) = item.primary else {
@@ -34,7 +34,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
   for child_key in item.get_children() {
     let child_item = arena.get_item(child_key);
 
-    let child_item = SchemaNode {
+    let child_item = SchemaItem {
       primary: Some(true),
       ..child_item.clone()
     };
@@ -46,24 +46,24 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaNode};
+  use crate::models::{arena::Arena, schema::SchemaItem};
 
   #[test]
   fn test_transform() {
     let mut arena = Arena::new();
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       primary: Some(true),
       all_of: Some([1].into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       all_of: Some([2].into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       ..Default::default()
     });
 
@@ -73,17 +73,17 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
-      SchemaNode {
+      SchemaItem {
         primary: Some(true),
         all_of: Some([1].into()),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         primary: Some(true),
         all_of: Some([2].into()),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         primary: Some(true),
         ..Default::default()
       },

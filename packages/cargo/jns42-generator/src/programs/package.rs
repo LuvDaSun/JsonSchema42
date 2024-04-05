@@ -3,14 +3,14 @@ use crate::documents::{DocumentContext, MetaSchemaId};
 use crate::generators::package::{generate_package, PackageConfiguration};
 use clap::Parser;
 use jns42_core::models::specification::Specification;
+use jns42_core::utils::node_location::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;
 use std::rc::Rc;
-use url::Url;
 
 #[derive(Parser, Debug)]
 pub struct CommandOptions {
-  pub schema_url: Url,
+  pub schema_url: NodeLocation,
 
   #[arg(long, default_value_t = MetaSchemaId::Draft202012)]
   pub default_meta_schema_url: MetaSchemaId,
@@ -72,7 +72,6 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     Box::new(move |_context, _initializer| Rc::new(draft_04::Document::new())),
   );
 
-  let schema_url = schema_url.clone().into();
   let context = Rc::new(context);
   context
     .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)

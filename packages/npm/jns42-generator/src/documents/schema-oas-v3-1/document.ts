@@ -1,26 +1,26 @@
+import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as spec from "@jns42/schema-oas-v3-1";
-import { NodeLocation } from "../../utils/index.js";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
 type N = spec.DialectBase;
 
 export class Document extends SchemaDocumentBase<N> {
-  private readonly anchorMap = new Map<string, NodeLocation>();
-  private readonly dynamicAnchorMap = new Map<string, NodeLocation>();
+  private readonly anchorMap = new Map<string, core.NodeLocation>();
+  private readonly dynamicAnchorMap = new Map<string, core.NodeLocation>();
 
   constructor(
-    retrievalLocation: NodeLocation,
-    givenLocation: NodeLocation,
-    antecedentLocation: NodeLocation | null,
+    retrievalLocation: core.NodeLocation,
+    givenLocation: core.NodeLocation,
+    antecedentLocation: core.NodeLocation | null,
     documentNode: unknown,
     context: DocumentContext,
   ) {
     super(retrievalLocation, givenLocation, antecedentLocation, documentNode, context);
 
     for (const [nodeId, node] of this.nodes) {
-      const nodeLocation = NodeLocation.parse(nodeId);
+      const nodeLocation = core.NodeLocation.parse(nodeId);
 
       const nodeAnchor = this.selectNodeAnchor(node);
       if (nodeAnchor != null) {
@@ -49,11 +49,13 @@ export class Document extends SchemaDocumentBase<N> {
     }
   }
 
-  public *getNodeLocations(): Iterable<NodeLocation> {
+  public *getNodeLocations(): Iterable<core.NodeLocation> {
     yield* super.getNodeLocations();
 
     for (const [anchorId] of this.anchorMap) {
-      yield this.documentNodeLocation.toRoot().setAnchor(anchorId);
+      const nodeLocation = this.documentNodeLocation.clone();
+      nodeLocation.setAnchor(anchorId);
+      yield nodeLocation;
     }
 
     /*
@@ -88,35 +90,40 @@ export class Document extends SchemaDocumentBase<N> {
 
   //#region reference
 
-  private resolveReferenceNodeLocation(nodeRef: string): NodeLocation {
-    const resolvedNodeLocation = this.documentNodeLocation.join(NodeLocation.parse(nodeRef));
+  private resolveReferenceNodeLocation(nodeRef: string): core.NodeLocation {
+    const resolvedNodeLocation = this.documentNodeLocation.join(core.NodeLocation.parse(nodeRef));
 
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeLocation);
     if (resolvedDocument instanceof Document) {
-      const anchor = resolvedNodeLocation.anchor;
-      const anchorResolvedLocation = resolvedDocument.anchorMap.get(anchor);
-      if (anchorResolvedLocation != null) {
-        return anchorResolvedLocation;
+      const anchor = resolvedNodeLocation.getAnchor();
+
+      if (anchor != null) {
+        const anchorResolvedLocation = resolvedDocument.anchorMap.get(anchor);
+        if (anchorResolvedLocation != null) {
+          return anchorResolvedLocation;
+        }
       }
     }
 
     return resolvedNodeLocation;
   }
-  private resolveDynamicReferenceNodeLocation(nodeDynamicRef: string): NodeLocation {
+  private resolveDynamicReferenceNodeLocation(nodeDynamicRef: string): core.NodeLocation {
     const documents = [this, ...this.getAntecedentDocuments()];
     documents.reverse();
 
-    const dynamicLocation = NodeLocation.parse(nodeDynamicRef);
+    const dynamicLocation = core.NodeLocation.parse(nodeDynamicRef);
 
     for (const document of documents) {
       if (!(document instanceof Document)) {
         continue;
       }
+      const anchor = dynamicLocation.getAnchor();
+      if (anchor != null) {
+        const resolvedLocation = document.dynamicAnchorMap.get(anchor);
 
-      const resolvedLocation = document.dynamicAnchorMap.get(dynamicLocation.anchor);
-
-      if (resolvedLocation != null) {
-        return resolvedLocation;
+        if (resolvedLocation != null) {
+          return resolvedLocation;
+        }
       }
     }
 

@@ -1,22 +1,19 @@
 import assert from "node:assert";
 import test from "node:test";
-import { wasmExports } from "./ffi.js";
-import { NamesBuilder } from "./naming.js";
+import { mainFfi } from "../main-ffi.js";
+import { NamesBuilder } from "./names-builder.js";
 
 test("names", () => {
   using namesBuilder = NamesBuilder.new()
-    .add(1, "cat")
-    .add(1, "id")
-    .add(2, "cat")
-    .add(2, "name")
-    .add(3, "dog")
-    .add(3, "id");
+    .add(1, ["cat", "id"])
+    .add(2, ["cat", "name"])
+    .add(3, ["dog", "id"]);
 
   using names = namesBuilder.build();
 
   {
     const actual = names.toSnakeCase(1);
-    const expected = "id_cat";
+    const expected = "cat_id";
     assert.equal(actual, expected);
   }
 
@@ -28,7 +25,7 @@ test("names", () => {
 
   {
     const actual = names.toSnakeCase(3);
-    const expected = "id_dog";
+    const expected = "dog_id";
     assert.equal(actual, expected);
   }
 });
@@ -36,18 +33,15 @@ test("names", () => {
 test("names leak test", () => {
   function runTest() {
     using namesBuilder = NamesBuilder.new()
-      .add(1, "cat")
-      .add(1, "id")
-      .add(2, "cat")
-      .add(2, "name")
-      .add(3, "dog")
-      .add(3, "id");
+      .add(1, ["cat", "id"])
+      .add(2, ["cat", "name"])
+      .add(3, ["dog", "id"]);
 
     using names = namesBuilder.build();
 
     {
       const actual = names.toSnakeCase(1);
-      const expected = "id_cat";
+      const expected = "cat_id";
       assert.equal(actual, expected);
     }
 
@@ -59,14 +53,14 @@ test("names leak test", () => {
 
     {
       const actual = names.toSnakeCase(3);
-      const expected = "id_dog";
+      const expected = "dog_id";
       assert.equal(actual, expected);
     }
   }
-  const byteLength = wasmExports.memory.buffer.byteLength;
+  const byteLength = mainFfi.exports.memory.buffer.byteLength;
   for (let index = 0; index < 100000; index++) {
     runTest();
 
-    assert.equal(wasmExports.memory.buffer.byteLength, byteLength);
+    assert.equal(mainFfi.exports.memory.buffer.byteLength, byteLength);
   }
 });

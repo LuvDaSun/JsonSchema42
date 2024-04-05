@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaNode};
+use crate::models::{arena::Arena, schema::SchemaItem};
 use std::iter::once;
 
 /**
@@ -25,17 +25,23 @@ use std::iter::once;
  *   - string
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
+pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   let item = arena.get_item(key);
 
+  // ew got nothing to do if there are no types
   let Some(types) = &item.types else {
     return;
   };
 
+  // we would overwrite this, so let's not!
+  if item.one_of.is_some() {
+    return;
+  }
+
   match types.len() {
     0 => {
       // if types is empty then we should just set it to None
-      let item = SchemaNode {
+      let item = SchemaItem {
         types: None,
         ..item.clone()
       };
@@ -45,14 +51,16 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
       // only one type, this is what we want! let's do nothing
     }
     _ => {
-      let item = SchemaNode {
+      // we will be creating a new schema with every type as an element in one_of
+      let item = item.clone();
+      let item = SchemaItem {
         types: None,
         one_of: Some(
           types
             .clone()
             .into_iter()
             .map(|r#type| {
-              arena.add_item(SchemaNode {
+              arena.add_item(SchemaItem {
                 parent: Some(key),
                 name: Some(r#type.to_string()),
                 types: Some(once(r#type).collect()),
@@ -61,7 +69,7 @@ pub fn transform(arena: &mut Arena<SchemaNode>, key: usize) {
             })
             .collect(),
         ),
-        ..Default::default()
+        ..item
       };
       arena.replace_item(key, item);
     }
@@ -73,14 +81,14 @@ mod tests {
   use super::*;
   use crate::models::{
     arena::Arena,
-    schema::{SchemaNode, SchemaType},
+    schema::{SchemaItem, SchemaType},
   };
 
   #[test]
   fn test_transform() {
     let mut arena = Arena::new();
 
-    arena.add_item(SchemaNode {
+    arena.add_item(SchemaItem {
       types: Some(vec![SchemaType::String, SchemaType::Number]),
       ..Default::default()
     });
@@ -91,17 +99,17 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
-      SchemaNode {
+      SchemaItem {
         one_of: Some([1, 2].into()),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         parent: Some(0),
         name: Some("string".to_string()),
         types: Some(vec![SchemaType::String]),
         ..Default::default()
       },
-      SchemaNode {
+      SchemaItem {
         parent: Some(0),
         name: Some("number".to_string()),
         types: Some(vec![SchemaType::Number]),

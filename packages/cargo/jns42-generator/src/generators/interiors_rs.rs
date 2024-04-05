@@ -1,6 +1,6 @@
 use jns42_core::{
   models::{
-    schema::{SchemaNode, SchemaType},
+    schema::{SchemaItem, SchemaType},
     specification::Specification,
   },
   naming::Sentence,
@@ -33,14 +33,14 @@ pub fn generate_file_token_stream(
 fn generate_type_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &SchemaNode,
+  item: &SchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
   let documentation: Vec<_> = [
     item.title.clone(),
     item.description.clone(),
-    item.id.as_ref().map(|id| id.get_url().to_string()),
+    item.id.as_ref().map(|id| id.to_string()),
   ]
   .into_iter()
   .flatten()
@@ -129,7 +129,7 @@ fn generate_type_token_stream(
             });
           }
         }
-        SchemaType::Object => {
+        SchemaType::Map => {
           if let Some(object_properties_entries) = &item.object_properties {
             let required: HashSet<_> = item
               .required

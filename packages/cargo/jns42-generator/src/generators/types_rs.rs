@@ -1,5 +1,5 @@
 use jns42_core::models::{
-  schema::{SchemaNode, SchemaType},
+  schema::{SchemaItem, SchemaType},
   specification::Specification,
 };
 use proc_macro2::TokenStream;
@@ -30,14 +30,14 @@ pub fn generate_file_token_stream(
 fn generate_type_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &SchemaNode,
+  item: &SchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
   let documentation: Vec<_> = [
     item.title.clone(),
     item.description.clone(),
-    item.id.as_ref().map(|id| id.get_url().to_string()),
+    item.id.as_ref().map(|id| id.to_string()),
   ]
   .into_iter()
   .flatten()
