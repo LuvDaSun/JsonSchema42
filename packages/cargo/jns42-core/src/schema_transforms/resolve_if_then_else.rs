@@ -103,18 +103,22 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
       SchemaItem {
+        exact: Some(false),
         one_of: Some([1, 3].into()),
         ..Default::default()
       },
       SchemaItem {
+        exact: Some(false),
         all_of: Some([100, 200].into()),
         ..Default::default()
       },
       SchemaItem {
+        exact: Some(false),
         not: Some(100),
         ..Default::default()
       },
       SchemaItem {
+        exact: Some(false),
         all_of: Some([2, 300].into()),
         ..Default::default()
       },
