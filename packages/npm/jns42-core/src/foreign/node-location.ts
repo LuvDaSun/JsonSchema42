@@ -17,7 +17,7 @@ const finalizationRegistry = new FinalizationRegistry<Pointer>((pointer) => {
  * @see https://www.rfc-editor.org/rfc/rfc6901
  */
 export class NodeLocation extends ForeignObject {
-  private token = Symbol();
+  private token = {};
 
   constructor(pointer: Pointer) {
     super(pointer);
