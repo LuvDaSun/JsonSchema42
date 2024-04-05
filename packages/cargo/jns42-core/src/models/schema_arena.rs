@@ -55,7 +55,7 @@ impl Arena<SchemaItem> {
             item
               .id
               .as_ref()
-              .map(|id| empty().chain(id.get_path()).chain(id.get_path())),
+              .map(|id| empty().chain(id.get_path()).chain(id.get_hash())),
           )
           .flatten()
           .chain(item.name.as_deref())
