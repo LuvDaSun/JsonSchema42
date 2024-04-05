@@ -1,4 +1,3 @@
-export * from "./arena.js";
 export * from "./banner.js";
 export * from "./calculate-hash.js";
 export * from "./choose.js";
