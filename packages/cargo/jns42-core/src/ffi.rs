@@ -115,20 +115,22 @@ extern "C" fn dealloc(pointer: *mut u8, size: usize) {
   unsafe { std::alloc::dealloc(pointer, layout) };
 }
 
-type Callbacks = Lazy<Mutex<BTreeMap<Key, Box<dyn FnOnce(*mut u8) + Send>>>>;
+type Callbacks = Lazy<Mutex<BTreeMap<Key, Box<dyn FnMut(*mut u8) + Send>>>>;
 static CALLBACKS: Callbacks = Lazy::new(Default::default);
 
-extern "C" fn invoke_callback(key: Key, pointer: *mut u8) {
+#[no_mangle]
+extern "C" fn invoke_callback(key: Key, argument: *mut u8) {
   let mut callbacks = CALLBACKS.lock().unwrap();
-  let callback = callbacks.remove(&key).unwrap();
-  (callback)(pointer);
+  let mut callback = callbacks.remove(&key).unwrap();
+  (callback)(argument);
 }
 
-pub fn register_callback(key: Key, callback: impl FnOnce(*mut u8) + 'static + Send) -> Key {
+pub fn register_callback(key: Key, callback: impl FnMut(*mut u8) + Send + 'static) {
   let mut callbacks = CALLBACKS.lock().unwrap();
-  let key = Key::new();
   let callback = Box::new(callback);
   assert!(callbacks.insert(key, callback).is_none());
+}
 
-  key
+extern "C" {
+  pub fn fetch(argument: *mut SizedString, key: Key);
 }

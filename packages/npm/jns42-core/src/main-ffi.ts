@@ -1,8 +1,42 @@
+import assert from "assert";
+import * as fs from "fs/promises";
 import path from "path";
+import { SizedString } from "./foreign/sized-string.js";
 import { projectRoot } from "./root.js";
-import { Exports, Ffi, Pointer, Size } from "./utils/index.js";
+import { EnvironmentBase, ExportsBase, Ffi, NULL_POINTER, Pointer, Size } from "./utils/index.js";
 
-export interface MainExports extends Exports {
+export interface MainEnvironment extends EnvironmentBase {
+  fetch: (location: Pointer, callback: number) => void;
+}
+
+let environment: MainEnvironment = {
+  async fetch(locationPointer, callback) {
+    let data: string | undefined;
+    try {
+      using locationForeign = new SizedString(locationPointer);
+      const location = locationForeign.toString();
+      assert(location != null);
+      const locationLower = location.toLowerCase();
+      if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
+        const result = await fetch(location);
+        data = await result.text();
+      } else {
+        data = await fs.readFile(location, "utf-8");
+      }
+    } finally {
+      if (data == null) {
+        mainFfi.exports.invoke_callback(callback, NULL_POINTER);
+      } else {
+        using dataForeign = SizedString.fromString(data);
+        mainFfi.exports.invoke_callback(callback, dataForeign.pointer);
+      }
+    }
+  },
+};
+
+export interface MainExports extends ExportsBase {
+  invoke_callback(callback: number, data: Pointer): void;
+
   alloc(size: Size): Pointer;
   realloc(pointer: Pointer, size_old: Size, size: Size): Pointer;
   dealloc(pointer: Pointer, size: Size): void;
@@ -67,8 +101,9 @@ export interface MainExports extends Exports {
   to_screaming_snake_case(value: Pointer): Pointer;
 }
 
-export type MainFfi = Ffi<MainExports>;
+export type MainFfi = Ffi<MainExports, MainEnvironment>;
 
-export const mainFfi: MainFfi = Ffi.fromFile<MainExports>(
+export const mainFfi: MainFfi = Ffi.fromFile<MainExports, MainEnvironment>(
   path.join(projectRoot, "bin", "main.wasm"),
+  environment,
 );

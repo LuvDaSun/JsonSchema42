@@ -5,13 +5,16 @@ export type Pointer = number;
 
 export const NULL_POINTER = 0;
 
-export interface Exports {
+export interface ExportsBase {
   memory: WebAssembly.Memory;
 }
+export interface EnvironmentBase {
+  [name: string]: WebAssembly.ImportValue;
+}
 
-export class Ffi<E extends Exports> {
+export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBase> {
   public get exports() {
-    return this.instance.exports as unknown as E;
+    return this.instance.exports as unknown as Exports;
   }
 
   private memoryUint8Cache?: Uint8Array;
@@ -32,23 +35,30 @@ export class Ffi<E extends Exports> {
     return this.memoryViewCache;
   }
 
-  public static fromFile<E extends Exports>(path: string) {
+  public static fromFile<Exports extends ExportsBase, Environment extends EnvironmentBase>(
+    path: string,
+    environment: Environment,
+  ) {
     const buffer = fs.readFileSync(path);
-    return Ffi.fromBuffer<E>(buffer);
+    return Ffi.fromBuffer<Exports, Environment>(buffer, environment);
   }
 
-  public static fromBuffer<E extends Exports>(buffer: BufferSource) {
+  public static fromBuffer<Exports extends ExportsBase, Environment extends EnvironmentBase>(
+    buffer: BufferSource,
+    environment: Environment,
+  ) {
     const module = new WebAssembly.Module(buffer);
-    return Ffi.fromModule<E>(module);
+    return Ffi.fromModule<Exports, Environment>(module, environment);
   }
 
-  public static fromModule<E extends Exports>(module: WebAssembly.Module) {
-    const instance = new WebAssembly.Instance(module, {});
-    return Ffi.fromInstance<E>(instance);
-  }
-
-  public static fromInstance<E extends Exports>(instance: WebAssembly.Instance) {
-    return new Ffi<E>(instance);
+  public static fromModule<Exports extends ExportsBase, Environment extends EnvironmentBase>(
+    module: WebAssembly.Module,
+    environment: Environment,
+  ) {
+    const instance = new WebAssembly.Instance(module, {
+      env: environment,
+    });
+    return new Ffi<Exports, Environment>(instance);
   }
 
   private constructor(private readonly instance: WebAssembly.Instance) {
