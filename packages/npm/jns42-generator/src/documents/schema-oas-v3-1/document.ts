@@ -1,7 +1,6 @@
 import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import * as spec from "@jns42/schema-oas-v3-1";
-import assert from "assert";
 import { DocumentContext } from "../document-context.js";
 import { SchemaDocumentBase } from "../schema-document-base.js";
 
@@ -97,10 +96,12 @@ export class Document extends SchemaDocumentBase<N> {
     const resolvedDocument = this.context.getDocumentForNode(resolvedNodeLocation);
     if (resolvedDocument instanceof Document) {
       const anchor = resolvedNodeLocation.getAnchor();
-      assert(anchor != null);
-      const anchorResolvedLocation = resolvedDocument.anchorMap.get(anchor);
-      if (anchorResolvedLocation != null) {
-        return anchorResolvedLocation;
+
+      if (anchor != null) {
+        const anchorResolvedLocation = resolvedDocument.anchorMap.get(anchor);
+        if (anchorResolvedLocation != null) {
+          return anchorResolvedLocation;
+        }
       }
     }
 
@@ -117,11 +118,12 @@ export class Document extends SchemaDocumentBase<N> {
         continue;
       }
       const anchor = dynamicLocation.getAnchor();
-      assert(anchor != null);
-      const resolvedLocation = document.dynamicAnchorMap.get(anchor);
+      if (anchor != null) {
+        const resolvedLocation = document.dynamicAnchorMap.get(anchor);
 
-      if (resolvedLocation != null) {
-        return resolvedLocation;
+        if (resolvedLocation != null) {
+          return resolvedLocation;
+        }
       }
     }
 
