@@ -1,5 +1,3 @@
-use crate::ffi::SizedString;
-
 use super::Word;
 use std::{
   iter::{empty, once},
@@ -179,67 +177,72 @@ impl FromIterator<Word> for Sentence {
   }
 }
 
-/// get the name as camelCase
-#[no_mangle]
-extern "C" fn to_camel_case(value: *const SizedString) -> *const SizedString {
-  assert!(!value.is_null());
+mod ffi {
+  use super::*;
+  use crate::ffi::SizedString;
 
-  let value = unsafe { &*value };
-  let value = value.as_ref();
+  /// get the name as camelCase
+  #[no_mangle]
+  extern "C" fn to_camel_case(value: *const SizedString) -> *const SizedString {
+    assert!(!value.is_null());
 
-  let sentence = Sentence::new(value);
-  let result = sentence.to_camel_case();
-  let result = SizedString::new(result);
-  let result = Box::new(result);
-  Box::into_raw(result)
-}
+    let value = unsafe { &*value };
+    let value = value.as_ref();
 
-/// get the name as PascalCase
-#[no_mangle]
-extern "C" fn to_pascal_case(value: *const SizedString) -> *const SizedString {
-  assert!(!value.is_null());
+    let sentence = Sentence::new(value);
+    let result = sentence.to_camel_case();
+    let result = SizedString::new(result);
+    let result = Box::new(result);
+    Box::into_raw(result)
+  }
 
-  let value = unsafe { &*value };
-  let value = value.as_ref();
+  /// get the name as PascalCase
+  #[no_mangle]
+  extern "C" fn to_pascal_case(value: *const SizedString) -> *const SizedString {
+    assert!(!value.is_null());
 
-  let sentence = Sentence::new(value);
+    let value = unsafe { &*value };
+    let value = value.as_ref();
 
-  let result = sentence.to_pascal_case();
-  let result = SizedString::new(result);
-  let result = Box::new(result);
-  Box::into_raw(result)
-}
+    let sentence = Sentence::new(value);
 
-/// get the name as snake_case
-#[no_mangle]
-extern "C" fn to_snake_case(value: *const SizedString) -> *const SizedString {
-  assert!(!value.is_null());
+    let result = sentence.to_pascal_case();
+    let result = SizedString::new(result);
+    let result = Box::new(result);
+    Box::into_raw(result)
+  }
 
-  let value = unsafe { &*value };
-  let value = value.as_ref();
+  /// get the name as snake_case
+  #[no_mangle]
+  extern "C" fn to_snake_case(value: *const SizedString) -> *const SizedString {
+    assert!(!value.is_null());
 
-  let sentence = Sentence::new(value);
+    let value = unsafe { &*value };
+    let value = value.as_ref();
 
-  let result = sentence.to_snake_case();
-  let result = SizedString::new(result);
-  let result = Box::new(result);
-  Box::into_raw(result)
-}
+    let sentence = Sentence::new(value);
 
-/// get the name as SCREAMING_SNAKE_CASE
-#[no_mangle]
-extern "C" fn to_screaming_snake_case(value: *const SizedString) -> *const SizedString {
-  assert!(!value.is_null());
+    let result = sentence.to_snake_case();
+    let result = SizedString::new(result);
+    let result = Box::new(result);
+    Box::into_raw(result)
+  }
 
-  let value = unsafe { &*value };
-  let value = value.as_ref();
+  /// get the name as SCREAMING_SNAKE_CASE
+  #[no_mangle]
+  extern "C" fn to_screaming_snake_case(value: *const SizedString) -> *const SizedString {
+    assert!(!value.is_null());
 
-  let sentence = Sentence::new(value);
+    let value = unsafe { &*value };
+    let value = value.as_ref();
 
-  let result = sentence.to_screaming_snake_case();
-  let result = SizedString::new(result);
-  let result = Box::new(result);
-  Box::into_raw(result)
+    let sentence = Sentence::new(value);
+
+    let result = sentence.to_screaming_snake_case();
+    let result = SizedString::new(result);
+    let result = Box::new(result);
+    Box::into_raw(result)
+  }
 }
 
 #[cfg(test)]
