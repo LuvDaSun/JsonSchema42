@@ -3,10 +3,33 @@ import * as fs from "fs/promises";
 import path from "path";
 import { SizedString } from "./foreign/sized-string.js";
 import { projectRoot } from "./root.js";
-import { EnvironmentBase, ExportsBase, Ffi, NULL_POINTER, Pointer, Size } from "./utils/index.js";
+import {
+  EnvironmentBase,
+  ExportsBase,
+  Ffi,
+  NULL_POINTER,
+  Pointer,
+  Size,
+  newKey,
+} from "./utils/index.js";
+
+const callbacks: Record<number, () => void> = {};
+export function registerCallback(callback: () => void) {
+  let key = newKey();
+  callbacks[key] = callback;
+  return key;
+}
+export function invokeCallback(key: number) {
+  try {
+    callbacks[key]();
+  } finally {
+    delete callbacks[key];
+  }
+  return key;
+}
 
 export interface MainEnvironment extends EnvironmentBase {
-  fetch: (location: Pointer, callback: number) => void;
+  fetch: (location: Pointer, wake: number) => void;
 }
 
 let environment: MainEnvironment = {
@@ -32,7 +55,7 @@ let environment: MainEnvironment = {
           mainFfi.exports.invoke_callback(callback, dataForeign.pointer);
         }
       }
-      mainFfi.exports.wake_host();
+      mainFfi.exports.wake_host(callback);
     })();
   },
 
@@ -44,7 +67,7 @@ let environment: MainEnvironment = {
 
 export interface MainExports extends ExportsBase {
   invoke_callback(callback: number, data: Pointer): void;
-  wake_host(): void;
+  wake_host(key: number): void;
 
   alloc(size: Size): Pointer;
   realloc(pointer: Pointer, size_old: Size, size: Size): Pointer;

@@ -51,6 +51,7 @@
   "dependencies": {
     "@jns42/schema-intermediate": "^0.16.2",
     "@types/node": "^20.12.4",
+    "p-defer": "^4.0.1",
     "tslib": "^2.6.2",
     "type-fest": "^4.9.0"
   },

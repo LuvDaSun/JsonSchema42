@@ -1,9 +1,10 @@
-use crate::utils::{key::Key, manual_executor::ManualExecutor};
 use once_cell::sync::Lazy;
 use std::{
   collections::BTreeMap,
   sync::{Arc, Mutex},
 };
+
+use crate::utils::key::Key;
 
 #[no_mangle]
 extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
@@ -139,9 +140,10 @@ extern "C" {
   pub fn invoke_host_callback(key: usize, argument: *mut u8);
 }
 
-pub static MANUAL_EXECUTOR: Lazy<Arc<ManualExecutor>> = Lazy::new(ManualExecutor::new);
+pub static MANUAL_EXECUTOR: Lazy<Arc<manual_executor::ManualExecutor>> =
+  Lazy::new(manual_executor::ManualExecutor::new);
 
 #[no_mangle]
-extern "C" fn wake_host() {
-  MANUAL_EXECUTOR.wake()
+extern "C" fn wake_host(key: manual_executor::Key) {
+  MANUAL_EXECUTOR.wake(key);
 }

@@ -86,7 +86,7 @@ mod ffi {
       }
     };
 
-    MANUAL_EXECUTOR.spawn(future);
-    MANUAL_EXECUTOR.wake();
+    let key = MANUAL_EXECUTOR.spawn_wake(future);
+    MANUAL_EXECUTOR.wake(key);
   }
 }
