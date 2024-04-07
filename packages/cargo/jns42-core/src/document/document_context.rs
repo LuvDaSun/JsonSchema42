@@ -21,6 +21,7 @@ impl DocumentContext {
 mod ffi {
   use super::*;
   use crate::ffi::{SizedString, MANUAL_EXECUTOR};
+  use std::ptr::null_mut;
 
   #[no_mangle]
   extern "C" fn document_context_drop(document_context: *mut DocumentContext) {
@@ -49,7 +50,7 @@ mod ffi {
         let location = Box::into_raw(location);
 
         unsafe {
-          crate::ffi::fetch(location, callback_key);
+          crate::ffi::fetch(location, null_mut(), callback_key);
         }
 
         ready_receiver.await.unwrap()

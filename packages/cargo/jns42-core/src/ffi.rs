@@ -136,7 +136,11 @@ pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key
 }
 
 extern "C" {
-  pub fn fetch(argument: *mut SizedString, key: Key);
+  pub fn fetch(
+    argument: *mut SizedString,
+    result_output: *mut *const SizedString,
+    callback_key: Key,
+  );
   pub fn invoke_host_callback(key: usize, argument: *mut u8);
 }
 
