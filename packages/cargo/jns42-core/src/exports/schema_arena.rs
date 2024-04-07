@@ -15,8 +15,6 @@ extern "C" fn schema_arena_new() -> *const SchemaArena {
 
 #[no_mangle]
 extern "C" fn schema_arena_clone(arena: *const SchemaArena) -> *const SchemaArena {
-  assert!(!arena.is_null());
-
   let arena = unsafe { &*arena };
   let arena = arena.clone();
   let arena = Box::new(arena);
@@ -25,17 +23,12 @@ extern "C" fn schema_arena_clone(arena: *const SchemaArena) -> *const SchemaAren
 
 #[no_mangle]
 extern "C" fn schema_arena_count(arena: *const SchemaArena) -> usize {
-  assert!(!arena.is_null());
-
   let arena = unsafe { &*arena };
   arena.count()
 }
 
 #[no_mangle]
 extern "C" fn schema_arena_add_item(arena: *mut SchemaArena, item: *const c_char) -> usize {
-  assert!(!arena.is_null());
-  assert!(!item.is_null());
-
   let arena = unsafe { &mut *arena };
   let item = unsafe { CStr::from_ptr(item) };
   let item = item.to_str().unwrap();
@@ -50,9 +43,6 @@ extern "C" fn schema_arena_replace_item(
   key: usize,
   item: *const c_char,
 ) -> *mut c_char {
-  assert!(!arena.is_null());
-  assert!(!item.is_null());
-
   let arena = unsafe { &mut *arena };
   let item = unsafe { CStr::from_ptr(item) };
   let item = item.to_str().unwrap();
@@ -67,8 +57,6 @@ extern "C" fn schema_arena_replace_item(
 
 #[no_mangle]
 extern "C" fn schema_arena_get_item(arena: *mut SchemaArena, key: usize) -> *mut c_char {
-  assert!(!arena.is_null());
-
   let arena = unsafe { &mut *arena };
   let item = arena.get_item(key);
   let item = serde_json::to_string(item).unwrap();
@@ -82,9 +70,6 @@ extern "C" fn schema_arena_transform(
   arena: *mut SchemaArena,
   transforms: *const Vec<SchemaTransform>,
 ) -> usize {
-  assert!(!arena.is_null());
-  assert!(!transforms.is_null());
-
   let arena = unsafe { &mut *arena };
   let transforms = unsafe { &*transforms };
 

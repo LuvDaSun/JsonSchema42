@@ -10,8 +10,6 @@ extern "C" fn vec_string_new(capacity: usize) -> *mut Vec<String> {
 
 #[no_mangle]
 extern "C" fn vec_string_drop(vec: *mut Vec<String>) {
-  assert!(!vec.is_null());
-
   let _ = unsafe { Box::from_raw(vec) };
 }
 
@@ -24,8 +22,6 @@ extern "C" fn vec_string_len(vec: *const Vec<String>) -> usize {
 
 #[no_mangle]
 extern "C" fn vec_string_get(vec: *const Vec<String>, index: usize) -> *const c_char {
-  assert!(!vec.is_null());
-
   let vec = unsafe { &*vec };
 
   let value = vec.get(index).unwrap();
@@ -36,9 +32,6 @@ extern "C" fn vec_string_get(vec: *const Vec<String>, index: usize) -> *const c_
 
 #[no_mangle]
 extern "C" fn vec_string_push(vec: *mut Vec<String>, value: *mut c_char) {
-  assert!(!vec.is_null());
-  assert!(!value.is_null());
-
   let vec = unsafe { &mut *vec };
   let value = unsafe { CString::from_raw(value) };
   let value = value.to_str().unwrap();

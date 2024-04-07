@@ -1,14 +1,11 @@
 use crate::{
-  document::document_context::DocumentContext, executor::spawn,
-  imports::callbacks::invoke_callback, utils::key::Key,
+  document::document_context::DocumentContext, executor::spawn_and_callback, utils::key::Key,
 };
 use std::ffi::{c_char, CStr, CString};
 
 #[no_mangle]
 extern "C" fn document_context_drop(document_context: *mut DocumentContext) {
-  assert!(!document_context.is_null());
-
-  drop(unsafe { Box::from_raw(document_context) });
+  let _ = unsafe { Box::from_raw(document_context) };
 }
 
 #[no_mangle]
@@ -26,13 +23,10 @@ extern "C" fn document_context_load(
   data_reference: *mut *mut c_char,
   callback: Key,
 ) {
-  assert!(!document_context.is_null());
-  assert!(!location.is_null());
+  spawn_and_callback(callback, async move {
+    let location = unsafe { CStr::from_ptr(location) };
+    let document_context = unsafe { &mut *document_context };
 
-  let location = unsafe { CStr::from_ptr(location) };
-  let document_context = unsafe { &mut *document_context };
-
-  let task = async move {
     let location = location.to_str().unwrap();
 
     let data = document_context.load(location).await;
@@ -42,9 +36,5 @@ extern "C" fn document_context_load(
     unsafe {
       *data_reference = data;
     }
-
-    invoke_callback(callback);
-  };
-
-  spawn(task);
+  });
 }

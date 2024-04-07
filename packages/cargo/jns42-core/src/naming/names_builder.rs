@@ -219,9 +219,7 @@ mod ffi {
   /// Free NamesBuilder instance
   #[no_mangle]
   extern "C" fn names_builder_drop(names_builder: *mut NamesBuilder<usize>) {
-    assert!(!names_builder.is_null());
-
-    drop(unsafe { Box::from_raw(names_builder) });
+    let _ = unsafe { Box::from_raw(names_builder) };
   }
 
   /// Create a new NamesBuilder instance
@@ -239,9 +237,6 @@ mod ffi {
     key: usize,
     values: *const Vec<String>,
   ) {
-    assert!(!names_builder.is_null());
-    assert!(!values.is_null());
-
     let names_builder = unsafe { &mut *names_builder };
     let values = unsafe { &*values };
 
@@ -254,8 +249,6 @@ mod ffi {
     names_builder: *mut NamesBuilder<usize>,
     value: *const c_char,
   ) {
-    assert!(!value.is_null());
-
     let names_builder = unsafe { &mut *names_builder };
     let value = unsafe { CStr::from_ptr(value) };
     let value = value.to_str().unwrap();
@@ -266,8 +259,6 @@ mod ffi {
   /// create a names struct from the builder
   #[no_mangle]
   extern "C" fn names_builder_build(names_builder: *mut NamesBuilder<usize>) -> *mut Names<usize> {
-    assert!(!names_builder.is_null());
-
     let names_builder = unsafe { &mut *names_builder };
 
     let names = names_builder.build();

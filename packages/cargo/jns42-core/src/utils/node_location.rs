@@ -297,15 +297,11 @@ fn normalize_path(path: impl IntoIterator<Item = impl ToString>) -> Vec<String> 
 
 #[no_mangle]
 extern "C" fn node_location_drop(node_location: *mut NodeLocation) {
-  assert!(!node_location.is_null());
-
-  drop(unsafe { Box::from_raw(node_location) });
+  let _ = unsafe { Box::from_raw(node_location) };
 }
 
 #[no_mangle]
 extern "C" fn node_location_clone(node_location: *const NodeLocation) -> *mut NodeLocation {
-  assert!(!node_location.is_null());
-
   let node_location = unsafe { &*node_location };
 
   let result = node_location.clone();
@@ -316,8 +312,6 @@ extern "C" fn node_location_clone(node_location: *const NodeLocation) -> *mut No
 
 #[no_mangle]
 extern "C" fn node_location_parse(input: *const c_char) -> *mut NodeLocation {
-  assert!(!input.is_null());
-
   let input = unsafe { CStr::from_ptr(input) };
   let input = input.to_str().unwrap();
 
@@ -332,9 +326,6 @@ extern "C" fn node_location_join(
   node_location: *const NodeLocation,
   other_node_location: *const NodeLocation,
 ) -> *mut NodeLocation {
-  assert!(!node_location.is_null());
-  assert!(!other_node_location.is_null());
-
   let node_location = unsafe { &*node_location };
   let other_node_location = unsafe { &*other_node_location };
 
@@ -346,8 +337,6 @@ extern "C" fn node_location_join(
 
 #[no_mangle]
 extern "C" fn node_location_to_string(node_location: *const NodeLocation) -> *mut c_char {
-  assert!(!node_location.is_null());
-
   let node_location = unsafe { &*node_location };
 
   let result = node_location.to_string();
@@ -358,8 +347,6 @@ extern "C" fn node_location_to_string(node_location: *const NodeLocation) -> *mu
 
 #[no_mangle]
 extern "C" fn node_location_to_retrieval_string(node_location: *const NodeLocation) -> *mut c_char {
-  assert!(!node_location.is_null());
-
   let node_location = unsafe { &*node_location };
 
   let result = node_location.to_retrieval_string();
@@ -370,8 +357,6 @@ extern "C" fn node_location_to_retrieval_string(node_location: *const NodeLocati
 
 #[no_mangle]
 extern "C" fn node_location_get_anchor(node_location: *mut NodeLocation) -> *const c_char {
-  assert!(!node_location.is_null());
-
   let node_location = unsafe { &mut *node_location };
 
   let result = node_location.get_anchor();
@@ -422,9 +407,6 @@ extern "C" fn node_location_get_hash(node_location: *mut NodeLocation) -> *const
 
 #[no_mangle]
 extern "C" fn node_location_set_anchor(node_location: *mut NodeLocation, anchor: *const c_char) {
-  assert!(!node_location.is_null());
-  assert!(!anchor.is_null());
-
   let node_location = unsafe { &mut *node_location };
   let anchor = unsafe { CStr::from_ptr(anchor) };
   let anchor = anchor.to_str().unwrap();
@@ -437,9 +419,6 @@ extern "C" fn node_location_set_pointer(
   node_location: *mut NodeLocation,
   pointer: *const Vec<String>,
 ) {
-  assert!(!node_location.is_null());
-  assert!(!pointer.is_null());
-
   let node_location = unsafe { &mut *node_location };
   let pointer = unsafe { &*pointer };
 
@@ -448,8 +427,6 @@ extern "C" fn node_location_set_pointer(
 
 #[no_mangle]
 extern "C" fn node_location_set_root(node_location: *mut NodeLocation) {
-  assert!(!node_location.is_null());
-
   let node_location = unsafe { &mut *node_location };
 
   node_location.set_root();
