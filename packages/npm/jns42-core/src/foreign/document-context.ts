@@ -4,8 +4,8 @@ import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class DocumentContext extends ForeignObject {
-  protected drop() {
-    mainFfi.exports.document_context_drop(this.pointer);
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.document_context_drop(pointer));
   }
 
   public static new() {

@@ -5,8 +5,8 @@ import { Names } from "./names.js";
 import { VecString } from "./vec-string.js";
 
 export class NamesBuilder extends ForeignObject {
-  protected drop() {
-    mainFfi.exports.names_builder_drop(this.pointer);
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.names_builder_drop(pointer));
   }
 
   public static new() {

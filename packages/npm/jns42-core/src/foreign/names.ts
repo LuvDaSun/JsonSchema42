@@ -3,8 +3,8 @@ import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class Names extends ForeignObject {
-  protected drop() {
-    mainFfi.exports.names_drop(this.pointer);
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.names_drop(pointer));
   }
 
   public toCamelCase(key: number) {

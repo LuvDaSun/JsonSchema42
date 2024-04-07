@@ -2,8 +2,8 @@ import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class SchemaItem extends ForeignObject {
-  protected drop() {
-    mainFfi.exports.schema_item_drop(this.pointer);
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.schema_item_drop(pointer));
   }
 
   public static new() {

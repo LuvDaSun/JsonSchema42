@@ -3,34 +3,14 @@ import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
 import { VecString } from "./vec-string.js";
 
-const finalizationRegistry = new FinalizationRegistry<number>((pointer) => {
-  if (pointer !== 0) {
-    mainFfi.exports.node_location_drop(pointer);
-  }
-});
-
 /**
  * Location of a node. The location can be either a path or a url
  *
  * @see https://www.rfc-editor.org/rfc/rfc6901
  */
 export class NodeLocation extends ForeignObject {
-  private token = {};
-
   constructor(pointer: number) {
-    super(pointer);
-
-    finalizationRegistry.register(this, pointer, this.token);
-  }
-
-  [Symbol.dispose]() {
-    finalizationRegistry.unregister(this.token);
-
-    super[Symbol.dispose]();
-  }
-
-  protected drop() {
-    mainFfi.exports.node_location_drop(this.pointer);
+    super(pointer, () => mainFfi.exports.node_location_drop(pointer));
   }
 
   public static parse(input: string) {

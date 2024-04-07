@@ -4,6 +4,10 @@ import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class VecString extends ForeignObject {
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.vec_string_drop(pointer));
+  }
+
   public static fromArray(array: string[]) {
     const vec = VecString.new(array.length);
     for (const item of array) {
@@ -31,10 +35,6 @@ export class VecString extends ForeignObject {
   public static new(capacity: number) {
     const pointer = mainFfi.exports.vec_string_new(capacity);
     return new VecString(pointer);
-  }
-
-  protected drop() {
-    mainFfi.exports.vec_string_drop(this.pointer);
   }
 
   public len() {

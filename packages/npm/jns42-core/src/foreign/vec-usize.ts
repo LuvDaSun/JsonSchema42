@@ -3,6 +3,10 @@ import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class VecUsize extends ForeignObject {
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.vec_usize_drop(pointer));
+  }
+
   public static fromArray(array: number[]) {
     const vec = VecUsize.new(array.length);
     for (const item of array) {
@@ -15,10 +19,6 @@ export class VecUsize extends ForeignObject {
   public static new(capacity: number) {
     const pointer = mainFfi.exports.vec_usize_new(capacity);
     return new VecUsize(pointer);
-  }
-
-  protected drop() {
-    mainFfi.exports.vec_usize_drop(this.pointer);
   }
 
   public len() {

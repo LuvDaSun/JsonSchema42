@@ -141,8 +141,8 @@ export class SchemaArena extends ForeignObject {
     return arena;
   }
 
-  protected drop() {
-    mainFfi.exports.schema_arena_drop(this.pointer);
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.schema_arena_drop(pointer));
   }
 
   public static new() {

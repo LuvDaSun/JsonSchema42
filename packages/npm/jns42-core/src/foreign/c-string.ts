@@ -8,6 +8,10 @@ const textDecoder = new TextDecoder("utf-8", {
 });
 
 export class CString extends ForeignObject {
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.c_string_drop(pointer));
+  }
+
   public static fromString(value: string) {
     const data = textEncoder.encode(value);
     const pointer = mainFfi.exports.c_string_new(data.length);
@@ -24,10 +28,5 @@ export class CString extends ForeignObject {
     const data = mainFfi.memoryUint8.subarray(pointer, index);
     const value = textDecoder.decode(data);
     return value;
-  }
-
-  protected drop() {
-    const { pointer } = this;
-    mainFfi.exports.c_string_drop(pointer);
   }
 }

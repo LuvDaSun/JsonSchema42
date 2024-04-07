@@ -1,6 +1,10 @@
 import assert from "assert";
 
+const finalizationRegistry = new FinalizationRegistry<() => void>((drop) => drop());
+
 export abstract class ForeignObject {
+  private token = {};
+
   /**
    * is this object disposed?
    */
@@ -10,8 +14,13 @@ export abstract class ForeignObject {
    */
   private responsible = true;
 
-  constructor(public readonly pointer: number) {
+  constructor(
+    public readonly pointer: number,
+    private readonly drop: () => void,
+  ) {
     assert(pointer !== 0);
+
+    finalizationRegistry.register(this, drop, this.token);
   }
 
   /**
@@ -21,14 +30,11 @@ export abstract class ForeignObject {
     this.responsible = false;
   }
 
-  protected abstract drop(): void;
-
   [Symbol.dispose]() {
     assert.equal(this.disposed, false);
+    finalizationRegistry.unregister(this.token);
     if (this.responsible) {
-      if (this.pointer !== 0) {
-        this.drop();
-      }
+      this.drop();
     }
     this.disposed = true;
   }
