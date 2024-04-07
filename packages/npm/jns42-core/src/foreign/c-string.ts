@@ -28,12 +28,12 @@ function allocate(value: string): number {
   const size = dataSize + 1;
   const pointer = mainFfi.exports.alloc(size);
   mainFfi.memoryUint8.set(data, pointer);
-  mainFfi.memoryView.setUint8(pointer + size + 0, 0);
+  mainFfi.memoryView.setUint8(pointer + dataSize + 0, 0);
   return pointer;
 }
 
 function read(pointer: number): string {
-  const size = findCStringSize(pointer);
+  const size = findSize(pointer);
   const dataSize = size - 1;
   const data = mainFfi.memoryUint8.subarray(pointer, pointer + dataSize);
   const value = textDecoder.decode(data);
@@ -41,11 +41,11 @@ function read(pointer: number): string {
 }
 
 function deallocate(pointer: number) {
-  const size = findCStringSize(pointer);
+  const size = findSize(pointer);
   mainFfi.exports.dealloc(pointer, size);
 }
 
-function findCStringSize(pointer: number): number {
+function findSize(pointer: number): number {
   const index = mainFfi.memoryUint8.indexOf(0, pointer);
   if (index < 0) {
     throw new TypeError("cstring size not found");

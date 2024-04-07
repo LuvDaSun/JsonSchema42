@@ -1,11 +1,11 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
+import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
-import { SizedString } from "./sized-string.js";
 
-export class VecSizedString extends ForeignObject {
+export class VecCString extends ForeignObject {
   public static fromArray(array: string[]) {
-    const vec = VecSizedString.new(array.length);
+    const vec = VecCString.new(array.length);
     for (const item of array) {
       vec.push(item);
     }
@@ -29,30 +29,30 @@ export class VecSizedString extends ForeignObject {
   }
 
   public static new(capacity: number) {
-    const pointer = mainFfi.exports.vec_sized_string_new(capacity);
-    return new VecSizedString(pointer);
+    const pointer = mainFfi.exports.vec_c_string_new(capacity);
+    return new VecCString(pointer);
   }
 
   protected drop() {
-    mainFfi.exports.vec_sized_string_drop(this.pointer);
+    mainFfi.exports.vec_c_string_drop(this.pointer);
   }
 
   public len() {
-    const result = mainFfi.exports.vec_sized_string_len(this.pointer);
+    const result = mainFfi.exports.vec_c_string_len(this.pointer);
     return result;
   }
 
   public get(index: number) {
-    const resultPointer = mainFfi.exports.vec_sized_string_get(this.pointer, index);
-    using resultForeign = new SizedString(resultPointer);
+    const resultPointer = mainFfi.exports.vec_c_string_get(this.pointer, index);
+    using resultForeign = new CString(resultPointer);
     resultForeign.abandon();
     const result = resultForeign.toString();
     return result;
   }
 
   public push(value: string) {
-    using valueForeign = SizedString.fromString(value);
+    using valueForeign = CString.fromString(value);
     valueForeign.abandon();
-    mainFfi.exports.vec_sized_string_push(this.pointer, valueForeign.pointer);
+    mainFfi.exports.vec_c_string_push(this.pointer, valueForeign.pointer);
   }
 }

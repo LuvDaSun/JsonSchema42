@@ -2,7 +2,7 @@ import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 import { Names } from "./names.js";
 import { SizedString } from "./sized-string.js";
-import { VecSizedString } from "./vec-sized-string.js";
+import { VecCString } from "./vec-c-string.js";
 
 export class NamesBuilder extends ForeignObject {
   protected drop() {
@@ -15,7 +15,7 @@ export class NamesBuilder extends ForeignObject {
   }
 
   public add(key: number, values: string[]) {
-    using valuesForeign = VecSizedString.fromArray(values);
+    using valuesForeign = VecCString.fromArray(values);
 
     mainFfi.exports.names_builder_add(this.pointer, key, valuesForeign.pointer);
 
