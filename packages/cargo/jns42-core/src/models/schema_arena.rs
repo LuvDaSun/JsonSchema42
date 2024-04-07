@@ -1,11 +1,10 @@
-use crate::{
-  ffi::SizedString,
-  schema_transforms::{BoxedSchemaTransform, SchemaTransform},
-};
-
 use super::{
   arena::Arena,
   schema::{SchemaItem, SchemaKey},
+};
+use crate::{
+  ffi::SizedString,
+  schema_transforms::{BoxedSchemaTransform, SchemaTransform},
 };
 use std::iter::empty;
 

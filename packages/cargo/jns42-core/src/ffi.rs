@@ -1,10 +1,8 @@
-use once_cell::sync::Lazy;
-use std::{
-  collections::BTreeMap,
-  sync::{Arc, Mutex},
-};
-
 use crate::utils::key::Key;
+use futures::task::LocalSpawnExt;
+use futures::{channel::oneshot, executor::LocalPool, Future};
+use once_cell::sync::Lazy;
+use std::{cell::RefCell, collections::BTreeMap, sync::Mutex};
 
 #[no_mangle]
 extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
@@ -125,7 +123,7 @@ extern "C" fn invoke_callback(key: Key, result: *mut u8) {
   let mut callbacks = CALLBACKS.lock().unwrap();
   let callback = callbacks.remove(&key).unwrap();
   (callback)(result);
-  MANUAL_EXECUTOR.wake_all();
+  EXECUTOR.with_borrow_mut(|pool| pool.run_until_stalled());
 }
 
 pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key {
@@ -136,10 +134,45 @@ pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key
   key
 }
 
-extern "C" {
-  pub fn fetch(argument: *const SizedString, callback: Key);
-  pub fn invoke_host_callback(callback: Key, result: *mut u8);
+pub async fn fetch(location: &str) -> String {
+  let (ready_sender, ready_receiver) = oneshot::channel();
+
+  let callback_key = crate::ffi::register_callback(|data| {
+    let data = data as *mut SizedString;
+    let data: Box<SizedString> = unsafe { Box::from_raw(data) };
+    let data: String = (*data).into();
+
+    ready_sender.send(data).unwrap();
+  });
+
+  let location = SizedString::new(location.to_owned());
+  let location = Box::new(location);
+  let location = Box::into_raw(location);
+
+  unsafe {
+    crate::ffi::host::fetch(location, callback_key);
+  }
+
+  ready_receiver.await.unwrap()
 }
 
-pub static MANUAL_EXECUTOR: Lazy<Arc<manual_executor::ManualExecutor>> =
-  Lazy::new(manual_executor::ManualExecutor::new);
+pub mod host {
+  use super::*;
+
+  extern "C" {
+    pub fn fetch(argument: *const SizedString, callback: Key);
+    pub fn invoke_callback(callback: Key, result: *mut u8);
+  }
+}
+
+pub fn spawn(task: impl Future<Output = ()> + 'static) {
+  EXECUTOR.with_borrow_mut(|pool| {
+    let spawner = pool.spawner();
+    spawner.spawn_local(task).unwrap();
+    pool.run_until_stalled()
+  });
+}
+
+thread_local! {
+  pub static EXECUTOR: RefCell<LocalPool> = RefCell::new(LocalPool::new());
+}
