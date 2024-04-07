@@ -1,4 +1,3 @@
-import assert from "assert";
 import * as fs from "fs/promises";
 import path from "path";
 import { CString } from "./foreign/c-string.js";
@@ -12,7 +11,6 @@ export interface MainEnvironment extends EnvironmentBase {
 async function hostFetch(locationPointer: number) {
   using locationForeign = new CString(locationPointer);
   const location = locationForeign.toString();
-  assert(location != null);
 
   const locationLower = location.toLowerCase();
   let data: string | undefined;

@@ -50,6 +50,6 @@ function findSize(pointer: number): number {
   if (index < 0) {
     throw new TypeError("cstring size not found");
   }
-  const size = index - pointer;
+  const size = index - pointer + 1;
   return size;
 }

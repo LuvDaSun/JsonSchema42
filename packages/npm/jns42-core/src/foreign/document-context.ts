@@ -1,7 +1,7 @@
 import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
+import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
-import { SizedString } from "./sized-string.js";
 
 export class DocumentContext extends ForeignObject {
   protected drop() {
@@ -14,11 +14,11 @@ export class DocumentContext extends ForeignObject {
   }
 
   public async load(location: string) {
-    using locationForeign = SizedString.fromString(location);
+    using locationForeign = CString.fromString(location);
 
     const deferred = defer<string>();
     const key = mainFfi.registerCallback((dataPointer: number) => {
-      using dataForeign = new SizedString(dataPointer);
+      using dataForeign = new CString(dataPointer);
       const data = dataForeign.toString();
       deferred.resolve(data);
     });

@@ -13,13 +13,10 @@ impl DocumentContext {
 }
 
 mod ffi {
-  use std::ffi::{c_char, CStr};
+  use std::ffi::{c_char, CStr, CString};
 
   use super::*;
-  use crate::{
-    ffi::{spawn, SizedString},
-    utils::key::Key,
-  };
+  use crate::{ffi::spawn, utils::key::Key};
 
   #[no_mangle]
   extern "C" fn document_context_drop(document_context: *mut DocumentContext) {
@@ -53,9 +50,8 @@ mod ffi {
       let location = location.as_ref();
 
       let data = document_context.load(location).await;
-      let data = SizedString::new(data);
-      let data = Box::new(data);
-      let data = Box::into_raw(data);
+      let data = CString::new(data).unwrap();
+      let data = data.into_raw();
       let data = data as *mut u8;
 
       unsafe {
