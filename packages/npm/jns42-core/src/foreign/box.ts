@@ -2,6 +2,10 @@ import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 
 export class Box extends ForeignObject {
+  constructor(pointer: number) {
+    super(pointer, () => mainFfi.exports.dealloc(pointer, 4));
+  }
+
   public static fromTargetPointer(value: number) {
     const pointer = mainFfi.exports.alloc(4);
     mainFfi.memoryView.setUint32(pointer + 0, value, true);
@@ -15,10 +19,5 @@ export class Box extends ForeignObject {
   public setTargetPointer(value: number) {
     const { pointer } = this;
     mainFfi.memoryView.setUint32(pointer, value, true);
-  }
-
-  protected drop() {
-    const { pointer } = this;
-    mainFfi.exports.dealloc(pointer, 4);
   }
 }
