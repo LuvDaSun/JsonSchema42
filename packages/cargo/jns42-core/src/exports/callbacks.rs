@@ -21,7 +21,3 @@ extern "C" fn invoke_callback(key: Key, result: *mut u8) {
   (callback)(result);
   wake();
 }
-
-extern "C" {
-  pub fn host_invoke_callback(callback: Key, result: *mut u8);
-}

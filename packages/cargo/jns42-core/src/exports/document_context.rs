@@ -1,7 +1,6 @@
 use crate::{
-  document::document_context::DocumentContext,
-  ffi::{callbacks::host_invoke_callback, executor::spawn},
-  utils::key::Key,
+  document::document_context::DocumentContext, exports::executor::spawn,
+  imports::callbacks::invoke_callback, utils::key::Key,
 };
 use std::ffi::{c_char, CStr, CString};
 
@@ -40,9 +39,7 @@ extern "C" fn document_context_load(
     let data = data.into_raw();
     let data = data as *mut u8;
 
-    unsafe {
-      host_invoke_callback(callback, data);
-    }
+    invoke_callback(callback, data);
   };
 
   spawn(task);

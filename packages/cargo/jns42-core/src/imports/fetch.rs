@@ -1,5 +1,4 @@
-use super::callbacks::register_callback;
-use crate::utils::key::Key;
+use crate::{exports::callbacks::register_callback, utils::key::Key};
 use futures::channel::oneshot;
 use std::ffi::{c_char, CString};
 
@@ -25,5 +24,5 @@ pub async fn fetch(location: &str) -> String {
 }
 
 extern "C" {
-  pub fn host_fetch(location: *mut c_char, callback: Key);
+  fn host_fetch(location: *mut c_char, callback: Key);
 }
