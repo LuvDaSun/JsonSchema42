@@ -34,8 +34,8 @@ let environment: MainEnvironment = {
 };
 
 export interface MainExports extends ExportsBase {
-  alloc(size: number): number;
-  dealloc(pointer: number, size: number): void;
+  reference_drop(pointer_box: number): void;
+  reference_new(): number;
 
   c_string_drop(pointer: number): void;
   c_string_new(size: number): number;

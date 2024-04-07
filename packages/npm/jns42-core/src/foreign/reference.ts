@@ -1,21 +1,23 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 
-export class Box extends ForeignObject {
+export class Reference extends ForeignObject {
   constructor(pointer: number) {
-    super(pointer, () => mainFfi.exports.dealloc(pointer, 4));
+    super(pointer, () => mainFfi.exports.reference_drop(pointer));
   }
 
   public static fromTargetPointer(value: number) {
-    const pointer = mainFfi.exports.alloc(4);
-    mainFfi.memoryView.setUint32(pointer + 0, value, true);
-    return new Box(pointer);
+    const pointer = mainFfi.exports.reference_new();
+    mainFfi.memoryView.setUint32(pointer, value, true);
+    return new Reference(pointer);
   }
+
   public toTargetPointer(): number {
     const { pointer } = this;
     const value = mainFfi.memoryView.getUint32(pointer, true);
     return value;
   }
+
   public setTargetPointer(value: number) {
     const { pointer } = this;
     mainFfi.memoryView.setUint32(pointer, value, true);
