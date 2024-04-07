@@ -2,11 +2,11 @@ use super::{
   arena::Arena,
   schema::{SchemaItem, SchemaKey},
 };
-use crate::{
-  ffi::SizedString,
-  schema_transforms::{BoxedSchemaTransform, SchemaTransform},
+use crate::schema_transforms::{BoxedSchemaTransform, SchemaTransform};
+use std::{
+  ffi::{c_char, CStr, CString},
+  iter::empty,
 };
-use std::iter::empty;
 
 impl Arena<SchemaItem> {
   pub fn resolve_entry(&self, key: SchemaKey) -> (SchemaKey, &SchemaItem) {
@@ -80,9 +80,9 @@ impl Arena<SchemaItem> {
     ancestors.into_iter().rev().flatten()
   }
 
-  pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
+  pub fn transform(&mut self, transforms: &Vec<SchemaTransform>) -> usize {
     self.apply_transform(|arena: &mut Arena<SchemaItem>, key: usize| {
-      for transform in &transforms {
+      for transform in transforms {
         let transform: BoxedSchemaTransform = transform.into();
         transform(arena, key)
       }
@@ -123,16 +123,13 @@ extern "C" fn schema_arena_count(arena: *const Arena<SchemaItem>) -> usize {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_add_item(
-  arena: *mut Arena<SchemaItem>,
-  item: *const SizedString,
-) -> usize {
+extern "C" fn schema_arena_add_item(arena: *mut Arena<SchemaItem>, item: *const c_char) -> usize {
   assert!(!arena.is_null());
   assert!(!item.is_null());
 
   let arena = unsafe { &mut *arena };
-  let item = unsafe { &*item };
-  let item = item.as_ref();
+  let item = unsafe { CStr::from_ptr(item) };
+  let item = item.to_str().unwrap();
   let item = serde_json::from_str(item).unwrap();
 
   arena.add_item(item)
@@ -142,54 +139,45 @@ extern "C" fn schema_arena_add_item(
 extern "C" fn schema_arena_replace_item(
   arena: *mut Arena<SchemaItem>,
   key: usize,
-  item: *const SizedString,
-) -> *const SizedString {
+  item: *const c_char,
+) -> *mut c_char {
   assert!(!arena.is_null());
   assert!(!item.is_null());
 
   let arena = unsafe { &mut *arena };
-  let item = unsafe { &*item };
-  let item = item.as_ref();
+  let item = unsafe { CStr::from_ptr(item) };
+  let item = item.to_str().unwrap();
   let item = serde_json::from_str(item).unwrap();
 
   let item_previous = arena.replace_item(key, item);
   let item_previous = serde_json::to_string(&item_previous).unwrap();
-  let item_previous = SizedString::new(item_previous);
-  let item_previous = Box::new(item_previous);
+  let item_previous = CString::new(item_previous).unwrap();
 
-  Box::into_raw(item_previous)
+  item_previous.into_raw()
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_get_item(
-  arena: *mut Arena<SchemaItem>,
-  key: usize,
-) -> *const SizedString {
+extern "C" fn schema_arena_get_item(arena: *mut Arena<SchemaItem>, key: usize) -> *mut c_char {
   assert!(!arena.is_null());
 
   let arena = unsafe { &mut *arena };
   let item = arena.get_item(key);
   let item = serde_json::to_string(item).unwrap();
-  let item = SizedString::new(item);
-  let item = Box::new(item);
+  let item = CString::new(item).unwrap();
 
-  Box::into_raw(item)
+  item.into_raw()
 }
 
 #[no_mangle]
 extern "C" fn schema_arena_transform(
   arena: *mut Arena<SchemaItem>,
-  transforms: *const Vec<usize>,
+  transforms: *const Vec<SchemaTransform>,
 ) -> usize {
   assert!(!arena.is_null());
   assert!(!transforms.is_null());
 
   let arena = unsafe { &mut *arena };
   let transforms = unsafe { &*transforms };
-  let transforms = transforms
-    .iter()
-    .map(|transform| (*transform).into())
-    .collect();
 
   arena.transform(transforms)
 }

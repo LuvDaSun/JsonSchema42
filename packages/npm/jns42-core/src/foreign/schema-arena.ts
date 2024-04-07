@@ -1,9 +1,9 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
+import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SchemaItemValue, SchemaType } from "./schema-item.js";
-import { SizedString } from "./sized-string.js";
 import { VecUsize } from "./vec-usize.js";
 
 export class SchemaArena extends ForeignObject {
@@ -162,20 +162,20 @@ export class SchemaArena extends ForeignObject {
 
   public addItem(item: SchemaItemValue): number {
     const itemString = JSON.stringify(item);
-    using itemWrapper = SizedString.fromString(itemString);
+    using itemWrapper = CString.fromString(itemString);
     const key = mainFfi.exports.schema_arena_add_item(this.pointer, itemWrapper.pointer);
     return key;
   }
 
   public replaceItem(key: number, item: SchemaItemValue): SchemaItemValue {
     const itemString = JSON.stringify(item);
-    using itemWrapper = SizedString.fromString(itemString);
+    using itemWrapper = CString.fromString(itemString);
     const itemPreviousPointer = mainFfi.exports.schema_arena_replace_item(
       this.pointer,
       key,
       itemWrapper.pointer,
     );
-    using itemPreviousWrapper = new SizedString(itemPreviousPointer);
+    using itemPreviousWrapper = new CString(itemPreviousPointer);
     const itemPreviousString = itemPreviousWrapper.toString();
     const itemPrevious = JSON.parse(itemPreviousString);
     return itemPrevious;
@@ -183,7 +183,7 @@ export class SchemaArena extends ForeignObject {
 
   public getItem(key: number): SchemaItemValue {
     const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
-    using itemWrapper = new SizedString(itemPointer);
+    using itemWrapper = new CString(itemPointer);
     const itemString = itemWrapper.toString();
     const item = JSON.parse(itemString);
     return item;
