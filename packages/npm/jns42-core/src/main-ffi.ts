@@ -73,6 +73,13 @@ export interface MainExports extends ExportsBase {
 
   document_context_drop(document_context: number): void;
   document_context_new(): number;
+  document_context_load_from_location(
+    document_context: number,
+    retrieval_location: number,
+    given_location: number,
+    antecedent_location: number,
+    callback: number,
+  ): void;
   document_context_load(
     document_context: number,
     location: number,

@@ -1,16 +1,310 @@
-use crate::imports::fetch_file::fetch_file;
+use crate::{
+  imports::fetch_file::fetch_file,
+  utils::{node_location::NodeLocation, read_json_node::read_json_node},
+};
+use std::{
+  cell::RefCell,
+  collections::{HashMap, HashSet},
+  rc::Rc,
+};
 
 #[derive(Default)]
 pub struct DocumentContext {
-  //
+  /**
+   * maps node urls to their documents
+   */
+  node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
+
+  /**
+   * all loaded nodes
+   */
+  cache: RefCell<HashMap<NodeLocation, serde_json::Value>>,
+
+  /**
+   * keep track of what we have been loading (so we only load it once)
+   */
+  loaded: RefCell<HashSet<String>>,
 }
 
 impl DocumentContext {
-  pub fn new() -> Self {
-    Default::default()
+  pub fn new() -> Rc<Self> {
+    Rc::new(Default::default())
   }
 
-  pub async fn load(&mut self, location: &str) -> String {
-    fetch_file(location).await
+  pub async fn load_from_location(
+    self: &Rc<Self>,
+    retrieval_location: &NodeLocation,
+    given_location: &NodeLocation,
+    antecedent_location: Option<&NodeLocation>,
+    // default_schema_uri: &MetaSchemaId,
+  ) {
+    let mut queue = Default::default();
+    self
+      .load_from_location_with_queue(
+        retrieval_location,
+        given_location,
+        antecedent_location,
+        // default_schema_uri,
+        &mut queue,
+      )
+      .await;
+    self.load_from_cache_queue(&mut queue).await;
+  }
+
+  async fn load_from_location_with_queue(
+    self: &Rc<Self>,
+    retrieval_location: &NodeLocation,
+    given_location: &NodeLocation,
+    antecedent_location: Option<&NodeLocation>,
+    // default_schema_uri: &MetaSchemaId,
+    queue: &mut Vec<(
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
+      // MetaSchemaId,
+    )>,
+  ) {
+    let document_node_is_none = {
+      let node_cache = self.cache.borrow();
+      let document_node = node_cache.get(retrieval_location);
+      document_node.is_none()
+    };
+
+    if document_node_is_none {
+      let document_node = load_json(&retrieval_location.to_retrieval_string())
+        .await
+        .unwrap();
+
+      self.fill_node_cache(retrieval_location, document_node);
+    }
+
+    queue.push((
+      retrieval_location.clone(),
+      given_location.clone(),
+      antecedent_location.cloned(),
+      // default_schema_uri.clone(),
+    ));
+  }
+
+  pub async fn _load_from_document(
+    self: &Rc<Self>,
+    retrieval_location: &NodeLocation,
+    given_location: &NodeLocation,
+    antecedent_location: Option<&NodeLocation>,
+    document_node: serde_json::Value,
+    // default_schema_uri: &MetaSchemaId,
+  ) {
+    let mut queue = Default::default();
+    self
+      .load_from_document_with_queue(
+        retrieval_location,
+        given_location,
+        antecedent_location,
+        document_node,
+        // default_schema_uri,
+        &mut queue,
+      )
+      .await;
+    self.load_from_cache_queue(&mut queue).await;
+  }
+
+  async fn load_from_document_with_queue(
+    self: &Rc<Self>,
+    retrieval_location: &NodeLocation,
+    given_location: &NodeLocation,
+    antecedent_location: Option<&NodeLocation>,
+    document_node: serde_json::Value,
+    // default_schema_uri: &MetaSchemaId,
+    queue: &mut Vec<(
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
+      // MetaSchemaId,
+    )>,
+  ) {
+    let node_cache_contains_key = {
+      let node_cache = self.cache.borrow();
+      node_cache.contains_key(retrieval_location)
+    };
+
+    if !node_cache_contains_key {
+      self.fill_node_cache(retrieval_location, document_node)
+    }
+
+    queue.push((
+      retrieval_location.clone(),
+      given_location.clone(),
+      antecedent_location.cloned(),
+      // default_schema_uri.clone(),
+    ));
+  }
+
+  fn fill_node_cache(&self, retrieval_url: &NodeLocation, document_node: serde_json::Value) {
+    for (pointer, node) in read_json_node(&[], document_node) {
+      let mut node_url = retrieval_url.clone();
+      node_url.set_pointer(pointer);
+      assert!(self.cache.borrow_mut().insert(node_url, node).is_none())
+    }
+  }
+
+  async fn load_from_cache_queue(
+    self: &Rc<Self>,
+    queue: &mut Vec<(
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
+      // MetaSchemaId,
+    )>,
+  ) {
+    while let Some((
+      retrieval_url,
+      given_url,
+      antecedent_url,
+      // default_schema_uri,
+    )) = queue.pop()
+    {
+      self
+        .load_from_cache_with_queue(
+          &retrieval_url,
+          &given_url,
+          antecedent_url.as_ref(),
+          // &default_schema_uri,
+          queue,
+        )
+        .await;
+    }
+  }
+
+  async fn load_from_cache_with_queue(
+    self: &Rc<Self>,
+    retrieval_location: &NodeLocation,
+    _given_location: &NodeLocation,
+    _antecedent_location: Option<&NodeLocation>,
+    // default_schema_uri: &MetaSchemaId,
+    #[allow(clippy::ptr_arg)] _queue: &mut Vec<(
+      NodeLocation,
+      NodeLocation,
+      Option<NodeLocation>,
+      // MetaSchemaId,
+    )>,
+  ) {
+    if self
+      .node_documents
+      .borrow()
+      .contains_key(retrieval_location)
+    {
+      return;
+    }
+
+    let server_url = retrieval_location.to_retrieval_string();
+    if !self.loaded.borrow_mut().insert(server_url) {
+      return;
+    }
+
+    let _node = self.cache.borrow().get(retrieval_location).unwrap().clone();
+
+    /*
+
+    let schema_uri = MetaSchemaId::discover(&node).unwrap_or_else(|| default_schema_uri.clone());
+    let factory = self.factories.get(&schema_uri).unwrap();
+
+    let document = factory(
+      Rc::downgrade(self),
+      DocumentInitializer {
+        retrieval_url: retrieval_url.clone(),
+        given_url: given_url.clone(),
+        antecedent_url: antecedent_url.cloned(),
+        document_node: &node,
+      },
+    );
+    let document_uri = document.get_document_uri();
+
+    assert!(self
+      .resolved
+      .borrow_mut()
+      .insert(retrieval_url.clone(), document_uri.clone())
+      .is_none());
+
+    assert!(self
+      .documents
+      .borrow_mut()
+      .insert(document_uri.clone(), document.clone())
+      .is_none());
+
+    // Map node urls to this document
+    for node_url in document.get_node_urls() {
+      let ok = self
+        .node_documents
+        .borrow_mut()
+        .insert(node_url.clone(), document_uri.clone())
+        .is_none();
+      if !ok {
+        println!("{} -> {}", node_url, document_uri);
+      }
+    }
+
+    let embedded_documents = document.get_embedded_documents();
+    for embedded_document in embedded_documents {
+      let node = self
+        .clone()
+        .cache
+        .borrow()
+        .get(&embedded_document.retrieval_url)
+        .unwrap()
+        .clone();
+      self
+        .load_from_document_with_queue(
+          &embedded_document.retrieval_url,
+          &embedded_document.given_url,
+          Some(document.get_document_uri()),
+          node,
+          default_schema_uri,
+          queue,
+        )
+        .await;
+    }
+
+    let referenced_documents = document.get_referenced_documents();
+    for referenced_document in referenced_documents {
+      self
+        .load_from_url_with_queue(
+          &referenced_document.retrieval_url,
+          &referenced_document.given_url,
+          Some(document.get_document_uri()),
+          default_schema_uri,
+          queue,
+        )
+        .await;
+    }
+
+    */
+  }
+}
+
+pub async fn load_json(location: &str) -> serde_json::Result<serde_json::Value> {
+  let data = load(location).await;
+  serde_json::from_str(&data)
+}
+
+pub async fn load(location: &str) -> String {
+  fetch_file(location).await
+}
+
+#[cfg(test)]
+mod tests {
+  use super::DocumentContext;
+  use crate::executor::spawn_wait;
+
+  #[test]
+  fn document_context_load() {
+    spawn_wait(async {
+      let document_context = DocumentContext::new();
+
+      let retrieval_location = "https://api.chucknorris.io/jokes/random".parse().unwrap();
+      let given_location = "https://api.chucknorris.io/jokes/random".parse().unwrap();
+      document_context
+        .load_from_location(&retrieval_location, &given_location, None)
+        .await;
+    })
   }
 }

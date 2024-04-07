@@ -14,6 +14,32 @@ export class DocumentContext extends ForeignObject {
     return new DocumentContext(pointer);
   }
 
+  public async loadFromLocation(
+    retrievalLocation: string,
+    givenLocation: string,
+    antecedentLocation?: string,
+  ) {
+    using retrievalLocationForeign = CString.fromString(retrievalLocation);
+    using givenLocationForeign = CString.fromString(givenLocation);
+    using antecedentLocationForeign =
+      antecedentLocation == null ? null : CString.fromString(antecedentLocation);
+
+    const deferred = defer<void>();
+    const key = mainFfi.registerCallback(() => {
+      deferred.resolve();
+    });
+    mainFfi.exports.document_context_load_from_location(
+      this.pointer,
+      retrievalLocationForeign.pointer,
+      givenLocationForeign.pointer,
+      antecedentLocationForeign?.pointer ?? 0,
+      key,
+    );
+
+    const data = await deferred.promise;
+    return data;
+  }
+
   public async load(location: string) {
     using locationForeign = CString.fromString(location);
     using dataReferenceForeign = Reference.new();
