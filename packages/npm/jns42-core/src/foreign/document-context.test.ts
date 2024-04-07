@@ -4,7 +4,8 @@ import { DocumentContext } from "./document-context.js";
 test("load", async () => {
   using documentContext = DocumentContext.new();
 
-  await documentContext.load("http://google.com");
+  const data = await documentContext.load("https://api.chucknorris.io/jokes/random");
 
+  console.log(data);
   debugger;
 });

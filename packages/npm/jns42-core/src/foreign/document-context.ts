@@ -16,10 +16,15 @@ export class DocumentContext extends ForeignObject {
   public async load(location: string) {
     using locationForeign = SizedString.fromString(location);
 
-    const deferred = defer();
-    const key = mainFfi.registerCallback(() => deferred.resolve());
+    const deferred = defer<string>();
+    const key = mainFfi.registerCallback((dataPointer: number) => {
+      using dataForeign = new SizedString(dataPointer);
+      const data = dataForeign.toString();
+      deferred.resolve(data);
+    });
     mainFfi.exports.document_context_load(this.pointer, locationForeign.pointer, key);
 
-    await deferred.promise;
+    const data = await deferred.promise;
+    return data;
   }
 }
