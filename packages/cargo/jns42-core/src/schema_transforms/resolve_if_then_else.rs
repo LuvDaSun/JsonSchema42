@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{arena::Arena, schema_item::SchemaItem};
 use std::collections::BTreeSet;
 
 /**
@@ -78,7 +78,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaItem};
+  use crate::models::{arena::Arena, schema_item::SchemaItem};
 
   #[test]
   fn test_transform() {

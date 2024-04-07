@@ -52,7 +52,7 @@ will become
 macro_rules! generate_mod {
   ( $name: ident, $base_member: ident, $other_member: ident  ) => {
     pub mod $name {
-      use crate::models::{arena::Arena, schema::SchemaItem};
+      use crate::models::{arena::Arena, schema_item::SchemaItem};
       use crate::utils::product::product;
       use std::collections::{BTreeMap, BTreeSet};
 
@@ -127,7 +127,7 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use crate::models::{arena::Arena, schema::SchemaItem};
+        use crate::models::{arena::Arena, schema_item::SchemaItem};
 
         #[test]
         fn test_transform() {

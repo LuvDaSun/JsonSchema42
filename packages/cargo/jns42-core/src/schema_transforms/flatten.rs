@@ -2,7 +2,7 @@ macro_rules! generate_mod {
   ( $member: ident ) => {
     pub mod $member {
       use std::iter::once;
-      use $crate::models::{arena::Arena, schema::SchemaItem};
+      use $crate::models::{arena::Arena, schema_item::SchemaItem};
 
       pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
         let item = arena.get_item(key);
@@ -33,7 +33,7 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use $crate::models::{arena::Arena, schema::SchemaItem};
+        use $crate::models::{arena::Arena, schema_item::SchemaItem};
 
         #[test]
         fn test_transform() {

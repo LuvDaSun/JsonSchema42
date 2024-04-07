@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{arena::Arena, schema_item::SchemaItem};
 use im::HashMap;
 use itertools::Itertools;
 use std::{cell::RefCell, collections::BTreeSet};
@@ -117,7 +117,7 @@ mod tests {
   use super::*;
   use crate::models::{
     arena::Arena,
-    schema::{SchemaItem, SchemaType},
+    schema_item::{SchemaItem, SchemaType},
   };
 
   #[test]

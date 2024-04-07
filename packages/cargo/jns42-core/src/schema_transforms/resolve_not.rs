@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{arena::Arena, schema_item::SchemaItem};
 
 /**
  * This transformer turns resolves the not field
@@ -59,7 +59,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaItem};
+  use crate::models::{arena::Arena, schema_item::SchemaItem};
 
   #[test]
   fn test_transform() {

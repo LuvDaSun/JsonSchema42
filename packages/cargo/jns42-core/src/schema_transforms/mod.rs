@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{arena::Arena, schema_item::SchemaItem};
 
 pub mod explode;
 pub mod flatten;

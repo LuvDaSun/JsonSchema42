@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{arena::Arena, schema_item::SchemaItem};
 use std::{cell::RefCell, collections::HashMap};
 
 /**
@@ -134,7 +134,7 @@ mod tests {
   use super::*;
   use crate::models::{
     arena::Arena,
-    schema::{SchemaItem, SchemaType},
+    schema_item::{SchemaItem, SchemaType},
   };
 
   #[test]

@@ -1,5 +1,5 @@
 use jns42_core::models::{
-  schema::{SchemaItem, SchemaType},
+  schema_item::{SchemaItem, SchemaType},
   specification::Specification,
 };
 use proc_macro2::TokenStream;

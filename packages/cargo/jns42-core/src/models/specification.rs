@@ -1,7 +1,7 @@
 use super::{
   arena::Arena,
   intermediate::IntermediateSchema,
-  schema::{SchemaItem, SchemaType},
+  schema_item::{SchemaItem, SchemaType},
 };
 use crate::{
   naming::{NamesBuilder, Sentence},

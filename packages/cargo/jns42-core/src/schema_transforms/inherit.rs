@@ -1,7 +1,7 @@
 macro_rules! generate_mod {
   ($member: ident) => {
     pub mod $member {
-      use crate::models::{arena::Arena, schema::SchemaItem};
+      use crate::models::{arena::Arena, schema_item::SchemaItem};
 
       /**
        * This function inherits inheritable properties from a item to it's $member items. This
@@ -223,7 +223,7 @@ generate_mod!(any_of);
 generate_mod!(one_of);
 
 pub mod reference {
-  use crate::models::{arena::Arena, schema::SchemaItem};
+  use crate::models::{arena::Arena, schema_item::SchemaItem};
 
   /**
    * This function inherits inheritable properties from a item to a referenced item. This
