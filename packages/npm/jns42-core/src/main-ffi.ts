@@ -4,12 +4,12 @@ import { projectRoot } from "./root.js";
 import { EnvironmentBase, ExportsBase, Ffi } from "./utils/index.js";
 
 export interface MainEnvironment extends EnvironmentBase {
-  host_fetch_file: (location: number, callback: number) => void;
+  host_fetch_file: (location: number, data: number, callback: number) => void;
 }
 
 let environment: MainEnvironment = {
-  host_fetch_file(locationPointer, callback) {
-    mainFfi.spawn(callback, () => fetchFile(locationPointer));
+  host_fetch_file(locationPointer, dataReferencePointer, callback) {
+    mainFfi.spawn(callback, () => fetchFile(locationPointer, dataReferencePointer));
   },
 };
 

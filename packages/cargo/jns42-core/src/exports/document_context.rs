@@ -43,7 +43,7 @@ extern "C" fn document_context_load(
       *data_reference = data;
     }
 
-    invoke_callback(callback, core::ptr::null_mut());
+    invoke_callback(callback);
   };
 
   spawn(task);

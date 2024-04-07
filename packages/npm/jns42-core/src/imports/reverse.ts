@@ -6,7 +6,7 @@ export function reverse(value: string): string {
   using resultReferenceForeign = Reference.new(0);
   using valueForeign = CString.fromString(value);
   mainFfi.exports.reverse(valueForeign.pointer, resultReferenceForeign.pointer);
-  using resultWrapper = new CString(resultReferenceForeign.target);
-  const result = resultWrapper.toString();
+  using resultForeign = new CString(resultReferenceForeign.target);
+  const result = resultForeign.toString();
   return result;
 }

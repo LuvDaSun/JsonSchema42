@@ -1,10 +1,11 @@
 import fs from "fs/promises";
-import { CString } from "../imports/index.js";
+import { CString, Reference } from "../imports/index.js";
 
-export async function fetchFile(locationPointer: number) {
+export async function fetchFile(locationPointer: number, dataReferencePointer: number) {
   using locationForeign = new CString(locationPointer);
-  const location = locationForeign.toString();
+  using dataReferenceForeign = new Reference(dataReferencePointer);
 
+  const location = locationForeign.toString();
   const locationLower = location.toLowerCase();
   let data: string | undefined;
   if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
@@ -17,5 +18,6 @@ export async function fetchFile(locationPointer: number) {
   using dataForeign = CString.fromString(data);
   dataForeign.abandon();
 
-  return dataForeign.pointer;
+  dataReferenceForeign.target = dataForeign.pointer;
+  dataReferenceForeign.abandon();
 }

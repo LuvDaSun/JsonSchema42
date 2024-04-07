@@ -3,7 +3,7 @@ import { newKey } from "./key.js";
 
 export interface ExportsBase {
   memory: WebAssembly.Memory;
-  invoke_callback(key: number, result: number): void;
+  invoke_callback(key: number): void;
 }
 export interface EnvironmentBase {
   [name: string]: WebAssembly.ImportValue;
@@ -33,8 +33,8 @@ export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBas
     const instance = new WebAssembly.Instance(module, {
       env: {
         ...environment,
-        host_invoke_callback(key: number, result: number) {
-          ffi.invokeCallback(key, result);
+        host_invoke_callback(key: number) {
+          ffi.invokeCallback(key);
         },
       },
     });
@@ -50,7 +50,7 @@ export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBas
     return this.instance.exports as unknown as Exports;
   }
 
-  private readonly callbacks: Record<number, (result: number) => void> = {};
+  private readonly callbacks: Record<number, () => void> = {};
 
   private memoryUint8Cache?: Uint8Array;
   public get memoryUint8() {
@@ -70,22 +70,19 @@ export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBas
     return this.memoryViewCache;
   }
 
-  public spawn(callback: number, task: () => Promise<number>) {
-    task().then(
-      (result) => this.exports.invoke_callback(callback, result),
-      () => this.exports.invoke_callback(callback, 0),
-    );
+  public spawn(callback: number, task: () => Promise<void>) {
+    task().finally(() => this.exports.invoke_callback(callback));
   }
 
-  public registerCallback(callback: (result: number) => void) {
+  public registerCallback(callback: () => void) {
     let key = newKey();
     this.callbacks[key] = callback;
     return key;
   }
 
-  private invokeCallback(key: number, result: number) {
+  private invokeCallback(key: number) {
     try {
-      this.callbacks[key](result);
+      this.callbacks[key]();
     } finally {
       delete this.callbacks[key];
     }
