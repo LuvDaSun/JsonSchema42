@@ -3,7 +3,7 @@ import { newKey } from "./key.js";
 
 export interface ExportsBase {
   memory: WebAssembly.Memory;
-  invoke_host_callback(key: number, result: number): void;
+  invoke_callback(key: number, result: number): void;
 }
 export interface EnvironmentBase {
   [name: string]: WebAssembly.ImportValue;
@@ -72,8 +72,8 @@ export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBas
 
   public spawn(callback: number, task: () => Promise<number>) {
     task().then(
-      (result) => this.exports.invoke_host_callback(callback, result),
-      () => this.exports.invoke_host_callback(callback, 0),
+      (result) => this.exports.invoke_callback(callback, result),
+      () => this.exports.invoke_callback(callback, 0),
     );
   }
 
