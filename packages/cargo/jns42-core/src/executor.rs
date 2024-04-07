@@ -1,4 +1,4 @@
-use crate::imports::callbacks::invoke_callback;
+use crate::imports::host_invoke_callback;
 use crate::utils::key::Key;
 use futures::task::LocalSpawnExt;
 use futures::{executor::LocalPool, Future};
@@ -18,7 +18,9 @@ pub fn spawn_and_callback(callback: Key, task: impl Future<Output = ()> + 'stati
     spawner
       .spawn_local(async move {
         task.await;
-        invoke_callback(callback);
+        unsafe {
+          host_invoke_callback(callback);
+        }
       })
       .unwrap();
     pool.run_until_stalled()

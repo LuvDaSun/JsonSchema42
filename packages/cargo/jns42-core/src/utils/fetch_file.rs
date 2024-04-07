@@ -1,4 +1,4 @@
-use crate::{callbacks::register_callback, utils::key::Key};
+use crate::callbacks::register_callback;
 use futures::channel::oneshot;
 use std::{
   ffi::{c_char, CString},
@@ -17,7 +17,7 @@ pub async fn fetch_file(location: &str) -> String {
     ready_sender.send(()).unwrap();
   });
   unsafe {
-    host_fetch_file(location, data, callback_key);
+    crate::imports::host_fetch_file(location, data, callback_key);
   }
   ready_receiver.await.unwrap();
 
@@ -27,8 +27,4 @@ pub async fn fetch_file(location: &str) -> String {
   let data = data.to_str().unwrap();
 
   data.to_owned()
-}
-
-extern "C" {
-  fn host_fetch_file(location: *mut c_char, data: *mut *mut c_char, callback: Key);
 }

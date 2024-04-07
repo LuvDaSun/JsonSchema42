@@ -68,9 +68,9 @@ impl DocumentContext {
     };
 
     if document_node_is_none {
-      let document_node = load_json(&retrieval_location.to_retrieval_string())
-        .await
-        .unwrap();
+      let data =
+        crate::utils::fetch_file::fetch_file(&retrieval_location.to_retrieval_string()).await;
+      let document_node = serde_json::from_str(&data).unwrap();
 
       self.fill_node_cache(retrieval_location, document_node);
     }
@@ -276,13 +276,4 @@ impl DocumentContext {
 
     */
   }
-}
-
-pub async fn load_json(location: &str) -> serde_json::Result<serde_json::Value> {
-  let data = load(location).await;
-  serde_json::from_str(&data)
-}
-
-pub async fn load(location: &str) -> String {
-  crate::imports::fetch_file::fetch_file(location).await
 }
