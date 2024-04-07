@@ -1,4 +1,3 @@
-use crate::ffi::SizedString;
 use once_cell::sync::Lazy;
 use regex::{Regex, RegexBuilder};
 use std::{
@@ -346,16 +345,15 @@ extern "C" fn node_location_join(
 }
 
 #[no_mangle]
-extern "C" fn node_location_to_string(node_location: *const NodeLocation) -> *mut SizedString {
+extern "C" fn node_location_to_string(node_location: *const NodeLocation) -> *mut c_char {
   assert!(!node_location.is_null());
 
   let node_location = unsafe { &*node_location };
 
   let result = node_location.to_string();
-  let result = SizedString::new(result);
-  let result = Box::new(result);
+  let result = CString::new(result).unwrap();
 
-  Box::into_raw(result)
+  result.into_raw()
 }
 
 #[no_mangle]

@@ -1,6 +1,6 @@
 import { mainFfi } from "../main-ffi.js";
+import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
-import { SizedString } from "./sized-string.js";
 import { VecString } from "./vec-string.js";
 
 const finalizationRegistry = new FinalizationRegistry<number>((pointer) => {
@@ -34,7 +34,7 @@ export class NodeLocation extends ForeignObject {
   }
 
   public static parse(input: string) {
-    using inputForeign = SizedString.fromString(input);
+    using inputForeign = CString.fromString(input);
     const pointer = mainFfi.exports.node_location_parse(inputForeign.pointer);
     return new NodeLocation(pointer);
   }
@@ -55,14 +55,14 @@ export class NodeLocation extends ForeignObject {
 
   public toString() {
     const resultPointer = mainFfi.exports.node_location_to_string(this.pointer);
-    using resultForeign = new SizedString(resultPointer);
+    using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;
   }
 
   public toRetrievalString() {
     const resultPointer = mainFfi.exports.node_location_to_retrieval_string(this.pointer);
-    using resultForeign = new SizedString(resultPointer);
+    using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;
   }
@@ -76,7 +76,7 @@ export class NodeLocation extends ForeignObject {
 
   public getAnchor() {
     const resultPointer = mainFfi.exports.node_location_get_anchor(this.pointer);
-    using resultForeign = new SizedString(resultPointer);
+    using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;
   }
@@ -101,7 +101,7 @@ export class NodeLocation extends ForeignObject {
   }
 
   public setAnchor(anchor: string) {
-    using anchorForeign = SizedString.fromString(anchor);
+    using anchorForeign = CString.fromString(anchor);
     mainFfi.exports.node_location_set_anchor(this.pointer, anchorForeign.pointer);
   }
 

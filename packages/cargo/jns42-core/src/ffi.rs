@@ -19,50 +19,6 @@ extern "C" fn reverse(value: *const c_char, result_output: *mut *mut c_char) {
   unsafe { *result_output = result };
 }
 
-#[repr(C)]
-pub struct SizedString {
-  data: *mut u8,
-  size: usize,
-}
-
-impl SizedString {
-  pub fn new(value: String) -> Self {
-    let bytes = value.into_bytes();
-    let data = bytes.into_boxed_slice();
-    let size = data.len();
-    let data = Box::into_raw(data) as *mut u8;
-
-    Self { data, size }
-  }
-}
-
-impl Drop for SizedString {
-  fn drop(&mut self) {
-    dealloc(self.data, self.size)
-  }
-}
-
-impl From<SizedString> for String {
-  fn from(value: SizedString) -> Self {
-    value.as_ref().to_string()
-  }
-}
-
-impl From<&SizedString> for String {
-  fn from(value: &SizedString) -> Self {
-    value.as_ref().to_string()
-  }
-}
-
-impl AsRef<str> for SizedString {
-  fn as_ref(&self) -> &str {
-    unsafe {
-      let slice = std::slice::from_raw_parts(self.data, self.size);
-      std::str::from_utf8_unchecked(slice)
-    }
-  }
-}
-
 const ALIGN: usize = std::mem::align_of::<usize>();
 
 #[no_mangle]
