@@ -1,7 +1,7 @@
 import { mainFfi } from "../main-ffi.js";
+import { CString } from "./c-string.js";
 import { ForeignObject } from "./foreign-object.js";
 import { Names } from "./names.js";
-import { SizedString } from "./sized-string.js";
 import { VecString } from "./vec-string.js";
 
 export class NamesBuilder extends ForeignObject {
@@ -23,7 +23,7 @@ export class NamesBuilder extends ForeignObject {
   }
 
   public setDefaultName(value: string) {
-    using valueForeign = SizedString.fromString(value);
+    using valueForeign = CString.fromString(value);
 
     mainFfi.exports.names_builder_set_default_name(this.pointer, valueForeign.pointer);
 
