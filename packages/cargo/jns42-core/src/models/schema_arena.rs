@@ -1,9 +1,11 @@
-use super::{
-  arena::Arena,
-  schema_item::{SchemaItem, SchemaKey},
+use super::schema_item::{SchemaItem, SchemaKey};
+use crate::{
+  schema_transforms::{BoxedSchemaTransform, SchemaTransform},
+  utils::arena::Arena,
 };
-use crate::schema_transforms::{BoxedSchemaTransform, SchemaTransform};
 use std::iter::empty;
+
+pub type SchemaArena = Arena<SchemaItem>;
 
 impl Arena<SchemaItem> {
   pub fn resolve_entry(&self, key: SchemaKey) -> (SchemaKey, &SchemaItem) {

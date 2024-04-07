@@ -1,6 +1,5 @@
+use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 use std::collections::HashSet;
-
-use crate::models::{arena::Arena, schema_item::SchemaItem};
 
 /**
  * This transformer turns resolves the not field
@@ -23,7 +22,7 @@ use crate::models::{arena::Arena, schema_item::SchemaItem};
  *   - a
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let Some(not) = item.not else {
@@ -59,11 +58,10 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema_item::SchemaItem};
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
     arena.add_item(SchemaItem {
       required: Some(["a"].map(|value| value.to_string()).into()),

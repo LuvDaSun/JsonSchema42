@@ -1,7 +1,7 @@
 macro_rules! generate_mod {
   ($member: ident) => {
     pub mod $member {
-      use crate::models::{arena::Arena, schema_item::SchemaItem};
+      use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 
       /**
        * This function inherits inheritable properties from a item to it's $member items. This
@@ -42,7 +42,7 @@ macro_rules! generate_mod {
        * ```
        *
        */
-      pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         let Some(sub_keys) = item.$member.clone() else {
@@ -161,7 +161,7 @@ macro_rules! generate_mod {
 
         #[test]
         fn test_transform() {
-          let mut arena = Arena::new();
+          let mut arena = SchemaArena::new();
 
           arena.add_item(SchemaItem {
             required: Some(["a"].map(|value| value.into()).into()),
@@ -223,7 +223,7 @@ generate_mod!(any_of);
 generate_mod!(one_of);
 
 pub mod reference {
-  use crate::models::{arena::Arena, schema_item::SchemaItem};
+  use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 
   /**
    * This function inherits inheritable properties from a item to a referenced item. This
@@ -257,7 +257,7 @@ pub mod reference {
    * ```
    *
    */
-  pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+  pub fn transform(arena: &mut SchemaArena, key: usize) {
     let item = arena.get_item(key);
 
     let Some(sub_key) = item.reference else {
@@ -370,7 +370,7 @@ pub mod reference {
 
     #[test]
     fn test_transform() {
-      let mut arena = Arena::new();
+      let mut arena = SchemaArena::new();
 
       arena.add_item(SchemaItem {
         required: Some(["a", "b"].map(|value| value.into()).into()),

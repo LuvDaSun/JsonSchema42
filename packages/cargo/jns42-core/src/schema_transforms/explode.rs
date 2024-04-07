@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema_item::SchemaItem};
+use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 
 /**
  * Turns the model into a single all-of with various
@@ -54,7 +54,7 @@ use crate::models::{arena::Arena, schema_item::SchemaItem};
  * ```
  *
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
   let mut sub_items = Vec::new();
 
@@ -168,7 +168,7 @@ mod tests {
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
     arena.add_item(SchemaItem {
       reference: Some(10),

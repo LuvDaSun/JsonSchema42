@@ -15,9 +15,9 @@
 macro_rules! generate_mod {
   ( $member: ident ) => {
     pub mod $member {
-      use $crate::models::{arena::Arena, schema_item::SchemaItem};
+      use crate::models::schema_arena::SchemaArena;
 
-      pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         if let Some(sub_keys) = &item.$member {
@@ -45,11 +45,11 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use $crate::models::{arena::Arena, schema_item::SchemaItem};
+        use crate::models::schema_item::SchemaItem;
 
         #[test]
         fn test_transform() {
-          let mut arena = Arena::new();
+          let mut arena = SchemaArena::new();
 
           arena.add_item(SchemaItem {
             $member: Some([10].into()),

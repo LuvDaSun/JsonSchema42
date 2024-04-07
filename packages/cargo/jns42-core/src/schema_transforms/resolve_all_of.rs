@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema_item::SchemaItem};
+use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 use std::{cell::RefCell, collections::HashMap};
 
 /**
@@ -28,7 +28,7 @@ use std::{cell::RefCell, collections::HashMap};
  *   - 300
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let Some(sub_keys) = item.all_of.clone() else {
@@ -132,14 +132,11 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{
-    arena::Arena,
-    schema_item::{SchemaItem, SchemaType},
-  };
+  use crate::models::schema_item::SchemaType;
 
   #[test]
   fn test_utility() {
-    let mut arena = Arena::from_iter([
+    let mut arena = SchemaArena::from_iter([
       SchemaItem {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
@@ -196,7 +193,7 @@ mod tests {
 
   #[test]
   fn test_primitive() {
-    let mut arena = Arena::from_iter([
+    let mut arena = SchemaArena::from_iter([
       SchemaItem {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
@@ -253,7 +250,7 @@ mod tests {
 
   #[test]
   fn test_tuple() {
-    let mut arena = Arena::from_iter([
+    let mut arena = SchemaArena::from_iter([
       SchemaItem {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
@@ -339,7 +336,7 @@ mod tests {
 
   #[test]
   fn test_array() {
-    let mut arena = Arena::from_iter([
+    let mut arena = SchemaArena::from_iter([
       SchemaItem {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
@@ -405,7 +402,7 @@ mod tests {
 
   #[test]
   fn test_object() {
-    let mut arena = Arena::from_iter([
+    let mut arena = SchemaArena::from_iter([
       SchemaItem {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
@@ -490,7 +487,7 @@ mod tests {
 
   #[test]
   fn test_map() {
-    let mut arena = Arena::from_iter([
+    let mut arena = SchemaArena::from_iter([
       SchemaItem {
         types: Some([SchemaType::String].into()),
         ..Default::default()

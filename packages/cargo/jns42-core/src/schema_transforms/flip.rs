@@ -52,11 +52,11 @@ will become
 macro_rules! generate_mod {
   ( $name: ident, $base_member: ident, $other_member: ident  ) => {
     pub mod $name {
-      use crate::models::{arena::Arena, schema_item::SchemaItem};
+      use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
       use crate::utils::product::product;
       use std::collections::{BTreeMap, BTreeSet};
 
-      pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         let Some(base_keys) = &item.$base_member else {
@@ -127,11 +127,10 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use crate::models::{arena::Arena, schema_item::SchemaItem};
 
         #[test]
         fn test_transform() {
-          let mut arena = Arena::new();
+          let mut arena = SchemaArena::new();
 
           arena.add_item(Default::default()); // 0
           arena.add_item(Default::default()); // 1

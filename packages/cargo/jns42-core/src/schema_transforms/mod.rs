@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema_item::SchemaItem};
+use crate::models::schema_arena::SchemaArena;
 
 pub mod explode;
 pub mod flatten;
@@ -62,7 +62,7 @@ impl From<SchemaTransform> for usize {
   }
 }
 
-pub type BoxedSchemaTransform = Box<dyn Fn(&mut Arena<SchemaItem>, usize)>;
+pub type BoxedSchemaTransform = Box<dyn Fn(&mut SchemaArena, usize)>;
 
 impl From<&SchemaTransform> for BoxedSchemaTransform {
   fn from(value: &SchemaTransform) -> Self {

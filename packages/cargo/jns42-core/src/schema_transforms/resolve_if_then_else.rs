@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema_item::SchemaItem};
+use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 use std::collections::BTreeSet;
 
 /**
@@ -25,7 +25,7 @@ use std::collections::BTreeSet;
  *   - 300
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   if item.one_of.is_some() {
@@ -78,11 +78,10 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema_item::SchemaItem};
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
     arena.add_item(SchemaItem {
       r#if: Some(100),

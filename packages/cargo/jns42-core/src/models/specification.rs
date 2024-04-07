@@ -1,12 +1,11 @@
 use super::{
-  arena::Arena,
   intermediate::IntermediateSchema,
   schema_item::{SchemaItem, SchemaType},
 };
 use crate::{
   naming::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::node_location::NodeLocation,
+  utils::{arena::Arena, node_location::NodeLocation},
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};

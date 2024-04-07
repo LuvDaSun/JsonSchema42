@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema_item::SchemaItem};
+use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
 
 /**
  * This sets the primary field on all relevant schemas
@@ -17,7 +17,7 @@ use crate::models::{arena::Arena, schema_item::SchemaItem};
  * - primary: true
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let Some(primary) = item.primary else {
@@ -46,11 +46,10 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema_item::SchemaItem};
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
     arena.add_item(SchemaItem {
       primary: Some(true),

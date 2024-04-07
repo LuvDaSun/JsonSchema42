@@ -1,23 +1,20 @@
-use crate::{
-  models::{arena::Arena, schema_item::SchemaItem},
-  schema_transforms::SchemaTransform,
-};
+use crate::{models::schema_arena::SchemaArena, schema_transforms::SchemaTransform};
 use std::ffi::{c_char, CStr, CString};
 
 #[no_mangle]
-extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
+extern "C" fn schema_arena_drop(arena: *mut SchemaArena) {
   let _ = unsafe { Box::from_raw(arena) };
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_new() -> *const Arena<SchemaItem> {
-  let arena = Arena::new();
+extern "C" fn schema_arena_new() -> *const SchemaArena {
+  let arena = SchemaArena::new();
   let arena = Box::new(arena);
   Box::into_raw(arena)
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_clone(arena: *const Arena<SchemaItem>) -> *const Arena<SchemaItem> {
+extern "C" fn schema_arena_clone(arena: *const SchemaArena) -> *const SchemaArena {
   assert!(!arena.is_null());
 
   let arena = unsafe { &*arena };
@@ -27,7 +24,7 @@ extern "C" fn schema_arena_clone(arena: *const Arena<SchemaItem>) -> *const Aren
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_count(arena: *const Arena<SchemaItem>) -> usize {
+extern "C" fn schema_arena_count(arena: *const SchemaArena) -> usize {
   assert!(!arena.is_null());
 
   let arena = unsafe { &*arena };
@@ -35,7 +32,7 @@ extern "C" fn schema_arena_count(arena: *const Arena<SchemaItem>) -> usize {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_add_item(arena: *mut Arena<SchemaItem>, item: *const c_char) -> usize {
+extern "C" fn schema_arena_add_item(arena: *mut SchemaArena, item: *const c_char) -> usize {
   assert!(!arena.is_null());
   assert!(!item.is_null());
 
@@ -49,7 +46,7 @@ extern "C" fn schema_arena_add_item(arena: *mut Arena<SchemaItem>, item: *const 
 
 #[no_mangle]
 extern "C" fn schema_arena_replace_item(
-  arena: *mut Arena<SchemaItem>,
+  arena: *mut SchemaArena,
   key: usize,
   item: *const c_char,
 ) -> *mut c_char {
@@ -69,7 +66,7 @@ extern "C" fn schema_arena_replace_item(
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_get_item(arena: *mut Arena<SchemaItem>, key: usize) -> *mut c_char {
+extern "C" fn schema_arena_get_item(arena: *mut SchemaArena, key: usize) -> *mut c_char {
   assert!(!arena.is_null());
 
   let arena = unsafe { &mut *arena };
@@ -82,7 +79,7 @@ extern "C" fn schema_arena_get_item(arena: *mut Arena<SchemaItem>, key: usize) -
 
 #[no_mangle]
 extern "C" fn schema_arena_transform(
-  arena: *mut Arena<SchemaItem>,
+  arena: *mut SchemaArena,
   transforms: *const Vec<SchemaTransform>,
 ) -> usize {
   assert!(!arena.is_null());
@@ -97,10 +94,11 @@ extern "C" fn schema_arena_transform(
 #[cfg(test)]
 mod tests {
   use super::*;
+  use crate::models::schema_item::SchemaItem;
 
   #[test]
   fn test_get_name_parts() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
     arena.add_item(SchemaItem {
       id: Some("http://id.com#/a/0".parse().unwrap()),
