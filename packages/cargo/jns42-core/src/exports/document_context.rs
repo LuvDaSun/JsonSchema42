@@ -4,21 +4,21 @@ use crate::{
   utils::key::Key,
 };
 use std::{
-  ffi::{c_char, CStr, CString},
+  ffi::{c_char, c_void, CStr, CString},
   rc::Rc,
 };
 
 #[no_mangle]
 extern "C" fn document_context_drop(document_context: *mut Rc<DocumentContext>) {
-  let _ = unsafe { Box::from_raw(document_context) };
+  let _ = unsafe { Rc::from_raw(document_context) };
 }
 
 #[no_mangle]
-extern "C" fn document_context_new() -> *mut Rc<DocumentContext> {
+extern "C" fn document_context_new() -> *mut c_void {
   let document_context = DocumentContext::new();
   let document_context = Box::new(document_context);
 
-  Box::into_raw(document_context)
+  Box::into_raw(document_context) as *mut c_void
 }
 
 #[no_mangle]
@@ -29,8 +29,8 @@ extern "C" fn document_context_load(
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
-    let location = unsafe { CStr::from_ptr(location) };
     let _document_context = unsafe { &mut *document_context };
+    let location = unsafe { CStr::from_ptr(location) };
 
     let location = location.to_str().unwrap();
 

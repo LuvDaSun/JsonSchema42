@@ -1,7 +1,4 @@
-use crate::{
-  imports::fetch_file::fetch_file,
-  utils::{node_location::NodeLocation, read_json_node::read_json_node},
-};
+use crate::utils::{node_location::NodeLocation, read_json_node::read_json_node};
 use std::{
   cell::RefCell,
   collections::{HashMap, HashSet},
@@ -287,24 +284,5 @@ pub async fn load_json(location: &str) -> serde_json::Result<serde_json::Value> 
 }
 
 pub async fn load(location: &str) -> String {
-  fetch_file(location).await
-}
-
-#[cfg(test)]
-mod tests {
-  use super::DocumentContext;
-  use crate::executor::spawn_wait;
-
-  #[test]
-  fn document_context_load() {
-    spawn_wait(async {
-      let document_context = DocumentContext::new();
-
-      let retrieval_location = "https://api.chucknorris.io/jokes/random".parse().unwrap();
-      let given_location = "https://api.chucknorris.io/jokes/random".parse().unwrap();
-      document_context
-        .load_from_location(&retrieval_location, &given_location, None)
-        .await;
-    })
-  }
+  crate::imports::fetch_file::fetch_file(location).await
 }
