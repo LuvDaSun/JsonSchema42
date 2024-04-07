@@ -1,5 +1,5 @@
 use crate::{
-  document::document_context::DocumentContext, exports::executor::spawn,
+  document::document_context::DocumentContext, executor::spawn,
   imports::callbacks::invoke_callback, utils::key::Key,
 };
 use std::ffi::{c_char, CStr, CString};
@@ -23,6 +23,7 @@ extern "C" fn document_context_new() -> *mut DocumentContext {
 extern "C" fn document_context_load(
   document_context: *mut DocumentContext,
   location: *const c_char,
+  data_reference: *mut *mut c_char,
   callback: Key,
 ) {
   assert!(!document_context.is_null());
@@ -37,9 +38,12 @@ extern "C" fn document_context_load(
     let data = document_context.load(location).await;
     let data = CString::new(data).unwrap();
     let data = data.into_raw();
-    let data = data as *mut u8;
 
-    invoke_callback(callback, data);
+    unsafe {
+      *data_reference = data;
+    }
+
+    invoke_callback(callback, core::ptr::null_mut());
   };
 
   spawn(task);

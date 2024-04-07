@@ -2,6 +2,7 @@ import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
+import { Reference } from "./reference.js";
 
 export class DocumentContext extends ForeignObject {
   constructor(pointer: number) {
@@ -15,14 +16,20 @@ export class DocumentContext extends ForeignObject {
 
   public async load(location: string) {
     using locationForeign = CString.fromString(location);
+    using dataReferenceForeign = Reference.new();
 
     const deferred = defer<string>();
-    const key = mainFfi.registerCallback((dataPointer: number) => {
-      using dataForeign = new CString(dataPointer);
+    const key = mainFfi.registerCallback(() => {
+      using dataForeign = new CString(dataReferenceForeign.target);
       const data = dataForeign.toString();
       deferred.resolve(data);
     });
-    mainFfi.exports.document_context_load(this.pointer, locationForeign.pointer, key);
+    mainFfi.exports.document_context_load(
+      this.pointer,
+      locationForeign.pointer,
+      dataReferenceForeign.pointer,
+      key,
+    );
 
     const data = await deferred.promise;
     return data;

@@ -73,7 +73,12 @@ export interface MainExports extends ExportsBase {
 
   document_context_drop(document_context: number): void;
   document_context_new(): number;
-  document_context_load(document_context: number, location: number, key: number): void;
+  document_context_load(
+    document_context: number,
+    location: number,
+    data_reference: number,
+    key: number,
+  ): void;
 
   to_camel_case(value: number): number;
   to_pascal_case(value: number): number;

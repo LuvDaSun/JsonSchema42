@@ -6,19 +6,19 @@ export class Reference extends ForeignObject {
     super(pointer, () => mainFfi.exports.reference_drop(pointer));
   }
 
-  public static fromTargetPointer(value: number) {
+  public static new(target: number = 0) {
     const pointer = mainFfi.exports.reference_new();
-    mainFfi.memoryView.setUint32(pointer, value, true);
+    mainFfi.memoryView.setUint32(pointer, target, true);
     return new Reference(pointer);
   }
 
-  public toTargetPointer(): number {
+  public get target(): number {
     const { pointer } = this;
     const value = mainFfi.memoryView.getUint32(pointer, true);
     return value;
   }
 
-  public setTargetPointer(value: number) {
+  public set target(value: number) {
     const { pointer } = this;
     mainFfi.memoryView.setUint32(pointer, value, true);
   }

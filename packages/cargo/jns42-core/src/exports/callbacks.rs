@@ -1,4 +1,4 @@
-use super::executor::wake;
+use crate::executor::wake;
 use crate::utils::key::Key;
 use once_cell::sync::Lazy;
 use std::{collections::BTreeMap, sync::Mutex};
