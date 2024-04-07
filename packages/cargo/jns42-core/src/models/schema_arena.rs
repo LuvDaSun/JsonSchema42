@@ -92,9 +92,7 @@ impl Arena<SchemaItem> {
 
 #[no_mangle]
 extern "C" fn schema_arena_drop(arena: *mut Arena<SchemaItem>) {
-  assert!(!arena.is_null());
-
-  drop(unsafe { Box::from_raw(arena) });
+  let _ = unsafe { Box::from_raw(arena) };
 }
 
 #[no_mangle]

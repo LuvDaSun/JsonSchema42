@@ -9,47 +9,25 @@ const textDecoder = new TextDecoder("utf-8", {
 
 export class CString extends ForeignObject {
   public static fromString(value: string) {
-    const pointer = allocate(value);
+    const data = textEncoder.encode(value);
+    const pointer = mainFfi.exports.c_string_new(data.length);
+    mainFfi.memoryUint8.set(data, pointer);
     return new CString(pointer);
   }
+
   public toString(): string {
     const { pointer } = this;
-    return read(pointer);
+    const index = mainFfi.memoryUint8.indexOf(0, pointer);
+    if (index < 0) {
+      throw new TypeError("cstring size not found");
+    }
+    const data = mainFfi.memoryUint8.subarray(pointer, index);
+    const value = textDecoder.decode(data);
+    return value;
   }
+
   protected drop() {
     const { pointer } = this;
-    deallocate(pointer);
+    mainFfi.exports.c_string_drop(pointer);
   }
-}
-
-function allocate(value: string): number {
-  const data = textEncoder.encode(value);
-  const dataSize = data.length;
-  const size = dataSize + 1;
-  const pointer = mainFfi.exports.alloc(size);
-  mainFfi.memoryUint8.set(data, pointer);
-  mainFfi.memoryView.setUint8(pointer + dataSize + 0, 0);
-  return pointer;
-}
-
-function read(pointer: number): string {
-  const size = findSize(pointer);
-  const dataSize = size - 1;
-  const data = mainFfi.memoryUint8.subarray(pointer, pointer + dataSize);
-  const value = textDecoder.decode(data);
-  return value;
-}
-
-function deallocate(pointer: number) {
-  const size = findSize(pointer);
-  mainFfi.exports.dealloc(pointer, size);
-}
-
-function findSize(pointer: number): number {
-  const index = mainFfi.memoryUint8.indexOf(0, pointer);
-  if (index < 0) {
-    throw new TypeError("cstring size not found");
-  }
-  const size = index - pointer + 1;
-  return size;
 }

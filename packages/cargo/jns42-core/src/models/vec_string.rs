@@ -12,15 +12,11 @@ extern "C" fn vec_string_new(capacity: usize) -> *mut Vec<String> {
 extern "C" fn vec_string_drop(vec: *mut Vec<String>) {
   assert!(!vec.is_null());
 
-  let vec = unsafe { Box::from_raw(vec) };
-
-  drop(vec);
+  let _ = unsafe { Box::from_raw(vec) };
 }
 
 #[no_mangle]
 extern "C" fn vec_string_len(vec: *const Vec<String>) -> usize {
-  assert!(!vec.is_null());
-
   let vec = unsafe { &*vec };
 
   vec.len()

@@ -8,15 +8,11 @@ extern "C" fn vec_usize_new(capacity: usize) -> *const Vec<usize> {
 
 #[no_mangle]
 extern "C" fn vec_usize_drop(vec: *mut Vec<usize>) {
-  assert!(!vec.is_null());
-
-  drop(unsafe { Box::from_raw(vec) });
+  let _ = unsafe { Box::from_raw(vec) };
 }
 
 #[no_mangle]
 extern "C" fn vec_usize_len(vec: *const Vec<usize>) -> usize {
-  assert!(!vec.is_null());
-
   let vec = unsafe { &*vec };
 
   vec.len()
@@ -24,8 +20,6 @@ extern "C" fn vec_usize_len(vec: *const Vec<usize>) -> usize {
 
 #[no_mangle]
 extern "C" fn vec_usize_push(vec: *mut Vec<usize>, value: usize) {
-  assert!(!vec.is_null());
-
   let vec = unsafe { &mut *vec };
 
   vec.push(value);
