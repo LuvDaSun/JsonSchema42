@@ -1,7 +1,7 @@
 import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
+import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
-import { ForeignObject } from "./foreign-object.js";
 
 export class DocumentContext extends ForeignObject {
   constructor(pointer: number) {

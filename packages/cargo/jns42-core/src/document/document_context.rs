@@ -1,4 +1,4 @@
-use crate::imports::fetch::fetch;
+use crate::imports::fetch_file::fetch_file;
 
 #[derive(Default)]
 pub struct DocumentContext {
@@ -11,6 +11,6 @@ impl DocumentContext {
   }
 
   pub async fn load(&mut self, location: &str) -> String {
-    fetch(location).await
+    fetch_file(location).await
   }
 }

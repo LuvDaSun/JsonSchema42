@@ -1,8 +1,8 @@
 import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
+import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
-import { ForeignObject } from "./foreign-object.js";
 import { SchemaItemValue, SchemaType } from "./schema-item.js";
 import { VecUsize } from "./vec-usize.js";
 

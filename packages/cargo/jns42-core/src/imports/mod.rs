@@ -1,2 +1,2 @@
 pub mod callbacks;
-pub mod fetch;
+pub mod fetch_file;

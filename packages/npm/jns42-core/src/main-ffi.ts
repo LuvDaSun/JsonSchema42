@@ -1,35 +1,15 @@
-import * as fs from "fs/promises";
 import path from "path";
-import { CString } from "./foreign/c-string.js";
+import { fetchFile } from "./exports/fetch-file.js";
 import { projectRoot } from "./root.js";
 import { EnvironmentBase, ExportsBase, Ffi } from "./utils/index.js";
 
 export interface MainEnvironment extends EnvironmentBase {
-  host_fetch: (location: number, callback: number) => void;
-}
-
-async function hostFetch(locationPointer: number) {
-  using locationForeign = new CString(locationPointer);
-  const location = locationForeign.toString();
-
-  const locationLower = location.toLowerCase();
-  let data: string | undefined;
-  if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
-    const result = await fetch(location);
-    data = await result.text();
-  } else {
-    data = await fs.readFile(location, "utf-8");
-  }
-
-  using dataForeign = CString.fromString(data);
-  dataForeign.abandon();
-
-  return dataForeign.pointer;
+  host_fetch_file: (location: number, callback: number) => void;
 }
 
 let environment: MainEnvironment = {
-  host_fetch(locationPointer, callback) {
-    mainFfi.spawn(callback, () => hostFetch(locationPointer));
+  host_fetch_file(locationPointer, callback) {
+    mainFfi.spawn(callback, () => fetchFile(locationPointer));
   },
 };
 

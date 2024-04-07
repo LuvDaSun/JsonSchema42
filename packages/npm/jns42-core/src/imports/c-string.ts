@@ -1,5 +1,5 @@
 import { mainFfi } from "../main-ffi.js";
-import { ForeignObject } from "./foreign-object.js";
+import { ForeignObject } from "../utils/foreign-object.js";
 
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder("utf-8", {

@@ -1,5 +1,5 @@
 import { mainFfi } from "../main-ffi.js";
-import { ForeignObject } from "./foreign-object.js";
+import { ForeignObject } from "../utils/foreign-object.js";
 
 export class SchemaItem extends ForeignObject {
   constructor(pointer: number) {

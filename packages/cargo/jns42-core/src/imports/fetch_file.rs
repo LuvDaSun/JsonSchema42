@@ -2,7 +2,7 @@ use crate::{exports::callbacks::register_callback, utils::key::Key};
 use futures::channel::oneshot;
 use std::ffi::{c_char, CString};
 
-pub async fn fetch(location: &str) -> String {
+pub async fn fetch_file(location: &str) -> String {
   let (ready_sender, ready_receiver) = oneshot::channel();
 
   let callback_key = register_callback(|data| {
@@ -17,12 +17,12 @@ pub async fn fetch(location: &str) -> String {
   let location = location.into_raw();
 
   unsafe {
-    host_fetch(location, callback_key);
+    host_fetch_file(location, callback_key);
   }
 
   ready_receiver.await.unwrap()
 }
 
 extern "C" {
-  fn host_fetch(location: *mut c_char, callback: Key);
+  fn host_fetch_file(location: *mut c_char, callback: Key);
 }
