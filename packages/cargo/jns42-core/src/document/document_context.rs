@@ -46,8 +46,7 @@ mod ffi {
     let document_context = unsafe { &mut *document_context };
 
     let task = async move {
-      let location = location.to_string_lossy();
-      let location = location.as_ref();
+      let location = location.to_str().unwrap();
 
       let data = document_context.load(location).await;
       let data = CString::new(data).unwrap();

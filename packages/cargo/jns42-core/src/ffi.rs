@@ -2,21 +2,21 @@ use crate::utils::key::Key;
 use futures::{channel::oneshot, executor::LocalPool, Future};
 use manual_executor::ManualExecutor;
 use once_cell::sync::Lazy;
-use std::ffi::{c_char, CString};
+use std::ffi::{c_char, CStr, CString};
 use std::sync::Arc;
 use std::{cell::RefCell, collections::BTreeMap, sync::Mutex};
 
 #[no_mangle]
-extern "C" fn reverse(value: *const SizedString, result_output: *mut *const SizedString) {
-  let value = unsafe { &*value };
-  let value = value.as_ref();
+extern "C" fn reverse(value: *const c_char, result_output: *mut *mut c_char) {
+  let value = unsafe { CStr::from_ptr(value) };
+  let value = value.to_str().unwrap();
 
   let result: String = value.chars().rev().collect();
 
-  let result = SizedString::new(result);
-  let result = Box::new(result);
+  let result = CString::new(result).unwrap();
+  let result = result.into_raw();
 
-  unsafe { *result_output = Box::into_raw(result) };
+  unsafe { *result_output = result };
 }
 
 #[repr(C)]
@@ -142,7 +142,8 @@ pub async fn fetch(location: &str) -> String {
 
   let callback_key = crate::ffi::register_callback(|data| {
     let data = unsafe { CString::from_raw(data as *mut c_char) };
-    let data = data.to_string_lossy().into_owned();
+    let data = data.to_str().unwrap();
+    let data = data.to_owned();
 
     ready_sender.send(data).unwrap();
   });
