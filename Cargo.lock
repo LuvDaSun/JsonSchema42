@@ -634,6 +634,7 @@ dependencies = [
  "futures",
  "im",
  "itertools",
+ "manual-executor",
  "once_cell",
  "proc-macro2",
  "quote",
@@ -712,6 +713,12 @@ name = "log"
 version = "0.4.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
+
+[[package]]
+name = "manual-executor"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e02d1ee0b185902e1043ae55f014f92424a545e5195c326bf97efb6106956ad"
 
 [[package]]
 name = "memchr"

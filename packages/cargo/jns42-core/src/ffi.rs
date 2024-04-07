@@ -1,7 +1,8 @@
 use crate::utils::key::Key;
-use futures::task::LocalSpawnExt;
 use futures::{channel::oneshot, executor::LocalPool, Future};
+use manual_executor::ManualExecutor;
 use once_cell::sync::Lazy;
+use std::sync::Arc;
 use std::{cell::RefCell, collections::BTreeMap, sync::Mutex};
 
 #[no_mangle]
@@ -123,7 +124,8 @@ extern "C" fn invoke_callback(key: Key, result: *mut u8) {
   let mut callbacks = CALLBACKS.lock().unwrap();
   let callback = callbacks.remove(&key).unwrap();
   (callback)(result);
-  EXECUTOR.with_borrow_mut(|pool| pool.run_until_stalled());
+  MANUAL_EXECUTOR.wake_all();
+  // EXECUTOR.with_borrow_mut(|pool| pool.run_until_stalled());
 }
 
 pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key {
@@ -150,29 +152,28 @@ pub async fn fetch(location: &str) -> String {
   let location = Box::into_raw(location);
 
   unsafe {
-    crate::ffi::host::fetch(location, callback_key);
+    crate::ffi::host_fetch(location, callback_key);
   }
 
   ready_receiver.await.unwrap()
 }
 
-pub mod host {
-  use super::*;
-
-  extern "C" {
-    pub fn fetch(argument: *const SizedString, callback: Key);
-    pub fn invoke_callback(callback: Key, result: *mut u8);
-  }
+extern "C" {
+  pub fn host_fetch(argument: *const SizedString, callback: Key);
+  pub fn host_invoke_callback(callback: Key, result: *mut u8);
 }
 
-pub fn spawn(task: impl Future<Output = ()> + 'static) {
-  EXECUTOR.with_borrow_mut(|pool| {
-    let spawner = pool.spawner();
-    spawner.spawn_local(task).unwrap();
-    pool.run_until_stalled()
-  });
+pub fn spawn(task: impl Future<Output = ()> + 'static + Send) {
+  MANUAL_EXECUTOR.spawn_wake(task);
+  // EXECUTOR.with_borrow_mut(|pool| {
+  //   let spawner = pool.spawner();
+  //   spawner.spawn_local(task).unwrap();
+  //   pool.run_until_stalled()
+  // });
 }
 
 thread_local! {
   pub static EXECUTOR: RefCell<LocalPool> = RefCell::new(LocalPool::new());
 }
+
+pub static MANUAL_EXECUTOR: Lazy<Arc<ManualExecutor>> = Lazy::new(ManualExecutor::new);

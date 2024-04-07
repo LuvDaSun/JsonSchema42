@@ -6,30 +6,32 @@ import { projectRoot } from "./root.js";
 import { EnvironmentBase, ExportsBase, Ffi } from "./utils/index.js";
 
 export interface MainEnvironment extends EnvironmentBase {
-  fetch: (location: number, callback: number) => void;
+  host_fetch: (location: number, callback: number) => void;
+}
+
+async function hostFetch(locationPointer: number) {
+  using locationForeign = new SizedString(locationPointer);
+  const location = locationForeign.toString();
+  assert(location != null);
+
+  const locationLower = location.toLowerCase();
+  let data: string | undefined;
+  if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
+    const result = await fetch(location);
+    data = await result.text();
+  } else {
+    data = await fs.readFile(location, "utf-8");
+  }
+
+  using dataForeign = SizedString.fromString(data);
+  dataForeign.abandon();
+
+  return dataForeign.pointer;
 }
 
 let environment: MainEnvironment = {
-  fetch(locationPointer, callback) {
-    mainFfi.spawn(callback, async () => {
-      using locationForeign = new SizedString(locationPointer);
-      const location = locationForeign.toString();
-      assert(location != null);
-
-      const locationLower = location.toLowerCase();
-      let data: string | undefined;
-      if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
-        const result = await fetch(location);
-        data = await result.text();
-      } else {
-        data = await fs.readFile(location, "utf-8");
-      }
-
-      using dataForeign = SizedString.fromString(data);
-      dataForeign.abandon();
-
-      return dataForeign.pointer;
-    });
+  host_fetch(locationPointer, callback) {
+    mainFfi.spawn(callback, () => hostFetch(locationPointer));
   },
 };
 

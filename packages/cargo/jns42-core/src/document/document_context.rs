@@ -40,15 +40,15 @@ mod ffi {
     location: *const SizedString,
     callback: Key,
   ) {
+    assert!(!document_context.is_null());
+    assert!(!location.is_null());
+
+    let document_context = unsafe { &mut *document_context };
+
+    let location = unsafe { &*location };
+    let location = location.as_ref();
+
     let task = async move {
-      assert!(!document_context.is_null());
-      assert!(!location.is_null());
-
-      let document_context = unsafe { &mut *document_context };
-
-      let location = unsafe { &*location };
-      let location = location.as_ref();
-
       let data = document_context.load(location).await;
       let data = SizedString::new(data);
       let data = Box::new(data);
@@ -56,7 +56,7 @@ mod ffi {
       let data = data as *mut u8;
 
       unsafe {
-        crate::ffi::host::invoke_callback(callback, data);
+        crate::ffi::host_invoke_callback(callback, data);
       }
     };
 
