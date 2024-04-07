@@ -1,4 +1,3 @@
-import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
@@ -58,7 +57,6 @@ export class NodeLocation extends ForeignObject {
     const resultPointer = mainFfi.exports.node_location_to_string(this.pointer);
     using resultForeign = new SizedString(resultPointer);
     const result = resultForeign.toString();
-    assert(result != null);
     return result;
   }
 
@@ -66,7 +64,6 @@ export class NodeLocation extends ForeignObject {
     const resultPointer = mainFfi.exports.node_location_to_retrieval_string(this.pointer);
     using resultForeign = new SizedString(resultPointer);
     const result = resultForeign.toString();
-    assert(result != null);
     return result;
   }
 
@@ -88,7 +85,6 @@ export class NodeLocation extends ForeignObject {
     const resultPointer = mainFfi.exports.node_location_get_path(this.pointer);
     using resultForeign = new VecSizedString(resultPointer);
     const result = resultForeign.toArray();
-    assert(result != null);
     return result;
   }
 
@@ -96,7 +92,6 @@ export class NodeLocation extends ForeignObject {
     const resultPointer = mainFfi.exports.node_location_get_hash(this.pointer);
     using resultForeign = new VecSizedString(resultPointer);
     const result = resultForeign.toArray();
-    assert(result != null);
     return result;
   }
 

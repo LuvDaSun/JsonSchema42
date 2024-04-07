@@ -11,7 +11,7 @@ export abstract class ForeignObject {
   private responsible = true;
 
   constructor(public readonly pointer: number) {
-    //
+    assert(pointer !== 0);
   }
 
   /**

@@ -1,4 +1,3 @@
-import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 
@@ -9,24 +8,16 @@ const textDecoder = new TextDecoder("utf-8", {
 });
 
 export class SizedString extends ForeignObject {
-  public static fromString(value: string | undefined) {
-    if (value == null) {
-      const pointer = 0;
-      return new SizedString(pointer);
-    } else {
-      const pointer = allocate(value);
-      return new SizedString(pointer);
-    }
+  public static fromString(value: string) {
+    const pointer = allocate(value);
+    return new SizedString(pointer);
   }
 
-  public toString(): string | undefined {
+  public toString(): string {
     const { pointer } = this;
-    if (pointer === 0) {
-      return undefined;
-    } else {
-      return read(pointer);
-    }
+    return read(pointer);
   }
+
   protected drop() {
     const { pointer } = this;
     deallocate(pointer);
@@ -49,8 +40,6 @@ function allocate(value: string): number {
 }
 
 function read(pointer: number): string {
-  assert(pointer !== 0);
-
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);
   const dataSize = mainFfi.memoryView.getUint32(pointer + 4, true);
   if (dataSize === 0) {
@@ -64,8 +53,6 @@ function read(pointer: number): string {
 }
 
 function deallocate(pointer: number) {
-  assert(pointer !== 0);
-
   const dataPointer = mainFfi.memoryView.getUint32(pointer + 0, true);
   const dataSize = mainFfi.memoryView.getUint32(pointer + 4, true);
   mainFfi.exports.dealloc(pointer, 8);

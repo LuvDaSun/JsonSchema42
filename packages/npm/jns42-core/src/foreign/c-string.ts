@@ -1,4 +1,3 @@
-import { assert } from "console";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 
@@ -9,22 +8,13 @@ const textDecoder = new TextDecoder("utf-8", {
 });
 
 export class CString extends ForeignObject {
-  public static fromString(value: string | undefined) {
-    if (value == null) {
-      const pointer = 0;
-      return new CString(pointer);
-    } else {
-      const pointer = allocate(value);
-      return new CString(pointer);
-    }
+  public static fromString(value: string) {
+    const pointer = allocate(value);
+    return new CString(pointer);
   }
-  public toString(): string | undefined {
+  public toString(): string {
     const { pointer } = this;
-    if (pointer === 0) {
-      return undefined;
-    } else {
-      return read(pointer);
-    }
+    return read(pointer);
   }
   protected drop() {
     const { pointer } = this;
@@ -43,8 +33,6 @@ function allocate(value: string): number {
 }
 
 function read(pointer: number): string {
-  assert(pointer !== 0);
-
   const size = findCStringSize(pointer);
   const dataSize = size - 1;
   const data = mainFfi.memoryUint8.subarray(pointer, pointer + dataSize);
@@ -53,15 +41,11 @@ function read(pointer: number): string {
 }
 
 function deallocate(pointer: number) {
-  assert(pointer !== 0);
-
   const size = findCStringSize(pointer);
   mainFfi.exports.dealloc(pointer, size);
 }
 
 function findCStringSize(pointer: number): number {
-  assert(pointer !== 0);
-
   const index = mainFfi.memoryUint8.indexOf(0, pointer);
   if (index < 0) {
     throw new TypeError("cstring size not found");

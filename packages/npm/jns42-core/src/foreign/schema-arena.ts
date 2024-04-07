@@ -177,7 +177,6 @@ export class SchemaArena extends ForeignObject {
     );
     using itemPreviousWrapper = new SizedString(itemPreviousPointer);
     const itemPreviousString = itemPreviousWrapper.toString();
-    assert(itemPreviousString != null);
     const itemPrevious = JSON.parse(itemPreviousString);
     return itemPrevious;
   }
@@ -186,7 +185,6 @@ export class SchemaArena extends ForeignObject {
     const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
     using itemWrapper = new SizedString(itemPointer);
     const itemString = itemWrapper.toString();
-    assert(itemString != null);
     const item = JSON.parse(itemString);
     return item;
   }

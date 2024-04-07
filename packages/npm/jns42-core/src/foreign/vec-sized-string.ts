@@ -22,7 +22,6 @@ export class VecSizedString extends ForeignObject {
       const result = new Array(len);
       for (let index = 0; index < len; index++) {
         const value = this.get(index);
-        assert(value != null);
         result[index] = value;
       }
       return result;
@@ -48,7 +47,6 @@ export class VecSizedString extends ForeignObject {
     using resultForeign = new SizedString(resultPointer);
     resultForeign.abandon();
     const result = resultForeign.toString();
-    assert(result != null);
     return result;
   }
 
