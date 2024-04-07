@@ -13,6 +13,8 @@ impl DocumentContext {
 }
 
 mod ffi {
+  use std::ffi::{c_char, CStr};
+
   use super::*;
   use crate::{
     ffi::{spawn, SizedString},
@@ -37,18 +39,19 @@ mod ffi {
   #[no_mangle]
   extern "C" fn document_context_load(
     document_context: *mut DocumentContext,
-    location: *const SizedString,
+    location: *const c_char,
     callback: Key,
   ) {
     assert!(!document_context.is_null());
     assert!(!location.is_null());
 
+    let location = unsafe { CStr::from_ptr(location) };
     let document_context = unsafe { &mut *document_context };
 
-    let location = unsafe { &*location };
-    let location = location.as_ref();
-
     let task = async move {
+      let location = location.to_string_lossy();
+      let location = location.as_ref();
+
       let data = document_context.load(location).await;
       let data = SizedString::new(data);
       let data = Box::new(data);

@@ -1,7 +1,7 @@
 import assert from "assert";
 import * as fs from "fs/promises";
 import path from "path";
-import { SizedString } from "./foreign/sized-string.js";
+import { CString } from "./foreign/c-string.js";
 import { projectRoot } from "./root.js";
 import { EnvironmentBase, ExportsBase, Ffi } from "./utils/index.js";
 
@@ -10,7 +10,7 @@ export interface MainEnvironment extends EnvironmentBase {
 }
 
 async function hostFetch(locationPointer: number) {
-  using locationForeign = new SizedString(locationPointer);
+  using locationForeign = new CString(locationPointer);
   const location = locationForeign.toString();
   assert(location != null);
 
@@ -23,7 +23,7 @@ async function hostFetch(locationPointer: number) {
     data = await fs.readFile(location, "utf-8");
   }
 
-  using dataForeign = SizedString.fromString(data);
+  using dataForeign = CString.fromString(data);
   dataForeign.abandon();
 
   return dataForeign.pointer;

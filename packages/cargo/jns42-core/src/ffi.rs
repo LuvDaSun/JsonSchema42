@@ -2,6 +2,7 @@ use crate::utils::key::Key;
 use futures::{channel::oneshot, executor::LocalPool, Future};
 use manual_executor::ManualExecutor;
 use once_cell::sync::Lazy;
+use std::ffi::{c_char, CString};
 use std::sync::Arc;
 use std::{cell::RefCell, collections::BTreeMap, sync::Mutex};
 
@@ -140,16 +141,14 @@ pub async fn fetch(location: &str) -> String {
   let (ready_sender, ready_receiver) = oneshot::channel();
 
   let callback_key = crate::ffi::register_callback(|data| {
-    let data = data as *mut SizedString;
-    let data: Box<SizedString> = unsafe { Box::from_raw(data) };
-    let data: String = (*data).into();
+    let data = unsafe { CString::from_raw(data as *mut c_char) };
+    let data = data.to_string_lossy().into_owned();
 
     ready_sender.send(data).unwrap();
   });
 
-  let location = SizedString::new(location.to_owned());
-  let location = Box::new(location);
-  let location = Box::into_raw(location);
+  let location = CString::new(location.to_owned()).unwrap();
+  let location = location.into_raw();
 
   unsafe {
     crate::ffi::host_fetch(location, callback_key);
@@ -159,7 +158,7 @@ pub async fn fetch(location: &str) -> String {
 }
 
 extern "C" {
-  pub fn host_fetch(argument: *const SizedString, callback: Key);
+  pub fn host_fetch(location: *mut c_char, callback: Key);
   pub fn host_invoke_callback(callback: Key, result: *mut u8);
 }
 
