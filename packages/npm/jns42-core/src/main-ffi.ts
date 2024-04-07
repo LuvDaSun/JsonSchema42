@@ -9,7 +9,7 @@ export interface MainEnvironment extends EnvironmentBase {
 
 let environment: MainEnvironment = {
   host_fetch_file(locationPointer, dataReferencePointer, callback) {
-    mainFfi.spawn(callback, () => fetchFile(locationPointer, dataReferencePointer));
+    mainFfi.spawn_and_callback(callback, () => fetchFile(locationPointer, dataReferencePointer));
   },
 };
 

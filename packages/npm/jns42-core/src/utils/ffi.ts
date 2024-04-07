@@ -70,7 +70,7 @@ export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBas
     return this.memoryViewCache;
   }
 
-  public spawn(callback: number, task: () => Promise<void>) {
+  public spawn_and_callback(callback: number, task: () => Promise<void>) {
     task().finally(() => this.exports.invoke_callback(callback));
   }
 
