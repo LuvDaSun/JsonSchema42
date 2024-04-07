@@ -69,11 +69,11 @@ export interface MainExports extends ExportsBase {
   vec_usize_len(vec_usize: number): number;
   vec_usize_push(vec_usize: number, value: number): void;
 
-  vec_c_string_drop(vec_usize: number): void;
-  vec_c_string_new(capacity: number): number;
-  vec_c_string_len(vec_usize: number): number;
-  vec_c_string_get(vec_usize: number, index: number): number;
-  vec_c_string_push(vec_usize: number, value: number): void;
+  vec_string_drop(vec_usize: number): void;
+  vec_string_new(capacity: number): number;
+  vec_string_len(vec_usize: number): number;
+  vec_string_get(vec_usize: number, index: number): number;
+  vec_string_push(vec_usize: number, value: number): void;
 
   node_location_drop(node_location: number): void;
   node_location_clone(node_location: number): number;

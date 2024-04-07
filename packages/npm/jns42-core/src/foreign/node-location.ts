@@ -1,7 +1,7 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
-import { VecCString } from "./vec-c-string.js";
+import { VecString } from "./vec-string.js";
 
 const finalizationRegistry = new FinalizationRegistry<number>((pointer) => {
   if (pointer !== 0) {
@@ -69,7 +69,7 @@ export class NodeLocation extends ForeignObject {
 
   public getPointer() {
     const resultPointer = mainFfi.exports.node_location_get_pointer(this.pointer);
-    using resultForeign = new VecCString(resultPointer);
+    using resultForeign = new VecString(resultPointer);
     const result = resultForeign.toArray();
     return result;
   }
@@ -83,20 +83,20 @@ export class NodeLocation extends ForeignObject {
 
   public getPath() {
     const resultPointer = mainFfi.exports.node_location_get_path(this.pointer);
-    using resultForeign = new VecCString(resultPointer);
+    using resultForeign = new VecString(resultPointer);
     const result = resultForeign.toArray();
     return result;
   }
 
   public getHash() {
     const resultPointer = mainFfi.exports.node_location_get_hash(this.pointer);
-    using resultForeign = new VecCString(resultPointer);
+    using resultForeign = new VecString(resultPointer);
     const result = resultForeign.toArray();
     return result;
   }
 
   public setPointer(pointer: string[]) {
-    using pointerForeign = VecCString.fromArray(pointer);
+    using pointerForeign = VecString.fromArray(pointer);
     mainFfi.exports.node_location_set_pointer(this.pointer, pointerForeign.pointer);
   }
 

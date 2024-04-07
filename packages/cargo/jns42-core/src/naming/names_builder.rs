@@ -214,7 +214,7 @@ where
 
 mod ffi {
   use super::*;
-  use crate::ffi::SizedString;
+  use std::ffi::{c_char, CStr};
 
   /// Free NamesBuilder instance
   #[no_mangle]
@@ -237,7 +237,7 @@ mod ffi {
   extern "C" fn names_builder_add(
     names_builder: *mut NamesBuilder<usize>,
     key: usize,
-    values: *const Vec<SizedString>,
+    values: *const Vec<String>,
   ) {
     assert!(!names_builder.is_null());
     assert!(!values.is_null());
@@ -252,13 +252,13 @@ mod ffi {
   #[no_mangle]
   extern "C" fn names_builder_set_default_name(
     names_builder: *mut NamesBuilder<usize>,
-    value: *const SizedString,
+    value: *const c_char,
   ) {
     assert!(!value.is_null());
 
     let names_builder = unsafe { &mut *names_builder };
-    let value = unsafe { &*value };
-    let value = value.as_ref();
+    let value = unsafe { CStr::from_ptr(value) };
+    let value = value.to_str().unwrap();
 
     names_builder.set_default_name(value);
   }

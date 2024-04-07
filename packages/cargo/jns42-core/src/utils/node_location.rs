@@ -1,7 +1,15 @@
 use crate::ffi::SizedString;
 use once_cell::sync::Lazy;
 use regex::{Regex, RegexBuilder};
-use std::{error::Error, fmt::Display, hash::Hash, iter::once, ptr::null, str::FromStr};
+use std::{
+  error::Error,
+  ffi::{c_char, CStr, CString},
+  fmt::Display,
+  hash::Hash,
+  iter::once,
+  ptr::null,
+  str::FromStr,
+};
 
 pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
   RegexBuilder::new(r"^([a-z]+\:(?:\/\/)?[^\/]*)?([^\?\#]*?)?(\?.*?)?(\#.*?)?$")
@@ -54,8 +62,8 @@ impl NodeLocation {
     self.hash.iter().map(|value| value.as_str()).collect()
   }
 
-  pub fn set_anchor(&mut self, value: impl ToString) {
-    self.hash = once(value).map(|part| part.to_string()).collect();
+  pub fn set_anchor(&mut self, value: impl Into<String>) {
+    self.hash = once(value).map(|part| part.into()).collect();
   }
 
   pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
@@ -308,11 +316,11 @@ extern "C" fn node_location_clone(node_location: *const NodeLocation) -> *mut No
 }
 
 #[no_mangle]
-extern "C" fn node_location_parse(input: *const SizedString) -> *mut NodeLocation {
+extern "C" fn node_location_parse(input: *const c_char) -> *mut NodeLocation {
   assert!(!input.is_null());
 
-  let input = unsafe { &*input };
-  let input = input.as_ref();
+  let input = unsafe { CStr::from_ptr(input) };
+  let input = input.to_str().unwrap();
 
   let node_location = input.parse().unwrap();
   let node_location = Box::new(node_location);
@@ -351,22 +359,19 @@ extern "C" fn node_location_to_string(node_location: *const NodeLocation) -> *mu
 }
 
 #[no_mangle]
-extern "C" fn node_location_to_retrieval_string(
-  node_location: *const NodeLocation,
-) -> *mut SizedString {
+extern "C" fn node_location_to_retrieval_string(node_location: *const NodeLocation) -> *mut c_char {
   assert!(!node_location.is_null());
 
   let node_location = unsafe { &*node_location };
 
   let result = node_location.to_retrieval_string();
-  let result = SizedString::new(result);
-  let result = Box::new(result);
+  let result = CString::new(result).unwrap();
 
-  Box::into_raw(result)
+  result.into_raw()
 }
 
 #[no_mangle]
-extern "C" fn node_location_get_anchor(node_location: *mut NodeLocation) -> *const SizedString {
+extern "C" fn node_location_get_anchor(node_location: *mut NodeLocation) -> *const c_char {
   assert!(!node_location.is_null());
 
   let node_location = unsafe { &mut *node_location };
@@ -375,70 +380,56 @@ extern "C" fn node_location_get_anchor(node_location: *mut NodeLocation) -> *con
   let Some(result) = result else {
     return null();
   };
-  let result = SizedString::new(result.to_owned());
-  let result = Box::new(result);
+  let result = result.to_owned();
+  let result = CString::new(result).unwrap();
 
-  Box::into_raw(result)
+  result.into_raw()
 }
 
 #[no_mangle]
-extern "C" fn node_location_get_pointer(
-  node_location: *mut NodeLocation,
-) -> *const Vec<SizedString> {
+extern "C" fn node_location_get_pointer(node_location: *mut NodeLocation) -> *const Vec<String> {
   let node_location = unsafe { &mut *node_location };
 
   let result = node_location.get_pointer();
   let Some(result) = result else {
     return null();
   };
-  let result = result
-    .into_iter()
-    .map(|value| SizedString::new(value.to_owned()))
-    .collect();
+  let result = result.into_iter().map(|value| value.to_owned()).collect();
   let result = Box::new(result);
 
   Box::into_raw(result)
 }
 
 #[no_mangle]
-extern "C" fn node_location_get_path(node_location: *mut NodeLocation) -> *const Vec<SizedString> {
+extern "C" fn node_location_get_path(node_location: *mut NodeLocation) -> *const Vec<String> {
   let node_location = unsafe { &mut *node_location };
 
   let result = node_location.get_path();
-  let result = result
-    .into_iter()
-    .map(|value| SizedString::new(value.to_owned()))
-    .collect();
+  let result = result.into_iter().map(|value| value.to_owned()).collect();
   let result = Box::new(result);
 
   Box::into_raw(result)
 }
 
 #[no_mangle]
-extern "C" fn node_location_get_hash(node_location: *mut NodeLocation) -> *const Vec<SizedString> {
+extern "C" fn node_location_get_hash(node_location: *mut NodeLocation) -> *const Vec<String> {
   let node_location = unsafe { &mut *node_location };
 
   let result = node_location.get_hash();
-  let result = result
-    .into_iter()
-    .map(|value| SizedString::new(value.to_owned()))
-    .collect();
+  let result = result.into_iter().map(|value| value.to_owned()).collect();
   let result = Box::new(result);
 
   Box::into_raw(result)
 }
 
 #[no_mangle]
-extern "C" fn node_location_set_anchor(
-  node_location: *mut NodeLocation,
-  anchor: *const SizedString,
-) {
+extern "C" fn node_location_set_anchor(node_location: *mut NodeLocation, anchor: *const c_char) {
   assert!(!node_location.is_null());
   assert!(!anchor.is_null());
 
   let node_location = unsafe { &mut *node_location };
-  let anchor = unsafe { &*anchor };
-  let anchor = anchor.as_ref();
+  let anchor = unsafe { CStr::from_ptr(anchor) };
+  let anchor = anchor.to_str().unwrap();
 
   node_location.set_anchor(anchor);
 }
@@ -446,7 +437,7 @@ extern "C" fn node_location_set_anchor(
 #[no_mangle]
 extern "C" fn node_location_set_pointer(
   node_location: *mut NodeLocation,
-  pointer: *const Vec<SizedString>,
+  pointer: *const Vec<String>,
 ) {
   assert!(!node_location.is_null());
   assert!(!pointer.is_null());

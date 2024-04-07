@@ -28,7 +28,7 @@ impl<K> IntoIterator for Names<K> {
 
 mod ffi {
   use super::*;
-  use crate::ffi::SizedString;
+  use std::ffi::{c_char, CString};
 
   /// Free Names instance
   #[no_mangle]
@@ -40,21 +40,21 @@ mod ffi {
 
   /// get the name as camelCase
   #[no_mangle]
-  extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *const SizedString {
+  extern "C" fn names_to_camel_case(names: *mut Names<usize>, key: usize) -> *mut c_char {
     assert!(!names.is_null());
 
     let names = unsafe { &mut *names };
 
     let sentence = names.get_name(&key).clone();
     let result = sentence.to_camel_case();
-    let result = SizedString::new(result);
-    let result = Box::new(result);
-    Box::into_raw(result)
+    let result = CString::new(result).unwrap();
+
+    result.into_raw()
   }
 
   /// get the name as PascalCase
   #[no_mangle]
-  extern "C" fn names_to_pascal_case(names: *mut Names<usize>, key: usize) -> *const SizedString {
+  extern "C" fn names_to_pascal_case(names: *mut Names<usize>, key: usize) -> *mut c_char {
     assert!(!names.is_null());
 
     let names = unsafe { &mut *names };
@@ -62,14 +62,14 @@ mod ffi {
     let sentence = names.get_name(&key).clone();
 
     let result = sentence.to_pascal_case();
-    let result = SizedString::new(result);
-    let result = Box::new(result);
-    Box::into_raw(result)
+    let result = CString::new(result).unwrap();
+
+    result.into_raw()
   }
 
   /// get the name as snake_case
   #[no_mangle]
-  extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *const SizedString {
+  extern "C" fn names_to_snake_case(names: *mut Names<usize>, key: usize) -> *mut c_char {
     assert!(!names.is_null());
 
     let names = unsafe { &mut *names };
@@ -77,17 +77,14 @@ mod ffi {
     let sentence = names.get_name(&key).clone();
 
     let result = sentence.to_snake_case();
-    let result = SizedString::new(result);
-    let result = Box::new(result);
-    Box::into_raw(result)
+    let result = CString::new(result).unwrap();
+
+    result.into_raw()
   }
 
   /// get the name as SCREAMING_SNAKE_CASE
   #[no_mangle]
-  extern "C" fn names_to_screaming_snake_case(
-    names: *mut Names<usize>,
-    key: usize,
-  ) -> *const SizedString {
+  extern "C" fn names_to_screaming_snake_case(names: *mut Names<usize>, key: usize) -> *mut c_char {
     assert!(!names.is_null());
 
     let names = unsafe { &mut *names };
@@ -95,8 +92,8 @@ mod ffi {
     let sentence = names.get_name(&key).clone();
 
     let result = sentence.to_screaming_snake_case();
-    let result = SizedString::new(result);
-    let result = Box::new(result);
-    Box::into_raw(result)
+    let result = CString::new(result).unwrap();
+
+    result.into_raw()
   }
 }
