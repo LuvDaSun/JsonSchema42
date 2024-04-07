@@ -49,6 +49,9 @@ export class NodeLocation extends ForeignObject {
 
   public getPointer() {
     const resultPointer = mainFfi.exports.node_location_get_pointer(this.pointer);
+    if (resultPointer === 0) {
+      return;
+    }
     using resultForeign = new VecString(resultPointer);
     const result = resultForeign.toArray();
     return result;
@@ -56,6 +59,9 @@ export class NodeLocation extends ForeignObject {
 
   public getAnchor() {
     const resultPointer = mainFfi.exports.node_location_get_anchor(this.pointer);
+    if (resultPointer === 0) {
+      return;
+    }
     using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;

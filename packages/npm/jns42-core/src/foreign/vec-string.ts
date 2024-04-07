@@ -17,19 +17,14 @@ export class VecString extends ForeignObject {
     return vec;
   }
 
-  public toArray(): string[] | undefined {
-    const { pointer } = this;
-    if (pointer === 0) {
-      return undefined;
-    } else {
-      const len = this.len();
-      const result = new Array(len);
-      for (let index = 0; index < len; index++) {
-        const value = this.get(index);
-        result[index] = value;
-      }
-      return result;
+  public toArray(): string[] {
+    const len = this.len();
+    const result = new Array(len);
+    for (let index = 0; index < len; index++) {
+      const value = this.get(index);
+      result[index] = value;
     }
+    return result;
   }
 
   public static new(capacity: number) {
