@@ -26,12 +26,3 @@ pub fn spawn_and_callback(callback: Key, task: impl Future<Output = ()> + 'stati
     pool.run_until_stalled()
   });
 }
-
-#[cfg(test)]
-pub fn spawn_wait(task: impl Future<Output = ()> + 'static) {
-  EXECUTOR.with_borrow_mut(|pool| {
-    let spawner = pool.spawner();
-    spawner.spawn_local(task).unwrap();
-    pool.run()
-  });
-}

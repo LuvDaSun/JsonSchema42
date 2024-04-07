@@ -69,7 +69,9 @@ impl DocumentContext {
 
     if document_node_is_none {
       let data =
-        crate::utils::fetch_file::fetch_file(&retrieval_location.to_retrieval_string()).await;
+        crate::utils::fetch_file::local_fetch_file(&retrieval_location.to_retrieval_string())
+          .await
+          .unwrap();
       let document_node = serde_json::from_str(&data).unwrap();
 
       self.fill_node_cache(retrieval_location, document_node);
@@ -198,7 +200,7 @@ impl DocumentContext {
       return;
     }
 
-    let _node = self.cache.borrow().get(retrieval_location).unwrap().clone();
+    let _node = self.cache.borrow().get(retrieval_location);
 
     /*
 
@@ -275,5 +277,23 @@ impl DocumentContext {
     }
 
     */
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[tokio::test]
+  async fn document_context_load_from_location() {
+    let document_context = DocumentContext::new();
+
+    document_context
+      .load_from_location(
+        &"https://api.chucknorris.io/jokes/random".parse().unwrap(),
+        &"https://api.chucknorris.io/jokes/random".parse().unwrap(),
+        None,
+      )
+      .await
   }
 }
