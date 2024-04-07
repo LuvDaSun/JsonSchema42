@@ -1,4 +1,4 @@
-use crate::{exports::callbacks::register_callback, utils::key::Key};
+use crate::{callbacks::register_callback, utils::key::Key};
 use futures::channel::oneshot;
 use std::{
   ffi::{c_char, CString},
