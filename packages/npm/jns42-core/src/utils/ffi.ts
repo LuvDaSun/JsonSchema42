@@ -33,7 +33,7 @@ export class Ffi<Exports extends ExportsBase, Environment extends EnvironmentBas
     const instance = new WebAssembly.Instance(module, {
       env: {
         ...environment,
-        invoke_host_callback(key: number, result: number) {
+        invoke_callback(key: number, result: number) {
           ffi.invokeCallback(key, result);
         },
       },
