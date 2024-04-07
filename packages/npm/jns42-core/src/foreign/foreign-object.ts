@@ -1,5 +1,4 @@
 import assert from "assert";
-import { NULL_POINTER, Pointer } from "../utils/index.js";
 
 export abstract class ForeignObject {
   /**
@@ -11,7 +10,7 @@ export abstract class ForeignObject {
    */
   private responsible = true;
 
-  constructor(public readonly pointer: Pointer) {
+  constructor(public readonly pointer: number) {
     //
   }
 
@@ -27,7 +26,7 @@ export abstract class ForeignObject {
   [Symbol.dispose]() {
     assert.equal(this.disposed, false);
     if (this.responsible) {
-      if (this.pointer !== NULL_POINTER) {
+      if (this.pointer !== 0) {
         this.drop();
       }
     }

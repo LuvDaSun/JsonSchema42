@@ -20,8 +20,10 @@ impl DocumentContext {
 
 mod ffi {
   use super::*;
-  use crate::ffi::{SizedString, MANUAL_EXECUTOR};
-  use std::ptr::null_mut;
+  use crate::{
+    ffi::{SizedString, MANUAL_EXECUTOR},
+    utils::key::Key,
+  };
 
   #[no_mangle]
   extern "C" fn document_context_drop(document_context: *mut DocumentContext) {
@@ -35,22 +37,21 @@ mod ffi {
     let fetch: Fetch = Box::new(|location: &str| {
       Box::pin(async {
         let (ready_sender, ready_receiver) = oneshot::channel();
-        let callback_key = {
-          let callback = |pointer: *mut u8| {
-            let content = pointer as *mut SizedString;
-            let content = unsafe { &*content };
-            let content: String = content.into();
-            ready_sender.send(content).unwrap();
-          };
-          crate::ffi::register_callback(callback)
-        };
+
+        let callback_key = crate::ffi::register_callback(|data| {
+          let data = data as *mut SizedString;
+          let data: Box<SizedString> = unsafe { Box::from_raw(data) };
+          let data: String = (*data).into();
+
+          ready_sender.send(data).unwrap();
+        });
 
         let location = SizedString::new(location.to_owned());
         let location = Box::new(location);
         let location = Box::into_raw(location);
 
         unsafe {
-          crate::ffi::fetch(location, null_mut(), callback_key);
+          crate::ffi::fetch(location, callback_key);
         }
 
         ready_receiver.await.unwrap()
@@ -66,28 +67,29 @@ mod ffi {
   #[no_mangle]
   extern "C" fn document_context_load(
     document_context: *mut DocumentContext,
-    location: *mut SizedString,
+    location: *const SizedString,
+    callback: Key,
   ) {
     assert!(!document_context.is_null());
     assert!(!location.is_null());
 
-    let document_context = unsafe { &mut *document_context };
+    let document_context = unsafe { &*document_context };
 
     let location = unsafe { &*location };
     let location = location.as_ref();
 
-    let future = async {
-      let result = document_context.load(location).await;
-      let result = SizedString::new(result);
-      let result = Box::new(result);
-      let result = Box::into_raw(result) as *mut u8;
+    let task = async move {
+      let data = document_context.load(location).await;
+      let data = SizedString::new(data);
+      let data = Box::new(data);
+      let data = Box::into_raw(data);
+      let data = data as *mut u8;
 
       unsafe {
-        crate::ffi::invoke_host_callback(0, result);
+        crate::ffi::invoke_host_callback(callback, data);
       }
     };
 
-    let key = MANUAL_EXECUTOR.spawn_wake(future);
-    MANUAL_EXECUTOR.wake(key);
+    MANUAL_EXECUTOR.spawn_wake(task);
   }
 }

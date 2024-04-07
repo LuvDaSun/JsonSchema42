@@ -1,6 +1,5 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { NULL_POINTER } from "../utils/index.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
 
@@ -16,7 +15,7 @@ export class VecSizedString extends ForeignObject {
 
   public toArray(): string[] | undefined {
     const { pointer } = this;
-    if (pointer === NULL_POINTER) {
+    if (pointer === 0) {
       return undefined;
     } else {
       const len = this.len();

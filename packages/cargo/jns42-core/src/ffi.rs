@@ -121,10 +121,11 @@ type Callbacks = Lazy<Mutex<BTreeMap<Key, Box<dyn FnOnce(*mut u8) + Send>>>>;
 static CALLBACKS: Callbacks = Lazy::new(Default::default);
 
 #[no_mangle]
-extern "C" fn invoke_callback(key: Key, argument: *mut u8) {
+extern "C" fn invoke_callback(key: Key, result: *mut u8) {
   let mut callbacks = CALLBACKS.lock().unwrap();
   let callback = callbacks.remove(&key).unwrap();
-  (callback)(argument);
+  (callback)(result);
+  MANUAL_EXECUTOR.wake_all();
 }
 
 pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key {
@@ -136,18 +137,9 @@ pub fn register_callback(callback: impl FnOnce(*mut u8) + Send + 'static) -> Key
 }
 
 extern "C" {
-  pub fn fetch(
-    argument: *mut SizedString,
-    result_output: *mut *const SizedString,
-    callback_key: Key,
-  );
-  pub fn invoke_host_callback(key: usize, argument: *mut u8);
+  pub fn fetch(argument: *const SizedString, callback: Key);
+  pub fn invoke_host_callback(callback: Key, result: *mut u8);
 }
 
 pub static MANUAL_EXECUTOR: Lazy<Arc<manual_executor::ManualExecutor>> =
   Lazy::new(manual_executor::ManualExecutor::new);
-
-#[no_mangle]
-extern "C" fn wake_host(key: manual_executor::Key) {
-  MANUAL_EXECUTOR.wake(key);
-}

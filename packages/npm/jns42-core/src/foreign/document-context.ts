@@ -1,5 +1,5 @@
 import defer from "p-defer";
-import { mainFfi, registerCallback } from "../main-ffi.js";
+import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "./foreign-object.js";
 import { SizedString } from "./sized-string.js";
 
@@ -17,8 +17,8 @@ export class DocumentContext extends ForeignObject {
     using locationForeign = SizedString.fromString(location);
 
     const deferred = defer();
-    const key = registerCallback(() => deferred.resolve());
-    mainFfi.exports.document_context_load(this.pointer, locationForeign.pointer);
+    const key = mainFfi.registerCallback(() => deferred.resolve());
+    mainFfi.exports.document_context_load(this.pointer, locationForeign.pointer, key);
 
     await deferred.promise;
   }

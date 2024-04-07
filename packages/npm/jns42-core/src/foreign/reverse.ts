@@ -1,11 +1,10 @@
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
-import { NULL_POINTER } from "../utils/index.js";
 import { Box } from "./box.js";
 import { SizedString } from "./sized-string.js";
 
 export function reverse(value: string): string {
-  using resultBoxWrapper = Box.fromTargetPointer(NULL_POINTER);
+  using resultBoxWrapper = Box.fromTargetPointer(0);
   using valueWrapper = SizedString.fromString(value);
   mainFfi.exports.reverse(valueWrapper.pointer, resultBoxWrapper.pointer);
   const resultPointer = resultBoxWrapper.toTargetPointer();
