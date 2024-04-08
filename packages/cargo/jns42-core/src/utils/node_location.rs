@@ -75,7 +75,7 @@ impl NodeLocation {
     self.hash = Vec::new();
   }
 
-  pub fn to_retrieval_string(&self) -> String {
+  pub fn to_fetch_string(&self) -> String {
     let origin = &self.origin;
     let path = self
       .path
@@ -346,10 +346,10 @@ extern "C" fn node_location_to_string(node_location: *const NodeLocation) -> *mu
 }
 
 #[no_mangle]
-extern "C" fn node_location_to_retrieval_string(node_location: *const NodeLocation) -> *mut c_char {
+extern "C" fn node_location_to_fetch_string(node_location: *const NodeLocation) -> *mut c_char {
   let node_location = unsafe { &*node_location };
 
-  let result = node_location.to_retrieval_string();
+  let result = node_location.to_fetch_string();
   let result = CString::new(result).unwrap();
 
   result.into_raw()

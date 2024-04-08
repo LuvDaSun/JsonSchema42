@@ -40,8 +40,8 @@ export class NodeLocation extends ForeignObject {
     return result;
   }
 
-  public toRetrievalString() {
-    const resultPointer = mainFfi.exports.node_location_to_retrieval_string(this.pointer);
+  public toFetchString() {
+    const resultPointer = mainFfi.exports.node_location_to_fetch_string(this.pointer);
     using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;

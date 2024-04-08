@@ -8,18 +8,21 @@ use std::{
 #[derive(Default)]
 pub struct DocumentContext {
   /**
-   * maps node urls to their documents
-   */
+  Maps node urls to their documents. Every node has a location that is an identifier. Thi
+  map maps that identifier to the identifier of a document.
+  */
   node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
   /**
-   * all loaded nodes
-   */
+  Keeps all loaded nodes. Nodes are retrieved and then stored in this cache. Then we work
+  exclusively from this cache.
+  */
   cache: RefCell<HashMap<NodeLocation, serde_json::Value>>,
 
   /**
-   * keep track of what we have been loading (so we only load it once)
-   */
+  Keep track of what we have loaded so far. We store the fetch locations here, this is the
+  location without the hash that can be used to fetch the document from a server or file system.
+  */
   loaded: RefCell<HashSet<String>>,
 }
 
@@ -68,10 +71,9 @@ impl DocumentContext {
     };
 
     if document_node_is_none {
-      let data =
-        crate::utils::fetch_file::local_fetch_file(&retrieval_location.to_retrieval_string())
-          .await
-          .unwrap();
+      let data = crate::utils::fetch_file::local_fetch_file(&retrieval_location.to_fetch_string())
+        .await
+        .unwrap();
       let document_node = serde_json::from_str(&data).unwrap();
 
       self.fill_node_cache(retrieval_location, document_node);
@@ -195,7 +197,7 @@ impl DocumentContext {
       return;
     }
 
-    let server_url = retrieval_location.to_retrieval_string();
+    let server_url = retrieval_location.to_fetch_string();
     if !self.loaded.borrow_mut().insert(server_url) {
       return;
     }

@@ -142,9 +142,7 @@ impl DocumentContext {
     };
 
     if document_node_is_none {
-      let document_node = load_yaml(&retrieval_url.to_retrieval_string())
-        .await
-        .unwrap();
+      let document_node = load_yaml(&retrieval_url.to_fetch_string()).await.unwrap();
 
       self.fill_node_cache(retrieval_url, document_node.unwrap());
     }
@@ -257,7 +255,7 @@ impl DocumentContext {
       return;
     }
 
-    let server_url = retrieval_url.to_retrieval_string();
+    let server_url = retrieval_url.to_fetch_string();
     if !self.loaded.borrow_mut().insert(server_url) {
       return;
     }

@@ -62,7 +62,7 @@ export interface MainExports extends ExportsBase {
   node_location_parse(input: number): number;
   node_location_join(node_location: number, other_node_location: number): number;
   node_location_to_string(node_location: number): number;
-  node_location_to_retrieval_string(node_location: number): number;
+  node_location_to_fetch_string(node_location: number): number;
   node_location_get_anchor(node_location: number): number;
   node_location_get_pointer(node_location: number): number;
   node_location_get_path(node_location: number): number;
