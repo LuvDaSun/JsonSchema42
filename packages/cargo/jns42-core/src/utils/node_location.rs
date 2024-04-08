@@ -57,20 +57,48 @@ impl NodeLocation {
     self.hash.is_empty()
   }
 
+  /*
+  Set the anchor of this location, replacing the pointer.
+  */
   pub fn set_anchor(&mut self, value: impl Into<String>) {
     self.hash = once(value).map(|part| part.into()).collect();
   }
 
+  /*
+  Replace pointer
+  */
   pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
     self.hash = once(String::new())
       .chain(value.into_iter().map(|part| part.into()))
       .collect();
   }
 
+  /*
+  Removes pointer and anchor (the has) from this location.
+  */
   pub fn set_root(&mut self) {
     self.hash = Vec::new();
   }
 
+  /*
+  Append to pointer
+  */
+  pub fn push_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
+    if let Some(pointer) = self.get_pointer() {
+      self.hash = pointer
+        .into_iter()
+        .map(|part| part.into())
+        .chain(value.into_iter().map(|part| part.into()))
+        .collect();
+    } else {
+      self.set_pointer(value);
+    }
+  }
+
+  /**
+  Get the part of the location before the hash. This could be used to get data from a server
+  or file system.
+  */
   pub fn to_fetch_string(&self) -> String {
     let origin = &self.origin;
     let path = self

@@ -34,7 +34,7 @@ This class loads document nodes and documents. Every node has a few locations:
 #[derive(Default)]
 pub struct DocumentContext {
   /**
-  Maps node urls to their documents. Every node has a location that is an identifier. Thi
+  Maps node retrieval urls to their documents. Every node has a location that is an identifier. Thi
   map maps that identifier to the identifier of a document.
   */
   node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
@@ -43,13 +43,18 @@ pub struct DocumentContext {
   Keeps all loaded nodes. Nodes are retrieved and then stored in this cache. Then we work
   exclusively from this cache.
   */
-  cache: RefCell<HashMap<NodeLocation, serde_json::Value>>,
+  node_cache: RefCell<HashMap<NodeLocation, serde_json::Value>>,
 
   /**
   Keep track of what we have loaded so far. We store the fetch locations here, this is the
   location without the hash that can be used to fetch the document from a server or file system.
   */
   loaded: RefCell<HashSet<String>>,
+
+  /**
+  This map maps node locations to retrieval locations
+   */
+  resolved: HashMap<NodeLocation, NodeLocation>,
 }
 
 impl DocumentContext {
@@ -59,7 +64,7 @@ impl DocumentContext {
 
   /**
   Load nodes from a location. The retrieval location is the physical location of the node,
-  it should not contain a hash.
+  it should be a root location
   */
   pub async fn load_from_location(
     self: &Rc<Self>,
@@ -68,6 +73,8 @@ impl DocumentContext {
     antecedent_location: Option<&NodeLocation>,
     // default_schema_uri: &MetaSchemaId,
   ) {
+    assert!(retrieval_location.is_root());
+
     let mut queue = Default::default();
     self
       .load_from_location_with_queue(
@@ -94,18 +101,22 @@ impl DocumentContext {
       // MetaSchemaId,
     )>,
   ) {
-    let document_node_is_none = {
-      let node_cache = self.cache.borrow();
-      let document_node = node_cache.get(retrieval_location);
-      document_node.is_none()
-    };
-
-    if document_node_is_none {
-      let data = crate::utils::fetch_file::local_fetch_file(&retrieval_location.to_fetch_string())
+    /*
+    If the document is not in the cache
+    */
+    if !self.node_cache.borrow().contains_key(retrieval_location) {
+      /*
+      retrieve the document
+      */
+      let fetch_location = &retrieval_location.to_fetch_string();
+      let data = crate::utils::fetch_file::local_fetch_file(fetch_location)
         .await
         .unwrap();
       let document_node = serde_json::from_str(&data).unwrap();
 
+      /*
+      populate the cache with this document
+      */
       self.fill_node_cache(retrieval_location, document_node);
     }
 
@@ -117,21 +128,26 @@ impl DocumentContext {
     ));
   }
 
-  pub async fn _load_from_document(
+  /**
+  Load nodes from a document. The retrieval location dopes not have to be root (may contain
+  a hash). The document_node provided here is the actual document that is identified by the
+  retrieval_location and the given_location.
+  */
+  pub async fn load_from_node(
     self: &Rc<Self>,
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    document_node: serde_json::Value,
+    node: serde_json::Value,
     // default_schema_uri: &MetaSchemaId,
   ) {
     let mut queue = Default::default();
     self
-      .load_from_document_with_queue(
+      .load_from_node_with_queue(
         retrieval_location,
         given_location,
         antecedent_location,
-        document_node,
+        node,
         // default_schema_uri,
         &mut queue,
       )
@@ -139,12 +155,12 @@ impl DocumentContext {
     self.load_from_cache_queue(&mut queue).await;
   }
 
-  async fn load_from_document_with_queue(
+  async fn load_from_node_with_queue(
     self: &Rc<Self>,
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    document_node: serde_json::Value,
+    node: serde_json::Value,
     // default_schema_uri: &MetaSchemaId,
     queue: &mut Vec<(
       NodeLocation,
@@ -153,13 +169,11 @@ impl DocumentContext {
       // MetaSchemaId,
     )>,
   ) {
-    let node_cache_contains_key = {
-      let node_cache = self.cache.borrow();
-      node_cache.contains_key(retrieval_location)
-    };
-
-    if !node_cache_contains_key {
-      self.fill_node_cache(retrieval_location, document_node)
+    /*
+    If the document is not in the cache
+    */
+    if !self.node_cache.borrow().contains_key(retrieval_location) {
+      self.fill_node_cache(retrieval_location, node)
     }
 
     queue.push((
@@ -170,14 +184,45 @@ impl DocumentContext {
     ));
   }
 
-  fn fill_node_cache(&self, retrieval_url: &NodeLocation, document_node: serde_json::Value) {
+  /**
+  the retrieval location is the location of the document node. The document node may be
+  a part of a bigger document, if this is the case then it's retrieval url is not
+  root.
+  */
+  fn fill_node_cache(&self, retrieval_location: &NodeLocation, document_node: serde_json::Value) {
+    /*
+    we add every node in the tree to the cache
+    */
     for (pointer, node) in read_json_node(&[], document_node) {
-      let mut node_url = retrieval_url.clone();
-      node_url.set_pointer(pointer);
-      assert!(self.cache.borrow_mut().insert(node_url, node).is_none())
+      let mut node_url = retrieval_location.clone();
+      /*
+      The retrieval url a unique, physical location where we can retrieve this node. The physical
+      location of all nodes in the documents can be derived from the pointer and the retrieval_url
+      of the document. It is possible that the retrieval url of the document is not root (has
+      a hash). That is ok, then the pointer to the node is appended to the pointer of the document
+      */
+      node_url.push_pointer(pointer);
+
+      if let Some(node_previous) = self.node_cache.borrow().get(retrieval_location) {
+        /*
+        If a node is already in the cache we won't override. We assume that this is the same node
+        as it has the same identifier. This might happen if we load an embedded document first
+        and then we load a document that contains the embedded document.
+        */
+        assert_eq!(node, *node_previous);
+      } else {
+        assert!(self
+          .node_cache
+          .borrow_mut()
+          .insert(node_url, node)
+          .is_none());
+      }
     }
   }
 
+  /**
+  Load documents from queue, drain the queue
+  */
   async fn load_from_cache_queue(
     self: &Rc<Self>,
     queue: &mut Vec<(
@@ -187,6 +232,9 @@ impl DocumentContext {
       // MetaSchemaId,
     )>,
   ) {
+    /*
+    This here will drain the queue.
+    */
     while let Some((
       retrieval_url,
       given_url,
@@ -206,6 +254,11 @@ impl DocumentContext {
     }
   }
 
+  /**
+  Load document and possibly adding data to the queue. This function is responsible for
+  instantiating the documents. And also the load referenced and embedded documents by adding
+  them to the queue.
+  */
   async fn load_from_cache_with_queue(
     self: &Rc<Self>,
     retrieval_location: &NodeLocation,
@@ -232,7 +285,7 @@ impl DocumentContext {
       return;
     }
 
-    let _node = self.cache.borrow().get(retrieval_location);
+    let _node = self.node_cache.borrow().get(retrieval_location);
 
     /*
 
