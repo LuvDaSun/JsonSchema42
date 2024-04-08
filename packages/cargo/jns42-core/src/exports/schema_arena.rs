@@ -1,5 +1,10 @@
 use crate::{models::SchemaArena, schema_transforms::SchemaTransform};
-use std::ffi::{c_char, CStr, CString};
+use std::{
+  ffi::{c_char, CStr, CString},
+  ptr::null_mut,
+};
+
+use super::with_error::with_error_reference;
 
 #[no_mangle]
 extern "C" fn schema_arena_drop(arena: *mut SchemaArena) {
@@ -28,13 +33,20 @@ extern "C" fn schema_arena_count(arena: *const SchemaArena) -> usize {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_add_item(arena: *mut SchemaArena, item: *const c_char) -> usize {
-  let arena = unsafe { &mut *arena };
-  let item = unsafe { CStr::from_ptr(item) };
-  let item = item.to_str().unwrap();
-  let item = serde_json::from_str(item).unwrap();
+extern "C" fn schema_arena_add_item(
+  arena: *mut SchemaArena,
+  item: *const c_char,
+  error_reference: *mut usize,
+) -> usize {
+  with_error_reference(error_reference, || {
+    let arena = unsafe { &mut *arena };
+    let item = unsafe { CStr::from_ptr(item) };
+    let item = item.to_str()?;
+    let item = serde_json::from_str(item)?;
 
-  arena.add_item(item)
+    Ok(arena.add_item(item))
+  })
+  .unwrap_or_default()
 }
 
 #[no_mangle]
@@ -42,27 +54,38 @@ extern "C" fn schema_arena_replace_item(
   arena: *mut SchemaArena,
   key: usize,
   item: *const c_char,
+  error_reference: *mut usize,
 ) -> *mut c_char {
-  let arena = unsafe { &mut *arena };
-  let item = unsafe { CStr::from_ptr(item) };
-  let item = item.to_str().unwrap();
-  let item = serde_json::from_str(item).unwrap();
+  with_error_reference(error_reference, || {
+    let arena = unsafe { &mut *arena };
+    let item = unsafe { CStr::from_ptr(item) };
+    let item = item.to_str()?;
+    let item = serde_json::from_str(item)?;
 
-  let item_previous = arena.replace_item(key, item);
-  let item_previous = serde_json::to_string(&item_previous).unwrap();
-  let item_previous = CString::new(item_previous).unwrap();
+    let item_previous = arena.replace_item(key, item);
+    let item_previous = serde_json::to_string(&item_previous)?;
+    let item_previous = CString::new(item_previous)?;
 
-  item_previous.into_raw()
+    Ok(item_previous.into_raw())
+  })
+  .unwrap_or_else(null_mut)
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_get_item(arena: *mut SchemaArena, key: usize) -> *mut c_char {
-  let arena = unsafe { &mut *arena };
-  let item = arena.get_item(key);
-  let item = serde_json::to_string(item).unwrap();
-  let item = CString::new(item).unwrap();
+extern "C" fn schema_arena_get_item(
+  arena: *mut SchemaArena,
+  key: usize,
+  error_reference: *mut usize,
+) -> *mut c_char {
+  with_error_reference(error_reference, || {
+    let arena = unsafe { &mut *arena };
+    let item = arena.get_item(key);
+    let item = serde_json::to_string(item).unwrap();
+    let item = CString::new(item).unwrap();
 
-  item.into_raw()
+    Ok(item.into_raw())
+  })
+  .unwrap_or_else(null_mut)
 }
 
 #[no_mangle]
@@ -74,49 +97,4 @@ extern "C" fn schema_arena_transform(
   let transforms = unsafe { &*transforms };
 
   arena.transform(transforms)
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  use crate::models::SchemaItem;
-
-  #[test]
-  fn test_get_name_parts() {
-    let mut arena = SchemaArena::new();
-
-    arena.add_item(SchemaItem {
-      id: Some("http://id.com#/a/0".parse().unwrap()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      parent: Some(0),
-      id: Some("http://id.com#/b/1".parse().unwrap()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      parent: Some(1),
-      name: Some("2".to_string()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      parent: Some(2),
-      name: Some("3".to_string()),
-      ..Default::default()
-    });
-
-    assert_eq!(arena.get_name_parts(0).collect::<Vec<_>>(), vec!["a", "0"]);
-    assert_eq!(arena.get_name_parts(1).collect::<Vec<_>>(), vec!["b", "1"]);
-    assert_eq!(
-      arena.get_name_parts(2).collect::<Vec<_>>(),
-      vec!["b", "1", "2"]
-    );
-    assert_eq!(
-      arena.get_name_parts(3).collect::<Vec<_>>(),
-      vec!["b", "1", "2", "3"]
-    );
-  }
 }

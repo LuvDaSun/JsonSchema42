@@ -1,6 +1,8 @@
 use crate::naming::{Names, NamesBuilder};
 use std::ffi::{c_char, CStr};
 
+use super::with_error::with_error_reference;
+
 /// Free NamesBuilder instance
 #[no_mangle]
 extern "C" fn names_builder_drop(names_builder: *mut NamesBuilder<usize>) {
@@ -33,12 +35,18 @@ extern "C" fn names_builder_add(
 extern "C" fn names_builder_set_default_name(
   names_builder: *mut NamesBuilder<usize>,
   value: *const c_char,
+  error_reference: *mut usize,
 ) {
-  let names_builder = unsafe { &mut *names_builder };
-  let value = unsafe { CStr::from_ptr(value) };
-  let value = value.to_str().unwrap();
+  with_error_reference(error_reference, || {
+    let names_builder = unsafe { &mut *names_builder };
+    let value = unsafe { CStr::from_ptr(value) };
+    let value = value.to_str()?;
 
-  names_builder.set_default_name(value);
+    names_builder.set_default_name(value);
+
+    Ok(())
+  })
+  .unwrap_or_default()
 }
 
 /// create a names struct from the builder

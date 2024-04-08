@@ -88,3 +88,48 @@ impl Arena<SchemaItem> {
     })
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::models::SchemaItem;
+
+  #[test]
+  fn test_get_name_parts() {
+    let mut arena = SchemaArena::new();
+
+    arena.add_item(SchemaItem {
+      id: Some("http://id.com#/a/0".parse().unwrap()),
+      ..Default::default()
+    });
+
+    arena.add_item(SchemaItem {
+      parent: Some(0),
+      id: Some("http://id.com#/b/1".parse().unwrap()),
+      ..Default::default()
+    });
+
+    arena.add_item(SchemaItem {
+      parent: Some(1),
+      name: Some("2".to_string()),
+      ..Default::default()
+    });
+
+    arena.add_item(SchemaItem {
+      parent: Some(2),
+      name: Some("3".to_string()),
+      ..Default::default()
+    });
+
+    assert_eq!(arena.get_name_parts(0).collect::<Vec<_>>(), vec!["a", "0"]);
+    assert_eq!(arena.get_name_parts(1).collect::<Vec<_>>(), vec!["b", "1"]);
+    assert_eq!(
+      arena.get_name_parts(2).collect::<Vec<_>>(),
+      vec!["b", "1", "2"]
+    );
+    assert_eq!(
+      arena.get_name_parts(3).collect::<Vec<_>>(),
+      vec!["b", "1", "2", "3"]
+    );
+  }
+}

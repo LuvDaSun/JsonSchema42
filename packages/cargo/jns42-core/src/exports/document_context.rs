@@ -1,6 +1,8 @@
+use super::with_error::with_error_reference;
 use crate::{documents::DocumentContext, executor::spawn_and_callback, utils::key::Key};
 use std::{
   ffi::{c_char, CStr, CString},
+  ptr::null_mut,
   rc::Rc,
 };
 
@@ -19,9 +21,14 @@ extern "C" fn document_context_new() -> *mut Rc<DocumentContext> {
 #[no_mangle]
 extern "C" fn document_context_register_well_known_factories(
   document_context: *mut Rc<DocumentContext>,
+  error_reference: *mut usize,
 ) {
-  let document_context = unsafe { &mut *document_context };
-  document_context.register_well_known_factories().unwrap();
+  with_error_reference(error_reference, || {
+    let document_context = unsafe { &mut *document_context };
+    document_context.register_well_known_factories().unwrap();
+    Ok(())
+  })
+  .unwrap_or_default()
 }
 
 #[no_mangle]
@@ -31,6 +38,7 @@ extern "C" fn document_context_load_from_location(
   given_location: *const c_char,
   antecedent_location: *const c_char,
   default_meta_schema_id: *const c_char,
+  error_reference: *mut usize,
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
@@ -76,6 +84,7 @@ extern "C" fn document_context_load_from_node(
   antecedent_location: *const c_char,
   node: *const c_char,
   default_meta_schema_id: *const c_char,
+  error_reference: *mut usize,
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
@@ -121,11 +130,15 @@ extern "C" fn document_context_load_from_node(
 #[no_mangle]
 extern "C" fn document_context_get_intermediate_document(
   document_context: *const Rc<DocumentContext>,
+  error_reference: *mut usize,
 ) -> *mut c_char {
-  let document_context = unsafe { &*document_context };
-  let intermediate_document = document_context.get_intermediate_document();
-  let intermediate_document = serde_json::to_string(&intermediate_document).unwrap();
-  let intermediate_document = CString::new(intermediate_document).unwrap();
+  with_error_reference(error_reference, || {
+    let document_context = unsafe { &*document_context };
+    let intermediate_document = document_context.get_intermediate_document();
+    let intermediate_document = serde_json::to_string(&intermediate_document)?;
+    let intermediate_document = CString::new(intermediate_document)?;
 
-  intermediate_document.into_raw()
+    Ok(intermediate_document.into_raw())
+  })
+  .unwrap_or_else(null_mut)
 }

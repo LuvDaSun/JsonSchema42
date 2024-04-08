@@ -1,4 +1,10 @@
-use std::ffi::{c_char, CString};
+use super::with_error::with_error_reference;
+use crate::error::Error;
+use std::{
+  ffi::{c_char, CString},
+  ptr::null_mut,
+  usize,
+};
 
 #[no_mangle]
 extern "C" fn vec_string_new(capacity: usize) -> *mut Vec<String> {
@@ -21,21 +27,37 @@ extern "C" fn vec_string_len(vec: *const Vec<String>) -> usize {
 }
 
 #[no_mangle]
-extern "C" fn vec_string_get(vec: *const Vec<String>, index: usize) -> *const c_char {
-  let vec = unsafe { &*vec };
+extern "C" fn vec_string_get(
+  vec: *const Vec<String>,
+  index: usize,
+  error_reference: *mut usize,
+) -> *mut c_char {
+  with_error_reference(error_reference, || {
+    let vec = unsafe { &*vec };
 
-  let value = vec.get(index).unwrap();
-  let value = CString::new(value.clone()).unwrap();
+    let value = vec.get(index).ok_or(Error::Unknown)?;
+    let value = CString::new(value.clone())?;
 
-  value.into_raw()
+    Ok(value.into_raw())
+  })
+  .unwrap_or_else(null_mut)
 }
 
 #[no_mangle]
-extern "C" fn vec_string_push(vec: *mut Vec<String>, value: *mut c_char) {
-  let vec = unsafe { &mut *vec };
-  let value = unsafe { CString::from_raw(value) };
-  let value = value.to_str().unwrap();
-  let value = value.to_owned();
+extern "C" fn vec_string_push(
+  vec: *mut Vec<String>,
+  value: *mut c_char,
+  error_reference: *mut usize,
+) {
+  with_error_reference(error_reference, || {
+    let vec = unsafe { &mut *vec };
+    let value = unsafe { CString::from_raw(value) };
+    let value = value.to_str()?;
+    let value = value.to_owned();
 
-  vec.push(value);
+    vec.push(value);
+
+    Ok(())
+  })
+  .unwrap_or(())
 }

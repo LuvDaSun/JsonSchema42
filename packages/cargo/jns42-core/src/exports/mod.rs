@@ -9,6 +9,6 @@ pub mod reverse;
 pub mod schema_arena;
 pub mod schema_item;
 pub mod sentence;
-pub mod status_code;
 pub mod vec_string;
 pub mod vec_usize;
+pub mod with_error;
