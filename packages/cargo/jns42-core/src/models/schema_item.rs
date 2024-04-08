@@ -156,36 +156,36 @@ pub struct SchemaItem {
   pub required: Option<HashSet<String>>,
 
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub minimum_inclusive: Option<f64>,
+  pub minimum_inclusive: Option<serde_json::Number>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub minimum_exclusive: Option<f64>,
+  pub minimum_exclusive: Option<serde_json::Number>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub maximum_inclusive: Option<f64>,
+  pub maximum_inclusive: Option<serde_json::Number>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub maximum_exclusive: Option<f64>,
+  pub maximum_exclusive: Option<serde_json::Number>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub multiple_of: Option<f64>,
+  pub multiple_of: Option<serde_json::Number>,
 
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub minimum_length: Option<usize>,
+  pub minimum_length: Option<u64>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub maximum_length: Option<usize>,
+  pub maximum_length: Option<u64>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub value_pattern: Option<Vec<String>>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub value_format: Option<Vec<String>>,
 
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub minimum_items: Option<usize>,
+  pub minimum_items: Option<u64>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub maximum_items: Option<usize>,
+  pub maximum_items: Option<u64>,
   #[serde(skip_serializing_if = "Option::is_none")]
   pub unique_items: Option<bool>,
 
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub minimum_properties: Option<usize>,
+  pub minimum_properties: Option<u64>,
   #[serde(skip_serializing_if = "Option::is_none")]
-  pub maximum_properties: Option<usize>,
+  pub maximum_properties: Option<u64>,
 }
 
 impl SchemaItem {
@@ -338,11 +338,11 @@ impl SchemaItem {
       options: union_merge!(options), // TODO
       required: union_merge!(required),
 
-      minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),
-      minimum_exclusive: merge_option!(minimum_exclusive, |base, other| base.min(*other)),
-      maximum_inclusive: merge_option!(maximum_inclusive, |base, other| base.max(*other)),
-      maximum_exclusive: merge_option!(maximum_exclusive, |base, other| base.max(*other)),
-      multiple_of: None, // TODO
+      minimum_inclusive: None, // merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: None, // merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: None, // merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: None, // merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      multiple_of: None,       // TODO
 
       minimum_length: merge_option!(minimum_length, |base, other| *base.min(other)),
       maximum_length: merge_option!(maximum_length, |base, other| *base.max(other)),

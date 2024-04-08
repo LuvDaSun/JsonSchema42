@@ -1,4 +1,4 @@
-use crate::utils::node_location::NodeLocation;
+use crate::{models::IntermediateNode, utils::node_location::NodeLocation};
 
 pub struct EmbeddedDocument {
   pub retrieval_location: NodeLocation,
@@ -16,4 +16,8 @@ pub trait SchemaDocument {
 
   fn get_document_location(&self) -> &NodeLocation;
   fn get_node_locations(&self) -> Box<dyn Iterator<Item = NodeLocation> + '_>;
+
+  fn get_intermediate_node_entries(
+    &self,
+  ) -> Box<dyn Iterator<Item = (NodeLocation, IntermediateNode)> + '_>;
 }

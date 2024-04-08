@@ -70,25 +70,25 @@ pub struct IntermediateNode {
   pub types: Option<Vec<IntermediateType>>,
 
   // assertions
-  pub options: Option<Vec<Value>>,
+  pub options: Option<Vec<serde_json::Value>>,
 
-  pub minimum_inclusive: Option<f64>,
-  pub minimum_exclusive: Option<f64>,
-  pub maximum_inclusive: Option<f64>,
-  pub maximum_exclusive: Option<f64>,
-  pub multiple_of: Option<f64>,
+  pub minimum_inclusive: Option<serde_json::Number>,
+  pub minimum_exclusive: Option<serde_json::Number>,
+  pub maximum_inclusive: Option<serde_json::Number>,
+  pub maximum_exclusive: Option<serde_json::Number>,
+  pub multiple_of: Option<serde_json::Number>,
 
-  pub minimum_length: Option<usize>,
-  pub maximum_length: Option<usize>,
+  pub minimum_length: Option<u64>,
+  pub maximum_length: Option<u64>,
   pub value_pattern: Option<String>,
   pub value_format: Option<String>,
 
-  pub maximum_items: Option<usize>,
-  pub minimum_items: Option<usize>,
+  pub maximum_items: Option<u64>,
+  pub minimum_items: Option<u64>,
   pub unique_items: Option<bool>,
 
-  pub minimum_properties: Option<usize>,
-  pub maximum_properties: Option<usize>,
+  pub minimum_properties: Option<u64>,
+  pub maximum_properties: Option<u64>,
   pub required: Option<Vec<String>>,
 
   // applicators

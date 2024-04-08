@@ -125,11 +125,11 @@ impl Specification {
 
           options: schema.options.clone(),
 
-          minimum_inclusive: schema.minimum_inclusive,
-          minimum_exclusive: schema.minimum_exclusive,
-          maximum_inclusive: schema.maximum_inclusive,
-          maximum_exclusive: schema.maximum_exclusive,
-          multiple_of: schema.multiple_of,
+          minimum_inclusive: schema.minimum_inclusive.clone(),
+          minimum_exclusive: schema.minimum_exclusive.clone(),
+          maximum_inclusive: schema.maximum_inclusive.clone(),
+          maximum_exclusive: schema.maximum_exclusive.clone(),
+          multiple_of: schema.multiple_of.clone(),
 
           minimum_length: schema.minimum_length,
           maximum_length: schema.maximum_length,

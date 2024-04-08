@@ -1,6 +1,5 @@
-use std::iter::once;
-
 use crate::models::IntermediateType;
+use std::iter::once;
 
 #[derive(Clone, Debug)]
 pub struct Node(serde_json::Value);
