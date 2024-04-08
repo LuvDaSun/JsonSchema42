@@ -15,7 +15,7 @@
 macro_rules! generate_mod {
   ( $member: ident ) => {
     pub mod $member {
-      use crate::models::schema_arena::SchemaArena;
+      use crate::models::SchemaArena;
 
       pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
@@ -45,7 +45,7 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use crate::models::schema_item::SchemaItem;
+        use crate::models::SchemaItem;
 
         #[test]
         fn test_transform() {

@@ -1,4 +1,4 @@
-use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
+use crate::models::{SchemaArena, SchemaItem};
 use im::HashMap;
 use itertools::Itertools;
 use std::{cell::RefCell, collections::BTreeSet};
@@ -115,7 +115,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::schema_item::SchemaType;
+  use crate::models::SchemaType;
 
   #[test]
   fn test_utility() {

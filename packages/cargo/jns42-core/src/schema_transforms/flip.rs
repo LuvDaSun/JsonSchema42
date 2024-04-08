@@ -52,7 +52,7 @@ will become
 macro_rules! generate_mod {
   ( $name: ident, $base_member: ident, $other_member: ident  ) => {
     pub mod $name {
-      use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
+      use crate::models::{SchemaArena, SchemaItem};
       use crate::utils::product::product;
       use std::collections::{BTreeMap, BTreeSet};
 

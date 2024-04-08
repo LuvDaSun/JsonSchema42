@@ -1,4 +1,4 @@
-use crate::models::{schema_arena::SchemaArena, schema_item::SchemaItem};
+use crate::models::{SchemaArena, SchemaItem};
 
 /**
  * This sets the primary field on all relevant schemas

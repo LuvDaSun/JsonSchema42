@@ -1,4 +1,4 @@
-use crate::{models::schema_arena::SchemaArena, schema_transforms::SchemaTransform};
+use crate::{models::SchemaArena, schema_transforms::SchemaTransform};
 use std::ffi::{c_char, CStr, CString};
 
 #[no_mangle]
@@ -79,7 +79,7 @@ extern "C" fn schema_arena_transform(
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::schema_item::SchemaItem;
+  use crate::models::SchemaItem;
 
   #[test]
   fn test_get_name_parts() {

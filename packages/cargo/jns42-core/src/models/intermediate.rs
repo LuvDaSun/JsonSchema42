@@ -1,6 +1,6 @@
 use crate::utils::node_location::NodeLocation;
 
-use super::schema_item::SchemaType;
+use super::SchemaType;
 use serde_json::Value;
 use std::collections::HashMap;
 

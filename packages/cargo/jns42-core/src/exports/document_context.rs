@@ -1,5 +1,5 @@
 use crate::{
-  document::{document_context::DocumentContext, meta::MetaSchemaId},
+  documents::{DocumentContext, MetaSchemaId},
   executor::spawn_and_callback,
   utils::key::Key,
 };

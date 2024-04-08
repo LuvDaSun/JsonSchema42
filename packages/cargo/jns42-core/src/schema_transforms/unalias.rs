@@ -1,4 +1,4 @@
-use crate::models::schema_arena::SchemaArena;
+use crate::models::SchemaArena;
 
 pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);

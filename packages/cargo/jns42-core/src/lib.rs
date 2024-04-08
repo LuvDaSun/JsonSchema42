@@ -1,4 +1,4 @@
-pub mod document;
+pub mod documents;
 pub mod models;
 pub mod naming;
 pub mod schema_transforms;

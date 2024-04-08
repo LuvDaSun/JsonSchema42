@@ -1,4 +1,4 @@
-use crate::models::schema_item::SchemaItem;
+use crate::models::SchemaItem;
 
 #[no_mangle]
 extern "C" fn schema_item_new() -> *const SchemaItem {
