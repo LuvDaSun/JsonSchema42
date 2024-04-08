@@ -88,12 +88,15 @@ impl DocumentContext {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(documents::draft_2020_12::Document::new(
-          configuration.retrieval_url,
-          configuration.given_url,
-          configuration.antecedent_url,
-          configuration.document_node.clone().into(),
-        ))
+        Rc::new(
+          documents::draft_2020_12::Document::new(
+            configuration.retrieval_url,
+            configuration.given_url,
+            configuration.antecedent_url,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
       }),
     )?;
     // context.register_factory(
@@ -111,12 +114,15 @@ impl DocumentContext {
     self.register_factory(
       documents::draft_04::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(documents::draft_04::Document::new(
-          configuration.retrieval_url,
-          configuration.given_url,
-          configuration.antecedent_url,
-          configuration.document_node.clone().into(),
-        ))
+        Rc::new(
+          documents::draft_04::Document::new(
+            configuration.retrieval_url,
+            configuration.given_url,
+            configuration.antecedent_url,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
       }),
     )?;
     // context.register_factory(
@@ -221,9 +227,7 @@ impl DocumentContext {
       retrieve the document
       */
       let fetch_location = &retrieval_location.to_fetch_string();
-      let data = crate::utils::fetch_file::fetch_file(fetch_location)
-        .await
-        .map_err(|_error| Error::FetchFile)?;
+      let data = crate::utils::fetch_file::fetch_file(fetch_location).await?;
       let document_node = serde_json::from_str(&data).map_err(|_error| Error::Deserialization)?;
 
       /*

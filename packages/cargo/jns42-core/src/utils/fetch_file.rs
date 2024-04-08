@@ -1,7 +1,7 @@
-use std::error::Error;
+use crate::error::Error;
 
 #[cfg(feature = "hosted")]
-pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
+pub async fn fetch_file(location: &str) -> Result<String, Error> {
   use crate::callbacks::register_callback;
   use futures::channel::oneshot;
   use std::{
@@ -22,7 +22,7 @@ pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
   unsafe {
     crate::imports::host_fetch_file(location, data, callback_key);
   }
-  ready_receiver.await?;
+  ready_receiver.await.unwrap();
 
   let data = unsafe { Box::from_raw(data) };
   let data = *data;
@@ -34,7 +34,7 @@ pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
 }
 
 #[cfg(feature = "local")]
-pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
+pub async fn fetch_file(location: &str) -> Result<String, Error> {
   use tokio::{fs::File, io::AsyncReadExt};
 
   if location.starts_with("http://") || location.starts_with("https://") {

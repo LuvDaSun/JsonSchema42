@@ -15,6 +15,7 @@ pub fn register_callback(callback: impl FnOnce() + Send + 'static) -> Key {
 
 pub fn invoke_callback(key: Key) {
   let mut callbacks = CALLBACKS.lock().unwrap();
-  let callback = callbacks.remove(&key).unwrap();
-  (callback)();
+  if let Some(callback) = callbacks.remove(&key) {
+    (callback)();
+  }
 }

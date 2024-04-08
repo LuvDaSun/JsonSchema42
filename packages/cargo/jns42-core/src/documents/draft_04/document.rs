@@ -1,5 +1,6 @@
 use super::Node;
 use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
+use crate::error::Error;
 use crate::models::IntermediateNode;
 use crate::utils::node_location::NodeLocation;
 use std::collections::HashMap;
@@ -20,16 +21,19 @@ impl Document {
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
     document_node: Node,
-  ) -> Self {
+  ) -> Result<Self, Error> {
     let node_id = document_node.select_id();
-    let node_location = node_id.and_then(|node_id| {
+
+    let document_location = if let Some(node_id) = node_id {
+      let node_location = node_id.parse()?;
       if let Some(antecedent_location) = &antecedent_location {
-        Some(antecedent_location.join(&node_id.parse().unwrap()))
+        antecedent_location.join(&node_location)
       } else {
-        node_id.parse().ok()
+        node_location
       }
-    });
-    let document_location = node_location.unwrap_or(given_location.clone());
+    } else {
+      given_location.clone()
+    };
 
     let mut nodes = HashMap::new();
     let mut referenced_documents = Vec::new();
@@ -41,7 +45,7 @@ impl Document {
       nodes.insert(node_pointer.clone(), node.clone());
 
       if let Some(node_reference) = node.select_reference() {
-        let reference_location = &node_reference.parse().unwrap();
+        let reference_location = &node_reference.parse()?;
         let retrieval_location = retrieval_location.clone();
         let given_location = document_location.clone();
         retrieval_location.join(reference_location);
@@ -55,7 +59,7 @@ impl Document {
 
       for (sub_pointer, sub_node) in node.select_sub_nodes(&node_pointer) {
         if let Some(node_id) = sub_node.select_id() {
-          let id_location = &node_id.parse().unwrap();
+          let id_location = &node_id.parse()?;
           let retrieval_location = retrieval_location.clone();
           let given_location = document_location.clone();
           retrieval_location.join(id_location);
@@ -76,12 +80,12 @@ impl Document {
       }
     }
 
-    Self {
+    Ok(Self {
       document_location,
       nodes,
       referenced_documents,
       embedded_documents,
-    }
+    })
   }
 }
 
