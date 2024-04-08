@@ -1,8 +1,8 @@
 use super::Node;
-use crate::documents::{DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument};
+use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::models::IntermediateNode;
 use crate::utils::node_location::NodeLocation;
-use std::{collections::HashMap, rc::Weak};
+use std::collections::HashMap;
 
 pub struct Document {
   document_location: NodeLocation,

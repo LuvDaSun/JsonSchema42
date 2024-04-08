@@ -93,9 +93,15 @@ impl Node {
     select_entries_one(self, pointer, "additionalProperties")
   }
   pub fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    todo!();
-    // select_entries_one(self, pointer, "items")
-    // select_entries_one(self, pointer, "additionalItems")
+    if let Some(value) = select_entries_one(self, pointer, "items") {
+      return Some(value);
+    }
+
+    if let Some(value) = select_entries_one(self, pointer, "additionalItems") {
+      return Some(value);
+    }
+
+    None
   }
 
   pub fn select_all_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
