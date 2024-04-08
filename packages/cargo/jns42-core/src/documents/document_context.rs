@@ -91,7 +91,7 @@ impl DocumentContext {
   pub fn register_well_known_factories(self: &mut Rc<Self>) {
     self.register_factory(
       &MetaSchemaId::Draft202012,
-      Box::new(move |context, configuration| {
+      Box::new(|context, configuration| {
         Rc::new(documents::draft_2020_12::Document::new(
           context,
           configuration.retrieval_url,
@@ -103,31 +103,38 @@ impl DocumentContext {
     );
     // context.register_factory(
     //   &MetaSchemaId::Draft201909,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_2019_09::Document::new())),
+    //   Box::new( |_context, _initializer| Rc::new(documents::draft_2019_09::Document::new())),
     // );
     // context.register_factory(
     //   &MetaSchemaId::Draft07,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_07::Document::new())),
+    //   Box::new(|_context, _initializer| Rc::new(documents::draft_07::Document::new())),
     // );
     // context.register_factory(
     //   &MetaSchemaId::Draft06,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_06::Document::new())),
+    //   Box::new(|_context, _initializer| Rc::new(documents::draft_06::Document::new())),
+    // );
+    self.register_factory(
+      &MetaSchemaId::Draft04,
+      Box::new(|_context, configuration| {
+        Rc::new(documents::draft_04::Document::new(
+          configuration.retrieval_url,
+          configuration.given_url,
+          configuration.antecedent_url,
+          configuration.document_node.clone().into(),
+        ))
+      }),
+    );
+    // context.register_factory(
+    //   &MetaSchemaId::OasV31,
+    //   Box::new(|_context, _initializer| Rc::new(documents::oas_v3_1::Document::new())),
     // );
     // context.register_factory(
-    //   &MetaSchemaId::Draft04,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_04::Document::new())),
+    //   &MetaSchemaId::OasV30,
+    //   Box::new(|_context, _initializer| Rc::new(documents::oas_v3_0::Document::new())),
     // );
     // context.register_factory(
-    //   &MetaSchemaId::Draft04,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::oas_v3_1::Document::new())),
-    // );
-    // context.register_factory(
-    //   &MetaSchemaId::Draft04,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::oas_v3_0::Document::new())),
-    // );
-    // context.register_factory(
-    //   &MetaSchemaId::Draft04,
-    //   Box::new(move |_context, _initializer| Rc::new(documents::swagger_v2::Document::new())),
+    //   &MetaSchemaId::SwaggerV2,
+    //   Box::new(|_context, _initializer| Rc::new(documents::swagger_v2::Document::new())),
     // );
   }
 

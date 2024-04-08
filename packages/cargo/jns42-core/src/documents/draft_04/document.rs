@@ -16,7 +16,6 @@ pub struct Document {
 
 impl Document {
   pub fn new(
-    document_context: Weak<DocumentContext>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,

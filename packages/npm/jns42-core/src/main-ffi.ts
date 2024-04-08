@@ -83,6 +83,15 @@ export interface MainExports extends ExportsBase {
     default_schema_id: MetaSchemaId,
     callback: number,
   ): void;
+  document_context_load_from_node(
+    document_context: number,
+    retrieval_location: number,
+    given_location: number,
+    antecedent_location: number,
+    node: number,
+    default_schema_id: MetaSchemaId,
+    callback: number,
+  ): void;
   document_context_get_intermediate_document(document_context: number): number;
 
   to_camel_case(value: number): number;

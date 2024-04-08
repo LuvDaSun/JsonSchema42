@@ -7,14 +7,9 @@ import * as path from "node:path";
 import test from "node:test";
 import YAML from "yaml";
 import * as yargs from "yargs";
-import { DocumentContext } from "../documents/document-context.js";
-import * as oasV30 from "../documents/oas-v3-0/index.js";
 import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
 import * as schema202012 from "../documents/schema-draft-2020-12/index.js";
-import * as schemaDraft202012 from "../documents/schema-draft-2020-12/index.js";
 import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
-import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
-import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
 
@@ -29,7 +24,7 @@ export function configureTestProgram(argv: yargs.Argv) {
           type: "string",
           demandOption: true,
         })
-        .option("default-meta-schema-location", {
+        .option("default-meta-schema", {
           description: "the default meta schema to use",
           type: "string",
           choices: [
@@ -70,7 +65,7 @@ export function configureTestProgram(argv: yargs.Argv) {
 
 interface MainConfiguration {
   pathToTest: string;
-  defaultMetaSchemaLocation: string;
+  defaultMetaSchema: string;
   packageDirectory: string;
   packageName: string;
   packageVersion: string;
@@ -79,10 +74,10 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
+  const { defaultMetaSchema } = configuration;
+  const packageDirectoryRoot = path.resolve(configuration.packageDirectory);
   const pathToTest = path.resolve(configuration.pathToTest);
 
-  const defaultMetaSchemaId = configuration.defaultMetaSchemaLocation;
-  const packageDirectoryRoot = path.resolve(configuration.packageDirectory);
   const {
     packageName,
     packageVersion,
@@ -90,7 +85,6 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  const testLocation = core.NodeLocation.parse(pathToTest);
   const defaultTypeName = toPascalCase(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
@@ -106,96 +100,17 @@ async function main(configuration: MainConfiguration) {
 
     // generate package
     {
-      const context = new DocumentContext();
-      context.registerFactory(
-        schemaDraft202012.metaSchemaId,
-        ({
-          retrievalLocation: retrievalLocation,
-          givenLocation: givenLocation,
-          antecedentLocation: antecedentLocation,
-          documentNode: documentNode,
-        }) =>
-          new schemaDraft202012.Document(
-            retrievalLocation,
-            givenLocation,
-            antecedentLocation,
-            documentNode,
-            context,
-          ),
-      );
-      context.registerFactory(
-        schemaDraft04.metaSchemaId,
-        ({
-          retrievalLocation: retrievalLocation,
-          givenLocation: givenLocation,
-          antecedentLocation: antecedentLocation,
-          documentNode: documentNode,
-        }) =>
-          new schemaDraft04.Document(
-            retrievalLocation,
-            givenLocation,
-            antecedentLocation,
-            documentNode,
-            context,
-          ),
-      );
-      context.registerFactory(
-        schemaOasV31.metaSchemaId,
-        ({
-          retrievalLocation: retrievalLocation,
-          givenLocation: givenLocation,
-          antecedentLocation: antecedentLocation,
-          documentNode: documentNode,
-        }) =>
-          new schemaOasV31.Document(
-            retrievalLocation,
-            givenLocation,
-            antecedentLocation,
-            documentNode,
-            context,
-          ),
-      );
-      context.registerFactory(
-        oasV30.metaSchemaId,
-        ({
-          retrievalLocation: retrievalLocation,
-          givenLocation: givenLocation,
-          antecedentLocation: antecedentLocation,
-          documentNode: documentNode,
-        }) =>
-          new oasV30.Document(
-            retrievalLocation,
-            givenLocation,
-            antecedentLocation,
-            documentNode,
-            context,
-          ),
-      );
-      context.registerFactory(
-        swaggerV2.metaSchemaId,
-        ({
-          retrievalLocation: retrievalLocation,
-          givenLocation: givenLocation,
-          antecedentLocation: antecedentLocation,
-          documentNode: documentNode,
-        }) =>
-          new swaggerV2.Document(
-            retrievalLocation,
-            givenLocation,
-            antecedentLocation,
-            documentNode,
-            context,
-          ),
-      );
-      context.registerFactory(
-        schemaIntermediate.metaSchemaId,
-        ({ givenLocation: givenLocation, documentNode: documentNode }) =>
-          new schemaIntermediate.Document(givenLocation, documentNode),
+      const context = core.DocumentContext.new();
+      context.registerWellKnownFactories();
+      await context.loadFromNode(
+        pathToTest,
+        pathToTest,
+        undefined,
+        schema,
+        defaultMetaSchema as core.MetaSchemaString,
       );
 
-      await context.loadFromDocument(testLocation, testLocation, null, schema, defaultMetaSchemaId);
-
-      const intermediateDocument = context.getIntermediateData();
+      const intermediateDocument = context.getIntermediateDocument();
 
       using specification = models.loadSpecification(intermediateDocument, {
         transformMaximumIterations,

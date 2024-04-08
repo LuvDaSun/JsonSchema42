@@ -26,7 +26,9 @@ export class DocumentContext extends ForeignObject {
     defaultMetaSchema: MetaSchemaString,
   ) {
     using retrievalLocationForeign = CString.fromString(retrievalLocation);
+
     using givenLocationForeign = CString.fromString(givenLocation);
+
     using antecedentLocationForeign =
       antecedentLocation == null ? null : CString.fromString(antecedentLocation);
 
@@ -45,8 +47,43 @@ export class DocumentContext extends ForeignObject {
       key,
     );
 
-    const data = await deferred.promise;
-    return data;
+    await deferred.promise;
+  }
+
+  public async loadFromNode(
+    retrievalLocation: string,
+    givenLocation: string,
+    antecedentLocation: string | undefined,
+    node: any,
+    defaultMetaSchema: MetaSchemaString,
+  ) {
+    using retrievalLocationForeign = CString.fromString(retrievalLocation);
+
+    using givenLocationForeign = CString.fromString(givenLocation);
+
+    using antecedentLocationForeign =
+      antecedentLocation == null ? null : CString.fromString(antecedentLocation);
+
+    let nodeString = JSON.stringify(node);
+    using nodeForeign = CString.fromString(nodeString);
+
+    let defaultMetaSchemaId = metaSchemaIdFromString(defaultMetaSchema);
+
+    const deferred = defer<void>();
+    const key = mainFfi.registerCallback(() => {
+      deferred.resolve();
+    });
+    mainFfi.exports.document_context_load_from_node(
+      this.pointer,
+      retrievalLocationForeign.pointer,
+      givenLocationForeign.pointer,
+      antecedentLocationForeign?.pointer ?? 0,
+      nodeForeign.pointer,
+      defaultMetaSchemaId,
+      key,
+    );
+
+    await deferred.promise;
   }
 
   public getIntermediateDocument(): schemaIntermediate.SchemaJson {
