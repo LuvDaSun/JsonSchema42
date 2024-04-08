@@ -1,5 +1,5 @@
-use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
-use crate::documents;
+use super::schema_document::SchemaDocument;
+use crate::documents::{self, discover_meta_schema};
 use crate::{
   models::IntermediateSchema,
   utils::{node_location::NodeLocation, read_json_node::read_json_node},
@@ -20,12 +20,7 @@ pub struct DocumentConfiguration<'a> {
 pub type DocumentFactory =
   dyn Fn(Weak<DocumentContext>, DocumentConfiguration) -> Rc<dyn SchemaDocument>;
 
-pub type Queue = Vec<(
-  NodeLocation,
-  NodeLocation,
-  Option<NodeLocation>,
-  MetaSchemaId,
-)>;
+pub type Queue = Vec<(NodeLocation, NodeLocation, Option<NodeLocation>, String)>;
 
 /**
 This class loads document nodes and documents. Every node has a few locations:
@@ -80,7 +75,7 @@ pub struct DocumentContext {
   /**
    * document factories by schema identifier
    */
-  factories: HashMap<MetaSchemaId, Box<DocumentFactory>>,
+  factories: HashMap<String, Box<DocumentFactory>>,
 }
 
 impl DocumentContext {
@@ -90,7 +85,7 @@ impl DocumentContext {
 
   pub fn register_well_known_factories(self: &mut Rc<Self>) {
     self.register_factory(
-      &MetaSchemaId::Draft202012,
+      documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
         Rc::new(documents::draft_2020_12::Document::new(
           configuration.retrieval_url,
@@ -101,19 +96,19 @@ impl DocumentContext {
       }),
     );
     // context.register_factory(
-    //   &MetaSchemaId::Draft201909,
+    //   documents::draft_2019_09::META_SCHEMA_ID,
     //   Box::new( |_context, _initializer| Rc::new(documents::draft_2019_09::Document::new())),
     // );
     // context.register_factory(
-    //   &MetaSchemaId::Draft07,
+    //  documents::draft_07::META_SCHEMA_ID,
     //   Box::new(|_context, _initializer| Rc::new(documents::draft_07::Document::new())),
     // );
     // context.register_factory(
-    //   &MetaSchemaId::Draft06,
+    //  documents::draft_06::META_SCHEMA_ID,
     //   Box::new(|_context, _initializer| Rc::new(documents::draft_06::Document::new())),
     // );
     self.register_factory(
-      &MetaSchemaId::Draft04,
+      documents::draft_04::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
         Rc::new(documents::draft_04::Document::new(
           configuration.retrieval_url,
@@ -137,11 +132,7 @@ impl DocumentContext {
     // );
   }
 
-  pub fn register_factory(
-    self: &mut Rc<Self>,
-    schema: &MetaSchemaId,
-    factory: Box<DocumentFactory>,
-  ) {
+  pub fn register_factory(self: &mut Rc<Self>, schema: &str, factory: Box<DocumentFactory>) {
     /*
     don't check if the factory is already registered here so we can
     override factories
@@ -149,7 +140,7 @@ impl DocumentContext {
     Rc::get_mut(self)
       .unwrap()
       .factories
-      .insert(schema.clone(), factory);
+      .insert(schema.to_owned(), factory);
   }
 
   pub fn resolve_document_retrieval_url(
@@ -186,7 +177,7 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    default_schema_uri: &MetaSchemaId,
+    default_schema_uri: &str,
   ) {
     assert!(retrieval_location.is_root());
 
@@ -208,7 +199,7 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    default_schema_uri: &MetaSchemaId,
+    default_meta_schema_id: &str,
     queue: &mut Queue,
   ) {
     /*
@@ -234,7 +225,7 @@ impl DocumentContext {
       retrieval_location.clone(),
       given_location.clone(),
       antecedent_location.cloned(),
-      default_schema_uri.clone(),
+      default_meta_schema_id.to_owned(),
     ));
   }
 
@@ -249,7 +240,7 @@ impl DocumentContext {
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
     node: serde_json::Value,
-    default_schema_uri: &MetaSchemaId,
+    default_meta_schema_id: &str,
   ) {
     let mut queue = Default::default();
     self
@@ -258,7 +249,7 @@ impl DocumentContext {
         given_location,
         antecedent_location,
         node,
-        default_schema_uri,
+        default_meta_schema_id,
         &mut queue,
       )
       .await;
@@ -271,7 +262,7 @@ impl DocumentContext {
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
     node: serde_json::Value,
-    default_schema_uri: &MetaSchemaId,
+    default_meta_schema_id: &str,
     queue: &mut Queue,
   ) {
     /*
@@ -285,7 +276,7 @@ impl DocumentContext {
       retrieval_location.clone(),
       given_location.clone(),
       antecedent_location.cloned(),
-      default_schema_uri.clone(),
+      default_meta_schema_id.to_owned(),
     ));
   }
 
@@ -352,8 +343,8 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    default_schema_uri: &MetaSchemaId,
-    #[allow(clippy::ptr_arg)] queue: &mut Queue,
+    default_meta_schema_id: &str,
+    queue: &mut Queue,
   ) {
     if self
       .node_documents
@@ -369,9 +360,9 @@ impl DocumentContext {
     let document = {
       let node_cache = self.node_cache.borrow();
       let node = node_cache.get(retrieval_location).unwrap();
-      let schema_uri = MetaSchemaId::discover(node).unwrap_or_else(|| default_schema_uri.clone());
+      let meta_schema_id = discover_meta_schema(node).unwrap_or(default_meta_schema_id);
 
-      let factory = self.factories.get(&schema_uri).unwrap();
+      let factory = self.factories.get(meta_schema_id).unwrap();
 
       factory(
         Rc::downgrade(self),
@@ -429,7 +420,7 @@ impl DocumentContext {
           &embedded_document.given_location,
           Some(document_location),
           node,
-          default_schema_uri,
+          default_meta_schema_id,
           queue,
         )
         .await;
@@ -442,7 +433,7 @@ impl DocumentContext {
           &referenced_document.retrieval_location,
           &referenced_document.given_location,
           Some(document_location),
-          default_schema_uri,
+          default_meta_schema_id,
           queue,
         )
         .await;
@@ -450,10 +441,11 @@ impl DocumentContext {
   }
 }
 
-#[cfg(all(test, not(feature = "hosted")))]
+#[cfg(test)]
 mod tests {
   use super::*;
 
+  #[cfg(feature = "local")]
   #[tokio::test]
   async fn test_load_empty_node() {
     let mut document_context = DocumentContext::new();
@@ -465,7 +457,7 @@ mod tests {
         &"schema.json".parse().unwrap(),
         None,
         serde_json::Value::Object(Default::default()),
-        &MetaSchemaId::Draft202012,
+        documents::draft_2020_12::META_SCHEMA_ID,
       )
       .await;
   }

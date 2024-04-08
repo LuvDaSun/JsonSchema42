@@ -1,6 +1,7 @@
 use crate::generators::package::{generate_package, PackageConfiguration};
 use clap::Parser;
-use jns42_core::documents::{DocumentContext, MetaSchemaId};
+use jns42_core::documents;
+use jns42_core::documents::DocumentContext;
 use jns42_core::models::Specification;
 use jns42_core::utils::node_location::NodeLocation;
 use std::error::Error;
@@ -10,8 +11,8 @@ use std::path::PathBuf;
 pub struct CommandOptions {
   pub schema_location: NodeLocation,
 
-  #[arg(long, default_value_t = MetaSchemaId::Draft202012)]
-  pub default_meta_schema_id: MetaSchemaId,
+  #[arg(long, default_value = documents::draft_2020_12::META_SCHEMA_ID)]
+  pub default_meta_schema_id: String,
 
   #[arg(long)]
   pub package_directory: PathBuf,

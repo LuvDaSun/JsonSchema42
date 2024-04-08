@@ -3,7 +3,6 @@ import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
-import { MetaSchemaString, metaSchemaIdFromString } from "./meta-schema-id.js";
 
 export class DocumentContext extends ForeignObject {
   constructor(pointer: number) {
@@ -23,7 +22,7 @@ export class DocumentContext extends ForeignObject {
     retrievalLocation: string,
     givenLocation: string,
     antecedentLocation: string | undefined,
-    defaultMetaSchema: MetaSchemaString,
+    defaultMetaSchemaId: string,
   ) {
     using retrievalLocationForeign = CString.fromString(retrievalLocation);
 
@@ -32,18 +31,19 @@ export class DocumentContext extends ForeignObject {
     using antecedentLocationForeign =
       antecedentLocation == null ? null : CString.fromString(antecedentLocation);
 
-    let defaultMetaSchemaId = metaSchemaIdFromString(defaultMetaSchema);
+    using defaultMetaSchemaIdForeign = CString.fromString(defaultMetaSchemaId);
 
     const deferred = defer<void>();
     const key = mainFfi.registerCallback(() => {
       deferred.resolve();
     });
+
     mainFfi.exports.document_context_load_from_location(
       this.pointer,
       retrievalLocationForeign.pointer,
       givenLocationForeign.pointer,
       antecedentLocationForeign?.pointer ?? 0,
-      defaultMetaSchemaId,
+      defaultMetaSchemaIdForeign.pointer,
       key,
     );
 
@@ -55,7 +55,7 @@ export class DocumentContext extends ForeignObject {
     givenLocation: string,
     antecedentLocation: string | undefined,
     node: any,
-    defaultMetaSchema: MetaSchemaString,
+    defaultMetaSchemaId: string,
   ) {
     using retrievalLocationForeign = CString.fromString(retrievalLocation);
 
@@ -67,19 +67,20 @@ export class DocumentContext extends ForeignObject {
     let nodeString = JSON.stringify(node);
     using nodeForeign = CString.fromString(nodeString);
 
-    let defaultMetaSchemaId = metaSchemaIdFromString(defaultMetaSchema);
+    using defaultMetaSchemaIdForeign = CString.fromString(defaultMetaSchemaId);
 
     const deferred = defer<void>();
     const key = mainFfi.registerCallback(() => {
       deferred.resolve();
     });
+
     mainFfi.exports.document_context_load_from_node(
       this.pointer,
       retrievalLocationForeign.pointer,
       givenLocationForeign.pointer,
       antecedentLocationForeign?.pointer ?? 0,
       nodeForeign.pointer,
-      defaultMetaSchemaId,
+      defaultMetaSchemaIdForeign.pointer,
       key,
     );
 

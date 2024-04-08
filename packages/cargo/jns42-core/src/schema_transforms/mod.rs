@@ -14,6 +14,7 @@ pub mod single_type;
 pub mod unalias;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
+#[repr(transparent)]
 pub struct SchemaTransform(usize);
 impl SchemaTransform {
   pub const EXPLODE: Self = Self(10);

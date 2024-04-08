@@ -33,7 +33,7 @@ pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
   Ok(data)
 }
 
-#[cfg(not(feature = "hosted"))]
+#[cfg(feature = "local")]
 pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
   use tokio::{fs::File, io::AsyncReadExt};
 

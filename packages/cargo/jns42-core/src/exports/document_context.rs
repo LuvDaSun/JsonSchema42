@@ -1,8 +1,4 @@
-use crate::{
-  documents::{DocumentContext, MetaSchemaId},
-  executor::spawn_and_callback,
-  utils::key::Key,
-};
+use crate::{documents::DocumentContext, executor::spawn_and_callback, utils::key::Key};
 use std::{
   ffi::{c_char, CStr, CString},
   rc::Rc,
@@ -34,7 +30,7 @@ extern "C" fn document_context_load_from_location(
   retrieval_location: *const c_char,
   given_location: *const c_char,
   antecedent_location: *const c_char,
-  default_schema_id: MetaSchemaId,
+  default_meta_schema_id: *const c_char,
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
@@ -57,12 +53,15 @@ extern "C" fn document_context_load_from_location(
       Some(antecedent_location)
     };
 
+    let default_meta_schema_id = unsafe { CStr::from_ptr(default_meta_schema_id) };
+    let default_meta_schema_id = default_meta_schema_id.to_str().unwrap();
+
     document_context
       .load_from_location(
         &retrieval_location,
         &given_location,
         antecedent_location.as_ref(),
-        &default_schema_id,
+        default_meta_schema_id,
       )
       .await;
   });
@@ -75,7 +74,7 @@ extern "C" fn document_context_load_from_node(
   given_location: *const c_char,
   antecedent_location: *const c_char,
   node: *const c_char,
-  default_schema_id: MetaSchemaId,
+  default_meta_schema_id: *const c_char,
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
@@ -102,13 +101,16 @@ extern "C" fn document_context_load_from_node(
     let node = node.to_str().unwrap();
     let node = serde_json::from_str(node).unwrap();
 
+    let default_meta_schema_id = unsafe { CStr::from_ptr(default_meta_schema_id) };
+    let default_meta_schema_id = default_meta_schema_id.to_str().unwrap();
+
     document_context
       .load_from_node(
         &retrieval_location,
         &given_location,
         antecedent_location.as_ref(),
         node,
-        &default_schema_id,
+        default_meta_schema_id,
       )
       .await;
   });

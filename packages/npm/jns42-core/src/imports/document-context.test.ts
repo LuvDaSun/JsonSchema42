@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import test from "node:test";
 import { DocumentContext } from "./document-context.js";
 
@@ -12,4 +13,8 @@ test("load empty", async () => {
     {},
     "https://json-schema.org/draft/2020-12/schema",
   );
+
+  const intermediateDocument = documentContext.getIntermediateDocument();
+
+  assert(intermediateDocument.schemas["schema.json#"] != null);
 });
