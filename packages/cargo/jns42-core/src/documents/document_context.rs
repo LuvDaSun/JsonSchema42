@@ -341,13 +341,13 @@ impl DocumentContext {
       let node = self
         .node_cache
         .borrow()
-        .get(&embedded_document.retrieval_url)
+        .get(&embedded_document.retrieval_location)
         .unwrap()
         .clone();
       self
         .load_from_node_with_queue(
-          &embedded_document.retrieval_url,
-          &embedded_document.given_url,
+          &embedded_document.retrieval_location,
+          &embedded_document.given_location,
           Some(document_location),
           node,
           default_schema_uri,
@@ -360,8 +360,8 @@ impl DocumentContext {
     for referenced_document in referenced_documents {
       self
         .load_from_location_with_queue(
-          &referenced_document.retrieval_url,
-          &referenced_document.given_url,
+          &referenced_document.retrieval_location,
+          &referenced_document.given_location,
           Some(document_location),
           default_schema_uri,
           queue,

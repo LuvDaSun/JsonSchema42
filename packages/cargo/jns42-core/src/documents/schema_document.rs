@@ -1,13 +1,13 @@
 use crate::utils::node_location::NodeLocation;
 
 pub struct EmbeddedDocument {
-  pub retrieval_url: NodeLocation,
-  pub given_url: NodeLocation,
+  pub retrieval_location: NodeLocation,
+  pub given_location: NodeLocation,
 }
 
 pub struct ReferencedDocument {
-  pub retrieval_url: NodeLocation,
-  pub given_url: NodeLocation,
+  pub retrieval_location: NodeLocation,
+  pub given_location: NodeLocation,
 }
 
 pub trait SchemaDocument {
