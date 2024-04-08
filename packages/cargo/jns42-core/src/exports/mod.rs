@@ -1,6 +1,7 @@
 pub mod c_string;
 pub mod callbacks;
 pub mod document_context;
+pub mod node_location;
 pub mod reference;
 pub mod reverse;
 pub mod schema_arena;

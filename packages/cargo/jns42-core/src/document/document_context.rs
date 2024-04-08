@@ -5,6 +5,32 @@ use std::{
   rc::Rc,
 };
 
+/**
+This class loads document nodes and documents. Every node has a few locations:
+- Node location
+
+  This is the main identifier for the node
+
+- Retrieval location
+
+  This is the physical location of the node
+
+- Document location
+
+  This is the node location of the document this node belongs to
+
+- Antecedent location
+
+  This is the antecedent (reason) for the node, (or empty if no antecedent). Antecedent
+  can be a referencing document, or the embedding document.
+
+- Given location
+
+  This is an expected location for a node that is often derived from the antecedent and the
+  JSON pointer to the node.
+
+
+*/
 #[derive(Default)]
 pub struct DocumentContext {
   /**
@@ -31,6 +57,10 @@ impl DocumentContext {
     Rc::new(Default::default())
   }
 
+  /**
+  Load nodes from a location. The retrieval location is the physical location of the node,
+  it should not contain a hash.
+  */
   pub async fn load_from_location(
     self: &Rc<Self>,
     retrieval_location: &NodeLocation,
