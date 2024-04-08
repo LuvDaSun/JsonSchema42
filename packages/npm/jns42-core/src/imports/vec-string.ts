@@ -2,6 +2,7 @@ import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
+import { withErrorReference } from "./with-error.js";
 
 export class VecString extends ForeignObject {
   constructor(pointer: number) {
@@ -38,7 +39,9 @@ export class VecString extends ForeignObject {
   }
 
   public get(index: number) {
-    const resultPointer = mainFfi.exports.vec_string_get(this.pointer, index);
+    const resultPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.vec_string_get(this.pointer, index, errorReferencePointer),
+    );
     using resultForeign = new CString(resultPointer);
     resultForeign.abandon();
     const result = resultForeign.toString();
@@ -48,6 +51,8 @@ export class VecString extends ForeignObject {
   public push(value: string) {
     using valueForeign = CString.fromString(value);
     valueForeign.abandon();
-    mainFfi.exports.vec_string_push(this.pointer, valueForeign.pointer);
+    withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.vec_string_push(this.pointer, valueForeign.pointer, errorReferencePointer),
+    );
   }
 }

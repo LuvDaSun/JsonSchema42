@@ -12,3 +12,4 @@ export * from "./schema-item.js";
 export * from "./schema-transform.js";
 export * from "./vec-string.js";
 export * from "./vec-usize.js";
+export * from "./with-error.js";

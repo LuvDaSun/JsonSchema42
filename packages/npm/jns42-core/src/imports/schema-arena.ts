@@ -5,6 +5,7 @@ import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
 import { SchemaItemValue, SchemaType } from "./schema-item.js";
 import { VecUsize } from "./vec-usize.js";
+import { withErrorReference } from "./with-error.js";
 
 export class SchemaArena extends ForeignObject {
   public static fromIntermediate(document: schemaIntermediate.SchemaJson): SchemaArena {
@@ -163,17 +164,26 @@ export class SchemaArena extends ForeignObject {
   public addItem(item: SchemaItemValue): number {
     const itemString = JSON.stringify(item);
     using itemWrapper = CString.fromString(itemString);
-    const key = mainFfi.exports.schema_arena_add_item(this.pointer, itemWrapper.pointer);
+    const key = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.schema_arena_add_item(
+        this.pointer,
+        itemWrapper.pointer,
+        errorReferencePointer,
+      ),
+    );
     return key;
   }
 
   public replaceItem(key: number, item: SchemaItemValue): SchemaItemValue {
     const itemString = JSON.stringify(item);
     using itemWrapper = CString.fromString(itemString);
-    const itemPreviousPointer = mainFfi.exports.schema_arena_replace_item(
-      this.pointer,
-      key,
-      itemWrapper.pointer,
+    const itemPreviousPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.schema_arena_replace_item(
+        this.pointer,
+        key,
+        itemWrapper.pointer,
+        errorReferencePointer,
+      ),
     );
     using itemPreviousWrapper = new CString(itemPreviousPointer);
     const itemPreviousString = itemPreviousWrapper.toString();
@@ -182,7 +192,9 @@ export class SchemaArena extends ForeignObject {
   }
 
   public getItem(key: number): SchemaItemValue {
-    const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
+    const itemPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.schema_arena_get_item(this.pointer, key, errorReferencePointer),
+    );
     using itemWrapper = new CString(itemPointer);
     const itemString = itemWrapper.toString();
     const item = JSON.parse(itemString);

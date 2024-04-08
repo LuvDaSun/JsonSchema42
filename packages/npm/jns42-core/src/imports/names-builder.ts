@@ -3,6 +3,7 @@ import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
 import { Names } from "./names.js";
 import { VecString } from "./vec-string.js";
+import { withErrorReference } from "./with-error.js";
 
 export class NamesBuilder extends ForeignObject {
   constructor(pointer: number) {
@@ -25,7 +26,13 @@ export class NamesBuilder extends ForeignObject {
   public setDefaultName(value: string) {
     using valueForeign = CString.fromString(value);
 
-    mainFfi.exports.names_builder_set_default_name(this.pointer, valueForeign.pointer);
+    withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.names_builder_set_default_name(
+        this.pointer,
+        valueForeign.pointer,
+        errorReferencePointer,
+      ),
+    );
 
     return this;
   }

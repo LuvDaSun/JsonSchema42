@@ -3,6 +3,7 @@ import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
+import { withErrorReference, withErrorReferencePromise } from "./with-error.js";
 
 export class DocumentContext extends ForeignObject {
   constructor(pointer: number) {
@@ -15,7 +16,12 @@ export class DocumentContext extends ForeignObject {
   }
 
   public registerWellKnownFactories() {
-    mainFfi.exports.document_context_register_well_known_factories(this.pointer);
+    withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.document_context_register_well_known_factories(
+        this.pointer,
+        errorReferencePointer,
+      ),
+    );
   }
 
   public async loadFromLocation(
@@ -38,13 +44,16 @@ export class DocumentContext extends ForeignObject {
       deferred.resolve();
     });
 
-    mainFfi.exports.document_context_load_from_location(
-      this.pointer,
-      retrievalLocationForeign.pointer,
-      givenLocationForeign.pointer,
-      antecedentLocationForeign?.pointer ?? 0,
-      defaultMetaSchemaIdForeign.pointer,
-      key,
+    await withErrorReferencePromise(async (errorReferencePointer) =>
+      mainFfi.exports.document_context_load_from_location(
+        this.pointer,
+        retrievalLocationForeign.pointer,
+        givenLocationForeign.pointer,
+        antecedentLocationForeign?.pointer ?? 0,
+        defaultMetaSchemaIdForeign.pointer,
+        errorReferencePointer,
+        key,
+      ),
     );
 
     await deferred.promise;
@@ -74,22 +83,28 @@ export class DocumentContext extends ForeignObject {
       deferred.resolve();
     });
 
-    mainFfi.exports.document_context_load_from_node(
-      this.pointer,
-      retrievalLocationForeign.pointer,
-      givenLocationForeign.pointer,
-      antecedentLocationForeign?.pointer ?? 0,
-      nodeForeign.pointer,
-      defaultMetaSchemaIdForeign.pointer,
-      key,
+    await withErrorReferencePromise(async (errorReferencePointer) =>
+      mainFfi.exports.document_context_load_from_node(
+        this.pointer,
+        retrievalLocationForeign.pointer,
+        givenLocationForeign.pointer,
+        antecedentLocationForeign?.pointer ?? 0,
+        nodeForeign.pointer,
+        defaultMetaSchemaIdForeign.pointer,
+        errorReferencePointer,
+        key,
+      ),
     );
 
     await deferred.promise;
   }
 
   public getIntermediateDocument(): schemaIntermediate.SchemaJson {
-    const documentPointer = mainFfi.exports.document_context_get_intermediate_document(
-      this.pointer,
+    const documentPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.document_context_get_intermediate_document(
+        this.pointer,
+        errorReferencePointer,
+      ),
     );
     using documentForeign = new CString(documentPointer);
     const documentString = documentForeign.toString();
