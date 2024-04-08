@@ -1,5 +1,6 @@
 export * from "./c-string.js";
 export * from "./document-context.js";
+export * from "./meta-schema-id.js";
 export * from "./names-builder.js";
 export * from "./names.js";
 export * from "./naming.js";

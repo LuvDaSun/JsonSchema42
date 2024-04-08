@@ -1,12 +1,10 @@
 use crate::generators::package::{generate_package, PackageConfiguration};
 use clap::Parser;
-use jns42_core::documents;
 use jns42_core::documents::{DocumentContext, MetaSchemaId};
 use jns42_core::models::Specification;
 use jns42_core::utils::node_location::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;
-use std::rc::Rc;
 
 #[derive(Parser, Debug)]
 pub struct CommandOptions {
@@ -43,8 +41,6 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
   let mut context = DocumentContext::new();
   context.register_well_known_factories();
-
-  let context = context.into_rc();
 
   context
     .load_from_location(

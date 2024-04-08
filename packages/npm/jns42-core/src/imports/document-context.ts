@@ -1,7 +1,9 @@
+import * as schemaIntermediate from "@jns42/schema-intermediate";
 import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
+import { MetaSchemaId } from "./meta-schema-id.js";
 
 export class DocumentContext extends ForeignObject {
   constructor(pointer: number) {
@@ -13,10 +15,15 @@ export class DocumentContext extends ForeignObject {
     return new DocumentContext(pointer);
   }
 
+  public registerWellKnownFactories() {
+    mainFfi.exports.document_context_register_well_known_factories(this.pointer);
+  }
+
   public async loadFromLocation(
     retrievalLocation: string,
     givenLocation: string,
-    antecedentLocation?: string,
+    antecedentLocation: string | undefined,
+    defaultMetaSchemaId: MetaSchemaId,
   ) {
     using retrievalLocationForeign = CString.fromString(retrievalLocation);
     using givenLocationForeign = CString.fromString(givenLocation);
@@ -32,10 +39,21 @@ export class DocumentContext extends ForeignObject {
       retrievalLocationForeign.pointer,
       givenLocationForeign.pointer,
       antecedentLocationForeign?.pointer ?? 0,
+      defaultMetaSchemaId,
       key,
     );
 
     const data = await deferred.promise;
     return data;
+  }
+
+  public getIntermediateDocument(): schemaIntermediate.SchemaJson {
+    const documentPointer = mainFfi.exports.document_context_get_intermediate_document(
+      this.pointer,
+    );
+    using documentForeign = new CString(documentPointer);
+    const documentString = documentForeign.toString();
+    const document = JSON.parse(documentString);
+    return document;
   }
 }

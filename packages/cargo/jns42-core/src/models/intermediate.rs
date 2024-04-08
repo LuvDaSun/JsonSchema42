@@ -4,13 +4,13 @@ use super::SchemaType;
 use serde_json::Value;
 use std::collections::HashMap;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct IntermediateSchema {
   pub schema: String,
   pub schemas: HashMap<NodeLocation, IntermediateNode>,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
 pub enum IntermediateType {
   Never,
   Any,
@@ -58,7 +58,7 @@ impl From<&SchemaType> for IntermediateType {
   }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct IntermediateNode {
   // metadata
   pub title: Option<String>,

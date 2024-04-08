@@ -84,15 +84,11 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-  pub fn new() -> Self {
+  pub fn new() -> Rc<Self> {
     Default::default()
   }
 
-  pub fn into_rc(self) -> Rc<Self> {
-    Rc::new(self)
-  }
-
-  pub fn register_well_known_factories(&mut self) {
+  pub fn register_well_known_factories(self: &mut Rc<Self>) {
     self.register_factory(
       &MetaSchemaId::Draft202012,
       Box::new(move |context, configuration| {
@@ -135,12 +131,19 @@ impl DocumentContext {
     // );
   }
 
-  pub fn register_factory(&mut self, schema: &MetaSchemaId, factory: Box<DocumentFactory>) {
+  pub fn register_factory(
+    self: &mut Rc<Self>,
+    schema: &MetaSchemaId,
+    factory: Box<DocumentFactory>,
+  ) {
     /*
-     * don't check if the factory is already registered here so we can
-     * override factories
-     */
-    self.factories.insert(schema.clone(), factory);
+    don't check if the factory is already registered here so we can
+    override factories
+    */
+    Rc::get_mut(self)
+      .unwrap()
+      .factories
+      .insert(schema.clone(), factory);
   }
 
   pub fn resolve_document_retrieval_url(
@@ -450,7 +453,7 @@ mod tests {
 
   #[tokio::test]
   async fn document_context_load_from_location() {
-    let document_context = DocumentContext::new().into_rc();
+    let document_context = DocumentContext::new();
 
     document_context
       .load_from_location(

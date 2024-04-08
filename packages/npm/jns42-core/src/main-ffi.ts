@@ -1,5 +1,6 @@
 import path from "path";
 import { fetchFile } from "./exports/fetch-file.js";
+import { MetaSchemaId } from "./imports/meta-schema-id.js";
 import { projectRoot } from "./root.js";
 import { EnvironmentBase, ExportsBase, Ffi } from "./utils/index.js";
 
@@ -73,19 +74,16 @@ export interface MainExports extends ExportsBase {
 
   document_context_drop(document_context: number): void;
   document_context_new(): number;
+  document_context_register_well_known_factories(document_context: number): void;
   document_context_load_from_location(
     document_context: number,
     retrieval_location: number,
     given_location: number,
     antecedent_location: number,
+    default_schema_id: MetaSchemaId,
     callback: number,
   ): void;
-  document_context_load(
-    document_context: number,
-    location: number,
-    data_reference: number,
-    key: number,
-  ): void;
+  document_context_get_intermediate_document(document_context: number): number;
 
   to_camel_case(value: number): number;
   to_pascal_case(value: number): number;

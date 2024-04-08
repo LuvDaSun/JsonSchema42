@@ -3,14 +3,18 @@ use serde_json::Value;
 use std::fmt::Display;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(C)]
 pub enum MetaSchemaId {
   #[default]
-  Unknown,
+  Unknown = 0,
   Draft202012,
   Draft201909,
   Draft07,
   Draft06,
   Draft04,
+  OasV31,
+  OasV30,
+  SwaggerV2,
 }
 
 impl MetaSchemaId {
@@ -39,6 +43,9 @@ impl From<&MetaSchemaId> for &'static str {
       MetaSchemaId::Draft07 => documents::draft_07::META_SCHEMA_ID,
       MetaSchemaId::Draft06 => documents::draft_06::META_SCHEMA_ID,
       MetaSchemaId::Draft04 => documents::draft_04::META_SCHEMA_ID,
+      MetaSchemaId::OasV31 => documents::oas_v3_1::META_SCHEMA_ID,
+      MetaSchemaId::OasV30 => documents::oas_v3_0::META_SCHEMA_ID,
+      MetaSchemaId::SwaggerV2 => documents::swagger_v2::META_SCHEMA_ID,
       MetaSchemaId::Unknown => "",
     }
   }
@@ -52,6 +59,9 @@ impl From<&str> for MetaSchemaId {
       documents::draft_07::META_SCHEMA_ID => MetaSchemaId::Draft07,
       documents::draft_06::META_SCHEMA_ID => MetaSchemaId::Draft06,
       documents::draft_04::META_SCHEMA_ID => MetaSchemaId::Draft04,
+      documents::oas_v3_1::META_SCHEMA_ID => MetaSchemaId::OasV31,
+      documents::oas_v3_0::META_SCHEMA_ID => MetaSchemaId::OasV30,
+      documents::swagger_v2::META_SCHEMA_ID => MetaSchemaId::SwaggerV2,
       _ => MetaSchemaId::Unknown,
     }
   }
