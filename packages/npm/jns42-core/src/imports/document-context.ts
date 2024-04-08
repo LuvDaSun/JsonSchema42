@@ -39,12 +39,12 @@ export class DocumentContext extends ForeignObject {
 
     using defaultMetaSchemaIdForeign = CString.fromString(defaultMetaSchemaId);
 
-    const deferred = defer<void>();
-    const key = mainFfi.registerCallback(() => {
-      deferred.resolve();
-    });
+    await withErrorReferencePromise(async (errorReferencePointer) => {
+      const deferred = defer<void>();
+      const key = mainFfi.registerCallback(() => {
+        deferred.resolve();
+      });
 
-    await withErrorReferencePromise(async (errorReferencePointer) =>
       mainFfi.exports.document_context_load_from_location(
         this.pointer,
         retrievalLocationForeign.pointer,
@@ -53,10 +53,10 @@ export class DocumentContext extends ForeignObject {
         defaultMetaSchemaIdForeign.pointer,
         errorReferencePointer,
         key,
-      ),
-    );
+      );
 
-    await deferred.promise;
+      await deferred.promise;
+    });
   }
 
   public async loadFromNode(
@@ -78,12 +78,12 @@ export class DocumentContext extends ForeignObject {
 
     using defaultMetaSchemaIdForeign = CString.fromString(defaultMetaSchemaId);
 
-    const deferred = defer<void>();
-    const key = mainFfi.registerCallback(() => {
-      deferred.resolve();
-    });
+    await withErrorReferencePromise(async (errorReferencePointer) => {
+      const deferred = defer<void>();
+      const key = mainFfi.registerCallback(() => {
+        deferred.resolve();
+      });
 
-    await withErrorReferencePromise(async (errorReferencePointer) =>
       mainFfi.exports.document_context_load_from_node(
         this.pointer,
         retrievalLocationForeign.pointer,
@@ -93,10 +93,10 @@ export class DocumentContext extends ForeignObject {
         defaultMetaSchemaIdForeign.pointer,
         errorReferencePointer,
         key,
-      ),
-    );
+      );
 
-    await deferred.promise;
+      await deferred.promise;
+    });
   }
 
   public getIntermediateDocument(): schemaIntermediate.SchemaJson {
