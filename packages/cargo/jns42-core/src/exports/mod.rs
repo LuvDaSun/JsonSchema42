@@ -6,5 +6,6 @@ pub mod reference;
 pub mod reverse;
 pub mod schema_arena;
 pub mod schema_item;
+pub mod status_code;
 pub mod vec_string;
 pub mod vec_usize;

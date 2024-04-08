@@ -1,5 +1,6 @@
 use super::schema_document::SchemaDocument;
 use crate::documents::{self, discover_meta_schema};
+use crate::error::Error;
 use crate::{
   models::IntermediateSchema,
   utils::{node_location::NodeLocation, read_json_node::read_json_node},
@@ -83,7 +84,7 @@ impl DocumentContext {
     Default::default()
   }
 
-  pub fn register_well_known_factories(self: &mut Rc<Self>) {
+  pub fn register_well_known_factories(self: &mut Rc<Self>) -> Result<(), Error> {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
@@ -94,7 +95,7 @@ impl DocumentContext {
           configuration.document_node.clone().into(),
         ))
       }),
-    );
+    )?;
     // context.register_factory(
     //   documents::draft_2019_09::META_SCHEMA_ID,
     //   Box::new( |_context, _initializer| Rc::new(documents::draft_2019_09::Document::new())),
@@ -117,7 +118,7 @@ impl DocumentContext {
           configuration.document_node.clone().into(),
         ))
       }),
-    );
+    )?;
     // context.register_factory(
     //   &MetaSchemaId::OasV31,
     //   Box::new(|_context, _initializer| Rc::new(documents::oas_v3_1::Document::new())),
@@ -130,17 +131,24 @@ impl DocumentContext {
     //   &MetaSchemaId::SwaggerV2,
     //   Box::new(|_context, _initializer| Rc::new(documents::swagger_v2::Document::new())),
     // );
+    Ok(())
   }
 
-  pub fn register_factory(self: &mut Rc<Self>, schema: &str, factory: Box<DocumentFactory>) {
+  pub fn register_factory(
+    self: &mut Rc<Self>,
+    schema: &str,
+    factory: Box<DocumentFactory>,
+  ) -> Result<(), Error> {
     /*
     don't check if the factory is already registered here so we can
     override factories
     */
     Rc::get_mut(self)
-      .unwrap()
+      .ok_or(Error::RegisterFactory)?
       .factories
       .insert(schema.to_owned(), factory);
+
+    Ok(())
   }
 
   pub fn resolve_document_retrieval_url(
@@ -178,7 +186,7 @@ impl DocumentContext {
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
     default_schema_uri: &str,
-  ) {
+  ) -> Result<(), Error> {
     assert!(retrieval_location.is_root());
 
     let mut queue = Default::default();
@@ -190,8 +198,11 @@ impl DocumentContext {
         default_schema_uri,
         &mut queue,
       )
-      .await;
-    self.load_from_queue(&mut queue).await;
+      .await?;
+
+    self.load_from_queue(&mut queue).await?;
+
+    Ok(())
   }
 
   async fn load_from_location_with_queue(
@@ -201,7 +212,7 @@ impl DocumentContext {
     antecedent_location: Option<&NodeLocation>,
     default_meta_schema_id: &str,
     queue: &mut Queue,
-  ) {
+  ) -> Result<(), Error> {
     /*
     If the document is not in the cache
     */
@@ -212,8 +223,8 @@ impl DocumentContext {
       let fetch_location = &retrieval_location.to_fetch_string();
       let data = crate::utils::fetch_file::fetch_file(fetch_location)
         .await
-        .unwrap();
-      let document_node = serde_json::from_str(&data).unwrap();
+        .map_err(|_error| Error::FetchFile)?;
+      let document_node = serde_json::from_str(&data).map_err(|_error| Error::Deserialization)?;
 
       /*
       populate the cache with this document
@@ -227,6 +238,8 @@ impl DocumentContext {
       antecedent_location.cloned(),
       default_meta_schema_id.to_owned(),
     ));
+
+    Ok(())
   }
 
   /**
@@ -241,7 +254,7 @@ impl DocumentContext {
     antecedent_location: Option<&NodeLocation>,
     node: serde_json::Value,
     default_meta_schema_id: &str,
-  ) {
+  ) -> Result<(), Error> {
     let mut queue = Default::default();
     self
       .load_from_node_with_queue(
@@ -253,7 +266,9 @@ impl DocumentContext {
         &mut queue,
       )
       .await;
-    self.load_from_queue(&mut queue).await;
+    self.load_from_queue(&mut queue).await?;
+
+    Ok(())
   }
 
   async fn load_from_node_with_queue(
@@ -316,7 +331,7 @@ impl DocumentContext {
   /**
   Load documents from queue, drain the queue
   */
-  async fn load_from_queue(self: &Rc<Self>, queue: &mut Queue) {
+  async fn load_from_queue(self: &Rc<Self>, queue: &mut Queue) -> Result<(), Error> {
     /*
     This here will drain the queue.
     */
@@ -329,8 +344,10 @@ impl DocumentContext {
           &default_schema_uri,
           queue,
         )
-        .await;
+        .await?;
     }
+
+    Ok(())
   }
 
   /**
@@ -345,13 +362,13 @@ impl DocumentContext {
     antecedent_location: Option<&NodeLocation>,
     default_meta_schema_id: &str,
     queue: &mut Queue,
-  ) {
+  ) -> Result<(), Error> {
     if self
       .node_documents
       .borrow()
       .contains_key(retrieval_location)
     {
-      return;
+      return Ok(());
     }
 
     /*
@@ -359,10 +376,15 @@ impl DocumentContext {
     */
     let document = {
       let node_cache = self.node_cache.borrow();
-      let node = node_cache.get(retrieval_location).unwrap();
+      let node = node_cache
+        .get(retrieval_location)
+        .ok_or(Error::NodeNotFound)?;
       let meta_schema_id = discover_meta_schema(node).unwrap_or(default_meta_schema_id);
 
-      let factory = self.factories.get(meta_schema_id).unwrap();
+      let factory = self
+        .factories
+        .get(meta_schema_id)
+        .ok_or(Error::FactoryNotFound)?;
 
       factory(
         Rc::downgrade(self),
@@ -412,7 +434,7 @@ impl DocumentContext {
         .node_cache
         .borrow()
         .get(&embedded_document.retrieval_location)
-        .unwrap()
+        .ok_or(Error::NodeNotFound)?
         .clone();
       self
         .load_from_node_with_queue(
@@ -436,8 +458,10 @@ impl DocumentContext {
           default_meta_schema_id,
           queue,
         )
-        .await;
+        .await?;
     }
+
+    Ok(())
   }
 }
 
@@ -449,7 +473,7 @@ mod tests {
   #[tokio::test]
   async fn test_load_empty_node() {
     let mut document_context = DocumentContext::new();
-    document_context.register_well_known_factories();
+    document_context.register_well_known_factories().unwrap();
 
     document_context
       .load_from_node(
@@ -459,6 +483,7 @@ mod tests {
         serde_json::Value::Object(Default::default()),
         documents::draft_2020_12::META_SCHEMA_ID,
       )
-      .await;
+      .await
+      .unwrap();
   }
 }
