@@ -7,11 +7,10 @@ test("load from node", async () => {
   documentContext.registerWellKnownFactories();
 
   await documentContext.loadFromNode(
-    "string-or-boolean.json",
-    "string-or-boolean.json",
+    "/string-or-boolean.json#",
+    "/string-or-boolean.json#",
     undefined,
     {
-      $schema: "http://json-schema.org/draft-04/schema#",
       type: ["string", "boolean"],
     },
     "https://json-schema.org/draft/2020-12/schema",
@@ -19,5 +18,5 @@ test("load from node", async () => {
 
   const intermediateDocument = documentContext.getIntermediateDocument();
 
-  assert(intermediateDocument.schemas["string-or-boolean.json#"] != null);
+  assert(intermediateDocument.schemas["/string-or-boolean.json#"] != null);
 });

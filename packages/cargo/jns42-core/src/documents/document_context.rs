@@ -193,7 +193,9 @@ impl DocumentContext {
     antecedent_location: Option<&NodeLocation>,
     default_schema_uri: &str,
   ) -> Result<(), Error> {
-    assert!(retrieval_location.is_root());
+    if !retrieval_location.is_root() {
+      Err(Error::Unknown)?
+    }
 
     let mut queue = Default::default();
     self
@@ -493,8 +495,8 @@ mod tests {
 
     document_context
       .load_from_node(
-        &"schema.json".parse().unwrap(),
-        &"schema.json".parse().unwrap(),
+        &"/schema.json#".parse().unwrap(),
+        &"/schema.json#".parse().unwrap(),
         None,
         serde_json::Value::Object(Default::default()),
         documents::draft_2020_12::META_SCHEMA_ID,
