@@ -3,7 +3,7 @@ import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
-import { MetaSchemaId } from "./meta-schema-id.js";
+import { MetaSchemaString, metaSchemaIdFromString } from "./meta-schema-id.js";
 
 export class DocumentContext extends ForeignObject {
   constructor(pointer: number) {
@@ -23,12 +23,14 @@ export class DocumentContext extends ForeignObject {
     retrievalLocation: string,
     givenLocation: string,
     antecedentLocation: string | undefined,
-    defaultMetaSchemaId: MetaSchemaId,
+    defaultMetaSchema: MetaSchemaString,
   ) {
     using retrievalLocationForeign = CString.fromString(retrievalLocation);
     using givenLocationForeign = CString.fromString(givenLocation);
     using antecedentLocationForeign =
       antecedentLocation == null ? null : CString.fromString(antecedentLocation);
+
+    let defaultMetaSchemaId = metaSchemaIdFromString(defaultMetaSchema);
 
     const deferred = defer<void>();
     const key = mainFfi.registerCallback(() => {

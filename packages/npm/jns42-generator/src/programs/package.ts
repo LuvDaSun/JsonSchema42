@@ -1,7 +1,6 @@
 import * as core from "@jns42/core";
 import * as path from "node:path";
 import * as yargs from "yargs";
-import { DocumentContext } from "../documents/document-context.js";
 import * as oasV30 from "../documents/oas-v3-0/index.js";
 import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
 import * as schemaDraft202012 from "../documents/schema-draft-2020-12/index.js";
@@ -75,74 +74,22 @@ interface MainConfiguration {
 }
 
 async function main(configuration: MainConfiguration) {
-  const instanceSchemaLocation = core.NodeLocation.parse(configuration.instanceSchemaLocation);
-  const defaultMetaSchema = configuration.defaultMetaSchema;
+  const { instanceSchemaLocation, defaultMetaSchema } = configuration;
   const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
     configuration;
 
-  const context = new DocumentContext();
-  context.registerFactory(
-    schemaDraft202012.metaSchemaId,
-    ({
-      retrievalLocation: retrievalLocation,
-      givenLocation: givenLocation,
-      antecedentLocation: antecedentLocation,
-      documentNode: documentNode,
-    }) =>
-      new schemaDraft202012.Document(
-        retrievalLocation,
-        givenLocation,
-        antecedentLocation,
-        documentNode,
-        context,
-      ),
-  );
-  context.registerFactory(
-    schemaDraft04.metaSchemaId,
-    ({
-      retrievalLocation: retrievalLocation,
-      givenLocation: givenLocation,
-      antecedentLocation: antecedentLocation,
-      documentNode: documentNode,
-    }) =>
-      new schemaDraft04.Document(
-        retrievalLocation,
-        givenLocation,
-        antecedentLocation,
-        documentNode,
-        context,
-      ),
-  );
-  context.registerFactory(
-    schemaOasV31.metaSchemaId,
-    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
-      new schemaIntermediate.Document(givenLocation, documentNode),
-  );
-  context.registerFactory(
-    oasV30.metaSchemaId,
-    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
-      new schemaIntermediate.Document(givenLocation, documentNode),
-  );
-  context.registerFactory(
-    swaggerV2.metaSchemaId,
-    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
-      new schemaIntermediate.Document(givenLocation, documentNode),
-  );
-  context.registerFactory(
-    schemaIntermediate.metaSchemaId,
-    ({ givenLocation: givenLocation, documentNode: documentNode }) =>
-      new schemaIntermediate.Document(givenLocation, documentNode),
-  );
+  const context = core.DocumentContext.new();
+  context.registerWellKnownFactories();
 
   await context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
-    null,
-    defaultMetaSchema,
+    undefined,
+    defaultMetaSchema as core.MetaSchemaString,
   );
 
-  const intermediateDocument = context.getIntermediateData();
+  const intermediateDocument = context.getIntermediateDocument();
 
   using specification = models.loadSpecification(intermediateDocument, {
     transformMaximumIterations,
