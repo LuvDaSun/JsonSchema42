@@ -503,5 +503,7 @@ mod tests {
       )
       .await
       .unwrap();
+
+    let intermediate_document = document_context.get_intermediate_document();
   }
 }
