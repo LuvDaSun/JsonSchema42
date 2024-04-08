@@ -41,7 +41,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
   } = options;
 
   let mut context = DocumentContext::new();
-  context.register_well_known_factories();
+  context.register_well_known_factories().unwrap();
 
   context
     .load_from_location(
@@ -50,7 +50,8 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
       None,
       &default_meta_schema_id,
     )
-    .await;
+    .await
+    .unwrap();
 
   let root_url = context
     .resolve_document_retrieval_url(&schema_location)
@@ -58,7 +59,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
   let intermediate_document = context.get_intermediate_document();
 
-  let specification = Specification::new(root_url, intermediate_document);
+  let specification = Specification::new(root_url, intermediate_document).unwrap();
   generate_package(
     PackageConfiguration {
       package_name: package_name.as_str(),

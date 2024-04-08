@@ -21,7 +21,7 @@ extern "C" fn document_context_register_well_known_factories(
   document_context: *mut Rc<DocumentContext>,
 ) {
   let document_context = unsafe { &mut *document_context };
-  document_context.register_well_known_factories();
+  document_context.register_well_known_factories().unwrap();
 }
 
 #[no_mangle]
@@ -63,7 +63,8 @@ extern "C" fn document_context_load_from_location(
         antecedent_location.as_ref(),
         default_meta_schema_id,
       )
-      .await;
+      .await
+      .unwrap();
   });
 }
 
@@ -112,7 +113,8 @@ extern "C" fn document_context_load_from_node(
         node,
         default_meta_schema_id,
       )
-      .await;
+      .await
+      .unwrap();
   });
 }
 
