@@ -219,7 +219,7 @@ impl DocumentContext {
       retrieve the document
       */
       let fetch_location = &retrieval_location.to_fetch_string();
-      let data = crate::utils::fetch_file::host_fetch_file(fetch_location)
+      let data = crate::utils::fetch_file::local_fetch_file(fetch_location)
         .await
         .unwrap();
       let document_node = serde_json::from_str(&data).unwrap();
@@ -308,7 +308,8 @@ impl DocumentContext {
       */
       node_url.push_pointer(pointer);
 
-      if let Some(node_previous) = self.node_cache.borrow().get(retrieval_location) {
+      let mut node_cache = self.node_cache.borrow_mut();
+      if let Some(node_previous) = node_cache.get(retrieval_location) {
         /*
         If a node is already in the cache we won't override. We assume that this is the same node
         as it has the same identifier. This might happen if we load an embedded document first
@@ -316,11 +317,7 @@ impl DocumentContext {
         */
         assert_eq!(node, *node_previous);
       } else {
-        assert!(self
-          .node_cache
-          .borrow_mut()
-          .insert(node_url, node)
-          .is_none());
+        assert!(node_cache.insert(node_url, node).is_none());
       }
     }
   }
@@ -450,5 +447,26 @@ impl DocumentContext {
         )
         .await;
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[tokio::test]
+  async fn test_load_empty_node() {
+    let mut document_context = DocumentContext::new();
+    document_context.register_well_known_factories();
+
+    document_context
+      .load_from_node(
+        &"schema.json".parse().unwrap(),
+        &"schema.json".parse().unwrap(),
+        None,
+        serde_json::Value::Object(Default::default()),
+        &MetaSchemaId::Draft202012,
+      )
+      .await;
   }
 }

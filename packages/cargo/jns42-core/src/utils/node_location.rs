@@ -199,15 +199,11 @@ impl TryFrom<&str> for NodeLocation {
       .map(|capture| capture.as_str())
       .map(|capture| capture.trim_start_matches('#'))
       .unwrap_or_default();
-    let hash = if hash.is_empty() {
-      Default::default()
-    } else {
-      hash
-        .split('/')
-        .map(|part| urlencoding::decode(part).map_err(|_error| ParseError::DecodeError))
-        .map(|part| part.map(unescape_hash))
-        .collect::<Result<_, _>>()?
-    };
+    let hash = hash
+      .split('/')
+      .map(|part| urlencoding::decode(part).map_err(|_error| ParseError::DecodeError))
+      .map(|part| part.map(unescape_hash))
+      .collect::<Result<_, _>>()?;
 
     Ok(Self::new(origin, path, query, hash))
   }
