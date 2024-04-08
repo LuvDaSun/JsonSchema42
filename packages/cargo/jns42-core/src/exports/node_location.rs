@@ -115,10 +115,10 @@ extern "C" fn node_location_get_hash(node_location: *const NodeLocation) -> *con
 }
 
 #[no_mangle]
-extern "C" fn is_root(node_location: *const NodeLocation) -> bool {
+extern "C" fn is_root(node_location: *const NodeLocation) -> c_char {
   let node_location = unsafe { &*node_location };
 
-  node_location.is_root()
+  node_location.is_root() as c_char
 }
 
 #[no_mangle]
