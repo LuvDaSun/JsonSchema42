@@ -1,5 +1,9 @@
 use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
-use crate::utils::{node_location::NodeLocation, read_json_node::read_json_node};
+use crate::documents;
+use crate::{
+  models::IntermediateSchema,
+  utils::{node_location::NodeLocation, read_json_node::read_json_node},
+};
 use std::{
   cell::RefCell,
   collections::HashMap,
@@ -80,8 +84,63 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-  pub fn new() -> Rc<Self> {
-    Rc::new(Default::default())
+  pub fn new() -> Self {
+    Default::default()
+  }
+
+  pub fn into_rc(self) -> Rc<Self> {
+    Rc::new(self)
+  }
+
+  pub fn register_well_known_factories(&mut self) {
+    self.register_factory(
+      &MetaSchemaId::Draft202012,
+      Box::new(move |context, configuration| {
+        Rc::new(documents::draft_2020_12::Document::new(
+          context,
+          configuration.retrieval_url,
+          configuration.given_url,
+          configuration.antecedent_url,
+          configuration.document_node.clone().into(),
+        ))
+      }),
+    );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft201909,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_2019_09::Document::new())),
+    // );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft07,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_07::Document::new())),
+    // );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft06,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_06::Document::new())),
+    // );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft04,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::draft_04::Document::new())),
+    // );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft04,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::oas_v3_1::Document::new())),
+    // );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft04,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::oas_v3_0::Document::new())),
+    // );
+    // context.register_factory(
+    //   &MetaSchemaId::Draft04,
+    //   Box::new(move |_context, _initializer| Rc::new(documents::swagger_v2::Document::new())),
+    // );
+  }
+
+  pub fn register_factory(&mut self, schema: &MetaSchemaId, factory: Box<DocumentFactory>) {
+    /*
+     * don't check if the factory is already registered here so we can
+     * override factories
+     */
+    self.factories.insert(schema.clone(), factory);
   }
 
   pub fn resolve_document_retrieval_url(
@@ -93,6 +152,20 @@ impl DocumentContext {
       .borrow()
       .get(document_retrieval_url)
       .cloned()
+  }
+
+  pub fn get_intermediate_document(&self) -> IntermediateSchema {
+    let schemas = self
+      .documents
+      .borrow()
+      .values()
+      .flat_map(|document| document.get_intermediate_node_entries())
+      .collect();
+
+    IntermediateSchema {
+      schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json".to_string(),
+      schemas,
+    }
   }
 
   /**
@@ -377,7 +450,7 @@ mod tests {
 
   #[tokio::test]
   async fn document_context_load_from_location() {
-    let document_context = DocumentContext::new();
+    let document_context = DocumentContext::new().into_rc();
 
     document_context
       .load_from_location(
