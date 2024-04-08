@@ -1,7 +1,4 @@
-use jns42_core::models::{
-  schema_item::{SchemaItem, SchemaType},
-  specification::Specification,
-};
+use jns42_core::models::{SchemaItem, SchemaType, Specification};
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;

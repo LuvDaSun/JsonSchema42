@@ -1,8 +1,8 @@
-use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
-use crate::documents::{DocumentContext, MetaSchemaId};
 use crate::generators::package::{generate_package, PackageConfiguration};
 use clap::Parser;
-use jns42_core::models::specification::Specification;
+use jns42_core::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
+use jns42_core::documents::{DocumentContext, MetaSchemaId};
+use jns42_core::models::Specification;
 use jns42_core::utils::node_location::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;

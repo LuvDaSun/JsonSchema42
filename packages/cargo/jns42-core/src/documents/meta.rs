@@ -1,16 +1,16 @@
+use crate::documents;
 use serde_json::Value;
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum MetaSchemaId {
+  #[default]
   Unknown,
-}
-
-#[allow(clippy::derivable_impls)]
-impl Default for MetaSchemaId {
-  fn default() -> Self {
-    MetaSchemaId::Unknown
-  }
+  Draft202012,
+  Draft201909,
+  Draft07,
+  Draft06,
+  Draft04,
 }
 
 impl MetaSchemaId {
@@ -34,6 +34,11 @@ impl Display for MetaSchemaId {
 impl From<&MetaSchemaId> for &'static str {
   fn from(value: &MetaSchemaId) -> Self {
     match value {
+      MetaSchemaId::Draft202012 => documents::draft_2020_12::META_SCHEMA_ID,
+      MetaSchemaId::Draft201909 => documents::draft_2019_09::META_SCHEMA_ID,
+      MetaSchemaId::Draft07 => documents::draft_07::META_SCHEMA_ID,
+      MetaSchemaId::Draft06 => documents::draft_06::META_SCHEMA_ID,
+      MetaSchemaId::Draft04 => documents::draft_04::META_SCHEMA_ID,
       MetaSchemaId::Unknown => "",
     }
   }
@@ -41,8 +46,12 @@ impl From<&MetaSchemaId> for &'static str {
 
 impl From<&str> for MetaSchemaId {
   fn from(value: &str) -> Self {
-    #[allow(clippy::match_single_binding)]
     match value {
+      documents::draft_2020_12::META_SCHEMA_ID => MetaSchemaId::Draft202012,
+      documents::draft_2019_09::META_SCHEMA_ID => MetaSchemaId::Draft201909,
+      documents::draft_07::META_SCHEMA_ID => MetaSchemaId::Draft07,
+      documents::draft_06::META_SCHEMA_ID => MetaSchemaId::Draft06,
+      documents::draft_04::META_SCHEMA_ID => MetaSchemaId::Draft04,
       _ => MetaSchemaId::Unknown,
     }
   }
