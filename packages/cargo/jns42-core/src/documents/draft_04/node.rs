@@ -10,35 +10,10 @@ impl From<serde_json::Value> for Node {
   }
 }
 
+/*
+core
+*/
 impl Node {
-  pub fn select_schema(&self) -> Option<&str> {
-    self.0.as_object()?.get("$schema")?.as_str()
-  }
-
-  pub fn select_id(&self) -> Option<&str> {
-    self.0.as_object()?.get("$id")?.as_str()
-  }
-
-  pub fn select_ref(&self) -> Option<&str> {
-    self.0.as_object()?.get("$ref")?.as_str()
-  }
-
-  pub fn select_title(&self) -> Option<&str> {
-    self.0.as_object()?.get("title")?.as_str()
-  }
-
-  pub fn select_description(&self) -> Option<&str> {
-    self.0.as_object()?.get("description")?.as_str()
-  }
-
-  pub fn select_examples(&self) -> Option<&Vec<serde_json::Value>> {
-    self.0.as_object()?.get("examples")?.as_array()
-  }
-
-  pub fn select_deprecated(&self) -> Option<bool> {
-    self.0.as_object()?.get("deprecated")?.as_bool()
-  }
-
   pub fn select_types(&self) -> Option<Vec<IntermediateType>> {
     match self.0.as_object()?.get("type")? {
       serde_json::Value::String(value) => Some(vec![IntermediateType::parse(value)]),
@@ -52,19 +27,39 @@ impl Node {
     }
   }
 
+  pub fn select_schema(&self) -> Option<&str> {
+    self.0.as_object()?.get("$schema")?.as_str()
+  }
+
+  pub fn select_id(&self) -> Option<&str> {
+    self.0.as_object()?.get("id")?.as_str()
+  }
+
   pub fn select_reference(&self) -> Option<&str> {
     self.0.as_object()?.get("$ref")?.as_str()
   }
+}
 
+/*
+metadata
+*/
+impl Node {
+  pub fn select_title(&self) -> Option<&str> {
+    self.0.as_object()?.get("title")?.as_str()
+  }
+
+  pub fn select_description(&self) -> Option<&str> {
+    self.0.as_object()?.get("description")?.as_str()
+  }
+}
+
+/*
+sub nodes
+*/
+impl Node {
   pub fn select_sub_nodes(&self, pointer: &[String]) -> impl Iterator<Item = (Vec<String>, Node)> {
     empty()
-      .chain(self.select_if_entry(pointer))
-      .chain(self.select_then_entry(pointer))
-      .chain(self.select_else_entry(pointer))
       .chain(self.select_not_entry(pointer))
-      .chain(self.select_property_names_entry(pointer))
-      .chain(self.select_array_items_entry(pointer))
-      .chain(self.select_contains_entry(pointer))
       .chain(self.select_map_properties_entry(pointer))
       .chain(self.select_array_items_entry(pointer))
       .chain(self.select_all_of_entries(pointer).unwrap_or_default())
@@ -91,29 +86,16 @@ impl Node {
 
   //
 
-  pub fn select_if_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "if")
-  }
-  pub fn select_then_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "then")
-  }
-  pub fn select_else_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "else")
-  }
   pub fn select_not_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
     select_entries_one(self, pointer, "not")
   }
-  pub fn select_contains_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "contains")
-  }
-  pub fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "items")
-  }
-  pub fn select_property_names_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "propertyNames")
-  }
   pub fn select_map_properties_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
     select_entries_one(self, pointer, "additionalProperties")
+  }
+  pub fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
+    todo!();
+    // select_entries_one(self, pointer, "items")
+    // select_entries_one(self, pointer, "additionalItems")
   }
 
   pub fn select_all_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
@@ -126,7 +108,7 @@ impl Node {
     select_entries_list(self, pointer, "oneOf")
   }
   pub fn select_tuple_items_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_list(self, pointer, "prefixItems")
+    select_entries_list(self, pointer, "items")
   }
 
   pub fn select_dependent_schemas_entries(
@@ -148,27 +130,32 @@ impl Node {
     select_entries_map(self, pointer, "patternProperties")
   }
   pub fn select_definition_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_map(self, pointer, "$defs")
+    select_entries_map(self, pointer, "definitions")
   }
+}
 
+/*
+assertions
+*/
+impl Node {
   pub fn select_options(&self) -> Option<Vec<serde_json::Value>> {
     Some(vec![])
   }
 
-  pub fn select_minimum_inclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "minimumInclusive")
+  pub fn select_minimum(&self) -> Option<&serde_json::Number> {
+    select_number(self, "minimum")
   }
 
-  pub fn select_minimum_exclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "minimumExclusive")
+  pub fn select_is_minimum_exclusive(&self) -> Option<bool> {
+    select_bool(self, "exclusiveMinimum")
   }
 
-  pub fn select_maximum_inclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "maximumInclusive")
+  pub fn select_maximum(&self) -> Option<&serde_json::Number> {
+    select_number(self, "maximum")
   }
 
-  pub fn select_maximum_exclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "maximumExclusive")
+  pub fn select_is_maximum_exclusive(&self) -> Option<bool> {
+    select_bool(self, "exclusiveMaximum")
   }
 
   pub fn select_multiple_of(&self) -> Option<&serde_json::Number> {

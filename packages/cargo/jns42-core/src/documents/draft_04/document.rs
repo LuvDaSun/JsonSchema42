@@ -5,11 +5,7 @@ use crate::utils::node_location::NodeLocation;
 use std::{collections::HashMap, rc::Weak};
 
 pub struct Document {
-  document_context: Weak<DocumentContext>,
-  given_location: NodeLocation,
-  antecedent_location: Option<NodeLocation>,
   document_location: NodeLocation,
-  document_node: Node,
   /**
   Nodes that belong to this document, indexed by their pointer
   */
@@ -45,8 +41,8 @@ impl Document {
     while let Some((node_pointer, node)) = node_queue.pop() {
       nodes.insert(node_pointer.clone(), node.clone());
 
-      if let Some(node_ref) = node.select_ref() {
-        let reference_location = &node_ref.parse().unwrap();
+      if let Some(node_reference) = node.select_reference() {
+        let reference_location = &node_reference.parse().unwrap();
         let retrieval_location = retrieval_location.clone();
         let given_location = document_location.clone();
         retrieval_location.join(reference_location);
@@ -82,11 +78,7 @@ impl Document {
     }
 
     Self {
-      document_context,
-      antecedent_location,
-      given_location,
       document_location,
-      document_node,
       nodes,
       referenced_documents,
       embedded_documents,
@@ -127,8 +119,8 @@ impl SchemaDocument for Document {
           // meta
           title: node.select_title().map(|value| value.to_string()),
           description: node.select_description().map(|value| value.to_string()),
-          examples: node.select_examples().cloned(),
-          deprecated: node.select_deprecated(),
+          examples: None,
+          deprecated: None,
 
           // types
           types: node.select_types(),
@@ -136,10 +128,34 @@ impl SchemaDocument for Document {
           // assertions
           options: node.select_options(),
 
-          minimum_inclusive: node.select_minimum_inclusive().cloned(),
-          minimum_exclusive: node.select_minimum_exclusive().cloned(),
-          maximum_inclusive: node.select_maximum_inclusive().cloned(),
-          maximum_exclusive: node.select_maximum_exclusive().cloned(),
+          minimum_inclusive: node.select_is_minimum_exclusive().and_then(|value| {
+            if value {
+              None
+            } else {
+              node.select_minimum().cloned()
+            }
+          }),
+          minimum_exclusive: node.select_is_minimum_exclusive().and_then(|value| {
+            if value {
+              node.select_minimum().cloned()
+            } else {
+              None
+            }
+          }),
+          maximum_inclusive: node.select_is_maximum_exclusive().and_then(|value| {
+            if value {
+              None
+            } else {
+              node.select_maximum().cloned()
+            }
+          }),
+          maximum_exclusive: node.select_is_maximum_exclusive().and_then(|value| {
+            if value {
+              node.select_maximum().cloned()
+            } else {
+              None
+            }
+          }),
           multiple_of: node.select_multiple_of().cloned(),
           minimum_length: node.select_minimum_length(),
           maximum_length: node.select_maximum_length(),
@@ -160,13 +176,13 @@ impl SchemaDocument for Document {
           }),
 
           // sub nodes
-          r#if: map_entry_location(&location, node.select_if_entry(pointer)),
-          then: map_entry_location(&location, node.select_then_entry(pointer)),
-          r#else: map_entry_location(&location, node.select_else_entry(pointer)),
+          r#if: None,
+          then: None,
+          r#else: None,
           not: map_entry_location(&location, node.select_not_entry(pointer)),
-          contains: map_entry_location(&location, node.select_contains_entry(pointer)),
+          contains: None,
           array_items: map_entry_location(&location, node.select_array_items_entry(pointer)),
-          property_names: map_entry_location(&location, node.select_property_names_entry(pointer)),
+          property_names: None,
           map_properties: map_entry_location(&location, node.select_map_properties_entry(pointer)),
 
           all_of: map_entry_locations_vec(&location, node.select_all_of_entries(pointer)),
