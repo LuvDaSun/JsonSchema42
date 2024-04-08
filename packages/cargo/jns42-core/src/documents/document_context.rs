@@ -233,7 +233,7 @@ impl DocumentContext {
       /*
       populate the cache with this document
       */
-      self.fill_node_cache(retrieval_location, document_node);
+      self.fill_node_cache(retrieval_location, document_node)?;
     }
 
     queue.push((
@@ -270,7 +270,7 @@ impl DocumentContext {
         default_meta_schema_id,
         &mut queue,
       )
-      .await;
+      .await?;
 
     self.load_from_queue(&mut queue).await?;
 
@@ -285,12 +285,12 @@ impl DocumentContext {
     node: serde_json::Value,
     default_meta_schema_id: &str,
     queue: &mut Queue,
-  ) {
+  ) -> Result<(), Error> {
     /*
     If the document is not in the cache
     */
     if !self.node_cache.borrow().contains_key(retrieval_location) {
-      self.fill_node_cache(retrieval_location, node)
+      self.fill_node_cache(retrieval_location, node)?
     }
 
     queue.push((
@@ -299,6 +299,8 @@ impl DocumentContext {
       antecedent_location.cloned(),
       default_meta_schema_id.to_owned(),
     ));
+
+    Ok(())
   }
 
   /**
@@ -306,7 +308,11 @@ impl DocumentContext {
   a part of a bigger document, if this is the case then it's retrieval url is not
   root.
   */
-  fn fill_node_cache(&self, retrieval_location: &NodeLocation, document_node: serde_json::Value) {
+  fn fill_node_cache(
+    &self,
+    retrieval_location: &NodeLocation,
+    document_node: serde_json::Value,
+  ) -> Result<(), Error> {
     /*
     we add every node in the tree to the cache
     */
@@ -321,17 +327,21 @@ impl DocumentContext {
       node_url.push_pointer(pointer);
 
       let mut node_cache = self.node_cache.borrow_mut();
-      if let Some(node_previous) = node_cache.get(retrieval_location) {
+      if let Some(node_previous) = node_cache.get(&node_url) {
         /*
         If a node is already in the cache we won't override. We assume that this is the same node
         as it has the same identifier. This might happen if we load an embedded document first
         and then we load a document that contains the embedded document.
         */
-        assert_eq!(node, *node_previous);
+        if node != *node_previous {
+          Err(Error::Unknown)?
+        }
       } else {
         assert!(node_cache.insert(node_url, node).is_none());
       }
     }
+
+    Ok(())
   }
 
   /**
@@ -451,7 +461,7 @@ impl DocumentContext {
           default_meta_schema_id,
           queue,
         )
-        .await;
+        .await?;
     }
 
     let referenced_documents = document.get_referenced_documents();

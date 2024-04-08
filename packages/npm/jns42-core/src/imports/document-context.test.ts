@@ -19,5 +19,5 @@ test("load from node", async () => {
 
   const intermediateDocument = documentContext.getIntermediateDocument();
 
-  assert(intermediateDocument.schemas["schema.json#"] != null);
+  assert(intermediateDocument.schemas["string-or-boolean.json#"] != null);
 });
