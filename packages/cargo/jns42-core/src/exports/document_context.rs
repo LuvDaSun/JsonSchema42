@@ -1,4 +1,4 @@
-use super::with_error::with_error_reference;
+use super::with_error::{with_error_reference, with_error_reference_future};
 use crate::{documents::DocumentContext, executor::spawn_and_callback, utils::key::Key};
 use std::{
   ffi::{c_char, CStr, CString},
@@ -25,7 +25,7 @@ extern "C" fn document_context_register_well_known_factories(
 ) {
   with_error_reference(error_reference, || {
     let document_context = unsafe { &mut *document_context };
-    document_context.register_well_known_factories().unwrap();
+    document_context.register_well_known_factories()?;
     Ok(())
   })
   .unwrap_or_default()
@@ -42,37 +42,41 @@ extern "C" fn document_context_load_from_location(
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
-    let document_context = unsafe { &*document_context };
+    with_error_reference_future(error_reference, || async move {
+      let document_context = unsafe { &*document_context };
 
-    let retrieval_location = unsafe { CStr::from_ptr(retrieval_location) };
-    let retrieval_location = retrieval_location.to_str().unwrap();
-    let retrieval_location = retrieval_location.parse().unwrap();
+      let retrieval_location = unsafe { CStr::from_ptr(retrieval_location) };
+      let retrieval_location = retrieval_location.to_str()?;
+      let retrieval_location = retrieval_location.parse()?;
 
-    let given_location = unsafe { CStr::from_ptr(given_location) };
-    let given_location = given_location.to_str().unwrap();
-    let given_location = given_location.parse().unwrap();
+      let given_location = unsafe { CStr::from_ptr(given_location) };
+      let given_location = given_location.to_str()?;
+      let given_location = given_location.parse()?;
 
-    let antecedent_location = if antecedent_location.is_null() {
-      None
-    } else {
-      let antecedent_location = unsafe { CStr::from_ptr(antecedent_location) };
-      let antecedent_location = antecedent_location.to_str().unwrap();
-      let antecedent_location = antecedent_location.parse().unwrap();
-      Some(antecedent_location)
-    };
+      let antecedent_location = if antecedent_location.is_null() {
+        None
+      } else {
+        let antecedent_location = unsafe { CStr::from_ptr(antecedent_location) };
+        let antecedent_location = antecedent_location.to_str()?;
+        let antecedent_location = antecedent_location.parse()?;
+        Some(antecedent_location)
+      };
 
-    let default_meta_schema_id = unsafe { CStr::from_ptr(default_meta_schema_id) };
-    let default_meta_schema_id = default_meta_schema_id.to_str().unwrap();
+      let default_meta_schema_id = unsafe { CStr::from_ptr(default_meta_schema_id) };
+      let default_meta_schema_id = default_meta_schema_id.to_str()?;
 
-    document_context
-      .load_from_location(
-        &retrieval_location,
-        &given_location,
-        antecedent_location.as_ref(),
-        default_meta_schema_id,
-      )
-      .await
-      .unwrap();
+      document_context
+        .load_from_location(
+          &retrieval_location,
+          &given_location,
+          antecedent_location.as_ref(),
+          default_meta_schema_id,
+        )
+        .await?;
+
+      Ok(())
+    })
+    .await;
   });
 }
 
@@ -88,42 +92,46 @@ extern "C" fn document_context_load_from_node(
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
-    let document_context = unsafe { &*document_context };
+    with_error_reference_future(error_reference, || async move {
+      let document_context = unsafe { &*document_context };
 
-    let retrieval_location = unsafe { CStr::from_ptr(retrieval_location) };
-    let retrieval_location = retrieval_location.to_str().unwrap();
-    let retrieval_location = retrieval_location.parse().unwrap();
+      let retrieval_location = unsafe { CStr::from_ptr(retrieval_location) };
+      let retrieval_location = retrieval_location.to_str()?;
+      let retrieval_location = retrieval_location.parse()?;
 
-    let given_location = unsafe { CStr::from_ptr(given_location) };
-    let given_location = given_location.to_str().unwrap();
-    let given_location = given_location.parse().unwrap();
+      let given_location = unsafe { CStr::from_ptr(given_location) };
+      let given_location = given_location.to_str()?;
+      let given_location = given_location.parse()?;
 
-    let antecedent_location = if antecedent_location.is_null() {
-      None
-    } else {
-      let antecedent_location = unsafe { CStr::from_ptr(antecedent_location) };
-      let antecedent_location = antecedent_location.to_str().unwrap();
-      let antecedent_location = antecedent_location.parse().unwrap();
-      Some(antecedent_location)
-    };
+      let antecedent_location = if antecedent_location.is_null() {
+        None
+      } else {
+        let antecedent_location = unsafe { CStr::from_ptr(antecedent_location) };
+        let antecedent_location = antecedent_location.to_str()?;
+        let antecedent_location = antecedent_location.parse()?;
+        Some(antecedent_location)
+      };
 
-    let node = unsafe { CStr::from_ptr(node) };
-    let node = node.to_str().unwrap();
-    let node = serde_json::from_str(node).unwrap();
+      let node = unsafe { CStr::from_ptr(node) };
+      let node = node.to_str()?;
+      let node = serde_json::from_str(node)?;
 
-    let default_meta_schema_id = unsafe { CStr::from_ptr(default_meta_schema_id) };
-    let default_meta_schema_id = default_meta_schema_id.to_str().unwrap();
+      let default_meta_schema_id = unsafe { CStr::from_ptr(default_meta_schema_id) };
+      let default_meta_schema_id = default_meta_schema_id.to_str()?;
 
-    document_context
-      .load_from_node(
-        &retrieval_location,
-        &given_location,
-        antecedent_location.as_ref(),
-        node,
-        default_meta_schema_id,
-      )
-      .await
-      .unwrap();
+      document_context
+        .load_from_node(
+          &retrieval_location,
+          &given_location,
+          antecedent_location.as_ref(),
+          node,
+          default_meta_schema_id,
+        )
+        .await?;
+
+      Ok(())
+    })
+    .await;
   });
 }
 
