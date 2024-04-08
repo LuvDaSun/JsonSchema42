@@ -8,7 +8,7 @@ test("load from node", async () => {
 
   await documentContext.loadFromNode(
     "string-or-boolean.json",
-    "string-or-boolean.json",
+    "schema.json",
     undefined,
     {
       $schema: "http://json-schema.org/draft-04/schema#",
@@ -19,5 +19,5 @@ test("load from node", async () => {
 
   const intermediateDocument = documentContext.getIntermediateDocument();
 
-  assert(intermediateDocument.schemas["string-or-boolean.json#"] != null);
+  assert(intermediateDocument.schemas["schema.json#"] != null);
 });

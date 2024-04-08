@@ -260,6 +260,7 @@ impl DocumentContext {
     default_meta_schema_id: &str,
   ) -> Result<(), Error> {
     let mut queue = Default::default();
+
     self
       .load_from_node_with_queue(
         retrieval_location,
@@ -270,6 +271,7 @@ impl DocumentContext {
         &mut queue,
       )
       .await;
+
     self.load_from_queue(&mut queue).await?;
 
     Ok(())
