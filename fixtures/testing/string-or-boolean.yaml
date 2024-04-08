@@ -8,14 +8,14 @@ schemas:
     type:
       - "string"
       - "boolean"
+    examples:
+      - "hi!"
+      - false
   draft-04:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     type:
       - "string"
       - "boolean"
-    examples:
-      - "hi!"
-      - false
 
 valid:
   hi: "hi!"
