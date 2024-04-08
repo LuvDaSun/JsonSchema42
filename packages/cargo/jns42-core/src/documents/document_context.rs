@@ -91,9 +91,8 @@ impl DocumentContext {
   pub fn register_well_known_factories(self: &mut Rc<Self>) {
     self.register_factory(
       &MetaSchemaId::Draft202012,
-      Box::new(|context, configuration| {
+      Box::new(|_context, configuration| {
         Rc::new(documents::draft_2020_12::Document::new(
-          context,
           configuration.retrieval_url,
           configuration.given_url,
           configuration.antecedent_url,

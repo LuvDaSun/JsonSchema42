@@ -5,11 +5,11 @@ use crate::utils::node_location::NodeLocation;
 use std::{collections::HashMap, rc::Weak};
 
 pub struct Document {
-  document_context: Weak<DocumentContext>,
-  given_location: NodeLocation,
-  antecedent_location: Option<NodeLocation>,
+  // document_context: Weak<DocumentContext>,
+  // given_location: NodeLocation,
+  // antecedent_location: Option<NodeLocation>,
   document_location: NodeLocation,
-  document_node: Node,
+  // document_node: Node,
   /**
   Nodes that belong to this document, indexed by their pointer
   */
@@ -20,7 +20,7 @@ pub struct Document {
 
 impl Document {
   pub fn new(
-    document_context: Weak<DocumentContext>,
+    // document_context: Weak<DocumentContext>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
@@ -82,11 +82,11 @@ impl Document {
     }
 
     Self {
-      document_context,
-      antecedent_location,
-      given_location,
+      // document_context,
+      // antecedent_location,
+      // given_location,
       document_location,
-      document_node,
+      // document_node,
       nodes,
       referenced_documents,
       embedded_documents,
