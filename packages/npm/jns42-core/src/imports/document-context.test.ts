@@ -8,7 +8,7 @@ test("load from node", async () => {
 
   await documentContext.loadFromNode(
     "string-or-boolean.json",
-    "schema.json",
+    "string-or-boolean.json",
     undefined,
     {
       $schema: "http://json-schema.org/draft-04/schema#",
