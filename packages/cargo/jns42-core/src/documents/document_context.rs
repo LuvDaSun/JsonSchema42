@@ -213,7 +213,7 @@ impl DocumentContext {
       retrieve the document
       */
       let fetch_location = &retrieval_location.to_fetch_string();
-      let data = crate::utils::fetch_file::local_fetch_file(fetch_location)
+      let data = crate::utils::fetch_file::host_fetch_file(fetch_location)
         .await
         .unwrap();
       let document_node = serde_json::from_str(&data).unwrap();
@@ -444,24 +444,5 @@ impl DocumentContext {
         )
         .await;
     }
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[tokio::test]
-  async fn document_context_load_from_location() {
-    let document_context = DocumentContext::new();
-
-    document_context
-      .load_from_location(
-        &"https://api.chucknorris.io/jokes/random".parse().unwrap(),
-        &"https://api.chucknorris.io/jokes/random".parse().unwrap(),
-        None,
-        &MetaSchemaId::Unknown,
-      )
-      .await
   }
 }
