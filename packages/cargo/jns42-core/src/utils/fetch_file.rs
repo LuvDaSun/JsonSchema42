@@ -1,13 +1,14 @@
-use crate::callbacks::register_callback;
-use futures::channel::oneshot;
-use std::{
-  error::Error,
-  ffi::{c_char, CString},
-  ptr::null_mut,
-};
-use tokio::{fs::File, io::AsyncReadExt};
+use std::error::Error;
 
-pub async fn host_fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
+#[cfg(feature = "hosted")]
+pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
+  use crate::callbacks::register_callback;
+  use futures::channel::oneshot;
+  use std::{
+    ffi::{c_char, CString},
+    ptr::null_mut,
+  };
+
   let location = CString::new(location.to_owned()).unwrap();
   let location = location.into_raw();
 
@@ -32,7 +33,10 @@ pub async fn host_fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
   Ok(data)
 }
 
-pub async fn local_fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
+#[cfg(not(feature = "hosted"))]
+pub async fn fetch_file(location: &str) -> Result<String, Box<dyn Error>> {
+  use tokio::{fs::File, io::AsyncReadExt};
+
   if location.starts_with("http://") || location.starts_with("https://") {
     let response = reqwest::get(location).await?.error_for_status()?;
     let data = response.text().await?;
@@ -41,7 +45,9 @@ pub async fn local_fetch_file(location: &str) -> Result<String, Box<dyn Error>> 
     let mut file = File::open(location).await?;
     let metadata = file.metadata().await?;
     let mut data = String::with_capacity(metadata.len() as usize);
+
     file.read_to_string(&mut data).await?;
+
     Ok(data)
   }
 }

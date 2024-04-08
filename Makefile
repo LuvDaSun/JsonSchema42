@@ -26,6 +26,8 @@ target/wasm32-unknown-unknown/release/jns42_core.wasm: \
 		--package jns42-core \
 		--target wasm32-unknown-unknown \
 		--release \
+		--no-default-features \
+		--features hosted \
 
 
 packages/npm/jns42-core/bin/main.wasm: \
