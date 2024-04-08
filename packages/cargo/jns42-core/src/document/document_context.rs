@@ -1,9 +1,27 @@
+use super::{meta::MetaSchemaId, schema_document::SchemaDocument};
 use crate::utils::{node_location::NodeLocation, read_json_node::read_json_node};
 use std::{
   cell::RefCell,
-  collections::{HashMap, HashSet},
-  rc::Rc,
+  collections::HashMap,
+  rc::{Rc, Weak},
 };
+
+pub struct DocumentConfiguration<'a> {
+  pub retrieval_url: NodeLocation,
+  pub given_url: NodeLocation,
+  pub antecedent_url: Option<NodeLocation>,
+  pub document_node: &'a serde_json::Value,
+}
+
+pub type DocumentFactory =
+  dyn Fn(Weak<DocumentContext>, DocumentConfiguration) -> Rc<dyn SchemaDocument>;
+
+pub type Queue = Vec<(
+  NodeLocation,
+  NodeLocation,
+  Option<NodeLocation>,
+  MetaSchemaId,
+)>;
 
 /**
 This class loads document nodes and documents. Every node has a few locations:
@@ -13,7 +31,7 @@ This class loads document nodes and documents. Every node has a few locations:
 
 - Retrieval location
 
-  This is the physical location of the node
+  This is the physical location of the node we often use this as a primary identifier
 
 - Document location
 
@@ -41,25 +59,40 @@ pub struct DocumentContext {
 
   /**
   Keeps all loaded nodes. Nodes are retrieved and then stored in this cache. Then we work
-  exclusively from this cache.
+  exclusively from this cache. The key is the retrieval location of the node.
   */
   node_cache: RefCell<HashMap<NodeLocation, serde_json::Value>>,
 
   /**
-  Keep track of what we have loaded so far. We store the fetch locations here, this is the
-  location without the hash that can be used to fetch the document from a server or file system.
-  */
-  loaded: RefCell<HashSet<String>>,
+   * all documents, indexed by the document node id of the document
+   */
+  documents: RefCell<HashMap<NodeLocation, Rc<dyn SchemaDocument>>>,
 
   /**
-  This map maps node locations to retrieval locations
+  This map maps document retrieval locations to document root locations
    */
-  resolved: HashMap<NodeLocation, NodeLocation>,
+  document_resolved: RefCell<HashMap<NodeLocation, NodeLocation>>,
+
+  /**
+   * document factories by schema identifier
+   */
+  factories: HashMap<MetaSchemaId, Box<DocumentFactory>>,
 }
 
 impl DocumentContext {
   pub fn new() -> Rc<Self> {
     Rc::new(Default::default())
+  }
+
+  pub fn resolve_document_retrieval_url(
+    &self,
+    document_retrieval_url: &NodeLocation,
+  ) -> Option<NodeLocation> {
+    self
+      .document_resolved
+      .borrow()
+      .get(document_retrieval_url)
+      .cloned()
   }
 
   /**
@@ -71,7 +104,7 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    // default_schema_uri: &MetaSchemaId,
+    default_schema_uri: &MetaSchemaId,
   ) {
     assert!(retrieval_location.is_root());
 
@@ -81,11 +114,11 @@ impl DocumentContext {
         retrieval_location,
         given_location,
         antecedent_location,
-        // default_schema_uri,
+        default_schema_uri,
         &mut queue,
       )
       .await;
-    self.load_from_cache_queue(&mut queue).await;
+    self.load_from_queue(&mut queue).await;
   }
 
   async fn load_from_location_with_queue(
@@ -93,13 +126,8 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    // default_schema_uri: &MetaSchemaId,
-    queue: &mut Vec<(
-      NodeLocation,
-      NodeLocation,
-      Option<NodeLocation>,
-      // MetaSchemaId,
-    )>,
+    default_schema_uri: &MetaSchemaId,
+    queue: &mut Queue,
   ) {
     /*
     If the document is not in the cache
@@ -124,7 +152,7 @@ impl DocumentContext {
       retrieval_location.clone(),
       given_location.clone(),
       antecedent_location.cloned(),
-      // default_schema_uri.clone(),
+      default_schema_uri.clone(),
     ));
   }
 
@@ -139,7 +167,7 @@ impl DocumentContext {
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
     node: serde_json::Value,
-    // default_schema_uri: &MetaSchemaId,
+    default_schema_uri: &MetaSchemaId,
   ) {
     let mut queue = Default::default();
     self
@@ -148,11 +176,11 @@ impl DocumentContext {
         given_location,
         antecedent_location,
         node,
-        // default_schema_uri,
+        default_schema_uri,
         &mut queue,
       )
       .await;
-    self.load_from_cache_queue(&mut queue).await;
+    self.load_from_queue(&mut queue).await;
   }
 
   async fn load_from_node_with_queue(
@@ -161,13 +189,8 @@ impl DocumentContext {
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
     node: serde_json::Value,
-    // default_schema_uri: &MetaSchemaId,
-    queue: &mut Vec<(
-      NodeLocation,
-      NodeLocation,
-      Option<NodeLocation>,
-      // MetaSchemaId,
-    )>,
+    default_schema_uri: &MetaSchemaId,
+    queue: &mut Queue,
   ) {
     /*
     If the document is not in the cache
@@ -180,7 +203,7 @@ impl DocumentContext {
       retrieval_location.clone(),
       given_location.clone(),
       antecedent_location.cloned(),
-      // default_schema_uri.clone(),
+      default_schema_uri.clone(),
     ));
   }
 
@@ -223,31 +246,17 @@ impl DocumentContext {
   /**
   Load documents from queue, drain the queue
   */
-  async fn load_from_cache_queue(
-    self: &Rc<Self>,
-    queue: &mut Vec<(
-      NodeLocation,
-      NodeLocation,
-      Option<NodeLocation>,
-      // MetaSchemaId,
-    )>,
-  ) {
+  async fn load_from_queue(self: &Rc<Self>, queue: &mut Queue) {
     /*
     This here will drain the queue.
     */
-    while let Some((
-      retrieval_url,
-      given_url,
-      antecedent_url,
-      // default_schema_uri,
-    )) = queue.pop()
-    {
+    while let Some((retrieval_url, given_url, antecedent_url, default_schema_uri)) = queue.pop() {
       self
         .load_from_cache_with_queue(
           &retrieval_url,
           &given_url,
           antecedent_url.as_ref(),
-          // &default_schema_uri,
+          &default_schema_uri,
           queue,
         )
         .await;
@@ -262,15 +271,10 @@ impl DocumentContext {
   async fn load_from_cache_with_queue(
     self: &Rc<Self>,
     retrieval_location: &NodeLocation,
-    _given_location: &NodeLocation,
-    _antecedent_location: Option<&NodeLocation>,
-    // default_schema_uri: &MetaSchemaId,
-    #[allow(clippy::ptr_arg)] _queue: &mut Vec<(
-      NodeLocation,
-      NodeLocation,
-      Option<NodeLocation>,
-      // MetaSchemaId,
-    )>,
+    given_location: &NodeLocation,
+    antecedent_location: Option<&NodeLocation>,
+    default_schema_uri: &MetaSchemaId,
+    #[allow(clippy::ptr_arg)] queue: &mut Queue,
   ) {
     if self
       .node_documents
@@ -280,67 +284,71 @@ impl DocumentContext {
       return;
     }
 
-    let server_url = retrieval_location.to_fetch_string();
-    if !self.loaded.borrow_mut().insert(server_url) {
-      return;
-    }
-
-    let _node = self.node_cache.borrow().get(retrieval_location);
-
     /*
+    this has it's own scope so node_cache is dropped when we don't need it anymore.
+    */
+    let document = {
+      let node_cache = self.node_cache.borrow();
+      let node = node_cache.get(retrieval_location).unwrap();
+      let schema_uri = MetaSchemaId::discover(node).unwrap_or_else(|| default_schema_uri.clone());
 
-    let schema_uri = MetaSchemaId::discover(&node).unwrap_or_else(|| default_schema_uri.clone());
-    let factory = self.factories.get(&schema_uri).unwrap();
+      let factory = self.factories.get(&schema_uri).unwrap();
 
-    let document = factory(
-      Rc::downgrade(self),
-      DocumentInitializer {
-        retrieval_url: retrieval_url.clone(),
-        given_url: given_url.clone(),
-        antecedent_url: antecedent_url.cloned(),
-        document_node: &node,
-      },
-    );
-    let document_uri = document.get_document_uri();
+      factory(
+        Rc::downgrade(self),
+        DocumentConfiguration {
+          retrieval_url: retrieval_location.clone(),
+          given_url: given_location.clone(),
+          antecedent_url: antecedent_location.cloned(),
+          document_node: node,
+        },
+      )
+    };
+    let document_location = document.get_document_location();
 
     assert!(self
-      .resolved
+      .document_resolved
       .borrow_mut()
-      .insert(retrieval_url.clone(), document_uri.clone())
+      .insert(retrieval_location.clone(), document_location.clone())
       .is_none());
 
     assert!(self
       .documents
       .borrow_mut()
-      .insert(document_uri.clone(), document.clone())
+      .insert(document_location.clone(), document.clone())
       .is_none());
 
     // Map node urls to this document
-    for node_url in document.get_node_urls() {
-      let ok = self
+    for node_location in document.get_node_locations() {
+      /*
+      Inserts all node locations that belong to this document. We only expect locations
+      that are part of this document and not part of embedded documents. So every node_location
+      should be unique.
+      */
+      assert!(self
         .node_documents
         .borrow_mut()
-        .insert(node_url.clone(), document_uri.clone())
-        .is_none();
-      if !ok {
-        println!("{} -> {}", node_url, document_uri);
-      }
+        .insert(node_location.clone(), document_location.clone())
+        .is_none());
     }
 
     let embedded_documents = document.get_embedded_documents();
     for embedded_document in embedded_documents {
+      /*
+      Find the node in the cache, it should be there, because the embedded document is always
+      a descendant of this document. This document is cached, and so are all it's descendants.
+      */
       let node = self
-        .clone()
-        .cache
+        .node_cache
         .borrow()
         .get(&embedded_document.retrieval_url)
         .unwrap()
         .clone();
       self
-        .load_from_document_with_queue(
+        .load_from_node_with_queue(
           &embedded_document.retrieval_url,
           &embedded_document.given_url,
-          Some(document.get_document_uri()),
+          Some(document_location),
           node,
           default_schema_uri,
           queue,
@@ -351,17 +359,15 @@ impl DocumentContext {
     let referenced_documents = document.get_referenced_documents();
     for referenced_document in referenced_documents {
       self
-        .load_from_url_with_queue(
+        .load_from_location_with_queue(
           &referenced_document.retrieval_url,
           &referenced_document.given_url,
-          Some(document.get_document_uri()),
+          Some(document_location),
           default_schema_uri,
           queue,
         )
         .await;
     }
-
-    */
   }
 }
 
@@ -378,6 +384,7 @@ mod tests {
         &"https://api.chucknorris.io/jokes/random".parse().unwrap(),
         &"https://api.chucknorris.io/jokes/random".parse().unwrap(),
         None,
+        &MetaSchemaId::Unknown,
       )
       .await
   }

@@ -1,5 +1,7 @@
 use crate::{
-  document::document_context::DocumentContext, executor::spawn_and_callback, utils::key::Key,
+  document::{document_context::DocumentContext, meta::MetaSchemaId},
+  executor::spawn_and_callback,
+  utils::key::Key,
 };
 use std::{
   ffi::{c_char, c_void, CStr},
@@ -52,6 +54,7 @@ extern "C" fn document_context_load_from_location(
         &retrieval_location,
         &given_location,
         antecedent_location.as_ref(),
+        &MetaSchemaId::Unknown,
       )
       .await;
   });
