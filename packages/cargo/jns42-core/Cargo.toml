@@ -29,3 +29,6 @@ async-std = { version = "1.12.0", features = ["attributes"] }
 
 [lib]
 crate-type = ["rlib", "cdylib"]
+
+[profile.release]
+lto = true
