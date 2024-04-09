@@ -4,7 +4,7 @@ use std::{ffi::NulError, fmt::Display, str::Utf8Error};
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(usize)]
 pub enum Error {
-  Ok,
+  Ok = 0,
   Unknown,
   Conflict,
   NotFound,
