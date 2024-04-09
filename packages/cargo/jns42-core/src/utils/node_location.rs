@@ -67,9 +67,8 @@ impl NodeLocation {
   Replace pointer
   */
   pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
-    self.hash = once(String::new())
-      .chain(value.into_iter().map(|part| part.into()))
-      .collect();
+    self.hash =
+      normalize_hash(once(String::new()).chain(value.into_iter().map(|part| part.into())));
   }
 
   /*
@@ -84,11 +83,12 @@ impl NodeLocation {
   */
   pub fn push_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
     if let Some(pointer) = self.get_pointer() {
-      self.hash = pointer
-        .into_iter()
-        .map(|part| part.into())
-        .chain(value.into_iter().map(|part| part.into()))
-        .collect();
+      self.hash = normalize_hash(
+        pointer
+          .into_iter()
+          .map(|part| part.into())
+          .chain(value.into_iter().map(|part| part.into())),
+      );
     } else {
       self.set_pointer(value);
     }
