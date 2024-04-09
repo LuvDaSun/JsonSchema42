@@ -53,7 +53,6 @@ This class loads document nodes and documents. Every node has a few locations:
 
 
 */
-
 pub struct DocumentContext {
   /**
   Maps node retrieval urls to their documents. Every node has a location that is an identifier. Thi

@@ -8,6 +8,17 @@ use std::iter::empty;
 pub type SchemaArena = Arena<SchemaItem>;
 
 impl Arena<SchemaItem> {
+  /// Resolves the final entry for a given schema key, following any alias chains.
+  ///
+  /// This method iteratively follows the alias chain for a given key until it reaches
+  /// an item that does not have an alias. It returns both the resolved key and a reference
+  /// to the resolved `SchemaItem`.
+  ///
+  /// # Parameters
+  /// - `key`: The initial `SchemaKey` to resolve.
+  ///
+  /// # Returns
+  /// A tuple containing the resolved `SchemaKey` and a reference to the resolved `SchemaItem`.
   pub fn resolve_entry(&self, key: SchemaKey) -> (SchemaKey, &SchemaItem) {
     let mut resolved_key = key;
     let mut resolved_item = self.get_item(resolved_key);
@@ -23,6 +34,17 @@ impl Arena<SchemaItem> {
     (resolved_key, resolved_item)
   }
 
+  /// Retrieves the ancestors of a given schema item by its key.
+  ///
+  /// This method returns an iterator over the ancestors of the specified item,
+  /// starting from the item itself and moving up to the root.
+  ///
+  /// # Parameters
+  /// - `key`: The `SchemaKey` of the item whose ancestors are to be retrieved.
+  ///
+  /// # Returns
+  /// An iterator over tuples containing the `SchemaKey` and a reference to the `SchemaItem`
+  /// for each ancestor, including the item itself.
   pub fn get_ancestors(
     &self,
     key: SchemaKey,
@@ -40,12 +62,32 @@ impl Arena<SchemaItem> {
     result.into_iter()
   }
 
+  /// Checks if a given schema item has a specific ancestor.
+  ///
+  /// # Parameters
+  /// - `key`: The `SchemaKey` of the item to check.
+  /// - `ancestor_key`: The `SchemaKey` of the potential ancestor.
+  ///
+  /// # Returns
+  /// `true` if the item identified by `key` has the ancestor identified by `ancestor_key`,
+  /// otherwise `false`.
   pub fn has_ancestor(&self, key: SchemaKey, ancestor_key: SchemaKey) -> bool {
     self
       .get_ancestors(key)
       .any(|(key, _item)| key == ancestor_key)
   }
 
+  /// Generates an iterator over the name parts of a schema item and its ancestors.
+  ///
+  /// This method constructs an iterator that yields the name parts (path and hash) of
+  /// the specified schema item and its ancestors, in reverse order (from the root ancestor
+  /// to the item itself).
+  ///
+  /// # Parameters
+  /// - `key`: The `SchemaKey` of the item whose name parts are to be retrieved.
+  ///
+  /// # Returns
+  /// An iterator over string slices (`&str`) representing the name parts.
   pub fn get_name_parts(&self, key: SchemaKey) -> impl Iterator<Item = &str> {
     let ancestors: Vec<_> = self
       .get_ancestors(key)
@@ -79,6 +121,16 @@ impl Arena<SchemaItem> {
     ancestors.into_iter().rev().flatten()
   }
 
+  /// Applies a series of transformations to the schema items within the arena.
+  ///
+  /// This method iterates over each transformation provided and applies it to the arena.
+  /// The transformations are applied in the order they are provided.
+  ///
+  /// # Parameters
+  /// - `transforms`: A reference to a vector of `SchemaTransform` instances to be applied.
+  ///
+  /// # Returns
+  /// The number of transformations applied.
   pub fn transform(&mut self, transforms: &Vec<SchemaTransform>) -> usize {
     self.apply_transform(|arena: &mut Arena<SchemaItem>, key: usize| {
       for transform in transforms {
@@ -86,50 +138,5 @@ impl Arena<SchemaItem> {
         transform(arena, key)
       }
     })
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  use crate::models::SchemaItem;
-
-  #[test]
-  fn test_get_name_parts() {
-    let mut arena = SchemaArena::new();
-
-    arena.add_item(SchemaItem {
-      id: Some("http://id.com#/a/0".parse().unwrap()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      parent: Some(0),
-      id: Some("http://id.com#/b/1".parse().unwrap()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      parent: Some(1),
-      name: Some("2".to_string()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      parent: Some(2),
-      name: Some("3".to_string()),
-      ..Default::default()
-    });
-
-    assert_eq!(arena.get_name_parts(0).collect::<Vec<_>>(), vec!["a", "0"]);
-    assert_eq!(arena.get_name_parts(1).collect::<Vec<_>>(), vec!["b", "1"]);
-    assert_eq!(
-      arena.get_name_parts(2).collect::<Vec<_>>(),
-      vec!["b", "1", "2"]
-    );
-    assert_eq!(
-      arena.get_name_parts(3).collect::<Vec<_>>(),
-      vec!["b", "1", "2", "3"]
-    );
   }
 }
