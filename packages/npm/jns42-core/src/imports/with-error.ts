@@ -1,10 +1,12 @@
+import { ForeignError, ForeignErrorCode } from "./error.js";
 import { Reference } from "./reference.js";
 
 export function withErrorReference<R>(task: (errorReferencePointer: number) => R): R {
   using errorReference = Reference.new();
   const result = task(errorReference.pointer);
   if (errorReference.target !== 0) {
-    throw errorReference.target;
+    const error = new ForeignError(errorReference.target);
+    throw error;
   }
   return result;
 }
@@ -14,8 +16,9 @@ export async function withErrorReferencePromise<R>(
 ): Promise<R> {
   using errorReference = Reference.new();
   const result = await task(errorReference.pointer);
-  if (errorReference.target !== 0) {
-    throw errorReference.target;
+  if (errorReference.target !== ForeignErrorCode.Ok) {
+    const error = new ForeignError(errorReference.target);
+    throw error;
   }
   return result;
 }

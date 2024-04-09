@@ -150,7 +150,7 @@ impl DocumentContext {
     override factories
     */
     Rc::get_mut(self)
-      .ok_or(Error::RegisterFactory)?
+      .ok_or(Error::Conflict)?
       .factories
       .insert(schema.to_owned(), factory);
 
@@ -194,7 +194,7 @@ impl DocumentContext {
     default_schema_uri: &str,
   ) -> Result<(), Error> {
     if !retrieval_location.is_root() {
-      Err(Error::Unknown)?
+      Err(Error::NotARoot)?
     }
 
     let mut queue = Default::default();
@@ -230,7 +230,7 @@ impl DocumentContext {
       */
       let fetch_location = &retrieval_location.to_fetch_string();
       let data = crate::utils::fetch_file::fetch_file(fetch_location).await?;
-      let document_node = serde_json::from_str(&data).map_err(|_error| Error::Deserialization)?;
+      let document_node = serde_json::from_str(&data)?;
 
       /*
       populate the cache with this document
@@ -336,7 +336,7 @@ impl DocumentContext {
         and then we load a document that contains the embedded document.
         */
         if node != *node_previous {
-          Err(Error::Unknown)?
+          Err(Error::NotTheSame)?
         }
       } else {
         assert!(node_cache.insert(node_url, node).is_none());
@@ -394,15 +394,10 @@ impl DocumentContext {
     */
     let document = {
       let node_cache = self.node_cache.borrow();
-      let node = node_cache
-        .get(retrieval_location)
-        .ok_or(Error::NodeNotFound)?;
+      let node = node_cache.get(retrieval_location).ok_or(Error::NotFound)?;
       let meta_schema_id = discover_meta_schema(node).unwrap_or(default_meta_schema_id);
 
-      let factory = self
-        .factories
-        .get(meta_schema_id)
-        .ok_or(Error::FactoryNotFound)?;
+      let factory = self.factories.get(meta_schema_id).ok_or(Error::NotFound)?;
 
       factory(
         Rc::downgrade(self),
@@ -452,7 +447,7 @@ impl DocumentContext {
         .node_cache
         .borrow()
         .get(&embedded_document.retrieval_location)
-        .ok_or(Error::NodeNotFound)?
+        .ok_or(Error::NotFound)?
         .clone();
       self
         .load_from_node_with_queue(

@@ -35,7 +35,7 @@ extern "C" fn vec_string_get(
   with_error_reference(error_reference, || {
     let vec = unsafe { &*vec };
 
-    let value = vec.get(index).ok_or(Error::Unknown)?;
+    let value = vec.get(index).ok_or(Error::NotFound)?;
     let value = CString::new(value.clone())?;
 
     Ok(value.into_raw())
