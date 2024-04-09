@@ -15,43 +15,13 @@ let environment: MainEnvironment = {
 };
 
 export interface MainExports extends ExportsBase {
+  reverse(value: number, result: number, error_reference: number): void;
+
   reference_drop(pointer_box: number): void;
   reference_new(): number;
 
   c_string_drop(pointer: number): void;
   c_string_new(size: number): number;
-
-  reverse(value: number, result: number, error_reference: number): void;
-
-  names_builder_drop(names_builder: number): void;
-  names_builder_new(): number;
-  names_builder_add(names_builder: number, key: number, values: number): void;
-  names_builder_set_default_name(
-    names_builder: number,
-    value: number,
-    error_reference: number,
-  ): void;
-  names_builder_build(names_builder: number): number;
-
-  names_drop(names: number): void;
-  names_get_sentence(names: number, key: number): number;
-
-  schema_item_drop(schema_item: number): void;
-  schema_item_new(): number;
-
-  schema_arena_drop(schema_arena: number): void;
-  schema_arena_clone(schema_arena: number): number;
-  schema_arena_new(): number;
-  schema_arena_count(schema_arena: number): number;
-  schema_arena_add_item(schema_arena: number, item: number, error_reference: number): number;
-  schema_arena_replace_item(
-    schema_arena: number,
-    key: number,
-    item: number,
-    error_reference: number,
-  ): number;
-  schema_arena_get_item(schema_arena: number, key: number, error_reference: number): number;
-  schema_arena_transform(schema_arena: number, vec: number): number;
 
   vec_usize_drop(vec_usize: number): void;
   vec_usize_new(capacity: number): number;
@@ -85,6 +55,36 @@ export interface MainExports extends ExportsBase {
   node_location_set_anchor(node_location: number, anchor: number): void;
   node_location_set_pointer(node_location: number, pointer: number): void;
   node_location_set_root(node_location: number): void;
+
+  names_builder_drop(names_builder: number): void;
+  names_builder_new(): number;
+  names_builder_add(names_builder: number, key: number, values: number): void;
+  names_builder_set_default_name(
+    names_builder: number,
+    value: number,
+    error_reference: number,
+  ): void;
+  names_builder_build(names_builder: number): number;
+
+  names_drop(names: number): void;
+  names_get_sentence(names: number, key: number): number;
+
+  schema_item_drop(schema_item: number): void;
+  schema_item_new(): number;
+
+  schema_arena_drop(schema_arena: number): void;
+  schema_arena_clone(schema_arena: number): number;
+  schema_arena_new(): number;
+  schema_arena_count(schema_arena: number): number;
+  schema_arena_add_item(schema_arena: number, item: number, error_reference: number): number;
+  schema_arena_replace_item(
+    schema_arena: number,
+    key: number,
+    item: number,
+    error_reference: number,
+  ): number;
+  schema_arena_get_item(schema_arena: number, key: number, error_reference: number): number;
+  schema_arena_transform(schema_arena: number, vec: number): number;
 
   document_context_drop(document_context: number): void;
   document_context_new(): number;
