@@ -1,7 +1,6 @@
 use crate::error::Error;
 
-#[cfg(feature = "hosted")]
-pub async fn fetch_file(location: &str) -> Result<String, Error> {
+pub async fn fetch_file_hosted(location: &str) -> Result<String, Error> {
   use crate::callbacks::register_callback;
   use futures::channel::oneshot;
   use std::{
@@ -33,9 +32,8 @@ pub async fn fetch_file(location: &str) -> Result<String, Error> {
   Ok(data)
 }
 
-#[cfg(feature = "local")]
 pub async fn fetch_file(location: &str) -> Result<String, Error> {
-  use tokio::{fs::File, io::AsyncReadExt};
+  use async_std::{fs::File, io::ReadExt};
 
   if location.starts_with("http://") || location.starts_with("https://") {
     let response = reqwest::get(location).await?.error_for_status()?;

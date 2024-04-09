@@ -13,7 +13,7 @@ extern "C" fn document_context_drop(document_context: *mut Rc<DocumentContext>) 
 
 #[no_mangle]
 extern "C" fn document_context_new() -> *mut Rc<DocumentContext> {
-  let document_context = DocumentContext::new();
+  let document_context = DocumentContext::new_hosted();
   let document_context = Box::new(document_context);
   Box::into_raw(document_context)
 }

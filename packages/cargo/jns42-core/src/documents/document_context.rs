@@ -5,6 +5,8 @@ use crate::{
   models::IntermediateSchema,
   utils::{node_location::NodeLocation, read_json_node::read_json_node},
 };
+use std::future::Future;
+use std::pin::Pin;
 use std::{
   cell::RefCell,
   collections::HashMap,
@@ -21,7 +23,9 @@ pub struct DocumentConfiguration<'a> {
 pub type DocumentFactory =
   dyn Fn(Weak<DocumentContext>, DocumentConfiguration) -> Rc<dyn SchemaDocument>;
 
-pub type Queue = Vec<(NodeLocation, NodeLocation, Option<NodeLocation>, String)>;
+type Queue = Vec<(NodeLocation, NodeLocation, Option<NodeLocation>, String)>;
+
+type FetchFile = Box<dyn Fn(String) -> Pin<Box<dyn Future<Output = Result<String, Error>>>>>;
 
 /**
 This class loads document nodes and documents. Every node has a few locations:
@@ -49,7 +53,7 @@ This class loads document nodes and documents. Every node has a few locations:
 
 
 */
-#[derive(Default)]
+
 pub struct DocumentContext {
   /**
   Maps node retrieval urls to their documents. Every node has a location that is an identifier. Thi
@@ -77,11 +81,38 @@ pub struct DocumentContext {
    * document factories by schema identifier
    */
   factories: HashMap<String, Box<DocumentFactory>>,
+
+  // TODO this should be a &str
+  fetch_file: FetchFile,
 }
 
 impl DocumentContext {
   pub fn new() -> Rc<Self> {
-    Default::default()
+    Rc::new(Self {
+      node_documents: Default::default(),
+      node_cache: Default::default(),
+      documents: Default::default(),
+      document_resolved: Default::default(),
+      factories: Default::default(),
+      fetch_file: Box::new(|location: String| {
+        Box::pin(async move { crate::utils::fetch_file::fetch_file(location.as_str()).await })
+      }),
+    })
+  }
+
+  pub fn new_hosted() -> Rc<Self> {
+    Rc::new(Self {
+      node_documents: Default::default(),
+      node_cache: Default::default(),
+      documents: Default::default(),
+      document_resolved: Default::default(),
+      factories: Default::default(),
+      fetch_file: Box::new(|location: String| {
+        Box::pin(
+          async move { crate::utils::fetch_file::fetch_file_hosted(location.as_str()).await },
+        )
+      }),
+    })
   }
 
   pub fn register_well_known_factories(self: &mut Rc<Self>) -> Result<(), Error> {
@@ -228,8 +259,8 @@ impl DocumentContext {
       /*
       retrieve the document
       */
-      let fetch_location = &retrieval_location.to_fetch_string();
-      let data = crate::utils::fetch_file::fetch_file(fetch_location).await?;
+      let fetch_location = retrieval_location.to_fetch_string();
+      let data = (self.fetch_file)(fetch_location).await?;
       let document_node = serde_json::from_str(&data)?;
 
       /*
@@ -488,8 +519,7 @@ impl DocumentContext {
 mod tests {
   use super::*;
 
-  #[cfg(feature = "local")]
-  #[tokio::test]
+  #[async_std::test]
   async fn test_load_empty_node() {
     let mut document_context = DocumentContext::new();
     document_context.register_well_known_factories().unwrap();

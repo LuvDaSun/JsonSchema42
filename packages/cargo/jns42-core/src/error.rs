@@ -67,16 +67,14 @@ impl From<serde_json::Error> for Error {
   }
 }
 
-#[cfg(feature = "local")]
 impl From<reqwest::Error> for Error {
   fn from(_value: reqwest::Error) -> Self {
     Self::HttpError
   }
 }
 
-#[cfg(feature = "local")]
-impl From<tokio::io::Error> for Error {
-  fn from(_value: tokio::io::Error) -> Self {
+impl From<async_std::io::Error> for Error {
+  fn from(_value: async_std::io::Error) -> Self {
     Self::FileSystemError
   }
 }
