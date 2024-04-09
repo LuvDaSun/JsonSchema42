@@ -15,7 +15,6 @@ pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
 )]
 #[serde(try_from = "&str")]
 #[serde(into = "String")]
-
 pub struct NodeLocation {
   origin: String,
   path: Vec<String>,
@@ -316,9 +315,16 @@ fn normalize_path(path: impl IntoIterator<Item = impl ToString>) -> Vec<String> 
 }
 
 fn normalize_hash(hash: impl IntoIterator<Item = impl ToString>) -> Vec<String> {
-  let hash: Vec<_> = hash.into_iter().map(|part| part.to_string()).collect();
+  let hash: Vec<_> = hash
+    .into_iter()
+    .map(|part| part.to_string())
+    .enumerate()
+    .filter(|(index, part)| *index == 0 || !part.is_empty())
+    .map(|(_index, part)| part)
+    .collect();
 
-  if hash.len() == 1 && hash.first().unwrap().is_empty() {
+  // last can only be empty if it is the only element!
+  if hash.is_empty() || hash.last().unwrap().is_empty() {
     return Default::default();
   }
 

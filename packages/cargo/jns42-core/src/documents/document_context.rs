@@ -339,7 +339,7 @@ impl DocumentContext {
           Err(Error::NotTheSame)?
         }
       } else {
-        assert!(node_cache.insert(node_url, node).is_none());
+        node_cache.insert(node_url, node);
       }
     }
 
