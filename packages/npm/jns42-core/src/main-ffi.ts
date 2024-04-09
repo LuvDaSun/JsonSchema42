@@ -34,10 +34,7 @@ export interface MainExports extends ExportsBase {
   names_builder_build(names_builder: number): number;
 
   names_drop(names: number): void;
-  names_to_camel_case(names: number, key: number, error_reference: number): number;
-  names_to_pascal_case(names: number, key: number, error_reference: number): number;
-  names_to_snake_case(names: number, key: number, error_reference: number): number;
-  names_to_screaming_snake_case(names: number, key: number, error_reference: number): number;
+  names_get_sentence(names: number, key: number): number;
 
   schema_item_drop(schema_item: number): void;
   schema_item_new(): number;
