@@ -96,7 +96,7 @@ impl Specification {
         }
       }
 
-      let transformer = |arena: &mut Arena<SchemaItem>, key: usize| {
+      for key in 0..arena.count() {
         let item = arena.get_item(key).clone();
         let id = item.id.unwrap();
         let schema = intermediate_document.schemas.get(&id).unwrap();
@@ -233,10 +233,6 @@ impl Specification {
         };
 
         arena.replace_item(key, item);
-      };
-
-      while arena.apply_transform(transformer) > 0 {
-        //
       }
     }
 
