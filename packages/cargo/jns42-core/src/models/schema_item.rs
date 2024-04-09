@@ -83,108 +83,108 @@ impl From<&IntermediateType> for SchemaType {
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SchemaItem {
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub name: Option<String>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub exact: Option<bool>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub primary: Option<bool>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub parent: Option<SchemaKey>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub id: Option<NodeLocation>,
 
   // metadata
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub title: Option<String>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub description: Option<String>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub examples: Option<Vec<serde_json::Value>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub deprecated: Option<bool>,
 
   // types
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub types: Option<Vec<SchemaType>>,
 
   // applicators
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub reference: Option<SchemaKey>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub all_of: Option<BTreeSet<SchemaKey>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub any_of: Option<BTreeSet<SchemaKey>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub one_of: Option<BTreeSet<SchemaKey>>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub r#if: Option<SchemaKey>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub then: Option<SchemaKey>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub r#else: Option<SchemaKey>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub not: Option<SchemaKey>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub property_names: Option<SchemaKey>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub map_properties: Option<SchemaKey>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub array_items: Option<SchemaKey>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub contains: Option<SchemaKey>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub tuple_items: Option<Vec<SchemaKey>>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub object_properties: Option<HashMap<String, SchemaKey>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub pattern_properties: Option<HashMap<String, SchemaKey>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub dependent_schemas: Option<HashMap<String, SchemaKey>>,
 
   // assertions
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub options: Option<Vec<serde_json::Value>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub required: Option<HashSet<String>>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub minimum_inclusive: Option<serde_json::Number>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub minimum_exclusive: Option<serde_json::Number>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub maximum_inclusive: Option<serde_json::Number>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub maximum_exclusive: Option<serde_json::Number>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub multiple_of: Option<serde_json::Number>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub minimum_length: Option<u64>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub maximum_length: Option<u64>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub value_pattern: Option<Vec<String>>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub value_format: Option<Vec<String>>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub minimum_items: Option<u64>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub maximum_items: Option<u64>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub unique_items: Option<bool>,
 
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub minimum_properties: Option<u64>,
-  #[serde(skip_serializing_if = "Option::is_none")]
+  #[serde(default)]
   pub maximum_properties: Option<u64>,
 }
 
