@@ -5,11 +5,13 @@ use std::collections::HashMap;
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct IntermediateSchema {
+  #[serde(rename = "$schema")]
   pub schema: String,
   pub schemas: HashMap<NodeLocation, IntermediateNode>,
 }
 
 #[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub enum IntermediateType {
   Never,
   Any,
