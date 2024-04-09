@@ -29,7 +29,7 @@ impl NodeLocation {
       origin,
       path: normalize_path(path),
       query,
-      hash,
+      hash: normalize_hash(hash),
     }
   }
 
@@ -313,6 +313,16 @@ fn normalize_path(path: impl IntoIterator<Item = impl ToString>) -> Vec<String> 
   }
 
   path
+}
+
+fn normalize_hash(hash: impl IntoIterator<Item = impl ToString>) -> Vec<String> {
+  let hash: Vec<_> = hash.into_iter().map(|part| part.to_string()).collect();
+
+  if hash.len() == 1 && hash.first().unwrap().is_empty() {
+    return Default::default();
+  }
+
+  hash
 }
 
 #[cfg(test)]
