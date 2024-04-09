@@ -29,10 +29,6 @@ export class NodeLocation extends ForeignObject {
     return new NodeLocation(pointer);
   }
 
-  public get debug() {
-    return this.toString();
-  }
-
   public toString() {
     const resultPointer = mainFfi.exports.node_location_to_string(this.pointer);
     using resultForeign = new CString(resultPointer);

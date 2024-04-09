@@ -67,6 +67,14 @@ export interface MainExports extends ExportsBase {
   vec_string_get(vec_usize: number, index: number, error_reference: number): number;
   vec_string_push(vec_usize: number, value: number, error_reference: number): void;
 
+  sentence_drop(sentence: number): void;
+  sentence_new(input: number): number;
+  sentence_clone(sentence: number): number;
+  sentence_to_camel_case(value: number, error_reference: number): number;
+  sentence_to_pascal_case(value: number, error_reference: number): number;
+  sentence_to_snake_case(value: number, error_reference: number): number;
+  sentence_to_screaming_snake_case(value: number, error_reference: number): number;
+
   node_location_drop(node_location: number): void;
   node_location_clone(node_location: number): number;
   node_location_parse(input: number): number;
@@ -110,11 +118,6 @@ export interface MainExports extends ExportsBase {
     document_context: number,
     error_reference: number,
   ): number;
-
-  to_camel_case(value: number, error_reference: number): number;
-  to_pascal_case(value: number, error_reference: number): number;
-  to_snake_case(value: number, error_reference: number): number;
-  to_screaming_snake_case(value: number, error_reference: number): number;
 }
 
 export type MainFfi = Ffi<MainExports, MainEnvironment>;
