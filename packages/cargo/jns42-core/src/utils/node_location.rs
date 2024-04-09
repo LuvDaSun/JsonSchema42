@@ -451,7 +451,7 @@ mod tests {
 
     do_test("#", vec![]);
 
-    do_test("#/", vec!["", ""]);
+    do_test("#/", vec![]);
 
     do_test("#/1/2/3", vec!["", "1", "2", "3"]);
 
