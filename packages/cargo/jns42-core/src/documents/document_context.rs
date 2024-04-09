@@ -87,6 +87,7 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
+  #[cfg(not(target_family = "wasm"))]
   pub fn new() -> Rc<Self> {
     Rc::new(Self {
       node_documents: Default::default(),

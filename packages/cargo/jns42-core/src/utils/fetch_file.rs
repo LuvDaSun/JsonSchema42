@@ -32,6 +32,7 @@ pub async fn fetch_file_hosted(location: &str) -> Result<String, Error> {
   Ok(data)
 }
 
+#[cfg(not(target_family = "wasm"))]
 pub async fn fetch_file(location: &str) -> Result<String, Error> {
   use async_std::{fs::File, io::ReadExt};
 
