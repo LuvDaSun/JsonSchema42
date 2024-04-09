@@ -150,7 +150,7 @@ impl DocumentContext {
     override factories
     */
     Rc::get_mut(self)
-      .ok_or(Error::Conflict)?
+      .ok_or(Error::Unknown)?
       .factories
       .insert(schema.to_owned(), factory);
 
@@ -411,17 +411,23 @@ impl DocumentContext {
     };
     let document_location = document.get_document_location();
 
-    assert!(self
+    if self
       .document_resolved
       .borrow_mut()
       .insert(retrieval_location.clone(), document_location.clone())
-      .is_none());
+      .is_some()
+    {
+      Err(Error::Conflict)?;
+    }
 
-    assert!(self
+    if self
       .documents
       .borrow_mut()
       .insert(document_location.clone(), document.clone())
-      .is_none());
+      .is_some()
+    {
+      Err(Error::Conflict)?;
+    }
 
     // Map node urls to this document
     for node_location in document.get_node_locations() {
