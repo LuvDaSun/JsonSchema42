@@ -14,9 +14,9 @@ use std::{
 };
 
 pub struct DocumentConfiguration<'a> {
-  pub retrieval_url: NodeLocation,
-  pub given_url: NodeLocation,
-  pub antecedent_url: Option<NodeLocation>,
+  pub retrieval_location: NodeLocation,
+  pub given_location: NodeLocation,
+  pub antecedent_location: Option<NodeLocation>,
   pub document_node: &'a serde_json::Value,
 }
 
@@ -55,7 +55,7 @@ This class loads document nodes and documents. Every node has a few locations:
 */
 pub struct DocumentContext {
   /**
-  Maps node retrieval urls to their documents. Every node has a location that is an identifier. Thi
+  Maps node retrieval locations to their documents. Every node has a location that is an identifier. Thi
   map maps that identifier to the identifier of a document.
   */
   node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
@@ -121,9 +121,9 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::draft_2020_12::Document::new(
-            configuration.retrieval_url,
-            configuration.given_url,
-            configuration.antecedent_url,
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
           .unwrap(),
@@ -147,9 +147,9 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::draft_04::Document::new(
-            configuration.retrieval_url,
-            configuration.given_url,
-            configuration.antecedent_url,
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
           .unwrap(),
@@ -188,14 +188,14 @@ impl DocumentContext {
     Ok(())
   }
 
-  pub fn resolve_document_retrieval_url(
+  pub fn resolve_document_retrieval_location(
     &self,
-    document_retrieval_url: &NodeLocation,
+    document_retrieval_location: &NodeLocation,
   ) -> Option<NodeLocation> {
     self
       .document_resolved
       .borrow()
-      .get(document_retrieval_url)
+      .get(document_retrieval_location)
       .cloned()
   }
 
@@ -222,7 +222,7 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
     given_location: &NodeLocation,
     antecedent_location: Option<&NodeLocation>,
-    default_schema_uri: &str,
+    default_meta_schema_id: &str,
   ) -> Result<(), Error> {
     if !retrieval_location.is_root() {
       Err(Error::NotARoot)?
@@ -234,7 +234,7 @@ impl DocumentContext {
         retrieval_location,
         given_location,
         antecedent_location,
-        default_schema_uri,
+        default_meta_schema_id,
         &mut queue,
       )
       .await?;
@@ -338,7 +338,7 @@ impl DocumentContext {
 
   /**
   the retrieval location is the location of the document node. The document node may be
-  a part of a bigger document, if this is the case then it's retrieval url is not
+  a part of a bigger document, if this is the case then it's retrieval location is not
   root.
   */
   fn fill_node_cache(
@@ -350,17 +350,17 @@ impl DocumentContext {
     we add every node in the tree to the cache
     */
     for (pointer, node) in read_json_node(&[], document_node) {
-      let mut node_url = retrieval_location.clone();
+      let mut node_location = retrieval_location.clone();
       /*
-      The retrieval url a unique, physical location where we can retrieve this node. The physical
-      location of all nodes in the documents can be derived from the pointer and the retrieval_url
-      of the document. It is possible that the retrieval url of the document is not root (has
+      The retrieval location a unique, physical location where we can retrieve this node. The physical
+      location of all nodes in the documents can be derived from the pointer and the retrieval_location
+      of the document. It is possible that the retrieval location of the document is not root (has
       a hash). That is ok, then the pointer to the node is appended to the pointer of the document
       */
-      node_url.push_pointer(pointer);
+      node_location.push_pointer(pointer);
 
       let mut node_cache = self.node_cache.borrow_mut();
-      if let Some(node_previous) = node_cache.get(&node_url) {
+      if let Some(node_previous) = node_cache.get(&node_location) {
         /*
         If a node is already in the cache we won't override. We assume that this is the same node
         as it has the same identifier. This might happen if we load an embedded document first
@@ -370,7 +370,7 @@ impl DocumentContext {
           Err(Error::NotTheSame)?
         }
       } else {
-        node_cache.insert(node_url, node);
+        node_cache.insert(node_location, node);
       }
     }
 
@@ -384,13 +384,19 @@ impl DocumentContext {
     /*
     This here will drain the queue.
     */
-    while let Some((retrieval_url, given_url, antecedent_url, default_schema_uri)) = queue.pop() {
+    while let Some((
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      default_meta_schema_id,
+    )) = queue.pop()
+    {
       self
         .load_from_cache_with_queue(
-          &retrieval_url,
-          &given_url,
-          antecedent_url.as_ref(),
-          &default_schema_uri,
+          &retrieval_location,
+          &given_location,
+          antecedent_location.as_ref(),
+          &default_meta_schema_id,
           queue,
         )
         .await?;
@@ -433,9 +439,9 @@ impl DocumentContext {
       factory(
         Rc::downgrade(self),
         DocumentConfiguration {
-          retrieval_url: retrieval_location.clone(),
-          given_url: given_location.clone(),
-          antecedent_url: antecedent_location.cloned(),
+          retrieval_location: retrieval_location.clone(),
+          given_location: given_location.clone(),
+          antecedent_location: antecedent_location.cloned(),
           document_node: node,
         },
       )
@@ -460,7 +466,7 @@ impl DocumentContext {
       Err(Error::Conflict)?;
     }
 
-    // Map node urls to this document
+    // Map node locations to this document
     for node_location in document.get_node_locations() {
       /*
       Inserts all node locations that belong to this document. We only expect locations

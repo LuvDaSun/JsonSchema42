@@ -54,7 +54,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     .unwrap();
 
   let root_url = context
-    .resolve_document_retrieval_url(&schema_location)
+    .resolve_document_retrieval_location(&schema_location)
     .unwrap();
 
   let intermediate_document = context.get_intermediate_document();
