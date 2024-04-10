@@ -34,20 +34,18 @@ pub async fn fetch_file_hosted(location: &str) -> Result<String, Error> {
 
 #[cfg(not(target_os = "unknown"))]
 pub async fn fetch_file(location: &str) -> Result<String, Error> {
-  todo!()
-  // use async_std::{fs::File, io::ReadExt};
+  use async_std::fs::File;
+  use async_std::io::ReadExt;
 
-  // if location.starts_with("http://") || location.starts_with("https://") {
-  //   let response = reqwest::get(location).await?.error_for_status()?;
-  //   let data = response.text().await?;
-  //   Ok(data)
-  // } else {
-  //   let mut file = File::open(location).await?;
-  //   let metadata = file.metadata().await?;
-  //   let mut data = String::with_capacity(metadata.len() as usize);
-
-  //   file.read_to_string(&mut data).await?;
-
-  //   Ok(data)
-  // }
+  if location.starts_with("http://") || location.starts_with("https://") {
+    let mut response = surf::get(location).await?;
+    let data = response.body_string().await?;
+    Ok(data)
+  } else {
+    let mut file = File::open(location).await?;
+    let metadata = file.metadata().await?;
+    let mut data = String::with_capacity(metadata.len() as usize);
+    file.read_to_string(&mut data).await?;
+    Ok(data)
+  }
 }

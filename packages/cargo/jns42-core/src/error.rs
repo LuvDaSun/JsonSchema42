@@ -1,5 +1,5 @@
 use crate::utils::node_location::ParseError;
-use std::{ffi::NulError, fmt::Display, str::Utf8Error};
+use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(usize)]
@@ -10,7 +10,7 @@ pub enum Error {
   NotFound,
   ParseLocationFailed,
   HttpError,
-  FileSystemError,
+  IoError,
   NulMissing,
   Utf8Error,
   InvalidJson,
@@ -29,7 +29,7 @@ impl Display for Error {
       Self::NotFound => write!(f, "NotFound"),
       Self::ParseLocationFailed => write!(f, "ParseLocationFailed"),
       Self::HttpError => write!(f, "HttpError"),
-      Self::FileSystemError => write!(f, "FileSystemError"),
+      Self::IoError => write!(f, "IoError"),
       Self::NulMissing => write!(f, "NulMissing"),
       Self::Utf8Error => write!(f, "Utf8Error"),
       Self::InvalidJson => write!(f, "InvalidJson"),
@@ -49,14 +49,14 @@ impl From<ParseError> for Error {
   }
 }
 
-impl From<NulError> for Error {
-  fn from(_value: NulError) -> Self {
+impl From<std::ffi::NulError> for Error {
+  fn from(_value: std::ffi::NulError) -> Self {
     Self::NulMissing
   }
 }
 
-impl From<Utf8Error> for Error {
-  fn from(_value: Utf8Error) -> Self {
+impl From<std::str::Utf8Error> for Error {
+  fn from(_value: std::str::Utf8Error) -> Self {
     Self::Utf8Error
   }
 }
@@ -67,14 +67,15 @@ impl From<serde_json::Error> for Error {
   }
 }
 
-// impl From<reqwest::Error> for Error {
-//   fn from(_value: reqwest::Error) -> Self {
-//     Self::HttpError
-//   }
-// }
+impl From<std::io::Error> for Error {
+  fn from(_value: std::io::Error) -> Self {
+    Self::IoError
+  }
+}
 
-// impl From<async_std::io::Error> for Error {
-//   fn from(_value: async_std::io::Error) -> Self {
-//     Self::FileSystemError
-//   }
-// }
+#[cfg(not(target_os = "unknown"))]
+impl From<surf::Error> for Error {
+  fn from(_value: surf::Error) -> Self {
+    Self::HttpError
+  }
+}

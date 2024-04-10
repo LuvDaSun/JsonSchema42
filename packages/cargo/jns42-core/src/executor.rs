@@ -48,28 +48,3 @@ pub fn spawn_and_callback(callback: Key, task: impl Future<Output = ()> + 'stati
     pool.run_until_stalled()
   });
 }
-
-/// Spawns a new task and waits for it to complete on the local executor.
-///
-/// This function takes a future representing a task, spawns it on the local executor,
-/// and then waits for the task to complete by running the executor. This is a blocking
-/// operation and should be used when it is necessary to wait for the task to finish before
-/// proceeding.
-///
-/// # Arguments
-///
-/// * `task` - A future that represents the task to be executed. The task must have a `'static`
-/// lifetime and return `()`.
-///
-/// # Panics
-///
-/// This function will panic if the task fails to spawn.
-///
-#[cfg(test)]
-pub fn spawn_and_wait(task: impl Future<Output = ()> + 'static) {
-  EXECUTOR.with_borrow_mut(|pool| {
-    let spawner = pool.spawner();
-    spawner.spawn_local(task).unwrap();
-    pool.run()
-  });
-}

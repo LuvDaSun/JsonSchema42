@@ -5,7 +5,7 @@ export enum ForeignErrorCode {
   NotFound,
   ParseLocationFailed,
   HttpError,
-  FileSystemError,
+  IoError,
   NulMissing,
   Utf8Error,
   InvalidJson,
@@ -27,8 +27,8 @@ function foreignCodeToString(code: ForeignErrorCode) {
       return "ParseLocationFailed";
     case ForeignErrorCode.HttpError:
       return "HttpError";
-    case ForeignErrorCode.FileSystemError:
-      return "FileSystemError";
+    case ForeignErrorCode.IoError:
+      return "IoError";
     case ForeignErrorCode.NulMissing:
       return "NulMissing";
     case ForeignErrorCode.Utf8Error:

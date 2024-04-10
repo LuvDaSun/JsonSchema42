@@ -25,6 +25,10 @@ urlencoding = "2.1.3"
 itertools = "0.12.1"
 futures = { version = "0.3.30" }
 
+[target.'cfg(not(target_os = "unknown"))'.dependencies]
+async-std = { version = "1.12.0", features = ["attributes"] }
+surf = "2.3.2"
+
 [lib]
 crate-type = ["rlib", "cdylib"]
 
