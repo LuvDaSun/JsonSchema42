@@ -1,6 +1,6 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
-import { CString } from "./c-string.js";
+import { Sentence } from "./sentence.js";
 import { withErrorReference } from "./with-error.js";
 
 export class Names extends ForeignObject {
@@ -8,39 +8,11 @@ export class Names extends ForeignObject {
     super(pointer, () => mainFfi.exports.names_drop(pointer));
   }
 
-  public toCamelCase(key: number) {
+  public getName(key: number) {
     const resultPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.names_to_camel_case(this.pointer, key, errorReferencePointer),
+      mainFfi.exports.names_get_name(this.pointer, key),
     );
-    using resultWrapper = new CString(resultPointer);
-    const result = resultWrapper.toString();
-    return result;
-  }
-
-  public toPascalCase(key: number) {
-    const resultPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.names_to_pascal_case(this.pointer, key, errorReferencePointer),
-    );
-    using resultWrapper = new CString(resultPointer);
-    const result = resultWrapper.toString();
-    return result;
-  }
-
-  public toSnakeCase(key: number) {
-    const resultPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.names_to_snake_case(this.pointer, key, errorReferencePointer),
-    );
-    using resultWrapper = new CString(resultPointer);
-    const result = resultWrapper.toString();
-    return result;
-  }
-
-  public toScreamingSnakeCase(key: number) {
-    const resultPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.names_to_screaming_snake_case(this.pointer, key, errorReferencePointer),
-    );
-    using resultWrapper = new CString(resultPointer);
-    const result = resultWrapper.toString();
-    return result;
+    using resultForeign = new Sentence(resultPointer);
+    return resultForeign;
   }
 }

@@ -12,19 +12,22 @@ test("names", () => {
   using names = namesBuilder.build();
 
   {
-    const actual = names.toSnakeCase(1);
+    using name = names.getName(1);
+    const actual = name.toSnakeCase();
     const expected = "cat_id";
     assert.equal(actual, expected);
   }
 
   {
-    const actual = names.toSnakeCase(2);
+    using name = names.getName(1);
+    const actual = name.toSnakeCase();
     const expected = "name";
     assert.equal(actual, expected);
   }
 
   {
-    const actual = names.toSnakeCase(3);
+    using name = names.getName(1);
+    const actual = name.toSnakeCase();
     const expected = "dog_id";
     assert.equal(actual, expected);
   }
@@ -40,19 +43,22 @@ test("names leak test", () => {
     using names = namesBuilder.build();
 
     {
-      const actual = names.toSnakeCase(1);
+      using name = names.getName(1);
+      const actual = name.toSnakeCase();
       const expected = "cat_id";
       assert.equal(actual, expected);
     }
 
     {
-      const actual = names.toSnakeCase(2);
+      using name = names.getName(2);
+      const actual = name.toSnakeCase();
       const expected = "name";
       assert.equal(actual, expected);
     }
 
     {
-      const actual = names.toSnakeCase(3);
+      using name = names.getName(3);
+      const actual = name.toSnakeCase();
       const expected = "dog_id";
       assert.equal(actual, expected);
     }

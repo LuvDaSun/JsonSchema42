@@ -7,7 +7,7 @@ extern "C" fn names_drop(names: *mut Names<usize>) {
 }
 
 #[no_mangle]
-extern "C" fn names_to_get_name(names: *const Names<usize>, key: usize) -> *mut Sentence {
+extern "C" fn names_get_name(names: *const Names<usize>, key: usize) -> *mut Sentence {
   let names = unsafe { &*names };
 
   let sentence = names.get_name(&key);

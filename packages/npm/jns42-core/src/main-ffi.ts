@@ -67,7 +67,7 @@ export interface MainExports extends ExportsBase {
   names_builder_build(names_builder: number): number;
 
   names_drop(names: number): void;
-  names_get_sentence(names: number, key: number): number;
+  names_get_name(names: number, key: number): number;
 
   schema_item_drop(schema_item: number): void;
   schema_item_new(): number;
