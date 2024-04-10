@@ -38,7 +38,8 @@ export class NamesBuilder extends ForeignObject {
   }
 
   public build() {
-    const pointer = mainFfi.exports.names_builder_build(this.pointer);
-    return new Names(pointer);
+    const namesPointer = mainFfi.exports.names_builder_build(this.pointer);
+    const namesForeign = new Names(namesPointer);
+    return namesForeign;
   }
 }

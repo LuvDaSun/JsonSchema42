@@ -5,7 +5,7 @@ import { withErrorReference } from "./with-error.js";
 
 export class Sentence extends ForeignObject {
   constructor(pointer: number) {
-    super(pointer, () => mainFfi.exports.node_location_drop(pointer));
+    super(pointer, () => mainFfi.exports.sentence_drop(pointer));
   }
 
   public static new(input: string) {

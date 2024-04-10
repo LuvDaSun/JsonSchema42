@@ -19,14 +19,14 @@ test("names", () => {
   }
 
   {
-    using name = names.getName(1);
+    using name = names.getName(2);
     const actual = name.toSnakeCase();
     const expected = "name";
     assert.equal(actual, expected);
   }
 
   {
-    using name = names.getName(1);
+    using name = names.getName(3);
     const actual = name.toSnakeCase();
     const expected = "dog_id";
     assert.equal(actual, expected);

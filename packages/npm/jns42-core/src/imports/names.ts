@@ -1,7 +1,6 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { Sentence } from "./sentence.js";
-import { withErrorReference } from "./with-error.js";
 
 export class Names extends ForeignObject {
   constructor(pointer: number) {
@@ -9,10 +8,9 @@ export class Names extends ForeignObject {
   }
 
   public getName(key: number) {
-    const resultPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.names_get_name(this.pointer, key),
-    );
-    using resultForeign = new Sentence(resultPointer);
-    return resultForeign;
+    const resultPointer = mainFfi.exports.names_get_name(this.pointer, key);
+    const sentenceForeign = new Sentence(resultPointer);
+    sentenceForeign.abandon();
+    return sentenceForeign;
   }
 }
