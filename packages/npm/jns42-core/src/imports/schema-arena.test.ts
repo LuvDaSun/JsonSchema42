@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import test from "node:test";
+import { normalizeObject } from "../utils/index.js";
 import { SchemaArena } from "./schema-arena.js";
 
 test("schema-arena", () => {
@@ -12,12 +13,12 @@ test("schema-arena", () => {
 
   for (let count = 0; count < 1000; count++) {
     const itemPrevious = schemaArena.replaceItem(count, { id: `#/${count}` });
-    assert.deepEqual(itemPrevious, {});
+    assert.deepEqual(normalizeObject(itemPrevious), {});
   }
 
   for (let count = 0; count < 1000; count++) {
     const item = schemaArena.getItem(count);
-    assert.deepEqual(item, { id: `#/${count}` });
+    assert.deepEqual(normalizeObject(item), { id: `#/${count}` });
   }
 
   assert.equal(1000, schemaArena.count());
