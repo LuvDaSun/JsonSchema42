@@ -1,4 +1,3 @@
-import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { banner, itt, mapIterable } from "../utils/index.js";
 
@@ -20,16 +19,14 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
-    const typeIdentifier = names.toSnakeCase(key);
-    const typeName = toPascalCase(typeIdentifier);
-    const validatorFunctionName = toCamelCase(`is ${typeIdentifier}`);
+    using typeName = names.getName(key);
 
     yield mapIterable(
       item.examples ?? [],
       (example) => itt`
-        test(${JSON.stringify(typeName)}, () => {
+        test(${JSON.stringify(typeName.toPascalCase())}, () => {
           const example = ${JSON.stringify(example)};
-          const valid = validators.${validatorFunctionName}(example);
+          const valid = validators.is${typeName.toPascalCase()}(example);
           assert.equal(valid, true);
         });
       `,

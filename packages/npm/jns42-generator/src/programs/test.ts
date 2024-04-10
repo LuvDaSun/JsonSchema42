@@ -1,5 +1,4 @@
 import * as core from "@jns42/core";
-import { toPascalCase } from "@jns42/core";
 import assert from "assert";
 import cp from "child_process";
 import fs from "node:fs";
@@ -85,7 +84,7 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  const defaultTypeName = toPascalCase(defaultName);
+  using defaultTypeName = core.Sentence.new(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);
@@ -114,7 +113,7 @@ async function main(configuration: MainConfiguration) {
 
       using specification = models.loadSpecification(intermediateDocument, {
         transformMaximumIterations,
-        defaultTypeName,
+        defaultTypeName: defaultTypeName.toPascalCase(),
       });
 
       generatePackage(intermediateDocument, specification, {

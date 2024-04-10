@@ -37,6 +37,8 @@ export interface MainExports extends ExportsBase {
   sentence_drop(sentence: number): void;
   sentence_new(input: number): number;
   sentence_clone(sentence: number): number;
+  sentence_join(sentence: number, sentence_other: number): number;
+
   sentence_to_camel_case(value: number, error_reference: number): number;
   sentence_to_pascal_case(value: number, error_reference: number): number;
   sentence_to_snake_case(value: number, error_reference: number): number;

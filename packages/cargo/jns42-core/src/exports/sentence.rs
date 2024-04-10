@@ -34,6 +34,20 @@ extern "C" fn sentence_clone(sentence: *const Sentence) -> *mut Sentence {
   Box::into_raw(sentence)
 }
 
+#[no_mangle]
+extern "C" fn sentence_join(
+  sentence: *const Sentence,
+  sentence_other: *const Sentence,
+) -> *mut Sentence {
+  let sentence = unsafe { &*sentence };
+  let sentence_other = unsafe { &*sentence_other };
+
+  let sentence_joined = sentence.join(sentence_other);
+  let sentence_joined = Box::new(sentence_joined);
+
+  Box::into_raw(sentence_joined)
+}
+
 /// get the sentence as camelCase
 #[no_mangle]
 extern "C" fn sentence_to_camel_case(

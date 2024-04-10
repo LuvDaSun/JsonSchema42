@@ -1,4 +1,3 @@
-import { toCamelCase, toPascalCase } from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
@@ -86,21 +85,19 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeIdentifier = names.toSnakeCase(itemKey);
-    const typeName = toPascalCase(typeIdentifier);
-    const functionName = toCamelCase(`is ${typeIdentifier}`);
+    using typeName = names.getName(itemKey);
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown): value is types.${typeName} {
+      export function is${typeName.toPascalCase()}(value: unknown): value is types.${typeName.toPascalCase()} {
         if(depth === 0) {
           resetErrors();
         }
   
         depth += 1;
         try{
-          return withType(${JSON.stringify(typeName)}, () => {
+          return withType(${JSON.stringify(typeName.toPascalCase())}, () => {
             ${statements};
           });
         }
@@ -123,9 +120,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         })(${valueExpression})
       `;
     } else {
-      const typeIdentifier = names.toSnakeCase(typeKey);
-      const functionName = toCamelCase(`is ${typeIdentifier}`);
-      yield itt`${functionName}(${valueExpression})`;
+      using typeName = names.getName(typeKey);
+      yield itt`is${typeName.toPascalCase()}(${valueExpression})`;
     }
   }
 

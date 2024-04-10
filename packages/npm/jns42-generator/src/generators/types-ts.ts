@@ -13,12 +13,12 @@ export function* generateTypesTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.toPascalCase(itemKey);
+    using typeName = names.getName(itemKey);
     const definition = generateTypeDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${typeName} = (${definition});
+      export type ${typeName.toPascalCase()} = (${definition});
     `;
   }
 
@@ -27,8 +27,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
     if (item.id == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      const typeName = names.toPascalCase(itemKey);
-      yield typeName;
+      using typeName = names.getName(itemKey);
+      yield typeName.toPascalCase();
     }
   }
 

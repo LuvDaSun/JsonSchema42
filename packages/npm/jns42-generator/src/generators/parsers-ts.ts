@@ -1,4 +1,3 @@
-import { toCamelCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
@@ -30,13 +29,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeIdentifier = names.toSnakeCase(itemKey);
-    const functionName = toCamelCase(`parse ${typeIdentifier}`);
+    using typeName = names.getName(itemKey);
     const definition = generateParserDefinition(itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
+      export function parse${typeName.toPascalCase()}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
         const configuration = {
           ...defaultParserGeneratorOptions,
           ...options,
@@ -55,9 +53,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
     if (item.id == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
-      const typeIdentifier = names.toSnakeCase(itemKey);
-      const functionName = toCamelCase(`parse ${typeIdentifier}`);
-      yield itt`${functionName}(${valueExpression}, configuration)`;
+      using typeName = names.getName(itemKey);
+      yield itt`parse${typeName.toPascalCase()}(${valueExpression}, configuration)`;
     }
   }
 

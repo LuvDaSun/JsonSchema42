@@ -19,6 +19,11 @@ export class Sentence extends ForeignObject {
     return new Sentence(pointer);
   }
 
+  public join(other: Sentence) {
+    const pointer = mainFfi.exports.sentence_join(this.pointer, other.pointer);
+    return new Sentence(pointer);
+  }
+
   public toCamelCase() {
     const resultPointer = withErrorReference((errorReferencePointer) =>
       mainFfi.exports.sentence_to_camel_case(this.pointer, errorReferencePointer),
