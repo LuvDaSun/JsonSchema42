@@ -1,7 +1,6 @@
+use super::with_error::with_error_reference;
 use crate::naming::{Names, NamesBuilder};
 use std::ffi::{c_char, CStr};
-
-use super::with_error::with_error_reference;
 
 /// Free NamesBuilder instance
 #[no_mangle]

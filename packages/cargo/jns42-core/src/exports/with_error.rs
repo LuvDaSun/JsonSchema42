@@ -1,6 +1,5 @@
-use futures::Future;
-
 use crate::error::Error;
+use futures::Future;
 
 pub fn with_error_reference<R, T>(error_reference: *mut usize, task: T) -> Option<R>
 where
