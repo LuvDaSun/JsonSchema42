@@ -25,6 +25,7 @@ words:
   - rlib
   - ryanluker
   - serde
+  - smol
   - snakecase
   - structs
   - tamasfe

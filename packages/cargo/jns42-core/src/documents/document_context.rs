@@ -518,23 +518,26 @@ impl DocumentContext {
 #[cfg(test)]
 mod tests {
   use super::*;
+  use crate::executor::spawn_and_wait;
 
-  #[async_std::test]
-  async fn test_load_empty_node() {
-    let mut document_context = DocumentContext::new();
-    document_context.register_well_known_factories().unwrap();
+  #[test]
+  fn test_load_empty_node() {
+    spawn_and_wait(async {
+      let mut document_context = DocumentContext::new();
+      document_context.register_well_known_factories().unwrap();
 
-    document_context
-      .load_from_node(
-        &"/schema.json#".parse().unwrap(),
-        &"/schema.json#".parse().unwrap(),
-        None,
-        serde_json::Value::Object(Default::default()),
-        documents::draft_2020_12::META_SCHEMA_ID,
-      )
-      .await
-      .unwrap();
+      document_context
+        .load_from_node(
+          &"/schema.json#".parse().unwrap(),
+          &"/schema.json#".parse().unwrap(),
+          None,
+          serde_json::Value::Object(Default::default()),
+          documents::draft_2020_12::META_SCHEMA_ID,
+        )
+        .await
+        .unwrap();
 
-    let _intermediate_document = document_context.get_intermediate_document();
+      let _intermediate_document = document_context.get_intermediate_document();
+    })
   }
 }

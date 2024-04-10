@@ -67,14 +67,14 @@ impl From<serde_json::Error> for Error {
   }
 }
 
-impl From<reqwest::Error> for Error {
-  fn from(_value: reqwest::Error) -> Self {
-    Self::HttpError
-  }
-}
+// impl From<reqwest::Error> for Error {
+//   fn from(_value: reqwest::Error) -> Self {
+//     Self::HttpError
+//   }
+// }
 
-impl From<async_std::io::Error> for Error {
-  fn from(_value: async_std::io::Error) -> Self {
-    Self::FileSystemError
-  }
-}
+// impl From<async_std::io::Error> for Error {
+//   fn from(_value: async_std::io::Error) -> Self {
+//     Self::FileSystemError
+//   }
+// }
