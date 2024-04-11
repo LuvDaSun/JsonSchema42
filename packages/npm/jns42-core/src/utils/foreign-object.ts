@@ -1,7 +1,7 @@
 import assert from "assert";
 
 // Initializes a FinalizationRegistry that calls the provided cleanup callback.
-const finalizationRegistry = new FinalizationRegistry<() => void>((drop) => drop());
+const finalizationRegistry = new FinalizationRegistry<(() => void) | undefined>((drop) => drop?.());
 
 /**
  * Represents an abstract class for foreign objects that require manual resource management.
@@ -27,7 +27,7 @@ export abstract class ForeignObject {
    */
   constructor(
     public readonly pointer: number,
-    private readonly drop: () => void,
+    private readonly drop?: () => void,
   ) {
     assert(pointer !== 0); // Ensure the pointer is valid.
 
@@ -41,6 +41,7 @@ export abstract class ForeignObject {
    */
   public abandon() {
     this.responsible = false;
+    finalizationRegistry.unregister(this.token); // Unregister from the finalization registry.
   }
 
   /**
@@ -58,9 +59,9 @@ export abstract class ForeignObject {
    */
   [Symbol.dispose]() {
     assert.equal(this.disposed, false); // Ensure the object has not already been disposed.
-    finalizationRegistry.unregister(this.token); // Unregister from the finalization registry.
     if (this.responsible) {
-      this.drop(); // Release resources if responsible.
+      finalizationRegistry.unregister(this.token); // Unregister from the finalization registry.
+      this.drop?.(); // Release resources if responsible.
     }
     this.disposed = true; // Mark the object as disposed.
   }
