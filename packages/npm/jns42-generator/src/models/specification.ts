@@ -29,7 +29,8 @@ export function loadSpecification(
   using namesBuilder = core.NamesBuilder.new();
   namesBuilder.setDefaultName(defaultTypeName);
 
-  for (let key = 0; key < typesArena.count(); key++) {
+  const count = typesArena.count();
+  for (let key = 0; key < count; key++) {
     const parts = typesArena.getNameParts(key);
     const path = parts.filter((part) => /^[a-zA-Z]/.test(part));
 
