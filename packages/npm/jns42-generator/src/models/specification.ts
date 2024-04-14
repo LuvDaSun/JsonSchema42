@@ -1,6 +1,5 @@
 import * as core from "@jns42/core";
 import * as schemaIntermediate from "@jns42/schema-intermediate";
-import assert from "assert";
 
 export interface Specification {
   typesArena: core.SchemaArena;
@@ -30,17 +29,11 @@ export function loadSpecification(
   using namesBuilder = core.NamesBuilder.new();
   namesBuilder.setDefaultName(defaultTypeName);
 
-  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+  for (let key = 0; key < typesArena.count(); key++) {
+    const parts = typesArena.getNameParts(key);
+    const path = parts.filter((part) => /^[a-zA-Z]/.test(part));
 
-    assert(nodeId != null);
-
-    using nodeLocation = core.NodeLocation.parse(nodeId);
-    const path = [...nodeLocation.getPath(), ...nodeLocation.getHash()].filter((part) =>
-      /^[a-zA-Z]/.test(part),
-    );
-
-    namesBuilder.add(itemKey, path);
+    namesBuilder.add(key, path);
   }
 
   const names = namesBuilder.build();

@@ -88,6 +88,18 @@ extern "C" fn schema_arena_get_item(
 }
 
 #[no_mangle]
+extern "C" fn schema_arena_get_name_parts(arena: *mut SchemaArena, key: usize) -> *mut Vec<String> {
+  let arena = unsafe { &mut *arena };
+  let parts = arena
+    .get_name_parts(key)
+    .map(|part| part.to_owned())
+    .collect();
+  let parts = Box::new(parts);
+
+  Box::into_raw(parts)
+}
+
+#[no_mangle]
 extern "C" fn schema_arena_transform(
   arena: *mut SchemaArena,
   transforms: *const Vec<SchemaTransform>,

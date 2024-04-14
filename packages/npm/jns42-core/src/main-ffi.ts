@@ -86,6 +86,7 @@ export interface MainExports extends ExportsBase {
     error_reference: number,
   ): number;
   schema_arena_get_item(schema_arena: number, key: number, error_reference: number): number;
+  schema_arena_get_name_parts(schema_arena: number, key: number): number;
   schema_arena_transform(schema_arena: number, vec: number): number;
 
   document_context_drop(document_context: number): void;
