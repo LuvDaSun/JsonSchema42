@@ -1,7 +1,4 @@
-import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
-import { CString } from "./c-string.js";
-import { VecString } from "./vec-string.js";
 
 /**
  * Location of a node. The location can be either a path or a url
@@ -10,84 +7,54 @@ import { VecString } from "./vec-string.js";
  */
 export class NodeLocation extends ForeignObject {
   constructor(pointer: number) {
-    super(pointer, () => mainFfi.exports.node_location_drop(pointer));
+    super(pointer);
   }
 
-  public static parse(input: string) {
-    using inputForeign = CString.fromString(input);
-    const pointer = mainFfi.exports.node_location_parse(inputForeign.pointer);
-    return new NodeLocation(pointer);
+  public static parse(input: string): NodeLocation {
+    throw "not implemented";
   }
 
-  public clone() {
-    const pointer = mainFfi.exports.node_location_clone(this.pointer);
-    return new NodeLocation(pointer);
+  public clone(): NodeLocation {
+    throw "not implemented";
   }
 
-  public join(other: NodeLocation) {
-    const pointer = mainFfi.exports.node_location_join(this.pointer, other.pointer);
-    return new NodeLocation(pointer);
+  public join(other: NodeLocation): NodeLocation {
+    throw "not implemented";
   }
 
-  public toString() {
-    const resultPointer = mainFfi.exports.node_location_to_string(this.pointer);
-    using resultForeign = new CString(resultPointer);
-    const result = resultForeign.toString();
-    return result;
+  public toString(): string {
+    throw "not implemented";
   }
 
-  public toFetchString() {
-    const resultPointer = mainFfi.exports.node_location_to_fetch_string(this.pointer);
-    using resultForeign = new CString(resultPointer);
-    const result = resultForeign.toString();
-    return result;
+  public toFetchString(): string {
+    throw "not implemented";
   }
 
-  public getPointer() {
-    const resultPointer = mainFfi.exports.node_location_get_pointer(this.pointer);
-    if (resultPointer === 0) {
-      return;
-    }
-    using resultForeign = new VecString(resultPointer);
-    const result = resultForeign.toArray();
-    return result;
+  public getPointer(): string[] {
+    throw "not implemented";
   }
 
-  public getAnchor() {
-    const resultPointer = mainFfi.exports.node_location_get_anchor(this.pointer);
-    if (resultPointer === 0) {
-      return;
-    }
-    using resultForeign = new CString(resultPointer);
-    const result = resultForeign.toString();
-    return result;
+  public getAnchor(): string | undefined {
+    throw "not implemented";
   }
 
-  public getPath() {
-    const resultPointer = mainFfi.exports.node_location_get_path(this.pointer);
-    using resultForeign = new VecString(resultPointer);
-    const result = resultForeign.toArray();
-    return result;
+  public getPath(): string[] | undefined {
+    throw "not implemented";
   }
 
-  public getHash() {
-    const resultPointer = mainFfi.exports.node_location_get_hash(this.pointer);
-    using resultForeign = new VecString(resultPointer);
-    const result = resultForeign.toArray();
-    return result;
+  public getHash(): string[] {
+    throw "not implemented";
   }
 
   public setPointer(pointer: string[]) {
-    using pointerForeign = VecString.fromArray(pointer);
-    mainFfi.exports.node_location_set_pointer(this.pointer, pointerForeign.pointer);
+    throw "not implemented";
   }
 
   public setAnchor(anchor: string) {
-    using anchorForeign = CString.fromString(anchor);
-    mainFfi.exports.node_location_set_anchor(this.pointer, anchorForeign.pointer);
+    throw "not implemented";
   }
 
   public setRoot() {
-    mainFfi.exports.node_location_set_root(this.pointer);
+    throw "not implemented";
   }
 }

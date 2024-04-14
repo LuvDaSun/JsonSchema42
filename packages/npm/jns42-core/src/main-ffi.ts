@@ -44,20 +44,6 @@ export interface MainExports extends ExportsBase {
   sentence_to_snake_case(value: number, error_reference: number): number;
   sentence_to_screaming_snake_case(value: number, error_reference: number): number;
 
-  node_location_drop(node_location: number): void;
-  node_location_clone(node_location: number): number;
-  node_location_parse(input: number): number;
-  node_location_join(node_location: number, other_node_location: number): number;
-  node_location_to_string(node_location: number): number;
-  node_location_to_fetch_string(node_location: number): number;
-  node_location_get_anchor(node_location: number): number;
-  node_location_get_pointer(node_location: number): number;
-  node_location_get_path(node_location: number): number;
-  node_location_get_hash(node_location: number): number;
-  node_location_set_anchor(node_location: number, anchor: number): void;
-  node_location_set_pointer(node_location: number, pointer: number): void;
-  node_location_set_root(node_location: number): void;
-
   names_builder_drop(names_builder: number): void;
   names_builder_new(): number;
   names_builder_add(names_builder: number, key: number, values: number): void;
