@@ -1,4 +1,5 @@
 use crate::{models::IntermediateNode, utils::node_location::NodeLocation};
+use std::collections::BTreeMap;
 
 pub struct EmbeddedDocument {
   pub retrieval_location: NodeLocation,
@@ -15,9 +16,7 @@ pub trait SchemaDocument {
   fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument>;
 
   fn get_document_location(&self) -> &NodeLocation;
-  fn get_node_locations(&self) -> Box<dyn Iterator<Item = NodeLocation> + '_>;
+  fn get_node_locations(&self) -> Vec<NodeLocation>;
 
-  fn get_intermediate_node_entries(
-    &self,
-  ) -> Box<dyn Iterator<Item = (NodeLocation, IntermediateNode)> + '_>;
+  fn get_intermediate_node_entries(&self) -> BTreeMap<NodeLocation, IntermediateNode>;
 }

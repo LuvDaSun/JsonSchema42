@@ -3,7 +3,7 @@ use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::error::Error;
 use crate::models::IntermediateNode;
 use crate::utils::node_location::NodeLocation;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 pub struct Document {
   // document_context: Weak<DocumentContext>,
@@ -103,12 +103,16 @@ impl SchemaDocument for Document {
     &self.document_location
   }
 
-  fn get_node_locations(&self) -> Box<dyn Iterator<Item = NodeLocation> + '_> {
-    Box::new(self.nodes.keys().map(|pointer| {
-      let mut node_location = self.document_location.clone();
-      node_location.push_pointer(pointer.clone());
-      node_location
-    }))
+  fn get_node_locations(&self) -> Vec<NodeLocation> {
+    self
+      .nodes
+      .keys()
+      .map(|pointer| {
+        let mut node_location = self.document_location.clone();
+        node_location.push_pointer(pointer.clone());
+        node_location
+      })
+      .collect()
   }
 
   fn get_referenced_documents(&self) -> &Vec<ReferencedDocument> {
@@ -119,80 +123,91 @@ impl SchemaDocument for Document {
     &self.embedded_documents
   }
 
-  fn get_intermediate_node_entries(
-    &self,
-  ) -> Box<dyn Iterator<Item = (NodeLocation, IntermediateNode)> + '_> {
-    Box::new(self.nodes.iter().map(|(pointer, node)| {
-      let mut location = self.get_document_location().clone();
-      location.push_pointer(pointer);
-      (
-        location.clone(),
-        IntermediateNode {
-          // meta
-          title: node.select_title().map(|value| value.to_string()),
-          description: node.select_description().map(|value| value.to_string()),
-          examples: node.select_examples().cloned(),
-          deprecated: node.select_deprecated(),
+  fn get_intermediate_node_entries(&self) -> BTreeMap<NodeLocation, IntermediateNode> {
+    self
+      .nodes
+      .iter()
+      .map(|(pointer, node)| {
+        let mut location = self.get_document_location().clone();
+        location.push_pointer(pointer);
+        (
+          location.clone(),
+          IntermediateNode {
+            // meta
+            title: node.select_title().map(|value| value.to_string()),
+            description: node.select_description().map(|value| value.to_string()),
+            examples: node.select_examples().cloned(),
+            deprecated: node.select_deprecated(),
 
-          // types
-          types: node.select_types(),
+            // types
+            types: node.select_types(),
 
-          // assertions
-          options: node.select_options(),
+            // assertions
+            options: node.select_options(),
 
-          minimum_inclusive: node.select_minimum_inclusive().cloned(),
-          minimum_exclusive: node.select_minimum_exclusive().cloned(),
-          maximum_inclusive: node.select_maximum_inclusive().cloned(),
-          maximum_exclusive: node.select_maximum_exclusive().cloned(),
-          multiple_of: node.select_multiple_of().cloned(),
-          minimum_length: node.select_minimum_length(),
-          maximum_length: node.select_maximum_length(),
-          value_pattern: node.select_value_pattern().map(|value| value.to_string()),
-          value_format: node.select_value_format().map(|value| value.to_string()),
-          maximum_items: node.select_maximum_items(),
-          minimum_items: node.select_minimum_items(),
-          unique_items: node.select_unique_items(),
-          minimum_properties: node.select_minimum_properties(),
-          maximum_properties: node.select_maximum_properties(),
-          required: node
-            .select_required()
-            .map(|value| value.iter().map(|value| value.to_string()).collect()),
+            minimum_inclusive: node.select_minimum_inclusive().cloned(),
+            minimum_exclusive: node.select_minimum_exclusive().cloned(),
+            maximum_inclusive: node.select_maximum_inclusive().cloned(),
+            maximum_exclusive: node.select_maximum_exclusive().cloned(),
+            multiple_of: node.select_multiple_of().cloned(),
+            minimum_length: node.select_minimum_length(),
+            maximum_length: node.select_maximum_length(),
+            value_pattern: node.select_value_pattern().map(|value| value.to_string()),
+            value_format: node.select_value_format().map(|value| value.to_string()),
+            maximum_items: node.select_maximum_items(),
+            minimum_items: node.select_minimum_items(),
+            unique_items: node.select_unique_items(),
+            minimum_properties: node.select_minimum_properties(),
+            maximum_properties: node.select_maximum_properties(),
+            required: node
+              .select_required()
+              .map(|value| value.iter().map(|value| value.to_string()).collect()),
 
-          reference: node.select_reference().map(|value| {
-            let reference_location = value.parse().unwrap();
-            location.join(&reference_location).to_string()
-          }),
+            reference: node.select_reference().map(|value| {
+              let reference_location = value.parse().unwrap();
+              location.join(&reference_location).to_string()
+            }),
 
-          // sub nodes
-          r#if: map_entry_location(&location, node.select_if_entry(pointer)),
-          then: map_entry_location(&location, node.select_then_entry(pointer)),
-          r#else: map_entry_location(&location, node.select_else_entry(pointer)),
-          not: map_entry_location(&location, node.select_not_entry(pointer)),
-          contains: map_entry_location(&location, node.select_contains_entry(pointer)),
-          array_items: map_entry_location(&location, node.select_array_items_entry(pointer)),
-          property_names: map_entry_location(&location, node.select_property_names_entry(pointer)),
-          map_properties: map_entry_location(&location, node.select_map_properties_entry(pointer)),
+            // sub nodes
+            r#if: map_entry_location(&location, node.select_if_entry(pointer)),
+            then: map_entry_location(&location, node.select_then_entry(pointer)),
+            r#else: map_entry_location(&location, node.select_else_entry(pointer)),
+            not: map_entry_location(&location, node.select_not_entry(pointer)),
+            contains: map_entry_location(&location, node.select_contains_entry(pointer)),
+            array_items: map_entry_location(&location, node.select_array_items_entry(pointer)),
+            property_names: map_entry_location(
+              &location,
+              node.select_property_names_entry(pointer),
+            ),
+            map_properties: map_entry_location(
+              &location,
+              node.select_map_properties_entry(pointer),
+            ),
 
-          all_of: map_entry_locations_vec(&location, node.select_all_of_entries(pointer)),
-          any_of: map_entry_locations_vec(&location, node.select_any_of_entries(pointer)),
-          one_of: map_entry_locations_vec(&location, node.select_one_of_entries(pointer)),
-          tuple_items: map_entry_locations_vec(&location, node.select_tuple_items_entries(pointer)),
+            all_of: map_entry_locations_vec(&location, node.select_all_of_entries(pointer)),
+            any_of: map_entry_locations_vec(&location, node.select_any_of_entries(pointer)),
+            one_of: map_entry_locations_vec(&location, node.select_one_of_entries(pointer)),
+            tuple_items: map_entry_locations_vec(
+              &location,
+              node.select_tuple_items_entries(pointer),
+            ),
 
-          dependent_schemas: map_entry_locations_map(
-            &location,
-            node.select_dependent_schemas_entries(pointer),
-          ),
-          object_properties: map_entry_locations_map(
-            &location,
-            node.select_object_properties_entries(pointer),
-          ),
-          pattern_properties: map_entry_locations_map(
-            &location,
-            node.select_pattern_properties_entries(pointer),
-          ),
-        },
-      )
-    }))
+            dependent_schemas: map_entry_locations_map(
+              &location,
+              node.select_dependent_schemas_entries(pointer),
+            ),
+            object_properties: map_entry_locations_map(
+              &location,
+              node.select_object_properties_entries(pointer),
+            ),
+            pattern_properties: map_entry_locations_map(
+              &location,
+              node.select_pattern_properties_entries(pointer),
+            ),
+          },
+        )
+      })
+      .collect()
   }
 }
 
