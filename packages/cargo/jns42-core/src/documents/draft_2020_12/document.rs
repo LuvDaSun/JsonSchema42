@@ -1,12 +1,13 @@
 use super::Node;
-use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
+use crate::documents::{DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::error::Error;
 use crate::models::IntermediateNode;
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeMap, HashMap};
+use std::rc::Weak;
 
 pub struct Document {
-  // document_context: Weak<DocumentContext>,
+  document_context: Weak<DocumentContext>,
   // given_location: NodeLocation,
   // antecedent_location: Option<NodeLocation>,
   document_location: NodeLocation,
@@ -21,7 +22,7 @@ pub struct Document {
 
 impl Document {
   pub fn new(
-    // document_context: Weak<DocumentContext>,
+    document_context: Weak<DocumentContext>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
@@ -86,7 +87,7 @@ impl Document {
     }
 
     Ok(Self {
-      // document_context,
+      document_context,
       // antecedent_location,
       // given_location,
       document_location,

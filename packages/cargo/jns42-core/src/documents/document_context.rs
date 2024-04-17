@@ -118,9 +118,10 @@ impl DocumentContext {
   pub fn register_well_known_factories(self: &mut Rc<Self>) -> Result<(), Error> {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
-      Box::new(|_context, configuration| {
+      Box::new(|context, configuration| {
         Rc::new(
           documents::draft_2020_12::Document::new(
+            context,
             configuration.retrieval_location,
             configuration.given_location,
             configuration.antecedent_location,
