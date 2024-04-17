@@ -440,12 +440,12 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".to_owned(), 0), ("b".to_owned(), 1)].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         required: Some(["b".to_owned()].into()),
         object_properties: Some([("b".to_owned(), 2), ("c".to_owned(), 3)].into()),
         ..Default::default()
@@ -479,12 +479,12 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".to_owned(), 0), ("b".to_owned(), 1)].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         required: Some(["b".to_owned()].into()),
         object_properties: Some([("b".to_owned(), 2), ("c".to_owned(), 3)].into()),
         ..Default::default()
@@ -501,7 +501,7 @@ mod tests {
       }, // 7
       SchemaItem {
         exact: Some(false),
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         required: Some(["b".to_owned()].into()),
         object_properties: Some(
           [
@@ -544,13 +544,13 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(0),
         map_properties: Some(1),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(2),
         map_properties: Some(3),
         ..Default::default()
@@ -584,13 +584,13 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(0),
         map_properties: Some(1),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(2),
         map_properties: Some(3),
         ..Default::default()
@@ -612,7 +612,7 @@ mod tests {
       }, // 8
       SchemaItem {
         exact: Some(false),
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(7),
         map_properties: Some(8),
         ..Default::default()

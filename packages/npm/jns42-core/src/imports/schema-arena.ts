@@ -2,6 +2,7 @@ import * as schemaIntermediate from "@jns42/schema-intermediate";
 import assert from "assert";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
+import { normalizeObject } from "../utils/index.js";
 import { CString } from "./c-string.js";
 import { SchemaItemValue, SchemaType } from "./schema-item.js";
 import { VecString } from "./vec-string.js";
@@ -137,7 +138,7 @@ export class SchemaArena extends ForeignObject {
 
       itemNew.types = normalizeTypes(schema.types) ?? implicitTypes[id];
 
-      arena.replaceItem(itemKey, itemNew);
+      arena.replaceItem(itemKey, normalizeObject(itemNew) as SchemaItemValue);
     }
 
     return arena;
@@ -233,17 +234,10 @@ function normalizeTypes(types?: schemaIntermediate.TypesItems[]): SchemaType[] |
 
   return types.map((type) => {
     switch (type) {
-      case "string":
-      case "number":
-      case "boolean":
-      case "never":
-      case "any":
-      case "null":
-      case "integer":
-      case "array":
-        return type;
       case "map":
         return "object" as const;
+      default:
+        return type;
     }
   });
 }

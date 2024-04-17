@@ -19,7 +19,7 @@ pub enum SchemaType {
   Number,
   String,
   Array,
-  Map,
+  Object,
 }
 
 impl SchemaType {
@@ -59,7 +59,7 @@ impl ToString for SchemaType {
       Self::Number => "number".to_string(),
       Self::String => "string".to_string(),
       Self::Array => "array".to_string(),
-      Self::Map => "object".to_string(),
+      Self::Object => "object".to_string(),
     }
   }
 }
@@ -75,7 +75,7 @@ impl From<&IntermediateType> for SchemaType {
       IntermediateType::Number => Self::Number,
       IntermediateType::String => Self::String,
       IntermediateType::Array => Self::Array,
-      IntermediateType::Object => Self::Map,
+      IntermediateType::Object => Self::Object,
     }
   }
 }
@@ -114,13 +114,6 @@ pub struct SchemaItem {
   pub reference: Option<SchemaKey>,
 
   #[serde(default)]
-  pub all_of: Option<BTreeSet<SchemaKey>>,
-  #[serde(default)]
-  pub any_of: Option<BTreeSet<SchemaKey>>,
-  #[serde(default)]
-  pub one_of: Option<BTreeSet<SchemaKey>>,
-
-  #[serde(default)]
   pub r#if: Option<SchemaKey>,
   #[serde(default)]
   pub then: Option<SchemaKey>,
@@ -139,6 +132,12 @@ pub struct SchemaItem {
   #[serde(default)]
   pub contains: Option<SchemaKey>,
 
+  #[serde(default)]
+  pub all_of: Option<BTreeSet<SchemaKey>>,
+  #[serde(default)]
+  pub any_of: Option<BTreeSet<SchemaKey>>,
+  #[serde(default)]
+  pub one_of: Option<BTreeSet<SchemaKey>>,
   #[serde(default)]
   pub tuple_items: Option<Vec<SchemaKey>>,
 

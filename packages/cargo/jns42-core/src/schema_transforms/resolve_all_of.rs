@@ -420,12 +420,12 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         required: Some(["b".into()].into()),
         object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
         ..Default::default()
@@ -459,18 +459,18 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         required: Some(["b".into()].into()),
         object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
         ..Default::default()
       }, // 5
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         required: Some(["b".into()].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 7), ("c".into(), 3)].into()),
         ..Default::default()
@@ -505,19 +505,19 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(0),
         map_properties: Some(1),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(2),
         map_properties: Some(3),
         ..Default::default()
       }, // 5
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         all_of: Some([4, 5].into()),
         ..Default::default()
       }, // 6
@@ -546,19 +546,19 @@ mod tests {
         ..Default::default()
       }, // 3
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(0),
         map_properties: Some(1),
         ..Default::default()
       }, // 4
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(2),
         map_properties: Some(3),
         ..Default::default()
       }, // 5
       SchemaItem {
-        types: Some([SchemaType::Map].into()),
+        types: Some([SchemaType::Object].into()),
         property_names: Some(7),
         map_properties: Some(8),
         ..Default::default()

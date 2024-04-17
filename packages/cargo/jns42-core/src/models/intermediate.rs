@@ -54,7 +54,7 @@ impl From<&SchemaType> for IntermediateType {
       SchemaType::Number => Self::Number,
       SchemaType::String => Self::String,
       SchemaType::Array => Self::Array,
-      SchemaType::Map => Self::Object,
+      SchemaType::Object => Self::Object,
     }
   }
 }
