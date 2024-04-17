@@ -135,7 +135,7 @@ export class SchemaArena extends ForeignObject {
               Object.entries(schema.patternProperties).map(([name, id]) => [name, idMap[id]]),
             );
 
-      itemNew.types = schema.types ?? implicitTypes[id];
+      itemNew.types = normalizeTypes(schema.types) ?? implicitTypes[id];
 
       arena.replaceItem(itemKey, itemNew);
     }
@@ -221,4 +221,29 @@ export class SchemaArena extends ForeignObject {
       yield this.getItem(key);
     }
   }
+}
+
+function normalizeTypes(types?: schemaIntermediate.TypesItems[]): SchemaType[] | undefined {
+  if (types == null) {
+    return;
+  }
+  if (types.length === 0) {
+    return;
+  }
+
+  return types.map((type) => {
+    switch (type) {
+      case "string":
+      case "number":
+      case "boolean":
+      case "never":
+      case "any":
+      case "null":
+      case "integer":
+      case "array":
+        return type;
+      case "map":
+        return "object" as const;
+    }
+  });
 }

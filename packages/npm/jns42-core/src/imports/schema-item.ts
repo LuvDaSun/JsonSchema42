@@ -28,7 +28,7 @@ export type SchemaType =
   | "number"
   | "string"
   | "array"
-  | "map";
+  | "object";
 
 /**
  * the entire SchemaItem, everything is optional!
