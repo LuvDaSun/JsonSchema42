@@ -14,7 +14,7 @@
           "--all-targets"
         ],
         "filter": {
-          "name": "${workspaceFolderBasename}",
+          "name": "jns42-generator",
           "kind": "lib"
         }
       },
@@ -34,7 +34,7 @@
           "${workspaceFolderBasename}"
         ],
         "filter": {
-          "name": "${workspaceFolderBasename}",
+          "name": "jns42-generator",
           "kind": "bin"
         }
       },
