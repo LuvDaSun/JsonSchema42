@@ -213,7 +213,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case "map": {
+            case "object": {
               yield itt`
                 ${valueExpression} !== null &&
                 typeof ${valueExpression} === "object" &&

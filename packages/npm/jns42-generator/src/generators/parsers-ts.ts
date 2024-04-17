@@ -287,7 +287,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
         }
 
-        case "map": {
+        case "object": {
           yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(

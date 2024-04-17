@@ -114,14 +114,14 @@ test("resolve-all-of object", () => {
     { types: ["string"] }, // 2
     { types: ["string"] }, // 3
     {
-      types: ["map"],
+      types: ["object"],
       objectProperties: {
         a: 0,
         b: 1,
       },
     }, // 4
     {
-      types: ["map"],
+      types: ["object"],
       required: ["b"],
       objectProperties: {
         b: 2,
@@ -142,14 +142,14 @@ test("resolve-all-of object", () => {
       { types: ["string"] }, // 2
       { types: ["string"] }, // 3
       {
-        types: ["map"],
+        types: ["object"],
         objectProperties: {
           a: 0,
           b: 1,
         },
       }, // 4
       {
-        types: ["map"],
+        types: ["object"],
         required: ["b"],
         objectProperties: {
           b: 2,
@@ -157,7 +157,7 @@ test("resolve-all-of object", () => {
         },
       }, // 5
       {
-        types: ["map"],
+        types: ["object"],
         required: ["b"],
         objectProperties: {
           a: 0,
@@ -176,8 +176,8 @@ test("resolve-all-of map", () => {
     { types: ["string"] }, // 1
     { types: ["string"] }, // 2
     { types: ["number"] }, // 3
-    { types: ["map"], propertyNames: 0, mapProperties: 1 }, // 4
-    { types: ["map"], propertyNames: 2, mapProperties: 3 }, // 5
+    { types: ["object"], propertyNames: 0, mapProperties: 1 }, // 4
+    { types: ["object"], propertyNames: 2, mapProperties: 3 }, // 5
     { allOf: [4, 5] }, // 6
   ]);
 
@@ -191,9 +191,9 @@ test("resolve-all-of map", () => {
       { types: ["string"] }, // 1
       { types: ["string"] }, // 2
       { types: ["number"] }, // 3
-      { types: ["map"], propertyNames: 0, mapProperties: 1 }, // 4
-      { types: ["map"], propertyNames: 2, mapProperties: 3 }, // 5
-      { types: ["map"], propertyNames: 7, mapProperties: 8 }, // 6
+      { types: ["object"], propertyNames: 0, mapProperties: 1 }, // 4
+      { types: ["object"], propertyNames: 2, mapProperties: 3 }, // 5
+      { types: ["object"], propertyNames: 7, mapProperties: 8 }, // 6
       { types: ["string"] }, // 7
       { types: ["never"] }, // 8
     ],

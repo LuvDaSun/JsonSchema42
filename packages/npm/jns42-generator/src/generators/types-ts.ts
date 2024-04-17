@@ -137,7 +137,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           }
         }
 
-        case "map": {
+        case "object": {
           yield itt`
           {
             ${generateInterfaceContent()}
