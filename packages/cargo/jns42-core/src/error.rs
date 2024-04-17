@@ -16,6 +16,7 @@ pub enum Error {
   InvalidJson,
   NotARoot,
   NotTheSame,
+  InvalidYaml,
 }
 
 impl std::error::Error for Error {}
@@ -35,6 +36,7 @@ impl Display for Error {
       Self::InvalidJson => write!(f, "InvalidJson"),
       Self::NotARoot => write!(f, "NotARoot"),
       Self::NotTheSame => write!(f, "NotTheSame"),
+      Self::InvalidYaml => write!(f, "InvalidYaml"),
     }
   }
   //
@@ -64,6 +66,12 @@ impl From<std::str::Utf8Error> for Error {
 impl From<serde_json::Error> for Error {
   fn from(_value: serde_json::Error) -> Self {
     Self::InvalidJson
+  }
+}
+
+impl From<serde_yaml::Error> for Error {
+  fn from(_value: serde_yaml::Error) -> Self {
+    Self::InvalidYaml
   }
 }
 

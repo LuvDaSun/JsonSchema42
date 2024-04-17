@@ -262,7 +262,7 @@ impl DocumentContext {
       */
       let fetch_location = retrieval_location.to_fetch_string();
       let data = (self.fetch_file)(fetch_location).await?;
-      let document_node = serde_json::from_str(&data)?;
+      let document_node = serde_yaml::from_str(&data)?;
 
       /*
       populate the cache with this document

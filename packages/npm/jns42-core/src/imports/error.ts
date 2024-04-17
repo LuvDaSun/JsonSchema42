@@ -11,6 +11,7 @@ export enum ForeignErrorCode {
   InvalidJson,
   NotARoot,
   NotTheSame,
+  InvalidYaml,
 }
 
 function foreignCodeToString(code: ForeignErrorCode) {
@@ -39,6 +40,8 @@ function foreignCodeToString(code: ForeignErrorCode) {
       return "NotARoot";
     case ForeignErrorCode.NotTheSame:
       return "NotTheSame";
+    case ForeignErrorCode.InvalidYaml:
+      return "InvalidYaml";
     default:
       return "";
   }
