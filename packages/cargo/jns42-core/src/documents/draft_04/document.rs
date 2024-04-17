@@ -46,10 +46,8 @@ impl Document {
 
       if let Some(node_reference) = node.select_reference() {
         let reference_location = &node_reference.parse()?;
-        let retrieval_location = retrieval_location.clone();
-        let given_location = document_location.clone();
-        retrieval_location.join(reference_location);
-        given_location.join(reference_location);
+        let retrieval_location = retrieval_location.join(reference_location);
+        let given_location = given_location.join(reference_location);
 
         referenced_documents.push(ReferencedDocument {
           retrieval_location,
@@ -60,10 +58,8 @@ impl Document {
       for (sub_pointer, sub_node) in node.select_sub_nodes(&node_pointer) {
         if let Some(node_id) = sub_node.select_id() {
           let id_location = &node_id.parse()?;
-          let retrieval_location = retrieval_location.clone();
-          let given_location = document_location.clone();
-          retrieval_location.join(id_location);
-          given_location.join(id_location);
+          let retrieval_location = retrieval_location.join(id_location);
+          let given_location = given_location.join(id_location);
 
           embedded_documents.push(EmbeddedDocument {
             retrieval_location,
