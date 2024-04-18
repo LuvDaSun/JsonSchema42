@@ -130,7 +130,7 @@ impl SchemaDocument for Document {
         (
           location.clone(),
           IntermediateNode {
-            id: Some(location.clone()),
+            id: Some(location.to_string()),
             name: None,
             exact: Some(true),
             parent: None,

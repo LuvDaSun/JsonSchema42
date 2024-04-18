@@ -20,9 +20,9 @@ pub struct IntermediateNode {
   #[serde(default)]
   pub primary: Option<bool>,
   #[serde(default)]
-  pub parent: Option<NodeLocation>,
+  pub parent: Option<String>,
   #[serde(default)]
-  pub id: Option<NodeLocation>,
+  pub id: Option<String>,
 
   // metadata
   #[serde(default)]
