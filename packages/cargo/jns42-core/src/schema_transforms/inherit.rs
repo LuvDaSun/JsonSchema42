@@ -366,8 +366,6 @@ pub mod reference {
 
   #[cfg(test)]
   mod tests {
-    use crate::models::SchemaType;
-
     use super::*;
 
     #[test]
