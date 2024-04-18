@@ -32,6 +32,3 @@ surf = "2.3.2"
 
 [lib]
 crate-type = ["rlib", "cdylib"]
-
-[profile.release]
-lto = true
