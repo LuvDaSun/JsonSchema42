@@ -1,7 +1,4 @@
-use super::{
-  intermediate::IntermediateSchema,
-  schema_item::{SchemaItem, SchemaType},
-};
+use super::{intermediate::IntermediateSchema, schema_item::SchemaItem, SchemaType};
 use crate::{
   error::Error,
   naming::{NamesBuilder, Sentence},
@@ -102,8 +99,13 @@ impl Specification {
         let types = schema
           .types
           .as_ref()
-          .and_then(|value| if value.is_empty() { None } else { Some(value) })
-          .map(|value| value.iter().map(|value| value.into()).collect())
+          .and_then(|value| {
+            if value.is_empty() {
+              None
+            } else {
+              Some(value.clone())
+            }
+          })
           .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
 
         let primary = if *id == root_id { Some(true) } else { None };

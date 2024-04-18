@@ -1,4 +1,4 @@
-use crate::models::IntermediateType;
+use crate::models::SchemaType;
 use std::iter::{empty, once};
 
 #[derive(Clone, Debug)]
@@ -14,13 +14,13 @@ impl From<serde_json::Value> for Node {
 core
 */
 impl Node {
-  pub fn select_types(&self) -> Option<Vec<IntermediateType>> {
+  pub fn select_types(&self) -> Option<Vec<SchemaType>> {
     match self.0.as_object()?.get("type")? {
-      serde_json::Value::String(value) => Some(vec![IntermediateType::parse(value)]),
+      serde_json::Value::String(value) => Some(vec![SchemaType::parse(value)]),
       serde_json::Value::Array(value) => Some(
         value
           .iter()
-          .filter_map(|value| value.as_str().map(IntermediateType::parse))
+          .filter_map(|value| value.as_str().map(SchemaType::parse))
           .collect(),
       ),
       _ => None,

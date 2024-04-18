@@ -10,55 +10,6 @@ pub struct IntermediateSchema {
   pub schemas: HashMap<NodeLocation, IntermediateNode>,
 }
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum IntermediateType {
-  Never,
-  Any,
-  Null,
-  Boolean,
-  Integer,
-  Number,
-  String,
-  Array,
-  Object,
-}
-
-impl IntermediateType {
-  pub fn parse(input: &str) -> Self {
-    match input {
-      "never" => Self::Never,
-      "any" => Self::Any,
-      "null" => Self::Null,
-      "boolean" => Self::Boolean,
-      "integer" => Self::Integer,
-      "number" => Self::Number,
-      "string" => Self::String,
-      "array" => Self::Array,
-      "object" => Self::Object,
-      _ => {
-        unreachable!();
-      }
-    }
-  }
-}
-
-impl From<&SchemaType> for IntermediateType {
-  fn from(value: &SchemaType) -> Self {
-    match value {
-      SchemaType::Never => Self::Never,
-      SchemaType::Any => Self::Any,
-      SchemaType::Null => Self::Null,
-      SchemaType::Boolean => Self::Boolean,
-      SchemaType::Integer => Self::Integer,
-      SchemaType::Number => Self::Number,
-      SchemaType::String => Self::String,
-      SchemaType::Array => Self::Array,
-      SchemaType::Object => Self::Object,
-    }
-  }
-}
-
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct IntermediateNode {
   // metadata
@@ -73,7 +24,7 @@ pub struct IntermediateNode {
 
   // types
   #[serde(default)]
-  pub types: Option<Vec<IntermediateType>>,
+  pub types: Option<Vec<SchemaType>>,
 
   // assertions
   #[serde(default)]
