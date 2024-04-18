@@ -109,12 +109,12 @@ mod tests {
   use itertools::Itertools;
 
   fn run_test(
-    input: impl IntoIterator<Item = SchemaItem>,
+    initial: impl IntoIterator<Item = SchemaItem>,
     expected: impl IntoIterator<Item = SchemaItem>,
     transforms: impl IntoIterator<Item = SchemaTransform>,
   ) {
     let expected: Vec<_> = expected.into_iter().collect();
-    let arena_input = SchemaArena::from_iter(input);
+    let arena_input = SchemaArena::from_iter(initial);
     let transforms: Vec<_> = transforms.into_iter().collect();
 
     // the order of transforms should not matter! we test that here
@@ -137,7 +137,6 @@ mod tests {
 
   #[test]
   fn test_transform_1() {
-    // some allof related transforms
     let transforms = [
       SchemaTransform::FLATTEN_ALL_OF,
       SchemaTransform::INHERIT_ALL_OF,
@@ -147,7 +146,7 @@ mod tests {
       SchemaTransform::UNALIAS,
     ];
 
-    let input = [
+    let initial = [
       SchemaItem {
         types: Some([SchemaType::String].into()),
         ..Default::default()
@@ -189,6 +188,6 @@ mod tests {
       }, // 4
     ];
 
-    run_test(input, expected, transforms);
+    run_test(initial, expected, transforms);
   }
 }
