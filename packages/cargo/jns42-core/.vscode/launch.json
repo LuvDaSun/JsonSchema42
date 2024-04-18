@@ -13,10 +13,15 @@
           "--package",
           "${workspaceFolderBasename}",
           "--all-targets"
-        ]
+        ],
+        "env": {
+          "RUSTFLAGS": "-C instrument-coverage"
+        }
       },
-      "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "LLVM_PROFILE_FILE": "${workspaceFolder}/coverage/default.profraw"
+      }
     }
   ]
 }
