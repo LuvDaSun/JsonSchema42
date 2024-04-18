@@ -40,14 +40,19 @@ impl Node {
   }
 
   pub fn select_types(&self) -> Option<Vec<SchemaType>> {
-    match self.0.as_object()?.get("type")? {
-      serde_json::Value::String(value) => Some(vec![SchemaType::parse(value)]),
-      serde_json::Value::Array(value) => Some(
-        value
-          .iter()
-          .filter_map(|value| value.as_str().map(SchemaType::parse))
-          .collect(),
-      ),
+    match &self.0 {
+      serde_json::Value::Bool(true) => Some(vec![SchemaType::Any]),
+      serde_json::Value::Bool(false) => Some(vec![SchemaType::Never]),
+      serde_json::Value::Object(value) => match value.get("type")? {
+        serde_json::Value::String(value) => Some(vec![SchemaType::parse(value)]),
+        serde_json::Value::Array(value) => Some(
+          value
+            .iter()
+            .filter_map(|value| value.as_str().map(SchemaType::parse))
+            .collect(),
+        ),
+        _ => None,
+      },
       _ => None,
     }
   }
