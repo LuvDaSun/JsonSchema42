@@ -33,7 +33,7 @@
       "type": "process",
       "command": "grcov",
       "args": [
-        ".",
+        "${workspaceFolder}/coverage/default.profraw",
         "--source-dir",
         "${workspaceFolder}/src",
         "--binary-path",
