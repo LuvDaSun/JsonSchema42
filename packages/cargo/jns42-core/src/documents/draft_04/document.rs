@@ -3,7 +3,7 @@ use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::error::Error;
 use crate::models::IntermediateNode;
 use crate::utils::node_location::NodeLocation;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 pub struct Document {
   document_location: NodeLocation,
@@ -120,7 +120,7 @@ impl SchemaDocument for Document {
         (
           location.clone(),
           IntermediateNode {
-            id: Some(location.to_string()),
+            id: Some(location.clone()),
             name: None,
             exact: Some(true),
             parent: None,
@@ -198,9 +198,9 @@ impl SchemaDocument for Document {
               node.select_map_properties_entry(pointer),
             ),
 
-            all_of: map_entry_locations_vec(&location, node.select_all_of_entries(pointer)),
-            any_of: map_entry_locations_vec(&location, node.select_any_of_entries(pointer)),
-            one_of: map_entry_locations_vec(&location, node.select_one_of_entries(pointer)),
+            all_of: map_entry_locations_set(&location, node.select_all_of_entries(pointer)),
+            any_of: map_entry_locations_set(&location, node.select_any_of_entries(pointer)),
+            one_of: map_entry_locations_set(&location, node.select_one_of_entries(pointer)),
             tuple_items: map_entry_locations_vec(
               &location,
               node.select_tuple_items_entries(pointer),
@@ -240,6 +240,22 @@ fn map_entry_locations_vec(
   location: &NodeLocation,
   entries: Option<Vec<(Vec<String>, Node)>>,
 ) -> Option<Vec<String>> {
+  entries.map(|value| {
+    value
+      .iter()
+      .map(|(pointer, _node)| {
+        let mut sub_location = location.clone();
+        sub_location.set_pointer(pointer.clone());
+        sub_location.to_string()
+      })
+      .collect()
+  })
+}
+
+fn map_entry_locations_set(
+  location: &NodeLocation,
+  entries: Option<Vec<(Vec<String>, Node)>>,
+) -> Option<BTreeSet<String>> {
   entries.map(|value| {
     value
       .iter()
