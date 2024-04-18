@@ -59,7 +59,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
 
   let schema_nodes = context.get_schema_nodes();
 
-  let specification = Specification::new(root_url, schema_nodes).unwrap();
+  let specification = Specification::new(root_url, schema_nodes);
   generate_package(
     PackageConfiguration {
       package_name: package_name.as_str(),
