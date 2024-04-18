@@ -4,9 +4,7 @@ Because JsonSchema is the answer to everything!
 
 ## Installing
 
-First, install dependencies via `npm install`.
-
-Install `wasm-pack` via `cargo install wasm-pack`.
+Install dependencies via `npm install`.
 
 ## Building
 

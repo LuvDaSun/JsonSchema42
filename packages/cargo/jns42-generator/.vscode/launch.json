@@ -12,11 +12,7 @@
           "--package",
           "${workspaceFolderBasename}",
           "--all-targets"
-        ],
-        "filter": {
-          "name": "jns42-generator",
-          "kind": "lib"
-        }
+        ]
       },
       "args": [],
       "cwd": "${workspaceFolder}"
@@ -32,11 +28,7 @@
           "${workspaceFolderBasename}",
           "--package",
           "${workspaceFolderBasename}"
-        ],
-        "filter": {
-          "name": "jns42-generator",
-          "kind": "bin"
-        }
+        ]
       },
       "args": [
         "package",
