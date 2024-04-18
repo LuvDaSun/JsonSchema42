@@ -7,7 +7,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::rc::Weak;
 
 pub struct Document {
-  document_context: Weak<DocumentContext>,
+  _document_context: Weak<DocumentContext>,
   // given_location: NodeLocation,
   // antecedent_location: Option<NodeLocation>,
   document_location: NodeLocation,
@@ -83,7 +83,7 @@ impl Document {
     }
 
     Ok(Self {
-      document_context,
+      _document_context: document_context,
       // antecedent_location,
       // given_location,
       document_location,
