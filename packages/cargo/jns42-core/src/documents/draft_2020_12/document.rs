@@ -130,15 +130,15 @@ impl SchemaDocument for Document {
         (
           location.clone(),
           IntermediateNode {
-            id: Some(location.clone()),
+            location: Some(location.clone()),
             name: None,
             exact: Some(true),
             parent: None,
             primary: Some(true),
 
             // meta
-            title: node.select_title().map(|value| value.to_string()),
-            description: node.select_description().map(|value| value.to_string()),
+            title: node.select_title().map(|value| value.to_owned()),
+            description: node.select_description().map(|value| value.to_owned()),
             examples: node.select_examples().cloned(),
             deprecated: node.select_deprecated(),
 
@@ -155,8 +155,8 @@ impl SchemaDocument for Document {
             multiple_of: node.select_multiple_of().cloned(),
             minimum_length: node.select_minimum_length(),
             maximum_length: node.select_maximum_length(),
-            value_pattern: node.select_value_pattern().map(|value| value.to_string()),
-            value_format: node.select_value_format().map(|value| value.to_string()),
+            value_pattern: node.select_value_pattern().map(|value| value.to_owned()),
+            value_format: node.select_value_format().map(|value| value.to_owned()),
             maximum_items: node.select_maximum_items(),
             minimum_items: node.select_minimum_items(),
             unique_items: node.select_unique_items(),
@@ -164,11 +164,11 @@ impl SchemaDocument for Document {
             maximum_properties: node.select_maximum_properties(),
             required: node
               .select_required()
-              .map(|value| value.iter().map(|value| value.to_string()).collect()),
+              .map(|value| value.iter().map(|value| (*value).to_owned()).collect()),
 
             reference: node.select_reference().map(|value| {
               let reference_location = value.parse().unwrap();
-              location.join(&reference_location).to_string()
+              location.join(&reference_location)
             }),
 
             // sub nodes
@@ -217,25 +217,25 @@ impl SchemaDocument for Document {
 fn map_entry_location(
   location: &NodeLocation,
   entry: Option<(Vec<String>, Node)>,
-) -> Option<String> {
+) -> Option<NodeLocation> {
   entry.map(|(pointer, _node)| {
     let mut sub_location = location.clone();
     sub_location.set_pointer(pointer.clone());
-    sub_location.to_string()
+    sub_location
   })
 }
 
 fn map_entry_locations_vec(
   location: &NodeLocation,
   entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<Vec<String>> {
+) -> Option<Vec<NodeLocation>> {
   entries.map(|value| {
     value
       .iter()
       .map(|(pointer, _node)| {
         let mut sub_location = location.clone();
         sub_location.set_pointer(pointer.clone());
-        sub_location.to_string()
+        sub_location
       })
       .collect()
   })
@@ -244,14 +244,14 @@ fn map_entry_locations_vec(
 fn map_entry_locations_set(
   location: &NodeLocation,
   entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<BTreeSet<String>> {
+) -> Option<BTreeSet<NodeLocation>> {
   entries.map(|value| {
     value
       .iter()
       .map(|(pointer, _node)| {
         let mut sub_location = location.clone();
         sub_location.set_pointer(pointer.clone());
-        sub_location.to_string()
+        sub_location
       })
       .collect()
   })
@@ -260,17 +260,14 @@ fn map_entry_locations_set(
 fn map_entry_locations_map(
   location: &NodeLocation,
   entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<HashMap<String, String>> {
+) -> Option<HashMap<String, NodeLocation>> {
   entries.map(|value| {
     value
       .iter()
       .map(|(pointer, _node)| {
         let mut sub_location = location.clone();
         sub_location.set_pointer(pointer.clone());
-        (
-          pointer.last().unwrap().to_string(),
-          sub_location.to_string(),
-        )
+        (pointer.last().unwrap().to_owned(), sub_location)
       })
       .collect()
   })

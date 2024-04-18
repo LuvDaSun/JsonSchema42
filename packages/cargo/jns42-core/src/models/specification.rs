@@ -1,6 +1,5 @@
 use super::{schema_node::SchemaItem, IntermediateNode, SchemaType};
 use crate::{
-  error::Error,
   naming::{NamesBuilder, Sentence},
   schema_transforms,
   utils::{arena::Arena, node_location::NodeLocation},
@@ -23,7 +22,7 @@ impl Specification {
   pub fn new(
     root_id: NodeLocation,
     schema_nodes: BTreeMap<NodeLocation, IntermediateNode>,
-  ) -> Result<Self, Error> {
+  ) -> Self {
     let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
     let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
 
@@ -42,65 +41,56 @@ impl Specification {
 
         for child_id in &schema.all_of {
           for child_id in child_id {
-            let child_id = child_id.parse()?;
-            parents.insert(child_id, id.clone());
+            parents.insert(child_id.clone(), id.clone());
           }
         }
 
         for child_id in &schema.any_of {
           for child_id in child_id {
-            let child_id = child_id.parse()?;
-            parents.insert(child_id, id.clone());
+            parents.insert(child_id.clone(), id.clone());
           }
         }
 
         for child_id in &schema.one_of {
           for child_id in child_id {
-            let child_id = child_id.parse()?;
-            parents.insert(child_id, id.clone());
+            parents.insert(child_id.clone(), id.clone());
           }
         }
 
         if let Some(child_id) = &schema.r#if {
-          let child_id = child_id.parse()?;
-          parents.insert(child_id, id.clone());
+          parents.insert(child_id.clone(), id.clone());
         }
 
         if let Some(child_id) = &schema.then {
-          let child_id = child_id.parse()?;
-          parents.insert(child_id, id.clone());
+          parents.insert(child_id.clone(), id.clone());
         }
 
         if let Some(child_id) = &schema.r#else {
-          let child_id = child_id.parse()?;
-          parents.insert(child_id, id.clone());
+          parents.insert(child_id.clone(), id.clone());
         }
 
         if let Some(child_id) = &schema.not {
-          let child_id = child_id.parse()?;
-          parents.insert(child_id, id.clone());
+          parents.insert(child_id.clone(), id.clone());
         }
 
         if let Some(child_id) = &schema.property_names {
-          let child_id = child_id.parse()?;
-          parents.insert(child_id, id.clone());
+          parents.insert(child_id.clone(), id.clone());
         }
 
         if let Some(child_id) = &schema.property_names {
-          let child_id = child_id.parse()?;
-          implicit_types.insert(child_id, SchemaType::String);
+          implicit_types.insert(child_id.clone(), SchemaType::String);
         }
       }
 
       for (id, key) in &key_map {
         let mut schema = schema_nodes.get(id).unwrap().clone();
-        schema.parent = parents.get(id).map(|value| value.to_string());
+        schema.parent = parents.get(id).cloned();
         schema.types = schema
           .types
           .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
         schema.primary = if *id == root_id { Some(true) } else { None };
 
-        let item = schema.map_keys(|key| *key_map.get(&key.parse().unwrap()).unwrap());
+        let item = schema.map_keys(|key| *key_map.get(key).unwrap());
 
         arena.replace_item(*key, item);
       }
@@ -175,7 +165,7 @@ impl Specification {
       .chain(secondary_names.map(|(key, parts)| (key, (false, parts))))
       .collect();
 
-    Ok(Self { arena, names })
+    Self { arena, names }
   }
 }
 

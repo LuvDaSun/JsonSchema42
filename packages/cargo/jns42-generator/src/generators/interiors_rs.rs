@@ -17,7 +17,7 @@ pub fn generate_file_token_stream(
       continue;
     }
 
-    if item.id.is_none() {
+    if item.location.is_none() {
       continue;
     };
 
@@ -37,7 +37,7 @@ fn generate_type_token_stream(
   let documentation: Vec<_> = [
     item.title.clone(),
     item.description.clone(),
-    item.id.as_ref().map(|id| id.to_string()),
+    item.location.as_ref().map(|id| id.to_string()),
   ]
   .into_iter()
   .flatten()

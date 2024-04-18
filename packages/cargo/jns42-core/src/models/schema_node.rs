@@ -1,12 +1,11 @@
 use super::SchemaType;
-use crate::error::Error;
 use crate::utils::merge::merge_option;
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};
 
-pub type IntermediateNode = SchemaNode<String>;
+pub type IntermediateNode = SchemaNode<NodeLocation>;
 pub type SchemaItem = SchemaNode<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
@@ -25,7 +24,7 @@ where
   #[serde(default)]
   pub parent: Option<K>,
   #[serde(default)]
-  pub id: Option<NodeLocation>,
+  pub location: Option<NodeLocation>,
 
   // metadata
   #[serde(default)]
@@ -234,7 +233,7 @@ where
       exact: merge_option!(exact, &|base, other| base & other),
       primary: self.primary,
       parent: self.parent.clone(),
-      id: self.id.clone(),
+      location: self.location.clone(),
 
       title: self.title.clone(),
       description: self.description.clone(),
@@ -413,7 +412,7 @@ where
 
       parent: map_single(&self.parent),
 
-      id: self.id.clone(),
+      location: self.location.clone(),
       title: self.title.clone(),
       description: self.description.clone(),
       examples: self.examples.clone(),

@@ -93,7 +93,7 @@ impl Arena<SchemaItem> {
       })
       .take_while(|(item_previous, _item)| {
         if let Some(item_previous) = item_previous {
-          item_previous.id.is_none()
+          item_previous.location.is_none()
         } else {
           true
         }
@@ -102,7 +102,7 @@ impl Arena<SchemaItem> {
         empty()
           .chain(
             item
-              .id
+              .location
               .as_ref()
               .map(|id| empty().chain(id.get_path()).chain(id.get_hash())),
           )
