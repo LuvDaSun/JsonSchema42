@@ -101,3 +101,94 @@ impl From<&SchemaTransform> for BoxedSchemaTransform {
   }
   //
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use crate::models::{SchemaItem, SchemaType};
+  use itertools::Itertools;
+
+  fn run_test(
+    input: impl IntoIterator<Item = SchemaItem>,
+    expected: impl IntoIterator<Item = SchemaItem>,
+    transforms: impl IntoIterator<Item = SchemaTransform>,
+  ) {
+    let expected: Vec<_> = expected.into_iter().collect();
+    let arena_input = SchemaArena::from_iter(input);
+    let transforms: Vec<_> = transforms.into_iter().collect();
+
+    // the order of transforms should not matter! we test that here
+    for transforms in transforms.iter().permutations(transforms.len()) {
+      let mut arena = arena_input.clone();
+      let transforms = transforms.into_iter().cloned().collect();
+
+      let mut iteration = 0;
+      while arena.transform(&transforms) > 0 {
+        iteration += 1;
+        assert!(iteration < 100);
+        assert!(arena.count() < 100);
+      }
+
+      let actual: Vec<_> = arena.iter().cloned().collect();
+
+      assert_eq!(actual, expected)
+    }
+  }
+
+  #[test]
+  fn test_transform_1() {
+    // some allof related transforms
+    let transforms = [
+      SchemaTransform::FLATTEN_ALL_OF,
+      SchemaTransform::INHERIT_ALL_OF,
+      SchemaTransform::INHERIT_REFERENCE,
+      SchemaTransform::RESOLVE_ALL_OF,
+      SchemaTransform::RESOLVE_SINGLE_ALL_OF,
+      SchemaTransform::UNALIAS,
+    ];
+
+    let input = [
+      SchemaItem {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 0
+      SchemaItem {
+        types: Some([SchemaType::Object].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
+        ..Default::default()
+      }, // 1
+      SchemaItem {
+        object_properties: Some([("c".into(), 0)].into()),
+        reference: Some(1),
+        ..Default::default()
+      }, // 2
+    ];
+
+    let expected = [
+      SchemaItem {
+        types: Some([SchemaType::String].into()),
+        ..Default::default()
+      }, // 0
+      SchemaItem {
+        types: Some([SchemaType::Object].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
+        ..Default::default()
+      }, // 1
+      SchemaItem {
+        reference: Some(4),
+        ..Default::default()
+      }, // 2
+      SchemaItem {
+        object_properties: Some([("c".into(), 0)].into()),
+        ..Default::default()
+      }, // 3
+      SchemaItem {
+        types: Some([SchemaType::Object].into()),
+        object_properties: Some([("a".into(), 0), ("b".into(), 0), ("c".into(), 0)].into()),
+        ..Default::default()
+      }, // 4
+    ];
+
+    run_test(input, expected, transforms);
+  }
+}
