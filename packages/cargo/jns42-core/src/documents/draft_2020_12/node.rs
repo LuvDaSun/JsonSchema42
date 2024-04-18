@@ -157,19 +157,19 @@ impl Node {
   }
 
   pub fn select_minimum_inclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "minimumInclusive")
+    select_number(self, "minimum")
   }
 
   pub fn select_minimum_exclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "minimumExclusive")
+    select_number(self, "exclusiveMinimum")
   }
 
   pub fn select_maximum_inclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "maximumInclusive")
+    select_number(self, "maximum")
   }
 
   pub fn select_maximum_exclusive(&self) -> Option<&serde_json::Number> {
-    select_number(self, "maximumExclusive")
+    select_number(self, "exclusiveMaximum")
   }
 
   pub fn select_multiple_of(&self) -> Option<&serde_json::Number> {

@@ -254,14 +254,16 @@ impl DocumentContext {
       /*
       retrieve the document
       */
-      let fetch_location = retrieval_location.to_fetch_string();
+      let mut document_location = retrieval_location.clone();
+      document_location.set_root();
+      let fetch_location = document_location.to_fetch_string();
       let data = (self.fetch_file)(fetch_location).await?;
       let document_node = serde_yaml::from_str(&data)?;
 
       /*
       populate the cache with this document
       */
-      self.fill_node_cache(retrieval_location, document_node)?;
+      self.fill_node_cache(&document_location, document_node)?;
     }
 
     queue.push((

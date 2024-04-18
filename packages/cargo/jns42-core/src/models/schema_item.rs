@@ -1,5 +1,5 @@
 use super::SchemaType;
-use crate::utils::merge::merge_option;
+use crate::utils::merge::{merge_either, merge_option};
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
@@ -144,14 +144,8 @@ where
         <= 1
     );
 
-    assert_eq!(self.all_of, None);
-    assert_eq!(other.all_of, None);
-
-    assert_eq!(self.any_of, None);
-    assert_eq!(other.any_of, None);
-
-    assert_eq!(self.one_of, None);
-    assert_eq!(other.one_of, None);
+    assert_eq!(self.reference, None);
+    assert_eq!(other.reference, None);
 
     assert_eq!(self.r#if, None);
     assert_eq!(other.r#if, None);
@@ -161,6 +155,21 @@ where
 
     assert_eq!(self.r#else, None);
     assert_eq!(other.r#else, None);
+
+    assert_eq!(self.all_of, None);
+    assert_eq!(other.all_of, None);
+
+    assert_eq!(self.any_of, None);
+    assert_eq!(other.any_of, None);
+
+    assert_eq!(self.one_of, None);
+    assert_eq!(other.one_of, None);
+
+    macro_rules! merge_either {
+      ($member: ident) => {
+        merge_either(self.$member.as_ref(), other.$member.as_ref())
+      };
+    }
 
     macro_rules! merge_option {
       ($member: ident, $merger: expr) => {
@@ -230,7 +239,7 @@ where
 
     Self {
       name: self.name.clone(),
-      exact: merge_option!(exact, &|base, other| base & other),
+      exact: Some(false), // TODO
       primary: self.primary,
       parent: self.parent.clone(),
       location: self.location.clone(),
@@ -245,7 +254,7 @@ where
         .unwrap()
         .intersection(other.first().unwrap())]),
 
-      reference: None, // TODO
+      reference: None,
 
       all_of: None,
       any_of: None,
@@ -271,16 +280,16 @@ where
       options: union_merge!(options), // TODO
       required: union_merge!(required),
 
-      minimum_inclusive: None, // merge_option!(minimum_inclusive, |base, other| base.min(*other)),
-      minimum_exclusive: None, // merge_option!(minimum_exclusive, |base, other| base.min(*other)),
-      maximum_inclusive: None, // merge_option!(maximum_inclusive, |base, other| base.max(*other)),
-      maximum_exclusive: None, // merge_option!(maximum_exclusive, |base, other| base.max(*other)),
-      multiple_of: None,       // TODO
+      minimum_inclusive: merge_either!(minimum_inclusive), // merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: merge_either!(minimum_exclusive), // merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: merge_either!(maximum_inclusive), // merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: merge_either!(maximum_exclusive), // merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      multiple_of: merge_either!(multiple_of),             // TODO
 
       minimum_length: merge_option!(minimum_length, |base, other| *base.min(other)),
       maximum_length: merge_option!(maximum_length, |base, other| *base.max(other)),
-      value_pattern: None, // TODO
-      value_format: None,  // TODO
+      value_pattern: merge_either!(value_pattern),
+      value_format: merge_either!(value_format),
 
       minimum_items: merge_option!(minimum_items, |base, other| *base.min(other)),
       maximum_items: merge_option!(maximum_items, |base, other| *base.max(other)),

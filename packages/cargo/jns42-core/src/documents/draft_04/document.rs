@@ -138,34 +138,26 @@ impl SchemaDocument for Document {
             // assertions
             options: node.select_options(),
 
-            minimum_inclusive: node.select_is_minimum_exclusive().and_then(|value| {
-              if value {
-                None
-              } else {
-                node.select_minimum().cloned()
-              }
-            }),
-            minimum_exclusive: node.select_is_minimum_exclusive().and_then(|value| {
-              if value {
-                node.select_minimum().cloned()
-              } else {
-                None
-              }
-            }),
-            maximum_inclusive: node.select_is_maximum_exclusive().and_then(|value| {
-              if value {
-                None
-              } else {
-                node.select_maximum().cloned()
-              }
-            }),
-            maximum_exclusive: node.select_is_maximum_exclusive().and_then(|value| {
-              if value {
-                node.select_maximum().cloned()
-              } else {
-                None
-              }
-            }),
+            minimum_inclusive: if node.select_is_minimum_exclusive().unwrap_or_default() {
+              None
+            } else {
+              node.select_minimum().cloned()
+            },
+            minimum_exclusive: if node.select_is_minimum_exclusive().unwrap_or_default() {
+              node.select_minimum().cloned()
+            } else {
+              None
+            },
+            maximum_inclusive: if node.select_is_maximum_exclusive().unwrap_or_default() {
+              None
+            } else {
+              node.select_maximum().cloned()
+            },
+            maximum_exclusive: if node.select_is_maximum_exclusive().unwrap_or_default() {
+              node.select_maximum().cloned()
+            } else {
+              None
+            },
             multiple_of: node.select_multiple_of().cloned(),
             minimum_length: node.select_minimum_length(),
             maximum_length: node.select_maximum_length(),

@@ -17,6 +17,21 @@ where
   }
 }
 
+pub fn merge_either<'f, T>(base: Option<&'f T>, other: Option<&'f T>) -> Option<T>
+where
+  T: Clone + PartialEq,
+{
+  if base == other {
+    return base.cloned();
+  }
+
+  match (base, other) {
+    (None, None) => None,
+    (Some(value), None) | (None, Some(value)) => Some(value.clone()),
+    (Some(_), Some(_)) => None,
+  }
+}
+
 #[cfg(test)]
 mod tests {
   use super::merge_option;
