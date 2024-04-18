@@ -1,14 +1,18 @@
 import assert from "node:assert";
 import test from "node:test";
+import path from "path";
+import { projectRoot } from "../root.js";
 import { DocumentContext } from "./document-context.js";
 
 test("load from node", async () => {
   using documentContext = DocumentContext.new();
   documentContext.registerWellKnownFactories();
 
+  const location = "/string-or-boolean.json#";
+
   await documentContext.loadFromNode(
-    "/string-or-boolean.json#",
-    "/string-or-boolean.json#",
+    location,
+    location,
     undefined,
     {
       type: ["string", "boolean"],
@@ -18,5 +22,31 @@ test("load from node", async () => {
 
   const schemas = documentContext.getSchemaNodes();
 
-  assert(schemas["/string-or-boolean.json#"] != null);
+  assert(schemas[location] != null);
+});
+
+test("load from location", async () => {
+  using documentContext = DocumentContext.new();
+  documentContext.registerWellKnownFactories();
+
+  const location = path.join(
+    projectRoot,
+    "..",
+    "..",
+    "..",
+    "fixtures",
+    "specification",
+    "schema-draft_2020-12.json#",
+  );
+
+  await documentContext.loadFromLocation(
+    location,
+    location,
+    undefined,
+    "https://json-schema.org/draft/2020-12/schema",
+  );
+
+  const schemas = documentContext.getSchemaNodes();
+
+  assert(schemas[location] != null);
 });
