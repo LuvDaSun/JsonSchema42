@@ -1,4 +1,4 @@
-use super::{schema_item::SchemaItem, BoxedSchemaTransform, SchemaTransform};
+use super::{schema_node::SchemaItem, BoxedSchemaTransform, SchemaTransform};
 use crate::utils::arena::Arena;
 use std::iter::empty;
 

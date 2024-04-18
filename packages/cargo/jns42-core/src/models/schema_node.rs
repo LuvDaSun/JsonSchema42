@@ -1,7 +1,9 @@
 use super::SchemaType;
+use crate::error::Error;
 use crate::utils::merge::merge_option;
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeSet, HashSet};
+use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};
 
 pub type IntermediateNode = SchemaNode<String>;
@@ -117,11 +119,14 @@ where
   pub maximum_properties: Option<u64>,
 }
 
-impl SchemaItem {
+impl<K> SchemaNode<K>
+where
+  K: Ord + Clone + Debug,
+{
   pub fn intersection<'f>(
     &'f self,
     other: &'f Self,
-    merge_key: &impl Fn(&'f usize, &'f usize) -> usize,
+    merge_key: &impl Fn(&'f K, &'f K) -> K,
   ) -> Self {
     assert!(
       self
@@ -228,7 +233,7 @@ impl SchemaItem {
       name: self.name.clone(),
       exact: merge_option!(exact, &|base, other| base & other),
       primary: self.primary,
-      parent: self.parent,
+      parent: self.parent.clone(),
       id: self.id.clone(),
 
       title: self.title.clone(),
@@ -286,46 +291,13 @@ impl SchemaItem {
       maximum_properties: merge_option!(maximum_properties, |base, other| *base.max(other)),
     }
   }
+}
 
-  pub fn get_children(&self) -> impl Iterator<Item = usize> + '_ {
-    empty()
-      .chain(self.reference)
-      .chain(self.r#if)
-      .chain(self.then)
-      .chain(self.r#else)
-      .chain(self.not)
-      .chain(self.map_properties)
-      .chain(self.array_items)
-      .chain(self.property_names)
-      .chain(self.contains)
-      .chain(self.tuple_items.iter().flat_map(|v| v.iter().copied()))
-      .chain(self.all_of.iter().flat_map(|v| v.iter().copied()))
-      .chain(self.any_of.iter().flat_map(|v| v.iter().copied()))
-      .chain(self.one_of.iter().flat_map(|v| v.iter().copied()))
-      .chain(
-        self
-          .object_properties
-          .iter()
-          .flat_map(|v| v.values())
-          .copied(),
-      )
-      .chain(
-        self
-          .pattern_properties
-          .iter()
-          .flat_map(|v| v.values())
-          .copied(),
-      )
-      .chain(
-        self
-          .dependent_schemas
-          .iter()
-          .flat_map(|v| v.values())
-          .copied(),
-      )
-  }
-
-  pub fn get_alias_key(&self) -> Option<usize> {
+impl<K> SchemaNode<K>
+where
+  K: Ord + Copy,
+{
+  pub fn get_alias_key(&self) -> Option<K> {
     let is_alias_maybe = self.types.is_none()
       && self.all_of.is_none()
       && self.any_of.is_none()
@@ -364,5 +336,149 @@ impl SchemaItem {
     } else {
       None
     }
+  }
+
+  pub fn get_children(&self) -> impl Iterator<Item = K> + '_ {
+    empty()
+      .chain(self.reference)
+      .chain(self.r#if)
+      .chain(self.then)
+      .chain(self.r#else)
+      .chain(self.not)
+      .chain(self.map_properties)
+      .chain(self.array_items)
+      .chain(self.property_names)
+      .chain(self.contains)
+      .chain(self.tuple_items.iter().flat_map(|v| v.iter().copied()))
+      .chain(self.all_of.iter().flat_map(|v| v.iter().copied()))
+      .chain(self.any_of.iter().flat_map(|v| v.iter().copied()))
+      .chain(self.one_of.iter().flat_map(|v| v.iter().copied()))
+      .chain(
+        self
+          .object_properties
+          .iter()
+          .flat_map(|v| v.values())
+          .copied(),
+      )
+      .chain(
+        self
+          .pattern_properties
+          .iter()
+          .flat_map(|v| v.values())
+          .copied(),
+      )
+      .chain(
+        self
+          .dependent_schemas
+          .iter()
+          .flat_map(|v| v.values())
+          .copied(),
+      )
+  }
+}
+
+impl<K> SchemaNode<K>
+where
+  K: Ord,
+{
+  pub fn map_keys<K1>(
+    &self,
+    map_key: impl Fn(&K) -> Result<K1, Error>,
+  ) -> Result<SchemaNode<K1>, Error>
+  where
+    K1: Ord,
+  {
+    let map_single = |value: &Option<K>| value.as_ref().map(&map_key).transpose();
+    let map_vec = |value: &Option<Vec<K>>| {
+      value
+        .as_ref()
+        .map(|value| {
+          value
+            .iter()
+            .map(&map_key)
+            .collect::<Result<Vec<K1>, Error>>()
+        })
+        .transpose()
+    };
+    let map_set = |value: &Option<BTreeSet<K>>| {
+      value
+        .as_ref()
+        .map(|value| {
+          value
+            .iter()
+            .map(&map_key)
+            .collect::<Result<BTreeSet<K1>, Error>>()
+        })
+        .transpose()
+    };
+    let map_map = |value: &Option<HashMap<String, K>>| {
+      value
+        .as_ref()
+        .map(|value| {
+          value
+            .iter()
+            .map(|(key, value)| map_key(value).map(|value| (key.clone(), value)))
+            .collect::<Result<HashMap<String, K1>, Error>>()
+        })
+        .transpose()
+    };
+
+    let item = SchemaNode {
+      name: self.name.clone(),
+      exact: self.exact,
+      primary: self.primary,
+      types: self.types.clone(),
+
+      parent: map_single(&self.parent)?,
+
+      id: self.id.clone(),
+      title: self.title.clone(),
+      description: self.description.clone(),
+      examples: self.examples.clone(),
+      deprecated: self.deprecated,
+
+      options: self.options.clone(),
+
+      minimum_inclusive: self.minimum_inclusive.clone(),
+      minimum_exclusive: self.minimum_exclusive.clone(),
+      maximum_inclusive: self.maximum_inclusive.clone(),
+      maximum_exclusive: self.maximum_exclusive.clone(),
+      multiple_of: self.multiple_of.clone(),
+
+      minimum_length: self.minimum_length,
+      maximum_length: self.maximum_length,
+      value_pattern: self.value_pattern.clone(),
+      value_format: self.value_format.clone(),
+
+      maximum_items: self.maximum_items,
+      minimum_items: self.minimum_items,
+      unique_items: self.unique_items,
+
+      minimum_properties: self.minimum_properties,
+      maximum_properties: self.maximum_properties,
+      required: self.required.clone(),
+
+      reference: map_single(&self.reference)?,
+
+      contains: map_single(&self.contains)?,
+      property_names: map_single(&self.property_names)?,
+      map_properties: map_single(&self.map_properties)?,
+      array_items: map_single(&self.array_items)?,
+      r#if: map_single(&self.r#if)?,
+      then: map_single(&self.then)?,
+      r#else: map_single(&self.r#else)?,
+      not: map_single(&self.not)?,
+
+      tuple_items: map_vec(&self.tuple_items)?,
+      all_of: map_set(&self.all_of)?,
+      any_of: map_set(&self.any_of)?,
+      one_of: map_set(&self.one_of)?,
+
+      dependent_schemas: map_map(&self.dependent_schemas)?,
+      object_properties: map_map(&self.object_properties)?,
+      pattern_properties: map_map(&self.pattern_properties)?,
+    };
+
+    Ok(item)
   }
 }

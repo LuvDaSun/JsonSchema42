@@ -1,4 +1,4 @@
-use super::{schema_item::SchemaItem, IntermediateNode, SchemaType};
+use super::{schema_node::SchemaItem, IntermediateNode, SchemaType};
 use crate::{
   error::Error,
   naming::{NamesBuilder, Sentence},
