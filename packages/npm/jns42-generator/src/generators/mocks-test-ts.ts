@@ -30,7 +30,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       ${generateJsDocComments(item)}
       test(${JSON.stringify(typeName.toPascalCase())}, () => {
         const mock = mocks.mock${typeName.toPascalCase()}();
-        const valid = validators.validate${typeName.toPascalCase()}(mock);
+        const valid = validators.is${typeName.toPascalCase()}(mock);
         assert.equal(valid, true);
       });
     `;
