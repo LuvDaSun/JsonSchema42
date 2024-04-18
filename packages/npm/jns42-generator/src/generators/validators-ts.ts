@@ -79,7 +79,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of [...validatorsArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
@@ -113,7 +113,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     valueExpression: string,
   ): Iterable<NestedText> {
     const typeItem = validatorsArena.getItem(typeKey);
-    if (typeItem.id == null) {
+    if (typeItem.location == null) {
       yield itt`
         ((value: unknown) => {
             ${generateValidatorStatements(typeKey, "value")}

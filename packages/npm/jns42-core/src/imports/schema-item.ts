@@ -1,36 +1,16 @@
-import { mainFfi } from "../main-ffi.js";
-import { ForeignObject } from "../utils/foreign-object.js";
 import { SchemaType } from "./schema-type.js";
 
-export class SchemaItem extends ForeignObject {
-  constructor(pointer: number) {
-    super(pointer, () => mainFfi.exports.schema_item_drop(pointer));
-  }
+export type ArenaSchemaItemValue = SchemaItemValue<number>;
+export type IntermediateSchemaItemValue = SchemaItemValue<string>;
 
-  public static new() {
-    const pointer = mainFfi.exports.schema_item_new();
-    return new SchemaItem(pointer);
-  }
-}
-
-/**
- * Key for referencing other schemas
- */
-export type SchemaKey = number;
-/**
- * Type for the SchemaItem
- */
-
-/**
- * the entire SchemaItem, everything is optional!
- */
-export type SchemaItemValue = {
-  // is this model exactly the same as the previous, un-optimized version or is is just similar
-  exact?: boolean;
-  primary?: boolean;
+export type SchemaItemValue<K> = {
   name?: string;
+  exact?: boolean;
 
-  id?: string;
+  primary?: boolean;
+  parent?: K;
+  location?: string;
+
   title?: string;
   description?: string;
   examples?: any[];
@@ -38,27 +18,27 @@ export type SchemaItemValue = {
 
   types?: SchemaType[];
 
-  reference?: SchemaKey;
+  reference?: K;
 
-  if?: SchemaKey;
-  then?: SchemaKey;
-  else?: SchemaKey;
+  if?: K;
+  then?: K;
+  else?: K;
 
-  not?: SchemaKey;
+  not?: K;
 
-  mapProperties?: SchemaKey;
-  arrayItems?: SchemaKey;
-  propertyNames?: SchemaKey;
-  contains?: SchemaKey;
+  propertyNames?: K;
+  mapProperties?: K;
+  arrayItems?: K;
+  contains?: K;
 
-  oneOf?: SchemaKey[];
-  anyOf?: SchemaKey[];
-  allOf?: SchemaKey[];
-  tupleItems?: SchemaKey[];
+  oneOf?: K[];
+  anyOf?: K[];
+  allOf?: K[];
+  tupleItems?: K[];
 
-  objectProperties?: Record<string, SchemaKey>;
-  patternProperties?: Record<string, SchemaKey>;
-  dependentSchemas?: Record<string, SchemaKey>;
+  objectProperties?: Record<string, K>;
+  patternProperties?: Record<string, K>;
+  dependentSchemas?: Record<string, K>;
 
   options?: any[];
   required?: string[];

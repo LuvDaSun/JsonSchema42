@@ -1,22 +1,106 @@
-use super::{schema_node::ArenaSchemaNode, BoxedSchemaTransform, SchemaTransform};
-use crate::utils::arena::Arena;
-use std::iter::empty;
+use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
+use crate::{
+  documents::DocumentContext,
+  utils::{arena::Arena, node_location::NodeLocation},
+};
+use std::{
+  collections::HashMap,
+  iter::{empty, once},
+};
 
-pub type SchemaArena = Arena<ArenaSchemaNode>;
+pub type SchemaArena = Arena<ArenaSchemaItem>;
 
-impl Arena<ArenaSchemaNode> {
+impl Arena<ArenaSchemaItem> {
+  pub fn from_document_context(document_context: &DocumentContext) -> Self {
+    let schema_nodes = document_context.get_schema_nodes();
+    let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
+    let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
+
+    // first load schemas in the arena
+
+    let mut arena = Arena::new();
+    {
+      let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
+      for (id, schema) in &schema_nodes {
+        let item = ArenaSchemaItem {
+          ..Default::default()
+        };
+
+        let key = arena.add_item(item);
+        key_map.insert(id.clone(), key);
+
+        for child_id in &schema.all_of {
+          for child_id in child_id {
+            parents.insert(child_id.clone(), id.clone());
+          }
+        }
+
+        for child_id in &schema.any_of {
+          for child_id in child_id {
+            parents.insert(child_id.clone(), id.clone());
+          }
+        }
+
+        for child_id in &schema.one_of {
+          for child_id in child_id {
+            parents.insert(child_id.clone(), id.clone());
+          }
+        }
+
+        if let Some(child_id) = &schema.r#if {
+          parents.insert(child_id.clone(), id.clone());
+        }
+
+        if let Some(child_id) = &schema.then {
+          parents.insert(child_id.clone(), id.clone());
+        }
+
+        if let Some(child_id) = &schema.r#else {
+          parents.insert(child_id.clone(), id.clone());
+        }
+
+        if let Some(child_id) = &schema.not {
+          parents.insert(child_id.clone(), id.clone());
+        }
+
+        if let Some(child_id) = &schema.property_names {
+          parents.insert(child_id.clone(), id.clone());
+        }
+
+        if let Some(child_id) = &schema.property_names {
+          implicit_types.insert(child_id.clone(), SchemaType::String);
+        }
+      }
+
+      for (id, key) in &key_map {
+        let mut schema = schema_nodes.get(id).unwrap().clone();
+        schema.parent = parents.get(id).cloned();
+        schema.types = schema
+          .types
+          .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
+        // schema.primary = if *id == root_id { Some(true) } else { None };
+
+        let item = schema.map_keys(|key| *key_map.get(key).unwrap());
+
+        arena.replace_item(*key, item);
+      }
+
+      arena
+    }
+  }
+
   /// Resolves the final entry for a given schema key, following any alias chains.
   ///
   /// This method iteratively follows the alias chain for a given key until it reaches
   /// an item that does not have an alias. It returns both the resolved key and a reference
-  /// to the resolved `ArenaSchemaNode`.
+  /// to the resolved `ArenaSchemaItem`.
   ///
   /// # Parameters
   /// - `key`: The initial `usize` to resolve.
   ///
   /// # Returns
-  /// A tuple containing the resolved `usize` and a reference to the resolved `ArenaSchemaNode`.
-  pub fn resolve_entry(&self, key: usize) -> (usize, &ArenaSchemaNode) {
+  /// A tuple containing the resolved `usize` and a reference to the resolved `ArenaSchemaItem`.
+  pub fn resolve_entry(&self, key: usize) -> (usize, &ArenaSchemaItem) {
     let mut resolved_key = key;
     let mut resolved_item = self.get_item(resolved_key);
 
@@ -40,12 +124,12 @@ impl Arena<ArenaSchemaNode> {
   /// - `key`: The `usize` of the item whose ancestors are to be retrieved.
   ///
   /// # Returns
-  /// An iterator over tuples containing the `usize` and a reference to the `ArenaSchemaNode`
+  /// An iterator over tuples containing the `usize` and a reference to the `ArenaSchemaItem`
   /// for each ancestor, including the item itself.
   pub fn get_ancestors(
     &self,
     key: usize,
-  ) -> impl DoubleEndedIterator<Item = (usize, &ArenaSchemaNode)> {
+  ) -> impl DoubleEndedIterator<Item = (usize, &ArenaSchemaItem)> {
     let mut result = Vec::new();
 
     let mut key_maybe = Some(key);
@@ -129,7 +213,7 @@ impl Arena<ArenaSchemaNode> {
   /// # Returns
   /// The number of transformations applied.
   pub fn transform(&mut self, transforms: &Vec<SchemaTransform>) -> usize {
-    self.apply_transform(|arena: &mut Arena<ArenaSchemaNode>, key: usize| {
+    self.apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
       for transform in transforms {
         let transform: BoxedSchemaTransform = transform.into();
         transform(arena, key)

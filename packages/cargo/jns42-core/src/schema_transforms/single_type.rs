@@ -1,4 +1,4 @@
-use crate::models::{ArenaSchemaNode, SchemaArena};
+use crate::models::{ArenaSchemaItem, SchemaArena};
 use std::iter::once;
 
 /**
@@ -41,7 +41,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   match types.len() {
     0 => {
       // if types is empty then we should just set it to None
-      let item = ArenaSchemaNode {
+      let item = ArenaSchemaItem {
         types: None,
         ..item.clone()
       };
@@ -53,14 +53,14 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     _ => {
       // we will be creating a new schema with every type as an element in one_of
       let item = item.clone();
-      let item = ArenaSchemaNode {
+      let item = ArenaSchemaItem {
         types: None,
         one_of: Some(
           types
             .clone()
             .into_iter()
             .map(|r#type| {
-              arena.add_item(ArenaSchemaNode {
+              arena.add_item(ArenaSchemaItem {
                 parent: Some(key),
                 name: Some(r#type.to_string()),
                 types: Some(once(r#type).collect()),
@@ -85,7 +85,7 @@ mod tests {
   fn test_transform() {
     let mut arena = SchemaArena::new();
 
-    arena.add_item(ArenaSchemaNode {
+    arena.add_item(ArenaSchemaItem {
       types: Some(vec![SchemaType::String, SchemaType::Number]),
       ..Default::default()
     });
@@ -96,17 +96,17 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         one_of: Some([1, 2].into()),
         ..Default::default()
       },
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("string".to_string()),
         types: Some(vec![SchemaType::String]),
         ..Default::default()
       },
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("number".to_string()),
         types: Some(vec![SchemaType::Number]),

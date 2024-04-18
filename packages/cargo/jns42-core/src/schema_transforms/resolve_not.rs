@@ -1,4 +1,4 @@
-use crate::models::{ArenaSchemaNode, SchemaArena};
+use crate::models::{ArenaSchemaItem, SchemaArena};
 use std::collections::HashSet;
 
 /**
@@ -46,7 +46,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     .cloned()
     .collect();
 
-  let item_new = ArenaSchemaNode {
+  let item_new = ArenaSchemaItem {
     not: None,
     required: Some(required_new),
     ..item.clone()
@@ -63,12 +63,12 @@ mod tests {
   fn test_transform() {
     let mut arena = SchemaArena::new();
 
-    arena.add_item(ArenaSchemaNode {
+    arena.add_item(ArenaSchemaItem {
       required: Some(["a"].map(|value| value.to_string()).into()),
       ..Default::default()
     });
 
-    arena.add_item(ArenaSchemaNode {
+    arena.add_item(ArenaSchemaItem {
       required: Some(["a", "b"].map(|value| value.to_string()).into()),
       not: Some(0),
       ..Default::default()
@@ -80,11 +80,11 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         required: Some(["a"].map(|value| value.to_string()).into()),
         ..Default::default()
       },
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         required: Some(["b"].map(|value| value.to_string()).into()),
         ..Default::default()
       },

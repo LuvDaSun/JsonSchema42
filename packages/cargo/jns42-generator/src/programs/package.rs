@@ -53,13 +53,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     .await
     .unwrap();
 
-  let root_url = context
-    .resolve_document_retrieval_location(&schema_location)
-    .unwrap();
-
-  let schema_nodes = context.get_schema_nodes();
-
-  let specification = Specification::new(root_url, schema_nodes);
+  let specification = Specification::new(&context);
   generate_package(
     PackageConfiguration {
       package_name: package_name.as_str(),

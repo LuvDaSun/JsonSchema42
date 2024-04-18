@@ -101,10 +101,7 @@ export class DocumentContext extends ForeignObject {
 
   public getIntermediateDocument(): schemaIntermediate.SchemaJson {
     const documentPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.document_context_get_intermediate_document(
-        this.pointer,
-        errorReferencePointer,
-      ),
+      mainFfi.exports.document_context_get_schema_nodes(this.pointer, errorReferencePointer),
     );
     using documentForeign = new CString(documentPointer);
     const documentString = documentForeign.toString();

@@ -105,12 +105,12 @@ impl From<&SchemaTransform> for BoxedSchemaTransform {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{ArenaSchemaNode, SchemaType};
+  use crate::models::{ArenaSchemaItem, SchemaType};
   use itertools::Itertools;
 
   fn run_test(
-    initial: impl IntoIterator<Item = ArenaSchemaNode>,
-    expected: impl IntoIterator<Item = ArenaSchemaNode>,
+    initial: impl IntoIterator<Item = ArenaSchemaItem>,
+    expected: impl IntoIterator<Item = ArenaSchemaItem>,
     transforms: impl IntoIterator<Item = SchemaTransform>,
   ) {
     let expected: Vec<_> = expected.into_iter().collect();
@@ -147,16 +147,16 @@ mod tests {
     ];
 
     let initial = [
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 0
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
         ..Default::default()
       }, // 1
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         object_properties: Some([("c".into(), 0)].into()),
         reference: Some(1),
         ..Default::default()
@@ -164,24 +164,24 @@ mod tests {
     ];
 
     let expected = [
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 0
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
         ..Default::default()
       }, // 1
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         reference: Some(4),
         ..Default::default()
       }, // 2
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         object_properties: Some([("c".into(), 0)].into()),
         ..Default::default()
       }, // 3
-      ArenaSchemaNode {
+      ArenaSchemaItem {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 0), ("c".into(), 0)].into()),
         ..Default::default()

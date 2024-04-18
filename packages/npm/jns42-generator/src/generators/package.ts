@@ -1,4 +1,3 @@
-import * as schemaIntermediate from "@jns42/schema-intermediate";
 import fs from "node:fs";
 import path from "node:path";
 import * as models from "../models/index.js";
@@ -22,7 +21,6 @@ export interface PackageConfiguration {
 }
 
 export function generatePackage(
-  document: schemaIntermediate.SchemaJson,
   specification: models.Specification,
   configuration: PackageConfiguration,
 ) {
@@ -35,12 +33,6 @@ export function generatePackage(
   {
     const content = generatePackageJsonData(packageName, packageVersion);
     const filePath = path.join(packageDirectoryPath, "package.json");
-    fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
-  }
-
-  {
-    const content = document;
-    const filePath = path.join(packageDirectoryPath, "intermediate.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
   }
 

@@ -56,7 +56,6 @@
     "@jns42/oas-v3-1": "^0.16.2",
     "@jns42/schema-draft-04": "^0.16.2",
     "@jns42/schema-draft-2020-12": "^0.16.2",
-    "@jns42/schema-intermediate": "^0.16.2",
     "@jns42/schema-oas-v3-1": "^0.16.2",
     "@jns42/swagger-v2": "^0.16.2",
     "@types/node": "^20.12.4",

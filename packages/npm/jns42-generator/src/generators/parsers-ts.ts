@@ -23,7 +23,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
@@ -50,7 +50,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     valueExpression: string,
   ): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    if (item.id == null) {
+    if (item.location == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
       using typeName = names.getName(itemKey);

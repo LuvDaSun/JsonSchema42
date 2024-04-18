@@ -1,7 +1,7 @@
 use super::schema_document::SchemaDocument;
 use crate::documents::{self, discover_meta_schema};
 use crate::error::Error;
-use crate::models::IntermediateSchemaNode;
+use crate::models::IntermediateSchemaItem;
 use crate::utils::{node_location::NodeLocation, read_json_node::read_json_node};
 use std::collections::BTreeMap;
 use std::future::Future;
@@ -199,7 +199,7 @@ impl DocumentContext {
       .cloned()
   }
 
-  pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateSchemaNode> {
+  pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateSchemaItem> {
     self
       .documents
       .borrow()

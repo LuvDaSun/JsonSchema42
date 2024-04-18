@@ -1,5 +1,8 @@
 use super::with_error::with_error_reference;
-use crate::{models::SchemaArena, models::SchemaTransform};
+use crate::{
+  documents::DocumentContext,
+  models::{SchemaArena, SchemaTransform},
+};
 use std::{
   ffi::{c_char, CStr, CString},
   ptr::null_mut,
@@ -18,7 +21,17 @@ extern "C" fn schema_arena_new() -> *const SchemaArena {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_clone(arena: *const SchemaArena) -> *const SchemaArena {
+extern "C" fn schema_arena_from_document_context(
+  document_context: *const DocumentContext,
+) -> *mut SchemaArena {
+  let document_context = unsafe { &*document_context };
+  let arena = SchemaArena::from_document_context(document_context);
+  let arena = Box::new(arena);
+  Box::into_raw(arena)
+}
+
+#[no_mangle]
+extern "C" fn schema_arena_clone(arena: *const SchemaArena) -> *mut SchemaArena {
   let arena = unsafe { &*arena };
   let arena = arena.clone();
   let arena = Box::new(arena);

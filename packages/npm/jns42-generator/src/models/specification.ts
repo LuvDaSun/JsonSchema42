@@ -1,5 +1,4 @@
 import * as core from "@jns42/core";
-import * as schemaIntermediate from "@jns42/schema-intermediate";
 
 export interface Specification {
   typesArena: core.SchemaArena;
@@ -14,14 +13,14 @@ export interface LoadSpecificationConfiguration {
 }
 
 export function loadSpecification(
-  document: schemaIntermediate.SchemaJson,
+  documentContext: core.DocumentContext,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
 
-  const typesArena = core.SchemaArena.fromIntermediate(document);
+  const typesArena = core.SchemaArena.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
   // generate names

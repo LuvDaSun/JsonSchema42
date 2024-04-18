@@ -1,5 +1,5 @@
 use jns42_core::{
-  models::{ArenaSchemaNode, SchemaType, Specification},
+  models::{ArenaSchemaItem, SchemaType, Specification},
   naming::Sentence,
 };
 use proc_macro2::TokenStream;
@@ -30,7 +30,7 @@ pub fn generate_file_token_stream(
 fn generate_type_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &ArenaSchemaNode,
+  item: &ArenaSchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 

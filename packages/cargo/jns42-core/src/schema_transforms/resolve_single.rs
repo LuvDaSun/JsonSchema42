@@ -45,13 +45,13 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use crate::models::ArenaSchemaNode;
+        use crate::models::ArenaSchemaItem;
 
         #[test]
         fn test_transform() {
           let mut arena = SchemaArena::new();
 
-          arena.add_item(ArenaSchemaNode {
+          arena.add_item(ArenaSchemaItem {
             $member: Some([10].into()),
             ..Default::default()
           });
@@ -61,7 +61,7 @@ macro_rules! generate_mod {
           }
 
           let actual: Vec<_> = arena.iter().cloned().collect();
-          let expected: Vec<_> = [ArenaSchemaNode {
+          let expected: Vec<_> = [ArenaSchemaItem {
             reference: Some(10),
             ..Default::default()
           }]

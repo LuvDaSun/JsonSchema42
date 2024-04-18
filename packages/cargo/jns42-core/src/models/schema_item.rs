@@ -5,12 +5,12 @@ use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};
 
-pub type IntermediateSchemaNode = SchemaNode<NodeLocation>;
-pub type ArenaSchemaNode = SchemaNode<usize>;
+pub type IntermediateSchemaItem = SchemaItem<NodeLocation>;
+pub type ArenaSchemaItem = SchemaItem<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SchemaNode<K>
+pub struct SchemaItem<K>
 where
   K: Ord,
 {
@@ -118,7 +118,7 @@ where
   pub maximum_properties: Option<u64>,
 }
 
-impl<K> SchemaNode<K>
+impl<K> SchemaItem<K>
 where
   K: Ord + Clone + Debug,
 {
@@ -292,7 +292,7 @@ where
   }
 }
 
-impl<K> SchemaNode<K>
+impl<K> SchemaItem<K>
 where
   K: Ord + Copy,
 {
@@ -376,11 +376,11 @@ where
   }
 }
 
-impl<K> SchemaNode<K>
+impl<K> SchemaItem<K>
 where
   K: Ord,
 {
-  pub fn map_keys<K1>(&self, map_key: impl Fn(&K) -> K1) -> SchemaNode<K1>
+  pub fn map_keys<K1>(&self, map_key: impl Fn(&K) -> K1) -> SchemaItem<K1>
   where
     K1: Ord,
   {
@@ -404,7 +404,7 @@ where
       })
     };
 
-    SchemaNode {
+    SchemaItem {
       name: self.name.clone(),
       exact: self.exact,
       primary: self.primary,

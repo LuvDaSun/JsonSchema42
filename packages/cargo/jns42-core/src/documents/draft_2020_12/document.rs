@@ -1,7 +1,7 @@
 use super::Node;
 use crate::documents::{DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::error::Error;
-use crate::models::IntermediateSchemaNode;
+use crate::models::IntermediateSchemaItem;
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::rc::Weak;
@@ -120,7 +120,7 @@ impl SchemaDocument for Document {
     &self.embedded_documents
   }
 
-  fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateSchemaNode> {
+  fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateSchemaItem> {
     self
       .nodes
       .iter()
@@ -129,7 +129,7 @@ impl SchemaDocument for Document {
         location.push_pointer(pointer);
         (
           location.clone(),
-          IntermediateSchemaNode {
+          IntermediateSchemaItem {
             location: Some(location.clone()),
             name: None,
             exact: Some(true),

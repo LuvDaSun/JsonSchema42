@@ -1,100 +1,29 @@
-use super::{schema_node::ArenaSchemaNode, IntermediateSchemaNode, SchemaType};
+use super::schema_item::ArenaSchemaItem;
 use crate::{
+  documents::DocumentContext,
   naming::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::{arena::Arena, node_location::NodeLocation},
+  utils::arena::Arena,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
-use std::collections::{BTreeMap, HashMap};
-use std::iter::{empty, once};
+use std::collections::HashMap;
+use std::iter::empty;
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
 pub struct Specification {
-  pub arena: Arena<ArenaSchemaNode>,
+  pub arena: Arena<ArenaSchemaItem>,
   pub names: HashMap<usize, (bool, Sentence)>,
 }
 
 impl Specification {
-  pub fn new(
-    root_id: NodeLocation,
-    schema_nodes: BTreeMap<NodeLocation, IntermediateSchemaNode>,
-  ) -> Self {
-    let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
-    let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
-
+  pub fn new(document_context: &DocumentContext) -> Self {
     // first load schemas in the arena
 
-    let mut arena = Arena::new();
-    {
-      let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
-      for (id, schema) in &schema_nodes {
-        let item = ArenaSchemaNode {
-          ..Default::default()
-        };
-
-        let key = arena.add_item(item);
-        key_map.insert(id.clone(), key);
-
-        for child_id in &schema.all_of {
-          for child_id in child_id {
-            parents.insert(child_id.clone(), id.clone());
-          }
-        }
-
-        for child_id in &schema.any_of {
-          for child_id in child_id {
-            parents.insert(child_id.clone(), id.clone());
-          }
-        }
-
-        for child_id in &schema.one_of {
-          for child_id in child_id {
-            parents.insert(child_id.clone(), id.clone());
-          }
-        }
-
-        if let Some(child_id) = &schema.r#if {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.then {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.r#else {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.not {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.property_names {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.property_names {
-          implicit_types.insert(child_id.clone(), SchemaType::String);
-        }
-      }
-
-      for (id, key) in &key_map {
-        let mut schema = schema_nodes.get(id).unwrap().clone();
-        schema.parent = parents.get(id).cloned();
-        schema.types = schema
-          .types
-          .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
-        schema.primary = if *id == root_id { Some(true) } else { None };
-
-        let item = schema.map_keys(|key| *key_map.get(key).unwrap());
-
-        arena.replace_item(*key, item);
-      }
-    }
+    let mut arena = Arena::from_document_context(document_context);
 
     // then optimize the schemas
 
@@ -103,7 +32,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<ArenaSchemaNode>, key: usize) {
+      fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
 
@@ -132,7 +61,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<ArenaSchemaNode>, key: usize) {
+      fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
         schema_transforms::primary::transform(arena, key);
       }
     }

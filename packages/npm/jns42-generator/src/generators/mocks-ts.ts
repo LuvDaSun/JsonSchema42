@@ -53,7 +53,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
@@ -108,7 +108,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
-    if (item.id == null) {
+    if (item.location == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
       using typeName = names.getName(itemKey);

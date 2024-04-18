@@ -57,12 +57,13 @@ export interface MainExports extends ExportsBase {
   names_drop(names: number): void;
   names_get_name(names: number, key: number): number;
 
-  schema_item_drop(schema_item: number): void;
-  schema_item_new(): number;
+  arena_schema_item_drop(schema_item: number): void;
+  arena_schema_item_new(): number;
 
   schema_arena_drop(schema_arena: number): void;
-  schema_arena_clone(schema_arena: number): number;
   schema_arena_new(): number;
+  schema_arena_from_document_context(document_context: number): number;
+  schema_arena_clone(schema_arena: number): number;
   schema_arena_count(schema_arena: number): number;
   schema_arena_add_item(schema_arena: number, item: number, error_reference: number): number;
   schema_arena_replace_item(

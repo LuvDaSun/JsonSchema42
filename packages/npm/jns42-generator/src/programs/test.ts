@@ -109,14 +109,12 @@ async function main(configuration: MainConfiguration) {
         defaultMetaSchema as core.MetaSchemaString,
       );
 
-      const intermediateDocument = context.getIntermediateDocument();
-
-      using specification = models.loadSpecification(intermediateDocument, {
+      using specification = models.loadSpecification(context, {
         transformMaximumIterations,
         defaultTypeName: defaultTypeName.toPascalCase(),
       });
 
-      generatePackage(intermediateDocument, specification, {
+      generatePackage(specification, {
         packageDirectoryPath,
         packageName,
         packageVersion,
