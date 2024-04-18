@@ -133,14 +133,8 @@ impl Specification {
 
           minimum_length: schema.minimum_length,
           maximum_length: schema.maximum_length,
-          value_pattern: schema
-            .value_pattern
-            .as_ref()
-            .map(|value| vec![value.clone()]),
-          value_format: schema
-            .value_format
-            .as_ref()
-            .map(|value| vec![value.clone()]),
+          value_pattern: schema.value_pattern.clone(),
+          value_format: schema.value_format.clone(),
 
           maximum_items: schema.maximum_items,
           minimum_items: schema.minimum_items,

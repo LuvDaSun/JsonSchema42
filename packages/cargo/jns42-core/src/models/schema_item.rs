@@ -96,9 +96,9 @@ pub struct SchemaItem {
   #[serde(default)]
   pub maximum_length: Option<u64>,
   #[serde(default)]
-  pub value_pattern: Option<Vec<String>>,
+  pub value_pattern: Option<String>,
   #[serde(default)]
-  pub value_format: Option<Vec<String>>,
+  pub value_format: Option<String>,
 
   #[serde(default)]
   pub minimum_items: Option<u64>,
