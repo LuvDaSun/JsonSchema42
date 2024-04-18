@@ -6,6 +6,7 @@ use crate::{
 use std::{
   ffi::{c_char, CStr, CString},
   ptr::null_mut,
+  rc::Rc,
 };
 
 #[no_mangle]
@@ -22,7 +23,7 @@ extern "C" fn schema_arena_new() -> *mut SchemaArena {
 
 #[no_mangle]
 extern "C" fn schema_arena_from_document_context(
-  document_context: *const DocumentContext,
+  document_context: *const Rc<DocumentContext>,
 ) -> *mut SchemaArena {
   let document_context = unsafe { &*document_context };
   let arena = SchemaArena::from_document_context(document_context);

@@ -9,8 +9,8 @@ use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
-use std::collections::HashMap;
 use std::iter::empty;
+use std::{collections::HashMap, rc::Rc};
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
@@ -20,7 +20,7 @@ pub struct Specification {
 }
 
 impl Specification {
-  pub fn new(document_context: &DocumentContext) -> Self {
+  pub fn new(document_context: &Rc<DocumentContext>) -> Self {
     // first load schemas in the arena
 
     let mut arena = Arena::from_document_context(document_context);

@@ -3,6 +3,7 @@ import test from "node:test";
 import path from "path";
 import { projectRoot } from "../root.js";
 import { DocumentContext } from "./document-context.js";
+import { SchemaArena } from "./schema-arena.js";
 
 test("load from node", async () => {
   using documentContext = DocumentContext.new();
@@ -23,6 +24,10 @@ test("load from node", async () => {
   const schemas = documentContext.getSchemaNodes();
 
   assert(schemas[location] != null);
+
+  using arena = SchemaArena.fromDocumentContext(documentContext);
+
+  assert.equal(arena.count(), Object.keys(schemas).length);
 });
 
 test("load from location", async () => {
@@ -49,4 +54,8 @@ test("load from location", async () => {
   const schemas = documentContext.getSchemaNodes();
 
   assert(schemas[location] != null);
+
+  using arena = SchemaArena.fromDocumentContext(documentContext);
+
+  assert.equal(arena.count(), Object.keys(schemas).length);
 });

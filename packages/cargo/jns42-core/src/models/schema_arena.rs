@@ -6,12 +6,13 @@ use crate::{
 use std::{
   collections::HashMap,
   iter::{empty, once},
+  rc::Rc,
 };
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
 
 impl Arena<ArenaSchemaItem> {
-  pub fn from_document_context(document_context: &DocumentContext) -> Self {
+  pub fn from_document_context(document_context: &Rc<DocumentContext>) -> Self {
     let schema_nodes = document_context.get_schema_nodes();
     let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
     let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
