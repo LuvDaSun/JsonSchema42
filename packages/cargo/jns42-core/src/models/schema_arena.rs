@@ -1,7 +1,4 @@
-use super::{
-  schema_item::{SchemaItem, SchemaKey},
-  BoxedSchemaTransform, SchemaTransform,
-};
+use super::{schema_item::SchemaItem, BoxedSchemaTransform, SchemaTransform};
 use crate::utils::arena::Arena;
 use std::iter::empty;
 
@@ -15,11 +12,11 @@ impl Arena<SchemaItem> {
   /// to the resolved `SchemaItem`.
   ///
   /// # Parameters
-  /// - `key`: The initial `SchemaKey` to resolve.
+  /// - `key`: The initial `usize` to resolve.
   ///
   /// # Returns
-  /// A tuple containing the resolved `SchemaKey` and a reference to the resolved `SchemaItem`.
-  pub fn resolve_entry(&self, key: SchemaKey) -> (SchemaKey, &SchemaItem) {
+  /// A tuple containing the resolved `usize` and a reference to the resolved `SchemaItem`.
+  pub fn resolve_entry(&self, key: usize) -> (usize, &SchemaItem) {
     let mut resolved_key = key;
     let mut resolved_item = self.get_item(resolved_key);
 
@@ -40,15 +37,12 @@ impl Arena<SchemaItem> {
   /// starting from the item itself and moving up to the root.
   ///
   /// # Parameters
-  /// - `key`: The `SchemaKey` of the item whose ancestors are to be retrieved.
+  /// - `key`: The `usize` of the item whose ancestors are to be retrieved.
   ///
   /// # Returns
-  /// An iterator over tuples containing the `SchemaKey` and a reference to the `SchemaItem`
+  /// An iterator over tuples containing the `usize` and a reference to the `SchemaItem`
   /// for each ancestor, including the item itself.
-  pub fn get_ancestors(
-    &self,
-    key: SchemaKey,
-  ) -> impl DoubleEndedIterator<Item = (SchemaKey, &SchemaItem)> {
+  pub fn get_ancestors(&self, key: usize) -> impl DoubleEndedIterator<Item = (usize, &SchemaItem)> {
     let mut result = Vec::new();
 
     let mut key_maybe = Some(key);
@@ -65,13 +59,13 @@ impl Arena<SchemaItem> {
   /// Checks if a given schema item has a specific ancestor.
   ///
   /// # Parameters
-  /// - `key`: The `SchemaKey` of the item to check.
-  /// - `ancestor_key`: The `SchemaKey` of the potential ancestor.
+  /// - `key`: The `usize` of the item to check.
+  /// - `ancestor_key`: The `usize` of the potential ancestor.
   ///
   /// # Returns
   /// `true` if the item identified by `key` has the ancestor identified by `ancestor_key`,
   /// otherwise `false`.
-  pub fn has_ancestor(&self, key: SchemaKey, ancestor_key: SchemaKey) -> bool {
+  pub fn has_ancestor(&self, key: usize, ancestor_key: usize) -> bool {
     self
       .get_ancestors(key)
       .any(|(key, _item)| key == ancestor_key)
@@ -84,11 +78,11 @@ impl Arena<SchemaItem> {
   /// to the item itself).
   ///
   /// # Parameters
-  /// - `key`: The `SchemaKey` of the item whose name parts are to be retrieved.
+  /// - `key`: The `usize` of the item whose name parts are to be retrieved.
   ///
   /// # Returns
   /// An iterator over string slices (`&str`) representing the name parts.
-  pub fn get_name_parts(&self, key: SchemaKey) -> impl Iterator<Item = &str> {
+  pub fn get_name_parts(&self, key: usize) -> impl Iterator<Item = &str> {
     let ancestors: Vec<_> = self
       .get_ancestors(key)
       .map(|(_key, item)| item)

@@ -4,11 +4,14 @@ use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeSet, HashSet};
 use std::{collections::HashMap, iter::empty};
 
-pub type SchemaKey = usize;
+pub type SchemaItem = SchemaNode<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SchemaItem {
+pub struct SchemaNode<K>
+where
+  K: Ord,
+{
   #[serde(default)]
   pub name: Option<String>,
   #[serde(default)]
@@ -17,7 +20,7 @@ pub struct SchemaItem {
   #[serde(default)]
   pub primary: Option<bool>,
   #[serde(default)]
-  pub parent: Option<SchemaKey>,
+  pub parent: Option<K>,
   #[serde(default)]
   pub id: Option<NodeLocation>,
 
@@ -37,42 +40,42 @@ pub struct SchemaItem {
 
   // applicators
   #[serde(default)]
-  pub reference: Option<SchemaKey>,
+  pub reference: Option<K>,
 
   #[serde(default)]
-  pub r#if: Option<SchemaKey>,
+  pub r#if: Option<K>,
   #[serde(default)]
-  pub then: Option<SchemaKey>,
+  pub then: Option<K>,
   #[serde(default)]
-  pub r#else: Option<SchemaKey>,
+  pub r#else: Option<K>,
 
   #[serde(default)]
-  pub not: Option<SchemaKey>,
+  pub not: Option<K>,
 
   #[serde(default)]
-  pub property_names: Option<SchemaKey>,
+  pub property_names: Option<K>,
   #[serde(default)]
-  pub map_properties: Option<SchemaKey>,
+  pub map_properties: Option<K>,
   #[serde(default)]
-  pub array_items: Option<SchemaKey>,
+  pub array_items: Option<K>,
   #[serde(default)]
-  pub contains: Option<SchemaKey>,
+  pub contains: Option<K>,
 
   #[serde(default)]
-  pub all_of: Option<BTreeSet<SchemaKey>>,
+  pub all_of: Option<BTreeSet<K>>,
   #[serde(default)]
-  pub any_of: Option<BTreeSet<SchemaKey>>,
+  pub any_of: Option<BTreeSet<K>>,
   #[serde(default)]
-  pub one_of: Option<BTreeSet<SchemaKey>>,
+  pub one_of: Option<BTreeSet<K>>,
   #[serde(default)]
-  pub tuple_items: Option<Vec<SchemaKey>>,
+  pub tuple_items: Option<Vec<K>>,
 
   #[serde(default)]
-  pub object_properties: Option<HashMap<String, SchemaKey>>,
+  pub object_properties: Option<HashMap<String, K>>,
   #[serde(default)]
-  pub pattern_properties: Option<HashMap<String, SchemaKey>>,
+  pub pattern_properties: Option<HashMap<String, K>>,
   #[serde(default)]
-  pub dependent_schemas: Option<HashMap<String, SchemaKey>>,
+  pub dependent_schemas: Option<HashMap<String, K>>,
 
   // assertions
   #[serde(default)]
@@ -117,7 +120,7 @@ impl SchemaItem {
   pub fn intersection<'f>(
     &'f self,
     other: &'f Self,
-    merge_key: &impl Fn(&'f SchemaKey, &'f SchemaKey) -> SchemaKey,
+    merge_key: &impl Fn(&'f usize, &'f usize) -> usize,
   ) -> Self {
     assert!(
       self
@@ -283,7 +286,7 @@ impl SchemaItem {
     }
   }
 
-  pub fn get_children(&self) -> impl Iterator<Item = SchemaKey> + '_ {
+  pub fn get_children(&self) -> impl Iterator<Item = usize> + '_ {
     empty()
       .chain(self.reference)
       .chain(self.r#if)
@@ -321,7 +324,7 @@ impl SchemaItem {
       )
   }
 
-  pub fn get_alias_key(&self) -> Option<SchemaKey> {
+  pub fn get_alias_key(&self) -> Option<usize> {
     let is_alias_maybe = self.types.is_none()
       && self.all_of.is_none()
       && self.any_of.is_none()
