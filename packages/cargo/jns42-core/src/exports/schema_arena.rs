@@ -1,5 +1,5 @@
 use super::with_error::with_error_reference;
-use crate::{models::SchemaArena, schema_transforms::SchemaTransform};
+use crate::{models::SchemaArena, models::SchemaTransform};
 use std::{
   ffi::{c_char, CStr, CString},
   ptr::null_mut,

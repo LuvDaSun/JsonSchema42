@@ -1,8 +1,8 @@
-use super::schema_item::{SchemaItem, SchemaKey};
-use crate::{
-  schema_transforms::{BoxedSchemaTransform, SchemaTransform},
-  utils::arena::Arena,
+use super::{
+  schema_item::{SchemaItem, SchemaKey},
+  BoxedSchemaTransform, SchemaTransform,
 };
+use crate::utils::arena::Arena;
 use std::iter::empty;
 
 pub type SchemaArena = Arena<SchemaItem>;
