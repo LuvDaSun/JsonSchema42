@@ -144,8 +144,8 @@ impl Node {
 assertions
 */
 impl Node {
-  pub fn select_options(&self) -> Option<Vec<serde_json::Value>> {
-    select_vec_value(self, "options")
+  pub fn select_enum(&self) -> Option<Vec<serde_json::Value>> {
+    select_vec_value(self, "enum")
   }
 
   pub fn select_minimum(&self) -> Option<&serde_json::Number> {

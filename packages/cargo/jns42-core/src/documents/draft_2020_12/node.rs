@@ -151,9 +151,12 @@ impl Node {
     select_entries_map(self, pointer, "$defs")
   }
 
-  pub fn select_options(&self) -> Option<Vec<serde_json::Value>> {
-    // TODO support const?
-    select_vec_value(self, "options")
+  pub fn select_enum(&self) -> Option<Vec<serde_json::Value>> {
+    select_vec_value(self, "enum")
+  }
+
+  pub fn select_const(&self) -> Option<&serde_json::Value> {
+    select_value(self, "const")
   }
 
   pub fn select_minimum_inclusive(&self) -> Option<&serde_json::Number> {
@@ -232,6 +235,10 @@ fn select_vec_str<'n>(node: &'n Node, field: &str) -> Option<Vec<&'n str>> {
 
 fn select_unsigned_integer(node: &Node, field: &str) -> Option<u64> {
   node.0.as_object()?.get(field)?.as_u64()
+}
+
+fn select_value<'n>(node: &'n Node, field: &str) -> Option<&'n serde_json::Value> {
+  node.0.as_object()?.get(field)
 }
 
 fn select_number<'n>(node: &'n Node, field: &str) -> Option<&'n serde_json::Number> {

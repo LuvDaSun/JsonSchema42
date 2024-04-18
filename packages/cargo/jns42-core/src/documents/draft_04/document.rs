@@ -136,7 +136,7 @@ impl SchemaDocument for Document {
             types: node.select_types(),
 
             // assertions
-            options: node.select_options(),
+            options: node.select_enum(),
 
             minimum_inclusive: if node.select_is_minimum_exclusive().unwrap_or_default() {
               None

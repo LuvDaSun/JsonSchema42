@@ -4,6 +4,7 @@ use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::iter::empty;
 use std::rc::Weak;
 
 pub struct Document {
@@ -146,7 +147,17 @@ impl SchemaDocument for Document {
             types: node.select_types(),
 
             // assertions
-            options: node.select_options(),
+            options: {
+              let value: Vec<_> = empty()
+                .chain(node.select_const().into_iter().cloned())
+                .chain(node.select_enum().into_iter().flatten())
+                .collect();
+              if value.is_empty() {
+                None
+              } else {
+                Some(value)
+              }
+            },
 
             minimum_inclusive: node.select_minimum_inclusive().cloned(),
             minimum_exclusive: node.select_minimum_exclusive().cloned(),
