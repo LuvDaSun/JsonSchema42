@@ -1,7 +1,7 @@
 import { SchemaType } from "./schema-type.js";
 
 export type ArenaSchemaItemValue = SchemaItemValue<number>;
-export type IntermediateSchemaItemValue = SchemaItemValue<string>;
+export type DocumentSchemaItemValue = SchemaItemValue<string>;
 
 export type SchemaItemValue<K> = {
   name?: string;
