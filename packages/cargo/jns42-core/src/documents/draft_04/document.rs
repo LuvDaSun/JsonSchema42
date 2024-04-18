@@ -120,6 +120,12 @@ impl SchemaDocument for Document {
         (
           location.clone(),
           IntermediateNode {
+            id: Some(location.clone()),
+            name: None,
+            exact: Some(true),
+            parent: None,
+            primary: Some(true),
+
             // meta
             title: node.select_title().map(|value| value.to_string()),
             description: node.select_description().map(|value| value.to_string()),

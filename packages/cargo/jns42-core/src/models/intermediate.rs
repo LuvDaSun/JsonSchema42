@@ -1,7 +1,7 @@
 use super::SchemaType;
 use crate::utils::node_location::NodeLocation;
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct IntermediateSchema {
@@ -12,6 +12,18 @@ pub struct IntermediateSchema {
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 pub struct IntermediateNode {
+  #[serde(default)]
+  pub name: Option<String>,
+  #[serde(default)]
+  pub exact: Option<bool>,
+
+  #[serde(default)]
+  pub primary: Option<bool>,
+  #[serde(default)]
+  pub parent: Option<NodeLocation>,
+  #[serde(default)]
+  pub id: Option<NodeLocation>,
+
   // metadata
   #[serde(default)]
   pub title: Option<String>,
@@ -26,9 +38,50 @@ pub struct IntermediateNode {
   #[serde(default)]
   pub types: Option<Vec<SchemaType>>,
 
+  // applicators
+  #[serde(default)]
+  pub reference: Option<String>,
+
+  #[serde(default)]
+  pub r#if: Option<String>,
+  #[serde(default)]
+  pub r#then: Option<String>,
+  #[serde(default)]
+  pub r#else: Option<String>,
+
+  #[serde(default)]
+  pub not: Option<String>,
+
+  #[serde(default)]
+  pub property_names: Option<String>,
+  #[serde(default)]
+  pub map_properties: Option<String>,
+  #[serde(default)]
+  pub array_items: Option<String>,
+  #[serde(default)]
+  pub contains: Option<String>,
+
+  #[serde(default)]
+  pub all_of: Option<Vec<String>>,
+  #[serde(default)]
+  pub any_of: Option<Vec<String>>,
+  #[serde(default)]
+  pub one_of: Option<Vec<String>>,
+  #[serde(default)]
+  pub tuple_items: Option<Vec<String>>,
+
+  #[serde(default)]
+  pub object_properties: Option<HashMap<String, String>>,
+  #[serde(default)]
+  pub pattern_properties: Option<HashMap<String, String>>,
+  #[serde(default)]
+  pub dependent_schemas: Option<HashMap<String, String>>,
+
   // assertions
   #[serde(default)]
   pub options: Option<Vec<serde_json::Value>>,
+  #[serde(default)]
+  pub required: Option<HashSet<String>>,
 
   #[serde(default)]
   pub minimum_inclusive: Option<serde_json::Number>,
@@ -61,45 +114,4 @@ pub struct IntermediateNode {
   pub minimum_properties: Option<u64>,
   #[serde(default)]
   pub maximum_properties: Option<u64>,
-  #[serde(default)]
-  pub required: Option<Vec<String>>,
-
-  // applicators
-  #[serde(default)]
-  pub reference: Option<String>,
-
-  #[serde(default)]
-  pub all_of: Option<Vec<String>>,
-  #[serde(default)]
-  pub any_of: Option<Vec<String>>,
-  #[serde(default)]
-  pub one_of: Option<Vec<String>>,
-  #[serde(default)]
-  pub tuple_items: Option<Vec<String>>,
-
-  #[serde(default)]
-  pub r#if: Option<String>,
-  #[serde(default)]
-  pub r#then: Option<String>,
-  #[serde(default)]
-  pub r#else: Option<String>,
-
-  #[serde(default)]
-  pub not: Option<String>,
-
-  #[serde(default)]
-  pub contains: Option<String>,
-  #[serde(default)]
-  pub property_names: Option<String>,
-  #[serde(default)]
-  pub map_properties: Option<String>,
-  #[serde(default)]
-  pub array_items: Option<String>,
-
-  #[serde(default)]
-  pub object_properties: Option<HashMap<String, String>>,
-  #[serde(default)]
-  pub pattern_properties: Option<HashMap<String, String>>,
-  #[serde(default)]
-  pub dependent_schemas: Option<HashMap<String, String>>,
 }
