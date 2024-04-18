@@ -1,8 +1,8 @@
-import * as schemaIntermediate from "@jns42/schema-intermediate";
 import defer from "p-defer";
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
+import { IntermediateSchemaItemValue } from "./schema-item.js";
 import { withErrorReference, withErrorReferencePromise } from "./with-error.js";
 
 export class DocumentContext extends ForeignObject {
@@ -99,7 +99,7 @@ export class DocumentContext extends ForeignObject {
     });
   }
 
-  public getIntermediateDocument(): schemaIntermediate.SchemaJson {
+  public getSchemaNodes(): Record<string, IntermediateSchemaItemValue> {
     const documentPointer = withErrorReference((errorReferencePointer) =>
       mainFfi.exports.document_context_get_schema_nodes(this.pointer, errorReferencePointer),
     );

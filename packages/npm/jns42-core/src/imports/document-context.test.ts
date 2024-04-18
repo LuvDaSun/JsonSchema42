@@ -16,7 +16,7 @@ test("load from node", async () => {
     "https://json-schema.org/draft/2020-12/schema",
   );
 
-  const intermediateDocument = documentContext.getIntermediateDocument();
+  const schemas = documentContext.getSchemaNodes();
 
-  assert(intermediateDocument.schemas["/string-or-boolean.json#"] != null);
+  assert(schemas["/string-or-boolean.json#"] != null);
 });

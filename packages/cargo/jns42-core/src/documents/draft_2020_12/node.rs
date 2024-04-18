@@ -152,7 +152,8 @@ impl Node {
   }
 
   pub fn select_options(&self) -> Option<Vec<serde_json::Value>> {
-    Some(vec![])
+    // TODO support const?
+    select_vec_value(self, "options")
   }
 
   pub fn select_minimum_inclusive(&self) -> Option<&serde_json::Number> {
@@ -214,6 +215,10 @@ impl Node {
   pub fn select_required(&self) -> Option<Vec<&str>> {
     select_vec_str(self, "required")
   }
+}
+
+fn select_vec_value(node: &Node, field: &str) -> Option<Vec<serde_json::Value>> {
+  node.0.as_object()?.get(field)?.as_array().cloned()
 }
 
 fn select_vec_str<'n>(node: &'n Node, field: &str) -> Option<Vec<&'n str>> {
