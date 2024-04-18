@@ -1,4 +1,4 @@
-use crate::models::{SchemaArena, SchemaItem};
+use crate::models::{ArenaSchemaNode, SchemaArena};
 use std::collections::BTreeSet;
 
 /**
@@ -41,7 +41,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   let mut sub_keys = BTreeSet::new();
 
   if let Some(then) = item.then {
-    let new_sub_item = SchemaItem {
+    let new_sub_item = ArenaSchemaNode {
       all_of: Some([r#if, then].into()),
       ..Default::default()
     };
@@ -50,13 +50,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   }
 
   if let Some(r#else) = item.r#else {
-    let new_sub_sub_item = SchemaItem {
+    let new_sub_sub_item = ArenaSchemaNode {
       not: Some(r#if),
       ..Default::default()
     };
     let new_sub_sub_key = arena.add_item(new_sub_sub_item);
 
-    let new_sub_item = SchemaItem {
+    let new_sub_item = ArenaSchemaNode {
       all_of: Some([new_sub_sub_key, r#else].into()),
       ..Default::default()
     };
@@ -64,7 +64,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     sub_keys.insert(new_sub_key);
   }
 
-  let item_new = SchemaItem {
+  let item_new = ArenaSchemaNode {
     r#if: None,
     then: None,
     r#else: None,
@@ -83,7 +83,7 @@ mod tests {
   fn test_transform() {
     let mut arena = SchemaArena::new();
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaNode {
       r#if: Some(100),
       then: Some(200),
       r#else: Some(300),
@@ -96,19 +96,19 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         one_of: Some([1, 3].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([100, 200].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaNode {
         not: Some(100),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([2, 300].into()),
         ..Default::default()
       },

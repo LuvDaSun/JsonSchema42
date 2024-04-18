@@ -1,4 +1,4 @@
-use super::{schema_node::SchemaItem, IntermediateNode, SchemaType};
+use super::{schema_node::ArenaSchemaNode, IntermediateSchemaNode, SchemaType};
 use crate::{
   naming::{NamesBuilder, Sentence},
   schema_transforms,
@@ -14,14 +14,14 @@ use std::iter::{empty, once};
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
 pub struct Specification {
-  pub arena: Arena<SchemaItem>,
+  pub arena: Arena<ArenaSchemaNode>,
   pub names: HashMap<usize, (bool, Sentence)>,
 }
 
 impl Specification {
   pub fn new(
     root_id: NodeLocation,
-    schema_nodes: BTreeMap<NodeLocation, IntermediateNode>,
+    schema_nodes: BTreeMap<NodeLocation, IntermediateSchemaNode>,
   ) -> Self {
     let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
     let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
@@ -32,7 +32,7 @@ impl Specification {
     {
       let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
       for (id, schema) in &schema_nodes {
-        let item = SchemaItem {
+        let item = ArenaSchemaNode {
           ..Default::default()
         };
 
@@ -103,7 +103,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<SchemaItem>, key: usize) {
+      fn transformer(arena: &mut Arena<ArenaSchemaNode>, key: usize) {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
 
@@ -132,7 +132,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<SchemaItem>, key: usize) {
+      fn transformer(arena: &mut Arena<ArenaSchemaNode>, key: usize) {
         schema_transforms::primary::transform(arena, key);
       }
     }

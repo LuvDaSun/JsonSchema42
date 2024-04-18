@@ -5,8 +5,8 @@ use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};
 
-pub type IntermediateNode = SchemaNode<NodeLocation>;
-pub type SchemaItem = SchemaNode<usize>;
+pub type IntermediateSchemaNode = SchemaNode<NodeLocation>;
+pub type ArenaSchemaNode = SchemaNode<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

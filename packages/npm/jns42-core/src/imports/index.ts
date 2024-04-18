@@ -10,6 +10,7 @@ export * from "./reverse.js";
 export * from "./schema-arena.js";
 export * from "./schema-item.js";
 export * from "./schema-transform.js";
+export * from "./schema-type.js";
 export * from "./sentence.js";
 export * from "./vec-string.js";
 export * from "./vec-usize.js";

@@ -1,4 +1,4 @@
-use crate::models::{SchemaArena, SchemaItem};
+use crate::models::{ArenaSchemaNode, SchemaArena};
 
 /**
  * This sets the primary field on all relevant schemas
@@ -34,7 +34,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   for child_key in item.get_children() {
     let child_item = arena.get_item(child_key);
 
-    let child_item = SchemaItem {
+    let child_item = ArenaSchemaNode {
       primary: Some(true),
       ..child_item.clone()
     };
@@ -51,18 +51,18 @@ mod tests {
   fn test_transform() {
     let mut arena = SchemaArena::new();
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaNode {
       primary: Some(true),
       all_of: Some([1].into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaNode {
       all_of: Some([2].into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaNode {
       ..Default::default()
     });
 
@@ -72,17 +72,17 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
-      SchemaItem {
+      ArenaSchemaNode {
         primary: Some(true),
         all_of: Some([1].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaNode {
         primary: Some(true),
         all_of: Some([2].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaNode {
         primary: Some(true),
         ..Default::default()
       },

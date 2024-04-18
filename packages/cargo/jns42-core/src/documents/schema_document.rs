@@ -1,4 +1,4 @@
-use crate::{models::IntermediateNode, utils::node_location::NodeLocation};
+use crate::{models::IntermediateSchemaNode, utils::node_location::NodeLocation};
 use std::collections::BTreeMap;
 
 pub struct EmbeddedDocument {
@@ -18,5 +18,5 @@ pub trait SchemaDocument {
   fn get_document_location(&self) -> &NodeLocation;
   fn get_node_locations(&self) -> Vec<NodeLocation>;
 
-  fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateNode>;
+  fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateSchemaNode>;
 }

@@ -105,12 +105,12 @@ impl From<&SchemaTransform> for BoxedSchemaTransform {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{SchemaItem, SchemaType};
+  use crate::models::{ArenaSchemaNode, SchemaType};
   use itertools::Itertools;
 
   fn run_test(
-    initial: impl IntoIterator<Item = SchemaItem>,
-    expected: impl IntoIterator<Item = SchemaItem>,
+    initial: impl IntoIterator<Item = ArenaSchemaNode>,
+    expected: impl IntoIterator<Item = ArenaSchemaNode>,
     transforms: impl IntoIterator<Item = SchemaTransform>,
   ) {
     let expected: Vec<_> = expected.into_iter().collect();
@@ -147,16 +147,16 @@ mod tests {
     ];
 
     let initial = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         object_properties: Some([("c".into(), 0)].into()),
         reference: Some(1),
         ..Default::default()
@@ -164,24 +164,24 @@ mod tests {
     ];
 
     let expected = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         reference: Some(4),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         object_properties: Some([("c".into(), 0)].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 0), ("c".into(), 0)].into()),
         ..Default::default()

@@ -1,4 +1,4 @@
-use crate::models::{SchemaArena, SchemaItem};
+use crate::models::{ArenaSchemaNode, SchemaArena};
 use std::{cell::RefCell, collections::HashMap};
 
 /**
@@ -82,7 +82,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     }
   }
 
-  let mut item_new = SchemaItem {
+  let mut item_new = ArenaSchemaNode {
     all_of: None,
     ..item.clone()
   };
@@ -95,7 +95,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
       return *key;
     }
 
-    let item_new = SchemaItem {
+    let item_new = ArenaSchemaNode {
       all_of: Some([*key, *other_key].into()),
       ..Default::default()
     };
@@ -137,23 +137,23 @@ mod tests {
   #[test]
   fn test_utility() {
     let mut arena = SchemaArena::from_iter([
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Any].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([2, 0].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([2, 1].into()),
         ..Default::default()
       }, // 4
@@ -165,23 +165,23 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Any].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 4
@@ -194,23 +194,23 @@ mod tests {
   #[test]
   fn test_primitive() {
     let mut arena = SchemaArena::from_iter([
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([0, 1].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([1, 2].into()),
         ..Default::default()
       }, // 4
@@ -222,23 +222,23 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 4
@@ -251,33 +251,33 @@ mod tests {
   #[test]
   fn test_tuple() {
     let mut arena = SchemaArena::from_iter([
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         tuple_items: Some([0, 1].into()),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         tuple_items: Some([2, 3].into()),
         ..Default::default()
       }, // 5
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([4, 5].into()),
         ..Default::default()
       }, // 6
@@ -289,42 +289,42 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         tuple_items: Some([0, 1].into()),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         tuple_items: Some([2, 3].into()),
         ..Default::default()
       }, // 5
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         tuple_items: Some([7, 8].into()),
         ..Default::default()
       }, // 6
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 7
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 8
@@ -337,25 +337,25 @@ mod tests {
   #[test]
   fn test_array() {
     let mut arena = SchemaArena::from_iter([
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         array_items: Some(0),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         array_items: Some(1),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([2, 3].into()),
         ..Default::default()
       }, // 4
@@ -367,30 +367,30 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         array_items: Some(0),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         array_items: Some(1),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Array].into()),
         array_items: Some(5),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 5
@@ -403,34 +403,34 @@ mod tests {
   #[test]
   fn test_object() {
     let mut arena = SchemaArena::from_iter([
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         required: Some(["b".into()].into()),
         object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
         ..Default::default()
       }, // 5
-      SchemaItem {
+      ArenaSchemaNode {
         all_of: Some([4, 5].into()),
         ..Default::default()
       }, // 6
@@ -442,40 +442,40 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 1)].into()),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         required: Some(["b".into()].into()),
         object_properties: Some([("b".into(), 2), ("c".into(), 3)].into()),
         ..Default::default()
       }, // 5
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         required: Some(["b".into()].into()),
         object_properties: Some([("a".into(), 0), ("b".into(), 7), ("c".into(), 3)].into()),
         ..Default::default()
       }, // 6
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 7
@@ -488,35 +488,35 @@ mod tests {
   #[test]
   fn test_map() {
     let mut arena = SchemaArena::from_iter([
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         property_names: Some(0),
         map_properties: Some(1),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         property_names: Some(2),
         map_properties: Some(3),
         ..Default::default()
       }, // 5
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         all_of: Some([4, 5].into()),
         ..Default::default()
@@ -529,45 +529,45 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 0
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 1
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 2
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Number].into()),
         ..Default::default()
       }, // 3
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         property_names: Some(0),
         map_properties: Some(1),
         ..Default::default()
       }, // 4
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         property_names: Some(2),
         map_properties: Some(3),
         ..Default::default()
       }, // 5
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Object].into()),
         property_names: Some(7),
         map_properties: Some(8),
         ..Default::default()
       }, // 6
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::String].into()),
         ..Default::default()
       }, // 7
-      SchemaItem {
+      ArenaSchemaNode {
         types: Some([SchemaType::Never].into()),
         ..Default::default()
       }, // 8

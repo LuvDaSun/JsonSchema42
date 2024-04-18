@@ -1,4 +1,4 @@
-use jns42_core::models::{SchemaItem, SchemaType, Specification};
+use jns42_core::models::{ArenaSchemaNode, SchemaType, Specification};
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;
@@ -27,7 +27,7 @@ pub fn generate_file_token_stream(
 fn generate_type_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &SchemaItem,
+  item: &ArenaSchemaNode,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 

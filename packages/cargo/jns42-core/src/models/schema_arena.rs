@@ -1,22 +1,22 @@
-use super::{schema_node::SchemaItem, BoxedSchemaTransform, SchemaTransform};
+use super::{schema_node::ArenaSchemaNode, BoxedSchemaTransform, SchemaTransform};
 use crate::utils::arena::Arena;
 use std::iter::empty;
 
-pub type SchemaArena = Arena<SchemaItem>;
+pub type SchemaArena = Arena<ArenaSchemaNode>;
 
-impl Arena<SchemaItem> {
+impl Arena<ArenaSchemaNode> {
   /// Resolves the final entry for a given schema key, following any alias chains.
   ///
   /// This method iteratively follows the alias chain for a given key until it reaches
   /// an item that does not have an alias. It returns both the resolved key and a reference
-  /// to the resolved `SchemaItem`.
+  /// to the resolved `ArenaSchemaNode`.
   ///
   /// # Parameters
   /// - `key`: The initial `usize` to resolve.
   ///
   /// # Returns
-  /// A tuple containing the resolved `usize` and a reference to the resolved `SchemaItem`.
-  pub fn resolve_entry(&self, key: usize) -> (usize, &SchemaItem) {
+  /// A tuple containing the resolved `usize` and a reference to the resolved `ArenaSchemaNode`.
+  pub fn resolve_entry(&self, key: usize) -> (usize, &ArenaSchemaNode) {
     let mut resolved_key = key;
     let mut resolved_item = self.get_item(resolved_key);
 
@@ -40,9 +40,12 @@ impl Arena<SchemaItem> {
   /// - `key`: The `usize` of the item whose ancestors are to be retrieved.
   ///
   /// # Returns
-  /// An iterator over tuples containing the `usize` and a reference to the `SchemaItem`
+  /// An iterator over tuples containing the `usize` and a reference to the `ArenaSchemaNode`
   /// for each ancestor, including the item itself.
-  pub fn get_ancestors(&self, key: usize) -> impl DoubleEndedIterator<Item = (usize, &SchemaItem)> {
+  pub fn get_ancestors(
+    &self,
+    key: usize,
+  ) -> impl DoubleEndedIterator<Item = (usize, &ArenaSchemaNode)> {
     let mut result = Vec::new();
 
     let mut key_maybe = Some(key);
@@ -126,7 +129,7 @@ impl Arena<SchemaItem> {
   /// # Returns
   /// The number of transformations applied.
   pub fn transform(&mut self, transforms: &Vec<SchemaTransform>) -> usize {
-    self.apply_transform(|arena: &mut Arena<SchemaItem>, key: usize| {
+    self.apply_transform(|arena: &mut Arena<ArenaSchemaNode>, key: usize| {
       for transform in transforms {
         let transform: BoxedSchemaTransform = transform.into();
         transform(arena, key)

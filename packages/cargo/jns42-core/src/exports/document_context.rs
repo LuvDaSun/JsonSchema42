@@ -136,14 +136,14 @@ extern "C" fn document_context_load_from_node(
 }
 
 #[no_mangle]
-extern "C" fn document_context_schema_nodes(
+extern "C" fn document_context_get_schema_nodes(
   document_context: *const Rc<DocumentContext>,
   error_reference: *mut usize,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let document_context = unsafe { &*document_context };
-    let intermediate_document = document_context.get_schema_nodes();
-    let intermediate_document = serde_json::to_string(&intermediate_document)?;
+    let schema_nodes = document_context.get_schema_nodes();
+    let intermediate_document = serde_json::to_string(&schema_nodes)?;
     let intermediate_document = CString::new(intermediate_document)?;
 
     Ok(intermediate_document.into_raw())

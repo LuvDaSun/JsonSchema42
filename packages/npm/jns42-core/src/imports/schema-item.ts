@@ -1,5 +1,6 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
+import { SchemaType } from "./schema-type.js";
 
 export class SchemaItem extends ForeignObject {
   constructor(pointer: number) {
@@ -19,16 +20,6 @@ export type SchemaKey = number;
 /**
  * Type for the SchemaItem
  */
-export type SchemaType =
-  | "never"
-  | "any"
-  | "null"
-  | "boolean"
-  | "integer"
-  | "number"
-  | "string"
-  | "array"
-  | "object";
 
 /**
  * the entire SchemaItem, everything is optional!
