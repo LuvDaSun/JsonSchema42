@@ -34,7 +34,6 @@ impl Specification {
       let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
       for (id, schema) in &schema_nodes {
         let item = SchemaItem {
-          id: Some(id.clone()),
           ..Default::default()
         };
 
@@ -94,83 +93,14 @@ impl Specification {
       }
 
       for (id, key) in &key_map {
-        let schema = schema_nodes.get(id).unwrap();
-        let parent = parents.get(id).map(|id| *key_map.get(id).unwrap());
-        let types = schema
+        let mut schema = schema_nodes.get(id).unwrap().clone();
+        schema.parent = parents.get(id).map(|value| value.to_string());
+        schema.types = schema
           .types
-          .as_ref()
-          .and_then(|value| {
-            if value.is_empty() {
-              None
-            } else {
-              Some(value.clone())
-            }
-          })
           .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
+        schema.primary = if *id == root_id { Some(true) } else { None };
 
-        let primary = if *id == root_id { Some(true) } else { None };
-
-        let item = SchemaItem {
-          name: None,
-          exact: None,
-          primary,
-          parent,
-          types,
-
-          id: Some(id.clone()),
-          title: schema.title.clone(),
-          description: schema.description.clone(),
-          examples: schema.examples.clone(),
-          deprecated: schema.deprecated,
-
-          options: schema.options.clone(),
-
-          minimum_inclusive: schema.minimum_inclusive.clone(),
-          minimum_exclusive: schema.minimum_exclusive.clone(),
-          maximum_inclusive: schema.maximum_inclusive.clone(),
-          maximum_exclusive: schema.maximum_exclusive.clone(),
-          multiple_of: schema.multiple_of.clone(),
-
-          minimum_length: schema.minimum_length,
-          maximum_length: schema.maximum_length,
-          value_pattern: schema.value_pattern.clone(),
-          value_format: schema.value_format.clone(),
-
-          maximum_items: schema.maximum_items,
-          minimum_items: schema.minimum_items,
-          unique_items: schema.unique_items,
-
-          minimum_properties: schema.minimum_properties,
-          maximum_properties: schema.maximum_properties,
-          required: schema
-            .required
-            .as_ref()
-            .map(|value| value.iter().cloned().collect()),
-
-          reference: map_location_value(&key_map, schema.reference.as_ref())?,
-
-          contains: map_location_value(&key_map, schema.contains.as_ref())?,
-          property_names: map_location_value(&key_map, schema.property_names.as_ref())?,
-          map_properties: map_location_value(&key_map, schema.map_properties.as_ref())?,
-          array_items: map_location_value(&key_map, schema.array_items.as_ref())?,
-          r#if: map_location_value(&key_map, schema.r#if.as_ref())?,
-          then: map_location_value(&key_map, schema.then.as_ref())?,
-          r#else: map_location_value(&key_map, schema.r#else.as_ref())?,
-          not: map_location_value(&key_map, schema.not.as_ref())?,
-
-          tuple_items: map_location_list(&key_map, schema.tuple_items.as_ref())?
-            .map(|list| list.collect()),
-          all_of: map_location_list(&key_map, schema.all_of.as_ref())?.map(|list| list.collect()),
-          any_of: map_location_list(&key_map, schema.any_of.as_ref())?.map(|list| list.collect()),
-          one_of: map_location_list(&key_map, schema.one_of.as_ref())?.map(|list| list.collect()),
-
-          dependent_schemas: map_location_map(&key_map, schema.dependent_schemas.as_ref())?
-            .map(|map| map.collect()),
-          object_properties: map_location_map(&key_map, schema.object_properties.as_ref())?
-            .map(|map| map.collect()),
-          pattern_properties: map_location_map(&key_map, schema.pattern_properties.as_ref())?
-            .map(|map| map.collect()),
-        };
+        let item = schema.map_keys(|key| *key_map.get(&key.parse().unwrap()).unwrap());
 
         arena.replace_item(*key, item);
       }
@@ -247,53 +177,6 @@ impl Specification {
 
     Ok(Self { arena, names })
   }
-}
-
-fn map_location_value(
-  key_map: &HashMap<NodeLocation, usize>,
-  value: Option<impl AsRef<str>>,
-) -> Result<Option<usize>, Error> {
-  let value = value.map(|value| value.as_ref().parse()).transpose()?;
-  Ok(value.map(|value| key_map.get(&value).unwrap()).copied())
-}
-
-fn map_location_list(
-  key_map: &HashMap<NodeLocation, usize>,
-  list: Option<impl IntoIterator<Item = impl AsRef<str>>>,
-) -> Result<Option<impl Iterator<Item = usize> + '_>, Error> {
-  let list = list
-    .map(|list| {
-      list
-        .into_iter()
-        .map(|value| value.as_ref().parse::<NodeLocation>())
-        .collect::<Result<Vec<_>, _>>()
-    })
-    .transpose()?;
-  Ok(list.map(|list| list.into_iter().map(|value| *key_map.get(&value).unwrap())))
-}
-
-fn map_location_map(
-  key_map: &HashMap<NodeLocation, usize>,
-  list: Option<impl IntoIterator<Item = (impl AsRef<str>, impl AsRef<str>)>>,
-) -> Result<Option<impl Iterator<Item = (String, usize)> + '_>, Error> {
-  let list = list
-    .map(|list| {
-      list
-        .into_iter()
-        .map(|(name, value)| {
-          value
-            .as_ref()
-            .parse::<NodeLocation>()
-            .map(|value| (name.as_ref().to_owned(), value))
-        })
-        .collect::<Result<Vec<_>, _>>()
-    })
-    .transpose()?;
-  Ok(list.map(|list| {
-    list
-      .into_iter()
-      .map(|(name, value)| (name, *key_map.get(&value).unwrap()))
-  }))
 }
 
 impl Specification {

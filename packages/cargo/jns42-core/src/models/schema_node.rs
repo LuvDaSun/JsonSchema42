@@ -381,55 +381,37 @@ impl<K> SchemaNode<K>
 where
   K: Ord,
 {
-  pub fn map_keys<K1>(
-    &self,
-    map_key: impl Fn(&K) -> Result<K1, Error>,
-  ) -> Result<SchemaNode<K1>, Error>
+  pub fn map_keys<K1>(&self, map_key: impl Fn(&K) -> K1) -> SchemaNode<K1>
   where
     K1: Ord,
   {
-    let map_single = |value: &Option<K>| value.as_ref().map(&map_key).transpose();
+    let map_single = |value: &Option<K>| value.as_ref().map(&map_key);
     let map_vec = |value: &Option<Vec<K>>| {
       value
         .as_ref()
-        .map(|value| {
-          value
-            .iter()
-            .map(&map_key)
-            .collect::<Result<Vec<K1>, Error>>()
-        })
-        .transpose()
+        .map(|value| value.iter().map(&map_key).collect::<Vec<K1>>())
     };
     let map_set = |value: &Option<BTreeSet<K>>| {
       value
         .as_ref()
-        .map(|value| {
-          value
-            .iter()
-            .map(&map_key)
-            .collect::<Result<BTreeSet<K1>, Error>>()
-        })
-        .transpose()
+        .map(|value| value.iter().map(&map_key).collect::<BTreeSet<K1>>())
     };
     let map_map = |value: &Option<HashMap<String, K>>| {
-      value
-        .as_ref()
-        .map(|value| {
-          value
-            .iter()
-            .map(|(key, value)| map_key(value).map(|value| (key.clone(), value)))
-            .collect::<Result<HashMap<String, K1>, Error>>()
-        })
-        .transpose()
+      value.as_ref().map(|value| {
+        value
+          .iter()
+          .map(|(key, value)| (key.clone(), map_key(value)))
+          .collect::<HashMap<String, K1>>()
+      })
     };
 
-    let item = SchemaNode {
+    SchemaNode {
       name: self.name.clone(),
       exact: self.exact,
       primary: self.primary,
       types: self.types.clone(),
 
-      parent: map_single(&self.parent)?,
+      parent: map_single(&self.parent),
 
       id: self.id.clone(),
       title: self.title.clone(),
@@ -458,27 +440,25 @@ where
       maximum_properties: self.maximum_properties,
       required: self.required.clone(),
 
-      reference: map_single(&self.reference)?,
+      reference: map_single(&self.reference),
 
-      contains: map_single(&self.contains)?,
-      property_names: map_single(&self.property_names)?,
-      map_properties: map_single(&self.map_properties)?,
-      array_items: map_single(&self.array_items)?,
-      r#if: map_single(&self.r#if)?,
-      then: map_single(&self.then)?,
-      r#else: map_single(&self.r#else)?,
-      not: map_single(&self.not)?,
+      contains: map_single(&self.contains),
+      property_names: map_single(&self.property_names),
+      map_properties: map_single(&self.map_properties),
+      array_items: map_single(&self.array_items),
+      r#if: map_single(&self.r#if),
+      then: map_single(&self.then),
+      r#else: map_single(&self.r#else),
+      not: map_single(&self.not),
 
-      tuple_items: map_vec(&self.tuple_items)?,
-      all_of: map_set(&self.all_of)?,
-      any_of: map_set(&self.any_of)?,
-      one_of: map_set(&self.one_of)?,
+      tuple_items: map_vec(&self.tuple_items),
+      all_of: map_set(&self.all_of),
+      any_of: map_set(&self.any_of),
+      one_of: map_set(&self.one_of),
 
-      dependent_schemas: map_map(&self.dependent_schemas)?,
-      object_properties: map_map(&self.object_properties)?,
-      pattern_properties: map_map(&self.pattern_properties)?,
-    };
-
-    Ok(item)
+      dependent_schemas: map_map(&self.dependent_schemas),
+      object_properties: map_map(&self.object_properties),
+      pattern_properties: map_map(&self.pattern_properties),
+    }
   }
 }
