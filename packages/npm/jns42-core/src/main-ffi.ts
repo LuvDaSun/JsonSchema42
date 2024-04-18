@@ -100,10 +100,7 @@ export interface MainExports extends ExportsBase {
     error_reference: number,
     callback: number,
   ): void;
-  document_context_get_intermediate_document(
-    document_context: number,
-    error_reference: number,
-  ): number;
+  document_context_get_schema_nodes(document_context: number, error_reference: number): number;
 }
 
 export type MainFfi = Ffi<MainExports, MainEnvironment>;

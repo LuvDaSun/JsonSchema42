@@ -18,5 +18,5 @@ pub trait SchemaDocument {
   fn get_document_location(&self) -> &NodeLocation;
   fn get_node_locations(&self) -> Vec<NodeLocation>;
 
-  fn get_intermediate_node_entries(&self) -> BTreeMap<NodeLocation, IntermediateNode>;
+  fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateNode>;
 }

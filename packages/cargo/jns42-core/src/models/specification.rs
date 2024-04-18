@@ -1,4 +1,4 @@
-use super::{intermediate::IntermediateSchema, schema_item::SchemaItem, SchemaType};
+use super::{schema_item::SchemaItem, IntermediateNode, SchemaType};
 use crate::{
   error::Error,
   naming::{NamesBuilder, Sentence},
@@ -9,7 +9,7 @@ use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::iter::{empty, once};
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
@@ -22,7 +22,7 @@ pub struct Specification {
 impl Specification {
   pub fn new(
     root_id: NodeLocation,
-    intermediate_document: IntermediateSchema,
+    schema_nodes: BTreeMap<NodeLocation, IntermediateNode>,
   ) -> Result<Self, Error> {
     let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
     let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
@@ -32,7 +32,7 @@ impl Specification {
     let mut arena = Arena::new();
     {
       let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
-      for (id, schema) in &intermediate_document.schemas {
+      for (id, schema) in &schema_nodes {
         let item = SchemaItem {
           id: Some(id.clone()),
           ..Default::default()
@@ -94,7 +94,7 @@ impl Specification {
       }
 
       for (id, key) in &key_map {
-        let schema = intermediate_document.schemas.get(id).unwrap();
+        let schema = schema_nodes.get(id).unwrap();
         let parent = parents.get(id).map(|id| *key_map.get(id).unwrap());
         let types = schema
           .types

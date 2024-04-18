@@ -1,10 +1,9 @@
 use super::schema_document::SchemaDocument;
 use crate::documents::{self, discover_meta_schema};
 use crate::error::Error;
-use crate::{
-  models::IntermediateSchema,
-  utils::{node_location::NodeLocation, read_json_node::read_json_node},
-};
+use crate::models::IntermediateNode;
+use crate::utils::{node_location::NodeLocation, read_json_node::read_json_node};
+use std::collections::BTreeMap;
 use std::future::Future;
 use std::pin::Pin;
 use std::{
@@ -200,18 +199,13 @@ impl DocumentContext {
       .cloned()
   }
 
-  pub fn get_intermediate_document(&self) -> IntermediateSchema {
-    let schemas = self
+  pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateNode> {
+    self
       .documents
       .borrow()
       .values()
-      .flat_map(|document| document.get_intermediate_node_entries())
-      .collect();
-
-    IntermediateSchema {
-      schema: "https://schema.JsonSchema42.org/jns42-intermediate/schema.json".to_string(),
-      schemas,
-    }
+      .flat_map(|document| document.get_schema_nodes())
+      .collect()
   }
 
   /**
@@ -542,6 +536,6 @@ mod tests {
       .await
       .unwrap();
 
-    let _intermediate_document = document_context.get_intermediate_document();
+    let _intermediate_document = document_context.get_schema_nodes();
   }
 }

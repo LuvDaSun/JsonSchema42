@@ -4,6 +4,7 @@ use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeSet, HashSet};
 use std::{collections::HashMap, iter::empty};
 
+pub type IntermediateNode = SchemaNode<String>;
 pub type SchemaItem = SchemaNode<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]

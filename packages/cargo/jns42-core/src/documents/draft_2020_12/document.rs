@@ -120,7 +120,7 @@ impl SchemaDocument for Document {
     &self.embedded_documents
   }
 
-  fn get_intermediate_node_entries(&self) -> BTreeMap<NodeLocation, IntermediateNode> {
+  fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, IntermediateNode> {
     self
       .nodes
       .iter()
