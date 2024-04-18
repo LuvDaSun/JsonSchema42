@@ -5,7 +5,7 @@ use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};
 
-pub type IntermediateSchemaItem = SchemaItem<NodeLocation>;
+pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]

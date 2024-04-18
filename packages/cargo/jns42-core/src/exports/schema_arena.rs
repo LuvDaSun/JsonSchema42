@@ -14,7 +14,7 @@ extern "C" fn schema_arena_drop(arena: *mut SchemaArena) {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_new() -> *const SchemaArena {
+extern "C" fn schema_arena_new() -> *mut SchemaArena {
   let arena = SchemaArena::new();
   let arena = Box::new(arena);
   Box::into_raw(arena)
