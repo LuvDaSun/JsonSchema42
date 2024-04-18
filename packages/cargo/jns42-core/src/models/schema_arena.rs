@@ -19,74 +19,73 @@ impl Arena<ArenaSchemaItem> {
     // first load schemas in the arena
 
     let mut arena = Arena::new();
-    {
-      let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
-      for (id, schema) in &schema_nodes {
-        let item = ArenaSchemaItem {
-          ..Default::default()
-        };
 
-        let key = arena.add_item(item);
-        key_map.insert(id.clone(), key);
+    let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
+    for (id, schema) in &schema_nodes {
+      let item = ArenaSchemaItem {
+        ..Default::default()
+      };
 
-        for child_id in &schema.all_of {
-          for child_id in child_id {
-            parents.insert(child_id.clone(), id.clone());
-          }
-        }
+      let key = arena.add_item(item);
+      key_map.insert(id.clone(), key);
 
-        for child_id in &schema.any_of {
-          for child_id in child_id {
-            parents.insert(child_id.clone(), id.clone());
-          }
-        }
-
-        for child_id in &schema.one_of {
-          for child_id in child_id {
-            parents.insert(child_id.clone(), id.clone());
-          }
-        }
-
-        if let Some(child_id) = &schema.r#if {
+      for child_id in &schema.all_of {
+        for child_id in child_id {
           parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.then {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.r#else {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.not {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.property_names {
-          parents.insert(child_id.clone(), id.clone());
-        }
-
-        if let Some(child_id) = &schema.property_names {
-          implicit_types.insert(child_id.clone(), SchemaType::String);
         }
       }
 
-      for (id, key) in &key_map {
-        let mut schema = schema_nodes.get(id).unwrap().clone();
-        schema.parent = parents.get(id).cloned();
-        schema.types = schema
-          .types
-          .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
-        // schema.primary = if *id == root_id { Some(true) } else { None };
-
-        let item = schema.map_keys(|key| *key_map.get(key).unwrap());
-
-        arena.replace_item(*key, item);
+      for child_id in &schema.any_of {
+        for child_id in child_id {
+          parents.insert(child_id.clone(), id.clone());
+        }
       }
 
-      arena
+      for child_id in &schema.one_of {
+        for child_id in child_id {
+          parents.insert(child_id.clone(), id.clone());
+        }
+      }
+
+      if let Some(child_id) = &schema.r#if {
+        parents.insert(child_id.clone(), id.clone());
+      }
+
+      if let Some(child_id) = &schema.then {
+        parents.insert(child_id.clone(), id.clone());
+      }
+
+      if let Some(child_id) = &schema.r#else {
+        parents.insert(child_id.clone(), id.clone());
+      }
+
+      if let Some(child_id) = &schema.not {
+        parents.insert(child_id.clone(), id.clone());
+      }
+
+      if let Some(child_id) = &schema.property_names {
+        parents.insert(child_id.clone(), id.clone());
+      }
+
+      if let Some(child_id) = &schema.property_names {
+        implicit_types.insert(child_id.clone(), SchemaType::String);
+      }
     }
+
+    for (id, key) in &key_map {
+      let mut schema = schema_nodes.get(id).unwrap().clone();
+      schema.parent = parents.get(id).cloned();
+      schema.types = schema
+        .types
+        .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
+      // schema.primary = if *id == root_id { Some(true) } else { None };
+
+      let item = schema.map_keys(|key| *key_map.get(key).unwrap());
+
+      arena.replace_item(*key, item);
+    }
+
+    arena
   }
 
   /// Resolves the final entry for a given schema key, following any alias chains.

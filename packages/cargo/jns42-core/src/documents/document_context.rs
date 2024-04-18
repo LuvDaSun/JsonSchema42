@@ -12,11 +12,11 @@ use std::{
   rc::{Rc, Weak},
 };
 
-pub struct DocumentConfiguration<'a> {
+pub struct DocumentConfiguration {
   pub retrieval_location: NodeLocation,
   pub given_location: NodeLocation,
   pub antecedent_location: Option<NodeLocation>,
-  pub document_node: &'a serde_json::Value,
+  pub document_node: serde_json::Value,
 }
 
 pub type DocumentFactory =
@@ -426,8 +426,11 @@ impl DocumentContext {
     */
     let document = {
       let node_cache = self.node_cache.borrow();
-      let node = node_cache.get(retrieval_location).ok_or(Error::NotFound)?;
-      let meta_schema_id = discover_meta_schema(node).unwrap_or(default_meta_schema_id);
+      let node = node_cache
+        .get(retrieval_location)
+        .ok_or(Error::NotFound)?
+        .clone();
+      let meta_schema_id = discover_meta_schema(&node).unwrap_or(default_meta_schema_id);
 
       let factory = self.factories.get(meta_schema_id).ok_or(Error::NotFound)?;
 

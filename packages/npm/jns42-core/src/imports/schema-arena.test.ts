@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import test from "node:test";
 import { normalizeObject } from "../utils/index.js";
+import { DocumentContext } from "./document-context.js";
 import { SchemaArena } from "./schema-arena.js";
 
 test("schema-arena", () => {
@@ -22,4 +23,23 @@ test("schema-arena", () => {
   }
 
   assert.equal(1000, schemaArena.count());
+});
+
+test("schema-arena from document-context", async () => {
+  using documentContext = DocumentContext.new();
+  documentContext.registerWellKnownFactories();
+
+  await documentContext.loadFromNode(
+    "/string-or-boolean.json#",
+    "/string-or-boolean.json#",
+    undefined,
+    {
+      type: ["string", "boolean"],
+    },
+    "https://json-schema.org/draft/2020-12/schema",
+  );
+
+  using arena = SchemaArena.fromDocumentContext(documentContext);
+
+  assert.equal(arena.count(), 1);
 });
