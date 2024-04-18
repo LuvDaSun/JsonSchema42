@@ -23,6 +23,14 @@ impl Node {
     self.0.as_object()?.get("$ref")?.as_str()
   }
 
+  pub fn select_anchor(&self) -> Option<&str> {
+    self.0.as_object()?.get("$anchor")?.as_str()
+  }
+
+  pub fn select_dynamic_anchor(&self) -> Option<&str> {
+    self.0.as_object()?.get("$dynamicAnchor")?.as_str()
+  }
+
   pub fn select_title(&self) -> Option<&str> {
     self.0.as_object()?.get("title")?.as_str()
   }
@@ -59,6 +67,10 @@ impl Node {
 
   pub fn select_reference(&self) -> Option<&str> {
     self.0.as_object()?.get("$ref")?.as_str()
+  }
+
+  pub fn select_dynamic_reference(&self) -> Option<&str> {
+    self.0.as_object()?.get("$dynamicRef")?.as_str()
   }
 
   pub fn select_sub_nodes(&self, pointer: &[String]) -> impl Iterator<Item = (Vec<String>, Node)> {

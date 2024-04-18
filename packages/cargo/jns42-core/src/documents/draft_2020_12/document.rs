@@ -8,10 +8,10 @@ use std::iter::empty;
 use std::rc::Weak;
 
 pub struct Document {
-  _document_context: Weak<DocumentContext>,
+  document_context: Weak<DocumentContext>,
   // given_location: NodeLocation,
-  // antecedent_location: Option<NodeLocation>,
   document_location: NodeLocation,
+  antecedent_location: Option<NodeLocation>,
   // document_node: Node,
   /**
   Nodes that belong to this document, indexed by their pointer
@@ -19,6 +19,8 @@ pub struct Document {
   nodes: HashMap<Vec<String>, Node>,
   referenced_documents: Vec<ReferencedDocument>,
   embedded_documents: Vec<EmbeddedDocument>,
+  anchors: HashMap<String, Vec<String>>,
+  dynamic_anchors: HashMap<String, Vec<String>>,
 }
 
 impl Document {
@@ -45,6 +47,8 @@ impl Document {
     let mut nodes = HashMap::new();
     let mut referenced_documents = Vec::new();
     let mut embedded_documents = Vec::new();
+    let mut anchors = HashMap::new();
+    let mut dynamic_anchors = HashMap::new();
 
     let mut node_queue = Vec::new();
     node_queue.push((vec![], document_node.clone()));
@@ -60,6 +64,14 @@ impl Document {
           retrieval_location,
           given_location,
         });
+      }
+
+      if let Some(node_anchor) = node.select_anchor() {
+        anchors.insert(node_anchor.to_owned(), node_pointer.clone());
+      }
+
+      if let Some(node_dynamic_anchor) = node.select_dynamic_anchor() {
+        dynamic_anchors.insert(node_dynamic_anchor.to_owned(), node_pointer.clone());
       }
 
       for (sub_pointer, sub_node) in node.select_sub_nodes(&node_pointer) {
@@ -84,14 +96,16 @@ impl Document {
     }
 
     Ok(Self {
-      _document_context: document_context,
-      // antecedent_location,
+      document_context,
+      antecedent_location,
       // given_location,
       document_location,
       // document_node,
       nodes,
       referenced_documents,
       embedded_documents,
+      anchors,
+      dynamic_anchors,
     })
   }
 }
@@ -101,15 +115,22 @@ impl SchemaDocument for Document {
     &self.document_location
   }
 
+  fn get_antecedent_location(&self) -> Option<&NodeLocation> {
+    self.antecedent_location.as_ref()
+  }
+
   fn get_node_locations(&self) -> Vec<NodeLocation> {
-    self
-      .nodes
-      .keys()
-      .map(|pointer| {
+    empty()
+      .chain(self.nodes.keys().map(|pointer| {
         let mut node_location = self.document_location.clone();
         node_location.push_pointer(pointer.clone());
         node_location
-      })
+      }))
+      .chain(self.anchors.keys().map(|anchor| {
+        let mut node_location = self.document_location.clone();
+        node_location.set_anchor(anchor.clone());
+        node_location
+      }))
       .collect()
   }
 
@@ -128,6 +149,43 @@ impl SchemaDocument for Document {
       .map(|(pointer, node)| {
         let mut location = self.get_document_location().clone();
         location.push_pointer(pointer);
+
+        let reference = None
+          .or_else(|| {
+            node.select_reference().map(|value| {
+              let reference_location = value.parse().unwrap();
+              location.join(&reference_location)
+            })
+          })
+          .or_else(|| {
+            node.select_dynamic_reference().map(|value| {
+              let document_context = self.document_context.upgrade().unwrap();
+              // get antecedents
+              let mut documents = document_context
+                .get_document_and_antecedents(&self.document_location)
+                .unwrap();
+              documents.reverse();
+              let dynamic_reference_location = value.parse().unwrap();
+
+              for document in documents {
+                let document_location = document.get_document_location().clone();
+                let location = document_location.join(&dynamic_reference_location);
+
+                if document.has_node(
+                  &location
+                    .get_hash()
+                    .into_iter()
+                    .map(|value| value.to_owned())
+                    .collect::<Vec<_>>(),
+                ) {
+                  return location;
+                }
+              }
+
+              panic!("not found");
+            })
+          });
+
         (
           location.clone(),
           DocumentSchemaItem {
@@ -177,10 +235,7 @@ impl SchemaDocument for Document {
               .select_required()
               .map(|value| value.iter().map(|value| (*value).to_owned()).collect()),
 
-            reference: node.select_reference().map(|value| {
-              let reference_location = value.parse().unwrap();
-              location.join(&reference_location)
-            }),
+            reference,
 
             // sub nodes
             r#if: map_entry_location(&location, node.select_if_entry(pointer)),
@@ -222,6 +277,10 @@ impl SchemaDocument for Document {
         )
       })
       .collect()
+  }
+
+  fn has_node(&self, hash: &[String]) -> bool {
+    self.nodes.contains_key(hash)
   }
 }
 

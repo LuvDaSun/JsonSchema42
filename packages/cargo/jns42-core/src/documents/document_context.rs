@@ -208,6 +208,27 @@ impl DocumentContext {
       .collect()
   }
 
+  pub fn get_document_and_antecedents(
+    &self,
+    document_location: &NodeLocation,
+  ) -> Result<Vec<Rc<dyn SchemaDocument>>, Error> {
+    let documents = Vec::new();
+    let mut document_location = document_location.clone();
+
+    loop {
+      let documents = self.documents.borrow();
+      let document = documents.get(&document_location).ok_or(Error::NotFound)?;
+
+      let Some(antecedent_location) = document.get_antecedent_location() else {
+        break;
+      };
+
+      document_location = antecedent_location.clone();
+    }
+
+    Ok(documents)
+  }
+
   /**
   Load nodes from a location. The retrieval location is the physical location of the node,
   it should be a root location

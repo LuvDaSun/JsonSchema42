@@ -7,6 +7,7 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 pub struct Document {
   document_location: NodeLocation,
+  antecedent_location: Option<NodeLocation>,
   /**
   Nodes that belong to this document, indexed by their pointer
   */
@@ -78,6 +79,7 @@ impl Document {
 
     Ok(Self {
       document_location,
+      antecedent_location,
       nodes,
       referenced_documents,
       embedded_documents,
@@ -88,6 +90,10 @@ impl Document {
 impl SchemaDocument for Document {
   fn get_document_location(&self) -> &NodeLocation {
     &self.document_location
+  }
+
+  fn get_antecedent_location(&self) -> Option<&NodeLocation> {
+    self.antecedent_location.as_ref()
   }
 
   fn get_node_locations(&self) -> Vec<NodeLocation> {
@@ -214,6 +220,10 @@ impl SchemaDocument for Document {
         )
       })
       .collect()
+  }
+
+  fn has_node(&self, hash: &[String]) -> bool {
+    self.nodes.contains_key(hash)
   }
 }
 

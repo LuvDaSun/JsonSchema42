@@ -16,7 +16,10 @@ pub trait SchemaDocument {
   fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument>;
 
   fn get_document_location(&self) -> &NodeLocation;
+  fn get_antecedent_location(&self) -> Option<&NodeLocation>;
   fn get_node_locations(&self) -> Vec<NodeLocation>;
 
   fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem>;
+
+  fn has_node(&self, pointer: &[String]) -> bool;
 }
