@@ -1,5 +1,11 @@
-use crate::models::SchemaType;
-use std::iter::{empty, once};
+use crate::{
+  models::{DocumentSchemaItem, SchemaType},
+  utils::node_location::NodeLocation,
+};
+use std::{
+  collections::{BTreeSet, HashMap},
+  iter::{empty, once},
+};
 
 #[derive(Clone, Debug)]
 pub struct Node(serde_json::Value);
@@ -10,11 +16,133 @@ impl From<serde_json::Value> for Node {
   }
 }
 
+impl Node {
+  pub fn to_document_schema_item(&self, location: NodeLocation) -> DocumentSchemaItem {
+    DocumentSchemaItem {
+      location: Some(location.clone()),
+      name: None,
+      exact: Some(true),
+      parent: None,
+      primary: Some(true),
+
+      // meta
+      title: self.select_title().map(|value| value.to_owned()),
+      description: self.select_description().map(|value| value.to_owned()),
+      examples: None,
+      deprecated: None,
+
+      // types
+      types: self.select_types(),
+
+      // assertions
+      options: self.select_enum(),
+
+      minimum_inclusive: if self.select_is_minimum_exclusive().unwrap_or_default() {
+        None
+      } else {
+        self.select_minimum().cloned()
+      },
+      minimum_exclusive: if self.select_is_minimum_exclusive().unwrap_or_default() {
+        self.select_minimum().cloned()
+      } else {
+        None
+      },
+      maximum_inclusive: if self.select_is_maximum_exclusive().unwrap_or_default() {
+        None
+      } else {
+        self.select_maximum().cloned()
+      },
+      maximum_exclusive: if self.select_is_maximum_exclusive().unwrap_or_default() {
+        self.select_maximum().cloned()
+      } else {
+        None
+      },
+      multiple_of: self.select_multiple_of().cloned(),
+      minimum_length: self.select_minimum_length(),
+      maximum_length: self.select_maximum_length(),
+      value_pattern: self.select_value_pattern().map(|value| value.to_owned()),
+      value_format: self.select_value_format().map(|value| value.to_owned()),
+      maximum_items: self.select_maximum_items(),
+      minimum_items: self.select_minimum_items(),
+      unique_items: self.select_unique_items(),
+      minimum_properties: self.select_minimum_properties(),
+      maximum_properties: self.select_maximum_properties(),
+      required: self
+        .select_required()
+        .map(|value| value.iter().map(|value| (*value).to_owned()).collect()),
+
+      reference: self.select_reference().map(|value| {
+        let reference_location = value.parse().unwrap();
+        location.join(&reference_location)
+      }),
+
+      // sub nodes
+      r#if: None,
+      then: None,
+      r#else: None,
+      not: Self::map_entry_location(&location, self.select_not_entry(Default::default())),
+      contains: None,
+      array_items: Self::map_entry_location(
+        &location,
+        self.select_array_items_entry(Default::default()),
+      ),
+      property_names: None,
+      map_properties: Self::map_entry_location(
+        &location,
+        self.select_map_properties_entry(Default::default()),
+      ),
+
+      all_of: Self::map_entry_locations_set(
+        &location,
+        self.select_all_of_entries(Default::default()),
+      ),
+      any_of: Self::map_entry_locations_set(
+        &location,
+        self.select_any_of_entries(Default::default()),
+      ),
+      one_of: Self::map_entry_locations_set(
+        &location,
+        self.select_one_of_entries(Default::default()),
+      ),
+      tuple_items: Self::map_entry_locations_vec(
+        &location,
+        self.select_tuple_items_entries(Default::default()),
+      ),
+
+      dependent_schemas: Self::map_entry_locations_map(
+        &location,
+        self.select_dependent_schemas_entries(Default::default()),
+      ),
+      object_properties: Self::map_entry_locations_map(
+        &location,
+        self.select_object_properties_entries(Default::default()),
+      ),
+      pattern_properties: Self::map_entry_locations_map(
+        &location,
+        self.select_pattern_properties_entries(Default::default()),
+      ),
+    }
+  }
+}
+
 /*
-core
+public selectors
 */
 impl Node {
-  pub fn select_types(&self) -> Option<Vec<SchemaType>> {
+  pub fn select_id(&self) -> Option<&str> {
+    self.select_str("id")
+  }
+
+  pub fn select_reference(&self) -> Option<&str> {
+    self.select_str("$ref")
+  }
+}
+
+/*
+metadata
+*/
+impl Node {
+  fn select_types(&self) -> Option<Vec<SchemaType>> {
     match &self.0 {
       serde_json::Value::Bool(true) => Some(vec![SchemaType::Any]),
       serde_json::Value::Bool(false) => Some(vec![SchemaType::Never]),
@@ -32,29 +160,12 @@ impl Node {
     }
   }
 
-  pub fn select_schema(&self) -> Option<&str> {
-    self.0.as_object()?.get("$schema")?.as_str()
+  fn select_title(&self) -> Option<&str> {
+    self.select_str("title")
   }
 
-  pub fn select_id(&self) -> Option<&str> {
-    self.0.as_object()?.get("id")?.as_str()
-  }
-
-  pub fn select_reference(&self) -> Option<&str> {
-    self.0.as_object()?.get("$ref")?.as_str()
-  }
-}
-
-/*
-metadata
-*/
-impl Node {
-  pub fn select_title(&self) -> Option<&str> {
-    self.0.as_object()?.get("title")?.as_str()
-  }
-
-  pub fn select_description(&self) -> Option<&str> {
-    self.0.as_object()?.get("description")?.as_str()
+  fn select_description(&self) -> Option<&str> {
+    self.select_str("description")
   }
 }
 
@@ -91,57 +202,57 @@ impl Node {
 
   //
 
-  pub fn select_not_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "not")
+  fn select_not_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
+    self.select_entries_one(pointer, "not")
   }
-  pub fn select_map_properties_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    select_entries_one(self, pointer, "additionalProperties")
+  fn select_map_properties_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
+    self.select_entries_one(pointer, "additionalProperties")
   }
-  pub fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    if let Some(value) = select_entries_one(self, pointer, "items") {
+  fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
+    if let Some(value) = self.select_entries_one(pointer, "items") {
       return Some(value);
     }
 
-    if let Some(value) = select_entries_one(self, pointer, "additionalItems") {
+    if let Some(value) = self.select_entries_one(pointer, "additionalItems") {
       return Some(value);
     }
 
     None
   }
 
-  pub fn select_all_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_list(self, pointer, "allOf")
+  fn select_all_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
+    self.select_entries_list(pointer, "allOf")
   }
-  pub fn select_any_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_list(self, pointer, "anyOf")
+  fn select_any_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
+    self.select_entries_list(pointer, "anyOf")
   }
-  pub fn select_one_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_list(self, pointer, "oneOf")
+  fn select_one_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
+    self.select_entries_list(pointer, "oneOf")
   }
-  pub fn select_tuple_items_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_list(self, pointer, "items")
+  fn select_tuple_items_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
+    self.select_entries_list(pointer, "items")
   }
 
-  pub fn select_dependent_schemas_entries(
+  fn select_dependent_schemas_entries(
     &self,
     pointer: &[String],
   ) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_map(self, pointer, "dependentSchemas")
+    self.select_entries_map(pointer, "dependentSchemas")
   }
-  pub fn select_object_properties_entries(
+  fn select_object_properties_entries(
     &self,
     pointer: &[String],
   ) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_map(self, pointer, "properties")
+    self.select_entries_map(pointer, "properties")
   }
-  pub fn select_pattern_properties_entries(
+  fn select_pattern_properties_entries(
     &self,
     pointer: &[String],
   ) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_map(self, pointer, "patternProperties")
+    self.select_entries_map(pointer, "patternProperties")
   }
-  pub fn select_definition_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    select_entries_map(self, pointer, "definitions")
+  fn select_definition_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
+    self.select_entries_map(pointer, "definitions")
   }
 }
 
@@ -149,171 +260,237 @@ impl Node {
 assertions
 */
 impl Node {
-  pub fn select_enum(&self) -> Option<Vec<serde_json::Value>> {
-    select_vec_value(self, "enum")
+  fn select_enum(&self) -> Option<Vec<serde_json::Value>> {
+    self.select_vec_value("enum")
   }
 
-  pub fn select_minimum(&self) -> Option<&serde_json::Number> {
-    select_number(self, "minimum")
+  fn select_minimum(&self) -> Option<&serde_json::Number> {
+    self.select_number("minimum")
   }
 
-  pub fn select_is_minimum_exclusive(&self) -> Option<bool> {
-    select_bool(self, "exclusiveMinimum")
+  fn select_is_minimum_exclusive(&self) -> Option<bool> {
+    self.select_bool("exclusiveMinimum")
   }
 
-  pub fn select_maximum(&self) -> Option<&serde_json::Number> {
-    select_number(self, "maximum")
+  fn select_maximum(&self) -> Option<&serde_json::Number> {
+    self.select_number("maximum")
   }
 
-  pub fn select_is_maximum_exclusive(&self) -> Option<bool> {
-    select_bool(self, "exclusiveMaximum")
+  fn select_is_maximum_exclusive(&self) -> Option<bool> {
+    self.select_bool("exclusiveMaximum")
   }
 
-  pub fn select_multiple_of(&self) -> Option<&serde_json::Number> {
-    select_number(self, "multipleOf")
+  fn select_multiple_of(&self) -> Option<&serde_json::Number> {
+    self.select_number("multipleOf")
   }
 
-  pub fn select_minimum_length(&self) -> Option<u64> {
-    select_unsigned_integer(self, "minLength")
+  fn select_minimum_length(&self) -> Option<u64> {
+    self.select_unsigned_integer("minLength")
   }
 
-  pub fn select_maximum_length(&self) -> Option<u64> {
-    select_unsigned_integer(self, "maxLength")
+  fn select_maximum_length(&self) -> Option<u64> {
+    self.select_unsigned_integer("maxLength")
   }
 
-  pub fn select_value_pattern(&self) -> Option<&str> {
-    select_str(self, "valuePattern")
+  fn select_value_pattern(&self) -> Option<&str> {
+    self.select_str("valuePattern")
   }
 
-  pub fn select_value_format(&self) -> Option<&str> {
-    select_str(self, "valueFormat")
+  fn select_value_format(&self) -> Option<&str> {
+    self.select_str("valueFormat")
   }
 
-  pub fn select_maximum_items(&self) -> Option<u64> {
-    select_unsigned_integer(self, "maxItems")
+  fn select_maximum_items(&self) -> Option<u64> {
+    self.select_unsigned_integer("maxItems")
   }
 
-  pub fn select_minimum_items(&self) -> Option<u64> {
-    select_unsigned_integer(self, "minItems")
+  fn select_minimum_items(&self) -> Option<u64> {
+    self.select_unsigned_integer("minItems")
   }
 
-  pub fn select_unique_items(&self) -> Option<bool> {
-    select_bool(self, "uniqueItems")
+  fn select_unique_items(&self) -> Option<bool> {
+    self.select_bool("uniqueItems")
   }
 
-  pub fn select_minimum_properties(&self) -> Option<u64> {
-    select_unsigned_integer(self, "minProperties")
+  fn select_minimum_properties(&self) -> Option<u64> {
+    self.select_unsigned_integer("minProperties")
   }
 
-  pub fn select_maximum_properties(&self) -> Option<u64> {
-    select_unsigned_integer(self, "maxProperties")
+  fn select_maximum_properties(&self) -> Option<u64> {
+    self.select_unsigned_integer("maxProperties")
   }
 
-  pub fn select_required(&self) -> Option<Vec<&str>> {
-    select_vec_str(self, "required")
+  fn select_required(&self) -> Option<Vec<&str>> {
+    self.select_vec_str("required")
   }
 }
 
-fn select_vec_value(node: &Node, field: &str) -> Option<Vec<serde_json::Value>> {
-  node.0.as_object()?.get(field)?.as_array().cloned()
+impl Node {
+  fn select_vec_value(&self, field: &str) -> Option<Vec<serde_json::Value>> {
+    self.0.as_object()?.get(field)?.as_array().cloned()
+  }
+
+  fn select_vec_str<'n>(&'n self, field: &str) -> Option<Vec<&'n str>> {
+    self
+      .0
+      .as_object()?
+      .get(field)?
+      .as_array()
+      .map(|value| value.iter().filter_map(|value| value.as_str()).collect())
+  }
+
+  fn select_unsigned_integer(&self, field: &str) -> Option<u64> {
+    self.0.as_object()?.get(field)?.as_u64()
+  }
+
+  fn select_number<'n>(&'n self, field: &str) -> Option<&'n serde_json::Number> {
+    self.0.as_object()?.get(field)?.as_number()
+  }
+
+  fn select_bool(&self, field: &str) -> Option<bool> {
+    self.0.as_object()?.get(field)?.as_bool()
+  }
+
+  fn select_str<'n>(&'n self, field: &str) -> Option<&'n str> {
+    self.0.as_object()?.get(field)?.as_str()
+  }
+
+  fn select_entries_one(&self, pointer: &[String], field: &str) -> Option<(Vec<String>, Node)> {
+    let selected = self.0.as_object()?.get(field)?;
+    let pointer: Vec<_> = pointer
+      .iter()
+      .cloned()
+      .chain(once(field.to_string()))
+      .collect();
+
+    let result = (pointer, selected.clone().into());
+    Some(result)
+  }
+
+  fn select_entries_list(
+    &self,
+    pointer: &[String],
+    field: &str,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
+    let selected = self.0.as_object()?.get(field)?;
+    let pointer: Vec<_> = pointer
+      .iter()
+      .cloned()
+      .map(|part| part.to_string())
+      .chain(once(field.to_string()))
+      .collect();
+
+    let result = selected
+      .as_array()?
+      .iter()
+      .enumerate()
+      .map(|(key, sub_node)| {
+        (
+          pointer
+            .iter()
+            .cloned()
+            .chain(once(key.to_string()))
+            .collect(),
+          sub_node.clone().into(),
+        )
+      })
+      .collect();
+
+    Some(result)
+  }
+
+  fn select_entries_map(
+    &self,
+    pointer: &[String],
+    field: &str,
+  ) -> Option<Vec<(Vec<String>, Node)>> {
+    let selected = self.0.as_object()?.get(field)?;
+    let pointer: Vec<_> = pointer
+      .iter()
+      .cloned()
+      .map(|part| part.to_string())
+      .chain(once(field.to_string()))
+      .collect();
+
+    let result = selected
+      .as_object()?
+      .iter()
+      .map(|(key, sub_node)| {
+        (
+          pointer
+            .iter()
+            .cloned()
+            .chain(once(key.to_string()))
+            .collect(),
+          sub_node.clone().into(),
+        )
+      })
+      .collect();
+
+    Some(result)
+  }
 }
 
-fn select_vec_str<'n>(node: &'n Node, field: &str) -> Option<Vec<&'n str>> {
-  node
-    .0
-    .as_object()?
-    .get(field)?
-    .as_array()
-    .map(|value| value.iter().filter_map(|value| value.as_str()).collect())
-}
-
-fn select_unsigned_integer(node: &Node, field: &str) -> Option<u64> {
-  node.0.as_object()?.get(field)?.as_u64()
-}
-
-fn select_number<'n>(node: &'n Node, field: &str) -> Option<&'n serde_json::Number> {
-  node.0.as_object()?.get(field)?.as_number()
-}
-
-fn select_bool(node: &Node, field: &str) -> Option<bool> {
-  node.0.as_object()?.get(field)?.as_bool()
-}
-
-fn select_str<'n>(node: &'n Node, field: &str) -> Option<&'n str> {
-  node.0.as_object()?.get(field)?.as_str()
-}
-
-fn select_entries_one(node: &Node, pointer: &[String], field: &str) -> Option<(Vec<String>, Node)> {
-  let selected = node.0.as_object()?.get(field)?;
-  let pointer: Vec<_> = pointer
-    .iter()
-    .cloned()
-    .chain(once(field.to_string()))
-    .collect();
-
-  let result = (pointer, selected.clone().into());
-  Some(result)
-}
-
-fn select_entries_list(
-  node: &Node,
-  pointer: &[String],
-  field: &str,
-) -> Option<Vec<(Vec<String>, Node)>> {
-  let selected = node.0.as_object()?.get(field)?;
-  let pointer: Vec<_> = pointer
-    .iter()
-    .cloned()
-    .map(|part| part.to_string())
-    .chain(once(field.to_string()))
-    .collect();
-
-  let result = selected
-    .as_array()?
-    .iter()
-    .enumerate()
-    .map(|(key, sub_node)| {
-      (
-        pointer
-          .iter()
-          .cloned()
-          .chain(once(key.to_string()))
-          .collect(),
-        sub_node.clone().into(),
-      )
+/*
+helpers
+*/
+impl Node {
+  fn map_entry_location(
+    location: &NodeLocation,
+    entry: Option<(Vec<String>, Node)>,
+  ) -> Option<NodeLocation> {
+    entry.map(|(pointer, _node)| {
+      let mut sub_location = location.clone();
+      sub_location.push_pointer(pointer.clone());
+      sub_location
     })
-    .collect();
+  }
 
-  Some(result)
-}
-
-fn select_entries_map(
-  node: &Node,
-  pointer: &[String],
-  field: &str,
-) -> Option<Vec<(Vec<String>, Node)>> {
-  let selected = node.0.as_object()?.get(field)?;
-  let pointer: Vec<_> = pointer
-    .iter()
-    .cloned()
-    .map(|part| part.to_string())
-    .chain(once(field.to_string()))
-    .collect();
-
-  let result = selected
-    .as_object()?
-    .iter()
-    .map(|(key, sub_node)| {
-      (
-        pointer
-          .iter()
-          .cloned()
-          .chain(once(key.to_string()))
-          .collect(),
-        sub_node.clone().into(),
-      )
+  fn map_entry_locations_vec(
+    location: &NodeLocation,
+    entries: Option<Vec<(Vec<String>, Node)>>,
+  ) -> Option<Vec<NodeLocation>> {
+    entries.map(|value| {
+      value
+        .iter()
+        .map(|(pointer, _node)| {
+          let mut sub_location = location.clone();
+          sub_location.push_pointer(pointer.clone());
+          sub_location
+        })
+        .collect()
     })
-    .collect();
+  }
 
-  Some(result)
+  fn map_entry_locations_set(
+    location: &NodeLocation,
+    entries: Option<Vec<(Vec<String>, Node)>>,
+  ) -> Option<BTreeSet<NodeLocation>> {
+    entries.map(|value| {
+      value
+        .iter()
+        .map(|(pointer, _node)| {
+          let mut sub_location = location.clone();
+          sub_location.push_pointer(pointer.clone());
+          sub_location
+        })
+        .collect()
+    })
+  }
+
+  fn map_entry_locations_map(
+    location: &NodeLocation,
+    entries: Option<Vec<(Vec<String>, Node)>>,
+  ) -> Option<HashMap<String, NodeLocation>> {
+    entries.map(|value| {
+      value
+        .iter()
+        .map(|(pointer, _node)| {
+          let mut sub_location = location.clone();
+          sub_location.push_pointer(pointer.clone());
+          (pointer.last().unwrap().to_owned(), sub_location)
+        })
+        .collect()
+    })
+  }
 }

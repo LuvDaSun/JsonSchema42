@@ -3,7 +3,7 @@ use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::node_location::NodeLocation;
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, HashMap};
 
 pub struct Document {
   document_location: NodeLocation,
@@ -123,101 +123,7 @@ impl SchemaDocument for Document {
       .map(|(pointer, node)| {
         let mut location = self.get_document_location().clone();
         location.push_pointer(pointer);
-        (
-          location.clone(),
-          DocumentSchemaItem {
-            location: Some(location.clone()),
-            name: None,
-            exact: Some(true),
-            parent: None,
-            primary: Some(true),
-
-            // meta
-            title: node.select_title().map(|value| value.to_owned()),
-            description: node.select_description().map(|value| value.to_owned()),
-            examples: None,
-            deprecated: None,
-
-            // types
-            types: node.select_types(),
-
-            // assertions
-            options: node.select_enum(),
-
-            minimum_inclusive: if node.select_is_minimum_exclusive().unwrap_or_default() {
-              None
-            } else {
-              node.select_minimum().cloned()
-            },
-            minimum_exclusive: if node.select_is_minimum_exclusive().unwrap_or_default() {
-              node.select_minimum().cloned()
-            } else {
-              None
-            },
-            maximum_inclusive: if node.select_is_maximum_exclusive().unwrap_or_default() {
-              None
-            } else {
-              node.select_maximum().cloned()
-            },
-            maximum_exclusive: if node.select_is_maximum_exclusive().unwrap_or_default() {
-              node.select_maximum().cloned()
-            } else {
-              None
-            },
-            multiple_of: node.select_multiple_of().cloned(),
-            minimum_length: node.select_minimum_length(),
-            maximum_length: node.select_maximum_length(),
-            value_pattern: node.select_value_pattern().map(|value| value.to_owned()),
-            value_format: node.select_value_format().map(|value| value.to_owned()),
-            maximum_items: node.select_maximum_items(),
-            minimum_items: node.select_minimum_items(),
-            unique_items: node.select_unique_items(),
-            minimum_properties: node.select_minimum_properties(),
-            maximum_properties: node.select_maximum_properties(),
-            required: node
-              .select_required()
-              .map(|value| value.iter().map(|value| (*value).to_owned()).collect()),
-
-            reference: node.select_reference().map(|value| {
-              let reference_location = value.parse().unwrap();
-              location.join(&reference_location)
-            }),
-
-            // sub nodes
-            r#if: None,
-            then: None,
-            r#else: None,
-            not: map_entry_location(&location, node.select_not_entry(pointer)),
-            contains: None,
-            array_items: map_entry_location(&location, node.select_array_items_entry(pointer)),
-            property_names: None,
-            map_properties: map_entry_location(
-              &location,
-              node.select_map_properties_entry(pointer),
-            ),
-
-            all_of: map_entry_locations_set(&location, node.select_all_of_entries(pointer)),
-            any_of: map_entry_locations_set(&location, node.select_any_of_entries(pointer)),
-            one_of: map_entry_locations_set(&location, node.select_one_of_entries(pointer)),
-            tuple_items: map_entry_locations_vec(
-              &location,
-              node.select_tuple_items_entries(pointer),
-            ),
-
-            dependent_schemas: map_entry_locations_map(
-              &location,
-              node.select_dependent_schemas_entries(pointer),
-            ),
-            object_properties: map_entry_locations_map(
-              &location,
-              node.select_object_properties_entries(pointer),
-            ),
-            pattern_properties: map_entry_locations_map(
-              &location,
-              node.select_pattern_properties_entries(pointer),
-            ),
-          },
-        )
+        (location.clone(), node.to_document_schema_item(location))
       })
       .collect()
   }
@@ -229,63 +135,4 @@ impl SchemaDocument for Document {
   fn resolve_dynamic_anchor(&self, _anchor: &str) -> Option<Vec<String>> {
     None
   }
-}
-
-fn map_entry_location(
-  location: &NodeLocation,
-  entry: Option<(Vec<String>, Node)>,
-) -> Option<NodeLocation> {
-  entry.map(|(pointer, _node)| {
-    let mut sub_location = location.clone();
-    sub_location.set_pointer(pointer.clone());
-    sub_location
-  })
-}
-
-fn map_entry_locations_vec(
-  location: &NodeLocation,
-  entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<Vec<NodeLocation>> {
-  entries.map(|value| {
-    value
-      .iter()
-      .map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.set_pointer(pointer.clone());
-        sub_location
-      })
-      .collect()
-  })
-}
-
-fn map_entry_locations_set(
-  location: &NodeLocation,
-  entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<BTreeSet<NodeLocation>> {
-  entries.map(|value| {
-    value
-      .iter()
-      .map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.set_pointer(pointer.clone());
-        sub_location
-      })
-      .collect()
-  })
-}
-
-fn map_entry_locations_map(
-  location: &NodeLocation,
-  entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<HashMap<String, NodeLocation>> {
-  entries.map(|value| {
-    value
-      .iter()
-      .map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.set_pointer(pointer.clone());
-        (pointer.last().unwrap().to_owned(), sub_location)
-      })
-      .collect()
-  })
 }
