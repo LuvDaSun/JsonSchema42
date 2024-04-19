@@ -43,12 +43,16 @@ impl Document {
     let mut node_queue = Vec::new();
     node_queue.push((vec![], document_node.clone()));
     while let Some((node_pointer, node)) = node_queue.pop() {
-      nodes.insert(node_pointer.clone(), node.clone());
+      assert!(nodes.insert(node_pointer.clone(), node.clone()).is_none());
 
       if let Some(node_reference) = node.select_reference() {
         let reference_location = &node_reference.parse()?;
-        let retrieval_location = retrieval_location.join(reference_location);
-        let given_location = given_location.join(reference_location);
+        let mut retrieval_location = retrieval_location.join(reference_location);
+        let mut given_location = given_location.join(reference_location);
+
+        // referenced documents are always have a root as location
+        retrieval_location.set_root();
+        given_location.set_root();
 
         referenced_documents.push(ReferencedDocument {
           retrieval_location,
@@ -123,6 +127,7 @@ impl SchemaDocument for Document {
       .map(|(pointer, node)| {
         let mut location = self.get_document_location().clone();
         location.push_pointer(pointer);
+
         (location.clone(), node.to_document_schema_item(location))
       })
       .collect()
