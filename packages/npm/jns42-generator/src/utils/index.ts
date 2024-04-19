@@ -6,5 +6,3 @@ export * from "./load.js";
 export * from "./mockable.js";
 export * from "./normalize-object.js";
 export * from "./package.js";
-export * from "./read-node.js";
-export * from "./schema.js";
