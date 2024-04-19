@@ -212,12 +212,13 @@ impl DocumentContext {
     &self,
     document_location: &NodeLocation,
   ) -> Result<Vec<Rc<dyn SchemaDocument>>, Error> {
-    let documents = Vec::new();
+    let mut result = Vec::new();
     let mut document_location = document_location.clone();
 
     loop {
       let documents = self.documents.borrow();
       let document = documents.get(&document_location).ok_or(Error::NotFound)?;
+      result.push(document.clone());
 
       let Some(antecedent_location) = document.get_antecedent_location() else {
         break;
@@ -226,7 +227,7 @@ impl DocumentContext {
       document_location = antecedent_location.clone();
     }
 
-    Ok(documents)
+    Ok(result)
   }
 
   /**

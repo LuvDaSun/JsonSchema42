@@ -225,6 +225,10 @@ impl SchemaDocument for Document {
   fn has_node(&self, hash: &[String]) -> bool {
     self.nodes.contains_key(hash)
   }
+
+  fn has_node_dynamic(&self, _hash: &[String]) -> bool {
+    false
+  }
 }
 
 fn map_entry_location(

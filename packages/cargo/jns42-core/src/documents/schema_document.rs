@@ -21,5 +21,6 @@ pub trait SchemaDocument {
 
   fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem>;
 
-  fn has_node(&self, pointer: &[String]) -> bool;
+  fn has_node(&self, hash: &[String]) -> bool;
+  fn has_node_dynamic(&self, hash: &[String]) -> bool;
 }

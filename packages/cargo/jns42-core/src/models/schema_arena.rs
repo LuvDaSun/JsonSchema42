@@ -73,15 +73,20 @@ impl Arena<ArenaSchemaItem> {
       }
     }
 
-    for (id, key) in &key_map {
-      let mut schema = schema_nodes.get(id).unwrap().clone();
-      schema.parent = parents.get(id).cloned();
-      schema.types = schema
-        .types
-        .or_else(|| implicit_types.get(id).map(|value| once(*value).collect()));
+    for (location, key) in &key_map {
+      let mut schema = schema_nodes.get(location).unwrap().clone();
+      schema.parent = parents.get(location).cloned();
+      schema.types = schema.types.or_else(|| {
+        implicit_types
+          .get(location)
+          .map(|value| once(*value).collect())
+      });
       // schema.primary = if *id == root_id { Some(true) } else { None };
 
-      let item = schema.map_keys(|key| *key_map.get(key).unwrap());
+      let item = schema.map_keys(|location| {
+        println!("{}", location);
+        *key_map.get(location).unwrap()
+      });
 
       arena.replace_item(*key, item);
     }

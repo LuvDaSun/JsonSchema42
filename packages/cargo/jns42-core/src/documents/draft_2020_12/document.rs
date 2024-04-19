@@ -14,7 +14,7 @@ pub struct Document {
   antecedent_location: Option<NodeLocation>,
   // document_node: Node,
   /**
-  Nodes that belong to this document, indexed by their pointer
+  Nodes that belong to this document, indexed by their hash ("" + pointer)
   */
   nodes: HashMap<Vec<String>, Node>,
   referenced_documents: Vec<ReferencedDocument>,
@@ -53,7 +53,19 @@ impl Document {
     let mut node_queue = Vec::new();
     node_queue.push((vec![], document_node.clone()));
     while let Some((node_pointer, node)) = node_queue.pop() {
-      nodes.insert(node_pointer.clone(), node.clone());
+      assert!(nodes.insert(node_pointer.clone(), node.clone()).is_none());
+
+      if let Some(node_anchor) = node.select_anchor() {
+        assert!(anchors
+          .insert(node_anchor.to_owned(), node_pointer.clone())
+          .is_none());
+      }
+
+      if let Some(node_dynamic_anchor) = node.select_dynamic_anchor() {
+        assert!(dynamic_anchors
+          .insert(node_dynamic_anchor.to_owned(), node_pointer.clone())
+          .is_none());
+      }
 
       if let Some(node_ref) = node.select_ref() {
         let reference_location = &node_ref.parse()?;
@@ -64,14 +76,6 @@ impl Document {
           retrieval_location,
           given_location,
         });
-      }
-
-      if let Some(node_anchor) = node.select_anchor() {
-        anchors.insert(node_anchor.to_owned(), node_pointer.clone());
-      }
-
-      if let Some(node_dynamic_anchor) = node.select_dynamic_anchor() {
-        dynamic_anchors.insert(node_dynamic_anchor.to_owned(), node_pointer.clone());
       }
 
       for (sub_pointer, sub_node) in node.select_sub_nodes(&node_pointer) {
@@ -131,6 +135,11 @@ impl SchemaDocument for Document {
         node_location.set_anchor(anchor.clone());
         node_location
       }))
+      .chain(self.dynamic_anchors.keys().map(|anchor| {
+        let mut node_location = self.document_location.clone();
+        node_location.set_anchor(anchor.clone());
+        node_location
+      }))
       .collect()
   }
 
@@ -164,14 +173,16 @@ impl SchemaDocument for Document {
               let mut documents = document_context
                 .get_document_and_antecedents(&self.document_location)
                 .unwrap();
+              // we start with the document that has no antecedent
               documents.reverse();
+
               let dynamic_reference_location = value.parse().unwrap();
 
               for document in documents {
                 let document_location = document.get_document_location().clone();
                 let location = document_location.join(&dynamic_reference_location);
 
-                if document.has_node(
+                if document.has_node_dynamic(
                   &location
                     .get_hash()
                     .into_iter()
@@ -280,7 +291,24 @@ impl SchemaDocument for Document {
   }
 
   fn has_node(&self, hash: &[String]) -> bool {
-    self.nodes.contains_key(hash)
+    if hash.len() > 1 {
+      return self.nodes.contains_key(hash);
+    }
+
+    let Some(anchor) = hash.first() else {
+      return false;
+    };
+    self.anchors.contains_key(anchor)
+  }
+
+  fn has_node_dynamic(&self, hash: &[String]) -> bool {
+    if hash.len() > 1 {
+      return false;
+    }
+    let Some(anchor) = hash.first() else {
+      return false;
+    };
+    self.dynamic_anchors.contains_key(anchor)
   }
 }
 
