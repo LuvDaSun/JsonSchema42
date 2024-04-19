@@ -237,9 +237,27 @@ where
       }};
     }
 
+    let exact_merge = if (self.minimum_inclusive.is_none() || other.minimum_inclusive.is_none())
+      && (self.minimum_exclusive.is_none() || other.minimum_exclusive.is_none())
+      && (self.maximum_inclusive.is_none() || other.maximum_inclusive.is_none())
+      && (self.maximum_exclusive.is_none() || other.maximum_exclusive.is_none())
+      && (self.multiple_of.is_none() || other.multiple_of.is_none())
+      && (self.value_pattern.is_none() || other.value_pattern.is_none())
+      && (self.value_format.is_none() || other.value_format.is_none())
+    {
+      None
+    } else {
+      Some(true)
+    };
+
+    let exact = merge_option!(exact, &|base, other| base & other);
+    let exact = merge_option(exact.as_ref(), exact_merge.as_ref(), |base, other| {
+      base & other
+    });
+
     Self {
       name: self.name.clone(),
-      exact: Some(false), // TODO
+      exact,
       primary: self.primary,
       parent: self.parent.clone(),
       location: self.location.clone(),
