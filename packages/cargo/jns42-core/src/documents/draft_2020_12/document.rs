@@ -14,11 +14,13 @@ pub struct Document {
   antecedent_location: Option<NodeLocation>,
   // document_node: Node,
   /**
-  Nodes that belong to this document, indexed by their hash ("" + pointer)
+  Nodes that belong to this document, indexed by their (sub)pointer
   */
   nodes: HashMap<Vec<String>, Node>,
   referenced_documents: Vec<ReferencedDocument>,
   embedded_documents: Vec<EmbeddedDocument>,
+
+  // maps anchors to their pointers
   anchors: HashMap<String, Vec<String>>,
   dynamic_anchors: HashMap<String, Vec<String>>,
 }
@@ -69,8 +71,12 @@ impl Document {
 
       if let Some(node_ref) = node.select_ref() {
         let reference_location = &node_ref.parse()?;
-        let retrieval_location = retrieval_location.join(reference_location);
-        let given_location = given_location.join(reference_location);
+        let mut retrieval_location = retrieval_location.join(reference_location);
+        let mut given_location = given_location.join(reference_location);
+
+        // referenced documents are always have a root as location
+        retrieval_location.set_root();
+        given_location.set_root();
 
         referenced_documents.push(ReferencedDocument {
           retrieval_location,
@@ -113,54 +119,48 @@ impl Document {
     })
   }
 
-  fn resolve_reference(&self, reference: &str) -> Option<NodeLocation> {
+  fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
-    let reference_location = reference.parse().unwrap();
+    let reference_location = reference.parse()?;
     let reference_location = self.document_location.join(&reference_location);
-    let document = document_context.get_document(&reference_location).unwrap();
+    let document_location = document_context.resolve_document_location(&reference_location);
+    let document = document_context.get_document(&document_location)?;
 
-    let resolved = document.resolve_alias(
-      &reference_location
-        .get_hash()
-        .into_iter()
-        .map(|value| value.to_owned())
-        .collect::<Vec<_>>(),
-    );
-    if let Some(resolved) = resolved {
-      let mut location = document.get_document_location().clone();
-      location.set_hash(resolved);
-      return Some(location);
-    };
+    if let Some(anchor) = reference_location.get_anchor() {
+      if let Some(pointer) = document.resolve_anchor(anchor) {
+        let mut reference_location = document.get_document_location().clone();
+        reference_location.push_pointer(pointer);
+        return Ok(reference_location);
+      }
+    } else {
+      return Ok(reference_location);
+    }
 
-    None
+    Err(Error::NotFound)
   }
 
-  fn resolve_dynamic_reference(&self, reference: &str) -> Option<NodeLocation> {
+  fn resolve_dynamic_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
-    let reference_location = reference.parse().unwrap();
-    let reference_location = self.document_location.join(&reference_location);
-    let mut antecedent_documents = document_context
-      .get_document_and_antecedents(&self.document_location)
-      .unwrap();
+    let reference_location = reference.parse()?;
+    let mut antecedent_documents =
+      document_context.get_document_and_antecedents(self.get_document_location())?;
     // we start with the document that has no antecedent
     antecedent_documents.reverse();
 
     for document in antecedent_documents {
-      let resolved = document.resolve_dynamic_alias(
-        &reference_location
-          .get_hash()
-          .into_iter()
-          .map(|value| value.to_owned())
-          .collect::<Vec<_>>(),
-      );
-      if let Some(resolved) = resolved {
-        let mut location = document.get_document_location().clone();
-        location.set_hash(resolved);
-        return Some(location);
-      };
+      let reference_location = document.get_document_location().join(&reference_location);
+      if let Some(anchor) = reference_location.get_anchor() {
+        if let Some(pointer) = document.resolve_dynamic_anchor(anchor) {
+          let mut reference_location = document.get_document_location().clone();
+          reference_location.push_pointer(pointer);
+          return Ok(reference_location);
+        };
+      } else {
+        return Err(Error::Unknown);
+      }
     }
 
-    None
+    Err(Error::NotFound)
   }
 }
 
@@ -213,12 +213,12 @@ impl SchemaDocument for Document {
           .or_else(|| {
             node
               .select_reference()
-              .and_then(|value| self.resolve_reference(value))
+              .map(|value| self.resolve_reference(value).unwrap())
           })
           .or_else(|| {
             node
               .select_dynamic_reference()
-              .and_then(|value| self.resolve_dynamic_reference(value))
+              .map(|value| self.resolve_dynamic_reference(value).unwrap())
           });
 
         (
@@ -314,23 +314,11 @@ impl SchemaDocument for Document {
       .collect()
   }
 
-  fn resolve_alias(&self, alias: &[String]) -> Option<Vec<String>> {
-    if alias.len() > 1 {
-      if self.nodes.contains_key(alias) {
-        return Some(alias.into());
-      }
-      return None;
-    }
-
-    let anchor = alias.first()?;
+  fn resolve_anchor(&self, anchor: &str) -> Option<Vec<String>> {
     self.anchors.get(anchor).cloned()
   }
 
-  fn resolve_dynamic_alias(&self, alias: &[String]) -> Option<Vec<String>> {
-    if alias.len() > 1 {
-      return None;
-    }
-    let anchor = alias.first()?;
+  fn resolve_dynamic_anchor(&self, anchor: &str) -> Option<Vec<String>> {
     self.dynamic_anchors.get(anchor).cloned()
   }
 }

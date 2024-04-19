@@ -222,14 +222,11 @@ impl SchemaDocument for Document {
       .collect()
   }
 
-  fn resolve_alias(&self, alias: &[String]) -> Option<Vec<String>> {
-    if self.nodes.contains_key(alias) {
-      return Some(alias.into());
-    }
+  fn resolve_anchor(&self, _anchor: &str) -> Option<Vec<String>> {
     None
   }
 
-  fn resolve_dynamic_alias(&self, _alias: &[String]) -> Option<Vec<String>> {
+  fn resolve_dynamic_anchor(&self, _anchor: &str) -> Option<Vec<String>> {
     None
   }
 }

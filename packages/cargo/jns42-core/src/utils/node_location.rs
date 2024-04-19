@@ -33,7 +33,11 @@ impl NodeLocation {
   }
 
   pub fn get_anchor(&self) -> Option<&str> {
-    return self.hash.first().map(|part| part.as_str());
+    if self.hash.len() > 1 {
+      None
+    } else {
+      self.hash.first().map(|part| part.as_str())
+    }
   }
 
   pub fn get_pointer(&self) -> Option<Vec<&str>> {
@@ -69,10 +73,6 @@ impl NodeLocation {
   pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
     self.hash =
       normalize_hash(once(String::new()).chain(value.into_iter().map(|part| part.into())));
-  }
-
-  pub fn set_hash(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
-    self.hash = normalize_hash(value.into_iter().map(|part| part.into()));
   }
 
   /*
