@@ -174,11 +174,11 @@ impl Node {
   }
 
   pub fn select_minimum_length(&self) -> Option<u64> {
-    select_unsigned_integer(self, "minimumLength")
+    select_unsigned_integer(self, "minLength")
   }
 
   pub fn select_maximum_length(&self) -> Option<u64> {
-    select_unsigned_integer(self, "maximumLength")
+    select_unsigned_integer(self, "maxLength")
   }
 
   pub fn select_value_pattern(&self) -> Option<&str> {
@@ -190,11 +190,11 @@ impl Node {
   }
 
   pub fn select_maximum_items(&self) -> Option<u64> {
-    select_unsigned_integer(self, "maximumItems")
+    select_unsigned_integer(self, "maxItems")
   }
 
   pub fn select_minimum_items(&self) -> Option<u64> {
-    select_unsigned_integer(self, "minimumLength")
+    select_unsigned_integer(self, "minItems")
   }
 
   pub fn select_unique_items(&self) -> Option<bool> {
@@ -202,11 +202,11 @@ impl Node {
   }
 
   pub fn select_minimum_properties(&self) -> Option<u64> {
-    select_unsigned_integer(self, "minimumProperties")
+    select_unsigned_integer(self, "minProperties")
   }
 
   pub fn select_maximum_properties(&self) -> Option<u64> {
-    select_unsigned_integer(self, "maximumProperties")
+    select_unsigned_integer(self, "maxProperties")
   }
 
   pub fn select_required(&self) -> Option<Vec<&str>> {
