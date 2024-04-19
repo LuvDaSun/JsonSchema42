@@ -12,11 +12,6 @@ export class SchemaArena extends ForeignObject {
     super(pointer, () => mainFfi.exports.schema_arena_drop(pointer));
   }
 
-  public static new() {
-    const pointer = mainFfi.exports.schema_arena_new();
-    return new SchemaArena(pointer);
-  }
-
   public static fromDocumentContext(documentContext: DocumentContext) {
     const pointer = mainFfi.exports.schema_arena_from_document_context(documentContext.pointer);
     return new SchemaArena(pointer);
@@ -30,36 +25,6 @@ export class SchemaArena extends ForeignObject {
   public count() {
     const count = mainFfi.exports.schema_arena_count(this.pointer);
     return count;
-  }
-
-  public addItem(item: ArenaSchemaItemValue): number {
-    const itemString = JSON.stringify(item);
-    using itemWrapper = CString.fromString(itemString);
-    const key = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.schema_arena_add_item(
-        this.pointer,
-        itemWrapper.pointer,
-        errorReferencePointer,
-      ),
-    );
-    return key;
-  }
-
-  public replaceItem(key: number, item: ArenaSchemaItemValue): ArenaSchemaItemValue {
-    const itemString = JSON.stringify(item);
-    using itemWrapper = CString.fromString(itemString);
-    const itemPreviousPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.schema_arena_replace_item(
-        this.pointer,
-        key,
-        itemWrapper.pointer,
-        errorReferencePointer,
-      ),
-    );
-    using itemPreviousWrapper = new CString(itemPreviousPointer);
-    const itemPreviousString = itemPreviousWrapper.toString();
-    const itemPrevious = JSON.parse(itemPreviousString);
-    return itemPrevious;
   }
 
   public getItem(key: number): ArenaSchemaItemValue {
