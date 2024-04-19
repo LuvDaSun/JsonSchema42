@@ -83,10 +83,7 @@ impl Arena<ArenaSchemaItem> {
       });
       // schema.primary = if *id == root_id { Some(true) } else { None };
 
-      let item = schema.map_keys(|location| {
-        println!("{}", location);
-        *key_map.get(location).unwrap()
-      });
+      let item = schema.map_keys(|location| *key_map.get(location).unwrap());
 
       arena.replace_item(*key, item);
     }

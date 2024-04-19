@@ -208,26 +208,47 @@ impl DocumentContext {
       .collect()
   }
 
+  pub fn resolve_document_location(&self, node_location: &NodeLocation) -> NodeLocation {
+    self
+      .node_documents
+      .borrow()
+      .get(node_location)
+      .unwrap()
+      .clone()
+  }
+
+  pub fn get_document(
+    &self,
+    document_location: &NodeLocation,
+  ) -> Result<Rc<dyn SchemaDocument>, Error> {
+    let document_location = document_location.clone();
+
+    let documents = self.documents.borrow();
+    let result = documents.get(&document_location).ok_or(Error::NotFound)?;
+    let result = result.clone();
+
+    Ok(result)
+  }
+
   pub fn get_document_and_antecedents(
     &self,
     document_location: &NodeLocation,
   ) -> Result<Vec<Rc<dyn SchemaDocument>>, Error> {
-    let mut result = Vec::new();
+    let mut results = Vec::new();
     let mut document_location = document_location.clone();
 
     loop {
-      let documents = self.documents.borrow();
-      let document = documents.get(&document_location).ok_or(Error::NotFound)?;
-      result.push(document.clone());
+      let result = self.get_document(&document_location)?;
+      results.push(result.clone());
 
-      let Some(antecedent_location) = document.get_antecedent_location() else {
+      let Some(antecedent_location) = result.get_antecedent_location() else {
         break;
       };
 
       document_location = antecedent_location.clone();
     }
 
-    Ok(result)
+    Ok(results)
   }
 
   /**

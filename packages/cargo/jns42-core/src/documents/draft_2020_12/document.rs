@@ -112,6 +112,56 @@ impl Document {
       dynamic_anchors,
     })
   }
+
+  fn resolve_reference(&self, reference: &str) -> Option<NodeLocation> {
+    let document_context = self.document_context.upgrade().unwrap();
+    let reference_location = reference.parse().unwrap();
+    let reference_location = self.document_location.join(&reference_location);
+    let document = document_context.get_document(&reference_location).unwrap();
+
+    let resolved = document.resolve_alias(
+      &reference_location
+        .get_hash()
+        .into_iter()
+        .map(|value| value.to_owned())
+        .collect::<Vec<_>>(),
+    );
+    if let Some(resolved) = resolved {
+      let mut location = document.get_document_location().clone();
+      location.set_hash(resolved);
+      return Some(location);
+    };
+
+    None
+  }
+
+  fn resolve_dynamic_reference(&self, reference: &str) -> Option<NodeLocation> {
+    let document_context = self.document_context.upgrade().unwrap();
+    let reference_location = reference.parse().unwrap();
+    let reference_location = self.document_location.join(&reference_location);
+    let mut antecedent_documents = document_context
+      .get_document_and_antecedents(&self.document_location)
+      .unwrap();
+    // we start with the document that has no antecedent
+    antecedent_documents.reverse();
+
+    for document in antecedent_documents {
+      let resolved = document.resolve_dynamic_alias(
+        &reference_location
+          .get_hash()
+          .into_iter()
+          .map(|value| value.to_owned())
+          .collect::<Vec<_>>(),
+      );
+      if let Some(resolved) = resolved {
+        let mut location = document.get_document_location().clone();
+        location.set_hash(resolved);
+        return Some(location);
+      };
+    }
+
+    None
+  }
 }
 
 impl SchemaDocument for Document {
@@ -161,40 +211,14 @@ impl SchemaDocument for Document {
 
         let reference = None
           .or_else(|| {
-            node.select_reference().map(|value| {
-              let reference_location = value.parse().unwrap();
-              location.join(&reference_location)
-            })
+            node
+              .select_reference()
+              .and_then(|value| self.resolve_reference(value))
           })
           .or_else(|| {
-            node.select_dynamic_reference().map(|value| {
-              let document_context = self.document_context.upgrade().unwrap();
-              // get antecedents
-              let mut documents = document_context
-                .get_document_and_antecedents(&self.document_location)
-                .unwrap();
-              // we start with the document that has no antecedent
-              documents.reverse();
-
-              let dynamic_reference_location = value.parse().unwrap();
-
-              for document in documents {
-                let document_location = document.get_document_location().clone();
-                let location = document_location.join(&dynamic_reference_location);
-
-                if document.has_node_dynamic(
-                  &location
-                    .get_hash()
-                    .into_iter()
-                    .map(|value| value.to_owned())
-                    .collect::<Vec<_>>(),
-                ) {
-                  return location;
-                }
-              }
-
-              panic!("not found");
-            })
+            node
+              .select_dynamic_reference()
+              .and_then(|value| self.resolve_dynamic_reference(value))
           });
 
         (
@@ -290,25 +314,24 @@ impl SchemaDocument for Document {
       .collect()
   }
 
-  fn has_node(&self, hash: &[String]) -> bool {
-    if hash.len() > 1 {
-      return self.nodes.contains_key(hash);
+  fn resolve_alias(&self, alias: &[String]) -> Option<Vec<String>> {
+    if alias.len() > 1 {
+      if self.nodes.contains_key(alias) {
+        return Some(alias.into());
+      }
+      return None;
     }
 
-    let Some(anchor) = hash.first() else {
-      return false;
-    };
-    self.anchors.contains_key(anchor)
+    let anchor = alias.first()?;
+    self.anchors.get(anchor).cloned()
   }
 
-  fn has_node_dynamic(&self, hash: &[String]) -> bool {
-    if hash.len() > 1 {
-      return false;
+  fn resolve_dynamic_alias(&self, alias: &[String]) -> Option<Vec<String>> {
+    if alias.len() > 1 {
+      return None;
     }
-    let Some(anchor) = hash.first() else {
-      return false;
-    };
-    self.dynamic_anchors.contains_key(anchor)
+    let anchor = alias.first()?;
+    self.dynamic_anchors.get(anchor).cloned()
   }
 }
 

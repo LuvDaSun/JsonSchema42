@@ -222,12 +222,15 @@ impl SchemaDocument for Document {
       .collect()
   }
 
-  fn has_node(&self, hash: &[String]) -> bool {
-    self.nodes.contains_key(hash)
+  fn resolve_alias(&self, alias: &[String]) -> Option<Vec<String>> {
+    if self.nodes.contains_key(alias) {
+      return Some(alias.into());
+    }
+    None
   }
 
-  fn has_node_dynamic(&self, _hash: &[String]) -> bool {
-    false
+  fn resolve_dynamic_alias(&self, _alias: &[String]) -> Option<Vec<String>> {
+    None
   }
 }
 

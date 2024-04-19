@@ -21,6 +21,6 @@ pub trait SchemaDocument {
 
   fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem>;
 
-  fn has_node(&self, hash: &[String]) -> bool;
-  fn has_node_dynamic(&self, hash: &[String]) -> bool;
+  fn resolve_alias(&self, alias: &[String]) -> Option<Vec<String>>;
+  fn resolve_dynamic_alias(&self, alias: &[String]) -> Option<Vec<String>>;
 }

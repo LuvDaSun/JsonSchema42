@@ -71,6 +71,10 @@ impl NodeLocation {
       normalize_hash(once(String::new()).chain(value.into_iter().map(|part| part.into())));
   }
 
+  pub fn set_hash(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
+    self.hash = normalize_hash(value.into_iter().map(|part| part.into()));
+  }
+
   /*
   Removes pointer and anchor (the has) from this location.
   */
