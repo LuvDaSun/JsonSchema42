@@ -4,7 +4,6 @@ pub mod document_context;
 pub mod names;
 pub mod names_builder;
 pub mod reference;
-pub mod reverse;
 pub mod schema_arena;
 pub mod schema_arena_item;
 pub mod sentence;

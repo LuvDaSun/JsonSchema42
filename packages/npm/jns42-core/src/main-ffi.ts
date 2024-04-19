@@ -15,8 +15,6 @@ let environment: MainEnvironment = {
 };
 
 export interface MainExports extends ExportsBase {
-  reverse(value: number, result: number, error_reference: number): void;
-
   reference_drop(pointer_box: number): void;
   reference_new(): number;
 
