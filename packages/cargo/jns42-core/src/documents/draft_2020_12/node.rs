@@ -210,7 +210,6 @@ impl Node {
       .chain(self.select_array_items_entry(pointer))
       .chain(self.select_contains_entry(pointer))
       .chain(self.select_map_properties_entry(pointer))
-      .chain(self.select_array_items_entry(pointer))
       .chain(self.select_all_of_entries(pointer).unwrap_or_default())
       .chain(self.select_any_of_entries(pointer).unwrap_or_default())
       .chain(self.select_one_of_entries(pointer).unwrap_or_default())

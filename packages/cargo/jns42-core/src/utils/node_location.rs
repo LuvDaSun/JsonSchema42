@@ -86,16 +86,15 @@ impl NodeLocation {
   Append to pointer
   */
   pub fn push_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
-    if let Some(pointer) = self.get_pointer() {
-      self.hash = normalize_hash(
-        pointer
-          .into_iter()
-          .map(|part| part.into())
-          .chain(value.into_iter().map(|part| part.into())),
-      );
-    } else {
-      self.set_pointer(value);
-    }
+    let pointer: Vec<_> = self
+      .get_pointer()
+      .unwrap_or_default()
+      .into_iter()
+      .map(|part| (*part).into())
+      .chain(value.into_iter().map(|part| part.into()))
+      .collect();
+
+    self.set_pointer(pointer);
   }
 
   /**
