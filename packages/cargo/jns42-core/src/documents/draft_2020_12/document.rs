@@ -3,7 +3,7 @@ use crate::documents::{DocumentContext, EmbeddedDocument, ReferencedDocument, Sc
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::node_location::NodeLocation;
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, HashMap};
 use std::iter::empty;
 use std::rc::Weak;
 
@@ -119,7 +119,7 @@ impl Document {
     })
   }
 
-  fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
+  pub fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let reference_location = self.document_location.join(&reference_location);
@@ -139,7 +139,7 @@ impl Document {
     Err(Error::NotFound)
   }
 
-  fn resolve_dynamic_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
+  pub fn resolve_dynamic_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let mut antecedent_documents =
@@ -209,106 +209,9 @@ impl SchemaDocument for Document {
         let mut location = self.get_document_location().clone();
         location.push_pointer(pointer);
 
-        let reference = None
-          .or_else(|| {
-            node
-              .select_reference()
-              .map(|value| self.resolve_reference(value).unwrap())
-          })
-          .or_else(|| {
-            node
-              .select_dynamic_reference()
-              .map(|value| self.resolve_dynamic_reference(value).unwrap())
-          });
-
         (
           location.clone(),
-          DocumentSchemaItem {
-            location: Some(location.clone()),
-            name: None,
-            exact: Some(true),
-            parent: None,
-            primary: Some(true),
-
-            // meta
-            title: node.select_title().map(|value| value.to_owned()),
-            description: node.select_description().map(|value| value.to_owned()),
-            examples: node.select_examples().cloned(),
-            deprecated: node.select_deprecated(),
-
-            // types
-            types: node.select_types(),
-
-            // assertions
-            options: {
-              let value: Vec<_> = empty()
-                .chain(node.select_const().into_iter().cloned())
-                .chain(node.select_enum().into_iter().flatten())
-                .collect();
-              if value.is_empty() {
-                None
-              } else {
-                Some(value)
-              }
-            },
-
-            minimum_inclusive: node.select_minimum_inclusive().cloned(),
-            minimum_exclusive: node.select_minimum_exclusive().cloned(),
-            maximum_inclusive: node.select_maximum_inclusive().cloned(),
-            maximum_exclusive: node.select_maximum_exclusive().cloned(),
-            multiple_of: node.select_multiple_of().cloned(),
-            minimum_length: node.select_minimum_length(),
-            maximum_length: node.select_maximum_length(),
-            value_pattern: node.select_value_pattern().map(|value| value.to_owned()),
-            value_format: node.select_value_format().map(|value| value.to_owned()),
-            maximum_items: node.select_maximum_items(),
-            minimum_items: node.select_minimum_items(),
-            unique_items: node.select_unique_items(),
-            minimum_properties: node.select_minimum_properties(),
-            maximum_properties: node.select_maximum_properties(),
-            required: node
-              .select_required()
-              .map(|value| value.iter().map(|value| (*value).to_owned()).collect()),
-
-            reference,
-
-            // sub nodes
-            r#if: map_entry_location(&location, node.select_if_entry(pointer)),
-            then: map_entry_location(&location, node.select_then_entry(pointer)),
-            r#else: map_entry_location(&location, node.select_else_entry(pointer)),
-            not: map_entry_location(&location, node.select_not_entry(pointer)),
-            contains: map_entry_location(&location, node.select_contains_entry(pointer)),
-            array_items: map_entry_location(&location, node.select_array_items_entry(pointer)),
-            property_names: map_entry_location(
-              &location,
-              node.select_property_names_entry(pointer),
-            ),
-            map_properties: map_entry_location(
-              &location,
-              node.select_map_properties_entry(pointer),
-            ),
-
-            all_of: map_entry_locations_set(&location, node.select_all_of_entries(pointer)),
-            any_of: map_entry_locations_set(&location, node.select_any_of_entries(pointer)),
-            one_of: map_entry_locations_set(&location, node.select_one_of_entries(pointer)),
-            tuple_items: map_entry_locations_vec(
-              &location,
-              node.select_tuple_items_entries(pointer),
-            ),
-
-            dependent_schemas: map_entry_locations_map(
-              &location,
-              node.select_dependent_schemas_entries(pointer),
-            ),
-            object_properties: map_entry_locations_map(
-              &location,
-              node.select_object_properties_entries(pointer),
-            ),
-            pattern_properties: map_entry_locations_map(
-              &location,
-              node.select_pattern_properties_entries(pointer),
-            ),
-          },
+          node.to_document_schema_item(location, self),
         )
       })
       .collect()
@@ -321,63 +224,4 @@ impl SchemaDocument for Document {
   fn resolve_dynamic_anchor(&self, anchor: &str) -> Option<Vec<String>> {
     self.dynamic_anchors.get(anchor).cloned()
   }
-}
-
-fn map_entry_location(
-  location: &NodeLocation,
-  entry: Option<(Vec<String>, Node)>,
-) -> Option<NodeLocation> {
-  entry.map(|(pointer, _node)| {
-    let mut sub_location = location.clone();
-    sub_location.set_pointer(pointer.clone());
-    sub_location
-  })
-}
-
-fn map_entry_locations_vec(
-  location: &NodeLocation,
-  entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<Vec<NodeLocation>> {
-  entries.map(|value| {
-    value
-      .iter()
-      .map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.set_pointer(pointer.clone());
-        sub_location
-      })
-      .collect()
-  })
-}
-
-fn map_entry_locations_set(
-  location: &NodeLocation,
-  entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<BTreeSet<NodeLocation>> {
-  entries.map(|value| {
-    value
-      .iter()
-      .map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.set_pointer(pointer.clone());
-        sub_location
-      })
-      .collect()
-  })
-}
-
-fn map_entry_locations_map(
-  location: &NodeLocation,
-  entries: Option<Vec<(Vec<String>, Node)>>,
-) -> Option<HashMap<String, NodeLocation>> {
-  entries.map(|value| {
-    value
-      .iter()
-      .map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.set_pointer(pointer.clone());
-        (pointer.last().unwrap().to_owned(), sub_location)
-      })
-      .collect()
-  })
 }

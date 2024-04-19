@@ -1,12 +1,6 @@
 import * as core from "@jns42/core";
 import * as path from "node:path";
 import * as yargs from "yargs";
-import * as oasV30 from "../documents/oas-v3-0/index.js";
-import * as schemaDraft04 from "../documents/schema-draft-04/index.js";
-import * as schemaDraft202012 from "../documents/schema-draft-2020-12/index.js";
-import * as schemaIntermediate from "../documents/schema-intermediate/index.js";
-import * as schemaOasV31 from "../documents/schema-oas-v3-1/index.js";
-import * as swaggerV2 from "../documents/swagger-v2/index.js";
 import { generatePackage } from "../generators/index.js";
 import * as models from "../models/index.js";
 
@@ -25,14 +19,16 @@ export function configurePackageProgram(argv: yargs.Argv) {
           description: "the default meta schema to use",
           type: "string",
           choices: [
-            schemaDraft202012.metaSchemaId,
-            schemaDraft04.metaSchemaId,
-            schemaOasV31.metaSchemaId,
-            oasV30.metaSchemaId,
-            swaggerV2.metaSchemaId,
-            schemaIntermediate.metaSchemaId,
+            "https://json-schema.org/draft/2020-12/schema",
+            "https://json-schema.org/draft/2019-09/schema",
+            "http://json-schema.org/draft-07/schema#",
+            "http://json-schema.org/draft-06/schema#",
+            "http://json-schema.org/draft-04/schema#",
+            "https://spec.openapis.org/oas/3.1/dialect/base",
+            "https://spec.openapis.org/oas/3.0/schema/2021-09-28#/definitions/Schema",
+            "http://swagger.io/v2/schema.json#/definitions/schema",
           ] as const,
-          default: schemaDraft202012.metaSchemaId,
+          default: "https://json-schema.org/draft/2020-12/schema",
         })
         .option("package-directory", {
           description: "where to output the package",
