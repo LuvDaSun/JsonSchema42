@@ -18,63 +18,94 @@ impl From<serde_json::Value> for Node {
 
 impl Node {
   pub fn to_document_schema_item(&self, location: NodeLocation) -> DocumentSchemaItem {
+    let types = {
+      match &self.0 {
+        serde_json::Value::Bool(true) => Some(vec![SchemaType::Any]),
+        serde_json::Value::Bool(false) => Some(vec![SchemaType::Never]),
+        serde_json::Value::Object(value) => {
+          if let Some(r#type) = value.get("type") {
+            match r#type {
+              serde_json::Value::String(value) => Some(vec![SchemaType::parse(value)]),
+              serde_json::Value::Array(value) => Some(
+                value
+                  .iter()
+                  .filter_map(|value| value.as_str().map(SchemaType::parse))
+                  .collect(),
+              ),
+              _ => None,
+            }
+          } else {
+            None
+          }
+        }
+        _ => None,
+      }
+    };
+
+    let reference = self.select_reference().map(|value| {
+      let reference_location = value.parse().unwrap();
+      location.join(&reference_location)
+    });
+
     DocumentSchemaItem {
       location: Some(location.clone()),
       name: None,
-      exact: Some(true),
+
       parent: None,
       primary: Some(true),
+      exact: Some(true),
 
       // meta
-      title: self.select_title().map(|value| value.to_owned()),
-      description: self.select_description().map(|value| value.to_owned()),
+      title: self.select_string("title").map(|value| value.to_owned()),
+      description: self
+        .select_string("description")
+        .map(|value| value.to_owned()),
       examples: None,
       deprecated: None,
 
       // types
-      types: self.select_types(),
+      types,
 
       // assertions
-      options: self.select_enum(),
+      options: self
+        .select_value_list("enum")
+        .map(|value| value.cloned().collect()),
 
-      minimum_inclusive: if self.select_is_minimum_exclusive().unwrap_or_default() {
+      minimum_inclusive: if self.select_bool("exclusiveMinimum").unwrap_or_default() {
         None
       } else {
-        self.select_minimum().cloned()
+        self.select_number("minimum").cloned()
       },
-      minimum_exclusive: if self.select_is_minimum_exclusive().unwrap_or_default() {
-        self.select_minimum().cloned()
-      } else {
-        None
-      },
-      maximum_inclusive: if self.select_is_maximum_exclusive().unwrap_or_default() {
-        None
-      } else {
-        self.select_maximum().cloned()
-      },
-      maximum_exclusive: if self.select_is_maximum_exclusive().unwrap_or_default() {
-        self.select_maximum().cloned()
+      minimum_exclusive: if self.select_bool("exclusiveMinimum").unwrap_or_default() {
+        self.select_number("minimum").cloned()
       } else {
         None
       },
-      multiple_of: self.select_multiple_of().cloned(),
-      minimum_length: self.select_minimum_length(),
-      maximum_length: self.select_maximum_length(),
-      value_pattern: self.select_value_pattern().map(|value| value.to_owned()),
-      value_format: self.select_value_format().map(|value| value.to_owned()),
-      maximum_items: self.select_maximum_items(),
-      minimum_items: self.select_minimum_items(),
-      unique_items: self.select_unique_items(),
-      minimum_properties: self.select_minimum_properties(),
-      maximum_properties: self.select_maximum_properties(),
+      maximum_inclusive: if self.select_bool("exclusiveMaximum").unwrap_or_default() {
+        None
+      } else {
+        self.select_number("maximum").cloned()
+      },
+      maximum_exclusive: if self.select_bool("exclusiveMaximum").unwrap_or_default() {
+        self.select_number("maximum").cloned()
+      } else {
+        None
+      },
+      multiple_of: self.select_number("multipleOf").cloned(),
+      minimum_length: self.select_unsigned_integer("minLength"),
+      maximum_length: self.select_unsigned_integer("maxLength"),
+      value_pattern: self.select_string("pattern").map(|value| value.to_owned()),
+      value_format: self.select_string("format").map(|value| value.to_owned()),
+      minimum_items: self.select_unsigned_integer("minItems"),
+      maximum_items: self.select_unsigned_integer("maxItems"),
+      unique_items: self.select_bool("uniqueItems"),
+      minimum_properties: self.select_unsigned_integer("minProperties"),
+      maximum_properties: self.select_unsigned_integer("maxProperties"),
       required: self
-        .select_required()
-        .map(|value| value.iter().map(|value| (*value).to_owned()).collect()),
+        .select_string_list("required")
+        .map(|value| value.map(|value| value.to_owned()).collect()),
 
-      reference: self.select_reference().map(|value| {
-        let reference_location = value.parse().unwrap();
-        location.join(&reference_location)
-      }),
+      reference,
 
       // sub nodes
       r#if: None,
@@ -130,42 +161,11 @@ public selectors
 */
 impl Node {
   pub fn select_id(&self) -> Option<&str> {
-    self.select_str("id")
+    self.select_string("id")
   }
 
   pub fn select_reference(&self) -> Option<&str> {
-    self.select_str("$ref")
-  }
-}
-
-/*
-metadata
-*/
-impl Node {
-  fn select_types(&self) -> Option<Vec<SchemaType>> {
-    match &self.0 {
-      serde_json::Value::Bool(true) => Some(vec![SchemaType::Any]),
-      serde_json::Value::Bool(false) => Some(vec![SchemaType::Never]),
-      serde_json::Value::Object(value) => match value.get("type")? {
-        serde_json::Value::String(value) => Some(vec![SchemaType::parse(value)]),
-        serde_json::Value::Array(value) => Some(
-          value
-            .iter()
-            .filter_map(|value| value.as_str().map(SchemaType::parse))
-            .collect(),
-        ),
-        _ => None,
-      },
-      _ => None,
-    }
-  }
-
-  fn select_title(&self) -> Option<&str> {
-    self.select_str("title")
-  }
-
-  fn select_description(&self) -> Option<&str> {
-    self.select_str("description")
+    self.select_string("$ref")
   }
 }
 
@@ -199,8 +199,6 @@ impl Node {
       )
       .chain(self.select_definition_entries(pointer).unwrap_or_default())
   }
-
-  //
 
   fn select_not_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
     self.select_entries_one(pointer, "not")
@@ -257,93 +255,30 @@ impl Node {
 }
 
 /*
-assertions
+helpers
 */
 impl Node {
-  fn select_enum(&self) -> Option<Vec<serde_json::Value>> {
-    self.select_vec_value("enum")
+  fn select_value_list(
+    &self,
+    field: &str,
+  ) -> Option<impl Iterator<Item = &serde_json::Value> + '_> {
+    Some(self.0.as_object()?.get(field)?.as_array()?.iter())
   }
 
-  fn select_minimum(&self) -> Option<&serde_json::Number> {
-    self.select_number("minimum")
-  }
-
-  fn select_is_minimum_exclusive(&self) -> Option<bool> {
-    self.select_bool("exclusiveMinimum")
-  }
-
-  fn select_maximum(&self) -> Option<&serde_json::Number> {
-    self.select_number("maximum")
-  }
-
-  fn select_is_maximum_exclusive(&self) -> Option<bool> {
-    self.select_bool("exclusiveMaximum")
-  }
-
-  fn select_multiple_of(&self) -> Option<&serde_json::Number> {
-    self.select_number("multipleOf")
-  }
-
-  fn select_minimum_length(&self) -> Option<u64> {
-    self.select_unsigned_integer("minLength")
-  }
-
-  fn select_maximum_length(&self) -> Option<u64> {
-    self.select_unsigned_integer("maxLength")
-  }
-
-  fn select_value_pattern(&self) -> Option<&str> {
-    self.select_str("valuePattern")
-  }
-
-  fn select_value_format(&self) -> Option<&str> {
-    self.select_str("valueFormat")
-  }
-
-  fn select_maximum_items(&self) -> Option<u64> {
-    self.select_unsigned_integer("maxItems")
-  }
-
-  fn select_minimum_items(&self) -> Option<u64> {
-    self.select_unsigned_integer("minItems")
-  }
-
-  fn select_unique_items(&self) -> Option<bool> {
-    self.select_bool("uniqueItems")
-  }
-
-  fn select_minimum_properties(&self) -> Option<u64> {
-    self.select_unsigned_integer("minProperties")
-  }
-
-  fn select_maximum_properties(&self) -> Option<u64> {
-    self.select_unsigned_integer("maxProperties")
-  }
-
-  fn select_required(&self) -> Option<Vec<&str>> {
-    self.select_vec_str("required")
-  }
-}
-
-impl Node {
-  fn select_vec_value(&self, field: &str) -> Option<Vec<serde_json::Value>> {
-    self.0.as_object()?.get(field)?.as_array().cloned()
-  }
-
-  fn select_vec_str<'n>(&'n self, field: &str) -> Option<Vec<&'n str>> {
+  fn select_string_list(&self, field: &str) -> Option<impl Iterator<Item = &str> + '_> {
     self
       .0
       .as_object()?
       .get(field)?
       .as_array()
-      .map(|value| value.iter().filter_map(|value| value.as_str()).collect())
+      .map(|value| value.iter().filter_map(|value| value.as_str()))
   }
 
   fn select_unsigned_integer(&self, field: &str) -> Option<u64> {
     self.0.as_object()?.get(field)?.as_u64()
   }
 
-  fn select_number<'n>(&'n self, field: &str) -> Option<&'n serde_json::Number> {
+  fn select_number(&self, field: &str) -> Option<&serde_json::Number> {
     self.0.as_object()?.get(field)?.as_number()
   }
 
@@ -351,7 +286,7 @@ impl Node {
     self.0.as_object()?.get(field)?.as_bool()
   }
 
-  fn select_str<'n>(&'n self, field: &str) -> Option<&'n str> {
+  fn select_string(&self, field: &str) -> Option<&'_ str> {
     self.0.as_object()?.get(field)?.as_str()
   }
 
@@ -432,7 +367,7 @@ impl Node {
 }
 
 /*
-helpers
+more helpers
 */
 impl Node {
   fn map_entry_location(
