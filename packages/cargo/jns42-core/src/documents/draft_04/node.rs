@@ -250,7 +250,10 @@ impl Node {
   fn select_string(&self, field: &str) -> Option<&'_ str> {
     self.0.as_object()?.get(field)?.as_str()
   }
+}
 
+// node
+impl Node {
   fn select_node_entry(&self, pointer: &[String], field: &str) -> Option<(Vec<String>, Node)> {
     let selected = self.0.as_object()?.get(field)?;
     let pointer: Vec<_> = pointer
