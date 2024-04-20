@@ -29,27 +29,24 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     return;
   };
 
-  let Some(required) = &item.required else {
-    return;
-  };
-
-  let sub_item = arena.get_item(not);
-
-  let Some(exclude_required) = &sub_item.required else {
-    return;
-  };
-
-  let exclude_required: HashSet<_> = exclude_required.iter().collect();
-  let required_new = required
-    .iter()
-    .filter(|value| !exclude_required.contains(value))
-    .cloned()
-    .collect();
-
-  let item_new = ArenaSchemaItem {
+  let mut item_new = ArenaSchemaItem {
     not: None,
-    required: Some(required_new),
     ..item.clone()
+  };
+
+  if let Some(required) = &item.required {
+    let sub_item = arena.get_item(not);
+
+    if let Some(exclude_required) = &sub_item.required {
+      let exclude_required: HashSet<_> = exclude_required.iter().collect();
+      let required_new = required
+        .iter()
+        .filter(|value| !exclude_required.contains(value))
+        .cloned()
+        .collect();
+
+      item_new.required = Some(required_new);
+    };
   };
 
   arena.replace_item(key, item_new);
