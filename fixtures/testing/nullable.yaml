@@ -3,7 +3,7 @@ $schema: "./schema.json"
 rootTypeName: NullableYaml
 
 schemas:
-  draft_2020-12:
+  draft-04:
     $schema: "http://json-schema.org/draft-04/schema#"
     type:
       - "string"
@@ -11,12 +11,12 @@ schemas:
     examples:
       - "hi!"
       - null
-  draft-04:
+  draft_2020-12:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     type:
       - "string"
       - "null"
-  oas-v3_0:
+  oas_v3_0:
     $schema: "https://spec.openapis.org/oas/3.0/schema/2021-09-28#/definitions/Schema"
     type: "string"
     nullable: true

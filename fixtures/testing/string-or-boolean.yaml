@@ -3,7 +3,7 @@ $schema: "./schema.json"
 rootTypeName: StringOrBooleanYaml
 
 schemas:
-  draft_2020-12:
+  draft-04:
     $schema: "http://json-schema.org/draft-04/schema#"
     type:
       - "string"
@@ -11,7 +11,7 @@ schemas:
     examples:
       - "hi!"
       - false
-  draft-04:
+  draft_2020-12:
     $schema: "https://json-schema.org/draft/2020-12/schema"
     type:
       - "string"
