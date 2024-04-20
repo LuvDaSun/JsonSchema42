@@ -155,84 +155,63 @@ impl Node {
     self.select_string("$ref")
   }
 
-  pub fn select_sub_nodes(&self, pointer: &[String]) -> impl Iterator<Item = (Vec<String>, Node)> {
+  pub fn select_sub_nodes(
+    &self,
+    pointer: &[String],
+  ) -> impl Iterator<Item = (Vec<String>, Node)> + '_ {
     empty()
-      .chain(self.select_not_entry(pointer))
-      .chain(self.select_map_properties_entry(pointer))
-      .chain(self.select_array_items_entry(pointer))
-      .chain(self.select_all_of_entries(pointer).unwrap_or_default())
-      .chain(self.select_any_of_entries(pointer).unwrap_or_default())
-      .chain(self.select_one_of_entries(pointer).unwrap_or_default())
-      .chain(self.select_tuple_items_entries(pointer).unwrap_or_default())
+      .chain(self.select_node_entry(pointer, "not"))
+      .chain(self.select_node_entry(pointer, "additionalProperties"))
+      .chain(self.select_node_entry(pointer, "items"))
+      .chain(self.select_node_entry(pointer, "additionalItems"))
       .chain(
         self
-          .select_dependent_schemas_entries(pointer)
-          .unwrap_or_default(),
+          .select_node_entry_list(pointer, "allOf")
+          .into_iter()
+          .flatten(),
       )
       .chain(
         self
-          .select_object_properties_entries(pointer)
-          .unwrap_or_default(),
+          .select_node_entry_list(pointer, "anyOf")
+          .into_iter()
+          .flatten(),
       )
       .chain(
         self
-          .select_pattern_properties_entries(pointer)
-          .unwrap_or_default(),
+          .select_node_entry_list(pointer, "oneOf")
+          .into_iter()
+          .flatten(),
       )
-      .chain(self.select_definition_entries(pointer).unwrap_or_default())
-  }
-
-  fn select_not_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    self.select_node_entry(pointer, "not")
-  }
-  fn select_map_properties_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    self.select_node_entry(pointer, "additionalProperties")
-  }
-  fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    if let Some(value) = self.select_node_entry(pointer, "items") {
-      return Some(value);
-    }
-
-    if let Some(value) = self.select_node_entry(pointer, "additionalItems") {
-      return Some(value);
-    }
-
-    None
-  }
-
-  fn select_all_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_list(pointer, "allOf")
-  }
-  fn select_any_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_list(pointer, "anyOf")
-  }
-  fn select_one_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_list(pointer, "oneOf")
-  }
-  fn select_tuple_items_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_list(pointer, "items")
-  }
-
-  fn select_dependent_schemas_entries(
-    &self,
-    pointer: &[String],
-  ) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_object(pointer, "dependentSchemas")
-  }
-  fn select_object_properties_entries(
-    &self,
-    pointer: &[String],
-  ) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_object(pointer, "properties")
-  }
-  fn select_pattern_properties_entries(
-    &self,
-    pointer: &[String],
-  ) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_object(pointer, "patternProperties")
-  }
-  fn select_definition_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_node_entry_object(pointer, "definitions")
+      .chain(
+        self
+          .select_node_entry_list(pointer, "items")
+          .into_iter()
+          .flatten(),
+      )
+      .chain(
+        self
+          .select_node_entry_object(pointer, "dependentSchemas")
+          .into_iter()
+          .flatten(),
+      )
+      .chain(
+        self
+          .select_node_entry_object(pointer, "properties")
+          .into_iter()
+          .flatten(),
+      )
+      .chain(
+        self
+          .select_node_entry_object(pointer, "patternProperties")
+          .into_iter()
+          .flatten(),
+      )
+      .chain(
+        self
+          .select_node_entry_object(pointer, "definitions")
+          .into_iter()
+          .flatten(),
+      )
   }
 }
 
@@ -288,7 +267,7 @@ impl Node {
     &self,
     pointer: &[String],
     field: &str,
-  ) -> Option<Vec<(Vec<String>, Node)>> {
+  ) -> Option<impl Iterator<Item = (Vec<String>, Node)> + '_> {
     let selected = self.0.as_object()?.get(field)?;
     let pointer: Vec<_> = pointer
       .iter()
@@ -301,7 +280,7 @@ impl Node {
       .as_array()?
       .iter()
       .enumerate()
-      .map(|(key, sub_node)| {
+      .map(move |(key, sub_node)| {
         (
           pointer
             .iter()
@@ -310,8 +289,7 @@ impl Node {
             .collect(),
           sub_node.clone().into(),
         )
-      })
-      .collect();
+      });
 
     Some(result)
   }
@@ -320,7 +298,7 @@ impl Node {
     &self,
     pointer: &[String],
     field: &str,
-  ) -> Option<Vec<(Vec<String>, Node)>> {
+  ) -> Option<impl Iterator<Item = (Vec<String>, Node)> + '_> {
     let selected = self.0.as_object()?.get(field)?;
     let pointer: Vec<_> = pointer
       .iter()
@@ -329,20 +307,16 @@ impl Node {
       .chain(once(field.to_string()))
       .collect();
 
-    let result = selected
-      .as_object()?
-      .iter()
-      .map(|(key, sub_node)| {
-        (
-          pointer
-            .iter()
-            .cloned()
-            .chain(once(key.to_string()))
-            .collect(),
-          sub_node.clone().into(),
-        )
-      })
-      .collect();
+    let result = selected.as_object()?.iter().map(move |(key, sub_node)| {
+      (
+        pointer
+          .iter()
+          .cloned()
+          .chain(once(key.to_string()))
+          .collect(),
+        sub_node.clone().into(),
+      )
+    });
 
     Some(result)
   }
@@ -354,7 +328,7 @@ impl Node {
   }
 
   fn select_node_location_list<'n>(
-    &self,
+    &'n self,
     location: &'n NodeLocation,
     field: &str,
   ) -> Option<impl Iterator<Item = NodeLocation> + 'n> {
@@ -368,7 +342,7 @@ impl Node {
   }
 
   fn select_node_location_object<'n>(
-    &self,
+    &'n self,
     location: &'n NodeLocation,
     field: &str,
   ) -> Option<impl Iterator<Item = (String, NodeLocation)> + 'n> {
