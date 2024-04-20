@@ -130,18 +130,49 @@ impl DocumentContext {
         )
       }),
     )?;
-    // context.register_factory(
-    //   documents::draft_2019_09::META_SCHEMA_ID,
-    //   Box::new( |_context, _initializer| Rc::new(documents::draft_2019_09::Document::new())),
-    // );
-    // context.register_factory(
-    //  documents::draft_07::META_SCHEMA_ID,
-    //   Box::new(|_context, _initializer| Rc::new(documents::draft_07::Document::new())),
-    // );
-    // context.register_factory(
-    //  documents::draft_06::META_SCHEMA_ID,
-    //   Box::new(|_context, _initializer| Rc::new(documents::draft_06::Document::new())),
-    // );
+    self.register_factory(
+      documents::draft_2019_09::META_SCHEMA_ID,
+      Box::new(|context, configuration| {
+        Rc::new(
+          documents::draft_2019_09::Document::new(
+            context,
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
+      }),
+    )?;
+    self.register_factory(
+      documents::draft_07::META_SCHEMA_ID,
+      Box::new(|_context, configuration| {
+        Rc::new(
+          documents::draft_07::Document::new(
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
+      }),
+    )?;
+    self.register_factory(
+      documents::draft_06::META_SCHEMA_ID,
+      Box::new(|_context, configuration| {
+        Rc::new(
+          documents::draft_06::Document::new(
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
+      }),
+    )?;
     self.register_factory(
       documents::draft_04::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
@@ -156,18 +187,49 @@ impl DocumentContext {
         )
       }),
     )?;
-    // context.register_factory(
-    //   &MetaSchemaId::OasV31,
-    //   Box::new(|_context, _initializer| Rc::new(documents::oas_v3_1::Document::new())),
-    // );
-    // context.register_factory(
-    //   &MetaSchemaId::OasV30,
-    //   Box::new(|_context, _initializer| Rc::new(documents::oas_v3_0::Document::new())),
-    // );
-    // context.register_factory(
-    //   &MetaSchemaId::SwaggerV2,
-    //   Box::new(|_context, _initializer| Rc::new(documents::swagger_v2::Document::new())),
-    // );
+    self.register_factory(
+      documents::oas_v3_1::META_SCHEMA_ID,
+      Box::new(|context, configuration| {
+        Rc::new(
+          documents::oas_v3_1::Document::new(
+            context,
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
+      }),
+    )?;
+    self.register_factory(
+      documents::oas_v3_0::META_SCHEMA_ID,
+      Box::new(|_context, configuration| {
+        Rc::new(
+          documents::oas_v3_0::Document::new(
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
+      }),
+    )?;
+    self.register_factory(
+      documents::swagger_v2::META_SCHEMA_ID,
+      Box::new(|_context, configuration| {
+        Rc::new(
+          documents::swagger_v2::Document::new(
+            configuration.retrieval_location,
+            configuration.given_location,
+            configuration.antecedent_location,
+            configuration.document_node.clone().into(),
+          )
+          .unwrap(),
+        )
+      }),
+    )?;
     Ok(())
   }
 
