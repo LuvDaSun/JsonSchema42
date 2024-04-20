@@ -103,12 +103,11 @@ impl Node {
       then: None,
       r#else: None,
       not: self.0.node_location(&location, "not"),
-
-      property_names: None,
       map_properties: self.0.node_location(&location, "additionalProperties"),
       array_items: None
         .or_else(|| self.0.node_location(&location, "items"))
         .or_else(|| self.0.node_location(&location, "additionalItems")),
+      property_names: None,
       contains: None,
 
       all_of: self

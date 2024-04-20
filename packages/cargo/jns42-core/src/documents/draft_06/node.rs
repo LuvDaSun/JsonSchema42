@@ -1,4 +1,3 @@
-use super::Document;
 use crate::{
   models::{DocumentSchemaItem, SchemaType},
   utils::{json_value::JsonValue, node_location::NodeLocation},
@@ -21,11 +20,7 @@ impl From<JsonValue> for Node {
 }
 
 impl Node {
-  pub fn to_document_schema_item(
-    &self,
-    location: NodeLocation,
-    document: &Document,
-  ) -> DocumentSchemaItem {
+  pub fn to_document_schema_item(&self, location: NodeLocation) -> DocumentSchemaItem {
     let types = if let Some(value) = self.0.as_bool() {
       if value {
         Some(vec![SchemaType::Any])
@@ -41,19 +36,10 @@ impl Node {
         .map(|value| value.map(|value| value.parse().unwrap()).collect())
     };
 
-    let reference = None
-      .or_else(|| {
-        self
-          .0
-          .string("$ref")
-          .map(|value| document.resolve_reference(value).unwrap())
-      })
-      .or_else(|| {
-        self
-          .0
-          .string("$dynamicRef")
-          .map(|value| document.resolve_dynamic_reference(value).unwrap())
-      });
+    let reference = self.select_reference().map(|value| {
+      let reference_location = value.parse().unwrap();
+      location.join(&reference_location)
+    });
 
     DocumentSchemaItem {
       location: Some(location.clone()),
@@ -73,7 +59,7 @@ impl Node {
         .0
         .value_list("examples")
         .map(|value| value.cloned().collect()),
-      deprecated: self.0.bool("deprecated"),
+      deprecated: None,
 
       // assertions
       options: None
@@ -110,13 +96,14 @@ impl Node {
         .string_list("required")
         .map(|value| value.map(str::to_owned).collect()),
 
-      // sub nodes
-      r#if: self.0.node_location(&location, "if"),
-      then: self.0.node_location(&location, "then"),
-      r#else: self.0.node_location(&location, "else"),
+      r#if: None,
+      then: None,
+      r#else: None,
       not: self.0.node_location(&location, "not"),
       map_properties: self.0.node_location(&location, "additionalProperties"),
-      array_items: self.0.node_location(&location, "items"),
+      array_items: None
+        .or_else(|| self.0.node_location(&location, "items"))
+        .or_else(|| self.0.node_location(&location, "additionalItems")),
       property_names: self.0.node_location(&location, "propertyNames"),
       contains: self.0.node_location(&location, "contains"),
 
@@ -134,7 +121,7 @@ impl Node {
         .map(|value| value.collect()),
       tuple_items: self
         .0
-        .node_location_list(&location, "prefixItems")
+        .node_location_list(&location, "items")
         .map(|value| value.collect()),
 
       dependent_schemas: self
@@ -153,21 +140,16 @@ impl Node {
   }
 }
 
+/*
+public selectors
+*/
 impl Node {
   pub fn select_id(&self) -> Option<&str> {
-    self.0.string("id")
+    self.0.string("$id")
   }
 
   pub fn select_reference(&self) -> Option<&str> {
     self.0.string("$ref")
-  }
-
-  pub fn select_anchor(&self) -> Option<&str> {
-    self.0.string("$anchor")
-  }
-
-  pub fn select_dynamic_anchor(&self) -> Option<&str> {
-    self.0.string("$dynamicAnchor")
   }
 
   pub fn select_sub_nodes(
@@ -175,14 +157,10 @@ impl Node {
     pointer: &[String],
   ) -> impl Iterator<Item = (Vec<String>, Node)> + '_ {
     empty()
-      .chain(self.0.node_entry(pointer, "if"))
-      .chain(self.0.node_entry(pointer, "then"))
-      .chain(self.0.node_entry(pointer, "else"))
       .chain(self.0.node_entry(pointer, "not"))
-      .chain(self.0.node_entry(pointer, "propertyNames"))
       .chain(self.0.node_entry(pointer, "additionalProperties"))
       .chain(self.0.node_entry(pointer, "items"))
-      .chain(self.0.node_entry(pointer, "contains"))
+      .chain(self.0.node_entry(pointer, "additionalItems"))
       .chain(
         self
           .0
@@ -207,7 +185,7 @@ impl Node {
       .chain(
         self
           .0
-          .node_entry_list(pointer, "prefixItems")
+          .node_entry_list(pointer, "items")
           .into_iter()
           .flatten(),
       )
@@ -235,7 +213,7 @@ impl Node {
       .chain(
         self
           .0
-          .node_entry_object(pointer, "$defs")
+          .node_entry_object(pointer, "definitions")
           .into_iter()
           .flatten(),
       )
