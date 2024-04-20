@@ -71,12 +71,11 @@ impl Document {
 
       if let Some(node_ref) = node.select_ref() {
         let reference_location = &node_ref.parse()?;
-        let mut retrieval_location = retrieval_location.join(reference_location);
-        let mut given_location = given_location.join(reference_location);
+        let retrieval_location = retrieval_location.join(reference_location);
+        let given_location = given_location.join(reference_location);
 
-        // referenced documents are always have a root as location
-        retrieval_location.set_root();
-        given_location.set_root();
+        let retrieval_location = retrieval_location.set_root();
+        let given_location = given_location.set_root();
 
         referenced_documents.push(ReferencedDocument {
           retrieval_location,
@@ -179,16 +178,18 @@ impl SchemaDocument for Document {
           .keys()
           .map(|pointer| self.document_location.push_pointer(pointer.clone())),
       )
-      .chain(self.anchors.keys().map(|anchor| {
-        let mut node_location = self.document_location.clone();
-        node_location.set_anchor(anchor.clone());
-        node_location
-      }))
-      .chain(self.dynamic_anchors.keys().map(|anchor| {
-        let mut node_location = self.document_location.clone();
-        node_location.set_anchor(anchor.clone());
-        node_location
-      }))
+      .chain(
+        self
+          .anchors
+          .keys()
+          .map(|anchor| self.document_location.set_anchor(anchor.clone())),
+      )
+      .chain(
+        self
+          .dynamic_anchors
+          .keys()
+          .map(|anchor| self.document_location.set_anchor(anchor.clone())),
+      )
       .collect()
   }
 

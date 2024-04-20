@@ -63,23 +63,29 @@ impl NodeLocation {
   /*
   Set the anchor of this location, replacing the pointer.
   */
-  pub fn set_anchor(&mut self, value: impl Into<String>) {
-    self.hash = once(value).map(|part| part.into()).collect();
+  pub fn set_anchor(&self, value: impl Into<String>) -> Self {
+    let mut cloned = self.clone();
+    cloned.hash = once(value).map(|part| part.into()).collect();
+    cloned
   }
 
   /*
   Replace pointer
   */
-  pub fn set_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
-    self.hash =
+  pub fn set_pointer(&self, value: impl IntoIterator<Item = impl Into<String>>) -> Self {
+    let mut cloned = self.clone();
+    cloned.hash =
       normalize_hash(once(String::new()).chain(value.into_iter().map(|part| part.into())));
+    cloned
   }
 
   /*
   Removes pointer and anchor (the has) from this location.
   */
-  pub fn set_root(&mut self) {
-    self.hash = Vec::new();
+  pub fn set_root(&self) -> Self {
+    let mut cloned = self.clone();
+    cloned.hash = Default::default();
+    cloned
   }
 
   /*
@@ -94,9 +100,7 @@ impl NodeLocation {
       .chain(value.into_iter().map(|part| part.into()))
       .collect();
 
-    let mut cloned = self.clone();
-    cloned.set_pointer(pointer);
-    cloned
+    self.set_pointer(pointer)
   }
 
   /**

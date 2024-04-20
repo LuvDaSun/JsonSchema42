@@ -297,8 +297,7 @@ impl DocumentContext {
       /*
       retrieve the document
       */
-      let mut document_location = retrieval_location.clone();
-      document_location.set_root();
+      let document_location = retrieval_location.set_root();
       let fetch_location = document_location.to_fetch_string();
       let data = (self.fetch_file)(fetch_location).await?;
       let document_node = serde_yaml::from_str(&data)?;

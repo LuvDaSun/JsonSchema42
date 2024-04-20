@@ -47,12 +47,11 @@ impl Document {
 
       if let Some(node_reference) = node.select_reference() {
         let reference_location = &node_reference.parse()?;
-        let mut retrieval_location = retrieval_location.join(reference_location);
-        let mut given_location = given_location.join(reference_location);
+        let retrieval_location = retrieval_location.join(reference_location);
+        let given_location = given_location.join(reference_location);
 
-        // referenced documents are always have a root as location
-        retrieval_location.set_root();
-        given_location.set_root();
+        let retrieval_location = retrieval_location.set_root();
+        let given_location = given_location.set_root();
 
         referenced_documents.push(ReferencedDocument {
           retrieval_location,
