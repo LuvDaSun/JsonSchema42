@@ -49,14 +49,14 @@ impl Node {
       primary: Some(true),
       exact: Some(true),
 
+      reference,
+      types,
+
       // meta
-      title: self.0.string("title").map(|value| value.to_owned()),
-      description: self.0.string("description").map(|value| value.to_owned()),
+      title: self.0.string("title").map(str::to_owned),
+      description: self.0.string("description").map(str::to_owned),
       examples: None,
       deprecated: None,
-
-      // types
-      types,
 
       // assertions
       options: self
@@ -87,8 +87,8 @@ impl Node {
       multiple_of: self.0.number("multipleOf").cloned(),
       minimum_length: self.0.unsigned_integer("minLength"),
       maximum_length: self.0.unsigned_integer("maxLength"),
-      value_pattern: self.0.string("pattern").map(|value| value.to_owned()),
-      value_format: self.0.string("format").map(|value| value.to_owned()),
+      value_pattern: self.0.string("pattern").map(str::to_owned),
+      value_format: self.0.string("format").map(str::to_owned),
       minimum_items: self.0.unsigned_integer("minItems"),
       maximum_items: self.0.unsigned_integer("maxItems"),
       unique_items: self.0.bool("uniqueItems"),
@@ -97,22 +97,19 @@ impl Node {
       required: self
         .0
         .string_list("required")
-        .map(|value| value.map(|value| value.to_owned()).collect()),
+        .map(|value| value.map(str::to_owned).collect()),
 
-      reference,
-
-      // sub nodes
       r#if: None,
       then: None,
       r#else: None,
       not: self.0.node_location(&location, "not"),
-      contains: None,
-      array_items: None
-        .or_else(|| self.0.node_location(&location, "items"))
-        .or_else(|| self.0.node_location(&location, "additionalItems")),
 
       property_names: None,
       map_properties: self.0.node_location(&location, "additionalProperties"),
+      array_items: None
+        .or_else(|| self.0.node_location(&location, "items"))
+        .or_else(|| self.0.node_location(&location, "additionalItems")),
+      contains: None,
 
       all_of: self
         .0
