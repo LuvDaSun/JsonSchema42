@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 #[derive(
   Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, Debug, serde::Serialize, serde::Deserialize,
 )]
@@ -56,21 +58,21 @@ impl ToString for SchemaType {
   }
 }
 
-impl SchemaType {
-  pub fn parse(input: &str) -> Self {
-    match input {
-      "never" => Self::Never,
-      "any" => Self::Any,
-      "null" => Self::Null,
-      "boolean" => Self::Boolean,
-      "integer" => Self::Integer,
-      "number" => Self::Number,
-      "string" => Self::String,
-      "array" => Self::Array,
-      "object" => Self::Object,
-      _ => {
-        unreachable!();
-      }
+impl FromStr for SchemaType {
+  type Err = ();
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "never" => Ok(Self::Never),
+      "any" => Ok(Self::Any),
+      "null" => Ok(Self::Null),
+      "boolean" => Ok(Self::Boolean),
+      "integer" => Ok(Self::Integer),
+      "number" => Ok(Self::Number),
+      "string" => Ok(Self::String),
+      "array" => Ok(Self::Array),
+      "object" => Ok(Self::Object),
+      _ => Err(()),
     }
   }
 }

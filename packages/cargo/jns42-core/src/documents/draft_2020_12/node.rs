@@ -179,11 +179,11 @@ impl Node {
       serde_json::Value::Bool(true) => Some(vec![SchemaType::Any]),
       serde_json::Value::Bool(false) => Some(vec![SchemaType::Never]),
       serde_json::Value::Object(value) => match value.get("type")? {
-        serde_json::Value::String(value) => Some(vec![SchemaType::parse(value)]),
+        serde_json::Value::String(value) => Some(vec![value.parse().unwrap()]),
         serde_json::Value::Array(value) => Some(
           value
             .iter()
-            .filter_map(|value| value.as_str().map(SchemaType::parse))
+            .filter_map(|value| value.as_str().map(|value| value.parse().unwrap()))
             .collect(),
         ),
         _ => None,
