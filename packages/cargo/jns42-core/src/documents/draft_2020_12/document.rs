@@ -69,7 +69,7 @@ impl Document {
           .is_none());
       }
 
-      if let Some(node_ref) = node.select_ref() {
+      if let Some(node_ref) = node.select_reference() {
         let reference_location = &node_ref.parse()?;
         let retrieval_location = retrieval_location.join(reference_location);
         let given_location = given_location.join(reference_location);

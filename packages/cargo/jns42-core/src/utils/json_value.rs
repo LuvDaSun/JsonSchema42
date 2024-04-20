@@ -24,11 +24,11 @@ impl JsonValue {
     self.0.as_bool()
   }
 
-  pub fn value_list(&self, field: &str) -> Option<impl Iterator<Item = &serde_json::Value> + '_> {
+  pub fn value_list(&self, field: &str) -> Option<impl Iterator<Item = &serde_json::Value>> {
     Some(self.0.as_object()?.get(field)?.as_array()?.iter())
   }
 
-  pub fn string_list(&self, field: &str) -> Option<impl Iterator<Item = &str> + '_> {
+  pub fn string_list(&self, field: &str) -> Option<impl Iterator<Item = &str>> {
     self
       .0
       .as_object()?
@@ -49,8 +49,12 @@ impl JsonValue {
     self.0.as_object()?.get(field)?.as_bool()
   }
 
-  pub fn string(&self, field: &str) -> Option<&'_ str> {
+  pub fn string(&self, field: &str) -> Option<&str> {
     self.0.as_object()?.get(field)?.as_str()
+  }
+
+  pub fn value(&self, field: &str) -> Option<&serde_json::Value> {
+    self.0.as_object()?.get(field)
   }
 }
 
