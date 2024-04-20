@@ -85,7 +85,7 @@ impl NodeLocation {
   /*
   Append to pointer
   */
-  pub fn push_pointer(&mut self, value: impl IntoIterator<Item = impl Into<String>>) {
+  pub fn push_pointer(&self, value: impl IntoIterator<Item = impl Into<String>>) -> Self {
     let pointer: Vec<_> = self
       .get_pointer()
       .unwrap_or_default()
@@ -94,7 +94,9 @@ impl NodeLocation {
       .chain(value.into_iter().map(|part| part.into()))
       .collect();
 
-    self.set_pointer(pointer);
+    let mut cloned = self.clone();
+    cloned.set_pointer(pointer);
+    cloned
   }
 
   /**

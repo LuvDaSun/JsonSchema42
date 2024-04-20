@@ -104,11 +104,7 @@ impl SchemaDocument for Document {
     self
       .nodes
       .keys()
-      .map(|pointer| {
-        let mut node_location = self.document_location.clone();
-        node_location.push_pointer(pointer.clone());
-        node_location
-      })
+      .map(|pointer| self.document_location.push_pointer(pointer.clone()))
       .collect()
   }
 
@@ -125,9 +121,7 @@ impl SchemaDocument for Document {
       .nodes
       .iter()
       .map(|(pointer, node)| {
-        let mut location = self.get_document_location().clone();
-        location.push_pointer(pointer);
-
+        let location = self.get_document_location().push_pointer(pointer);
         (location.clone(), node.to_document_schema_item(location))
       })
       .collect()

@@ -2,10 +2,7 @@ use crate::{
   models::{DocumentSchemaItem, SchemaType},
   utils::node_location::NodeLocation,
 };
-use std::{
-  collections::{BTreeSet, HashMap},
-  iter::{empty, once},
-};
+use std::iter::{empty, once};
 
 #[derive(Clone, Debug)]
 pub struct Node(serde_json::Value);
@@ -383,11 +380,7 @@ impl Node {
     location: &NodeLocation,
     entry: Option<(Vec<String>, Node)>,
   ) -> Option<NodeLocation> {
-    entry.map(|(pointer, _node)| {
-      let mut sub_location = location.clone();
-      sub_location.push_pointer(pointer.clone());
-      sub_location
-    })
+    entry.map(|(pointer, _node)| location.push_pointer(pointer.clone()))
   }
 
   fn map_entry_location_list<'n>(
@@ -395,11 +388,9 @@ impl Node {
     entries: Option<impl IntoIterator<Item = (Vec<String>, Node)> + 'n>,
   ) -> Option<impl Iterator<Item = NodeLocation> + 'n> {
     entries.map(|value| {
-      value.into_iter().map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.push_pointer(pointer.clone());
-        sub_location
-      })
+      value
+        .into_iter()
+        .map(|(pointer, _node)| location.push_pointer(pointer.clone()))
     })
   }
 
@@ -409,8 +400,7 @@ impl Node {
   ) -> Option<impl Iterator<Item = (String, NodeLocation)> + 'n> {
     entries.map(|value| {
       value.into_iter().map(|(pointer, _node)| {
-        let mut sub_location = location.clone();
-        sub_location.push_pointer(pointer.clone());
+        let sub_location = location.push_pointer(pointer.clone());
         (pointer.last().unwrap().to_owned(), sub_location)
       })
     })

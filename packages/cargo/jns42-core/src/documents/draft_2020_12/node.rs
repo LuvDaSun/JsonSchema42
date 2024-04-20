@@ -478,11 +478,7 @@ impl Node {
     location: &NodeLocation,
     entry: Option<(Vec<String>, Node)>,
   ) -> Option<NodeLocation> {
-    entry.map(|(pointer, _node)| {
-      let mut sub_location = location.clone();
-      sub_location.push_pointer(pointer.clone());
-      sub_location
-    })
+    entry.map(|(pointer, _node)| location.push_pointer(pointer.clone()))
   }
 
   fn map_entry_locations_vec(
@@ -492,11 +488,7 @@ impl Node {
     entries.map(|value| {
       value
         .iter()
-        .map(|(pointer, _node)| {
-          let mut sub_location = location.clone();
-          sub_location.push_pointer(pointer.clone());
-          sub_location
-        })
+        .map(|(pointer, _node)| location.push_pointer(pointer.clone()))
         .collect()
     })
   }
@@ -508,11 +500,7 @@ impl Node {
     entries.map(|value| {
       value
         .iter()
-        .map(|(pointer, _node)| {
-          let mut sub_location = location.clone();
-          sub_location.push_pointer(pointer.clone());
-          sub_location
-        })
+        .map(|(pointer, _node)| location.push_pointer(pointer.clone()))
         .collect()
     })
   }
@@ -525,8 +513,7 @@ impl Node {
       value
         .iter()
         .map(|(pointer, _node)| {
-          let mut sub_location = location.clone();
-          sub_location.push_pointer(pointer.clone());
+          let sub_location = location.push_pointer(pointer.clone());
           (pointer.last().unwrap().to_owned(), sub_location)
         })
         .collect()

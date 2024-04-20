@@ -390,14 +390,13 @@ impl DocumentContext {
     we add every node in the tree to the cache
     */
     for (pointer, node) in read_json_node(&[], document_node) {
-      let mut node_location = retrieval_location.clone();
       /*
       The retrieval location a unique, physical location where we can retrieve this node. The physical
       location of all nodes in the documents can be derived from the pointer and the retrieval_location
       of the document. It is possible that the retrieval location of the document is not root (has
       a hash). That is ok, then the pointer to the node is appended to the pointer of the document
       */
-      node_location.push_pointer(pointer);
+      let node_location = retrieval_location.push_pointer(pointer);
 
       let mut node_cache = self.node_cache.borrow_mut();
       if let Some(node_previous) = node_cache.get(&node_location) {

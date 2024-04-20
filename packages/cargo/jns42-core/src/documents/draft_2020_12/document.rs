@@ -128,8 +128,7 @@ impl Document {
 
     if let Some(anchor) = reference_location.get_anchor() {
       if let Some(pointer) = document.resolve_anchor(anchor) {
-        let mut reference_location = document.get_document_location().clone();
-        reference_location.push_pointer(pointer);
+        let reference_location = document.get_document_location().push_pointer(pointer);
         return Ok(reference_location);
       }
     } else {
@@ -151,8 +150,7 @@ impl Document {
       let reference_location = document.get_document_location().join(&reference_location);
       if let Some(anchor) = reference_location.get_anchor() {
         if let Some(pointer) = document.resolve_dynamic_anchor(anchor) {
-          let mut reference_location = document.get_document_location().clone();
-          reference_location.push_pointer(pointer);
+          let reference_location = document.get_document_location().push_pointer(pointer);
           return Ok(reference_location);
         };
       } else {
@@ -175,11 +173,12 @@ impl SchemaDocument for Document {
 
   fn get_node_locations(&self) -> Vec<NodeLocation> {
     empty()
-      .chain(self.nodes.keys().map(|pointer| {
-        let mut node_location = self.document_location.clone();
-        node_location.push_pointer(pointer.clone());
-        node_location
-      }))
+      .chain(
+        self
+          .nodes
+          .keys()
+          .map(|pointer| self.document_location.push_pointer(pointer.clone())),
+      )
       .chain(self.anchors.keys().map(|anchor| {
         let mut node_location = self.document_location.clone();
         node_location.set_anchor(anchor.clone());
@@ -206,9 +205,7 @@ impl SchemaDocument for Document {
       .nodes
       .iter()
       .map(|(pointer, node)| {
-        let mut location = self.get_document_location().clone();
-        location.push_pointer(pointer);
-
+        let location = self.get_document_location().push_pointer(pointer);
         (
           location.clone(),
           node.to_document_schema_item(location, self),
