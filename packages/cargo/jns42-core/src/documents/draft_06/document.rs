@@ -130,7 +130,7 @@ impl SchemaDocument for Document {
     None
   }
 
-  fn resolve_dynamic_anchor(&self, _anchor: &str) -> Option<Vec<String>> {
+  fn resolve_antecedent_anchor(&self, _anchor: &str) -> Option<Vec<String>> {
     None
   }
 }

@@ -4,7 +4,6 @@ use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::node_location::NodeLocation;
 use std::collections::{BTreeMap, HashMap};
-use std::iter::empty;
 use std::rc::Weak;
 
 pub struct Document {
@@ -12,9 +11,8 @@ pub struct Document {
 
   document_location: NodeLocation,
   antecedent_location: Option<NodeLocation>,
-
   /**
-  Nodes that belong to this document, indexed by their (sub)pointer
+  Nodes that belong to this document, indexed by their pointer
   */
   nodes: HashMap<Vec<String>, Node>,
   referenced_documents: Vec<ReferencedDocument>,
@@ -22,7 +20,9 @@ pub struct Document {
 
   // maps anchors to their pointers
   anchors: HashMap<String, Vec<String>>,
-  dynamic_anchors: HashMap<String, Vec<String>>,
+
+  // pointer to the anchor
+  recursive_anchor: Option<Vec<String>>,
 }
 
 impl Document {
@@ -50,7 +50,7 @@ impl Document {
     let mut referenced_documents = Vec::new();
     let mut embedded_documents = Vec::new();
     let mut anchors = HashMap::new();
-    let mut dynamic_anchors = HashMap::new();
+    let mut recursive_anchor = None;
 
     let mut node_queue = Vec::new();
     node_queue.push((vec![], document_node.clone()));
@@ -63,14 +63,16 @@ impl Document {
           .is_none());
       }
 
-      if let Some(node_dynamic_anchor) = node.select_dynamic_anchor() {
-        assert!(dynamic_anchors
-          .insert(node_dynamic_anchor.to_owned(), node_pointer.clone())
-          .is_none());
+      if node.select_recursive_anchor().unwrap_or_default() {
+        if recursive_anchor.is_some() {
+          Err(Error::Conflict)?
+        }
+
+        recursive_anchor = Some(node_pointer.clone());
       }
 
-      if let Some(node_ref) = node.select_reference() {
-        let reference_location = &node_ref.parse()?;
+      if let Some(node_reference) = node.select_reference() {
+        let reference_location = &node_reference.parse()?;
         let retrieval_location = retrieval_location.join(reference_location);
         let given_location = given_location.join(reference_location);
 
@@ -106,13 +108,13 @@ impl Document {
 
     Ok(Self {
       document_context,
-      antecedent_location,
       document_location,
+      antecedent_location,
       nodes,
       referenced_documents,
       embedded_documents,
       anchors,
-      dynamic_anchors,
+      recursive_anchor,
     })
   }
 
@@ -135,7 +137,7 @@ impl Document {
     Err(Error::NotFound)
   }
 
-  pub fn resolve_dynamic_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
+  pub fn resolve_recursive_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let mut antecedent_documents =
@@ -169,25 +171,10 @@ impl SchemaDocument for Document {
   }
 
   fn get_node_locations(&self) -> Vec<NodeLocation> {
-    empty()
-      .chain(
-        self
-          .nodes
-          .keys()
-          .map(|pointer| self.document_location.push_pointer(pointer.clone())),
-      )
-      .chain(
-        self
-          .anchors
-          .keys()
-          .map(|anchor| self.document_location.set_anchor(anchor.clone())),
-      )
-      .chain(
-        self
-          .dynamic_anchors
-          .keys()
-          .map(|anchor| self.document_location.set_anchor(anchor.clone())),
-      )
+    self
+      .nodes
+      .keys()
+      .map(|pointer| self.document_location.push_pointer(pointer.clone()))
       .collect()
   }
 
@@ -217,7 +204,7 @@ impl SchemaDocument for Document {
     self.anchors.get(anchor).cloned()
   }
 
-  fn resolve_antecedent_anchor(&self, anchor: &str) -> Option<Vec<String>> {
-    self.dynamic_anchors.get(anchor).cloned()
+  fn resolve_antecedent_anchor(&self, _anchor: &str) -> Option<Vec<String>> {
+    self.recursive_anchor.as_ref().cloned()
   }
 }
