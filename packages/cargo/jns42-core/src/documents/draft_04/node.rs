@@ -108,56 +108,37 @@ impl Node {
       r#if: None,
       then: None,
       r#else: None,
-      not: Self::map_entry_location(&location, self.select_node_entry(Default::default(), "not")),
+      not: self.select_node_location(&location, "not"),
       contains: None,
-      array_items: Self::map_entry_location(
-        &location,
-        None
-          .or_else(|| self.select_node_entry(Default::default(), "items"))
-          .or_else(|| self.select_node_entry(Default::default(), "additionalItems")),
-      ),
+      array_items: None
+        .or_else(|| self.select_node_location(&location, "items"))
+        .or_else(|| self.select_node_location(&location, "additionalItems")),
+
       property_names: None,
-      map_properties: Self::map_entry_location(
-        &location,
-        self.select_node_entry(Default::default(), "additionalProperties"),
-      ),
+      map_properties: self.select_node_location(&location, "additionalProperties"),
 
-      all_of: Self::map_entry_location_list(
-        &location,
-        self.select_node_entry_list(Default::default(), "allOf"),
-      )
-      .map(|value| value.collect()),
-      any_of: Self::map_entry_location_list(
-        &location,
-        self.select_node_entry_list(Default::default(), "anyOf"),
-      )
-      .map(|value| value.collect()),
-      one_of: Self::map_entry_location_list(
-        &location,
-        self.select_node_entry_list(Default::default(), "oneOf"),
-      )
-      .map(|value| value.collect()),
-      tuple_items: Self::map_entry_location_list(
-        &location,
-        self.select_node_entry_list(Default::default(), "items"),
-      )
-      .map(|value| value.collect()),
+      all_of: self
+        .select_node_location_list(&location, "allOf")
+        .map(|value| value.collect()),
+      any_of: self
+        .select_node_location_list(&location, "anyOf")
+        .map(|value| value.collect()),
+      one_of: self
+        .select_node_location_list(&location, "oneOf")
+        .map(|value| value.collect()),
+      tuple_items: self
+        .select_node_location_list(&location, "items")
+        .map(|value| value.collect()),
 
-      dependent_schemas: Self::map_entry_location_object(
-        &location,
-        self.select_node_entry_object(Default::default(), "dependentSchemas"),
-      )
-      .map(|value| value.collect()),
-      object_properties: Self::map_entry_location_object(
-        &location,
-        self.select_node_entry_object(Default::default(), "properties"),
-      )
-      .map(|value| value.collect()),
-      pattern_properties: Self::map_entry_location_object(
-        &location,
-        self.select_node_entry_object(Default::default(), "patternProperties"),
-      )
-      .map(|value| value.collect()),
+      dependent_schemas: self
+        .select_node_location_object(&location, "dependentSchemas")
+        .map(|value| value.collect()),
+      object_properties: self
+        .select_node_location_object(&location, "properties")
+        .map(|value| value.collect()),
+      pattern_properties: self
+        .select_node_location_object(&location, "patternProperties")
+        .map(|value| value.collect()),
     }
   }
 }
@@ -173,12 +154,7 @@ impl Node {
   pub fn select_reference(&self) -> Option<&str> {
     self.select_string("$ref")
   }
-}
 
-/*
-sub nodes
-*/
-impl Node {
   pub fn select_sub_nodes(&self, pointer: &[String]) -> impl Iterator<Item = (Vec<String>, Node)> {
     empty()
       .chain(self.select_not_entry(pointer))
@@ -370,39 +346,39 @@ impl Node {
 
     Some(result)
   }
-}
 
-/*
-more helpers
-*/
-impl Node {
-  fn map_entry_location(
-    location: &NodeLocation,
-    entry: Option<(Vec<String>, Node)>,
-  ) -> Option<NodeLocation> {
-    entry.map(|(pointer, _node)| location.push_pointer(pointer.clone()))
+  fn select_node_location(&self, location: &NodeLocation, field: &str) -> Option<NodeLocation> {
+    self
+      .select_node_entry(Default::default(), field)
+      .map(|(pointer, _node)| location.push_pointer(pointer.clone()))
   }
 
-  fn map_entry_location_list<'n>(
+  fn select_node_location_list<'n>(
+    &self,
     location: &'n NodeLocation,
-    entries: Option<impl IntoIterator<Item = (Vec<String>, Node)> + 'n>,
+    field: &str,
   ) -> Option<impl Iterator<Item = NodeLocation> + 'n> {
-    entries.map(|value| {
-      value
-        .into_iter()
-        .map(|(pointer, _node)| location.push_pointer(pointer.clone()))
-    })
+    self
+      .select_node_entry_list(Default::default(), field)
+      .map(|value| {
+        value
+          .into_iter()
+          .map(|(pointer, _node)| location.push_pointer(pointer.clone()))
+      })
   }
 
-  fn map_entry_location_object<'n>(
+  fn select_node_location_object<'n>(
+    &self,
     location: &'n NodeLocation,
-    entries: Option<impl IntoIterator<Item = (Vec<String>, Node)> + 'n>,
+    field: &str,
   ) -> Option<impl Iterator<Item = (String, NodeLocation)> + 'n> {
-    entries.map(|value| {
-      value.into_iter().map(|(pointer, _node)| {
-        let sub_location = location.push_pointer(pointer.clone());
-        (pointer.last().unwrap().to_owned(), sub_location)
+    self
+      .select_node_entry_object(Default::default(), field)
+      .map(|value| {
+        value.into_iter().map(|(pointer, _node)| {
+          let sub_location = location.push_pointer(pointer.clone());
+          (pointer.last().unwrap().to_owned(), sub_location)
+        })
       })
-    })
   }
 }
