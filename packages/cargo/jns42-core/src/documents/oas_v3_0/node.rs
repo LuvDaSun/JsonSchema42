@@ -2,10 +2,7 @@ use crate::{
   models::{DocumentSchemaItem, SchemaType},
   utils::{json_value::JsonValue, node_location::NodeLocation},
 };
-use std::{
-  iter::{empty, once},
-  str::FromStr,
-};
+use std::iter::empty;
 
 #[derive(Clone, Debug)]
 pub struct Node(JsonValue);
