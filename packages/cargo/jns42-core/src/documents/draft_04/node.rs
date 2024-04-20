@@ -111,47 +111,56 @@ impl Node {
       r#if: None,
       then: None,
       r#else: None,
-      not: Self::map_entry_location(&location, self.select_not_entry(Default::default())),
+      not: Self::map_entry_location(&location, self.select_node_entry(Default::default(), "not")),
       contains: None,
       array_items: Self::map_entry_location(
         &location,
-        self.select_array_items_entry(Default::default()),
+        None
+          .or_else(|| self.select_node_entry(Default::default(), "items"))
+          .or_else(|| self.select_node_entry(Default::default(), "additionalItems")),
       ),
       property_names: None,
       map_properties: Self::map_entry_location(
         &location,
-        self.select_map_properties_entry(Default::default()),
+        self.select_node_entry(Default::default(), "additionalProperties"),
       ),
 
-      all_of: Self::map_entry_locations_set(
+      all_of: Self::map_entry_location_list(
         &location,
-        self.select_all_of_entries(Default::default()),
-      ),
-      any_of: Self::map_entry_locations_set(
+        self.select_node_entry_list(Default::default(), "allOf"),
+      )
+      .map(|value| value.collect()),
+      any_of: Self::map_entry_location_list(
         &location,
-        self.select_any_of_entries(Default::default()),
-      ),
-      one_of: Self::map_entry_locations_set(
+        self.select_node_entry_list(Default::default(), "anyOf"),
+      )
+      .map(|value| value.collect()),
+      one_of: Self::map_entry_location_list(
         &location,
-        self.select_one_of_entries(Default::default()),
-      ),
-      tuple_items: Self::map_entry_locations_vec(
+        self.select_node_entry_list(Default::default(), "oneOf"),
+      )
+      .map(|value| value.collect()),
+      tuple_items: Self::map_entry_location_list(
         &location,
-        self.select_tuple_items_entries(Default::default()),
-      ),
+        self.select_node_entry_list(Default::default(), "items"),
+      )
+      .map(|value| value.collect()),
 
-      dependent_schemas: Self::map_entry_locations_map(
+      dependent_schemas: Self::map_entry_location_object(
         &location,
-        self.select_dependent_schemas_entries(Default::default()),
-      ),
-      object_properties: Self::map_entry_locations_map(
+        self.select_node_entry_object(Default::default(), "dependentSchemas"),
+      )
+      .map(|value| value.collect()),
+      object_properties: Self::map_entry_location_object(
         &location,
-        self.select_object_properties_entries(Default::default()),
-      ),
-      pattern_properties: Self::map_entry_locations_map(
+        self.select_node_entry_object(Default::default(), "properties"),
+      )
+      .map(|value| value.collect()),
+      pattern_properties: Self::map_entry_location_object(
         &location,
-        self.select_pattern_properties_entries(Default::default()),
-      ),
+        self.select_node_entry_object(Default::default(), "patternProperties"),
+      )
+      .map(|value| value.collect()),
     }
   }
 }
@@ -201,17 +210,17 @@ impl Node {
   }
 
   fn select_not_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    self.select_entries_one(pointer, "not")
+    self.select_node_entry(pointer, "not")
   }
   fn select_map_properties_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    self.select_entries_one(pointer, "additionalProperties")
+    self.select_node_entry(pointer, "additionalProperties")
   }
   fn select_array_items_entry(&self, pointer: &[String]) -> Option<(Vec<String>, Node)> {
-    if let Some(value) = self.select_entries_one(pointer, "items") {
+    if let Some(value) = self.select_node_entry(pointer, "items") {
       return Some(value);
     }
 
-    if let Some(value) = self.select_entries_one(pointer, "additionalItems") {
+    if let Some(value) = self.select_node_entry(pointer, "additionalItems") {
       return Some(value);
     }
 
@@ -219,38 +228,38 @@ impl Node {
   }
 
   fn select_all_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_list(pointer, "allOf")
+    self.select_node_entry_list(pointer, "allOf")
   }
   fn select_any_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_list(pointer, "anyOf")
+    self.select_node_entry_list(pointer, "anyOf")
   }
   fn select_one_of_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_list(pointer, "oneOf")
+    self.select_node_entry_list(pointer, "oneOf")
   }
   fn select_tuple_items_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_list(pointer, "items")
+    self.select_node_entry_list(pointer, "items")
   }
 
   fn select_dependent_schemas_entries(
     &self,
     pointer: &[String],
   ) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_map(pointer, "dependentSchemas")
+    self.select_node_entry_object(pointer, "dependentSchemas")
   }
   fn select_object_properties_entries(
     &self,
     pointer: &[String],
   ) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_map(pointer, "properties")
+    self.select_node_entry_object(pointer, "properties")
   }
   fn select_pattern_properties_entries(
     &self,
     pointer: &[String],
   ) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_map(pointer, "patternProperties")
+    self.select_node_entry_object(pointer, "patternProperties")
   }
   fn select_definition_entries(&self, pointer: &[String]) -> Option<Vec<(Vec<String>, Node)>> {
-    self.select_entries_map(pointer, "definitions")
+    self.select_node_entry_object(pointer, "definitions")
   }
 }
 
@@ -290,7 +299,7 @@ impl Node {
     self.0.as_object()?.get(field)?.as_str()
   }
 
-  fn select_entries_one(&self, pointer: &[String], field: &str) -> Option<(Vec<String>, Node)> {
+  fn select_node_entry(&self, pointer: &[String], field: &str) -> Option<(Vec<String>, Node)> {
     let selected = self.0.as_object()?.get(field)?;
     let pointer: Vec<_> = pointer
       .iter()
@@ -302,7 +311,7 @@ impl Node {
     Some(result)
   }
 
-  fn select_entries_list(
+  fn select_node_entry_list(
     &self,
     pointer: &[String],
     field: &str,
@@ -334,7 +343,7 @@ impl Node {
     Some(result)
   }
 
-  fn select_entries_map(
+  fn select_node_entry_object(
     &self,
     pointer: &[String],
     field: &str,
@@ -381,51 +390,29 @@ impl Node {
     })
   }
 
-  fn map_entry_locations_vec(
-    location: &NodeLocation,
-    entries: Option<Vec<(Vec<String>, Node)>>,
-  ) -> Option<Vec<NodeLocation>> {
+  fn map_entry_location_list<'n>(
+    location: &'n NodeLocation,
+    entries: Option<impl IntoIterator<Item = (Vec<String>, Node)> + 'n>,
+  ) -> Option<impl Iterator<Item = NodeLocation> + 'n> {
     entries.map(|value| {
-      value
-        .iter()
-        .map(|(pointer, _node)| {
-          let mut sub_location = location.clone();
-          sub_location.push_pointer(pointer.clone());
-          sub_location
-        })
-        .collect()
+      value.into_iter().map(|(pointer, _node)| {
+        let mut sub_location = location.clone();
+        sub_location.push_pointer(pointer.clone());
+        sub_location
+      })
     })
   }
 
-  fn map_entry_locations_set(
-    location: &NodeLocation,
-    entries: Option<Vec<(Vec<String>, Node)>>,
-  ) -> Option<BTreeSet<NodeLocation>> {
+  fn map_entry_location_object<'n>(
+    location: &'n NodeLocation,
+    entries: Option<impl IntoIterator<Item = (Vec<String>, Node)> + 'n>,
+  ) -> Option<impl Iterator<Item = (String, NodeLocation)> + 'n> {
     entries.map(|value| {
-      value
-        .iter()
-        .map(|(pointer, _node)| {
-          let mut sub_location = location.clone();
-          sub_location.push_pointer(pointer.clone());
-          sub_location
-        })
-        .collect()
-    })
-  }
-
-  fn map_entry_locations_map(
-    location: &NodeLocation,
-    entries: Option<Vec<(Vec<String>, Node)>>,
-  ) -> Option<HashMap<String, NodeLocation>> {
-    entries.map(|value| {
-      value
-        .iter()
-        .map(|(pointer, _node)| {
-          let mut sub_location = location.clone();
-          sub_location.push_pointer(pointer.clone());
-          (pointer.last().unwrap().to_owned(), sub_location)
-        })
-        .collect()
+      value.into_iter().map(|(pointer, _node)| {
+        let mut sub_location = location.clone();
+        sub_location.push_pointer(pointer.clone());
+        (pointer.last().unwrap().to_owned(), sub_location)
+      })
     })
   }
 }
