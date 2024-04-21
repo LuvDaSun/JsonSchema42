@@ -29,6 +29,12 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     return;
   };
 
+  let sub_item = arena.get_item(not);
+
+  if sub_item.reference.is_some() || sub_item.all_of.is_some() || sub_item.not.is_some() {
+    return;
+  }
+
   let mut item_new = ArenaSchemaItem {
     not: None,
     exact: Some(false),
@@ -36,8 +42,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   };
 
   if let Some(required) = &item.required {
-    let sub_item = arena.get_item(not);
-
     if let Some(exclude_required) = &sub_item.required {
       let exclude_required: HashSet<_> = exclude_required.iter().collect();
       let required_new = required
@@ -59,18 +63,17 @@ mod tests {
 
   #[test]
   fn test_transform() {
-    let mut arena = SchemaArena::new();
-
-    arena.add_item(ArenaSchemaItem {
-      required: Some(["a"].map(|value| value.to_string()).into()),
-      ..Default::default()
-    });
-
-    arena.add_item(ArenaSchemaItem {
-      required: Some(["a", "b"].map(|value| value.to_string()).into()),
-      not: Some(0),
-      ..Default::default()
-    });
+    let mut arena = SchemaArena::from_iter([
+      ArenaSchemaItem {
+        required: Some(["a"].map(str::to_owned).into()),
+        ..Default::default()
+      },
+      ArenaSchemaItem {
+        required: Some(["a", "b"].map(str::to_owned).into()),
+        not: Some(0),
+        ..Default::default()
+      },
+    ]);
 
     while arena.apply_transform(transform) > 0 {
       //
@@ -79,11 +82,12 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
       ArenaSchemaItem {
-        required: Some(["a"].map(|value| value.to_string()).into()),
+        required: Some(["a"].map(str::to_owned).into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        required: Some(["b"].map(|value| value.to_string()).into()),
+        exact: Some(false),
+        required: Some(["b"].map(str::to_owned).into()),
         ..Default::default()
       },
     ]
