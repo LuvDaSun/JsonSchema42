@@ -17,6 +17,7 @@ words:
   - lcov
   - luvdasun
   - notdir
+  - oneshot
   - presolved
   - realloc
   - repr
@@ -24,6 +25,7 @@ words:
   - rlib
   - ryanluker
   - serde
+  - smol
   - snakecase
   - structs
   - tamasfe

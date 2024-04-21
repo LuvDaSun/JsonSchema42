@@ -7,28 +7,28 @@ export function* generateTypesTsCode(specification: models.Specification) {
   const { names, typesArena } = specification;
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    const typeName = names.toPascalCase(itemKey);
+    using typeName = names.getName(itemKey);
     const definition = generateTypeDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${typeName} = (${definition});
+      export type ${typeName.toPascalCase()} = (${definition});
     `;
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    if (item.id == null) {
+    if (item.location == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      const typeName = names.toPascalCase(itemKey);
-      yield typeName;
+      using typeName = names.getName(itemKey);
+      yield typeName.toPascalCase();
     }
   }
 
@@ -137,7 +137,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           }
         }
 
-        case "map": {
+        case "object": {
           yield itt`
           {
             ${generateInterfaceContent()}

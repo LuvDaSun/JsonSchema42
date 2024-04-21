@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{ArenaSchemaItem, SchemaArena};
 
 /**
  * Turns the model into a single all-of with various
@@ -54,7 +54,7 @@ use crate::models::{arena::Arena, schema::SchemaItem};
  * ```
  *
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
   let mut sub_items = Vec::new();
 
@@ -65,7 +65,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
     .unwrap_or_default()
     > 0
   {
-    sub_items.push(SchemaItem {
+    sub_items.push(ArenaSchemaItem {
       parent: Some(key),
       name: Some("types".to_string()),
       types: item.types.clone(),
@@ -74,7 +74,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   }
 
   if item.reference.is_some() {
-    sub_items.push(SchemaItem {
+    sub_items.push(ArenaSchemaItem {
       parent: Some(key),
       name: Some("reference".to_string()),
       reference: item.reference,
@@ -89,7 +89,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
     .unwrap_or_default()
     > 0
   {
-    sub_items.push(SchemaItem {
+    sub_items.push(ArenaSchemaItem {
       parent: Some(key),
       name: Some("all_of".to_string()),
       all_of: item.all_of.clone(),
@@ -104,7 +104,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
     .unwrap_or_default()
     > 0
   {
-    sub_items.push(SchemaItem {
+    sub_items.push(ArenaSchemaItem {
       parent: Some(key),
       name: Some("any_of".to_string()),
       any_of: item.any_of.clone(),
@@ -119,7 +119,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
     .unwrap_or_default()
     > 0
   {
-    sub_items.push(SchemaItem {
+    sub_items.push(ArenaSchemaItem {
       parent: Some(key),
       name: Some("one_of".to_string()),
       one_of: item.one_of.clone(),
@@ -128,7 +128,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   }
 
   if item.r#if.is_some() || item.then.is_some() || item.r#else.is_some() {
-    sub_items.push(SchemaItem {
+    sub_items.push(ArenaSchemaItem {
       parent: Some(key),
       name: Some("if_then_else".to_string()),
       r#if: item.r#if,
@@ -147,7 +147,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 
     arena.replace_item(
       key,
-      SchemaItem {
+      ArenaSchemaItem {
         types: None,
         reference: None,
         all_of: Some(sub_keys),
@@ -168,9 +168,9 @@ mod tests {
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaItem {
       reference: Some(10),
       all_of: Some([100, 200].into()),
       any_of: Some([300, 400].into()),
@@ -187,35 +187,35 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
-      SchemaItem {
+      ArenaSchemaItem {
         all_of: Some([1, 2, 3, 4, 5].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("reference".to_string()),
         reference: Some(10),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("all_of".to_string()),
         all_of: Some([100, 200].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("any_of".to_string()),
         any_of: Some([300, 400].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("one_of".to_string()),
         one_of: Some([500, 600].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         parent: Some(0),
         name: Some("if_then_else".to_string()),
         r#if: Some(700),

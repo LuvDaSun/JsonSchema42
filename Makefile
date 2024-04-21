@@ -12,6 +12,7 @@ clean: \
 
 	rm -f packages/npm/jns42-core/bin/main.wasm
 	rm -rf generated
+	rm -rf target
 
 target/wasm32-unknown-unknown/release/jns42_core.wasm: \
 	packages/cargo/jns42-core \
@@ -26,7 +27,6 @@ target/wasm32-unknown-unknown/release/jns42_core.wasm: \
 		--package jns42-core \
 		--target wasm32-unknown-unknown \
 		--release \
-
 
 packages/npm/jns42-core/bin/main.wasm: \
 	target/wasm32-unknown-unknown/release/jns42_core.wasm \

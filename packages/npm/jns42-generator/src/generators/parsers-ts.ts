@@ -1,4 +1,3 @@
-import { toCamelCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import { NestedText, banner, generateJsDocComments, itt, joinIterable } from "../utils/index.js";
 
@@ -24,19 +23,18 @@ export function* generateParsersTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    const typeIdentifier = names.toSnakeCase(itemKey);
-    const functionName = toCamelCase(`parse ${typeIdentifier}`);
+    using typeName = names.getName(itemKey);
     const definition = generateParserDefinition(itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
+      export function parse${typeName.toPascalCase()}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
         const configuration = {
           ...defaultParserGeneratorOptions,
           ...options,
@@ -52,12 +50,11 @@ export function* generateParsersTsCode(specification: models.Specification) {
     valueExpression: string,
   ): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    if (item.id == null) {
+    if (item.location == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
-      const typeIdentifier = names.toSnakeCase(itemKey);
-      const functionName = toCamelCase(`parse ${typeIdentifier}`);
-      yield itt`${functionName}(${valueExpression}, configuration)`;
+      using typeName = names.getName(itemKey);
+      yield itt`parse${typeName.toPascalCase()}(${valueExpression}, configuration)`;
     }
   }
 
@@ -290,7 +287,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
         }
 
-        case "map": {
+        case "object": {
           yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(

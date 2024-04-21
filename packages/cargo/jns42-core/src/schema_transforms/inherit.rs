@@ -1,7 +1,7 @@
 macro_rules! generate_mod {
   ($member: ident) => {
     pub mod $member {
-      use crate::models::{arena::Arena, schema::SchemaItem};
+      use crate::models::{ArenaSchemaItem, SchemaArena};
 
       /**
        * This function inherits inheritable properties from a item to it's $member items. This
@@ -42,7 +42,7 @@ macro_rules! generate_mod {
        * ```
        *
        */
-      pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         let Some(sub_keys) = item.$member.clone() else {
@@ -82,11 +82,11 @@ macro_rules! generate_mod {
         let item = item.clone();
 
         // the base item has no meta or non inheritable properties
-        let base_item_new = SchemaItem {
+        let base_item_new = ArenaSchemaItem {
           name: None,
           primary: None,
           parent: None,
-          id: None,
+          location: None,
           title: None,
           description: None,
           examples: None,
@@ -108,7 +108,7 @@ macro_rules! generate_mod {
         let sub_keys_new = sub_keys
           .into_iter()
           .map(|sub_key| {
-            let sub_item_new = SchemaItem {
+            let sub_item_new = ArenaSchemaItem {
               all_of: Some([sub_key, base_key_new].into()),
 
               ..Default::default()
@@ -120,7 +120,7 @@ macro_rules! generate_mod {
 
         // the new sub item is an all of of the base and the previous sub item
 
-        let item_new = SchemaItem {
+        let item_new = ArenaSchemaItem {
           $member: Some(sub_keys_new),
 
           types: None,
@@ -161,19 +161,19 @@ macro_rules! generate_mod {
 
         #[test]
         fn test_transform() {
-          let mut arena = Arena::new();
+          let mut arena = SchemaArena::new();
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             required: Some(["a"].map(|value| value.into()).into()),
             ..Default::default()
           });
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             required: Some(["b"].map(|value| value.into()).into()),
             ..Default::default()
           });
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             $member: Some([0, 1].into()),
             required: Some(["c"].map(|value| value.into()).into()),
             ..Default::default()
@@ -185,27 +185,27 @@ macro_rules! generate_mod {
 
           let actual: Vec<_> = arena.iter().cloned().collect();
           let expected = vec![
-            SchemaItem {
+            ArenaSchemaItem {
               required: Some(["a"].map(|value| value.into()).into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               required: Some(["b"].map(|value| value.into()).into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               $member: Some([4, 5].into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               required: Some(["c"].map(|value| value.into()).into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               all_of: Some([0, 3].into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               all_of: Some([1, 3].into()),
               ..Default::default()
             },
@@ -223,7 +223,7 @@ generate_mod!(any_of);
 generate_mod!(one_of);
 
 pub mod reference {
-  use crate::models::{arena::Arena, schema::SchemaItem};
+  use crate::models::{ArenaSchemaItem, SchemaArena};
 
   /**
    * This function inherits inheritable properties from a item to a referenced item. This
@@ -257,7 +257,7 @@ pub mod reference {
    * ```
    *
    */
-  pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+  pub fn transform(arena: &mut SchemaArena, key: usize) {
     let item = arena.get_item(key);
 
     let Some(sub_key) = item.reference else {
@@ -297,11 +297,11 @@ pub mod reference {
     let item = item.clone();
 
     // the base item has no meta or non inheritable properties
-    let base_item_new = SchemaItem {
+    let base_item_new = ArenaSchemaItem {
       name: None,
       primary: None,
       parent: None,
-      id: None,
+      location: None,
       title: None,
       description: None,
       examples: None,
@@ -321,7 +321,7 @@ pub mod reference {
     let base_key_new = arena.add_item(base_item_new);
 
     // the new sub item is an all of of the base and the previous sub item
-    let sub_item_new = SchemaItem {
+    let sub_item_new = ArenaSchemaItem {
       all_of: Some([sub_key, base_key_new].into()),
 
       ..Default::default()
@@ -329,7 +329,7 @@ pub mod reference {
 
     let sub_key_new = arena.add_item(sub_item_new);
 
-    let item_new = SchemaItem {
+    let item_new = ArenaSchemaItem {
       reference: Some(sub_key_new),
 
       types: None,
@@ -370,14 +370,14 @@ pub mod reference {
 
     #[test]
     fn test_transform() {
-      let mut arena = Arena::new();
+      let mut arena = SchemaArena::new();
 
-      arena.add_item(SchemaItem {
+      arena.add_item(ArenaSchemaItem {
         required: Some(["a", "b"].map(|value| value.into()).into()),
         ..Default::default()
       });
 
-      arena.add_item(SchemaItem {
+      arena.add_item(ArenaSchemaItem {
         reference: Some(0),
         required: Some(["b", "c"].map(|value| value.into()).into()),
         ..Default::default()
@@ -389,19 +389,19 @@ pub mod reference {
 
       let actual: Vec<_> = arena.iter().cloned().collect();
       let expected = vec![
-        SchemaItem {
+        ArenaSchemaItem {
           required: Some(["a", "b"].map(|value| value.into()).into()),
           ..Default::default()
         },
-        SchemaItem {
+        ArenaSchemaItem {
           reference: Some(3),
           ..Default::default()
         },
-        SchemaItem {
+        ArenaSchemaItem {
           required: Some(["b", "c"].map(|value| value.into()).into()),
           ..Default::default()
         },
-        SchemaItem {
+        ArenaSchemaItem {
           all_of: Some([0, 2].into()),
           ..Default::default()
         },

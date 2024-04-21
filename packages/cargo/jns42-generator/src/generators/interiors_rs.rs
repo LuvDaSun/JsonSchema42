@@ -1,8 +1,5 @@
 use jns42_core::{
-  models::{
-    schema::{SchemaItem, SchemaType},
-    specification::Specification,
-  },
+  models::{ArenaSchemaItem, SchemaType, Specification},
   naming::Sentence,
 };
 use proc_macro2::TokenStream;
@@ -20,7 +17,7 @@ pub fn generate_file_token_stream(
       continue;
     }
 
-    if item.id.is_none() {
+    if item.location.is_none() {
       continue;
     };
 
@@ -33,14 +30,14 @@ pub fn generate_file_token_stream(
 fn generate_type_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &SchemaItem,
+  item: &ArenaSchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
   let documentation: Vec<_> = [
     item.title.clone(),
     item.description.clone(),
-    item.id.as_ref().map(|id| id.to_string()),
+    item.location.as_ref().map(|id| id.to_string()),
   ]
   .into_iter()
   .flatten()
@@ -129,7 +126,7 @@ fn generate_type_token_stream(
             });
           }
         }
-        SchemaType::Map => {
+        SchemaType::Object => {
           if let Some(object_properties_entries) = &item.object_properties {
             let required: HashSet<_> = item
               .required

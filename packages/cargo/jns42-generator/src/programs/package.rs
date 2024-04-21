@@ -1,19 +1,18 @@
-use crate::documents::{draft_04, draft_06, draft_07, draft_2019_09, draft_2020_12};
-use crate::documents::{DocumentContext, MetaSchemaId};
 use crate::generators::package::{generate_package, PackageConfiguration};
 use clap::Parser;
-use jns42_core::models::specification::Specification;
+use jns42_core::documents;
+use jns42_core::documents::DocumentContext;
+use jns42_core::models::Specification;
 use jns42_core::utils::node_location::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;
-use std::rc::Rc;
 
 #[derive(Parser, Debug)]
 pub struct CommandOptions {
-  pub schema_url: NodeLocation,
+  pub schema_location: NodeLocation,
 
-  #[arg(long, default_value_t = MetaSchemaId::Draft202012)]
-  pub default_meta_schema_url: MetaSchemaId,
+  #[arg(long, default_value = documents::draft_2020_12::META_SCHEMA_ID)]
+  pub default_meta_schema_id: String,
 
   #[arg(long)]
   pub package_directory: PathBuf,
@@ -33,8 +32,8 @@ pub struct CommandOptions {
 
 pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
   let CommandOptions {
-    schema_url,
-    default_meta_schema_url,
+    schema_location,
+    default_meta_schema_id,
     package_directory,
     package_name,
     package_version,
@@ -42,47 +41,19 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
   } = options;
 
   let mut context = DocumentContext::new();
+  context.register_well_known_factories().unwrap();
 
-  context.register_factory(
-    &MetaSchemaId::Draft202012,
-    Box::new(move |context, initializer| {
-      Rc::new(draft_2020_12::Document::new(
-        context,
-        initializer.retrieval_url,
-        initializer.given_url,
-        initializer.antecedent_url,
-        initializer.document_node.into(),
-      ))
-    }),
-  );
-  context.register_factory(
-    &MetaSchemaId::Draft201909,
-    Box::new(move |_context, _initializer| Rc::new(draft_2019_09::Document::new())),
-  );
-  context.register_factory(
-    &MetaSchemaId::Draft07,
-    Box::new(move |_context, _initializer| Rc::new(draft_07::Document::new())),
-  );
-  context.register_factory(
-    &MetaSchemaId::Draft06,
-    Box::new(move |_context, _initializer| Rc::new(draft_06::Document::new())),
-  );
-  context.register_factory(
-    &MetaSchemaId::Draft04,
-    Box::new(move |_context, _initializer| Rc::new(draft_04::Document::new())),
-  );
-
-  let context = Rc::new(context);
   context
-    .load_from_url(&schema_url, &schema_url, None, &default_meta_schema_url)
-    .await;
+    .load_from_location(
+      &schema_location,
+      &schema_location,
+      None,
+      &default_meta_schema_id,
+    )
+    .await
+    .unwrap();
 
-  let root_url = context.resolve_retrieval_url(&schema_url).unwrap();
-
-  let intermediate_document = context.get_intermediate_document();
-
-  let specification = Specification::new(root_url, intermediate_document);
-
+  let specification = Specification::new(&context);
   generate_package(
     PackageConfiguration {
       package_name: package_name.as_str(),

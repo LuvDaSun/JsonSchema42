@@ -1,6 +1,5 @@
+use crate::models::{ArenaSchemaItem, SchemaArena};
 use std::collections::HashSet;
-
-use crate::models::{arena::Arena, schema::SchemaItem};
 
 /**
  * This transformer turns resolves the not field
@@ -23,34 +22,36 @@ use crate::models::{arena::Arena, schema::SchemaItem};
  *   - a
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let Some(not) = item.not else {
     return;
   };
 
-  let Some(required) = &item.required else {
-    return;
-  };
-
   let sub_item = arena.get_item(not);
 
-  let Some(exclude_required) = &sub_item.required else {
+  if sub_item.reference.is_some() || sub_item.all_of.is_some() || sub_item.not.is_some() {
     return;
+  }
+
+  let mut item_new = ArenaSchemaItem {
+    not: None,
+    exact: Some(false),
+    ..item.clone()
   };
 
-  let exclude_required: HashSet<_> = exclude_required.iter().collect();
-  let required_new = required
-    .iter()
-    .filter(|value| !exclude_required.contains(value))
-    .cloned()
-    .collect();
+  if let Some(required) = &item.required {
+    if let Some(exclude_required) = &sub_item.required {
+      let exclude_required: HashSet<_> = exclude_required.iter().collect();
+      let required_new = required
+        .iter()
+        .filter(|value| !exclude_required.contains(value))
+        .cloned()
+        .collect();
 
-  let item_new = SchemaItem {
-    not: None,
-    required: Some(required_new),
-    ..item.clone()
+      item_new.required = Some(required_new);
+    };
   };
 
   arena.replace_item(key, item_new);
@@ -59,22 +60,20 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaItem};
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
-
-    arena.add_item(SchemaItem {
-      required: Some(["a"].map(|value| value.to_string()).into()),
-      ..Default::default()
-    });
-
-    arena.add_item(SchemaItem {
-      required: Some(["a", "b"].map(|value| value.to_string()).into()),
-      not: Some(0),
-      ..Default::default()
-    });
+    let mut arena = SchemaArena::from_iter([
+      ArenaSchemaItem {
+        required: Some(["a"].map(str::to_owned).into()),
+        ..Default::default()
+      },
+      ArenaSchemaItem {
+        required: Some(["a", "b"].map(str::to_owned).into()),
+        not: Some(0),
+        ..Default::default()
+      },
+    ]);
 
     while arena.apply_transform(transform) > 0 {
       //
@@ -82,12 +81,13 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
-      SchemaItem {
-        required: Some(["a"].map(|value| value.to_string()).into()),
+      ArenaSchemaItem {
+        required: Some(["a"].map(str::to_owned).into()),
         ..Default::default()
       },
-      SchemaItem {
-        required: Some(["b"].map(|value| value.to_string()).into()),
+      ArenaSchemaItem {
+        exact: Some(false),
+        required: Some(["b"].map(str::to_owned).into()),
         ..Default::default()
       },
     ]

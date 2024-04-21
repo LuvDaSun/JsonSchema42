@@ -11,6 +11,44 @@
         "isDefault": true
       },
       "label": "build"
+    },
+    {
+      "type": "process",
+      "command": "cargo",
+      "args": ["test", "--package", "${workspaceFolderBasename}", "--all-targets"],
+      "options": {
+        "env": {
+          "RUSTFLAGS": "-C instrument-coverage",
+          "LLVM_PROFILE_FILE": "${workspaceFolder}/coverage/default.profraw"
+        }
+      },
+      "problemMatcher": ["$rustc"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "label": "test"
+    },
+    {
+      "type": "process",
+      "command": "grcov",
+      "args": [
+        "${workspaceFolder}/coverage/default.profraw",
+        "--source-dir",
+        "${workspaceFolder}/src",
+        "--binary-path",
+        "${workspaceFolder}/../../../target/debug/",
+        "--output-types",
+        "lcov",
+        "--branch",
+        "--ignore-not-existing",
+        "--output-path",
+        "${workspaceFolder}/coverage/lcov.info"
+      ],
+      "problemMatcher": [],
+      "group": "test",
+      "label": "coverage",
+      "dependsOn": ["test"]
     }
   ]
 }

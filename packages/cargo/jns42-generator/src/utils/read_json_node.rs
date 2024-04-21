@@ -1,6 +1,7 @@
 use serde_json::Value;
 use std::iter::once;
 
+#[allow(dead_code)]
 pub fn read_json_node(prefix: &[String], node: Value) -> Vec<(Vec<String>, Value)> {
   match &node {
     Value::Array(array_value) => once((prefix.to_owned(), node.clone()))

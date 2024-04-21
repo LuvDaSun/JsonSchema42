@@ -3,19 +3,19 @@ $schema: "./schema.json"
 rootTypeName: StringOrBooleanYaml
 
 schemas:
-  draft_2020-12:
-    $schema: "http://json-schema.org/draft-04/schema#"
-    type:
-      - "string"
-      - "boolean"
   draft-04:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
+    $schema: "http://json-schema.org/draft-04/schema#"
     type:
       - "string"
       - "boolean"
     examples:
       - "hi!"
       - false
+  draft_2020-12:
+    $schema: "https://json-schema.org/draft/2020-12/schema"
+    type:
+      - "string"
+      - "boolean"
 
 valid:
   hi: "hi!"

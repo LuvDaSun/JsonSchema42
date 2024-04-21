@@ -1,241 +1,29 @@
-use super::{
-  arena::Arena,
-  intermediate::IntermediateSchema,
-  schema::{SchemaItem, SchemaType},
-};
+use super::schema_item::ArenaSchemaItem;
 use crate::{
+  documents::DocumentContext,
   naming::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::node_location::NodeLocation,
+  utils::arena::Arena,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
-use std::collections::HashMap;
-use std::iter::{empty, once};
+use std::iter::empty;
+use std::{collections::HashMap, rc::Rc};
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
 pub struct Specification {
-  pub arena: Arena<SchemaItem>,
+  pub arena: Arena<ArenaSchemaItem>,
   pub names: HashMap<usize, (bool, Sentence)>,
 }
 
 impl Specification {
-  pub fn new(root_id: NodeLocation, intermediate_document: IntermediateSchema) -> Self {
-    let mut parents: HashMap<NodeLocation, NodeLocation> = HashMap::new();
-    let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
-
+  pub fn new(document_context: &Rc<DocumentContext>) -> Self {
     // first load schemas in the arena
 
-    let mut arena = Arena::new();
-    {
-      let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
-      for (id, schema) in &intermediate_document.schemas {
-        let item = SchemaItem {
-          id: Some(id.clone()),
-          ..Default::default()
-        };
-
-        let key = arena.add_item(item);
-        key_map.insert(id.clone(), key);
-
-        for child_id in &schema.all_of {
-          for child_id in child_id {
-            let child_id = child_id.parse().unwrap();
-            parents.insert(child_id, id.clone());
-          }
-        }
-
-        for child_id in &schema.any_of {
-          for child_id in child_id {
-            let child_id = child_id.parse().unwrap();
-            parents.insert(child_id, id.clone());
-          }
-        }
-
-        for child_id in &schema.one_of {
-          for child_id in child_id {
-            let child_id = child_id.parse().unwrap();
-            parents.insert(child_id, id.clone());
-          }
-        }
-
-        if let Some(child_id) = &schema.r#if {
-          let child_id = child_id.parse().unwrap();
-          parents.insert(child_id, id.clone());
-        }
-
-        if let Some(child_id) = &schema.then {
-          let child_id = child_id.parse().unwrap();
-          parents.insert(child_id, id.clone());
-        }
-
-        if let Some(child_id) = &schema.r#else {
-          let child_id = child_id.parse().unwrap();
-          parents.insert(child_id, id.clone());
-        }
-
-        if let Some(child_id) = &schema.not {
-          let child_id = child_id.parse().unwrap();
-          parents.insert(child_id, id.clone());
-        }
-
-        if let Some(child_id) = &schema.property_names {
-          let child_id = child_id.parse().unwrap();
-          parents.insert(child_id, id.clone());
-        }
-
-        if let Some(child_id) = &schema.property_names {
-          let child_id = child_id.parse().unwrap();
-          implicit_types.insert(child_id, SchemaType::String);
-        }
-      }
-
-      let transformer = |arena: &mut Arena<SchemaItem>, key: usize| {
-        let item = arena.get_item(key).clone();
-        let id = item.id.unwrap();
-        let schema = intermediate_document.schemas.get(&id).unwrap();
-        let parent = parents.get(&id).map(|id| *key_map.get(id).unwrap());
-        let types = schema
-          .types
-          .as_ref()
-          .and_then(|value| if value.is_empty() { None } else { Some(value) })
-          .map(|value| value.iter().map(|value| value.into()).collect())
-          .or_else(|| implicit_types.get(&id).map(|value| once(*value).collect()));
-        let reference = schema
-          .reference
-          .as_ref()
-          .map(|url| *key_map.get(&id.join(&url.parse().unwrap())).unwrap());
-
-        let primary = if id == root_id { Some(true) } else { None };
-
-        let item = SchemaItem {
-          name: None,
-          exact: None,
-          primary,
-          parent,
-          types,
-
-          id: Some(id),
-          title: schema.title.clone(),
-          description: schema.description.clone(),
-          examples: schema.examples.clone(),
-          deprecated: schema.deprecated,
-
-          options: schema.options.clone(),
-
-          minimum_inclusive: schema.minimum_inclusive,
-          minimum_exclusive: schema.minimum_exclusive,
-          maximum_inclusive: schema.maximum_inclusive,
-          maximum_exclusive: schema.maximum_exclusive,
-          multiple_of: schema.multiple_of,
-
-          minimum_length: schema.minimum_length,
-          maximum_length: schema.maximum_length,
-          value_pattern: schema
-            .value_pattern
-            .as_ref()
-            .map(|value| vec![value.clone()]),
-          value_format: schema
-            .value_format
-            .as_ref()
-            .map(|value| vec![value.clone()]),
-
-          maximum_items: schema.maximum_items,
-          minimum_items: schema.minimum_items,
-          unique_items: schema.unique_items,
-
-          minimum_properties: schema.minimum_properties,
-          maximum_properties: schema.maximum_properties,
-          required: schema
-            .required
-            .as_ref()
-            .map(|value| value.iter().cloned().collect()),
-
-          reference,
-
-          contains: schema
-            .r#contains
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          property_names: schema
-            .r#property_names
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          map_properties: schema
-            .r#map_properties
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          array_items: schema
-            .r#array_items
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          r#if: schema
-            .r#if
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          then: schema
-            .then
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          r#else: schema
-            .r#else
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-          not: schema
-            .r#not
-            .as_ref()
-            .map(|url| *key_map.get(&url.parse().unwrap()).unwrap()),
-
-          tuple_items: None, // TODO
-          all_of: schema.all_of.as_ref().map(|value| {
-            value
-              .iter()
-              .map(|url| *key_map.get(&url.parse().unwrap()).unwrap())
-              .collect()
-          }),
-          any_of: schema.any_of.as_ref().map(|value| {
-            value
-              .iter()
-              .map(|url| *key_map.get(&url.parse().unwrap()).unwrap())
-              .collect()
-          }),
-          one_of: schema.one_of.as_ref().map(|value| {
-            value
-              .iter()
-              .map(|url| *key_map.get(&url.parse().unwrap()).unwrap())
-              .collect()
-          }),
-
-          dependent_schemas: schema.dependent_schemas.as_ref().map(|value| {
-            value
-              .iter()
-              .map(|(name, url)| (name.clone(), *key_map.get(&url.parse().unwrap()).unwrap()))
-              .collect()
-          }),
-          object_properties: schema.object_properties.as_ref().map(|value| {
-            value
-              .iter()
-              .map(|(name, url)| (name.clone(), *key_map.get(&url.parse().unwrap()).unwrap()))
-              .collect()
-          }),
-          pattern_properties: schema.pattern_properties.as_ref().map(|value| {
-            value
-              .iter()
-              .map(|(name, url)| (name.clone(), *key_map.get(&url.parse().unwrap()).unwrap()))
-              .collect()
-          }),
-        };
-
-        arena.replace_item(key, item);
-      };
-
-      while arena.apply_transform(transformer) > 0 {
-        //
-      }
-    }
+    let mut arena = Arena::from_document_context(document_context);
 
     // then optimize the schemas
 
@@ -244,7 +32,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<SchemaItem>, key: usize) {
+      fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
 
@@ -273,7 +61,7 @@ impl Specification {
         //
       }
 
-      fn transformer(arena: &mut Arena<SchemaItem>, key: usize) {
+      fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
         schema_transforms::primary::transform(arena, key);
       }
     }

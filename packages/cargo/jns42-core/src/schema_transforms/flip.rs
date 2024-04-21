@@ -52,11 +52,11 @@ will become
 macro_rules! generate_mod {
   ( $name: ident, $base_member: ident, $other_member: ident  ) => {
     pub mod $name {
-      use crate::models::{arena::Arena, schema::SchemaItem};
+      use crate::models::{ArenaSchemaItem, SchemaArena};
       use crate::utils::product::product;
       use std::collections::{BTreeMap, BTreeSet};
 
-      pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         let Some(base_keys) = &item.$base_member else {
@@ -100,7 +100,7 @@ macro_rules! generate_mod {
         let mut sub_keys_new = BTreeSet::new();
         let item = item.clone();
         for set in product(other_keys.values().cloned()) {
-          let sub_item = SchemaItem {
+          let sub_item = ArenaSchemaItem {
             parent: Some(key),
             $base_member: Some(
               sub_keys
@@ -115,7 +115,7 @@ macro_rules! generate_mod {
           assert!(sub_keys_new.insert(sub_key));
         }
 
-        let item = SchemaItem {
+        let item = ArenaSchemaItem {
           $base_member: None,
           $other_member: Some(sub_keys_new),
           ..item
@@ -127,11 +127,10 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use crate::models::{arena::Arena, schema::SchemaItem};
 
         #[test]
         fn test_transform() {
-          let mut arena = Arena::new();
+          let mut arena = SchemaArena::new();
 
           arena.add_item(Default::default()); // 0
           arena.add_item(Default::default()); // 1
@@ -139,15 +138,15 @@ macro_rules! generate_mod {
           arena.add_item(Default::default()); // 3
           arena.add_item(Default::default()); // 4
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             $other_member: Some([1, 2].into()),
             ..Default::default()
           }); // 5
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             $other_member: Some([3, 4].into()),
             ..Default::default()
           }); // 6
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             $base_member: Some([0, 5, 6].into()),
             ..Default::default()
           }); // 7
@@ -163,34 +162,34 @@ macro_rules! generate_mod {
             Default::default(), // 2
             Default::default(), // 3
             Default::default(), // 4
-            SchemaItem {
+            ArenaSchemaItem {
               $other_member: Some([1, 2].into()),
               ..Default::default()
             }, // 5
-            SchemaItem {
+            ArenaSchemaItem {
               $other_member: Some([3, 4].into()),
               ..Default::default()
             }, // 6
-            SchemaItem {
+            ArenaSchemaItem {
               $other_member: Some([8, 9, 10, 11].into()),
               ..Default::default()
             }, // 7
-            SchemaItem {
+            ArenaSchemaItem {
               parent: Some(7),
               $base_member: Some([0, 1, 3].into()),
               ..Default::default()
             }, // 8
-            SchemaItem {
+            ArenaSchemaItem {
               parent: Some(7),
               $base_member: Some([0, 1, 4].into()),
               ..Default::default()
             }, // 9
-            SchemaItem {
+            ArenaSchemaItem {
               parent: Some(7),
               $base_member: Some([0, 2, 3].into()),
               ..Default::default()
             }, // 10
-            SchemaItem {
+            ArenaSchemaItem {
               parent: Some(7),
               $base_member: Some([0, 2, 4].into()),
               ..Default::default()

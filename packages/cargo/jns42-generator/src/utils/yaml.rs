@@ -3,6 +3,7 @@ use futures_util::StreamExt;
 
 use super::read_url::read_url;
 
+#[allow(dead_code)]
 pub async fn load_yaml(url: &str) -> Result<Option<serde_json::Value>, Box<dyn std::error::Error>> {
   let stream = read_url(url).await?;
 

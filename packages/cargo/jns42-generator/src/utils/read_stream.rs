@@ -20,6 +20,7 @@ impl<R> ReadStream<R>
 where
   R: AsyncRead + Unpin,
 {
+  #[allow(dead_code)]
   pub fn new(reader: R) -> Self {
     Self {
       reader,

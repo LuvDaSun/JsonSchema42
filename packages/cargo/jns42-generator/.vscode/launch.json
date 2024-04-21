@@ -12,11 +12,7 @@
           "--package",
           "${workspaceFolderBasename}",
           "--all-targets"
-        ],
-        "filter": {
-          "name": "${workspaceFolderBasename}",
-          "kind": "lib"
-        }
+        ]
       },
       "args": [],
       "cwd": "${workspaceFolder}"
@@ -32,11 +28,7 @@
           "${workspaceFolderBasename}",
           "--package",
           "${workspaceFolderBasename}"
-        ],
-        "filter": {
-          "name": "${workspaceFolderBasename}",
-          "kind": "bin"
-        }
+        ]
       },
       "args": [
         "package",

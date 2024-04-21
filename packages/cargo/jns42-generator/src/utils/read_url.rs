@@ -6,6 +6,7 @@ use url::Url;
 
 pub type ReadUrlItem = Result<Vec<u8>, Box<dyn Error>>;
 
+#[allow(dead_code)]
 pub async fn read_url(
   url: &str,
 ) -> Result<Box<dyn Stream<Item = ReadUrlItem> + Unpin>, Box<dyn Error>> {

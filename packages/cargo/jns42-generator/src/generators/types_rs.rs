@@ -1,7 +1,4 @@
-use jns42_core::models::{
-  schema::{SchemaItem, SchemaType},
-  specification::Specification,
-};
+use jns42_core::models::{ArenaSchemaItem, SchemaType, Specification};
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;
@@ -17,7 +14,7 @@ pub fn generate_file_token_stream(
       continue;
     }
 
-    if item.id.is_none() {
+    if item.location.is_none() {
       continue;
     };
 
@@ -30,14 +27,14 @@ pub fn generate_file_token_stream(
 fn generate_type_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &SchemaItem,
+  item: &ArenaSchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
   let documentation: Vec<_> = [
     item.title.clone(),
     item.description.clone(),
-    item.id.as_ref().map(|id| id.to_string()),
+    item.location.as_ref().map(|id| id.to_string()),
   ]
   .into_iter()
   .flatten()

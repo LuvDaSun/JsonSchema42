@@ -1,4 +1,4 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::{ArenaSchemaItem, SchemaArena};
 
 /**
  * This sets the primary field on all relevant schemas
@@ -17,7 +17,7 @@ use crate::models::{arena::Arena, schema::SchemaItem};
  * - primary: true
  * ```
  */
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let Some(primary) = item.primary else {
@@ -34,7 +34,7 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
   for child_key in item.get_children() {
     let child_item = arena.get_item(child_key);
 
-    let child_item = SchemaItem {
+    let child_item = ArenaSchemaItem {
       primary: Some(true),
       ..child_item.clone()
     };
@@ -46,24 +46,23 @@ pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::models::{arena::Arena, schema::SchemaItem};
 
   #[test]
   fn test_transform() {
-    let mut arena = Arena::new();
+    let mut arena = SchemaArena::new();
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaItem {
       primary: Some(true),
       all_of: Some([1].into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaItem {
       all_of: Some([2].into()),
       ..Default::default()
     });
 
-    arena.add_item(SchemaItem {
+    arena.add_item(ArenaSchemaItem {
       ..Default::default()
     });
 
@@ -73,17 +72,17 @@ mod tests {
 
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
-      SchemaItem {
+      ArenaSchemaItem {
         primary: Some(true),
         all_of: Some([1].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         primary: Some(true),
         all_of: Some([2].into()),
         ..Default::default()
       },
-      SchemaItem {
+      ArenaSchemaItem {
         primary: Some(true),
         ..Default::default()
       },

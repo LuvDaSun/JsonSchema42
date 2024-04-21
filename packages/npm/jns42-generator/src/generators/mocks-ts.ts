@@ -1,4 +1,3 @@
-import { toCamelCase, toPascalCase } from "@jns42/core";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -54,7 +53,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { id: nodeId } = item;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
@@ -64,14 +63,12 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeIdentifier = names.toSnakeCase(itemKey);
-    const typeName = toPascalCase(typeIdentifier);
-    const functionName = toCamelCase(`mock ${typeIdentifier}`);
+    using typeName = names.getName(itemKey);
     const definition = generateMockDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function ${functionName}(options: MockGeneratorOptions = {}): types.${typeName} {
+      export function mock${typeName.toPascalCase()}(options: MockGeneratorOptions = {}): types.${typeName.toPascalCase()} {
         const configuration = {
           ...defaultMockGeneratorOptions,
           ...options,
@@ -111,12 +108,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
-    if (item.id == null) {
+    if (item.location == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
-      const typeIdentifier = names.toSnakeCase(itemKey);
-      const functionName = toCamelCase(`mock ${typeIdentifier}`);
-      yield itt`${functionName}()`;
+      using typeName = names.getName(itemKey);
+      yield itt`mock${typeName.toPascalCase()}()`;
     }
   }
 
@@ -347,7 +343,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           }
         }
 
-        case "map": {
+        case "object": {
           yield itt`
             {
               ${generateInterfaceContent()}

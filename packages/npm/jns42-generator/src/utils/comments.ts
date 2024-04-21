@@ -1,9 +1,9 @@
+import * as core from "@jns42/core";
 import { encode } from "entities";
-import { SchemaItem } from "../models/index.js";
 import { NestedText } from "./iterable-text-template.js";
 
-export function* generateJsDocComments(typeItem: SchemaItem): Iterable<NestedText> {
-  const { id: nodeId } = typeItem;
+export function* generateJsDocComments(typeItem: core.ArenaSchemaItemValue): Iterable<NestedText> {
+  const { location: nodeId } = typeItem;
 
   yield `/**\n`;
   if (typeItem.title != null) {

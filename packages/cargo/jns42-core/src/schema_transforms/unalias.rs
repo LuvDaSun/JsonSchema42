@@ -1,6 +1,6 @@
-use crate::models::{arena::Arena, schema::SchemaItem};
+use crate::models::SchemaArena;
 
-pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let mut item_new = item.clone();

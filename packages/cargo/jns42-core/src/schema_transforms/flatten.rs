@@ -1,10 +1,10 @@
 macro_rules! generate_mod {
   ( $member: ident ) => {
     pub mod $member {
+      use crate::models::SchemaArena;
       use std::iter::once;
-      use $crate::models::{arena::Arena, schema::SchemaItem};
 
-      pub fn transform(arena: &mut Arena<SchemaItem>, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         let mut item_new = item.clone();
@@ -33,25 +33,25 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
-        use $crate::models::{arena::Arena, schema::SchemaItem};
+        use crate::models::ArenaSchemaItem;
 
         #[test]
         fn test_transform() {
-          let mut arena = Arena::new();
+          let mut arena = SchemaArena::new();
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             // 0
             $member: Some([3, 4].into()),
             ..Default::default()
           });
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             // 1
             $member: Some([5, 6].into()),
             ..Default::default()
           });
 
-          arena.add_item(SchemaItem {
+          arena.add_item(ArenaSchemaItem {
             // 2
             $member: Some([0, 1, 7, 8].into()),
             ..Default::default()
@@ -70,15 +70,15 @@ macro_rules! generate_mod {
 
           let actual: Vec<_> = arena.iter().cloned().collect();
           let expected: Vec<_> = [
-            SchemaItem {
+            ArenaSchemaItem {
               $member: Some([3, 4].into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               $member: Some([5, 6].into()),
               ..Default::default()
             },
-            SchemaItem {
+            ArenaSchemaItem {
               $member: Some([3, 4, 5, 6, 7, 8].into()),
               ..Default::default()
             },
