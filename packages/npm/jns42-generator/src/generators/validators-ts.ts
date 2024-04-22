@@ -332,10 +332,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        for (const ruleValue of item.valuePattern ?? []) {
+        if (item.valuePattern != null) {
           yield itt`
             if(
-              !new RegExp(${JSON.stringify(ruleValue)}).test(${valueExpression})
+              !new RegExp(${JSON.stringify(item.valuePattern)}).test(${valueExpression})
             ) {
               recordError("valuePattern");
               return false;
