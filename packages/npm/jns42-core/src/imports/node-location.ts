@@ -32,10 +32,6 @@ export class NodeLocation extends ForeignObject {
     return new NodeLocation(pointer);
   }
 
-  public get debug() {
-    return this.toString();
-  }
-
   public toString() {
     const resultPointer = withErrorReference((errorReferencePointer) =>
       mainFfi.exports.node_location_to_string(this.pointer, errorReferencePointer),
