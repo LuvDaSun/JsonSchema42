@@ -626,6 +626,8 @@ impl DocumentContext {
 
 #[cfg(test)]
 mod tests {
+  use crate::models::SchemaType;
+
   use super::*;
 
   #[async_std::test]
@@ -638,12 +640,23 @@ mod tests {
         &"/schema.json#".parse().unwrap(),
         &"/schema.json#".parse().unwrap(),
         None,
-        serde_json::Value::Object(Default::default()),
+        serde_json::from_str(
+          r#"
+            {
+              "type": "string"
+            }
+          "#,
+        )
+        .unwrap(),
         documents::draft_2020_12::META_SCHEMA_ID,
       )
       .await
       .unwrap();
 
-    let _intermediate_document = document_context.get_schema_nodes();
+    let mut nodes = document_context.get_schema_nodes();
+    assert_eq!(nodes.len(), 1);
+
+    let (_key, node) = nodes.pop_last().unwrap();
+    assert_eq!(node.types, Some(vec![SchemaType::String]));
   }
 }

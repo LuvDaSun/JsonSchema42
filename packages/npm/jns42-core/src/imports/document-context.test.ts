@@ -25,6 +25,8 @@ test("load from node", async () => {
 
   assert(schemas[location] != null);
 
+  assert.deepEqual(schemas[location].types, ["string", "boolean"]);
+
   using arena = SchemaArena.fromDocumentContext(documentContext);
 
   assert.equal(arena.count(), Object.keys(schemas).length);
