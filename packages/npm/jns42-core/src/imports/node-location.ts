@@ -2,6 +2,7 @@ import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
 import { CString } from "./c-string.js";
 import { VecString } from "./vec-string.js";
+import { withErrorReference } from "./with-error.js";
 
 /**
  * Location of a node. The location can be either a path or a url
@@ -15,7 +16,9 @@ export class NodeLocation extends ForeignObject {
 
   public static parse(input: string) {
     using inputForeign = CString.fromString(input);
-    const pointer = mainFfi.exports.node_location_parse(inputForeign.pointer);
+    const pointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.node_location_parse(inputForeign.pointer, errorReferencePointer),
+    );
     return new NodeLocation(pointer);
   }
 
@@ -34,14 +37,18 @@ export class NodeLocation extends ForeignObject {
   }
 
   public toString() {
-    const resultPointer = mainFfi.exports.node_location_to_string(this.pointer);
+    const resultPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.node_location_to_string(this.pointer, errorReferencePointer),
+    );
     using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;
   }
 
   public toFetchString() {
-    const resultPointer = mainFfi.exports.node_location_to_fetch_string(this.pointer);
+    const resultPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.node_location_to_fetch_string(this.pointer, errorReferencePointer),
+    );
     using resultForeign = new CString(resultPointer);
     const result = resultForeign.toString();
     return result;
@@ -55,7 +62,9 @@ export class NodeLocation extends ForeignObject {
   }
 
   public getAnchor() {
-    const resultPointer = mainFfi.exports.node_location_get_anchor(this.pointer);
+    const resultPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.node_location_get_anchor(this.pointer, errorReferencePointer),
+    );
     if (resultPointer === 0) {
       return;
     }
@@ -89,9 +98,12 @@ export class NodeLocation extends ForeignObject {
 
   public setAnchor(anchor: string) {
     using anchorForeign = CString.fromString(anchor);
-    const resultPointer = mainFfi.exports.node_location_set_anchor(
-      this.pointer,
-      anchorForeign.pointer,
+    const resultPointer = withErrorReference((errorReferencePointer) =>
+      mainFfi.exports.node_location_set_anchor(
+        this.pointer,
+        anchorForeign.pointer,
+        errorReferencePointer,
+      ),
     );
     return new NodeLocation(resultPointer);
   }

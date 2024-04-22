@@ -95,15 +95,15 @@ export interface MainExports extends ExportsBase {
 
   node_location_drop(node_location: number): void;
   node_location_clone(node_location: number): number;
-  node_location_parse(input: number): number;
+  node_location_parse(input: number, error_reference: number): number;
   node_location_join(node_location: number, other_node_location: number): number;
-  node_location_to_string(node_location: number): number;
-  node_location_to_fetch_string(node_location: number): number;
-  node_location_get_anchor(node_location: number): number;
+  node_location_to_string(node_location: number, error_reference: number): number;
+  node_location_to_fetch_string(node_location: number, error_reference: number): number;
+  node_location_get_anchor(node_location: number, error_reference: number): number;
   node_location_get_pointer(node_location: number): number;
   node_location_get_path(node_location: number): number;
   node_location_get_hash(node_location: number): number;
-  node_location_set_anchor(node_location: number, anchor: number): number;
+  node_location_set_anchor(node_location: number, anchor: number, error_reference: number): number;
   node_location_set_pointer(node_location: number, pointer: number): number;
   node_location_set_root(node_location: number): number;
 }
