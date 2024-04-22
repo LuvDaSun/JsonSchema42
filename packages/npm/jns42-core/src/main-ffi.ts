@@ -105,6 +105,7 @@ export interface MainExports extends ExportsBase {
   node_location_get_hash(node_location: number): number;
   node_location_set_anchor(node_location: number, anchor: number, error_reference: number): number;
   node_location_set_pointer(node_location: number, pointer: number): number;
+  node_location_push_pointer(node_location: number, pointer: number): number;
   node_location_set_root(node_location: number): number;
 }
 

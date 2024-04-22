@@ -2,11 +2,18 @@ import assert from "node:assert";
 import test from "node:test";
 import { NodeLocation } from "./node-location.js";
 
-test("node-location push", () => {
+test("node-location set pointer", () => {
   {
-    using location = NodeLocation.parse("http://a.b.c/d/e/f#/g/h/i");
-    const pointer = location.getPointer() ?? [];
-    using actual = location.setPointer([...pointer, ...["j", "k", "l"]]);
+    using actual = NodeLocation.parse("http://a.b.c/d/e/f#/g/h/i").setPointer(["j", "k", "l"]);
+    using expected = NodeLocation.parse("http://a.b.c/d/e/f#/j/k/l");
+
+    assert.equal(actual.toString(), expected.toString());
+  }
+});
+
+test("node-location push pointer", () => {
+  {
+    using actual = NodeLocation.parse("http://a.b.c/d/e/f#/g/h/i").pushPointer(["j", "k", "l"]);
     using expected = NodeLocation.parse("http://a.b.c/d/e/f#/g/h/i/j/k/l");
 
     assert.equal(actual.toString(), expected.toString());

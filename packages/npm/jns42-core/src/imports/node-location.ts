@@ -96,6 +96,15 @@ export class NodeLocation extends ForeignObject {
     return new NodeLocation(resultPointer);
   }
 
+  public pushPointer(pointer: string[]) {
+    using pointerForeign = VecString.fromArray(pointer);
+    const resultPointer = mainFfi.exports.node_location_push_pointer(
+      this.pointer,
+      pointerForeign.pointer,
+    );
+    return new NodeLocation(resultPointer);
+  }
+
   public setAnchor(anchor: string) {
     using anchorForeign = CString.fromString(anchor);
     const resultPointer = withErrorReference((errorReferencePointer) =>

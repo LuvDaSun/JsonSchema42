@@ -164,6 +164,19 @@ extern "C" fn node_location_set_pointer(
 }
 
 #[no_mangle]
+extern "C" fn node_location_push_pointer(
+  node_location: *mut NodeLocation,
+  pointer: *const Vec<String>,
+) -> *mut NodeLocation {
+  let node_location = unsafe { &*node_location };
+  let pointer = unsafe { &*pointer };
+
+  let result = node_location.push_pointer(pointer);
+  let result = Box::new(result);
+  Box::into_raw(result)
+}
+
+#[no_mangle]
 extern "C" fn node_location_set_root(node_location: *mut NodeLocation) -> *mut NodeLocation {
   let node_location = unsafe { &*node_location };
 
