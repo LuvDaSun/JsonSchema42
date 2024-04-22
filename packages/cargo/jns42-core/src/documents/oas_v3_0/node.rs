@@ -25,7 +25,7 @@ impl Node {
       let node_type = self.0.string("type");
       let node_nullable = self.0.bool("nullable").unwrap_or_default();
 
-      if node_type.is_none() || !node_nullable {
+      if node_type.is_none() && !node_nullable {
         None
       } else {
         let types: Vec<_> = empty()
