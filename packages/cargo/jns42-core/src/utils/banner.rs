@@ -18,7 +18,7 @@ pub fn banner(prefix: &str, version: &str) -> String {
       "{}  |_____|___|___|_|_|_____|___|_|_|___|_|_|_|___| |_|___|",
       prefix
     ),
-    format!(" {}  {:30} -- www.JsonSchema42.org", prefix, version),
+    format!("{}   {:30} -- www.JsonSchema42.org", prefix, version),
   ]
   .join("\n")
 }
