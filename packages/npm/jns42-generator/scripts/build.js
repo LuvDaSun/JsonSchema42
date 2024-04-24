@@ -8,3 +8,5 @@ const options = { shell: true, stdio: "inherit", env: process.env };
 cp.execFileSync("tsc", [], options);
 
 cp.execFileSync("rollup", ["--config", path.resolve("rollup.config.js")], options);
+
+cp.execFileSync("npm", ["--workspace", "@jns42/core", "run", "build"], options);
