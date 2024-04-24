@@ -16,7 +16,7 @@ pub fn generate_file_content(file_tokens: TokenStream) -> Result<String, Box<dyn
 
   Ok(format!(
     "{}\n\n{}",
-    banner("//", env!("CARGO_PKG_VERSION")),
+    banner("//", &format!("v{}", env!("CARGO_PKG_VERSION"))),
     content
   ))
 }
