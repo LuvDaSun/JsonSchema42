@@ -4,7 +4,6 @@ pub mod callbacks;
 pub mod document_context;
 pub mod names;
 pub mod names_builder;
-pub mod node_location;
 pub mod reference;
 pub mod schema_arena;
 pub mod schema_arena_item;
