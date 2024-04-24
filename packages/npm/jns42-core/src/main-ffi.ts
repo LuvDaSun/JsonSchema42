@@ -93,6 +93,8 @@ export interface MainExports extends ExportsBase {
   ): void;
   document_context_get_schema_nodes(document_context: number, error_reference: number): number;
 
+  banner(prefix: number, version: number, error_reference: number): number;
+
   node_location_drop(node_location: number): void;
   node_location_clone(node_location: number): number;
   node_location_parse(input: number, error_reference: number): number;

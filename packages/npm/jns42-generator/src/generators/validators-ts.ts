@@ -1,16 +1,17 @@
+import { banner } from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
   NestedText,
-  banner,
   generateJsDocComments,
   itt,
   joinIterable,
   mapIterable,
+  packageInfo,
 } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
-  yield banner;
+  yield banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 

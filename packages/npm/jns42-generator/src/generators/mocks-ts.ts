@@ -1,15 +1,16 @@
+import { banner } from "@jns42/core";
 import * as models from "../models/index.js";
 import {
   NestedText,
-  banner,
   generateJsDocComments,
   isMockable,
   itt,
   joinIterable,
+  packageInfo,
 } from "../utils/index.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
-  yield banner;
+  yield banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 

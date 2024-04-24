@@ -1,4 +1,3 @@
-pub mod banner;
 pub mod cargo_toml;
 pub mod errors_rs;
 pub mod file;

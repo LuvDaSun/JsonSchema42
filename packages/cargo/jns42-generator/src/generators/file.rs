@@ -1,4 +1,4 @@
-use super::banner::get_banner_rs;
+use jns42_core::utils::banner;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use rust_format::Formatter;
@@ -14,5 +14,9 @@ pub fn generate_file_content(file_tokens: TokenStream) -> Result<String, Box<dyn
 
   let content = formatter.format_tokens(tokens)?;
 
-  Ok(format!("{}\n\n{}", get_banner_rs(), content))
+  Ok(format!(
+    "{}\n\n{}",
+    banner("//", env!("CARGO_PKG_VERSION")),
+    content
+  ))
 }
