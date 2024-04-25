@@ -38,9 +38,3 @@ export function* splitIterableText(texts: Iterable<string>, separator = /\r?\n/)
     }
   }
 }
-
-export function* repeat(count: number): Iterable<number> {
-  for (let iteration = 0; iteration < count; iteration++) {
-    yield iteration;
-  }
-}

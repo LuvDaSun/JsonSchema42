@@ -54,7 +54,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { location: nodeId } = item;
+    const itemValue = item.toValue();
+    const { location: nodeId } = itemValue;
 
     if (nodeId == null) {
       continue;
@@ -109,7 +110,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
-    if (item.location == null) {
+    const itemValue = item.toValue();
+    if (itemValue.location == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
       using typeName = names.getName(itemKey);
@@ -119,14 +121,15 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
   function* generateMockDefinition(itemKey: number): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
+    const itemValue = item.toValue();
 
-    if (item.reference != null) {
-      yield generateMockReference(item.reference);
+    if (itemValue.reference != null) {
+      yield generateMockReference(itemValue.reference);
       return;
     }
 
-    if (item.oneOf != null && item.oneOf.length > 0) {
-      const oneOfMockableEntries = item.oneOf
+    if (itemValue.oneOf != null && itemValue.oneOf.length > 0) {
+      const oneOfMockableEntries = itemValue.oneOf
         .filter((key) => isMockable(typesArena, key))
         .map((key) => [key, typesArena.getItem(key)] as const);
 
@@ -152,24 +155,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.options != null && item.options.length > 0) {
+    if (itemValue.options != null && itemValue.options.length > 0) {
       yield itt`
           (
             [
               ${joinIterable(
-                item.options.map((option) => JSON.stringify(option)),
+                itemValue.options.map((option) => JSON.stringify(option)),
                 ", ",
               )}
             ] as const
           )[
-            nextSeed() % ${JSON.stringify(item.options.length)}
+            nextSeed() % ${JSON.stringify(itemValue.options.length)}
           ]
         `;
       return;
     }
 
-    if (item.types != null && item.types.length == 1) {
-      switch (item.types[0]) {
+    if (itemValue.types != null && itemValue.types.length == 1) {
+      switch (itemValue.types[0]) {
         case "never":
           yield "neverValue";
           return;
@@ -187,16 +190,16 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
 
         case "integer": {
-          let multipleOf = item.multipleOf ?? 1;
+          let multipleOf = itemValue.multipleOf ?? 1;
 
           let minimumValue = Number.NEGATIVE_INFINITY;
           let isMinimumExclusive: boolean | undefined;
-          if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
-            minimumValue = item.minimumInclusive;
+          if (itemValue.minimumInclusive != null && itemValue.minimumInclusive >= minimumValue) {
+            minimumValue = itemValue.minimumInclusive;
             isMinimumExclusive = false;
           }
-          if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
-            minimumValue = item.minimumExclusive;
+          if (itemValue.minimumExclusive != null && itemValue.minimumExclusive >= minimumValue) {
+            minimumValue = itemValue.minimumExclusive;
             isMinimumExclusive = true;
           }
           const minimumValueInclusiveExpression =
@@ -208,12 +211,12 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
           let maximumValue = Number.POSITIVE_INFINITY;
           let isMaximumExclusive: boolean | undefined;
-          if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
-            maximumValue = item.maximumInclusive;
+          if (itemValue.maximumInclusive != null && itemValue.maximumInclusive <= maximumValue) {
+            maximumValue = itemValue.maximumInclusive;
             isMaximumExclusive = false;
           }
-          if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
-            maximumValue = item.maximumExclusive;
+          if (itemValue.maximumExclusive != null && itemValue.maximumExclusive <= maximumValue) {
+            maximumValue = itemValue.maximumExclusive;
             isMaximumExclusive = true;
           }
           const maximumValueInclusiveExpression =
@@ -232,12 +235,12 @@ export function* generateMocksTsCode(specification: models.Specification) {
         case "number": {
           let minimumValue = Number.NEGATIVE_INFINITY;
           let isMinimumExclusive: boolean | undefined;
-          if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
-            minimumValue = item.minimumInclusive;
+          if (itemValue.minimumInclusive != null && itemValue.minimumInclusive >= minimumValue) {
+            minimumValue = itemValue.minimumInclusive;
             isMinimumExclusive = false;
           }
-          if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
-            minimumValue = item.minimumExclusive;
+          if (itemValue.minimumExclusive != null && itemValue.minimumExclusive >= minimumValue) {
+            minimumValue = itemValue.minimumExclusive;
             isMinimumExclusive = true;
           }
           const minimumValueInclusiveExpression =
@@ -249,12 +252,12 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
           let maximumValue = Number.POSITIVE_INFINITY;
           let isMaximumExclusive: boolean | undefined;
-          if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
-            maximumValue = item.maximumInclusive;
+          if (itemValue.maximumInclusive != null && itemValue.maximumInclusive <= maximumValue) {
+            maximumValue = itemValue.maximumInclusive;
             isMaximumExclusive = false;
           }
-          if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
-            maximumValue = item.maximumExclusive;
+          if (itemValue.maximumExclusive != null && itemValue.maximumExclusive <= maximumValue) {
+            maximumValue = itemValue.maximumExclusive;
             isMaximumExclusive = true;
           }
           const maximumValueInclusiveExpression =
@@ -277,13 +280,13 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
         case "string": {
           const minimumStringLengthExpression =
-            item.minimumLength == null
+            itemValue.minimumLength == null
               ? "configuration.defaultMinimumStringLength"
-              : JSON.stringify(item.minimumLength);
+              : JSON.stringify(itemValue.minimumLength);
           const maximumStringLengthExpression =
-            item.maximumLength == null
+            itemValue.maximumLength == null
               ? "configuration.defaultMaximumStringLength"
-              : JSON.stringify(item.maximumLength);
+              : JSON.stringify(itemValue.maximumLength);
 
           yield `
             new Array(
@@ -310,24 +313,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
           function* generateInterfaceContent() {
             const minimumItemsExpression =
-              item.minimumItems == null
+              itemValue.minimumItems == null
                 ? "configuration.defaultMinimumItems"
-                : JSON.stringify(item.minimumItems);
+                : JSON.stringify(itemValue.minimumItems);
             const maximumItemsExpression =
-              item.maximumItems == null
+              itemValue.maximumItems == null
                 ? "configuration.defaultMaximumItems"
-                : JSON.stringify(item.maximumItems);
-            const tupleItemsLength = item.tupleItems?.length ?? 0;
+                : JSON.stringify(itemValue.maximumItems);
+            const tupleItemsLength = itemValue.tupleItems?.length ?? 0;
 
-            if (item.tupleItems != null) {
-              for (const elementKey of item.tupleItems) {
+            if (itemValue.tupleItems != null) {
+              for (const elementKey of itemValue.tupleItems) {
                 yield itt`
                   ${generateMockReference(elementKey)},
                 `;
               }
             }
 
-            if (item.arrayItems != null && isMockable(typesArena, item.arrayItems)) {
+            if (itemValue.arrayItems != null && isMockable(typesArena, itemValue.arrayItems)) {
               yield itt`
               ...new Array(
                 Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
@@ -338,7 +341,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                 )
               )
                 .fill(undefined)
-                .map(() => ${generateMockReference(item.arrayItems)})
+                .map(() => ${generateMockReference(itemValue.arrayItems)})
             `;
             }
           }
@@ -356,9 +359,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
           function* generateInterfaceContent() {
             let propertiesCount = 0;
 
-            if (item.objectProperties != null || item.required != null) {
-              const required = new Set(item.required);
-              const objectProperties = item.objectProperties ?? {};
+            if (itemValue.objectProperties != null || itemValue.required != null) {
+              const required = new Set(itemValue.required);
+              const objectProperties = itemValue.objectProperties ?? {};
               const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
               propertiesCount = propertyNames.size;
 
@@ -390,15 +393,18 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
             {
               const minimumPropertiesExpression =
-                item.minimumProperties == null
+                itemValue.minimumProperties == null
                   ? "configuration.defaultMinimumProperties"
-                  : JSON.stringify(item.minimumProperties);
+                  : JSON.stringify(itemValue.minimumProperties);
               const maximumPropertiesExpression =
-                item.maximumProperties == null
+                itemValue.maximumProperties == null
                   ? "configuration.defaultMaximumProperties"
-                  : JSON.stringify(item.maximumProperties);
+                  : JSON.stringify(itemValue.maximumProperties);
 
-              if (item.mapProperties != null && isMockable(typesArena, item.mapProperties)) {
+              if (
+                itemValue.mapProperties != null &&
+                isMockable(typesArena, itemValue.mapProperties)
+              ) {
                 yield itt`
                   ...Object.fromEntries(
                     new Array(
@@ -412,7 +418,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                     .fill(undefined)
                     .map(() => [
                       ${
-                        item.propertyNames == null
+                        itemValue.propertyNames == null
                           ? itt`
                             new Array(
                               configuration.defaultMinimumStringLength +
@@ -424,9 +430,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
                               map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
                               join("")
                           `
-                          : generateMockReference(item.propertyNames)
+                          : generateMockReference(itemValue.propertyNames)
                       },
-                      ${generateMockReference(item.mapProperties)},
+                      ${generateMockReference(itemValue.mapProperties)},
                       ]
                     )
                   )

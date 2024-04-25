@@ -1,11 +1,9 @@
 import { mainFfi } from "../main-ffi.js";
 import { ForeignObject } from "../utils/foreign-object.js";
-import { CString } from "./c-string.js";
+import { ArenaSchemaItem } from "./arena-schema-item.js";
 import { DocumentContext } from "./document-context.js";
-import { ArenaSchemaItemValue } from "./schema-item.js";
 import { VecString } from "./vec-string.js";
 import { VecUsize } from "./vec-usize.js";
-import { withErrorReference } from "./with-error.js";
 
 export class SchemaArena extends ForeignObject {
   constructor(pointer: number) {
@@ -27,14 +25,11 @@ export class SchemaArena extends ForeignObject {
     return count;
   }
 
-  public getItem(key: number): ArenaSchemaItemValue {
-    const itemPointer = withErrorReference((errorReferencePointer) =>
-      mainFfi.exports.schema_arena_get_item(this.pointer, key, errorReferencePointer),
-    );
-    using itemWrapper = new CString(itemPointer);
-    const itemString = itemWrapper.toString();
-    const item = JSON.parse(itemString);
-    return item;
+  public getItem(key: number): ArenaSchemaItem {
+    const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
+    using itemForeign = new ArenaSchemaItem(itemPointer);
+    itemForeign.abandon();
+    return itemForeign;
   }
 
   public getNameParts(key: number): string[] {

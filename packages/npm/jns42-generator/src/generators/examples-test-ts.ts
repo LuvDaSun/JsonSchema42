@@ -14,7 +14,8 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
   `;
 
   for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const { location: nodeId } = item;
+    const itemValue = item.toValue();
+    const { location: nodeId } = itemValue;
 
     if (nodeId == null) {
       continue;
@@ -23,7 +24,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     using typeName = names.getName(key);
 
     yield mapIterable(
-      item.examples ?? [],
+      itemValue.examples ?? [],
       (example) => itt`
         test(${JSON.stringify(typeName.toPascalCase())}, () => {
           const example = ${JSON.stringify(example)};

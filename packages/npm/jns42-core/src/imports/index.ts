@@ -1,3 +1,4 @@
+export * from "./arena-schema-item.js";
 export * from "./banner.js";
 export * from "./c-string.js";
 export * from "./document-context.js";

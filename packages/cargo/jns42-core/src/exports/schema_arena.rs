@@ -1,14 +1,8 @@
-use super::with_error::with_error_reference;
 use crate::{
   documents::DocumentContext,
-  error::Error,
-  models::{SchemaArena, SchemaTransform},
+  models::{ArenaSchemaItem, SchemaArena, SchemaTransform},
 };
-use std::{
-  ffi::{c_char, CString},
-  ptr::null_mut,
-  rc::Rc,
-};
+use std::rc::Rc;
 
 #[no_mangle]
 extern "C" fn schema_arena_drop(arena: *mut SchemaArena) {
@@ -40,20 +34,10 @@ extern "C" fn schema_arena_count(arena: *const SchemaArena) -> usize {
 }
 
 #[no_mangle]
-extern "C" fn schema_arena_get_item(
-  arena: *mut SchemaArena,
-  key: usize,
-  error_reference: *mut Error,
-) -> *mut c_char {
-  with_error_reference(error_reference, || {
-    let arena = unsafe { &mut *arena };
-    let item = arena.get_item(key);
-    let item = serde_json::to_string(item).unwrap();
-    let item = CString::new(item).unwrap();
-
-    Ok(item.into_raw())
-  })
-  .unwrap_or_else(null_mut)
+extern "C" fn schema_arena_get_item(arena: *mut SchemaArena, key: usize) -> *const ArenaSchemaItem {
+  let arena = unsafe { &mut *arena };
+  let item = arena.get_item(key);
+  item
 }
 
 #[no_mangle]
