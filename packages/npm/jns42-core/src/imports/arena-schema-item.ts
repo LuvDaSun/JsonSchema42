@@ -18,4 +18,17 @@ export class ArenaSchemaItem extends ForeignObject {
     const result = JSON.parse(resultString);
     return result;
   }
+
+  public get location() {
+    if (Boolean(mainFfi.exports.arena_schema_item_has_location(this.pointer))) {
+      const resultPointer = withErrorReference((errorReferencePointer) =>
+        mainFfi.exports.arena_schema_item_get_location(this.pointer, errorReferencePointer),
+      );
+      using resultForeign = new CString(resultPointer);
+      const resultString = resultForeign.toString();
+      return resultString;
+    } else {
+      return null;
+    }
+  }
 }

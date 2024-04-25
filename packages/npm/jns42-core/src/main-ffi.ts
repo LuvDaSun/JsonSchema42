@@ -58,6 +58,8 @@ export interface MainExports extends ExportsBase {
   arena_schema_item_drop(schema_item: number): void;
   arena_schema_item_new(): number;
   arena_schema_item_json(schema_item: number, error_reference: number): number;
+  arena_schema_item_has_location(schema_item: number): number;
+  arena_schema_item_get_location(schema_item: number, error_reference: number): number;
 
   schema_arena_drop(schema_arena: number): void;
   schema_arena_from_document_context(document_context: number): number;

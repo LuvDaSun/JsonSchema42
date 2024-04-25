@@ -3,8 +3,8 @@ import { encode } from "entities";
 import { NestedText } from "./iterable-text-template.js";
 
 export function* generateJsDocComments(item: core.ArenaSchemaItem): Iterable<NestedText> {
+  const { location: nodeId } = item;
   const itemValue = item.toValue();
-  const { location: nodeId } = itemValue;
 
   yield `/**\n`;
   if (itemValue.title != null) {

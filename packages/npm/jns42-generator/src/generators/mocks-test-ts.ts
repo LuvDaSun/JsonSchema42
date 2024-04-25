@@ -15,8 +15,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
   `;
 
   for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    let itemValue = item.toValue();
-    const { location: nodeId } = itemValue;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;

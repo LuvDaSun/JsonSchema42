@@ -14,12 +14,13 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
   `;
 
   for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
-    const itemValue = item.toValue();
-    const { location: nodeId } = itemValue;
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
+
+    const itemValue = item.toValue();
 
     using typeName = names.getName(key);
 
