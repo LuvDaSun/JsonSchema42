@@ -114,7 +114,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     typeKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const typeItem = validatorsArena.getItem(typeKey);
+    using typeItem = validatorsArena.getItem(typeKey);
     const typeItemValue = typeItem.toValue();
     if (typeItemValue.location == null) {
       yield itt`

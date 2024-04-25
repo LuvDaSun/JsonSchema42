@@ -31,7 +31,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
+    using item = typesArena.getItem(itemKey);
     const itemValue = item.toValue();
 
     if (itemValue.location == null) {

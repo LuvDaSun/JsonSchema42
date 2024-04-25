@@ -1,7 +1,7 @@
 import * as core from "@jns42/core";
 
 export function isMockable(arena: core.SchemaArena, key: number) {
-  const item = arena.getItem(key);
+  using item = arena.getItem(key);
   const itemValue = item.toValue();
 
   // the counter keeps track of of this item is unknown or not. If the counter is 0

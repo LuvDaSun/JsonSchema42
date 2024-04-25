@@ -109,7 +109,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       throw new TypeError("cannot mock non-mockable type");
     }
 
-    const item = typesArena.getItem(itemKey);
+    using item = typesArena.getItem(itemKey);
     const itemValue = item.toValue();
     if (itemValue.location == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
@@ -120,7 +120,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   }
 
   function* generateMockDefinition(itemKey: number): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
+    using item = typesArena.getItem(itemKey);
     const itemValue = item.toValue();
 
     if (itemValue.reference != null) {

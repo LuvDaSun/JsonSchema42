@@ -27,7 +27,7 @@ export class SchemaArena extends ForeignObject {
 
   public getItem(key: number): ArenaSchemaItem {
     const itemPointer = mainFfi.exports.schema_arena_get_item(this.pointer, key);
-    using itemForeign = new ArenaSchemaItem(itemPointer);
+    const itemForeign = new ArenaSchemaItem(itemPointer);
     itemForeign.abandon();
     return itemForeign;
   }

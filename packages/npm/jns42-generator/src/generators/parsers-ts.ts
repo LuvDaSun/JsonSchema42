@@ -57,7 +57,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
+    using item = typesArena.getItem(itemKey);
     const itemValue = item.toValue();
 
     if (itemValue.location == null) {
