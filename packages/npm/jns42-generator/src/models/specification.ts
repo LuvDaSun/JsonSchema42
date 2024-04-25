@@ -53,13 +53,6 @@ export function loadSpecification(
 
   // transform the typesArena
   {
-    // console.log(
-    //   Object.fromEntries(
-    //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
-    //   ),
-    // );
-    // debugger;
-
     using transformers = core.VecUsize.fromArray([
       core.SchemaTransform.explode,
       core.SchemaTransform.singleType,
@@ -87,13 +80,6 @@ export function loadSpecification(
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
       transformIterations++;
-
-      // console.log(
-      //   Object.fromEntries(
-      //     [...typesArena].map(normalizeObject).map((value, key) => [key, value] as const),
-      //   ),
-      // );
-      // debugger;
 
       if (transformIterations < transformMaximumIterations) {
         continue;
