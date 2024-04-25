@@ -1,6 +1,7 @@
 use super::with_error::with_error_reference;
 use crate::{
   documents::DocumentContext,
+  error::Error,
   models::{SchemaArena, SchemaTransform},
 };
 use std::{
@@ -42,7 +43,7 @@ extern "C" fn schema_arena_count(arena: *const SchemaArena) -> usize {
 extern "C" fn schema_arena_get_item(
   arena: *mut SchemaArena,
   key: usize,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let arena = unsafe { &mut *arena };

@@ -1,5 +1,5 @@
 use super::with_error::with_error_reference;
-use crate::naming::Sentence;
+use crate::{error::Error, naming::Sentence};
 use std::{
   ffi::{c_char, CStr, CString},
   ptr::null_mut,
@@ -11,7 +11,7 @@ extern "C" fn sentence_drop(sentence: *mut Sentence) {
 }
 
 #[no_mangle]
-extern "C" fn sentence_new(input: *const c_char, error_reference: *mut usize) -> *mut Sentence {
+extern "C" fn sentence_new(input: *const c_char, error_reference: *mut Error) -> *mut Sentence {
   with_error_reference(error_reference, || {
     let input = unsafe { CStr::from_ptr(input) };
     let input = input.to_str()?;
@@ -52,7 +52,7 @@ extern "C" fn sentence_join(
 #[no_mangle]
 extern "C" fn sentence_to_camel_case(
   sentence: *const Sentence,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let sentence = unsafe { &*sentence };
@@ -69,7 +69,7 @@ extern "C" fn sentence_to_camel_case(
 #[no_mangle]
 extern "C" fn sentence_to_pascal_case(
   sentence: *const Sentence,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let sentence = unsafe { &*sentence };
@@ -86,7 +86,7 @@ extern "C" fn sentence_to_pascal_case(
 #[no_mangle]
 extern "C" fn sentence_to_snake_case(
   sentence: *const Sentence,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let sentence = unsafe { &*sentence };
@@ -103,7 +103,7 @@ extern "C" fn sentence_to_snake_case(
 #[no_mangle]
 extern "C" fn sentence_to_screaming_snake_case(
   sentence: *const Sentence,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let sentence = unsafe { &*sentence };

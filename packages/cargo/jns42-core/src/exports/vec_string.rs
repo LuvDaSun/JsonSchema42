@@ -30,7 +30,7 @@ extern "C" fn vec_string_len(vec: *const Vec<String>) -> usize {
 extern "C" fn vec_string_get(
   vec: *const Vec<String>,
   index: usize,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let vec = unsafe { &*vec };
@@ -47,7 +47,7 @@ extern "C" fn vec_string_get(
 extern "C" fn vec_string_push(
   vec: *mut Vec<String>,
   value: *mut c_char,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) {
   with_error_reference(error_reference, || {
     let vec = unsafe { &mut *vec };

@@ -1,4 +1,5 @@
 use super::with_error::with_error_reference;
+use crate::error::Error;
 use std::{
   ffi::{c_char, CStr, CString},
   ptr::null_mut,
@@ -8,7 +9,7 @@ use std::{
 extern "C" fn banner(
   prefix: *const c_char,
   version: *const c_char,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let prefix = unsafe { CStr::from_ptr(prefix) };
