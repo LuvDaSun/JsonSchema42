@@ -57,12 +57,15 @@ export interface MainExports extends ExportsBase {
 
   arena_schema_item_drop(schema_item: number): void;
   arena_schema_item_new(): number;
+  arena_schema_item_json(schema_item: number, error_reference: number): number;
+  arena_schema_item_has_location(schema_item: number): number;
+  arena_schema_item_get_location(schema_item: number, error_reference: number): number;
 
   schema_arena_drop(schema_arena: number): void;
   schema_arena_from_document_context(document_context: number): number;
   schema_arena_clone(schema_arena: number): number;
   schema_arena_count(schema_arena: number): number;
-  schema_arena_get_item(schema_arena: number, key: number, error_reference: number): number;
+  schema_arena_get_item(schema_arena: number, key: number): number;
   schema_arena_get_name_parts(schema_arena: number, key: number): number;
   schema_arena_transform(schema_arena: number, vec: number): number;
 
@@ -93,20 +96,7 @@ export interface MainExports extends ExportsBase {
   ): void;
   document_context_get_schema_nodes(document_context: number, error_reference: number): number;
 
-  node_location_drop(node_location: number): void;
-  node_location_clone(node_location: number): number;
-  node_location_parse(input: number, error_reference: number): number;
-  node_location_join(node_location: number, other_node_location: number): number;
-  node_location_to_string(node_location: number, error_reference: number): number;
-  node_location_to_fetch_string(node_location: number, error_reference: number): number;
-  node_location_get_anchor(node_location: number, error_reference: number): number;
-  node_location_get_pointer(node_location: number): number;
-  node_location_get_path(node_location: number): number;
-  node_location_get_hash(node_location: number): number;
-  node_location_set_anchor(node_location: number, anchor: number, error_reference: number): number;
-  node_location_set_pointer(node_location: number, pointer: number): number;
-  node_location_push_pointer(node_location: number, pointer: number): number;
-  node_location_set_root(node_location: number): number;
+  banner(prefix: number, version: number, error_reference: number): number;
 }
 
 export type MainFfi = Ffi<MainExports, MainEnvironment>;

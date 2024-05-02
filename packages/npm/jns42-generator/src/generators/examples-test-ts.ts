@@ -1,8 +1,9 @@
+import { banner } from "@jns42/core";
 import * as models from "../models/index.js";
-import { banner, itt, mapIterable } from "../utils/index.js";
+import { itt, mapIterable, packageInfo } from "../utils/index.js";
 
 export function* generateExamplesTestTsCode(specification: models.Specification) {
-  yield banner;
+  yield banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -19,10 +20,12 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
+    const itemValue = item.toValue();
+
     using typeName = names.getName(key);
 
     yield mapIterable(
-      item.examples ?? [],
+      itemValue.examples ?? [],
       (example) => itt`
         test(${JSON.stringify(typeName.toPascalCase())}, () => {
           const example = ${JSON.stringify(example)};
