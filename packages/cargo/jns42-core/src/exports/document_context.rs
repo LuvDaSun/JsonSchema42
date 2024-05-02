@@ -1,5 +1,7 @@
 use super::with_error::{with_error_reference, with_error_reference_future};
-use crate::{documents::DocumentContext, executor::spawn_and_callback, utils::key::Key};
+use crate::{
+  documents::DocumentContext, error::Error, executor::spawn_and_callback, utils::key::Key,
+};
 use std::{
   ffi::{c_char, CStr, CString},
   ptr::null_mut,
@@ -21,7 +23,7 @@ extern "C" fn document_context_new() -> *mut Rc<DocumentContext> {
 #[no_mangle]
 extern "C" fn document_context_register_well_known_factories(
   document_context: *mut Rc<DocumentContext>,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) {
   with_error_reference(error_reference, || {
     let document_context = unsafe { &mut *document_context };
@@ -38,7 +40,7 @@ extern "C" fn document_context_load_from_location(
   given_location: *const c_char,
   antecedent_location: *const c_char,
   default_meta_schema_id: *const c_char,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
@@ -88,7 +90,7 @@ extern "C" fn document_context_load_from_node(
   antecedent_location: *const c_char,
   node: *const c_char,
   default_meta_schema_id: *const c_char,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
   callback: Key,
 ) {
   spawn_and_callback(callback, async move {
@@ -138,7 +140,7 @@ extern "C" fn document_context_load_from_node(
 #[no_mangle]
 extern "C" fn document_context_get_schema_nodes(
   document_context: *const Rc<DocumentContext>,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) -> *mut c_char {
   with_error_reference(error_reference, || {
     let document_context = unsafe { &*document_context };

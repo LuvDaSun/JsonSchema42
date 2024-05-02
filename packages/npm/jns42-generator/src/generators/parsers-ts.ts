@@ -56,7 +56,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
+    using item = typesArena.getItem(itemKey);
     if (item.location == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
@@ -67,16 +67,17 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   function* generateParserDefinition(itemKey: number, valueExpression: string) {
     const item = typesArena.getItem(itemKey);
+    const itemValue = item.toValue();
 
-    if (item.reference != null) {
-      yield generateParserReference(item.reference, valueExpression);
+    if (itemValue.reference != null) {
+      yield generateParserReference(itemValue.reference, valueExpression);
       return;
     }
 
-    if (item.oneOf != null && item.oneOf.length > 0) {
+    if (itemValue.oneOf != null && itemValue.oneOf.length > 0) {
       yield itt`
         ${joinIterable(
-          item.oneOf.map(
+          itemValue.oneOf.map(
             (element) => itt`
               ${generateParserReference(element, valueExpression)}
             `,
@@ -87,8 +88,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.types != null && item.types.length === 1) {
-      switch (item.types[0]) {
+    if (itemValue.types != null && itemValue.types.length === 1) {
+      switch (itemValue.types[0]) {
         case "any":
           yield valueExpression;
           return;
@@ -263,9 +264,13 @@ export function* generateParsersTsCode(specification: models.Specification) {
           return;
 
           function* generateCaseClauses() {
-            if (item.tupleItems != null) {
-              for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
-                const elementKey = item.tupleItems[elementIndex];
+            if (itemValue.tupleItems != null) {
+              for (
+                let elementIndex = 0;
+                elementIndex < itemValue.tupleItems.length;
+                elementIndex++
+              ) {
+                const elementKey = itemValue.tupleItems[elementIndex];
 
                 yield itt`
                   case ${JSON.stringify(elementIndex)}:
@@ -281,9 +286,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
 
           function* generateDefaultClauseContent() {
-            if (item.arrayItems != null) {
+            if (itemValue.arrayItems != null) {
               yield itt`
-                return ${generateParserReference(item.arrayItems, `value`)}
+                return ${generateParserReference(itemValue.arrayItems, `value`)}
               `;
               return;
             }
@@ -309,9 +314,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
           return;
 
           function* generateCaseClauses() {
-            if (item.objectProperties != null) {
-              for (const name in item.objectProperties) {
-                const elementKey = item.objectProperties[name];
+            if (itemValue.objectProperties != null) {
+              for (const name in itemValue.objectProperties) {
+                const elementKey = itemValue.objectProperties[name];
 
                 yield itt`
                   case ${JSON.stringify(name)}:
@@ -331,11 +336,11 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateDefaultClauseContent() {
             const elementKeys = new Array<number>();
-            if (item.mapProperties != null) {
-              elementKeys.push(item.mapProperties);
+            if (itemValue.mapProperties != null) {
+              elementKeys.push(itemValue.mapProperties);
             }
-            if (item.patternProperties != null) {
-              for (const elementKey of Object.values(item.patternProperties)) {
+            if (itemValue.patternProperties != null) {
+              for (const elementKey of Object.values(itemValue.patternProperties)) {
                 elementKeys.push(elementKey);
               }
             }

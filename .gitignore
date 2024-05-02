@@ -3,6 +3,7 @@
 *.tsbuildinfo
 *.tgz
 *.node
+*.profraw
 
 !.gitignore
 !.prettierignore

@@ -20,10 +20,12 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
+    const itemValue = item.toValue();
+
     using typeName = names.getName(key);
 
     yield mapIterable(
-      item.examples ?? [],
+      itemValue.examples ?? [],
       (example) => itt`
         test(${JSON.stringify(typeName.toPascalCase())}, () => {
           const example = ${JSON.stringify(example)};
