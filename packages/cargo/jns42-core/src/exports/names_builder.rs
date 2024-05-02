@@ -1,5 +1,8 @@
 use super::with_error::with_error_reference;
-use crate::naming::{Names, NamesBuilder};
+use crate::{
+  error::Error,
+  naming::{Names, NamesBuilder},
+};
 use std::ffi::{c_char, CStr};
 
 /// Free NamesBuilder instance
@@ -34,7 +37,7 @@ extern "C" fn names_builder_add(
 extern "C" fn names_builder_set_default_name(
   names_builder: *mut NamesBuilder<usize>,
   value: *const c_char,
-  error_reference: *mut usize,
+  error_reference: *mut Error,
 ) {
   with_error_reference(error_reference, || {
     let names_builder = unsafe { &mut *names_builder };

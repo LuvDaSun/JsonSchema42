@@ -1,5 +1,6 @@
-use super::banner::get_banner_toml;
 use std::error::Error;
+
+use jns42_core::utils::banner;
 
 pub fn generate_file_content(
   package_name: &str,
@@ -63,5 +64,9 @@ pub fn generate_file_content(
 
   let content = toml::ser::to_string_pretty(&manifest_table)?;
 
-  Ok(format!("{}\n\n{}", get_banner_toml(), content))
+  Ok(format!(
+    "{}\n\n{}",
+    banner("#", &format!("v{}", env!("CARGO_PKG_VERSION"))),
+    content
+  ))
 }

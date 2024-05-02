@@ -1,9 +1,7 @@
 SHELL:=$(PREFIX)/bin/sh
 
 build: \
-	packages/npm/jns42-core/bin/main.wasm \
 	generated/npm \
-	# generated/cargo \
 
 rebuild: \
 	clean build
@@ -13,26 +11,6 @@ clean: \
 	rm -f packages/npm/jns42-core/bin/main.wasm
 	rm -rf generated
 	rm -rf target
-
-target/wasm32-unknown-unknown/release/jns42_core.wasm: \
-	packages/cargo/jns42-core \
-	$(wildcard packages/cargo/jns42-core/Cargo.toml) \
-	$(wildcard packages/cargo/jns42-core/src/*.rs) \
-	$(wildcard packages/cargo/jns42-core/src/*/*.rs) \
-	$(wildcard packages/cargo/jns42-core/src/*/*/*.rs) \
-	Cargo.lock \
-
-	cargo \
-		build \
-		--package jns42-core \
-		--target wasm32-unknown-unknown \
-		--release \
-
-packages/npm/jns42-core/bin/main.wasm: \
-	target/wasm32-unknown-unknown/release/jns42_core.wasm \
-
-	@mkdir -p $(@D)
-	cp $< $@
 
 
 generated/npm: \
@@ -108,16 +86,6 @@ generated/npm/oas-v3-1:
 		--package-directory $@ \
 		--package-name @jns42/$(notdir $(basename $@)) \
 		--package-version $(shell npx jns42-generator --version) \
-
-generated/cargo/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
-	mkdir -p $(@D)
-
-	cargo run \
-		--package jns42-generator \
-		package $< \
-		--package-directory $@ \
-		--package-name jns42-$(notdir $(basename $@)) \
-		--package-version $(word 2,$(shell cargo run --package jns42-generator -- --version)) \
 
 .PHONY: \
 	build \

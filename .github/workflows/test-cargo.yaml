@@ -1,22 +1,17 @@
 on:
-  pull_request:
-    paths:
-      - Cargo.lock
-      - .github/**
-      - fixtures/**
-      - packages/cargo/**
+  pull_request: {}
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: rust:1.76.0
+    container: rust:1.77.0
     steps:
       - uses: actions/checkout@v4
       - run: cargo test --workspace --all-targets
 
   clippy:
     runs-on: ubuntu-latest
-    container: rust:1.76.0
+    container: rust:1.77.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add clippy
@@ -24,7 +19,7 @@ jobs:
 
   rustfmt:
     runs-on: ubuntu-latest
-    container: rust:1.76.0
+    container: rust:1.77.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add rustfmt

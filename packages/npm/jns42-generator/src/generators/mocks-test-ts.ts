@@ -1,8 +1,9 @@
+import { banner } from "@jns42/core";
 import * as models from "../models/index.js";
-import { banner, generateJsDocComments, isMockable, itt } from "../utils/index.js";
+import { generateJsDocComments, isMockable, itt, packageInfo } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
-  yield banner;
+  yield banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
