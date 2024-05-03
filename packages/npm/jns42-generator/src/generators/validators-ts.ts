@@ -819,7 +819,7 @@ function getValueFormatExpression(format: string, expression: string) {
 
     case "date": // New in draft 7
       // Date, for example, 2018-11-13.
-      return JSON.stringify(true);
+      return `/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(${expression})`;
 
     case "duration": // New in draft 2019-09
       // A duration as defined by the ISO 8601 ABNF for "duration". For example, P3D expresses a duration of 3 days.
