@@ -12,9 +12,7 @@ clean: \
 	rm -rf generated
 	rm -rf target
 
-
 generated/npm: \
-	generated/npm/schema-intermediate \
 	generated/npm/schema-draft-04 \
 	generated/npm/schema-draft-2020-12 \
 	generated/npm/schema-oas-v3-1 \
@@ -26,18 +24,6 @@ generated/npm: \
 
 	# Link the generated code, but don't save those links to the package lock
 	npm install --no-package-lock
-
-generated/cargo: \
-	generated/cargo/schema-intermediate \
-
-
-generated/npm/schema-intermediate: packages/oas/schema-intermediate/src/schema.yaml
-	mkdir -p $(@D)
-
-	npx jns42-generator package $< \
-		--package-directory $@ \
-		--package-name @jns42/$(notdir $(basename $@)) \
-		--package-version $(shell npx jns42-generator --version) \
 
 generated/npm/schema-draft-04:
 	mkdir -p $(@D)

@@ -9,10 +9,6 @@
       "path": "fixtures",
     },
     {
-      "name": "schema-intermediate",
-      "path": "packages/oas/schema-intermediate",
-    },
-    {
       "name": "npm/jns42-generator",
       "path": "packages/npm/jns42-generator",
     },
