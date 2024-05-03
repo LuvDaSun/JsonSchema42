@@ -308,7 +308,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     if (
       itemValue.minimumLength != null ||
       itemValue.maximumLength != null ||
-      itemValue.valuePattern != null
+      itemValue.valuePattern != null ||
+      itemValue.valueFormat != null
     ) {
       yield itt`
         if(
