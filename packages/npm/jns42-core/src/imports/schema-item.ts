@@ -50,8 +50,8 @@ export type SchemaItemValue<K> = {
   multipleOf?: number;
   minimumLength?: number;
   maximumLength?: number;
-  valuePattern?: string[];
-  valueFormat?: string[];
+  valuePattern?: string;
+  valueFormat?: string;
   minimumItems?: number;
   maximumItems?: number;
   uniqueItems?: boolean;
