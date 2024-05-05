@@ -308,7 +308,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     if (
       itemValue.minimumLength != null ||
       itemValue.maximumLength != null ||
-      itemValue.valuePattern != null
+      itemValue.valuePattern != null ||
+      itemValue.valueFormat != null
     ) {
       yield itt`
         if(
@@ -347,6 +348,21 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               !new RegExp(${JSON.stringify(itemValue.valuePattern)}).test(${valueExpression})
             ) {
               recordError("valuePattern");
+              return false;
+            }
+          `;
+        }
+
+        if (itemValue.valueFormat != null) {
+          const isValueFormatExpression = getValueFormatExpression(
+            itemValue.valueFormat,
+            valueExpression,
+          );
+          yield itt`
+            if(
+              !${isValueFormatExpression}
+            ) {
+              recordError("valueFormat");
               return false;
             }
           `;
@@ -786,5 +802,85 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     yield itt`
       return true;
     `;
+  }
+}
+
+/**
+ * @see https://json-schema.org/understanding-json-schema/reference/string#built-in-formats
+ */
+function getValueFormatExpression(format: string, expression: string) {
+  switch (format) {
+    case "date-time": // Date and time together, for example, 2018-11-13T20:20:39+00:00.
+      return JSON.stringify(true);
+
+    case "time": // New in draft 7
+      // Time, for example, 20:20:39+00:00
+      return JSON.stringify(true);
+
+    case "date": // New in draft 7
+      // Date, for example, 2018-11-13.
+      return `/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(${expression})`;
+
+    case "duration": // New in draft 2019-09
+      // A duration as defined by the ISO 8601 ABNF for "duration". For example, P3D expresses a duration of 3 days.
+      return JSON.stringify(true);
+
+    case "email": // Internet email address, see RFC 5321, section 4.1.2.
+      return JSON.stringify(true);
+
+    case "idn-email": // New in draft 7
+      // The internationalized form of an Internet email address, see RFC 6531.
+      return JSON.stringify(true);
+
+    case "hostname": // Internet host name, see RFC 1123, section 2.1.
+      return JSON.stringify(true);
+
+    case "idn-hostname": // New in draft 7
+      // An internationalized Internet host name, see RFC5890, section 2.3.2.3.
+      return JSON.stringify(true);
+
+    case "ipv4": // IPv4 address, according to dotted-quad ABNF syntax as defined in RFC 2673, section 3.2.
+      return JSON.stringify(true);
+
+    case "ipv6": // IPv6 address, as defined in RFC 2373, section 2.2.
+      return JSON.stringify(true);
+
+    case "uuid": // New in draft 2019-09
+      // A Universally Unique Identifier as defined by RFC 4122. Example: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a
+      return `/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(${expression})`;
+
+    case "uri": // A universal resource identifier (URI), according to RFC3986.
+      return JSON.stringify(true);
+
+    case "uri-reference": // New in draft 6
+      // A URI Reference (either a URI or a relative-reference), according to RFC3986, section 4.1.
+      return JSON.stringify(true);
+
+    case "iri": // New in draft 7
+      // The internationalized equivalent of a "uri", according to RFC3987.
+      return JSON.stringify(true);
+
+    case "iri-reference": //New in draft 7
+      // The internationalized equivalent of a "uri-reference", according to RFC3987
+      return JSON.stringify(true);
+
+    case "uri-template": // New in draft 6
+      // A URI Template (of any level) according to RFC6570. If you don't already know what a URI Template is, you probably don't need this value.
+      return JSON.stringify(true);
+
+    case "json-pointer": // New in draft 6
+      // A JSON Pointer, according to RFC6901. There is more discussion on the use of JSON Pointer within JSON Schema in Structuring a complex schema. Note that this should be used only when the entire string contains only JSON Pointer content, e.g. /foo/bar. JSON Pointer URI fragments, e.g. #/foo/bar/ should use "uri-reference".
+      return JSON.stringify(true);
+
+    case "relative-json-pointer": // New in draft 7
+      // A relative JSON pointer.
+      return JSON.stringify(true);
+
+    case "regex": // New in draft 7
+      // A regular expression, which should be valid according to the ECMA 262 dialect.
+      return JSON.stringify(true);
+
+    default:
+      return JSON.stringify(true);
   }
 }

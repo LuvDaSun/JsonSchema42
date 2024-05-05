@@ -104,7 +104,7 @@ export function generatePackage(
       !.gitignore
       *.tsbuildinfo
       transpiled/
-      types/
+      typed/
       bundled/
     `;
     const filePath = path.join(packageDirectoryPath, ".gitignore");
