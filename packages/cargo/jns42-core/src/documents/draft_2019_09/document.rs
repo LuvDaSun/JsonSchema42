@@ -2,7 +2,7 @@ use super::Node;
 use crate::documents::{DocumentContext, EmbeddedDocument, ReferencedDocument, SchemaDocument};
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
-use crate::utils::node_location::NodeLocation;
+use crate::utils::NodeLocation;
 use std::collections::{BTreeMap, HashMap};
 use std::rc::Weak;
 

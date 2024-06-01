@@ -1,4 +1,4 @@
-use crate::{models::DocumentSchemaItem, utils::node_location::NodeLocation};
+use crate::{models::DocumentSchemaItem, utils::NodeLocation};
 use std::collections::BTreeMap;
 
 pub struct EmbeddedDocument {

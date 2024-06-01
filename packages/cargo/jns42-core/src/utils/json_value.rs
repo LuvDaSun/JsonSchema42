@@ -1,4 +1,4 @@
-use super::node_location::NodeLocation;
+use super::NodeLocation;
 use std::iter::once;
 
 #[derive(Clone, Debug)]

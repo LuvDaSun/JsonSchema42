@@ -1,6 +1,6 @@
 use super::SchemaType;
 use crate::utils::merge::{merge_either, merge_option};
-use crate::utils::node_location::NodeLocation;
+use crate::utils::NodeLocation;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};

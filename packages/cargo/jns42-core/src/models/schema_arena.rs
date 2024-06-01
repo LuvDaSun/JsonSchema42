@@ -1,7 +1,7 @@
 use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
 use crate::{
   documents::DocumentContext,
-  utils::{arena::Arena, node_location::NodeLocation},
+  utils::{arena::Arena, NodeLocation},
 };
 use std::{
   collections::HashMap,

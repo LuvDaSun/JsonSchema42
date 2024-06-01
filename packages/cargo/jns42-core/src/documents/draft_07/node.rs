@@ -1,6 +1,6 @@
 use crate::{
   models::{DocumentSchemaItem, SchemaType},
-  utils::{json_value::JsonValue, node_location::NodeLocation},
+  utils::{json_value::JsonValue, NodeLocation},
 };
 use std::iter::{empty, once};
 

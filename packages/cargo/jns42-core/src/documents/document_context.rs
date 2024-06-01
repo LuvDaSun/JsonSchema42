@@ -2,7 +2,7 @@ use super::schema_document::SchemaDocument;
 use crate::documents::{self, discover_meta_schema};
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
-use crate::utils::{node_location::NodeLocation, read_json_node::read_json_node};
+use crate::utils::{read_json_node::read_json_node, NodeLocation};
 use std::collections::BTreeMap;
 use std::future::Future;
 use std::pin::Pin;
