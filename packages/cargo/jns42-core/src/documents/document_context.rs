@@ -286,6 +286,7 @@ impl DocumentContext {
   Load nodes from a location. The retrieval location is the physical location of the node,
   it should be a root location
   */
+  #[allow(clippy::await_holding_refcell_ref)]
   pub async fn load_from_location(
     self: &Rc<Self>,
     retrieval_location: &NodeLocation,
