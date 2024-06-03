@@ -1,120 +1,80 @@
 use super::SchemaType;
 use crate::utils::merge::{merge_either, merge_option};
 use crate::utils::NodeLocation;
+use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
+use std::ops::Deref;
 use std::{collections::HashMap, iter::empty};
+use wasm_bindgen::prelude::*;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SchemaItem<K>
 where
   K: Ord,
 {
-  #[serde(default)]
   pub name: Option<String>,
-  #[serde(default)]
   pub exact: Option<bool>,
 
-  #[serde(default)]
   pub primary: Option<bool>,
-  #[serde(default)]
   pub parent: Option<K>,
-  #[serde(default)]
   pub location: Option<NodeLocation>,
 
   // metadata
-  #[serde(default)]
   pub title: Option<String>,
-  #[serde(default)]
   pub description: Option<String>,
-  #[serde(default)]
   pub examples: Option<Vec<serde_json::Value>>,
-  #[serde(default)]
   pub deprecated: Option<bool>,
 
   // types
-  #[serde(default)]
   pub types: Option<Vec<SchemaType>>,
 
   // applicators
-  #[serde(default)]
   pub reference: Option<K>,
 
-  #[serde(default)]
   pub r#if: Option<K>,
-  #[serde(default)]
   pub then: Option<K>,
-  #[serde(default)]
   pub r#else: Option<K>,
 
-  #[serde(default)]
   pub not: Option<K>,
 
-  #[serde(default)]
   pub property_names: Option<K>,
-  #[serde(default)]
   pub map_properties: Option<K>,
-  #[serde(default)]
   pub array_items: Option<K>,
-  #[serde(default)]
   pub contains: Option<K>,
 
-  #[serde(default)]
   pub all_of: Option<BTreeSet<K>>,
-  #[serde(default)]
   pub any_of: Option<BTreeSet<K>>,
-  #[serde(default)]
   pub one_of: Option<BTreeSet<K>>,
-  #[serde(default)]
   pub tuple_items: Option<Vec<K>>,
 
-  #[serde(default)]
   pub object_properties: Option<HashMap<String, K>>,
-  #[serde(default)]
   pub pattern_properties: Option<HashMap<String, K>>,
-  #[serde(default)]
   pub dependent_schemas: Option<HashMap<String, K>>,
 
   // assertions
-  #[serde(default)]
   pub options: Option<Vec<serde_json::Value>>,
-  #[serde(default)]
   pub required: Option<HashSet<String>>,
 
-  #[serde(default)]
   pub minimum_inclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub minimum_exclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub maximum_inclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub maximum_exclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub multiple_of: Option<serde_json::Number>,
 
-  #[serde(default)]
   pub minimum_length: Option<u64>,
-  #[serde(default)]
   pub maximum_length: Option<u64>,
-  #[serde(default)]
   pub value_pattern: Option<String>,
-  #[serde(default)]
   pub value_format: Option<String>,
 
-  #[serde(default)]
   pub minimum_items: Option<u64>,
-  #[serde(default)]
   pub maximum_items: Option<u64>,
-  #[serde(default)]
   pub unique_items: Option<bool>,
 
-  #[serde(default)]
   pub minimum_properties: Option<u64>,
-  #[serde(default)]
   pub maximum_properties: Option<u64>,
 }
 
@@ -486,5 +446,232 @@ where
       object_properties: map_map(&self.object_properties),
       pattern_properties: map_map(&self.pattern_properties),
     }
+  }
+}
+
+#[wasm_bindgen]
+pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
+
+#[wasm_bindgen]
+impl ArenaSchemaItemContainer {
+  #[wasm_bindgen(getter = name)]
+  pub fn name_get(&self) -> Option<String> {
+    Some(self.name.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = exact)]
+  pub fn exact_get(&self) -> Option<bool> {
+    self.exact
+  }
+
+  #[wasm_bindgen(getter = primary)]
+  pub fn primary_get(&self) -> Option<bool> {
+    self.primary
+  }
+  #[wasm_bindgen(getter = parent)]
+  pub fn parent_get(&self) -> Option<usize> {
+    self.parent
+  }
+  #[wasm_bindgen(getter = location)]
+  pub fn location_get(&self) -> Option<NodeLocation> {
+    Some(self.location.as_ref()?.clone())
+  }
+
+  // metadata
+  #[wasm_bindgen(getter = title)]
+  pub fn title_get(&self) -> Option<String> {
+    Some(self.title.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = description)]
+  pub fn description_get(&self) -> Option<String> {
+    Some(self.description.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = examples)]
+  pub fn examples_get(&self) -> Option<Vec<JsValue>> {
+    Some(
+      self
+        .examples
+        .as_ref()?
+        .iter()
+        .filter_map(|value| JsValue::from_serde(value).ok())
+        .collect(),
+    )
+  }
+  #[wasm_bindgen(getter = deprecated)]
+  pub fn deprecated_get(&self) -> Option<bool> {
+    self.deprecated
+  }
+
+  // types
+  #[wasm_bindgen(getter = types)]
+  pub fn types_get(&self) -> Option<Vec<SchemaType>> {
+    Some(self.types.as_ref()?.clone())
+  }
+
+  // applicators
+  #[wasm_bindgen(getter = reference)]
+  pub fn reference_get(&self) -> Option<usize> {
+    self.reference
+  }
+
+  #[wasm_bindgen(getter = ifSchema)]
+  pub fn if_get(&self) -> Option<usize> {
+    self.r#if
+  }
+  #[wasm_bindgen(getter = thenSchema)]
+  pub fn then_get(&self) -> Option<usize> {
+    self.then
+  }
+  #[wasm_bindgen(getter = elseSchema)]
+  pub fn else_get(&self) -> Option<usize> {
+    self.r#else
+  }
+
+  #[wasm_bindgen(getter = not)]
+  pub fn not_get(&self) -> Option<usize> {
+    self.not
+  }
+
+  #[wasm_bindgen(getter = propertyNames)]
+  pub fn property_names_get(&self) -> Option<usize> {
+    self.property_names
+  }
+  #[wasm_bindgen(getter = mapProperties)]
+  pub fn map_properties_get(&self) -> Option<usize> {
+    self.map_properties
+  }
+  #[wasm_bindgen(getter = arrayItems)]
+  pub fn array_items_get(&self) -> Option<usize> {
+    self.array_items
+  }
+  #[wasm_bindgen(getter = contains)]
+  pub fn contains_get(&self) -> Option<usize> {
+    self.contains
+  }
+
+  #[wasm_bindgen(getter = allOf)]
+  pub fn all_of_get(&self) -> Option<Vec<usize>> {
+    Some(self.all_of.as_ref()?.iter().copied().collect())
+  }
+  #[wasm_bindgen(getter = anyOf)]
+  pub fn any_of_get(&self) -> Option<Vec<usize>> {
+    Some(self.any_of.as_ref()?.iter().copied().collect())
+  }
+  #[wasm_bindgen(getter = oneOf)]
+  pub fn one_of_get(&self) -> Option<Vec<usize>> {
+    Some(self.one_of.as_ref()?.iter().copied().collect())
+  }
+  #[wasm_bindgen(getter = tupleItems)]
+  pub fn tuple_items_get(&self) -> Option<Vec<usize>> {
+    Some(self.tuple_items.as_ref()?.clone())
+  }
+
+  // #[wasm_bindgen(getter = objectProperties)]
+  // pub fn object_properties_get(&self) -> Option<HashMap<String, usize>> {
+  //   self.object_properties
+  // }
+  // #[wasm_bindgen(getter = patternProperties)]
+  // pub fn pattern_properties_get(&self) -> Option<HashMap<String, usize>> {
+  //   self.pattern_properties
+  // }
+  // #[wasm_bindgen(getter = dependentSchemas)]
+  // pub fn dependent_schemas_get(&self) -> Option<HashMap<String, usize>> {
+  //   self.dependent_schemas
+  // }
+
+  // assertions
+  #[wasm_bindgen(getter = options)]
+  pub fn options_get(&self) -> Option<Vec<JsValue>> {
+    Some(
+      self
+        .options
+        .as_ref()?
+        .iter()
+        .filter_map(|value| JsValue::from_serde(value).ok())
+        .collect(),
+    )
+  }
+  #[wasm_bindgen(getter = required)]
+  pub fn required_get(&self) -> Option<Vec<String>> {
+    Some(self.required.as_ref()?.iter().cloned().collect())
+  }
+
+  #[wasm_bindgen(getter = minimumInclusive)]
+  pub fn minimum_inclusive_get(&self) -> Option<f64> {
+    self.minimum_inclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = minimumExclusive)]
+  pub fn minimum_exclusive_get(&self) -> Option<f64> {
+    self.minimum_exclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = maximumInclusive)]
+  pub fn maximum_inclusive_get(&self) -> Option<f64> {
+    self.maximum_inclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = maximumExclusive)]
+  pub fn maximum_exclusive_get(&self) -> Option<f64> {
+    self.maximum_exclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = multipleOf)]
+  pub fn multiple_of_get(&self) -> Option<f64> {
+    self.multiple_of.as_ref()?.as_f64()
+  }
+
+  #[wasm_bindgen(getter = minimumLength)]
+  pub fn minimum_length_get(&self) -> Option<u64> {
+    self.minimum_length
+  }
+  #[wasm_bindgen(getter = maximumLength)]
+  pub fn maximum_length_get(&self) -> Option<u64> {
+    self.maximum_length
+  }
+  #[wasm_bindgen(getter = valuePattern)]
+  pub fn value_pattern_get(&self) -> Option<String> {
+    Some(self.value_pattern.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = valueFormat)]
+  pub fn value_format_get(&self) -> Option<String> {
+    Some(self.value_format.as_ref()?.clone())
+  }
+
+  #[wasm_bindgen(getter = minimumItems)]
+  pub fn minimum_items_get(&self) -> Option<u64> {
+    self.minimum_items
+  }
+  #[wasm_bindgen(getter = maximumItems)]
+  pub fn maximum_items_get(&self) -> Option<u64> {
+    self.maximum_items
+  }
+  #[wasm_bindgen(getter = uniqueItems)]
+  pub fn unique_items_get(&self) -> Option<bool> {
+    self.unique_items
+  }
+
+  #[wasm_bindgen(getter = minimumProperties)]
+  pub fn minimum_properties_get(&self) -> Option<u64> {
+    self.minimum_properties
+  }
+  #[wasm_bindgen(getter = maximumProperties)]
+  pub fn maximum_properties_get(&self) -> Option<u64> {
+    self.maximum_properties
+  }
+}
+
+impl Deref for ArenaSchemaItemContainer {
+  type Target = ArenaSchemaItem;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
+  }
+}
+
+impl From<ArenaSchemaItem> for ArenaSchemaItemContainer {
+  fn from(value: ArenaSchemaItem) -> Self {
+    Self(value)
+  }
+}
+
+impl From<ArenaSchemaItemContainer> for ArenaSchemaItem {
+  fn from(value: ArenaSchemaItemContainer) -> Self {
+    value.0
   }
 }

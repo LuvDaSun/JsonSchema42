@@ -1,6 +1,7 @@
 use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
 use crate::{
   documents::DocumentContext,
+  models::ArenaSchemaItemContainer,
   utils::{arena::Arena, NodeLocation},
 };
 use std::{
@@ -229,7 +230,13 @@ impl Arena<ArenaSchemaItem> {
 #[wasm_bindgen]
 pub struct SchemaArenaContainer(SchemaArena);
 
-impl SchemaArenaContainer {}
+#[wasm_bindgen]
+impl SchemaArenaContainer {
+  #[wasm_bindgen(js_name = getItem)]
+  pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
+    self.0.get_item(key).clone().into()
+  }
+}
 
 impl From<SchemaArena> for SchemaArenaContainer {
   fn from(value: SchemaArena) -> Self {

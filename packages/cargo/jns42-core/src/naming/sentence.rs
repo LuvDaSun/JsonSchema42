@@ -3,15 +3,15 @@ use std::{
   iter::{empty, once},
   slice::Iter,
 };
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[wasm_bindgen]
 pub struct Sentence(Vec<Word>);
 
+#[wasm_bindgen]
 impl Sentence {
-  pub fn empty() -> Self {
-    Self(Vec::new())
-  }
-
+  #[wasm_bindgen(constructor)]
   pub fn new(input: &str) -> Self {
     #[derive(Debug, Clone, Copy)]
     enum CharType {
@@ -83,6 +83,72 @@ impl Sentence {
     Self(words)
   }
 
+  /// ToPascalCase
+  #[wasm_bindgen(js_name = "toPascalCase")]
+  pub fn to_pascal_case(&self) -> String {
+    let mut output = String::new();
+
+    for word in &self.0 {
+      output.push_str(&word.to_pascal());
+    }
+
+    output
+  }
+
+  /// toCamelCase
+  #[wasm_bindgen(js_name = "toCamelCase")]
+  pub fn to_camel_case(&self) -> String {
+    let mut output = String::new();
+
+    for word in &self.0 {
+      if output.is_empty() {
+        output.push_str(word.as_lower());
+      } else {
+        output.push_str(&word.to_pascal());
+      }
+    }
+
+    output
+  }
+
+  /// to_snake_case
+  #[wasm_bindgen(js_name = "toSnakeCase")]
+  pub fn to_snake_case(&self) -> String {
+    let mut output = String::new();
+
+    for word in &self.0 {
+      if !output.is_empty() {
+        output.push('_');
+      }
+
+      output.push_str(word.as_lower());
+    }
+
+    output
+  }
+
+  /// TO_SCREAMING_SNAKE_CASE
+  #[wasm_bindgen(js_name = "toScreamingSnakeCase")]
+  pub fn to_screaming_snake_case(&self) -> String {
+    let mut output = String::new();
+
+    for word in &self.0 {
+      if !output.is_empty() {
+        output += "_";
+      }
+
+      output.push_str(&word.to_upper());
+    }
+
+    output
+  }
+}
+
+impl Sentence {
+  pub fn empty() -> Self {
+    Self(Vec::new())
+  }
+
   pub fn is_empty(&self) -> bool {
     self.0.is_empty()
   }
@@ -99,62 +165,6 @@ impl Sentence {
 
   pub fn push(&self, word: Word) -> Self {
     Self(self.0.iter().cloned().chain(once(word)).collect())
-  }
-
-  /// ToPascalCase
-  pub fn to_pascal_case(&self) -> String {
-    let mut output = String::new();
-
-    for word in &self.0 {
-      output.push_str(&word.to_pascal());
-    }
-
-    output
-  }
-
-  /// toCamelCase
-  pub fn to_camel_case(&self) -> String {
-    let mut output = String::new();
-
-    for word in &self.0 {
-      if output.is_empty() {
-        output.push_str(word.as_lower());
-      } else {
-        output.push_str(&word.to_pascal());
-      }
-    }
-
-    output
-  }
-
-  /// to_snake_case
-  pub fn to_snake_case(&self) -> String {
-    let mut output = String::new();
-
-    for word in &self.0 {
-      if !output.is_empty() {
-        output.push('_');
-      }
-
-      output.push_str(word.as_lower());
-    }
-
-    output
-  }
-
-  /// TO_SCREAMING_SNAKE_CASE
-  pub fn to_screaming_snake_case(&self) -> String {
-    let mut output = String::new();
-
-    for word in &self.0 {
-      if !output.is_empty() {
-        output += "_";
-      }
-
-      output.push_str(&word.to_upper());
-    }
-
-    output
   }
 
   pub fn iter(&self) -> Iter<Word> {

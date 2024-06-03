@@ -2,24 +2,23 @@ import * as core from "@jns42/core";
 import { encode } from "entities";
 import { NestedText } from "./iterable-text-template.js";
 
-export function* generateJsDocComments(item: core.ArenaSchemaItem): Iterable<NestedText> {
+export function* generateJsDocComments(item: core.ArenaSchemaItemContainer): Iterable<NestedText> {
   const { location: nodeId } = item;
-  const itemValue = item.toValue();
 
   yield `/**\n`;
-  if (itemValue.title != null) {
-    yield ` * @summary ${formatComment(itemValue.title)}\n`;
+  if (item.title != null) {
+    yield ` * @summary ${formatComment(item.title)}\n`;
   }
 
-  if (itemValue.description != null) {
-    yield ` * @description ${formatComment(itemValue.description)}\n`;
+  if (item.description != null) {
+    yield ` * @description ${formatComment(item.description)}\n`;
   }
 
   if (nodeId != null) {
     yield ` * @see {@link ${nodeId}}\n`;
   }
 
-  if (itemValue.deprecated ?? false) {
+  if (item.deprecated ?? false) {
     yield ` * @deprecated\n`;
   }
 

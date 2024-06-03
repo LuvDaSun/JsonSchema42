@@ -86,7 +86,7 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  using defaultTypeName = core.Sentence.new(defaultName);
+  const defaultTypeName = new core.Sentence(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);
@@ -101,13 +101,14 @@ async function main(configuration: MainConfiguration) {
     const location = `${pathToTest}#/schemas/${schemaName}`;
     // generate package
     {
-      const context = core.DocumentContext.new();
+      const cache = new core.NodeCache();
+      const context = new core.DocumentContextContainer(cache);
       context.registerWellKnownFactories();
       await context.loadFromLocation(
-        location,
-        location,
+        core.NodeLocation.parse(location),
+        core.NodeLocation.parse(location),
         undefined,
-        defaultMetaSchema as core.MetaSchemaString,
+        defaultMetaSchema,
       );
 
       using specification = models.loadSpecification(context, {
