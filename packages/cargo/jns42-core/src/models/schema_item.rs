@@ -630,12 +630,12 @@ impl ArenaSchemaItemContainer {
   }
 
   #[wasm_bindgen(getter = minimumLength)]
-  pub fn minimum_length_get(&self) -> Option<u64> {
-    self.0.minimum_length
+  pub fn minimum_length_get(&self) -> Option<usize> {
+    self.0.minimum_length?.try_into().ok()
   }
   #[wasm_bindgen(getter = maximumLength)]
-  pub fn maximum_length_get(&self) -> Option<u64> {
-    self.0.maximum_length
+  pub fn maximum_length_get(&self) -> Option<usize> {
+    self.0.maximum_length?.try_into().ok()
   }
   #[wasm_bindgen(getter = valuePattern)]
   pub fn value_pattern_get(&self) -> Option<String> {
@@ -647,12 +647,12 @@ impl ArenaSchemaItemContainer {
   }
 
   #[wasm_bindgen(getter = minimumItems)]
-  pub fn minimum_items_get(&self) -> Option<u64> {
-    self.0.minimum_items
+  pub fn minimum_items_get(&self) -> Option<usize> {
+    self.0.minimum_items?.try_into().ok()
   }
   #[wasm_bindgen(getter = maximumItems)]
-  pub fn maximum_items_get(&self) -> Option<u64> {
-    self.0.maximum_items
+  pub fn maximum_items_get(&self) -> Option<usize> {
+    self.0.maximum_items?.try_into().ok()
   }
   #[wasm_bindgen(getter = uniqueItems)]
   pub fn unique_items_get(&self) -> Option<bool> {
@@ -660,12 +660,12 @@ impl ArenaSchemaItemContainer {
   }
 
   #[wasm_bindgen(getter = minimumProperties)]
-  pub fn minimum_properties_get(&self) -> Option<u64> {
-    self.0.minimum_properties
+  pub fn minimum_properties_get(&self) -> Option<usize> {
+    self.0.minimum_properties?.try_into().ok()
   }
   #[wasm_bindgen(getter = maximumProperties)]
-  pub fn maximum_properties_get(&self) -> Option<u64> {
-    self.0.maximum_properties
+  pub fn maximum_properties_get(&self) -> Option<usize> {
+    self.0.maximum_properties?.try_into().ok()
   }
 }
 
