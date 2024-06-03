@@ -444,6 +444,7 @@ impl From<DocumentContextContainer> for Rc<DocumentContext> {
   }
 }
 
+#[cfg(not(target_os = "unknown"))]
 #[cfg(test)]
 mod tests {
   use super::*;
