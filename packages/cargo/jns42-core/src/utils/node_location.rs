@@ -36,24 +36,24 @@ impl NodeLocation {
     if self.hash.len() > 1 {
       None
     } else {
-      self.hash.first().map(|part| part.clone())
+      self.hash.first().cloned()
     }
   }
 
   pub fn get_pointer(&self) -> Option<Vec<String>> {
     if self.hash.len() > 1 {
-      Some(self.hash.iter().skip(1).map(|part| part.clone()).collect())
+      Some(self.hash.iter().skip(1).cloned().collect())
     } else {
       None
     }
   }
 
   pub fn get_path(&self) -> Vec<String> {
-    self.path.iter().map(|value| value.clone()).collect()
+    self.path.to_vec()
   }
 
   pub fn get_hash(&self) -> Vec<String> {
-    self.hash.iter().map(|value| value.clone()).collect()
+    self.hash.to_vec()
   }
 
   pub fn is_root(&self) -> bool {
