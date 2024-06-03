@@ -1,7 +1,6 @@
-use super::{fetch_text, FetchTextError, Node, NodeLocation, NodeRc};
-use std::collections::BTreeMap;
-use std::iter::once;
-use std::rc::Rc;
+use super::{fetch_text, FetchTextError, NodeLocation};
+use std::collections::{btree_map, BTreeMap};
+use std::iter;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
 /// Nodes have a retrieval location that is the physical (possibly globally
@@ -9,7 +8,7 @@ use std::rc::Rc;
 ///
 #[derive(Default)]
 pub struct NodeCache {
-  nodes: BTreeMap<NodeLocation, NodeRc>,
+  root_nodes: BTreeMap<NodeLocation, serde_json::Value>,
 }
 
 impl NodeCache {
@@ -21,14 +20,62 @@ impl NodeCache {
 impl NodeCache {
   /// Retrieves all locations in the cache
   ///
-  pub fn get_locations(&self) -> impl Iterator<Item = &NodeLocation> {
-    self.nodes.keys()
+  pub fn get_locations(&self) -> impl Iterator<Item = NodeLocation> + '_ {
+    self.root_nodes.iter().flat_map(|(location, node)| {
+      iter::once(location.clone())
+        .chain(Self::get_child_pointers(node).map(|pointer| location.set_pointer(pointer)))
+    })
+  }
+
+  fn get_child_pointers(node: &serde_json::Value) -> impl Iterator<Item = Vec<String>> {
+    let mut result = Vec::new();
+
+    match node {
+      serde_json::Value::Array(array_node) => {
+        for index in 0..array_node.len() {
+          let member = index.to_string();
+          result.push(iter::once(member.clone()).collect());
+          for pointer in Self::get_child_pointers(node) {
+            result.push(iter::once(member.clone()).chain(pointer).collect());
+          }
+        }
+      }
+      serde_json::Value::Object(object_node) => {
+        for key in object_node.keys() {
+          let member = key.to_owned();
+          result.push(iter::once(member.clone()).collect());
+          for pointer in Self::get_child_pointers(node) {
+            result.push(iter::once(member.clone()).chain(pointer).collect());
+          }
+        }
+      }
+      _ => {}
+    }
+
+    result.into_iter()
   }
 
   /// Retrieves the node
   ///
-  pub fn get_node(&self, retrieval_location: &NodeLocation) -> Option<NodeRc> {
-    self.nodes.get(retrieval_location).cloned()
+  pub fn get_node(&self, retrieval_location: &NodeLocation) -> Option<&serde_json::Value> {
+    let root_location = retrieval_location.set_root();
+    let pointer = retrieval_location.get_pointer().unwrap_or_default();
+    let mut node = self.root_nodes.get(&root_location)?;
+
+    for member in pointer {
+      match node {
+        serde_json::Value::Array(array_node) => {
+          let index: usize = member.parse().ok()?;
+          node = array_node.get(index)?;
+        }
+        serde_json::Value::Object(object_node) => {
+          node = object_node.get(&member)?;
+        }
+        _ => return None,
+      }
+    }
+
+    Some(node)
   }
 
   /// Load nodes from a location. The retrieval location is the physical location of
@@ -38,80 +85,22 @@ impl NodeCache {
     &mut self,
     retrieval_location: &NodeLocation,
   ) -> Result<(), NodeCacheError> {
+    let root_location = retrieval_location.set_root();
+
     /*
     If the document is not in the cache
     */
-    if !self.nodes.contains_key(retrieval_location) {
+    if let btree_map::Entry::Vacant(entry) = self.root_nodes.entry(root_location) {
       /*
       retrieve the document
       */
-      let retrieval_location = retrieval_location.set_root();
-      let fetch_location = retrieval_location.to_fetch_string();
-      let data = fetch_text(&fetch_location).await?;
-      let document_node = serde_yaml::from_str(&data)?;
-      let document_node = Rc::new(document_node);
+      let data = fetch_text(&entry.key().to_fetch_string()).await?;
+      let root_node = serde_yaml::from_str(&data)?;
 
       /*
       populate the cache with this document
       */
-      self.fill_node_cache(&retrieval_location, document_node)?;
-    }
-
-    Ok(())
-  }
-
-  pub async fn load_from_node(
-    &mut self,
-    retrieval_location: &NodeLocation,
-    node: NodeRc,
-  ) -> Result<(), NodeCacheError> {
-    self.fill_node_cache(retrieval_location, node)?;
-
-    Ok(())
-  }
-
-  /// the retrieval location is the location of the document node. The document
-  /// node may be a part of a bigger document, if this is the case then it's
-  /// retrieval location is not root.
-  ///
-  fn fill_node_cache(
-    &mut self,
-    retrieval_location: &NodeLocation,
-    node: NodeRc,
-  ) -> Result<(), NodeCacheError> {
-    let mut queue = Vec::new();
-    queue.push((retrieval_location.clone(), node));
-
-    while let Some((retrieval_location, node)) = queue.pop() {
-      if let Some(node_previous) = self.nodes.get(&retrieval_location) {
-        if node != *node_previous {
-          Err(NodeCacheError::NotTheSame)?
-        }
-      } else {
-        match &*node {
-          Node::Array(array_node) => {
-            for (index, item_node) in array_node.into_iter().enumerate() {
-              queue.push((
-                retrieval_location.push_pointer(once(index.to_string()).collect()),
-                item_node.clone(),
-              ))
-            }
-          }
-
-          Node::Object(object_node) => {
-            for (name, item_node) in object_node {
-              queue.push((
-                retrieval_location.push_pointer(once(name.to_string()).collect()),
-                item_node.clone(),
-              ))
-            }
-          }
-
-          _ => {}
-        }
-
-        assert!(self.nodes.insert(retrieval_location, node).is_none());
-      }
+      entry.insert(root_node);
     }
 
     Ok(())
@@ -120,7 +109,6 @@ impl NodeCache {
 
 #[derive(Debug)]
 pub enum NodeCacheError {
-  NotTheSame,
   InvalidYaml,
   IoError,
   HttpError,
@@ -144,8 +132,7 @@ impl From<serde_yaml::Error> for NodeCacheError {
 #[cfg(not(target_os = "unknown"))]
 #[cfg(test)]
 mod tests {
-  use super::NodeCache;
-  use crate::utils::{Node, NodeLocation};
+  use super::*;
 
   #[async_std::test]
   async fn test_load_from_location() {
@@ -168,6 +155,9 @@ mod tests {
         "description".into(),
       ]))
       .unwrap();
-    assert_eq!(*node, Node::String("Full main category entity".into()));
+    assert_eq!(
+      *node,
+      serde_json::Value::String("Full main category entity".into())
+    );
   }
 }

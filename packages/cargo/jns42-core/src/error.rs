@@ -1,4 +1,4 @@
-use crate::utils::{FetchTextError, ParseError};
+use crate::utils::{FetchTextError, NodeCacheError, ParseError};
 use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
@@ -56,6 +56,16 @@ impl From<FetchTextError> for Error {
     match value {
       FetchTextError::HttpError => Self::HttpError,
       FetchTextError::IoError => Self::IoError,
+    }
+  }
+}
+
+impl From<NodeCacheError> for Error {
+  fn from(value: NodeCacheError) -> Self {
+    match value {
+      NodeCacheError::InvalidYaml => Self::InvalidYaml,
+      NodeCacheError::IoError => Self::IoError,
+      NodeCacheError::HttpError => Self::HttpError,
     }
   }
 }

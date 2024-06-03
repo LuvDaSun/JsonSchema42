@@ -12,8 +12,10 @@ pub struct ReferencedDocument {
 }
 
 pub trait SchemaDocument {
+  // TODO merge these 2
   fn get_referenced_documents(&self) -> &Vec<ReferencedDocument>;
   fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument>;
+  //
 
   fn get_document_location(&self) -> &NodeLocation;
   fn get_antecedent_location(&self) -> Option<&NodeLocation>;
