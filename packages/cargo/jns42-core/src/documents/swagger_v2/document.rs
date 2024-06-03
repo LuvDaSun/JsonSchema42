@@ -1,5 +1,5 @@
 use super::Node;
-use crate::documents::{EmbeddedDocument, ReferencedDocument, SchemaDocument};
+use crate::documents::SchemaDocument;
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeLocation;
@@ -12,13 +12,11 @@ pub struct Document {
   Nodes that belong to this document, indexed by their pointer
   */
   nodes: HashMap<Vec<String>, Node>,
-  referenced_documents: Vec<ReferencedDocument>,
-  embedded_documents: Vec<EmbeddedDocument>,
+  referenced_locations: Vec<NodeLocation>,
 }
 
 impl Document {
   pub fn new(
-    retrieval_location: NodeLocation,
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
     document_node: Node,
@@ -37,8 +35,7 @@ impl Document {
     };
 
     let mut nodes = HashMap::new();
-    let mut referenced_documents = Vec::new();
-    let mut embedded_documents = Vec::new();
+    let mut referenced_locations = Vec::new();
 
     let mut node_queue = Vec::new();
     node_queue.push((vec![], document_node.clone()));
@@ -46,30 +43,14 @@ impl Document {
       assert!(nodes.insert(node_pointer.clone(), node.clone()).is_none());
 
       if let Some(node_reference) = node.select_reference() {
-        let reference_location = &node_reference.parse()?;
-        let retrieval_location = retrieval_location.join(reference_location);
-        let given_location = given_location.join(reference_location);
-
-        let retrieval_location = retrieval_location.set_root();
-        let given_location = given_location.set_root();
-
-        referenced_documents.push(ReferencedDocument {
-          retrieval_location,
-          given_location,
-        });
+        let reference_location: NodeLocation = node_reference.parse()?;
+        referenced_locations.push(reference_location);
       }
 
       for (sub_pointer, sub_node) in node.select_sub_nodes(&node_pointer) {
         if let Some(node_id) = sub_node.select_id() {
-          let id_location = &node_id.parse()?;
-          let retrieval_location = retrieval_location.join(id_location);
-          let given_location = given_location.join(id_location);
-
-          embedded_documents.push(EmbeddedDocument {
-            retrieval_location,
-            given_location,
-          });
-
+          let id_location: NodeLocation = node_id.parse()?;
+          referenced_locations.push(id_location);
           /*
           if we found an embedded document then we don't include it in the nodes
           */
@@ -84,8 +65,7 @@ impl Document {
       document_location,
       antecedent_location,
       nodes,
-      referenced_documents,
-      embedded_documents,
+      referenced_locations,
     })
   }
 }
@@ -107,12 +87,8 @@ impl SchemaDocument for Document {
       .collect()
   }
 
-  fn get_referenced_documents(&self) -> &Vec<ReferencedDocument> {
-    &self.referenced_documents
-  }
-
-  fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument> {
-    &self.embedded_documents
+  fn get_referenced_locations(&self) -> Vec<NodeLocation> {
+    self.referenced_locations.clone()
   }
 
   fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem> {

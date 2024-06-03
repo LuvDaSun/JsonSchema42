@@ -1,21 +1,8 @@
 use crate::{models::DocumentSchemaItem, utils::NodeLocation};
 use std::collections::BTreeMap;
 
-pub struct EmbeddedDocument {
-  pub retrieval_location: NodeLocation,
-  pub given_location: NodeLocation,
-}
-
-pub struct ReferencedDocument {
-  pub retrieval_location: NodeLocation,
-  pub given_location: NodeLocation,
-}
-
 pub trait SchemaDocument {
-  // TODO merge these 2
-  fn get_referenced_documents(&self) -> &Vec<ReferencedDocument>;
-  fn get_embedded_documents(&self) -> &Vec<EmbeddedDocument>;
-  //
+  fn get_referenced_locations(&self) -> Vec<NodeLocation>;
 
   fn get_document_location(&self) -> &NodeLocation;
   fn get_antecedent_location(&self) -> Option<&NodeLocation>;

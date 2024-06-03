@@ -91,7 +91,6 @@ impl DocumentContext {
           documents::draft_2020_12::Document::new(
             context,
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -106,7 +105,6 @@ impl DocumentContext {
           documents::draft_2019_09::Document::new(
             context,
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -120,7 +118,6 @@ impl DocumentContext {
         Rc::new(
           documents::draft_07::Document::new(
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -134,7 +131,6 @@ impl DocumentContext {
         Rc::new(
           documents::draft_06::Document::new(
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -148,7 +144,6 @@ impl DocumentContext {
         Rc::new(
           documents::draft_04::Document::new(
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -163,7 +158,6 @@ impl DocumentContext {
           documents::oas_v3_1::Document::new(
             context,
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -177,7 +171,6 @@ impl DocumentContext {
         Rc::new(
           documents::oas_v3_0::Document::new(
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -191,7 +184,6 @@ impl DocumentContext {
         Rc::new(
           documents::swagger_v2::Document::new(
             configuration.retrieval_location,
-            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.clone().into(),
           )
@@ -376,21 +368,13 @@ impl DocumentContext {
           .is_none());
       }
 
-      let embedded_documents = document.get_embedded_documents();
-      for embedded_document in embedded_documents {
+      let referenced_locations = document.get_referenced_locations();
+      for referenced_location in referenced_locations {
+        let retrieval_location = retrieval_location.join(&referenced_location);
+        let given_location = document_location.join(&referenced_location);
         queue.push((
-          embedded_document.retrieval_location.clone(),
-          embedded_document.given_location.clone(),
-          Some(document_location.clone()),
-          meta_schema_id.clone(),
-        ));
-      }
-
-      let referenced_documents = document.get_referenced_documents();
-      for referenced_document in referenced_documents {
-        queue.push((
-          referenced_document.retrieval_location.clone(),
-          referenced_document.given_location.clone(),
+          retrieval_location,
+          given_location,
           Some(document_location.clone()),
           meta_schema_id.clone(),
         ));
