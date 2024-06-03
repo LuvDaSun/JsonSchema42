@@ -1,5 +1,5 @@
 use super::schema_document::SchemaDocument;
-use crate::documents::{self, discover_meta_schema};
+use crate::documents;
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeCache;
@@ -326,7 +326,7 @@ impl DocumentContext {
         .ok_or(Error::NotFound)?
         .clone();
 
-      let meta_schema_id = discover_meta_schema(&node)
+      let meta_schema_id = documents::discover_meta_schema(&node)
         .map(str::to_owned)
         .unwrap_or(default_meta_schema_id);
 
