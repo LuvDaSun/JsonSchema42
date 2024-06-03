@@ -111,7 +111,7 @@ async function main(configuration: MainConfiguration) {
         defaultMetaSchema,
       );
 
-      using specification = models.loadSpecification(context, {
+      const specification = models.loadSpecification(context, {
         transformMaximumIterations,
         defaultTypeName: defaultTypeName.toPascalCase(),
       });

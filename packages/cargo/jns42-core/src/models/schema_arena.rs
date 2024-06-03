@@ -4,11 +4,7 @@ use crate::{
   models::ArenaSchemaItemContainer,
   utils::{arena::Arena, NodeLocation},
 };
-use std::{
-  collections::HashMap,
-  iter::{empty, once},
-  rc::Rc,
-};
+use std::{collections::HashMap, iter, rc::Rc};
 use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
@@ -81,7 +77,7 @@ impl Arena<ArenaSchemaItem> {
       schema.types = schema.types.or_else(|| {
         implicit_types
           .get(location)
-          .map(|value| once(*value).collect())
+          .map(|value| iter::once(*value).collect())
       });
       // schema.primary = if *id == root_id { Some(true) } else { None };
 
@@ -190,12 +186,12 @@ impl Arena<ArenaSchemaItem> {
         }
       })
       .map(|(_item_previous, item)| {
-        empty()
+        iter::empty()
           .chain(
             item
               .location
               .as_ref()
-              .map(|id| empty().chain(id.get_path()).chain(id.get_hash())),
+              .map(|id| iter::empty().chain(id.get_path()).chain(id.get_hash())),
           )
           .flatten()
           .chain(item.name.clone())
@@ -204,25 +200,6 @@ impl Arena<ArenaSchemaItem> {
       .collect();
 
     ancestors.into_iter().rev().flatten()
-  }
-
-  /// Applies a series of transformations to the schema items within the arena.
-  ///
-  /// This method iterates over each transformation provided and applies it to the arena.
-  /// The transformations are applied in the order they are provided.
-  ///
-  /// # Parameters
-  /// - `transforms`: A reference to a vector of `SchemaTransform` instances to be applied.
-  ///
-  /// # Returns
-  /// The number of transformations applied.
-  pub fn transform(&mut self, transforms: &Vec<SchemaTransform>) -> usize {
-    self.apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
-      for transform in transforms {
-        let transform: BoxedSchemaTransform = transform.into();
-        transform(arena, key)
-      }
-    })
   }
 }
 
@@ -246,10 +223,37 @@ impl SchemaArenaContainer {
     self.0.count()
   }
 
+  #[wasm_bindgen(js_name = getNameParts)]
+  pub fn get_name_parts(&self, key: usize) -> Vec<String> {
+    self.0.get_name_parts(key).collect()
+  }
+
   #[wasm_bindgen(js_name = clone)]
   #[allow(clippy::should_implement_trait)]
   pub fn clone(&self) -> Self {
     Self(self.0.clone())
+  }
+
+  /// Applies a series of transformations to the schema items within the arena.
+  ///
+  /// This method iterates over each transformation provided and applies it to the arena.
+  /// The transformations are applied in the order they are provided.
+  ///
+  /// # Parameters
+  /// - `transforms`: A reference to a vector of `SchemaTransform` instances to be applied.
+  ///
+  /// # Returns
+  /// The number of transformations applied.
+  #[wasm_bindgen(js_name = transform)]
+  pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
+    self
+      .0
+      .apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
+        for transform in &transforms {
+          let transform: BoxedSchemaTransform = (*transform).into();
+          transform(arena, key)
+        }
+      })
   }
 }
 

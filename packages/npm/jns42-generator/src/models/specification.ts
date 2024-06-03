@@ -4,7 +4,6 @@ export interface Specification {
   typesArena: core.SchemaArenaContainer;
   validatorsArena: core.SchemaArenaContainer;
   names: core.NamesContainer;
-  [Symbol.dispose]: () => void;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -40,7 +39,7 @@ export function loadSpecification(
 
   // transform the validatorsArena
   {
-    using transformers = core.VecUsize.fromArray([]);
+    const transformers = [] as Transformer[];
     let transformIterations = 0;
     while (validatorsArena.transform(transformers) > 0) {
       transformIterations++;
@@ -53,30 +52,30 @@ export function loadSpecification(
 
   // transform the typesArena
   {
-    using transformers = core.VecUsize.fromArray([
-      core.SchemaTransform.explode,
-      core.SchemaTransform.singleType,
-      core.SchemaTransform.resolveSingleAllOf,
-      core.SchemaTransform.resolveSingleAnyOf,
-      core.SchemaTransform.resolveSingleOneOf,
-      core.SchemaTransform.flattenAllOf,
-      core.SchemaTransform.flattenAnyOf,
-      core.SchemaTransform.flattenOneOf,
-      core.SchemaTransform.flipAllOfOneOf,
-      core.SchemaTransform.flipAnyOfOneOf,
-      core.SchemaTransform.inheritAllOf,
-      core.SchemaTransform.inheritAnyOf,
-      core.SchemaTransform.inheritOneOf,
-      core.SchemaTransform.inheritReference,
-      core.SchemaTransform.resolveAllOf,
-      core.SchemaTransform.resolveAnyOf,
-      core.SchemaTransform.resolveNot,
-      core.SchemaTransform.resolveIfThenElse,
-      core.SchemaTransform.resolveSingleAllOf,
-      core.SchemaTransform.resolveSingleAnyOf,
-      core.SchemaTransform.resolveSingleOneOf,
-      core.SchemaTransform.unalias,
-    ]);
+    const transformers = [
+      core.SchemaTransform.Explode,
+      core.SchemaTransform.SingleType,
+      core.SchemaTransform.ResolveSingleAllOf,
+      core.SchemaTransform.ResolveSingleAnyOf,
+      core.SchemaTransform.ResolveSingleOneOf,
+      core.SchemaTransform.FlattenAllOf,
+      core.SchemaTransform.FlattenAnyOf,
+      core.SchemaTransform.FlattenOneOf,
+      core.SchemaTransform.FlipAllOfOneOf,
+      core.SchemaTransform.FlipAnyOfOneOf,
+      core.SchemaTransform.InheritAllOf,
+      core.SchemaTransform.InheritAnyOf,
+      core.SchemaTransform.InheritOneOf,
+      core.SchemaTransform.InheritReference,
+      core.SchemaTransform.ResolveAllOf,
+      core.SchemaTransform.ResolveAnyOf,
+      core.SchemaTransform.ResolveNot,
+      core.SchemaTransform.ResolveIfThenElse,
+      core.SchemaTransform.ResolveSingleAllOf,
+      core.SchemaTransform.ResolveSingleAnyOf,
+      core.SchemaTransform.ResolveSingleOneOf,
+      core.SchemaTransform.Unalias,
+    ];
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
       transformIterations++;
@@ -92,10 +91,5 @@ export function loadSpecification(
     typesArena,
     validatorsArena,
     names,
-    [Symbol.dispose]() {
-      typesArena[Symbol.dispose]();
-      validatorsArena[Symbol.dispose]();
-      names[Symbol.dispose]();
-    },
   };
 }
