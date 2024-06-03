@@ -29,7 +29,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   `;
 
-  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
+  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
+    const item = typesArena.getItem(itemKey);
     const { location: nodeId } = item;
 
     if (nodeId == null) {
@@ -56,7 +57,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    using item = typesArena.getItem(itemKey);
+    const item = typesArena.getItem(itemKey);
     if (item.location == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
@@ -67,17 +68,16 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   function* generateParserDefinition(itemKey: number, valueExpression: string) {
     const item = typesArena.getItem(itemKey);
-    const itemValue = item.toValue();
 
-    if (itemValue.reference != null) {
-      yield generateParserReference(itemValue.reference, valueExpression);
+    if (item.reference != null) {
+      yield generateParserReference(item.reference, valueExpression);
       return;
     }
 
-    if (itemValue.oneOf != null && itemValue.oneOf.length > 0) {
+    if (item.oneOf != null && item.oneOf.length > 0) {
       yield itt`
         ${joinIterable(
-          itemValue.oneOf.map(
+          [...item.oneOf].map(
             (element) => itt`
               ${generateParserReference(element, valueExpression)}
             `,
@@ -88,8 +88,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
       return;
     }
 
-    if (itemValue.types != null && itemValue.types.length === 1) {
-      switch (itemValue.types[0]) {
+    if (item.types != null && item.types.length === 1) {
+      switch (item.types[0]) {
         case "any":
           yield valueExpression;
           return;
@@ -264,13 +264,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
           return;
 
           function* generateCaseClauses() {
-            if (itemValue.tupleItems != null) {
-              for (
-                let elementIndex = 0;
-                elementIndex < itemValue.tupleItems.length;
-                elementIndex++
-              ) {
-                const elementKey = itemValue.tupleItems[elementIndex];
+            if (item.tupleItems != null) {
+              for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+                const elementKey = item.tupleItems[elementIndex];
 
                 yield itt`
                   case ${JSON.stringify(elementIndex)}:
@@ -286,9 +282,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
 
           function* generateDefaultClauseContent() {
-            if (itemValue.arrayItems != null) {
+            if (item.arrayItems != null) {
               yield itt`
-                return ${generateParserReference(itemValue.arrayItems, `value`)}
+                return ${generateParserReference(item.arrayItems, `value`)}
               `;
               return;
             }
@@ -314,9 +310,9 @@ export function* generateParsersTsCode(specification: models.Specification) {
           return;
 
           function* generateCaseClauses() {
-            if (itemValue.objectProperties != null) {
-              for (const name in itemValue.objectProperties) {
-                const elementKey = itemValue.objectProperties[name];
+            if (item.objectProperties != null) {
+              for (const name in item.objectProperties) {
+                const elementKey = item.objectProperties[name];
 
                 yield itt`
                   case ${JSON.stringify(name)}:
@@ -336,11 +332,13 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateDefaultClauseContent() {
             const elementKeys = new Array<number>();
-            if (itemValue.mapProperties != null) {
-              elementKeys.push(itemValue.mapProperties);
+            if (item.mapProperties != null) {
+              elementKeys.push(item.mapProperties);
             }
-            if (itemValue.patternProperties != null) {
-              for (const elementKey of Object.values(itemValue.patternProperties)) {
+            if (item.patternProperties != null) {
+              for (const elementKey of Object.values(
+                item.patternProperties as Record<string, number>,
+              )) {
                 elementKeys.push(elementKey);
               }
             }

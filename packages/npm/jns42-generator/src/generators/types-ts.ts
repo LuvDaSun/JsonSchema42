@@ -13,7 +13,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   const { names, typesArena } = specification;
 
-  for (const [itemKey, item] of [...typesArena].map((item, key) => [key, item] as const)) {
+  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
+    const item = typesArena.getItem(itemKey);
     const { location: nodeId } = item;
 
     if (nodeId == null) {
@@ -30,7 +31,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
-    using item = typesArena.getItem(itemKey);
+    const item = typesArena.getItem(itemKey);
     if (item.location == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
@@ -41,17 +42,16 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   function* generateTypeDefinition(itemKey: number) {
     const item = typesArena.getItem(itemKey);
-    const itemValue = item.toValue();
 
-    if (itemValue.reference != null) {
-      yield generateTypeReference(itemValue.reference);
+    if (item.reference != null) {
+      yield generateTypeReference(item.reference);
       return;
     }
 
-    if (itemValue.oneOf != null && itemValue.oneOf.length > 0) {
+    if (item.oneOf != null && item.oneOf.length > 0) {
       yield itt`
       ${joinIterable(
-        itemValue.oneOf.map(
+        [...item.oneOf].map(
           (element) => itt`
             ${generateTypeReference(element)}
           `,
@@ -62,10 +62,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
       return;
     }
 
-    if (itemValue.allOf != null && itemValue.allOf.length > 0) {
+    if (item.allOf != null && item.allOf.length > 0) {
       yield itt`
       ${joinIterable(
-        itemValue.allOf.map(
+        [...item.allOf].map(
           (element) => itt`
             ${generateTypeReference(element)}
           `,
@@ -76,18 +76,18 @@ export function* generateTypesTsCode(specification: models.Specification) {
       return;
     }
 
-    if (itemValue.options !== null) {
-      if (itemValue.options != null && itemValue.options.length > 0) {
+    if (item.options !== null) {
+      if (item.options != null && item.options.length > 0) {
         yield joinIterable(
-          itemValue.options.map((option) => JSON.stringify(option)),
+          (item.options as any[]).map((option) => JSON.stringify(option)),
           " |\n",
         );
         return;
       }
     }
 
-    if (itemValue.types != null && itemValue.types.length === 1) {
-      switch (itemValue.types[0]) {
+    if (item.types != null && item.types.length === 1) {
+      switch (item.types[0]) {
         case "never":
           yield "never";
           return;
@@ -123,21 +123,21 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
           function* generateInterfaceContent() {
-            if (itemValue.tupleItems != null) {
-              for (const elementKey of itemValue.tupleItems) {
+            if (item.tupleItems != null) {
+              for (const elementKey of item.tupleItems) {
                 yield itt`
                 ${generateTypeReference(elementKey)},
               `;
               }
             }
 
-            if (itemValue.arrayItems != null) {
+            if (item.arrayItems != null) {
               yield itt`
-              ...(${generateTypeReference(itemValue.arrayItems)})[]
+              ...(${generateTypeReference(item.arrayItems)})[]
             `;
             }
 
-            if (itemValue.tupleItems == null && itemValue.arrayItems == null) {
+            if (item.tupleItems == null && item.arrayItems == null) {
               yield itt`
               ...any
             `;
@@ -157,10 +157,13 @@ export function* generateTypesTsCode(specification: models.Specification) {
           function* generateInterfaceContent() {
             let undefinedProperty = false;
 
-            if (itemValue.objectProperties != null || itemValue.required != null) {
-              const required = new Set(itemValue.required);
-              const objectProperties = itemValue.objectProperties ?? {};
-              const propertyNames = new Set([...Object.keys(objectProperties), ...required]);
+            if (item.objectProperties != null || item.required != null) {
+              const required = new Set(item.required);
+              const objectProperties = item.objectProperties ?? {};
+              const propertyNames = new Set([
+                ...Object.keys(objectProperties),
+                ...required,
+              ] as string[]);
 
               for (const name of propertyNames) {
                 undefinedProperty ||= !required.has(name);
@@ -179,11 +182,13 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
             {
               const elementKeys = new Array<number>();
-              if (itemValue.mapProperties != null) {
-                elementKeys.push(itemValue.mapProperties);
+              if (item.mapProperties != null) {
+                elementKeys.push(item.mapProperties);
               }
-              if (itemValue.patternProperties != null) {
-                for (const elementKey of Object.values(itemValue.patternProperties)) {
+              if (item.patternProperties != null) {
+                for (const elementKey of Object.values(
+                  item.patternProperties as Record<string, number>,
+                )) {
                   elementKeys.push(elementKey);
                 }
               }
@@ -191,7 +196,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
               if (elementKeys.length > 0) {
                 const typeNames = [
                   ...elementKeys,
-                  ...Object.values(itemValue.objectProperties ?? {}),
+                  ...Object.values((item.objectProperties as Record<string, number>) ?? {}),
                 ].map((elementKey) => generateTypeReference(elementKey));
 
                 if (undefinedProperty) {
@@ -200,7 +205,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
                 yield itt`
                 [
-                  name: ${itemValue.propertyNames == null ? "string" : generateTypeReference(itemValue.propertyNames)}
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
                 ]: ${joinIterable(typeNames, " |\n")}
               `;
                 return;
@@ -208,7 +213,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
               yield itt`
               [
-                name: ${itemValue.propertyNames == null ? "string" : generateTypeReference(itemValue.propertyNames)}
+                name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
               ]: any
             `;
             }

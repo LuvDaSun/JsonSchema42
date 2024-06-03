@@ -236,6 +236,11 @@ impl SchemaArenaContainer {
   pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
     self.0.get_item(key).clone().into()
   }
+
+  #[wasm_bindgen(js_name = count)]
+  pub fn count(&self) -> usize {
+    self.0.count()
+  }
 }
 
 impl From<SchemaArena> for SchemaArenaContainer {

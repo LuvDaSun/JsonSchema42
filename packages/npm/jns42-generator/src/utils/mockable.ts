@@ -98,7 +98,7 @@ export function isMockable(arena: core.SchemaArenaContainer, key: number) {
   if (item.objectProperties != null && Object.keys(item.objectProperties).length > 0) {
     const required = new Set(item.required);
     if (
-      !Object.entries(item.objectProperties)
+      !Object.entries(item.objectProperties as Record<string, number>)
         .filter(([name, key]) => required.has(name))
         .every(([name, key]) => isMockable(arena, key))
     ) {

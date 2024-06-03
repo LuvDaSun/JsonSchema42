@@ -1,8 +1,8 @@
 import * as core from "@jns42/core";
 
 export interface Specification {
-  typesArena: core.SchemaArena;
-  validatorsArena: core.SchemaArena;
+  typesArena: core.SchemaArenaContainer;
+  validatorsArena: core.SchemaArenaContainer;
   names: core.Names;
   [Symbol.dispose]: () => void;
 }
@@ -13,14 +13,14 @@ export interface LoadSpecificationConfiguration {
 }
 
 export function loadSpecification(
-  documentContext: core.DocumentContext,
+  documentContext: core.DocumentContextContainer,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
 
-  const typesArena = core.SchemaArena.fromDocumentContext(documentContext);
+  const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
   // generate names

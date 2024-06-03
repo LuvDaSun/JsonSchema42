@@ -565,18 +565,30 @@ impl ArenaSchemaItemContainer {
     Some(self.tuple_items.as_ref()?.clone())
   }
 
-  // #[wasm_bindgen(getter = objectProperties)]
-  // pub fn object_properties_get(&self) -> Option<HashMap<String, usize>> {
-  //   self.object_properties
-  // }
-  // #[wasm_bindgen(getter = patternProperties)]
-  // pub fn pattern_properties_get(&self) -> Option<HashMap<String, usize>> {
-  //   self.pattern_properties
-  // }
-  // #[wasm_bindgen(getter = dependentSchemas)]
-  // pub fn dependent_schemas_get(&self) -> Option<HashMap<String, usize>> {
-  //   self.dependent_schemas
-  // }
+  #[wasm_bindgen(getter = objectProperties)]
+  pub fn object_properties_get(&self) -> JsValue {
+    let Some(value) = self.object_properties.as_ref() else {
+      return JsValue::undefined();
+    };
+
+    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  }
+  #[wasm_bindgen(getter = patternProperties)]
+  pub fn pattern_properties_get(&self) -> JsValue {
+    let Some(value) = self.pattern_properties.as_ref() else {
+      return JsValue::undefined();
+    };
+
+    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  }
+  #[wasm_bindgen(getter = dependentSchemas)]
+  pub fn dependent_schemas_get(&self) -> JsValue {
+    let Some(value) = self.dependent_schemas.as_ref() else {
+      return JsValue::undefined();
+    };
+
+    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  }
 
   // assertions
   #[wasm_bindgen(getter = options)]
