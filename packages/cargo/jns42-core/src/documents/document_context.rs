@@ -25,8 +25,6 @@ pub type DocumentFactory =
 
 type Queue = Vec<(NodeLocation, NodeLocation, Option<NodeLocation>, String)>;
 
-type FetchFile = Box<dyn Fn(String) -> Pin<Box<dyn Future<Output = Result<String, Error>>>>>;
-
 /**
 This class loads document nodes and documents. Every node has a few locations:
 - Node location
