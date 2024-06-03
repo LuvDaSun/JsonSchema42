@@ -25,5 +25,5 @@ jobs:
 
       # node test runner seems to support globs since v21
       - if: ${{ matrix.node-version >= 21 }}
-        run: npm --workspaces test
+        run: npm --workspaces test --if-present
       - run: ./test-fixtures-npm
