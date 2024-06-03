@@ -4,7 +4,6 @@ use crate::utils::NodeLocation;
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
-use std::ops::Deref;
 use std::{collections::HashMap, iter::empty};
 use wasm_bindgen::prelude::*;
 
@@ -456,39 +455,40 @@ pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
 impl ArenaSchemaItemContainer {
   #[wasm_bindgen(getter = name)]
   pub fn name_get(&self) -> Option<String> {
-    Some(self.name.as_ref()?.clone())
+    Some(self.0.name.as_ref()?.clone())
   }
   #[wasm_bindgen(getter = exact)]
   pub fn exact_get(&self) -> Option<bool> {
-    self.exact
+    self.0.exact
   }
 
   #[wasm_bindgen(getter = primary)]
   pub fn primary_get(&self) -> Option<bool> {
-    self.primary
+    self.0.primary
   }
   #[wasm_bindgen(getter = parent)]
   pub fn parent_get(&self) -> Option<usize> {
-    self.parent
+    self.0.parent
   }
   #[wasm_bindgen(getter = location)]
   pub fn location_get(&self) -> Option<NodeLocation> {
-    Some(self.location.as_ref()?.clone())
+    Some(self.0.location.as_ref()?.clone())
   }
 
   // metadata
   #[wasm_bindgen(getter = title)]
   pub fn title_get(&self) -> Option<String> {
-    Some(self.title.as_ref()?.clone())
+    Some(self.0.title.as_ref()?.clone())
   }
   #[wasm_bindgen(getter = description)]
   pub fn description_get(&self) -> Option<String> {
-    Some(self.description.as_ref()?.clone())
+    Some(self.0.description.as_ref()?.clone())
   }
   #[wasm_bindgen(getter = examples)]
   pub fn examples_get(&self) -> Option<Vec<JsValue>> {
     Some(
       self
+        .0
         .examples
         .as_ref()?
         .iter()
@@ -498,76 +498,76 @@ impl ArenaSchemaItemContainer {
   }
   #[wasm_bindgen(getter = deprecated)]
   pub fn deprecated_get(&self) -> Option<bool> {
-    self.deprecated
+    self.0.deprecated
   }
 
   // types
   #[wasm_bindgen(getter = types)]
   pub fn types_get(&self) -> Option<Vec<SchemaType>> {
-    Some(self.types.as_ref()?.clone())
+    Some(self.0.types.as_ref()?.clone())
   }
 
   // applicators
   #[wasm_bindgen(getter = reference)]
   pub fn reference_get(&self) -> Option<usize> {
-    self.reference
+    self.0.reference
   }
 
   #[wasm_bindgen(getter = ifSchema)]
   pub fn if_get(&self) -> Option<usize> {
-    self.r#if
+    self.0.r#if
   }
   #[wasm_bindgen(getter = thenSchema)]
   pub fn then_get(&self) -> Option<usize> {
-    self.then
+    self.0.then
   }
   #[wasm_bindgen(getter = elseSchema)]
   pub fn else_get(&self) -> Option<usize> {
-    self.r#else
+    self.0.r#else
   }
 
   #[wasm_bindgen(getter = not)]
   pub fn not_get(&self) -> Option<usize> {
-    self.not
+    self.0.not
   }
 
   #[wasm_bindgen(getter = propertyNames)]
   pub fn property_names_get(&self) -> Option<usize> {
-    self.property_names
+    self.0.property_names
   }
   #[wasm_bindgen(getter = mapProperties)]
   pub fn map_properties_get(&self) -> Option<usize> {
-    self.map_properties
+    self.0.map_properties
   }
   #[wasm_bindgen(getter = arrayItems)]
   pub fn array_items_get(&self) -> Option<usize> {
-    self.array_items
+    self.0.array_items
   }
   #[wasm_bindgen(getter = contains)]
   pub fn contains_get(&self) -> Option<usize> {
-    self.contains
+    self.0.contains
   }
 
   #[wasm_bindgen(getter = allOf)]
   pub fn all_of_get(&self) -> Option<Vec<usize>> {
-    Some(self.all_of.as_ref()?.iter().copied().collect())
+    Some(self.0.all_of.as_ref()?.iter().copied().collect())
   }
   #[wasm_bindgen(getter = anyOf)]
   pub fn any_of_get(&self) -> Option<Vec<usize>> {
-    Some(self.any_of.as_ref()?.iter().copied().collect())
+    Some(self.0.any_of.as_ref()?.iter().copied().collect())
   }
   #[wasm_bindgen(getter = oneOf)]
   pub fn one_of_get(&self) -> Option<Vec<usize>> {
-    Some(self.one_of.as_ref()?.iter().copied().collect())
+    Some(self.0.one_of.as_ref()?.iter().copied().collect())
   }
   #[wasm_bindgen(getter = tupleItems)]
   pub fn tuple_items_get(&self) -> Option<Vec<usize>> {
-    Some(self.tuple_items.as_ref()?.clone())
+    Some(self.0.tuple_items.as_ref()?.clone())
   }
 
   #[wasm_bindgen(getter = objectProperties)]
   pub fn object_properties_get(&self) -> JsValue {
-    let Some(value) = self.object_properties.as_ref() else {
+    let Some(value) = self.0.object_properties.as_ref() else {
       return JsValue::undefined();
     };
 
@@ -575,7 +575,7 @@ impl ArenaSchemaItemContainer {
   }
   #[wasm_bindgen(getter = patternProperties)]
   pub fn pattern_properties_get(&self) -> JsValue {
-    let Some(value) = self.pattern_properties.as_ref() else {
+    let Some(value) = self.0.pattern_properties.as_ref() else {
       return JsValue::undefined();
     };
 
@@ -583,7 +583,7 @@ impl ArenaSchemaItemContainer {
   }
   #[wasm_bindgen(getter = dependentSchemas)]
   pub fn dependent_schemas_get(&self) -> JsValue {
-    let Some(value) = self.dependent_schemas.as_ref() else {
+    let Some(value) = self.0.dependent_schemas.as_ref() else {
       return JsValue::undefined();
     };
 
@@ -595,6 +595,7 @@ impl ArenaSchemaItemContainer {
   pub fn options_get(&self) -> Option<Vec<JsValue>> {
     Some(
       self
+        .0
         .options
         .as_ref()?
         .iter()
@@ -604,75 +605,67 @@ impl ArenaSchemaItemContainer {
   }
   #[wasm_bindgen(getter = required)]
   pub fn required_get(&self) -> Option<Vec<String>> {
-    Some(self.required.as_ref()?.iter().cloned().collect())
+    Some(self.0.required.as_ref()?.iter().cloned().collect())
   }
 
   #[wasm_bindgen(getter = minimumInclusive)]
   pub fn minimum_inclusive_get(&self) -> Option<f64> {
-    self.minimum_inclusive.as_ref()?.as_f64()
+    self.0.minimum_inclusive.as_ref()?.as_f64()
   }
   #[wasm_bindgen(getter = minimumExclusive)]
   pub fn minimum_exclusive_get(&self) -> Option<f64> {
-    self.minimum_exclusive.as_ref()?.as_f64()
+    self.0.minimum_exclusive.as_ref()?.as_f64()
   }
   #[wasm_bindgen(getter = maximumInclusive)]
   pub fn maximum_inclusive_get(&self) -> Option<f64> {
-    self.maximum_inclusive.as_ref()?.as_f64()
+    self.0.maximum_inclusive.as_ref()?.as_f64()
   }
   #[wasm_bindgen(getter = maximumExclusive)]
   pub fn maximum_exclusive_get(&self) -> Option<f64> {
-    self.maximum_exclusive.as_ref()?.as_f64()
+    self.0.maximum_exclusive.as_ref()?.as_f64()
   }
   #[wasm_bindgen(getter = multipleOf)]
   pub fn multiple_of_get(&self) -> Option<f64> {
-    self.multiple_of.as_ref()?.as_f64()
+    self.0.multiple_of.as_ref()?.as_f64()
   }
 
   #[wasm_bindgen(getter = minimumLength)]
   pub fn minimum_length_get(&self) -> Option<u64> {
-    self.minimum_length
+    self.0.minimum_length
   }
   #[wasm_bindgen(getter = maximumLength)]
   pub fn maximum_length_get(&self) -> Option<u64> {
-    self.maximum_length
+    self.0.maximum_length
   }
   #[wasm_bindgen(getter = valuePattern)]
   pub fn value_pattern_get(&self) -> Option<String> {
-    Some(self.value_pattern.as_ref()?.clone())
+    Some(self.0.value_pattern.as_ref()?.clone())
   }
   #[wasm_bindgen(getter = valueFormat)]
   pub fn value_format_get(&self) -> Option<String> {
-    Some(self.value_format.as_ref()?.clone())
+    Some(self.0.value_format.as_ref()?.clone())
   }
 
   #[wasm_bindgen(getter = minimumItems)]
   pub fn minimum_items_get(&self) -> Option<u64> {
-    self.minimum_items
+    self.0.minimum_items
   }
   #[wasm_bindgen(getter = maximumItems)]
   pub fn maximum_items_get(&self) -> Option<u64> {
-    self.maximum_items
+    self.0.maximum_items
   }
   #[wasm_bindgen(getter = uniqueItems)]
   pub fn unique_items_get(&self) -> Option<bool> {
-    self.unique_items
+    self.0.unique_items
   }
 
   #[wasm_bindgen(getter = minimumProperties)]
   pub fn minimum_properties_get(&self) -> Option<u64> {
-    self.minimum_properties
+    self.0.minimum_properties
   }
   #[wasm_bindgen(getter = maximumProperties)]
   pub fn maximum_properties_get(&self) -> Option<u64> {
-    self.maximum_properties
-  }
-}
-
-impl Deref for ArenaSchemaItemContainer {
-  type Target = ArenaSchemaItem;
-
-  fn deref(&self) -> &Self::Target {
-    &self.0
+    self.0.maximum_properties
   }
 }
 

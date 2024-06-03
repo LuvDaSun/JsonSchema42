@@ -26,7 +26,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}

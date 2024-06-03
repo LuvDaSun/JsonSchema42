@@ -21,7 +21,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
     const definition = generateTypeDefinition(itemKey);
 
     yield itt`
@@ -35,7 +35,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     if (item.location == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      using typeName = names.getName(itemKey);
+      const typeName = names.getName(itemKey);
       yield typeName.toPascalCase();
     }
   }

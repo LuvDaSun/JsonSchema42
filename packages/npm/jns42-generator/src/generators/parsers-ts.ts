@@ -37,7 +37,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
     const definition = generateParserDefinition(itemKey, "value");
 
     yield itt`
@@ -61,7 +61,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     if (item.location == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
-      using typeName = names.getName(itemKey);
+      const typeName = names.getName(itemKey);
       yield itt`parse${typeName.toPascalCase()}(${valueExpression}, configuration)`;
     }
   }

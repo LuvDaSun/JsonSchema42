@@ -87,7 +87,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
@@ -122,7 +122,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         })(${valueExpression})
       `;
     } else {
-      using typeName = names.getName(typeKey);
+      const typeName = names.getName(typeKey);
       yield itt`is${typeName.toPascalCase()}(${valueExpression})`;
     }
   }

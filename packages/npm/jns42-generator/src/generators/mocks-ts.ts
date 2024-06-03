@@ -65,7 +65,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
     const definition = generateMockDefinition(itemKey);
 
     yield itt`
@@ -113,7 +113,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
     if (item.location == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
-      using typeName = names.getName(itemKey);
+      const typeName = names.getName(itemKey);
       yield itt`mock${typeName.toPascalCase()}()`;
     }
   }

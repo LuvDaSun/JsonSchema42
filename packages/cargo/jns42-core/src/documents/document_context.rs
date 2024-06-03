@@ -5,7 +5,6 @@ use crate::models::DocumentSchemaItem;
 use crate::utils::NodeCache;
 use crate::utils::NodeLocation;
 use std::collections::BTreeMap;
-use std::ops::Deref;
 use std::{
   cell::RefCell,
   collections::HashMap,
@@ -433,11 +432,15 @@ impl Default for DocumentContextContainer {
   }
 }
 
-impl Deref for DocumentContextContainer {
-  type Target = DocumentContext;
+impl From<Rc<DocumentContext>> for DocumentContextContainer {
+  fn from(value: Rc<DocumentContext>) -> Self {
+    Self(value)
+  }
+}
 
-  fn deref(&self) -> &Self::Target {
-    &self.0
+impl From<DocumentContextContainer> for Rc<DocumentContext> {
+  fn from(value: DocumentContextContainer) -> Self {
+    value.0
   }
 }
 
@@ -448,7 +451,7 @@ mod tests {
 
   #[async_std::test]
   async fn test_load_empty_node() {
-    let mut document_context = DocumentContextContainer::default();
+    let mut document_context = Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
     let location: NodeLocation = "../../../fixtures/specification/string.json"

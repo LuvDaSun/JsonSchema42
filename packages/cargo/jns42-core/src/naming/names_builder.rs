@@ -1,5 +1,6 @@
 use super::{NamePart, Names, Sentence};
 use std::collections::{BTreeMap, BTreeSet};
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 pub struct NamesBuilder<K> {
@@ -209,6 +210,40 @@ where
 {
   fn default() -> Self {
     Self::new()
+  }
+}
+
+#[wasm_bindgen]
+pub struct NamesBuilderContainer(NamesBuilder<usize>);
+
+#[wasm_bindgen]
+impl NamesBuilderContainer {
+  #[wasm_bindgen(constructor)]
+  pub fn new() -> Self {
+    Self(NamesBuilder::new())
+  }
+
+  #[wasm_bindgen(js_name = setDefaultName)]
+  pub fn set_default_name(&mut self, value: &str) {
+    self.0.set_default_name(value);
+  }
+}
+
+impl Default for NamesBuilderContainer {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl From<NamesBuilder<usize>> for NamesBuilderContainer {
+  fn from(value: NamesBuilder<usize>) -> Self {
+    Self(value)
+  }
+}
+
+impl From<NamesBuilderContainer> for NamesBuilder<usize> {
+  fn from(value: NamesBuilderContainer) -> Self {
+    value.0
   }
 }
 

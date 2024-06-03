@@ -1,13 +1,12 @@
 use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
 use crate::{
-  documents::DocumentContext,
+  documents::{DocumentContext, DocumentContextContainer},
   models::ArenaSchemaItemContainer,
   utils::{arena::Arena, NodeLocation},
 };
 use std::{
   collections::HashMap,
   iter::{empty, once},
-  ops::Deref,
   rc::Rc,
 };
 use wasm_bindgen::prelude::*;
@@ -232,6 +231,11 @@ pub struct SchemaArenaContainer(SchemaArena);
 
 #[wasm_bindgen]
 impl SchemaArenaContainer {
+  #[wasm_bindgen(js_name = fromDocumentContext)]
+  pub fn from_document_context(document_context: DocumentContextContainer) -> Self {
+    SchemaArena::from_document_context(&document_context.into()).into()
+  }
+
   #[wasm_bindgen(js_name = getItem)]
   pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
     self.0.get_item(key).clone().into()
@@ -240,6 +244,12 @@ impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = count)]
   pub fn count(&self) -> usize {
     self.0.count()
+  }
+
+  #[wasm_bindgen(js_name = clone)]
+  #[allow(clippy::should_implement_trait)]
+  pub fn clone(&self) -> Self {
+    Self(self.0.clone())
   }
 }
 
@@ -252,13 +262,5 @@ impl From<SchemaArena> for SchemaArenaContainer {
 impl From<SchemaArenaContainer> for SchemaArena {
   fn from(value: SchemaArenaContainer) -> Self {
     value.0
-  }
-}
-
-impl Deref for SchemaArenaContainer {
-  type Target = SchemaArena;
-
-  fn deref(&self) -> &Self::Target {
-    &self.0
   }
 }

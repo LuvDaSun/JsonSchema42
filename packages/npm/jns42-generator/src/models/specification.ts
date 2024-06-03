@@ -3,7 +3,7 @@ import * as core from "@jns42/core";
 export interface Specification {
   typesArena: core.SchemaArenaContainer;
   validatorsArena: core.SchemaArenaContainer;
-  names: core.Names;
+  names: core.NamesContainer;
   [Symbol.dispose]: () => void;
 }
 
@@ -25,7 +25,7 @@ export function loadSpecification(
 
   // generate names
 
-  using namesBuilder = core.NamesBuilder.new();
+  const namesBuilder = new core.NamesBuilderContainer();
   namesBuilder.setDefaultName(defaultTypeName);
 
   const count = typesArena.count();

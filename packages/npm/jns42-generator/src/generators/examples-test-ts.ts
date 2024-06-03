@@ -21,7 +21,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
 
     yield mapIterable(
       item.examples ?? [],
