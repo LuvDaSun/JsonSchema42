@@ -1,3 +1,5 @@
+use wasm_bindgen::prelude::*;
+
 pub enum FetchTextError {
   IoError,
   HttpError,
@@ -9,11 +11,31 @@ impl From<std::io::Error> for FetchTextError {
   }
 }
 
+impl From<JsValue> for FetchTextError {
+  fn from(_value: JsValue) -> Self {
+    Self::HttpError
+  }
+}
+
 #[cfg(not(target_os = "unknown"))]
 impl From<surf::Error> for FetchTextError {
   fn from(_value: surf::Error) -> Self {
     Self::HttpError
   }
+}
+
+#[wasm_bindgen(module = "oa42-lib")]
+extern "C" {
+  #[wasm_bindgen(catch, js_name = "fetchText")]
+  async fn fetch_text_js(location: &str) -> Result<JsValue, JsValue>;
+}
+
+#[cfg(target_os = "unknown")]
+pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
+  let text = fetch_text_js(location).await?;
+  let text = text.as_string().unwrap_or_default();
+
+  Ok(text)
 }
 
 #[cfg(not(target_os = "unknown"))]
@@ -32,37 +54,4 @@ pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
     file.read_to_string(&mut data).await?;
     Ok(data)
   }
-}
-
-#[cfg(target_os = "unknown")]
-pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  use crate::callbacks::register_callback;
-  use futures::channel::oneshot;
-  use std::{
-    ffi::{c_char, CString},
-    ptr::null_mut,
-  };
-
-  let location = CString::new(location.to_owned()).unwrap();
-  let location = location.into_raw();
-
-  let data = Box::new(null_mut() as *mut c_char);
-  let data = Box::into_raw(data);
-
-  let (ready_sender, ready_receiver) = oneshot::channel();
-  let callback_key = register_callback(|| {
-    ready_sender.send(()).unwrap();
-  });
-  unsafe {
-    crate::imports::host_fetch_file(location, data, callback_key);
-  }
-  ready_receiver.await.unwrap();
-
-  let data = unsafe { Box::from_raw(data) };
-  let data = *data;
-  let data = unsafe { CString::from_raw(data) };
-  let data = data.to_str().unwrap();
-  let data = data.to_owned();
-
-  Ok(data)
 }

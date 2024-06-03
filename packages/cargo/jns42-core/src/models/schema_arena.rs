@@ -6,8 +6,10 @@ use crate::{
 use std::{
   collections::HashMap,
   iter::{empty, once},
+  ops::Deref,
   rc::Rc,
 };
+use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
 
@@ -221,5 +223,30 @@ impl Arena<ArenaSchemaItem> {
         transform(arena, key)
       }
     })
+  }
+}
+
+#[wasm_bindgen]
+pub struct SchemaArenaContainer(SchemaArena);
+
+impl SchemaArenaContainer {}
+
+impl From<SchemaArena> for SchemaArenaContainer {
+  fn from(value: SchemaArena) -> Self {
+    Self(value)
+  }
+}
+
+impl From<SchemaArenaContainer> for SchemaArena {
+  fn from(value: SchemaArenaContainer) -> Self {
+    value.0
+  }
+}
+
+impl Deref for SchemaArenaContainer {
+  type Target = SchemaArena;
+
+  fn deref(&self) -> &Self::Target {
+    &self.0
   }
 }

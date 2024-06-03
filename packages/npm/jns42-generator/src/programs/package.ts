@@ -75,14 +75,15 @@ async function main(configuration: MainConfiguration) {
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
     configuration;
 
-  const context = core.DocumentContext.new();
+  const cache = new core.NodeCache();
+  const context = new core.DocumentContextContainer(cache);
   context.registerWellKnownFactories();
 
   await context.loadFromLocation(
-    instanceSchemaLocation,
-    instanceSchemaLocation,
+    core.NodeLocation.parse(instanceSchemaLocation),
+    core.NodeLocation.parse(instanceSchemaLocation),
     undefined,
-    defaultMetaSchema as core.MetaSchemaString,
+    defaultMetaSchema,
   );
 
   using specification = models.loadSpecification(context, {
