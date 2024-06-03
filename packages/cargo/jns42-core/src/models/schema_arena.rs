@@ -171,7 +171,7 @@ impl Arena<ArenaSchemaItem> {
   ///
   /// # Returns
   /// An iterator over string slices (`&str`) representing the name parts.
-  pub fn get_name_parts(&self, key: usize) -> impl Iterator<Item = &str> {
+  pub fn get_name_parts(&self, key: usize) -> impl Iterator<Item = String> {
     let ancestors: Vec<_> = self
       .get_ancestors(key)
       .map(|(_key, item)| item)
@@ -196,7 +196,7 @@ impl Arena<ArenaSchemaItem> {
               .map(|id| empty().chain(id.get_path()).chain(id.get_hash())),
           )
           .flatten()
-          .chain(item.name.as_deref())
+          .chain(item.name.clone())
           .filter(|part| !part.is_empty())
       })
       .collect();

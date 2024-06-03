@@ -1,4 +1,4 @@
-use crate::utils::ParseError;
+use crate::utils::{FetchTextError, ParseError};
 use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
@@ -51,6 +51,15 @@ impl From<ParseError> for Error {
   }
 }
 
+impl From<FetchTextError> for Error {
+  fn from(value: FetchTextError) -> Self {
+    match value {
+      FetchTextError::HttpError => Self::HttpError,
+      FetchTextError::IoError => Self::IoError,
+    }
+  }
+}
+
 impl From<std::ffi::NulError> for Error {
   fn from(_value: std::ffi::NulError) -> Self {
     Self::NulMissing
@@ -72,18 +81,5 @@ impl From<serde_json::Error> for Error {
 impl From<serde_yaml::Error> for Error {
   fn from(_value: serde_yaml::Error) -> Self {
     Self::InvalidYaml
-  }
-}
-
-impl From<std::io::Error> for Error {
-  fn from(_value: std::io::Error) -> Self {
-    Self::IoError
-  }
-}
-
-#[cfg(not(target_os = "unknown"))]
-impl From<surf::Error> for Error {
-  fn from(_value: surf::Error) -> Self {
-    Self::HttpError
   }
 }

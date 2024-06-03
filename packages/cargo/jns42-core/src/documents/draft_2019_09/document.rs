@@ -126,7 +126,7 @@ impl Document {
     let document = document_context.get_document(&document_location)?;
 
     if let Some(anchor) = reference_location.get_anchor() {
-      if let Some(pointer) = document.resolve_anchor(anchor) {
+      if let Some(pointer) = document.resolve_anchor(anchor.as_str()) {
         let reference_location = document.get_document_location().push_pointer(pointer);
         return Ok(reference_location);
       }
@@ -148,7 +148,7 @@ impl Document {
     for document in antecedent_documents {
       let reference_location = document.get_document_location().join(&reference_location);
       if let Some(anchor) = reference_location.get_anchor() {
-        if let Some(pointer) = document.resolve_antecedent_anchor(anchor) {
+        if let Some(pointer) = document.resolve_antecedent_anchor(anchor.as_str()) {
           let reference_location = document.get_document_location().push_pointer(pointer);
           return Ok(reference_location);
         };
@@ -191,7 +191,7 @@ impl SchemaDocument for Document {
       .nodes
       .iter()
       .map(|(pointer, node)| {
-        let location = self.get_document_location().push_pointer(pointer);
+        let location = self.get_document_location().push_pointer(pointer.clone());
         (
           location.clone(),
           node.to_document_schema_item(location, self),

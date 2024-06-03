@@ -120,7 +120,7 @@ impl SchemaDocument for Document {
       .nodes
       .iter()
       .map(|(pointer, node)| {
-        let location = self.get_document_location().push_pointer(pointer);
+        let location = self.get_document_location().push_pointer(pointer.clone());
         (location.clone(), node.to_document_schema_item(location))
       })
       .collect()

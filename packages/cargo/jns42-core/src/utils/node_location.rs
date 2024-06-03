@@ -32,28 +32,28 @@ impl NodeLocation {
     }
   }
 
-  pub fn get_anchor(&self) -> Option<&str> {
+  pub fn get_anchor(&self) -> Option<String> {
     if self.hash.len() > 1 {
       None
     } else {
-      self.hash.first().map(|part| part.as_str())
+      self.hash.first().map(|part| part.clone())
     }
   }
 
-  pub fn get_pointer(&self) -> Option<Vec<&str>> {
+  pub fn get_pointer(&self) -> Option<Vec<String>> {
     if self.hash.len() > 1 {
-      Some(self.hash.iter().skip(1).map(|part| part.as_str()).collect())
+      Some(self.hash.iter().skip(1).map(|part| part.clone()).collect())
     } else {
       None
     }
   }
 
-  pub fn get_path(&self) -> Vec<&str> {
-    self.path.iter().map(|value| value.as_str()).collect()
+  pub fn get_path(&self) -> Vec<String> {
+    self.path.iter().map(|value| value.clone()).collect()
   }
 
-  pub fn get_hash(&self) -> Vec<&str> {
-    self.hash.iter().map(|value| value.as_str()).collect()
+  pub fn get_hash(&self) -> Vec<String> {
+    self.hash.iter().map(|value| value.clone()).collect()
   }
 
   pub fn is_root(&self) -> bool {
@@ -63,19 +63,18 @@ impl NodeLocation {
   /*
   Set the anchor of this location, replacing the pointer.
   */
-  pub fn set_anchor(&self, value: impl Into<String>) -> Self {
+  pub fn set_anchor(&self, value: String) -> Self {
     let mut cloned = self.clone();
-    cloned.hash = once(value).map(|part| part.into()).collect();
+    cloned.hash = once(value).collect();
     cloned
   }
 
   /*
   Replace pointer
   */
-  pub fn set_pointer(&self, value: impl IntoIterator<Item = impl Into<String>>) -> Self {
+  pub fn set_pointer(&self, value: Vec<String>) -> Self {
     let mut cloned = self.clone();
-    cloned.hash =
-      normalize_hash(once(String::new()).chain(value.into_iter().map(|part| part.into())));
+    cloned.hash = normalize_hash(once(String::new()).chain(value));
     cloned
   }
 
@@ -91,13 +90,12 @@ impl NodeLocation {
   /*
   Append to pointer
   */
-  pub fn push_pointer(&self, value: impl IntoIterator<Item = impl Into<String>>) -> Self {
+  pub fn push_pointer(&self, value: Vec<String>) -> Self {
     let pointer: Vec<_> = self
       .get_pointer()
       .unwrap_or_default()
       .into_iter()
-      .map(|part| (*part).into())
-      .chain(value.into_iter().map(|part| part.into()))
+      .chain(value)
       .collect();
 
     self.set_pointer(pointer)

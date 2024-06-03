@@ -1,4 +1,4 @@
-use super::{fetch_text, FetchFileError, Node, NodeLocation, NodeRc};
+use super::{fetch_text, FetchTextError, Node, NodeLocation, NodeRc};
 use std::collections::BTreeMap;
 use std::iter::once;
 use std::rc::Rc;
@@ -127,11 +127,11 @@ pub enum NodeCacheError {
   HttpError,
 }
 
-impl From<FetchFileError> for NodeCacheError {
-  fn from(value: FetchFileError) -> Self {
+impl From<FetchTextError> for NodeCacheError {
+  fn from(value: FetchTextError) -> Self {
     match value {
-      FetchFileError::IoError => NodeCacheError::IoError,
-      FetchFileError::HttpError => NodeCacheError::HttpError,
+      FetchTextError::IoError => Self::IoError,
+      FetchTextError::HttpError => Self::HttpError,
     }
   }
 }
@@ -152,7 +152,7 @@ mod tests {
   async fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
-    let location = NodeLocation::parse("../../../fixtures/specifications/nwd.yaml").unwrap();
+    let location: NodeLocation = "../../../fixtures/specifications/nwd.yaml".parse().unwrap();
 
     cache.load_from_location(&location).await.unwrap();
 

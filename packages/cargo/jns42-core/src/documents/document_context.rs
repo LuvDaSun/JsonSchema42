@@ -94,7 +94,7 @@ impl DocumentContext {
       document_resolved: Default::default(),
       factories: Default::default(),
       fetch_file: Box::new(|location: String| {
-        Box::pin(async move { crate::utils::fetch_file::fetch_file(location.as_str()).await })
+        Box::pin(async move { Ok(crate::utils::fetch_text(location.as_str()).await?) })
       }),
     })
   }
@@ -107,9 +107,7 @@ impl DocumentContext {
       document_resolved: Default::default(),
       factories: Default::default(),
       fetch_file: Box::new(|location: String| {
-        Box::pin(
-          async move { crate::utils::fetch_file::fetch_file_hosted(location.as_str()).await },
-        )
+        Box::pin(async move { Ok(crate::utils::fetch_text(location.as_str()).await?) })
       }),
     })
   }
