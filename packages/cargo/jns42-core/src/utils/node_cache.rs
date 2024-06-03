@@ -151,25 +151,23 @@ mod tests {
   async fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
-    let location: NodeLocation = "../../../fixtures/specifications/nwd.yaml".parse().unwrap();
+    let location: NodeLocation = "../../../fixtures/specification/nwd.yaml".parse().unwrap();
 
     cache.load_from_location(&location).await.unwrap();
 
     cache.get_node(&location).unwrap();
 
     cache
-      .get_node(&location.set_pointer(vec!["paths".into(), "/me".into()]))
+      .get_node(&location.set_pointer(vec!["definitions".into(), "main-category".into()]))
       .unwrap();
 
     let node = cache
       .get_node(&location.set_pointer(vec![
-        "paths".into(),
-        "/location/{location-key}".into(),
-        "parameters".into(),
-        "0".into(),
-        "in".into(),
+        "definitions".into(),
+        "main-category".into(),
+        "description".into(),
       ]))
       .unwrap();
-    assert_eq!(*node, Node::String("path".into()));
+    assert_eq!(*node, Node::String("Full main category entity".into()));
   }
 }
