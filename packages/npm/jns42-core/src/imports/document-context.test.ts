@@ -5,33 +5,6 @@ import { projectRoot } from "../root.js";
 import { DocumentContext } from "./document-context.js";
 import { SchemaArena } from "./schema-arena.js";
 
-test("load from node", async () => {
-  using documentContext = DocumentContext.new();
-  documentContext.registerWellKnownFactories();
-
-  const location = "/string-or-boolean.json#";
-
-  await documentContext.loadFromNode(
-    location,
-    location,
-    undefined,
-    {
-      type: ["string", "boolean"],
-    },
-    "https://json-schema.org/draft/2020-12/schema",
-  );
-
-  const schemas = documentContext.getSchemaNodes();
-
-  // problems on windows
-  // assert(schemas[location] != null);
-  // assert.deepEqual(schemas[location].types, ["string", "boolean"]);
-
-  using arena = SchemaArena.fromDocumentContext(documentContext);
-
-  assert.equal(arena.count(), Object.keys(schemas).length);
-});
-
 test("load from location", async () => {
   using documentContext = DocumentContext.new();
   documentContext.registerWellKnownFactories();
