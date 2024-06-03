@@ -92,7 +92,7 @@ impl DocumentContext {
             context,
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -106,7 +106,7 @@ impl DocumentContext {
             context,
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -119,7 +119,7 @@ impl DocumentContext {
           documents::draft_07::Document::new(
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -132,7 +132,7 @@ impl DocumentContext {
           documents::draft_06::Document::new(
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -145,7 +145,7 @@ impl DocumentContext {
           documents::draft_04::Document::new(
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -159,7 +159,7 @@ impl DocumentContext {
             context,
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -172,7 +172,7 @@ impl DocumentContext {
           documents::oas_v3_0::Document::new(
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
@@ -185,7 +185,7 @@ impl DocumentContext {
           documents::swagger_v2::Document::new(
             configuration.retrieval_location,
             configuration.antecedent_location,
-            configuration.document_node.clone().into(),
+            configuration.document_node.into(),
           )
           .unwrap(),
         )
