@@ -3,7 +3,7 @@ use clap::Parser;
 use jns42_core::documents;
 use jns42_core::documents::DocumentContext;
 use jns42_core::models::Specification;
-use jns42_core::utils::node_location::NodeLocation;
+use jns42_core::utils::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;
 

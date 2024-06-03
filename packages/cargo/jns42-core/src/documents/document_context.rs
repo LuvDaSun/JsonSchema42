@@ -2,6 +2,7 @@ use super::schema_document::SchemaDocument;
 use crate::documents::{self, discover_meta_schema};
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
+use crate::utils::{fetch_text, NodeCache};
 use crate::utils::{read_json_node::read_json_node, NodeLocation};
 use std::collections::BTreeMap;
 use std::future::Future;
@@ -53,6 +54,8 @@ This class loads document nodes and documents. Every node has a few locations:
 
 */
 pub struct DocumentContext {
+  cache: RefCell<NodeCache>,
+
   /**
   Maps node retrieval locations to their documents. Every node has a location that is an identifier. Thi
   map maps that identifier to the identifier of a document.
@@ -79,36 +82,17 @@ pub struct DocumentContext {
    * document factories by schema identifier
    */
   factories: HashMap<String, Box<DocumentFactory>>,
-
-  // TODO this should be a &str
-  fetch_file: FetchFile,
 }
 
 impl DocumentContext {
-  #[cfg(not(target_os = "unknown"))]
   pub fn new() -> Rc<Self> {
     Rc::new(Self {
+      cache: Default::default(),
       node_documents: Default::default(),
       node_cache: Default::default(),
       documents: Default::default(),
       document_resolved: Default::default(),
       factories: Default::default(),
-      fetch_file: Box::new(|location: String| {
-        Box::pin(async move { Ok(crate::utils::fetch_text(location.as_str()).await?) })
-      }),
-    })
-  }
-
-  pub fn new_hosted() -> Rc<Self> {
-    Rc::new(Self {
-      node_documents: Default::default(),
-      node_cache: Default::default(),
-      documents: Default::default(),
-      document_resolved: Default::default(),
-      factories: Default::default(),
-      fetch_file: Box::new(|location: String| {
-        Box::pin(async move { Ok(crate::utils::fetch_text(location.as_str()).await?) })
-      }),
     })
   }
 
@@ -359,7 +343,7 @@ impl DocumentContext {
       */
       let document_location = retrieval_location.set_root();
       let fetch_location = document_location.to_fetch_string();
-      let data = (self.fetch_file)(fetch_location).await?;
+      let data = fetch_text(&fetch_location).await?;
       let document_node = serde_yaml::from_str(&data)?;
 
       /*

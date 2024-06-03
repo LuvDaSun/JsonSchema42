@@ -7,15 +7,14 @@ use std::rc::Rc;
 /// Nodes have a retrieval location that is the physical (possibly globally
 /// unique) location of the node.
 ///
+#[derive(Default)]
 pub struct NodeCache {
   nodes: BTreeMap<NodeLocation, NodeRc>,
 }
 
 impl NodeCache {
   pub fn new() -> Self {
-    Self {
-      nodes: Default::default(),
-    }
+    Default::default()
   }
 }
 
