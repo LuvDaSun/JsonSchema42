@@ -238,7 +238,12 @@ impl DocumentContext {
       default_meta_schema_id,
     )) = queue.pop()
     {
-      if self.documents.borrow().contains_key(&retrieval_location) {
+      // TODO
+      if self
+        .document_resolved
+        .borrow()
+        .contains_key(&retrieval_location)
+      {
         continue;
       }
 
