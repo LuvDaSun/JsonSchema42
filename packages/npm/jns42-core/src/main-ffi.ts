@@ -84,16 +84,6 @@ export interface MainExports extends ExportsBase {
     error_reference: number,
     callback: number,
   ): void;
-  // document_context_load_from_node(
-  //   document_context: number,
-  //   retrieval_location: number,
-  //   given_location: number,
-  //   antecedent_location: number,
-  //   node: number,
-  //   default_schema_id: MetaSchemaId,
-  //   error_reference: number,
-  //   callback: number,
-  // ): void;
   document_context_get_schema_nodes(document_context: number, error_reference: number): number;
 
   banner(prefix: number, version: number, error_reference: number): number;

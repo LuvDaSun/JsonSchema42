@@ -59,46 +59,6 @@ export class DocumentContext extends ForeignObject {
     });
   }
 
-  // public async loadFromNode(
-  //   retrievalLocation: string,
-  //   givenLocation: string,
-  //   antecedentLocation: string | undefined,
-  //   node: any,
-  //   defaultMetaSchemaId: string,
-  // ) {
-  //   using retrievalLocationForeign = CString.fromString(retrievalLocation);
-
-  //   using givenLocationForeign = CString.fromString(givenLocation);
-
-  //   using antecedentLocationForeign =
-  //     antecedentLocation == null ? null : CString.fromString(antecedentLocation);
-
-  //   let nodeString = JSON.stringify(node);
-  //   using nodeForeign = CString.fromString(nodeString);
-
-  //   using defaultMetaSchemaIdForeign = CString.fromString(defaultMetaSchemaId);
-
-  //   await withErrorReferencePromise(async (errorReferencePointer) => {
-  //     const deferred = defer<void>();
-  //     const key = mainFfi.registerCallback(() => {
-  //       deferred.resolve();
-  //     });
-
-  //     mainFfi.exports.document_context_load_from_node(
-  //       this.pointer,
-  //       retrievalLocationForeign.pointer,
-  //       givenLocationForeign.pointer,
-  //       antecedentLocationForeign?.pointer ?? 0,
-  //       nodeForeign.pointer,
-  //       defaultMetaSchemaIdForeign.pointer,
-  //       errorReferencePointer,
-  //       key,
-  //     );
-
-  //     await deferred.promise;
-  //   });
-  // }
-
   public getSchemaNodes(): Record<string, DocumentSchemaItemValue> {
     const documentPointer = withErrorReference((errorReferencePointer) =>
       mainFfi.exports.document_context_get_schema_nodes(this.pointer, errorReferencePointer),
