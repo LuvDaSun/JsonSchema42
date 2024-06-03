@@ -1,6 +1,7 @@
 use once_cell::sync::Lazy;
 use regex::{Regex, RegexBuilder};
 use std::{error::Error, fmt::Display, hash::Hash, iter::once, str::FromStr};
+use wasm_bindgen::prelude::*;
 
 pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
   RegexBuilder::new(r"^([a-z]+\:(?:\/\/)?[^\/]*)?([^\?\#]*?)?(\?.*?)?(\#.*?)?$")
@@ -15,6 +16,7 @@ pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
 )]
 #[serde(try_from = "&str")]
 #[serde(into = "String")]
+#[wasm_bindgen]
 pub struct NodeLocation {
   origin: String,
   path: Vec<String>,
@@ -22,6 +24,7 @@ pub struct NodeLocation {
   hash: Vec<String>,
 }
 
+#[wasm_bindgen]
 impl NodeLocation {
   fn new(origin: String, path: Vec<String>, query: String, hash: Vec<String>) -> Self {
     Self {
@@ -32,6 +35,7 @@ impl NodeLocation {
     }
   }
 
+  #[wasm_bindgen(js_name = "getAnchor")]
   pub fn get_anchor(&self) -> Option<String> {
     if self.hash.len() > 1 {
       None
@@ -40,6 +44,7 @@ impl NodeLocation {
     }
   }
 
+  #[wasm_bindgen(js_name = "getPointer")]
   pub fn get_pointer(&self) -> Option<Vec<String>> {
     if self.hash.len() > 1 {
       Some(self.hash.iter().skip(1).cloned().collect())
@@ -48,14 +53,17 @@ impl NodeLocation {
     }
   }
 
+  #[wasm_bindgen(js_name = "getPath")]
   pub fn get_path(&self) -> Vec<String> {
     self.path.to_vec()
   }
 
+  #[wasm_bindgen(js_name = "getHash")]
   pub fn get_hash(&self) -> Vec<String> {
     self.hash.to_vec()
   }
 
+  #[wasm_bindgen(js_name = "isRoot")]
   pub fn is_root(&self) -> bool {
     self.hash.is_empty()
   }
@@ -63,6 +71,7 @@ impl NodeLocation {
   /*
   Set the anchor of this location, replacing the pointer.
   */
+  #[wasm_bindgen(js_name = "setAnchor")]
   pub fn set_anchor(&self, value: String) -> Self {
     let mut cloned = self.clone();
     cloned.hash = once(value).collect();
@@ -72,6 +81,7 @@ impl NodeLocation {
   /*
   Replace pointer
   */
+  #[wasm_bindgen(js_name = "setPointer")]
   pub fn set_pointer(&self, value: Vec<String>) -> Self {
     let mut cloned = self.clone();
     cloned.hash = normalize_hash(once(String::new()).chain(value));
@@ -81,6 +91,7 @@ impl NodeLocation {
   /*
   Removes pointer and anchor (the has) from this location.
   */
+  #[wasm_bindgen(js_name = "setRoot")]
   pub fn set_root(&self) -> Self {
     let mut cloned = self.clone();
     cloned.hash = Default::default();
@@ -90,6 +101,7 @@ impl NodeLocation {
   /*
   Append to pointer
   */
+  #[wasm_bindgen(js_name = "pushPointer")]
   pub fn push_pointer(&self, value: Vec<String>) -> Self {
     let pointer: Vec<_> = self
       .get_pointer()
@@ -105,6 +117,7 @@ impl NodeLocation {
   Get the part of the location before the hash. This could be used to get data from a server
   or file system.
   */
+  #[wasm_bindgen(js_name = "toFetchString")]
   pub fn to_fetch_string(&self) -> String {
     let origin = &self.origin;
     let path = self
@@ -118,6 +131,7 @@ impl NodeLocation {
     return origin.to_string() + path.as_str() + query.as_str();
   }
 
+  #[wasm_bindgen(js_name = "join")]
   pub fn join(&self, other: &NodeLocation) -> Self {
     if !other.origin.is_empty() {
       return other.clone();
@@ -162,6 +176,24 @@ impl NodeLocation {
       self.query.clone(),
       other.hash.clone(),
     )
+  }
+}
+
+#[wasm_bindgen]
+impl NodeLocation {
+  #[wasm_bindgen(js_name = "clone")]
+  pub fn _clone(&self) -> Self {
+    Clone::clone(self)
+  }
+
+  #[wasm_bindgen(js_name = "parse")]
+  pub fn _parse(input: &str) -> Result<NodeLocation, ParseError> {
+    Self::from_str(input)
+  }
+
+  #[wasm_bindgen(js_name = "toString")]
+  pub fn _to_string(&self) -> String {
+    self.into()
   }
 }
 
@@ -261,6 +293,7 @@ impl FromStr for NodeLocation {
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
+#[wasm_bindgen]
 pub enum ParseError {
   InvalidInput,
   DecodeError,

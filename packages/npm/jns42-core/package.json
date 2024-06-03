@@ -3,28 +3,22 @@
   "version": "0.3.6",
   "sideEffects": false,
   "description": "core library",
-  "type": "module",
-  "main": "./bundled/main.cjs",
-  "module": "./bundled/main.js",
-  "types": "./typed/main.d.ts",
+  "type": "commonjs",
+  "module": "./dist/jns42_core.js",
+  "types": "./dist/jns42_core.d.ts",
   "exports": {
     ".": {
-      "require": "./bundled/main.cjs",
-      "import": "./bundled/main.js",
-      "types": "./typed/main.d.ts"
+      "import": "./dist/jns42_core.js",
+      "types": "./dist/jns42_core.d.ts"
     }
   },
   "files": [
-    "./typed/**",
-    "./bundled/**",
-    "./bin/**"
+    "./dist/**"
   ],
   "scripts": {
-    "prepack": "node ./scripts/build.js",
-    "pretest": "tsc",
-    "build": "node ./scripts/build.js",
-    "clean": "node ./scripts/clean.js",
-    "test": "node --test ./transpiled/**/*.test.js"
+    "prepack": "node ./scripts/build.mjs",
+    "build": "node ./scripts/build.mjs",
+    "clean": "node ./scripts/clean.mjs"
   },
   "repository": {
     "type": "git",

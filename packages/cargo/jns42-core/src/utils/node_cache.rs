@@ -1,17 +1,21 @@
 use super::{fetch_text, FetchTextError, NodeLocation};
 use std::collections::{btree_map, BTreeMap};
 use std::iter;
+use wasm_bindgen::prelude::*;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
 /// Nodes have a retrieval location that is the physical (possibly globally
 /// unique) location of the node.
 ///
 #[derive(Default)]
+#[wasm_bindgen]
 pub struct NodeCache {
   root_nodes: BTreeMap<NodeLocation, serde_json::Value>,
 }
 
+#[wasm_bindgen]
 impl NodeCache {
+  #[wasm_bindgen(constructor)]
   pub fn new() -> Self {
     Default::default()
   }

@@ -1302,6 +1302,8 @@ dependencies = [
  "surf",
  "url",
  "urlencoding",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]
