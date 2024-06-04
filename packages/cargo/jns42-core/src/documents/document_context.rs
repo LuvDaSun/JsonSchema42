@@ -12,6 +12,7 @@ use std::{
   rc::{Rc, Weak},
 };
 use wasm_bindgen::prelude::*;
+
 pub struct DocumentConfiguration {
   pub retrieval_location: NodeLocation,
   pub given_location: NodeLocation,
@@ -71,7 +72,7 @@ pub struct DocumentContext {
   /// Maps node retrieval locations to their documents retrieval location. We can work with the
   /// node via it's document.
   ///
-  // node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
+  node_to_document_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
   /// all documents, indexed by the retrieval location of the document
   ///
@@ -91,7 +92,7 @@ impl DocumentContext {
     Self {
       cache: RefCell::new(cache),
       factories: Default::default(),
-      // node_documents: Default::default(),
+      node_to_document_retrieval_locations: Default::default(),
       documents: Default::default(),
       retrieval_to_identity_locations: Default::default(),
       identity_to_retrieval_locations: Default::default(),
@@ -317,17 +318,17 @@ impl DocumentContext {
           )
         }))
       {
-        // if self
-        //   .node_documents
-        //   .borrow_mut()
-        //   .insert(
-        //     node_retrieval_location.clone(),
-        //     document_retrieval_location.clone(),
-        //   )
-        //   .is_some()
-        // {
-        //   Err(Error::Conflict)?;
-        // }
+        if self
+          .node_to_document_retrieval_locations
+          .borrow_mut()
+          .insert(
+            node_retrieval_location.clone(),
+            document_retrieval_location.clone(),
+          )
+          .is_some()
+        {
+          Err(Error::Conflict)?;
+        }
         if self
           .retrieval_to_identity_locations
           .borrow_mut()
@@ -375,6 +376,18 @@ impl DocumentContext {
       .values()
       .flat_map(|document| document.get_schema_nodes())
       .collect()
+  }
+
+  pub fn resolve_document_retrieval_location(
+    &self,
+    node_retrieval_location: &NodeLocation,
+  ) -> Result<NodeLocation, Error> {
+    self
+      .node_to_document_retrieval_locations
+      .borrow()
+      .get(node_retrieval_location)
+      .cloned()
+      .ok_or(Error::NotFound)
   }
 
   pub fn resolve_identity_location(

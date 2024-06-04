@@ -105,8 +105,10 @@ impl Document {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let reference_location = self.identity_location.join(&reference_location);
-    let document_retrieval_location =
+    let node_retrieval_location =
       document_context.resolve_retrieval_location(&reference_location)?;
+    let document_retrieval_location =
+      document_context.resolve_document_retrieval_location(&node_retrieval_location)?;
     let document = document_context.get_document(&document_retrieval_location)?;
 
     if let Some(anchor) = reference_location.get_anchor() {
