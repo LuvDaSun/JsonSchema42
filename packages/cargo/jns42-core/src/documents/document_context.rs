@@ -427,6 +427,56 @@ impl DocumentContext {
       Err(Error::Conflict)?;
     }
 
+    // Map node pointers and anchors to this document
+    for (node_retrieval_location, node_identity_location) in iter::empty()
+      .chain(document.get_node_pointers().into_iter().map(|pointer| {
+        (
+          document_retrieval_location.push_pointer(pointer.clone()),
+          document_identity_location.push_pointer(pointer.clone()),
+        )
+      }))
+      .chain(document.get_node_anchors().into_iter().map(|anchor| {
+        (
+          document_retrieval_location.set_anchor(anchor.clone()),
+          document_identity_location.set_anchor(anchor.clone()),
+        )
+      }))
+    {
+      if self
+        .node_to_document_retrieval_locations
+        .borrow_mut()
+        .insert(
+          node_retrieval_location.clone(),
+          document_retrieval_location.clone(),
+        )
+        .is_some()
+      {
+        Err(Error::Conflict)?;
+      }
+      if self
+        .retrieval_to_identity_locations
+        .borrow_mut()
+        .insert(
+          node_retrieval_location.clone(),
+          node_identity_location.clone(),
+        )
+        .is_some()
+      {
+        Err(Error::Conflict)?;
+      }
+      if self
+        .identity_to_retrieval_locations
+        .borrow_mut()
+        .insert(
+          node_identity_location.clone(),
+          node_retrieval_location.clone(),
+        )
+        .is_some()
+      {
+        Err(Error::Conflict)?;
+      }
+    }
+
     let referenced_locations = document.get_referenced_locations();
     for referenced_location in referenced_locations {
       let retrieval_location = document_retrieval_location.join(&referenced_location);
