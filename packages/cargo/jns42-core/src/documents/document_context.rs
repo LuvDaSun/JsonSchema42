@@ -122,7 +122,7 @@ impl DocumentContext {
         Rc::new(
           documents::draft_2020_12::Document::new(
             context,
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -136,7 +136,7 @@ impl DocumentContext {
         Rc::new(
           documents::draft_2019_09::Document::new(
             context,
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -149,7 +149,7 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::draft_07::Document::new(
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -162,7 +162,7 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::draft_06::Document::new(
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -175,7 +175,7 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::draft_04::Document::new(
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -189,7 +189,7 @@ impl DocumentContext {
         Rc::new(
           documents::oas_v3_1::Document::new(
             context,
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -202,7 +202,7 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::oas_v3_0::Document::new(
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
@@ -215,7 +215,7 @@ impl DocumentContext {
       Box::new(|_context, configuration| {
         Rc::new(
           documents::swagger_v2::Document::new(
-            configuration.retrieval_location,
+            configuration.given_location,
             configuration.antecedent_location,
             configuration.document_node.into(),
           )
