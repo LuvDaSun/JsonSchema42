@@ -106,6 +106,7 @@ async function main(configuration: MainConfiguration) {
       const cache = new core.NodeCache();
       const context = new core.DocumentContextContainer(cache);
       context.registerWellKnownFactories();
+
       await context.loadFromNode(
         location.clone(),
         location.clone(),
