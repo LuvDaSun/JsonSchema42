@@ -98,16 +98,19 @@ async function main(configuration: MainConfiguration) {
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
+    const schemaNode = schemas[schemaName];
+
     const location = core.NodeLocation.parse(pathToTest);
     // generate package
     {
       const cache = new core.NodeCache();
       const context = new core.DocumentContextContainer(cache);
       context.registerWellKnownFactories();
-      await context.loadFromLocation(
-        location.pushPointer(["schemas", schemaName]),
+      await context.loadFromNode(
+        location.clone(),
         location.clone(),
         undefined,
+        schemaNode,
         defaultMetaSchema,
       );
 

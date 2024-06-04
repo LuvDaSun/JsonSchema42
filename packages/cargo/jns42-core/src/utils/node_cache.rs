@@ -109,27 +109,46 @@ impl NodeCache {
 
     Ok(())
   }
+
+  pub fn load_from_node(
+    &mut self,
+    retrieval_location: &NodeLocation,
+    node: serde_json::Value,
+  ) -> Result<(), NodeCacheError> {
+    /*
+    If the document is not in the cache
+    */
+    if let btree_map::Entry::Vacant(entry) = self.root_nodes.entry(retrieval_location.clone()) {
+      /*
+      populate the cache with this document
+      */
+      entry.insert(node);
+      Ok(())
+    } else {
+      Err(NodeCacheError::Conflict)
+    }
+  }
 }
 
 #[derive(Debug)]
 pub enum NodeCacheError {
-  InvalidYaml,
-  IoError,
-  HttpError,
+  ParseError,
+  Conflict,
+  FetchError,
 }
 
 impl From<FetchTextError> for NodeCacheError {
   fn from(value: FetchTextError) -> Self {
     match value {
-      FetchTextError::IoError => Self::IoError,
-      FetchTextError::HttpError => Self::HttpError,
+      FetchTextError::IoError => Self::FetchError,
+      FetchTextError::HttpError => Self::FetchError,
     }
   }
 }
 
 impl From<serde_yaml::Error> for NodeCacheError {
   fn from(_value: serde_yaml::Error) -> Self {
-    Self::InvalidYaml
+    Self::ParseError
   }
 }
 

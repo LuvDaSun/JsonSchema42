@@ -10,14 +10,10 @@ pub enum Error {
   Conflict,
   NotFound,
   ParseLocationFailed,
-  HttpError,
-  IoError,
-  NulMissing,
-  Utf8Error,
+  FetchError,
   InvalidJson,
   NotARoot,
-  NotTheSame,
-  InvalidYaml,
+  ParseError,
 }
 
 impl std::error::Error for Error {}
@@ -30,14 +26,10 @@ impl Display for Error {
       Self::Conflict => write!(f, "Conflict"),
       Self::NotFound => write!(f, "NotFound"),
       Self::ParseLocationFailed => write!(f, "ParseLocationFailed"),
-      Self::HttpError => write!(f, "HttpError"),
-      Self::IoError => write!(f, "IoError"),
-      Self::NulMissing => write!(f, "NulMissing"),
-      Self::Utf8Error => write!(f, "Utf8Error"),
+      Self::FetchError => write!(f, "FetchError"),
       Self::InvalidJson => write!(f, "InvalidJson"),
       Self::NotARoot => write!(f, "NotARoot"),
-      Self::NotTheSame => write!(f, "NotTheSame"),
-      Self::InvalidYaml => write!(f, "InvalidYaml"),
+      Self::ParseError => write!(f, "ParseError"),
     }
   }
   //
@@ -55,8 +47,8 @@ impl From<ParseError> for Error {
 impl From<FetchTextError> for Error {
   fn from(value: FetchTextError) -> Self {
     match value {
-      FetchTextError::HttpError => Self::HttpError,
-      FetchTextError::IoError => Self::IoError,
+      FetchTextError::HttpError => Self::FetchError,
+      FetchTextError::IoError => Self::FetchError,
     }
   }
 }
@@ -64,33 +56,9 @@ impl From<FetchTextError> for Error {
 impl From<NodeCacheError> for Error {
   fn from(value: NodeCacheError) -> Self {
     match value {
-      NodeCacheError::InvalidYaml => Self::InvalidYaml,
-      NodeCacheError::IoError => Self::IoError,
-      NodeCacheError::HttpError => Self::HttpError,
+      NodeCacheError::ParseError => Self::ParseError,
+      NodeCacheError::FetchError => Self::FetchError,
+      NodeCacheError::Conflict => Self::Conflict,
     }
-  }
-}
-
-impl From<std::ffi::NulError> for Error {
-  fn from(_value: std::ffi::NulError) -> Self {
-    Self::NulMissing
-  }
-}
-
-impl From<std::str::Utf8Error> for Error {
-  fn from(_value: std::str::Utf8Error) -> Self {
-    Self::Utf8Error
-  }
-}
-
-impl From<serde_json::Error> for Error {
-  fn from(_value: serde_json::Error) -> Self {
-    Self::InvalidJson
-  }
-}
-
-impl From<serde_yaml::Error> for Error {
-  fn from(_value: serde_yaml::Error) -> Self {
-    Self::InvalidYaml
   }
 }
