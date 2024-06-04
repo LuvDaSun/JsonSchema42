@@ -609,7 +609,7 @@ mod tests {
   use crate::models::SchemaType;
 
   #[async_std::test]
-  async fn test_load_empty_node() {
+  async fn test_load_string_from_location() {
     let mut document_context = Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
@@ -622,6 +622,38 @@ mod tests {
         location.clone(),
         location.clone(),
         None,
+        documents::draft_2020_12::META_SCHEMA_ID.to_owned(),
+      )
+      .await
+      .unwrap();
+
+    let mut nodes = document_context.get_schema_nodes();
+    assert_eq!(nodes.len(), 1);
+
+    let (_key, node) = nodes.pop_last().unwrap();
+    assert_eq!(node.types, Some(vec![SchemaType::String]));
+  }
+
+  #[async_std::test]
+  async fn test_load_string_from_node() {
+    let mut document_context = Rc::new(DocumentContext::default());
+    document_context.register_well_known_factories().unwrap();
+
+    let location: NodeLocation = "/schema.json#".parse().unwrap();
+
+    document_context
+      .load_from_node(
+        location.clone(),
+        location.clone(),
+        None,
+        serde_json::from_str(
+          r#"
+            {
+              "type": "string"
+            }
+          "#,
+        )
+        .unwrap(),
         documents::draft_2020_12::META_SCHEMA_ID.to_owned(),
       )
       .await
