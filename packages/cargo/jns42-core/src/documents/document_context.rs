@@ -71,7 +71,7 @@ pub struct DocumentContext {
   /// Maps node retrieval locations to their documents retrieval location. We can work with the
   /// node via it's document.
   ///
-  node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
+  // node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
   /// all documents, indexed by the retrieval location of the document
   ///
@@ -91,7 +91,7 @@ impl DocumentContext {
     Self {
       cache: RefCell::new(cache),
       factories: Default::default(),
-      node_documents: Default::default(),
+      // node_documents: Default::default(),
       documents: Default::default(),
       retrieval_to_identity_locations: Default::default(),
       identity_to_retrieval_locations: Default::default(),
@@ -317,17 +317,17 @@ impl DocumentContext {
           )
         }))
       {
-        if self
-          .node_documents
-          .borrow_mut()
-          .insert(
-            node_retrieval_location.clone(),
-            document_retrieval_location.clone(),
-          )
-          .is_some()
-        {
-          Err(Error::Conflict)?;
-        }
+        // if self
+        //   .node_documents
+        //   .borrow_mut()
+        //   .insert(
+        //     node_retrieval_location.clone(),
+        //     document_retrieval_location.clone(),
+        //   )
+        //   .is_some()
+        // {
+        //   Err(Error::Conflict)?;
+        // }
         if self
           .retrieval_to_identity_locations
           .borrow_mut()
