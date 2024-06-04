@@ -1,4 +1,4 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -10,7 +10,7 @@ import {
 } from "../utils/index.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -170,24 +170,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length == 1) {
-      switch (item.types[0]) {
-        case "never":
+      switch (item.types[0] as core.SchemaType) {
+        case core.SchemaType.Never:
           yield "neverValue";
           return;
 
-        case "any":
+        case core.SchemaType.Any:
           yield "anyValue";
           return;
 
-        case "null":
+        case core.SchemaType.Null:
           yield JSON.stringify(null);
           return;
 
-        case "boolean":
+        case core.SchemaType.Boolean:
           yield `Boolean(nextSeed() % 2)`;
           return;
 
-        case "integer": {
+        case core.SchemaType.Integer: {
           let multipleOf = item.multipleOf ?? 1;
 
           let minimumValue = Number.NEGATIVE_INFINITY;
@@ -230,7 +230,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case "number": {
+        case core.SchemaType.Number: {
           let minimumValue = Number.NEGATIVE_INFINITY;
           let isMinimumExclusive: boolean | undefined;
           if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
@@ -276,7 +276,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case "string": {
+        case core.SchemaType.String: {
           const minimumStringLengthExpression =
             item.minimumLength == null
               ? "configuration.defaultMinimumStringLength"
@@ -300,7 +300,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case "array": {
+        case core.SchemaType.Array: {
           yield itt`
             [
               ${generateInterfaceContent()}
@@ -345,7 +345,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           }
         }
 
-        case "object": {
+        case core.SchemaType.Object: {
           yield itt`
             {
               ${generateInterfaceContent()}

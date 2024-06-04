@@ -1,9 +1,9 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import * as models from "../models/index.js";
 import { itt, mapIterable, packageInfo } from "../utils/index.js";
 
 export function* generateExamplesTestTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 

@@ -1,4 +1,4 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -9,7 +9,7 @@ import {
 } from "../utils/index.js";
 
 export function* generateParsersTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -89,12 +89,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length === 1) {
-      switch (item.types[0]) {
-        case "any":
+      switch (item.types[0] as core.SchemaType) {
+        case core.SchemaType.Any:
           yield valueExpression;
           return;
 
-        case "null":
+        case core.SchemaType.Null:
           yield `
             ((value: unknown) => {
               if(value == null) {
@@ -130,7 +130,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case "boolean":
+        case core.SchemaType.Boolean:
           yield `
             ((value: unknown) => {
               if(value == null) {
@@ -173,7 +173,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case "integer":
+        case core.SchemaType.Integer:
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -199,7 +199,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case "number":
+        case core.SchemaType.Number:
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -225,7 +225,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case "string":
+        case core.SchemaType.String:
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -251,7 +251,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case "array": {
+        case core.SchemaType.Array: {
           yield itt`
             Array.isArray(${valueExpression}) ?
               ${valueExpression}.map((value, index) => {
@@ -295,7 +295,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
         }
 
-        case "object": {
+        case core.SchemaType.Object: {
           yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(

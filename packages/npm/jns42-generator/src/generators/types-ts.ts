@@ -1,4 +1,4 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import * as models from "../models/index.js";
 import {
   NestedText,
@@ -9,7 +9,7 @@ import {
 } from "../utils/index.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -87,33 +87,33 @@ export function* generateTypesTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length === 1) {
-      switch (item.types[0]) {
-        case "never":
+      switch (item.types[0] as core.SchemaType) {
+        case core.SchemaType.Never:
           yield "never";
           return;
 
-        case "any":
+        case core.SchemaType.Any:
           yield "any";
           return;
 
-        case "null":
+        case core.SchemaType.Null:
           yield "null";
           return;
 
-        case "boolean":
+        case core.SchemaType.Boolean:
           yield "boolean";
           return;
 
-        case "integer":
-        case "number":
+        case core.SchemaType.Integer:
+        case core.SchemaType.Number:
           yield "number";
           return;
 
-        case "string":
+        case core.SchemaType.String:
           yield "string";
           return;
 
-        case "array": {
+        case core.SchemaType.Array: {
           yield itt`
           [
             ${generateInterfaceContent()}
@@ -145,7 +145,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           }
         }
 
-        case "object": {
+        case core.SchemaType.Object: {
           yield itt`
           {
             ${generateInterfaceContent()}

@@ -1,4 +1,4 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
@@ -11,7 +11,7 @@ import {
 } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 
@@ -168,29 +168,29 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     `;
       function* generateSubAssertions() {
-        for (const type of item.types ?? []) {
+        for (const type of item.types ?? ([] as core.SchemaType[])) {
           switch (type) {
-            case "any": {
+            case core.SchemaType.Any: {
               yield JSON.stringify(true);
               break;
             }
 
-            case "never": {
+            case core.SchemaType.Never: {
               yield JSON.stringify(false);
               return;
             }
 
-            case "null": {
+            case core.SchemaType.Null: {
               yield itt`${valueExpression} === null`;
               break;
             }
 
-            case "boolean": {
+            case core.SchemaType.Boolean: {
               yield itt`typeof ${valueExpression} === "boolean"`;
               break;
             }
 
-            case "integer": {
+            case core.SchemaType.Integer: {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression}) &&
@@ -199,7 +199,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case "number": {
+            case core.SchemaType.Number: {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression})
@@ -207,17 +207,17 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case "string": {
+            case core.SchemaType.String: {
               yield itt`typeof ${valueExpression} === "string"`;
               break;
             }
 
-            case "array": {
+            case core.SchemaType.Array: {
               yield itt`Array.isArray(${valueExpression})`;
               break;
             }
 
-            case "object": {
+            case core.SchemaType.Object: {
               yield itt`
                 ${valueExpression} !== null &&
                 typeof ${valueExpression} === "object" &&
