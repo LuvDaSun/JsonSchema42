@@ -7,7 +7,7 @@ use std::collections::{BTreeMap, HashMap};
 
 pub struct Document {
   document_location: NodeLocation,
-  antecedent_location: Option<NodeLocation>,
+  identity_location: Option<NodeLocation>,
   /**
   Nodes that belong to this document, indexed by their pointer
   */
@@ -63,7 +63,7 @@ impl Document {
 
     Ok(Self {
       document_location,
-      antecedent_location,
+      identity_location: antecedent_location,
       nodes,
       referenced_locations,
     })
@@ -71,20 +71,20 @@ impl Document {
 }
 
 impl SchemaDocument for Document {
-  fn get_document_location(&self) -> &NodeLocation {
-    &self.document_location
+  fn get_identity_location(&self) -> NodeLocation {
+    self.document_location.clone()
   }
 
-  fn get_antecedent_location(&self) -> Option<&NodeLocation> {
-    self.antecedent_location.as_ref()
+  fn get_antecedent_location(&self) -> Option<NodeLocation> {
+    self.identity_location.clone()
   }
 
-  fn get_node_locations(&self) -> Vec<NodeLocation> {
-    self
-      .nodes
-      .keys()
-      .map(|pointer| self.document_location.push_pointer(pointer.clone()))
-      .collect()
+  fn get_node_pointers(&self) -> Vec<Vec<String>> {
+    self.nodes.keys().cloned().collect()
+  }
+
+  fn get_node_anchors(&self) -> Vec<String> {
+    Default::default()
   }
 
   fn get_referenced_locations(&self) -> Vec<NodeLocation> {
@@ -96,7 +96,7 @@ impl SchemaDocument for Document {
       .nodes
       .iter()
       .map(|(pointer, node)| {
-        let location = self.get_document_location().push_pointer(pointer.clone());
+        let location = self.get_identity_location().push_pointer(pointer.clone());
         (location.clone(), node.to_document_schema_item(location))
       })
       .collect()

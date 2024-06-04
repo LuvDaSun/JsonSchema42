@@ -5,6 +5,7 @@ use crate::models::DocumentSchemaItem;
 use crate::utils::NodeCache;
 use crate::utils::NodeLocation;
 use std::collections::BTreeMap;
+use std::iter;
 use std::{
   cell::RefCell,
   collections::HashMap,
@@ -23,13 +24,13 @@ pub type DocumentFactory =
 
 /**
 This class loads document nodes and documents. Every node has a few locations:
-- Node location
+- Identity location
 
-  This is the main identifier for the node
+  This is the main identifier for the node, nodes reference to other nodes via this identifier
 
 - Retrieval location
 
-  This is the physical location of the node we often use this as a primary identifier
+  This is the physical location of the node this is considered the primary key of the node
 
 - Document location
 
@@ -38,48 +39,62 @@ This class loads document nodes and documents. Every node has a few locations:
 - Antecedent location
 
   This is the antecedent (reason) for the node, (or empty if no antecedent). Antecedent
-  can be a referencing document, or the embedding document.
+  can be a referencing document, or the embedding document. This references
+  the identity location of another document.
 
 - Given location
 
   This is an expected location for a node that is often derived from the antecedent and the
-  JSON pointer to the node.
+  JSON pointer to the node. This is the node location, unless the node itself specifies a
+  different location
 
+So there is something interesting going on here, we use retrieval location as a primary key,
+but nodes reference to each other vie the identity location. This seems a bit weird, but we need
+to do it this way. The retrieval location is known before the node is loaded, the node
+location is not. This is because in some edge cases the identity location may be specified by the
+node itself! So we need to load the node before we can know the identity location.
+
+Nodes reference each other by the identity location, so we have a way of translating node locations
+retrieval locations. This step need to be done first when retrieving a references node. We use
+the node_resolved map to translate identity locations to retrieval locations.
 
 */
 pub struct DocumentContext {
+  /// nodes are stored in the cache, and indexed by their retrieval location
+  ///
   cache: RefCell<NodeCache>,
 
-  /**
-  Maps node retrieval locations to their documents. Every node has a location that is an identifier. Thi
-  map maps that identifier to the identifier of a document.
-  */
+  /// document factories by schema identifier
+  ///
+  factories: HashMap<String, Box<DocumentFactory>>,
+
+  /// Maps node retrieval locations to their documents retrieval location. We can work with the
+  /// node via it's document.
+  ///
   node_documents: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
-  /**
-   * all documents, indexed by the document node id of the document
-   */
+  /// all documents, indexed by the retrieval location of the document
+  ///
   documents: RefCell<HashMap<NodeLocation, Rc<dyn SchemaDocument>>>,
 
-  /**
-  This map maps document retrieval locations to document root locations
-   */
-  document_resolved: RefCell<HashMap<NodeLocation, NodeLocation>>,
+  /// This maps identity locations to retrieval locations. Use this table every time you
+  /// need to fetch a node by it's identity location and you have a retrieval location
+  ///
+  retrieval_to_identity_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
-  /**
-   * document factories by schema identifier
-   */
-  factories: HashMap<String, Box<DocumentFactory>>,
+  /// this maps retrieval locations to identity locations
+  identity_to_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
 }
 
 impl DocumentContext {
   pub fn new(cache: NodeCache) -> Self {
     Self {
       cache: RefCell::new(cache),
+      factories: Default::default(),
       node_documents: Default::default(),
       documents: Default::default(),
-      document_resolved: Default::default(),
-      factories: Default::default(),
+      retrieval_to_identity_locations: Default::default(),
+      identity_to_retrieval_locations: Default::default(),
     }
   }
 
@@ -218,123 +233,139 @@ impl DocumentContext {
   #[allow(clippy::await_holding_refcell_ref)]
   pub async fn load_from_location(
     self: &Rc<Self>,
-    retrieval_location: NodeLocation,
-    given_location: NodeLocation,
-    antecedent_location: Option<NodeLocation>,
+    document_retrieval_location: NodeLocation,
+    document_given_location: NodeLocation,
+    document_antecedent_location: Option<NodeLocation>,
     default_meta_schema_id: String,
   ) -> Result<(), Error> {
     let mut queue = Vec::new();
     queue.push((
-      retrieval_location,
-      given_location,
-      antecedent_location,
-      default_meta_schema_id,
+      document_retrieval_location,
+      document_given_location,
+      document_antecedent_location,
     ));
 
     while let Some((
-      retrieval_location,
-      given_location,
-      antecedent_location,
-      default_meta_schema_id,
+      document_retrieval_location,
+      document_given_location,
+      document_antecedent_location,
     )) = queue.pop()
     {
-      // TODO
+      // If a document with this retrieval location is already loaded
       if self
-        .document_resolved
+        .documents
         .borrow()
-        .contains_key(&retrieval_location)
+        .contains_key(&document_retrieval_location)
       {
         continue;
       }
 
+      // Ensure the node is in the cache
       self
         .cache
         .borrow_mut()
-        .load_from_location(&retrieval_location)
+        .load_from_location(&document_retrieval_location)
         .await?;
 
-      let node = self
+      // Get the node from the cache
+      let document_node = self
         .cache
         .borrow()
-        .get_node(&retrieval_location)
+        .get_node(&document_retrieval_location)
         .ok_or(Error::NotFound)?
         .clone();
 
-      let meta_schema_id = documents::discover_meta_schema(&node)
-        .map(str::to_owned)
-        .unwrap_or(default_meta_schema_id);
-
-      let factory = self.factories.get(&meta_schema_id).ok_or(Error::NotFound)?;
+      // read the meta schema id from the node. The node is a document node, so meta
+      // schema may be set by this node.
+      let meta_schema_id =
+        documents::discover_meta_schema(&document_node).unwrap_or(&default_meta_schema_id);
+      let factory = self.factories.get(meta_schema_id).ok_or(Error::NotFound)?;
 
       let document = factory(
         Rc::downgrade(self),
         DocumentConfiguration {
-          retrieval_location: retrieval_location.clone(),
-          given_location: given_location.clone(),
-          antecedent_location: antecedent_location.clone(),
-          document_node: node,
+          retrieval_location: document_retrieval_location.clone(),
+          given_location: document_given_location.clone(),
+          antecedent_location: document_antecedent_location.clone(),
+          document_node,
         },
       );
 
-      let document_location = document.get_document_location();
-
-      if self
-        .document_resolved
-        .borrow_mut()
-        .insert(retrieval_location.clone(), document_location.clone())
-        .is_some()
-      {
-        Err(Error::Conflict)?;
-      }
+      let document_identity_location = document.get_identity_location();
 
       if self
         .documents
         .borrow_mut()
-        .insert(document_location.clone(), document.clone())
+        .insert(document_retrieval_location.clone(), document.clone())
         .is_some()
       {
         Err(Error::Conflict)?;
       }
 
-      // Map node locations to this document
-      for node_location in document.get_node_locations() {
-        /*
-        Inserts all node locations that belong to this document. We only expect locations
-        that are part of this document and not part of embedded documents. So every node_location
-        should be unique.
-        */
-        assert!(self
+      // Map node pointers and anchors to this document
+      for (node_retrieval_location, node_identity_location) in iter::empty()
+        .chain(document.get_node_pointers().into_iter().map(|pointer| {
+          (
+            document_retrieval_location.push_pointer(pointer.clone()),
+            document_identity_location.push_pointer(pointer.clone()),
+          )
+        }))
+        .chain(document.get_node_anchors().into_iter().map(|anchor| {
+          (
+            document_retrieval_location.set_anchor(anchor.clone()),
+            document_identity_location.set_anchor(anchor.clone()),
+          )
+        }))
+      {
+        if self
           .node_documents
           .borrow_mut()
-          .insert(node_location.clone(), document_location.clone())
-          .is_none());
+          .insert(
+            node_retrieval_location.clone(),
+            document_retrieval_location.clone(),
+          )
+          .is_some()
+        {
+          Err(Error::Conflict)?;
+        }
+        if self
+          .retrieval_to_identity_locations
+          .borrow_mut()
+          .insert(
+            node_retrieval_location.clone(),
+            node_identity_location.clone(),
+          )
+          .is_some()
+        {
+          Err(Error::Conflict)?;
+        }
+        if self
+          .identity_to_retrieval_locations
+          .borrow_mut()
+          .insert(
+            node_identity_location.clone(),
+            node_retrieval_location.clone(),
+          )
+          .is_some()
+        {
+          Err(Error::Conflict)?;
+        }
       }
 
       let referenced_locations = document.get_referenced_locations();
       for referenced_location in referenced_locations {
-        let retrieval_location = retrieval_location.join(&referenced_location);
-        let given_location = document_location.join(&referenced_location);
+        let retrieval_location = document_retrieval_location.join(&referenced_location);
+        let given_location = document_identity_location.join(&referenced_location);
         queue.push((
           retrieval_location,
           given_location,
-          Some(document_location.clone()),
-          meta_schema_id.clone(),
+          // antecedent location points to the identity location!
+          Some(document_identity_location.clone()),
         ));
       }
     }
 
     Ok(())
-  }
-
-  pub fn resolve_document_retrieval_location(
-    &self,
-    document_retrieval_location: &NodeLocation,
-  ) -> Option<NodeLocation> {
-    self
-      .document_resolved
-      .borrow()
-      .get(document_retrieval_location)
-      .cloned()
   }
 
   pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem> {
@@ -346,44 +377,58 @@ impl DocumentContext {
       .collect()
   }
 
-  pub fn resolve_document_location(&self, node_location: &NodeLocation) -> NodeLocation {
+  pub fn resolve_identity_location(
+    &self,
+    retrieval_location: &NodeLocation,
+  ) -> Result<NodeLocation, Error> {
     self
-      .node_documents
+      .retrieval_to_identity_locations
       .borrow()
-      .get(node_location)
-      .unwrap()
-      .clone()
+      .get(retrieval_location)
+      .cloned()
+      .ok_or(Error::NotFound)
+  }
+
+  pub fn resolve_retrieval_location(
+    &self,
+    identity_location: &NodeLocation,
+  ) -> Result<NodeLocation, Error> {
+    self
+      .identity_to_retrieval_locations
+      .borrow()
+      .get(identity_location)
+      .cloned()
+      .ok_or(Error::NotFound)
   }
 
   pub fn get_document(
     &self,
-    document_location: &NodeLocation,
+    document_retrieval_location: &NodeLocation,
   ) -> Result<Rc<dyn SchemaDocument>, Error> {
-    let document_location = document_location.clone();
-
-    let documents = self.documents.borrow();
-    let result = documents.get(&document_location).ok_or(Error::NotFound)?;
-    let result = result.clone();
-
-    Ok(result)
+    self
+      .documents
+      .borrow()
+      .get(document_retrieval_location)
+      .cloned()
+      .ok_or(Error::NotFound)
   }
 
   pub fn get_document_and_antecedents(
     &self,
-    document_location: &NodeLocation,
+    document_identity_location: &NodeLocation,
   ) -> Result<Vec<Rc<dyn SchemaDocument>>, Error> {
     let mut results = Vec::new();
-    let mut document_location = document_location.clone();
+    let mut document_identity_location = document_identity_location.clone();
 
     loop {
-      let result = self.get_document(&document_location)?;
+      let result = self.get_document(&document_identity_location)?;
       results.push(result.clone());
 
       let Some(antecedent_location) = result.get_antecedent_location() else {
         break;
       };
 
-      document_location = antecedent_location.clone();
+      document_identity_location = antecedent_location.clone();
     }
 
     Ok(results)

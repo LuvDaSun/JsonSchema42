@@ -9,7 +9,7 @@ use std::rc::Weak;
 pub struct Document {
   document_context: Weak<DocumentContext>,
 
-  document_location: NodeLocation,
+  identity_location: NodeLocation,
   antecedent_location: Option<NodeLocation>,
   /**
   Nodes that belong to this document, indexed by their pointer
@@ -33,7 +33,7 @@ impl Document {
   ) -> Result<Self, Error> {
     let node_id = document_node.select_id();
 
-    let document_location = if let Some(node_id) = node_id {
+    let identity_location = if let Some(node_id) = node_id {
       let node_location = node_id.parse()?;
       if let Some(antecedent_location) = &antecedent_location {
         antecedent_location.join(&node_location)
@@ -89,7 +89,7 @@ impl Document {
 
     Ok(Self {
       document_context,
-      document_location,
+      identity_location,
       antecedent_location,
       nodes,
       referenced_locations,
@@ -98,16 +98,19 @@ impl Document {
     })
   }
 
+  /// resolve reference to identity location
+  ///
   pub fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
-    let reference_location = self.document_location.join(&reference_location);
-    let document_location = document_context.resolve_document_location(&reference_location);
-    let document = document_context.get_document(&document_location)?;
+    let reference_location = self.identity_location.join(&reference_location);
+    let document_retrieval_location =
+      document_context.resolve_retrieval_location(&reference_location)?;
+    let document = document_context.get_document(&document_retrieval_location)?;
 
     if let Some(anchor) = reference_location.get_anchor() {
       if let Some(pointer) = document.resolve_anchor(anchor.as_str()) {
-        let reference_location = document.get_document_location().push_pointer(pointer);
+        let reference_location = document.get_identity_location().push_pointer(pointer);
         return Ok(reference_location);
       }
     } else {
@@ -117,19 +120,21 @@ impl Document {
     Err(Error::NotFound)
   }
 
+  /// resolve recursive reference to identity location
+  ///
   pub fn resolve_recursive_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let mut antecedent_documents =
-      document_context.get_document_and_antecedents(self.get_document_location())?;
+      document_context.get_document_and_antecedents(&self.get_identity_location())?;
     // we start with the document that has no antecedent
     antecedent_documents.reverse();
 
     for document in antecedent_documents {
-      let reference_location = document.get_document_location().join(&reference_location);
+      let reference_location = document.get_identity_location().join(&reference_location);
       if let Some(anchor) = reference_location.get_anchor() {
         if let Some(pointer) = document.resolve_antecedent_anchor(anchor.as_str()) {
-          let reference_location = document.get_document_location().push_pointer(pointer);
+          let reference_location = document.get_identity_location().push_pointer(pointer);
           return Ok(reference_location);
         };
       } else {
@@ -142,20 +147,20 @@ impl Document {
 }
 
 impl SchemaDocument for Document {
-  fn get_document_location(&self) -> &NodeLocation {
-    &self.document_location
+  fn get_identity_location(&self) -> NodeLocation {
+    self.identity_location.clone()
   }
 
-  fn get_antecedent_location(&self) -> Option<&NodeLocation> {
-    self.antecedent_location.as_ref()
+  fn get_antecedent_location(&self) -> Option<NodeLocation> {
+    self.antecedent_location.clone()
   }
 
-  fn get_node_locations(&self) -> Vec<NodeLocation> {
-    self
-      .nodes
-      .keys()
-      .map(|pointer| self.document_location.push_pointer(pointer.clone()))
-      .collect()
+  fn get_node_pointers(&self) -> Vec<Vec<String>> {
+    self.nodes.keys().cloned().collect()
+  }
+
+  fn get_node_anchors(&self) -> Vec<String> {
+    Default::default()
   }
 
   fn get_referenced_locations(&self) -> Vec<NodeLocation> {
@@ -167,7 +172,7 @@ impl SchemaDocument for Document {
       .nodes
       .iter()
       .map(|(pointer, node)| {
-        let location = self.get_document_location().push_pointer(pointer.clone());
+        let location = self.get_identity_location().push_pointer(pointer.clone());
         (
           location.clone(),
           node.to_document_schema_item(location, self),
