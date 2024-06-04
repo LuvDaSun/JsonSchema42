@@ -109,6 +109,7 @@ impl Document {
     if let Some(anchor) = reference_location.get_anchor() {
       if let Some(pointer) = document.resolve_anchor(anchor.as_str()) {
         let reference_location = document.get_identity_location().push_pointer(pointer);
+        let reference_location = reference_location.set_root();
         return Ok(reference_location);
       }
     } else {
