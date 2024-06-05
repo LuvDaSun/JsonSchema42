@@ -7,7 +7,7 @@ export function* generateCleanJsCode() {
     #!/usr/bin/env node
   `;
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.jns42Banner("//", `v${packageInfo.version}`);
 
   yield itt`
     import fs from "fs";

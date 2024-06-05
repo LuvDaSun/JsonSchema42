@@ -3,7 +3,7 @@ import * as models from "../models/index.js";
 import { generateJsDocComments, isMockable, itt, packageInfo } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.jns42Banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 

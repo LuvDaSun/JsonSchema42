@@ -3,7 +3,7 @@ import * as models from "../models/index.js";
 import { itt, packageInfo } from "../utils/index.js";
 
 export function* generateMainTsCode(specification: models.Specification) {
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.jns42Banner("//", `v${packageInfo.version}`);
 
   yield itt`
     export * from "./types.js";
