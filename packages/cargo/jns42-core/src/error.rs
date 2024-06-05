@@ -5,6 +5,7 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
 #[wasm_bindgen]
 pub enum Error {
+  Unknown,
   Conflict,
   NotFound,
   InvalidLocation,
@@ -17,6 +18,7 @@ impl std::error::Error for Error {}
 impl Display for Error {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
+      Self::Unknown => write!(f, "Unknown"),
       Self::Conflict => write!(f, "Conflict"),
       Self::NotFound => write!(f, "NotFound"),
       Self::InvalidLocation => write!(f, "InvalidLocation"),
@@ -24,7 +26,6 @@ impl Display for Error {
       Self::SerializationError => write!(f, "SerializationError"),
     }
   }
-  //
 }
 
 impl From<ParseLocationError> for Error {
