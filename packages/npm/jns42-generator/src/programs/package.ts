@@ -76,7 +76,7 @@ async function main(configuration: MainConfiguration) {
     configuration;
 
   const cache = new core.NodeCache();
-  const context = new core.DocumentContextContainer(cache);
+  const context = new core.Jns42DocumentContextContainer(cache);
   context.registerWellKnownFactories();
 
   await context.loadFromLocation(

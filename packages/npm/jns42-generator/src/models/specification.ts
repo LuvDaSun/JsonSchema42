@@ -12,7 +12,7 @@ export interface LoadSpecificationConfiguration {
 }
 
 export function loadSpecification(
-  documentContext: core.DocumentContextContainer,
+  documentContext: core.Jns42DocumentContextContainer,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;

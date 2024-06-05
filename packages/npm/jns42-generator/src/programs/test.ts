@@ -104,7 +104,7 @@ async function main(configuration: MainConfiguration) {
     // generate package
     {
       const cache = new core.NodeCache();
-      const context = new core.DocumentContextContainer(cache);
+      const context = new core.Jns42DocumentContextContainer(cache);
       context.registerWellKnownFactories();
 
       await context.loadFromNode(
