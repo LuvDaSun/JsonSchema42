@@ -1,6 +1,6 @@
 use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
 use crate::{
-  documents::{DocumentContext, DocumentContextContainer},
+  documents::{DocumentContext, Jns42DocumentContextContainer},
   models::ArenaSchemaItemContainer,
   utils::{arena::Arena, NodeLocation},
 };
@@ -209,7 +209,7 @@ pub struct SchemaArenaContainer(SchemaArena);
 #[wasm_bindgen]
 impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = fromDocumentContext)]
-  pub fn from_document_context(document_context: DocumentContextContainer) -> Self {
+  pub fn from_document_context(document_context: Jns42DocumentContextContainer) -> Self {
     SchemaArena::from_document_context(&document_context.into()).into()
   }
 

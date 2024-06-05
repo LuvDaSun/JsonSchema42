@@ -1,6 +1,6 @@
 use super::Node;
 use crate::documents::{DocumentContext, SchemaDocument};
-use crate::error::Error;
+use crate::error::Jns42Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeLocation;
 use std::collections::{BTreeMap, HashMap};
@@ -30,7 +30,7 @@ impl Document {
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
     document_node: Node,
-  ) -> Result<Self, Error> {
+  ) -> Result<Self, Jns42Error> {
     let node_id = document_node.select_id();
 
     let identity_location = if let Some(node_id) = node_id {
@@ -62,7 +62,7 @@ impl Document {
 
       if node.select_recursive_anchor().unwrap_or_default() {
         if recursive_anchor.is_some() {
-          Err(Error::Conflict)?
+          Err(Jns42Error::Conflict)?
         }
 
         recursive_anchor = Some(node_pointer.clone());
@@ -101,7 +101,7 @@ impl Document {
 
   /// resolve reference to identity location
   ///
-  pub fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
+  pub fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Jns42Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let reference_location = self.identity_location.join(&reference_location);
@@ -120,12 +120,12 @@ impl Document {
       return Ok(reference_location);
     }
 
-    Err(Error::NotFound)
+    Err(Jns42Error::NotFound)
   }
 
   /// resolve recursive reference to identity location
   ///
-  pub fn resolve_recursive_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
+  pub fn resolve_recursive_reference(&self, reference: &str) -> Result<NodeLocation, Jns42Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let mut antecedent_documents =
@@ -141,11 +141,11 @@ impl Document {
           return Ok(reference_location);
         };
       } else {
-        return Err(Error::Unknown);
+        return Err(Jns42Error::Unknown);
       }
     }
 
-    Err(Error::NotFound)
+    Err(Jns42Error::NotFound)
   }
 }
 
