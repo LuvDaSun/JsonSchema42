@@ -1,6 +1,7 @@
 use super::{fetch_text, FetchTextError, NodeLocation};
+use std::cell::RefCell;
 use std::collections::{btree_map, BTreeMap};
-use std::iter;
+use std::{iter, rc};
 use wasm_bindgen::prelude::*;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
@@ -8,20 +9,15 @@ use wasm_bindgen::prelude::*;
 /// unique) location of the node.
 ///
 #[derive(Default)]
-#[wasm_bindgen]
 pub struct NodeCache {
   root_nodes: BTreeMap<NodeLocation, serde_json::Value>,
 }
 
-#[wasm_bindgen]
 impl NodeCache {
-  #[wasm_bindgen(constructor)]
   pub fn new() -> Self {
     Default::default()
   }
-}
 
-impl NodeCache {
   /// Retrieves all locations in the cache
   ///
   pub fn get_locations(&self) -> impl Iterator<Item = NodeLocation> + '_ {
@@ -127,6 +123,38 @@ impl NodeCache {
     } else {
       Err(NodeCacheError::Conflict)
     }
+  }
+}
+
+#[wasm_bindgen]
+#[derive(Default, Clone)]
+pub struct NodeCacheContainer(rc::Rc<RefCell<NodeCache>>);
+
+#[wasm_bindgen]
+impl NodeCacheContainer {
+  #[wasm_bindgen(constructor)]
+  pub fn new() -> Self {
+    Default::default()
+  }
+}
+
+#[wasm_bindgen]
+impl NodeCacheContainer {
+  #[wasm_bindgen(js_name = "clone")]
+  pub fn _clone(&self) -> Self {
+    Clone::clone(self)
+  }
+}
+
+impl From<NodeCacheContainer> for rc::Rc<RefCell<NodeCache>> {
+  fn from(value: NodeCacheContainer) -> Self {
+    value.0
+  }
+}
+
+impl From<rc::Rc<RefCell<NodeCache>>> for NodeCacheContainer {
+  fn from(value: rc::Rc<RefCell<NodeCache>>) -> Self {
+    Self(value)
   }
 }
 

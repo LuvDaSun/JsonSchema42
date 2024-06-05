@@ -3,15 +3,13 @@ use crate::documents;
 use crate::error::Jns42Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeCache;
+use crate::utils::NodeCacheContainer;
 use crate::utils::NodeLocation;
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeMap;
 use std::iter;
-use std::{
-  cell::RefCell,
-  collections::HashMap,
-  rc::{Rc, Weak},
-};
+use std::rc;
+use std::{cell::RefCell, collections::HashMap};
 use wasm_bindgen::prelude::*;
 
 pub struct DocumentConfiguration {
@@ -22,7 +20,7 @@ pub struct DocumentConfiguration {
 }
 
 pub type DocumentFactory =
-  dyn Fn(Weak<DocumentContext>, DocumentConfiguration) -> Rc<dyn SchemaDocument>;
+  dyn Fn(rc::Weak<DocumentContext>, DocumentConfiguration) -> rc::Rc<dyn SchemaDocument>;
 
 /**
 This class loads document nodes and documents. Every node has a few locations:
@@ -64,7 +62,7 @@ the node_resolved map to translate identity locations to retrieval locations.
 pub struct DocumentContext {
   /// nodes are stored in the cache, and indexed by their retrieval location
   ///
-  cache: RefCell<NodeCache>,
+  cache: rc::Rc<RefCell<NodeCache>>,
 
   /// document factories by schema identifier
   ///
@@ -77,7 +75,7 @@ pub struct DocumentContext {
 
   /// all documents, indexed by the retrieval location of the document
   ///
-  documents: RefCell<HashMap<NodeLocation, Rc<dyn SchemaDocument>>>,
+  documents: RefCell<HashMap<NodeLocation, rc::Rc<dyn SchemaDocument>>>,
 
   /// This maps identity locations to retrieval locations. Use this table every time you
   /// need to fetch a node by it's identity location and you have a retrieval location
@@ -89,9 +87,9 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-  pub fn new(cache: NodeCache) -> Self {
+  pub fn new(cache: rc::Rc<RefCell<NodeCache>>) -> Self {
     Self {
-      cache: RefCell::new(cache),
+      cache,
       factories: Default::default(),
       node_to_document_retrieval_locations: Default::default(),
       documents: Default::default(),
@@ -101,7 +99,7 @@ impl DocumentContext {
   }
 
   pub fn register_factory(
-    self: &mut Rc<Self>,
+    self: &mut rc::Rc<Self>,
     schema: &str,
     factory: Box<DocumentFactory>,
   ) -> Result<(), Jns42Error> {
@@ -109,7 +107,7 @@ impl DocumentContext {
     don't check if the factory is already registered here so we can
     override factories
     */
-    Rc::get_mut(self)
+    rc::Rc::get_mut(self)
       .ok_or(Jns42Error::Unknown)?
       .factories
       .insert(schema.to_owned(), factory);
@@ -117,11 +115,11 @@ impl DocumentContext {
     Ok(())
   }
 
-  pub fn register_well_known_factories(self: &mut Rc<Self>) -> Result<(), Jns42Error> {
+  pub fn register_well_known_factories(self: &mut rc::Rc<Self>) -> Result<(), Jns42Error> {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::draft_2020_12::Document::new(
             context,
             configuration.given_location,
@@ -135,7 +133,7 @@ impl DocumentContext {
     self.register_factory(
       documents::draft_2019_09::META_SCHEMA_ID,
       Box::new(|context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::draft_2019_09::Document::new(
             context,
             configuration.given_location,
@@ -149,7 +147,7 @@ impl DocumentContext {
     self.register_factory(
       documents::draft_07::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::draft_07::Document::new(
             configuration.given_location,
             configuration.antecedent_location,
@@ -162,7 +160,7 @@ impl DocumentContext {
     self.register_factory(
       documents::draft_06::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::draft_06::Document::new(
             configuration.given_location,
             configuration.antecedent_location,
@@ -175,7 +173,7 @@ impl DocumentContext {
     self.register_factory(
       documents::draft_04::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::draft_04::Document::new(
             configuration.given_location,
             configuration.antecedent_location,
@@ -188,7 +186,7 @@ impl DocumentContext {
     self.register_factory(
       documents::oas_v3_1::META_SCHEMA_ID,
       Box::new(|context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::oas_v3_1::Document::new(
             context,
             configuration.given_location,
@@ -202,7 +200,7 @@ impl DocumentContext {
     self.register_factory(
       documents::oas_v3_0::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::oas_v3_0::Document::new(
             configuration.given_location,
             configuration.antecedent_location,
@@ -215,7 +213,7 @@ impl DocumentContext {
     self.register_factory(
       documents::swagger_v2::META_SCHEMA_ID,
       Box::new(|_context, configuration| {
-        Rc::new(
+        rc::Rc::new(
           documents::swagger_v2::Document::new(
             configuration.given_location,
             configuration.antecedent_location,
@@ -234,7 +232,7 @@ impl DocumentContext {
   */
   #[allow(clippy::await_holding_refcell_ref)]
   pub async fn load_from_location(
-    self: &Rc<Self>,
+    self: &rc::Rc<Self>,
     document_retrieval_location: NodeLocation,
     document_given_location: NodeLocation,
     document_antecedent_location: Option<NodeLocation>,
@@ -287,7 +285,7 @@ impl DocumentContext {
         .ok_or(Jns42Error::NotFound)?;
 
       let document = factory(
-        Rc::downgrade(self),
+        rc::Rc::downgrade(self),
         DocumentConfiguration {
           retrieval_location: document_retrieval_location.clone(),
           given_location: document_given_location.clone(),
@@ -374,7 +372,7 @@ impl DocumentContext {
   }
 
   pub async fn load_from_node(
-    self: &Rc<Self>,
+    self: &rc::Rc<Self>,
     document_retrieval_location: NodeLocation,
     document_given_location: NodeLocation,
     document_antecedent_location: Option<NodeLocation>,
@@ -413,7 +411,7 @@ impl DocumentContext {
       .ok_or(Jns42Error::NotFound)?;
 
     let document = factory(
-      Rc::downgrade(self),
+      rc::Rc::downgrade(self),
       DocumentConfiguration {
         retrieval_location: document_retrieval_location.clone(),
         given_location: document_given_location.clone(),
@@ -547,7 +545,7 @@ impl DocumentContext {
   pub fn get_document(
     &self,
     document_retrieval_location: &NodeLocation,
-  ) -> Result<Rc<dyn SchemaDocument>, Jns42Error> {
+  ) -> Result<rc::Rc<dyn SchemaDocument>, Jns42Error> {
     self
       .documents
       .borrow()
@@ -559,7 +557,7 @@ impl DocumentContext {
   pub fn get_document_and_antecedents(
     &self,
     document_identity_location: &NodeLocation,
-  ) -> Result<Vec<Rc<dyn SchemaDocument>>, Jns42Error> {
+  ) -> Result<Vec<rc::Rc<dyn SchemaDocument>>, Jns42Error> {
     let mut results = Vec::new();
     let mut document_identity_location = document_identity_location.clone();
 
@@ -585,13 +583,13 @@ impl Default for DocumentContext {
 }
 
 #[wasm_bindgen]
-pub struct Jns42DocumentContextContainer(Rc<DocumentContext>);
+pub struct Jns42DocumentContextContainer(rc::Rc<DocumentContext>);
 
 #[wasm_bindgen]
 impl Jns42DocumentContextContainer {
   #[wasm_bindgen(constructor)]
-  pub fn new(cache: NodeCache) -> Self {
-    Self(Rc::new(DocumentContext::new(cache)))
+  pub fn new(cache: NodeCacheContainer) -> Self {
+    Self(rc::Rc::new(DocumentContext::new(cache.into())))
   }
 
   #[wasm_bindgen(js_name = "registerWellKnownFactories")]
@@ -646,13 +644,13 @@ impl Default for Jns42DocumentContextContainer {
   }
 }
 
-impl From<Rc<DocumentContext>> for Jns42DocumentContextContainer {
-  fn from(value: Rc<DocumentContext>) -> Self {
+impl From<rc::Rc<DocumentContext>> for Jns42DocumentContextContainer {
+  fn from(value: rc::Rc<DocumentContext>) -> Self {
     Self(value)
   }
 }
 
-impl From<Jns42DocumentContextContainer> for Rc<DocumentContext> {
+impl From<Jns42DocumentContextContainer> for rc::Rc<DocumentContext> {
   fn from(value: Jns42DocumentContextContainer) -> Self {
     value.0
   }
@@ -666,7 +664,7 @@ mod tests {
 
   #[async_std::test]
   async fn test_load_string_from_location() {
-    let mut document_context = Rc::new(DocumentContext::default());
+    let mut document_context = rc::Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
     let location: NodeLocation = "../../../fixtures/specification/string.json"
@@ -692,7 +690,7 @@ mod tests {
 
   #[async_std::test]
   async fn test_load_string_from_node() {
-    let mut document_context = Rc::new(DocumentContext::default());
+    let mut document_context = rc::Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
     let location: NodeLocation = "/schema.json#".parse().unwrap();

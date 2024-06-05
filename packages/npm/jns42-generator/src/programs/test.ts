@@ -103,7 +103,7 @@ async function main(configuration: MainConfiguration) {
     const location = core.NodeLocation.parse(pathToTest);
     // generate package
     {
-      const cache = new core.NodeCache();
+      const cache = new core.NodeCacheContainer();
       const context = new core.Jns42DocumentContextContainer(cache);
       context.registerWellKnownFactories();
 
