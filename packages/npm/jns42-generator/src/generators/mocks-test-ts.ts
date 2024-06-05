@@ -1,9 +1,9 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import * as models from "../models/index.js";
 import { generateJsDocComments, isMockable, itt, packageInfo } from "../utils/index.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -14,18 +14,19 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (const [key, item] of [...typesArena].map((item, key) => [key, item] as const)) {
+  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
+    const item = typesArena.getItem(itemKey);
     const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    if (!isMockable(typesArena, key)) {
+    if (!isMockable(typesArena, itemKey)) {
       continue;
     }
 
-    using typeName = names.getName(key);
+    const typeName = names.getName(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}

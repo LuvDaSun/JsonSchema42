@@ -9,3 +9,7 @@ schemas:
       - true
       - true
       - true
+
+invalid:
+  one: 1
+  object: {}

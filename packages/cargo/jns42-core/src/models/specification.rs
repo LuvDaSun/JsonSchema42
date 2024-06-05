@@ -73,7 +73,7 @@ impl Specification {
     for (key, item) in arena.iter().enumerate() {
       let parts = arena.get_name_parts(key).map(|part| {
         NON_IDENTIFIER_REGEX
-          .replace_all(part, " ")
+          .replace_all(part.as_str(), " ")
           .into_owned()
           .trim()
           .to_string()

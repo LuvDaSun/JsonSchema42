@@ -1,5 +1,8 @@
+use crate::naming::NamesContainer;
+
 use super::{NamePart, Names, Sentence};
 use std::collections::{BTreeMap, BTreeSet};
+use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 pub struct NamesBuilder<K> {
@@ -32,7 +35,7 @@ where
     self
   }
 
-  pub fn build(&mut self) -> Names<K> {
+  pub fn build(&self) -> Names<K> {
     let cardinality_counters = Self::make_cardinality_counters(&self.sentences_map);
     let part_map = Self::make_parts_map(&self.sentences_map, &cardinality_counters);
     let optimized_names = Self::make_optimized_names(part_map);
@@ -209,6 +212,50 @@ where
 {
   fn default() -> Self {
     Self::new()
+  }
+}
+
+#[wasm_bindgen]
+pub struct NamesBuilderContainer(NamesBuilder<usize>);
+
+#[wasm_bindgen]
+impl NamesBuilderContainer {
+  #[wasm_bindgen(constructor)]
+  pub fn new() -> Self {
+    Self(NamesBuilder::new())
+  }
+
+  #[wasm_bindgen(js_name = setDefaultName)]
+  pub fn set_default_name(&mut self, value: &str) {
+    self.0.set_default_name(value);
+  }
+
+  #[wasm_bindgen(js_name = add)]
+  pub fn add(&mut self, key: usize, values: Vec<String>) {
+    self.0.add(key, values);
+  }
+
+  #[wasm_bindgen(js_name = build)]
+  pub fn build(&self) -> NamesContainer {
+    self.0.build().into()
+  }
+}
+
+impl Default for NamesBuilderContainer {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl From<NamesBuilder<usize>> for NamesBuilderContainer {
+  fn from(value: NamesBuilder<usize>) -> Self {
+    Self(value)
+  }
+}
+
+impl From<NamesBuilderContainer> for NamesBuilder<usize> {
+  fn from(value: NamesBuilderContainer) -> Self {
+    value.0
   }
 }
 

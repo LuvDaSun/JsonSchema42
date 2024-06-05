@@ -3,9 +3,10 @@ use clap::Parser;
 use jns42_core::documents;
 use jns42_core::documents::DocumentContext;
 use jns42_core::models::Specification;
-use jns42_core::utils::node_location::NodeLocation;
+use jns42_core::utils::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;
+use std::rc::Rc;
 
 #[derive(Parser, Debug)]
 pub struct CommandOptions {
@@ -40,15 +41,15 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     ..
   } = options;
 
-  let mut context = DocumentContext::new();
+  let mut context = Rc::new(DocumentContext::default());
   context.register_well_known_factories().unwrap();
 
   context
     .load_from_location(
-      &schema_location,
-      &schema_location,
+      schema_location.clone(),
+      schema_location.clone(),
       None,
-      &default_meta_schema_id,
+      default_meta_schema_id.to_owned(),
     )
     .await
     .unwrap();

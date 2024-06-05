@@ -86,7 +86,7 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  using defaultTypeName = core.Sentence.new(defaultName);
+  const defaultTypeName = new core.Sentence(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);
@@ -95,23 +95,27 @@ async function main(configuration: MainConfiguration) {
   const rootTypeName = testData.rootTypeName ?? defaultTypeName;
   const schemas = testData.schemas as Record<string, unknown>;
   for (const schemaName in schemas) {
-    const schema = schemas[schemaName];
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
+    const schemaNode = schemas[schemaName];
+
+    const location = core.NodeLocation.parse(pathToTest);
     // generate package
     {
-      const context = core.DocumentContext.new();
+      const cache = new core.NodeCache();
+      const context = new core.DocumentContextContainer(cache);
       context.registerWellKnownFactories();
+
       await context.loadFromNode(
-        pathToTest,
-        pathToTest,
+        location.clone(),
+        location.clone(),
         undefined,
-        schema,
-        defaultMetaSchema as core.MetaSchemaString,
+        schemaNode,
+        defaultMetaSchema,
       );
 
-      using specification = models.loadSpecification(context, {
+      const specification = models.loadSpecification(context, {
         transformMaximumIterations,
         defaultTypeName: defaultTypeName.toPascalCase(),
       });

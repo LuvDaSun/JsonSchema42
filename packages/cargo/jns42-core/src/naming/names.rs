@@ -1,5 +1,6 @@
 use super::Sentence;
 use std::collections::BTreeMap;
+use wasm_bindgen::prelude::*;
 
 pub struct Names<K>(BTreeMap<K, Sentence>);
 
@@ -23,5 +24,28 @@ impl<K> IntoIterator for Names<K> {
 
   fn into_iter(self) -> Self::IntoIter {
     self.0.into_iter()
+  }
+}
+
+#[wasm_bindgen]
+pub struct NamesContainer(Names<usize>);
+
+#[wasm_bindgen]
+impl NamesContainer {
+  #[wasm_bindgen(js_name = getName)]
+  pub fn get_name(&self, key: usize) -> Sentence {
+    self.0.get_name(&key).clone()
+  }
+}
+
+impl From<Names<usize>> for NamesContainer {
+  fn from(value: Names<usize>) -> Self {
+    Self(value)
+  }
+}
+
+impl From<NamesContainer> for Names<usize> {
+  fn from(value: NamesContainer) -> Self {
+    value.0
   }
 }

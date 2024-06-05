@@ -1,4 +1,4 @@
-import { banner } from "@jns42/core";
+import * as core from "@jns42/core";
 import assert from "assert";
 import * as models from "../models/index.js";
 import {
@@ -11,7 +11,7 @@ import {
 } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
-  yield banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 
@@ -79,15 +79,15 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
   `;
 
-  for (const [itemKey, item] of [...validatorsArena].map((item, key) => [key, item] as const)) {
-    const itemValue = item.toValue();
-    const { location: nodeId } = itemValue;
+  for (let itemKey = 0; itemKey < validatorsArena.count(); itemKey++) {
+    const item = validatorsArena.getItem(itemKey);
+    const { location: nodeId } = item;
 
     if (nodeId == null) {
       continue;
     }
 
-    using typeName = names.getName(itemKey);
+    const typeName = names.getName(itemKey);
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
@@ -114,7 +114,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     typeKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    using item = validatorsArena.getItem(typeKey);
+    const item = validatorsArena.getItem(typeKey);
     if (item.location == null) {
       yield itt`
         ((value: unknown) => {
@@ -122,7 +122,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         })(${valueExpression})
       `;
     } else {
-      using typeName = names.getName(typeKey);
+      const typeName = names.getName(typeKey);
       yield itt`is${typeName.toPascalCase()}(${valueExpression})`;
     }
   }
@@ -132,21 +132,20 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     valueExpression: string,
   ): Iterable<NestedText> {
     const item = validatorsArena.getItem(itemKey);
-    const itemValue = item.toValue();
 
-    if (itemValue.reference != null) {
+    if (item.reference != null) {
       yield itt`
-        if(!${generateValidatorReference(itemValue.reference, valueExpression)}) {
+        if(!${generateValidatorReference(item.reference, valueExpression)}) {
           return false;
         };
       `;
     }
 
-    if (itemValue.options != null) {
+    if (item.options != null) {
       yield itt`
         if(
           ${joinIterable(
-            itemValue.options.map(
+            (item.options as any[]).map(
               (option) => itt`${valueExpression} !== ${JSON.stringify(option)}`,
             ),
             " &&\n",
@@ -158,7 +157,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
     }
 
-    if (itemValue.types != null && itemValue.types.length > 0) {
+    if (item.types != null && item.types.length > 0) {
       yield itt`
       if(!(${joinIterable(
         mapIterable(generateSubAssertions(), (assertion) => itt`(${assertion})`),
@@ -169,29 +168,29 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     `;
       function* generateSubAssertions() {
-        for (const type of itemValue.types ?? []) {
+        for (const type of item.types ?? ([] as core.SchemaType[])) {
           switch (type) {
-            case "any": {
+            case core.SchemaType.Any: {
               yield JSON.stringify(true);
               break;
             }
 
-            case "never": {
+            case core.SchemaType.Never: {
               yield JSON.stringify(false);
               return;
             }
 
-            case "null": {
+            case core.SchemaType.Null: {
               yield itt`${valueExpression} === null`;
               break;
             }
 
-            case "boolean": {
+            case core.SchemaType.Boolean: {
               yield itt`typeof ${valueExpression} === "boolean"`;
               break;
             }
 
-            case "integer": {
+            case core.SchemaType.Integer: {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression}) &&
@@ -200,7 +199,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case "number": {
+            case core.SchemaType.Number: {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression})
@@ -208,17 +207,17 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case "string": {
+            case core.SchemaType.String: {
               yield itt`typeof ${valueExpression} === "string"`;
               break;
             }
 
-            case "array": {
+            case core.SchemaType.Array: {
               yield itt`Array.isArray(${valueExpression})`;
               break;
             }
 
-            case "object": {
+            case core.SchemaType.Object: {
               yield itt`
                 ${valueExpression} !== null &&
                 typeof ${valueExpression} === "object" &&
@@ -232,11 +231,11 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
 
     if (
-      itemValue.minimumInclusive != null ||
-      itemValue.minimumExclusive != null ||
-      itemValue.maximumInclusive != null ||
-      itemValue.maximumExclusive != null ||
-      itemValue.multipleOf != null
+      item.minimumInclusive != null ||
+      item.minimumExclusive != null ||
+      item.maximumInclusive != null ||
+      item.maximumExclusive != null ||
+      item.multipleOf != null
     ) {
       yield itt`
         if(
@@ -248,10 +247,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateSubValidators() {
-        if (itemValue.minimumInclusive != null) {
+        if (item.minimumInclusive != null) {
           yield itt`
             if(
-              ${valueExpression} < ${JSON.stringify(itemValue.minimumInclusive)}
+              ${valueExpression} < ${JSON.stringify(item.minimumInclusive)}
             ) {
               recordError("minimumInclusive");
               return false;
@@ -259,10 +258,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.minimumExclusive != null) {
+        if (item.minimumExclusive != null) {
           yield itt`
             if(
-              ${valueExpression} <= ${JSON.stringify(itemValue.minimumExclusive)}
+              ${valueExpression} <= ${JSON.stringify(item.minimumExclusive)}
             ) {
               recordError("minimumExclusive");
               return false;
@@ -270,10 +269,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.maximumInclusive != null) {
+        if (item.maximumInclusive != null) {
           yield itt`
             if(
-              ${valueExpression} > ${JSON.stringify(itemValue.maximumInclusive)}
+              ${valueExpression} > ${JSON.stringify(item.maximumInclusive)}
             ) {
               recordError("maximumInclusive");
               return false;
@@ -281,10 +280,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.maximumExclusive != null) {
+        if (item.maximumExclusive != null) {
           yield itt`
             if(
-              ${valueExpression} >= ${JSON.stringify(itemValue.maximumExclusive)}
+              ${valueExpression} >= ${JSON.stringify(item.maximumExclusive)}
             ) {
               recordError("maximumExclusive");
               return false;
@@ -292,10 +291,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.multipleOf != null) {
+        if (item.multipleOf != null) {
           yield itt`
             if(
-              ${valueExpression} % ${JSON.stringify(itemValue.multipleOf)} !== 0
+              ${valueExpression} % ${JSON.stringify(item.multipleOf)} !== 0
             ) {
               recordError("multipleOf");
               return false;
@@ -306,10 +305,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
 
     if (
-      itemValue.minimumLength != null ||
-      itemValue.maximumLength != null ||
-      itemValue.valuePattern != null ||
-      itemValue.valueFormat != null
+      item.minimumLength != null ||
+      item.maximumLength != null ||
+      item.valuePattern != null ||
+      item.valueFormat != null
     ) {
       yield itt`
         if(
@@ -320,10 +319,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateSubValidators() {
-        if (itemValue.minimumLength != null) {
+        if (item.minimumLength != null) {
           yield itt`
             if(
-              ${valueExpression}.length < ${JSON.stringify(itemValue.minimumLength)}
+              ${valueExpression}.length < ${JSON.stringify(item.minimumLength)}
             ) {
               recordError("minimumLength");
               return false;
@@ -331,10 +330,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.maximumLength != null) {
+        if (item.maximumLength != null) {
           yield itt`
             if(
-              value.length > ${JSON.stringify(itemValue.maximumLength)}
+              value.length > ${JSON.stringify(item.maximumLength)}
             ) {
               recordError("maximumLength");
               return false;
@@ -342,10 +341,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.valuePattern != null) {
+        if (item.valuePattern != null) {
           yield itt`
             if(
-              !new RegExp(${JSON.stringify(itemValue.valuePattern)}).test(${valueExpression})
+              !new RegExp(${JSON.stringify(item.valuePattern)}).test(${valueExpression})
             ) {
               recordError("valuePattern");
               return false;
@@ -353,9 +352,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.valueFormat != null) {
+        if (item.valueFormat != null) {
           const isValueFormatExpression = getValueFormatExpression(
-            itemValue.valueFormat,
+            item.valueFormat,
             valueExpression,
           );
           yield itt`
@@ -371,13 +370,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
 
     if (
-      itemValue.minimumItems != null ||
-      itemValue.maximumItems != null ||
-      itemValue.uniqueItems != null ||
-      itemValue.tupleItems != null ||
-      itemValue.arrayItems != null
+      item.minimumItems != null ||
+      item.maximumItems != null ||
+      item.uniqueItems != null ||
+      item.tupleItems != null ||
+      item.arrayItems != null
     ) {
-      const trackElements = itemValue.uniqueItems ?? false;
+      const trackElements = item.uniqueItems ?? false;
 
       yield itt`
       if(
@@ -388,10 +387,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     `;
 
       function* generateSubValidators() {
-        if (itemValue.tupleItems != null) {
+        if (item.tupleItems != null) {
           yield itt`
             if(
-              ${valueExpression}.length < ${JSON.stringify(itemValue.tupleItems.length)}
+              ${valueExpression}.length < ${JSON.stringify(item.tupleItems.length)}
             ) {
               recordError("tupleItems");
               return false;
@@ -399,18 +398,18 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.minimumItems != null) {
+        if (item.minimumItems != null) {
           yield itt`
-            if(${valueExpression}.length < ${JSON.stringify(itemValue.minimumItems)}) {
+            if(${valueExpression}.length < ${JSON.stringify(item.minimumItems)}) {
               recordError("minimumItems");
               return false;
             }
           `;
         }
 
-        if (itemValue.maximumItems != null) {
+        if (item.maximumItems != null) {
           yield itt`
-            if(${valueExpression}.length > ${JSON.stringify(itemValue.maximumItems)}) {
+            if(${valueExpression}.length > ${JSON.stringify(item.maximumItems)}) {
               recordError("maximumItems");
               return false;
             }
@@ -435,7 +434,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           const elementValue = ${valueExpression}[elementIndex];
         `;
 
-        if (itemValue.uniqueItems ?? false) {
+        if (item.uniqueItems ?? false) {
           yield itt`
             if(elementValueSeen.has(elementValue)) {
               recordError("uniqueItems");
@@ -458,9 +457,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateCaseClauses() {
-        if (itemValue.tupleItems != null) {
-          for (let elementIndex = 0; elementIndex < itemValue.tupleItems.length; elementIndex++) {
-            const elementKey = itemValue.tupleItems[elementIndex];
+        if (item.tupleItems != null) {
+          for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+            const elementKey = item.tupleItems[elementIndex];
             yield itt`
               case ${JSON.stringify(elementIndex)}:
                 if(!withPath(String(elementIndex), () => {
@@ -485,10 +484,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateDefaultCaseStatements() {
-        if (itemValue.arrayItems != null) {
+        if (item.arrayItems != null) {
           yield itt`
             if(!withPath(String(elementIndex), () => {
-              if(!${generateValidatorReference(itemValue.arrayItems, `elementValue`)}) {
+              if(!${generateValidatorReference(item.arrayItems, `elementValue`)}) {
                 recordError("elementValue");
                 return false;
               }
@@ -503,15 +502,14 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     }
 
     if (
-      itemValue.minimumProperties != null ||
-      itemValue.maximumProperties != null ||
-      itemValue.required != null ||
-      itemValue.objectProperties != null ||
-      itemValue.patternProperties != null ||
-      itemValue.mapProperties != null
+      item.minimumProperties != null ||
+      item.maximumProperties != null ||
+      item.required != null ||
+      item.objectProperties != null ||
+      item.patternProperties != null ||
+      item.mapProperties != null
     ) {
-      const countProperties =
-        itemValue.minimumProperties != null || itemValue.maximumProperties != null;
+      const countProperties = item.minimumProperties != null || item.maximumProperties != null;
 
       yield itt`
         if(
@@ -527,7 +525,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         /**
          * check if all the required properties are present
          */
-        for (const propertyName of itemValue.required ?? []) {
+        for (const propertyName of item.required ?? []) {
           yield itt`
             if(
               !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
@@ -551,9 +549,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           }
         `;
 
-        if (itemValue.minimumProperties != null) {
+        if (item.minimumProperties != null) {
           yield itt`
-            if(propertyCount < ${JSON.stringify(itemValue.minimumProperties)}) {
+            if(propertyCount < ${JSON.stringify(item.minimumProperties)}) {
               recordError("minimumProperties");
               return false;
               }
@@ -575,9 +573,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           `;
         }
 
-        if (itemValue.maximumProperties != null) {
+        if (item.maximumProperties != null) {
           yield itt`
-            if(propertyCount > ${JSON.stringify(itemValue.maximumProperties)}) {
+            if(propertyCount > ${JSON.stringify(item.maximumProperties)}) {
               recordError("maximumProperties");
               return false;
             }
@@ -592,13 +590,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateCaseClauses() {
-        if (itemValue.objectProperties != null) {
-          for (const propertyName in itemValue.objectProperties) {
+        if (item.objectProperties != null) {
+          for (const propertyName in item.objectProperties) {
             yield itt`
               case ${JSON.stringify(propertyName)}:
                 if(!withPath(propertyName, () => {
                   if(!${generateValidatorReference(
-                    itemValue.objectProperties[propertyName],
+                    item.objectProperties[propertyName],
                     `propertyValue`,
                   )}) {
                     recordError("objectProperties");
@@ -621,14 +619,14 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateDefaultCaseStatements() {
-        if (itemValue.patternProperties != null) {
-          for (const propertyPattern in itemValue.patternProperties) {
+        if (item.patternProperties != null) {
+          for (const propertyPattern in item.patternProperties) {
             yield itt`
               if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
                 if(!withPath(propertyName, () => {
                   if(
                     !${generateValidatorReference(
-                      itemValue.patternProperties[propertyPattern],
+                      item.patternProperties[propertyPattern],
                       `propertyValue`,
                     )}
                   ) {
@@ -644,11 +642,11 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           }
         }
 
-        if (itemValue.mapProperties != null) {
+        if (item.mapProperties != null) {
           yield itt`
             if(!withPath(propertyName, () => {
               if(
-                !${generateValidatorReference(itemValue.mapProperties, `propertyValue`)}
+                !${generateValidatorReference(item.mapProperties, `propertyValue`)}
               ) {
                 return false;
               }  
@@ -661,23 +659,23 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (itemValue.reference != null) {
+    if (item.reference != null) {
       yield itt`
-        if(!${generateValidatorReference(itemValue.reference, valueExpression)}) {
+        if(!${generateValidatorReference(item.reference, valueExpression)}) {
           recordError("reference");
           return false;
         }
       `;
     }
 
-    if (itemValue.allOf != null) {
+    if (item.allOf != null) {
       yield itt`
         {
           let counter = 0;
 
           ${generateInnerStatements()}
 
-          if(counter < ${JSON.stringify(itemValue.allOf.length)}) {
+          if(counter < ${JSON.stringify(item.allOf.length)}) {
             recordError("allOf");
             return false;
           }
@@ -685,10 +683,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerStatements() {
-        assert(itemValue.allOf != null);
+        assert(item.allOf != null);
 
-        for (let elementIndex = 0; elementIndex < itemValue.allOf.length; elementIndex++) {
-          const element = itemValue.allOf[elementIndex];
+        for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
+          const element = item.allOf[elementIndex];
           yield itt`
             if(counter === ${JSON.stringify(elementIndex)} && ${generateValidatorReference(
               element,
@@ -701,7 +699,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (itemValue.anyOf != null) {
+    if (item.anyOf != null) {
       yield itt`
         {
           let counter = 0;
@@ -716,10 +714,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerStatements() {
-        assert(itemValue.anyOf != null);
+        assert(item.anyOf != null);
 
-        for (let elementIndex = 0; elementIndex < itemValue.anyOf.length; elementIndex++) {
-          const element = itemValue.anyOf[elementIndex];
+        for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
+          const element = item.anyOf[elementIndex];
           yield itt`
             if(counter < 1 && ${generateValidatorReference(element, valueExpression)}) {
               counter += 1;
@@ -729,7 +727,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (itemValue.oneOf != null) {
+    if (item.oneOf != null) {
       yield itt`
         {
           let counter = 0;
@@ -744,10 +742,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerStatements() {
-        assert(itemValue.oneOf != null);
+        assert(item.oneOf != null);
 
-        for (let elementIndex = 0; elementIndex < itemValue.oneOf.length; elementIndex++) {
-          const element = itemValue.oneOf[elementIndex];
+        for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
+          const element = item.oneOf[elementIndex];
           yield itt`
             if(counter < 2 && ${generateValidatorReference(element, valueExpression)}) {
               counter += 1;
@@ -757,9 +755,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (itemValue.if != null) {
+    if (item.ifSchema != null) {
       yield itt`
-        if(${generateValidatorReference(itemValue.if, valueExpression)}) {
+        if(${generateValidatorReference(item.ifSchema, valueExpression)}) {
           ${generateInnerThenStatements()}
         }
         else {
@@ -768,9 +766,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerThenStatements() {
-        if (itemValue.then != null) {
+        if (item.thenSchema != null) {
           yield itt`
-            if(!${generateValidatorReference(itemValue.then, valueExpression)}) {
+            if(!${generateValidatorReference(item.thenSchema, valueExpression)}) {
               recordError("then");
               return false;
             }
@@ -779,9 +777,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateInnerElseStatements() {
-        if (itemValue.else != null) {
+        if (item.elseSchema != null) {
           yield itt`
-            if(!${generateValidatorReference(itemValue.else, valueExpression)}) {
+            if(!${generateValidatorReference(item.elseSchema, valueExpression)}) {
               recordError("else");
               return false;
             }
@@ -790,9 +788,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (itemValue.not != null) {
+    if (item.not != null) {
       yield itt`
-        if(${generateValidatorReference(itemValue.not, valueExpression)}) {
+        if(${generateValidatorReference(item.not, valueExpression)}) {
           recordError("not");
           return false;
         }

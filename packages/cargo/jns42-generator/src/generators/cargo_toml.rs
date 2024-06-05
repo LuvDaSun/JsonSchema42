@@ -1,6 +1,5 @@
-use std::error::Error;
-
 use jns42_core::utils::banner;
+use std::error::Error;
 
 pub fn generate_file_content(
   package_name: &str,

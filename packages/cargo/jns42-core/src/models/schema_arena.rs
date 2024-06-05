@@ -1,13 +1,11 @@
 use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
 use crate::{
-  documents::DocumentContext,
-  utils::{arena::Arena, node_location::NodeLocation},
+  documents::{DocumentContext, DocumentContextContainer},
+  models::ArenaSchemaItemContainer,
+  utils::{arena::Arena, NodeLocation},
 };
-use std::{
-  collections::HashMap,
-  iter::{empty, once},
-  rc::Rc,
-};
+use std::{collections::HashMap, iter, rc::Rc};
+use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
 
@@ -79,7 +77,7 @@ impl Arena<ArenaSchemaItem> {
       schema.types = schema.types.or_else(|| {
         implicit_types
           .get(location)
-          .map(|value| once(*value).collect())
+          .map(|value| iter::once(*value).collect())
       });
       // schema.primary = if *id == root_id { Some(true) } else { None };
 
@@ -171,7 +169,7 @@ impl Arena<ArenaSchemaItem> {
   ///
   /// # Returns
   /// An iterator over string slices (`&str`) representing the name parts.
-  pub fn get_name_parts(&self, key: usize) -> impl Iterator<Item = &str> {
+  pub fn get_name_parts(&self, key: usize) -> impl Iterator<Item = String> {
     let ancestors: Vec<_> = self
       .get_ancestors(key)
       .map(|(_key, item)| item)
@@ -188,20 +186,52 @@ impl Arena<ArenaSchemaItem> {
         }
       })
       .map(|(_item_previous, item)| {
-        empty()
+        iter::empty()
           .chain(
             item
               .location
               .as_ref()
-              .map(|id| empty().chain(id.get_path()).chain(id.get_hash())),
+              .map(|id| iter::empty().chain(id.get_path()).chain(id.get_hash())),
           )
           .flatten()
-          .chain(item.name.as_deref())
+          .chain(item.name.clone())
           .filter(|part| !part.is_empty())
       })
       .collect();
 
     ancestors.into_iter().rev().flatten()
+  }
+}
+
+#[wasm_bindgen]
+pub struct SchemaArenaContainer(SchemaArena);
+
+#[wasm_bindgen]
+impl SchemaArenaContainer {
+  #[wasm_bindgen(js_name = fromDocumentContext)]
+  pub fn from_document_context(document_context: DocumentContextContainer) -> Self {
+    SchemaArena::from_document_context(&document_context.into()).into()
+  }
+
+  #[wasm_bindgen(js_name = getItem)]
+  pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
+    self.0.get_item(key).clone().into()
+  }
+
+  #[wasm_bindgen(js_name = count)]
+  pub fn count(&self) -> usize {
+    self.0.count()
+  }
+
+  #[wasm_bindgen(js_name = getNameParts)]
+  pub fn get_name_parts(&self, key: usize) -> Vec<String> {
+    self.0.get_name_parts(key).collect()
+  }
+
+  #[wasm_bindgen(js_name = clone)]
+  #[allow(clippy::should_implement_trait)]
+  pub fn clone(&self) -> Self {
+    Self(self.0.clone())
   }
 
   /// Applies a series of transformations to the schema items within the arena.
@@ -214,12 +244,27 @@ impl Arena<ArenaSchemaItem> {
   ///
   /// # Returns
   /// The number of transformations applied.
-  pub fn transform(&mut self, transforms: &Vec<SchemaTransform>) -> usize {
-    self.apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
-      for transform in transforms {
-        let transform: BoxedSchemaTransform = transform.into();
-        transform(arena, key)
-      }
-    })
+  #[wasm_bindgen(js_name = transform)]
+  pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
+    self
+      .0
+      .apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
+        for transform in &transforms {
+          let transform: BoxedSchemaTransform = (*transform).into();
+          transform(arena, key)
+        }
+      })
+  }
+}
+
+impl From<SchemaArena> for SchemaArenaContainer {
+  fn from(value: SchemaArena) -> Self {
+    Self(value)
+  }
+}
+
+impl From<SchemaArenaContainer> for SchemaArena {
+  fn from(value: SchemaArenaContainer) -> Self {
+    value.0
   }
 }

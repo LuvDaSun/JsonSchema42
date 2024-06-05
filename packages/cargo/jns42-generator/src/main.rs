@@ -1,6 +1,5 @@
 mod generators;
 mod programs;
-mod utils;
 
 use clap::Parser;
 use programs::{run_program, ProgramOptions};

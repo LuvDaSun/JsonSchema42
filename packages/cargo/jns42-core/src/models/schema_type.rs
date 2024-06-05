@@ -1,9 +1,10 @@
 use std::str::FromStr;
+use wasm_bindgen::prelude::*;
 
 #[derive(
   Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, Debug, serde::Serialize, serde::Deserialize,
 )]
-#[serde(rename_all = "camelCase")]
+#[wasm_bindgen]
 pub enum SchemaType {
   Never,
   Any,

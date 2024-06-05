@@ -56,6 +56,7 @@ valid:
   array: ["hi"]
   object: { "a": 1 }
   record: { "z": "z" }
+
 invalid:
   # tuple: [1, 2]
   array: [1]

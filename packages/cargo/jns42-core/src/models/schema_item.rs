@@ -1,120 +1,79 @@
 use super::SchemaType;
 use crate::utils::merge::{merge_either, merge_option};
-use crate::utils::node_location::NodeLocation;
+use crate::utils::NodeLocation;
+use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::{collections::HashMap, iter::empty};
+use wasm_bindgen::prelude::*;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SchemaItem<K>
 where
   K: Ord,
 {
-  #[serde(default)]
   pub name: Option<String>,
-  #[serde(default)]
   pub exact: Option<bool>,
 
-  #[serde(default)]
   pub primary: Option<bool>,
-  #[serde(default)]
   pub parent: Option<K>,
-  #[serde(default)]
   pub location: Option<NodeLocation>,
 
   // metadata
-  #[serde(default)]
   pub title: Option<String>,
-  #[serde(default)]
   pub description: Option<String>,
-  #[serde(default)]
   pub examples: Option<Vec<serde_json::Value>>,
-  #[serde(default)]
   pub deprecated: Option<bool>,
 
   // types
-  #[serde(default)]
   pub types: Option<Vec<SchemaType>>,
 
   // applicators
-  #[serde(default)]
   pub reference: Option<K>,
 
-  #[serde(default)]
   pub r#if: Option<K>,
-  #[serde(default)]
   pub then: Option<K>,
-  #[serde(default)]
   pub r#else: Option<K>,
 
-  #[serde(default)]
   pub not: Option<K>,
 
-  #[serde(default)]
   pub property_names: Option<K>,
-  #[serde(default)]
   pub map_properties: Option<K>,
-  #[serde(default)]
   pub array_items: Option<K>,
-  #[serde(default)]
   pub contains: Option<K>,
 
-  #[serde(default)]
   pub all_of: Option<BTreeSet<K>>,
-  #[serde(default)]
   pub any_of: Option<BTreeSet<K>>,
-  #[serde(default)]
   pub one_of: Option<BTreeSet<K>>,
-  #[serde(default)]
   pub tuple_items: Option<Vec<K>>,
 
-  #[serde(default)]
   pub object_properties: Option<HashMap<String, K>>,
-  #[serde(default)]
   pub pattern_properties: Option<HashMap<String, K>>,
-  #[serde(default)]
   pub dependent_schemas: Option<HashMap<String, K>>,
 
   // assertions
-  #[serde(default)]
   pub options: Option<Vec<serde_json::Value>>,
-  #[serde(default)]
   pub required: Option<HashSet<String>>,
 
-  #[serde(default)]
   pub minimum_inclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub minimum_exclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub maximum_inclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub maximum_exclusive: Option<serde_json::Number>,
-  #[serde(default)]
   pub multiple_of: Option<serde_json::Number>,
 
-  #[serde(default)]
   pub minimum_length: Option<u64>,
-  #[serde(default)]
   pub maximum_length: Option<u64>,
-  #[serde(default)]
   pub value_pattern: Option<String>,
-  #[serde(default)]
   pub value_format: Option<String>,
 
-  #[serde(default)]
   pub minimum_items: Option<u64>,
-  #[serde(default)]
   pub maximum_items: Option<u64>,
-  #[serde(default)]
   pub unique_items: Option<bool>,
 
-  #[serde(default)]
   pub minimum_properties: Option<u64>,
-  #[serde(default)]
   pub maximum_properties: Option<u64>,
 }
 
@@ -486,5 +445,238 @@ where
       object_properties: map_map(&self.object_properties),
       pattern_properties: map_map(&self.pattern_properties),
     }
+  }
+}
+
+#[wasm_bindgen]
+pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
+
+#[wasm_bindgen]
+impl ArenaSchemaItemContainer {
+  #[wasm_bindgen(getter = name)]
+  pub fn name_get(&self) -> Option<String> {
+    Some(self.0.name.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = exact)]
+  pub fn exact_get(&self) -> Option<bool> {
+    self.0.exact
+  }
+
+  #[wasm_bindgen(getter = primary)]
+  pub fn primary_get(&self) -> Option<bool> {
+    self.0.primary
+  }
+  #[wasm_bindgen(getter = parent)]
+  pub fn parent_get(&self) -> Option<usize> {
+    self.0.parent
+  }
+  #[wasm_bindgen(getter = location)]
+  pub fn location_get(&self) -> Option<NodeLocation> {
+    Some(self.0.location.as_ref()?.clone())
+  }
+
+  // metadata
+  #[wasm_bindgen(getter = title)]
+  pub fn title_get(&self) -> Option<String> {
+    Some(self.0.title.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = description)]
+  pub fn description_get(&self) -> Option<String> {
+    Some(self.0.description.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = examples)]
+  pub fn examples_get(&self) -> Option<Vec<JsValue>> {
+    Some(
+      self
+        .0
+        .examples
+        .as_ref()?
+        .iter()
+        .filter_map(|value| JsValue::from_serde(value).ok())
+        .collect(),
+    )
+  }
+  #[wasm_bindgen(getter = deprecated)]
+  pub fn deprecated_get(&self) -> Option<bool> {
+    self.0.deprecated
+  }
+
+  // types
+  #[wasm_bindgen(getter = types)]
+  pub fn types_get(&self) -> Option<Vec<SchemaType>> {
+    Some(self.0.types.as_ref()?.clone())
+  }
+
+  // applicators
+  #[wasm_bindgen(getter = reference)]
+  pub fn reference_get(&self) -> Option<usize> {
+    self.0.reference
+  }
+
+  #[wasm_bindgen(getter = ifSchema)]
+  pub fn if_get(&self) -> Option<usize> {
+    self.0.r#if
+  }
+  #[wasm_bindgen(getter = thenSchema)]
+  pub fn then_get(&self) -> Option<usize> {
+    self.0.then
+  }
+  #[wasm_bindgen(getter = elseSchema)]
+  pub fn else_get(&self) -> Option<usize> {
+    self.0.r#else
+  }
+
+  #[wasm_bindgen(getter = not)]
+  pub fn not_get(&self) -> Option<usize> {
+    self.0.not
+  }
+
+  #[wasm_bindgen(getter = propertyNames)]
+  pub fn property_names_get(&self) -> Option<usize> {
+    self.0.property_names
+  }
+  #[wasm_bindgen(getter = mapProperties)]
+  pub fn map_properties_get(&self) -> Option<usize> {
+    self.0.map_properties
+  }
+  #[wasm_bindgen(getter = arrayItems)]
+  pub fn array_items_get(&self) -> Option<usize> {
+    self.0.array_items
+  }
+  #[wasm_bindgen(getter = contains)]
+  pub fn contains_get(&self) -> Option<usize> {
+    self.0.contains
+  }
+
+  #[wasm_bindgen(getter = allOf)]
+  pub fn all_of_get(&self) -> Option<Vec<usize>> {
+    Some(self.0.all_of.as_ref()?.iter().copied().collect())
+  }
+  #[wasm_bindgen(getter = anyOf)]
+  pub fn any_of_get(&self) -> Option<Vec<usize>> {
+    Some(self.0.any_of.as_ref()?.iter().copied().collect())
+  }
+  #[wasm_bindgen(getter = oneOf)]
+  pub fn one_of_get(&self) -> Option<Vec<usize>> {
+    Some(self.0.one_of.as_ref()?.iter().copied().collect())
+  }
+  #[wasm_bindgen(getter = tupleItems)]
+  pub fn tuple_items_get(&self) -> Option<Vec<usize>> {
+    Some(self.0.tuple_items.as_ref()?.clone())
+  }
+
+  #[wasm_bindgen(getter = objectProperties)]
+  pub fn object_properties_get(&self) -> JsValue {
+    let Some(value) = self.0.object_properties.as_ref() else {
+      return JsValue::undefined();
+    };
+
+    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  }
+  #[wasm_bindgen(getter = patternProperties)]
+  pub fn pattern_properties_get(&self) -> JsValue {
+    let Some(value) = self.0.pattern_properties.as_ref() else {
+      return JsValue::undefined();
+    };
+
+    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  }
+  #[wasm_bindgen(getter = dependentSchemas)]
+  pub fn dependent_schemas_get(&self) -> JsValue {
+    let Some(value) = self.0.dependent_schemas.as_ref() else {
+      return JsValue::undefined();
+    };
+
+    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  }
+
+  // assertions
+  #[wasm_bindgen(getter = options)]
+  pub fn options_get(&self) -> Option<Vec<JsValue>> {
+    Some(
+      self
+        .0
+        .options
+        .as_ref()?
+        .iter()
+        .filter_map(|value| JsValue::from_serde(value).ok())
+        .collect(),
+    )
+  }
+  #[wasm_bindgen(getter = required)]
+  pub fn required_get(&self) -> Option<Vec<String>> {
+    Some(self.0.required.as_ref()?.iter().cloned().collect())
+  }
+
+  #[wasm_bindgen(getter = minimumInclusive)]
+  pub fn minimum_inclusive_get(&self) -> Option<f64> {
+    self.0.minimum_inclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = minimumExclusive)]
+  pub fn minimum_exclusive_get(&self) -> Option<f64> {
+    self.0.minimum_exclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = maximumInclusive)]
+  pub fn maximum_inclusive_get(&self) -> Option<f64> {
+    self.0.maximum_inclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = maximumExclusive)]
+  pub fn maximum_exclusive_get(&self) -> Option<f64> {
+    self.0.maximum_exclusive.as_ref()?.as_f64()
+  }
+  #[wasm_bindgen(getter = multipleOf)]
+  pub fn multiple_of_get(&self) -> Option<f64> {
+    self.0.multiple_of.as_ref()?.as_f64()
+  }
+
+  #[wasm_bindgen(getter = minimumLength)]
+  pub fn minimum_length_get(&self) -> Option<usize> {
+    self.0.minimum_length?.try_into().ok()
+  }
+  #[wasm_bindgen(getter = maximumLength)]
+  pub fn maximum_length_get(&self) -> Option<usize> {
+    self.0.maximum_length?.try_into().ok()
+  }
+  #[wasm_bindgen(getter = valuePattern)]
+  pub fn value_pattern_get(&self) -> Option<String> {
+    Some(self.0.value_pattern.as_ref()?.clone())
+  }
+  #[wasm_bindgen(getter = valueFormat)]
+  pub fn value_format_get(&self) -> Option<String> {
+    Some(self.0.value_format.as_ref()?.clone())
+  }
+
+  #[wasm_bindgen(getter = minimumItems)]
+  pub fn minimum_items_get(&self) -> Option<usize> {
+    self.0.minimum_items?.try_into().ok()
+  }
+  #[wasm_bindgen(getter = maximumItems)]
+  pub fn maximum_items_get(&self) -> Option<usize> {
+    self.0.maximum_items?.try_into().ok()
+  }
+  #[wasm_bindgen(getter = uniqueItems)]
+  pub fn unique_items_get(&self) -> Option<bool> {
+    self.0.unique_items
+  }
+
+  #[wasm_bindgen(getter = minimumProperties)]
+  pub fn minimum_properties_get(&self) -> Option<usize> {
+    self.0.minimum_properties?.try_into().ok()
+  }
+  #[wasm_bindgen(getter = maximumProperties)]
+  pub fn maximum_properties_get(&self) -> Option<usize> {
+    self.0.maximum_properties?.try_into().ok()
+  }
+}
+
+impl From<ArenaSchemaItem> for ArenaSchemaItemContainer {
+  fn from(value: ArenaSchemaItem) -> Self {
+    Self(value)
+  }
+}
+
+impl From<ArenaSchemaItemContainer> for ArenaSchemaItem {
+  fn from(value: ArenaSchemaItemContainer) -> Self {
+    value.0
   }
 }
