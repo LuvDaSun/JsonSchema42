@@ -7,7 +7,7 @@ license = "ISC"
 authors = ["Elmer Bulthuis"]
 homepage = "https://www.JsonSchema42.org"
 keywords = ["json", "schema"]
-repository = "git@github.com:LuvDaSun/JsonSchema42"
+repository = "https://github.com/LuvDaSun/JsonSchema42"
 
 [badges]
 maintenance = { status = "actively-developed" }
