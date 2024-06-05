@@ -588,8 +588,8 @@ pub struct Jns42DocumentContextContainer(rc::Rc<DocumentContext>);
 #[wasm_bindgen]
 impl Jns42DocumentContextContainer {
   #[wasm_bindgen(constructor)]
-  pub fn new(cache: NodeCacheContainer) -> Self {
-    Self(rc::Rc::new(DocumentContext::new(cache.into())))
+  pub fn new(cache: &NodeCacheContainer) -> Self {
+    Self(rc::Rc::new(DocumentContext::new(cache.clone().into())))
   }
 
   #[wasm_bindgen(js_name = "registerWellKnownFactories")]
@@ -635,12 +635,6 @@ impl Jns42DocumentContextContainer {
         default_meta_schema_id,
       )
       .await
-  }
-}
-
-impl Default for Jns42DocumentContextContainer {
-  fn default() -> Self {
-    Self::new(Default::default())
   }
 }
 
