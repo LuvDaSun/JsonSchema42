@@ -132,7 +132,7 @@ impl NodeCache {
 
 #[derive(Debug)]
 pub enum NodeCacheError {
-  ParseError,
+  SerializationError,
   Conflict,
   FetchError,
 }
@@ -148,7 +148,7 @@ impl From<FetchTextError> for NodeCacheError {
 
 impl From<serde_yaml::Error> for NodeCacheError {
   fn from(_value: serde_yaml::Error) -> Self {
-    Self::ParseError
+    Self::SerializationError
   }
 }
 

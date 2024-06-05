@@ -187,7 +187,7 @@ impl NodeLocation {
   }
 
   #[wasm_bindgen(js_name = "parse")]
-  pub fn _parse(input: &str) -> Result<NodeLocation, ParseError> {
+  pub fn _parse(input: &str) -> Result<NodeLocation, ParseLocationError> {
     Self::from_str(input)
   }
 
@@ -198,12 +198,14 @@ impl NodeLocation {
 }
 
 impl TryFrom<&str> for NodeLocation {
-  type Error = ParseError;
+  type Error = ParseLocationError;
 
   fn try_from(value: &str) -> Result<Self, Self::Error> {
     let input = value.replace('\\', "/");
 
-    let input_captures = URL_REGEX.captures(&input).ok_or(ParseError::InvalidInput)?;
+    let input_captures = URL_REGEX
+      .captures(&input)
+      .ok_or(ParseLocationError::InvalidInput)?;
 
     let origin_capture = input_captures.get(1);
     let path_capture = input_captures.get(2);
@@ -223,7 +225,7 @@ impl TryFrom<&str> for NodeLocation {
     } else {
       path
         .split('/')
-        .map(|part| urlencoding::decode(part).map_err(|_error| ParseError::DecodeError))
+        .map(|part| urlencoding::decode(part).map_err(|_error| ParseLocationError::DecodeError))
         .map(|part| part.map(unescape_hash))
         .collect::<Result<_, _>>()?
     };
@@ -239,7 +241,7 @@ impl TryFrom<&str> for NodeLocation {
       .unwrap_or_default();
     let hash = hash
       .split('/')
-      .map(|part| urlencoding::decode(part).map_err(|_error| ParseError::DecodeError))
+      .map(|part| urlencoding::decode(part).map_err(|_error| ParseLocationError::DecodeError))
       .map(|part| part.map(unescape_hash))
       .collect::<Result<_, _>>()?;
 
@@ -285,7 +287,7 @@ impl Display for NodeLocation {
 }
 
 impl FromStr for NodeLocation {
-  type Err = ParseError;
+  type Err = ParseLocationError;
 
   fn from_str(input: &str) -> Result<Self, Self::Err> {
     input.try_into()
@@ -294,21 +296,21 @@ impl FromStr for NodeLocation {
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 #[wasm_bindgen]
-pub enum ParseError {
+pub enum ParseLocationError {
   InvalidInput,
   DecodeError,
 }
 
-impl Display for ParseError {
+impl Display for ParseLocationError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
-      ParseError::InvalidInput => write!(f, "Invalid input"),
-      ParseError::DecodeError => write!(f, "Decode error"),
+      ParseLocationError::InvalidInput => write!(f, "Invalid input"),
+      ParseLocationError::DecodeError => write!(f, "Decode error"),
     }
   }
 }
 
-impl Error for ParseError {}
+impl Error for ParseLocationError {}
 
 fn escape_hash(input: impl AsRef<str>) -> String {
   input.as_ref().replace('~', "~0").replace('/', "~1")
