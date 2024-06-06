@@ -1,3 +1,4 @@
+use super::find_version_node;
 use super::schema_document::SchemaDocument;
 use crate::documents;
 use crate::error::Jns42Error;
@@ -277,9 +278,13 @@ impl DocumentContext {
       let factory = {
         let cache = self.cache.borrow();
 
+        let version_retrieval_location = find_version_node(&cache, &document_retrieval_location)
+          .unwrap_or_else(|| document_retrieval_location.clone());
+        let version_node = cache
+          .get_node(&version_retrieval_location)
+          .ok_or(Jns42Error::NotFound)?;
         let meta_schema_id =
-          documents::discover_meta_schema_id(&cache, &document_retrieval_location)
-            .unwrap_or(&default_meta_schema_id);
+          documents::discover_meta_schema_id(version_node).unwrap_or(&default_meta_schema_id);
 
         self
           .factories
@@ -362,9 +367,13 @@ impl DocumentContext {
       for referenced_location in referenced_locations {
         let retrieval_location = document_retrieval_location.join(&referenced_location);
         let given_location = document_identity_location.join(&referenced_location);
+
+        let document_retrieval_location = retrieval_location; // TODO
+        let document_given_location = given_location; // TODO
+
         queue.push((
-          retrieval_location,
-          given_location,
+          document_retrieval_location,
+          document_given_location,
           // antecedent location points to the identity location!
           Some(document_identity_location.clone()),
         ));

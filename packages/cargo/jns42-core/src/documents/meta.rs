@@ -1,13 +1,7 @@
 use crate::utils::{NodeCache, NodeLocation};
 use semver::Version;
 
-pub fn discover_meta_schema_id<'a>(
-  node_cache: &'a NodeCache,
-  retrieval_location: &NodeLocation,
-) -> Option<&'a str> {
-  let version_location = find_version_node(node_cache, retrieval_location)?;
-  let version_node = node_cache.get_node(&version_location)?;
-
+pub fn discover_meta_schema_id(version_node: &serde_json::Value) -> Option<&str> {
   if let Some(schema) = select_schema(version_node) {
     return Some(schema);
   }

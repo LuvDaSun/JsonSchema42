@@ -68,7 +68,6 @@ impl Document {
 
       if let Some(node_reference) = node.select_reference() {
         let reference_location: NodeLocation = node_reference.parse()?;
-        let reference_location = reference_location.set_root();
         referenced_locations.push(reference_location);
       }
 
