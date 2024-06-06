@@ -98,7 +98,7 @@ async function main(configuration: MainConfiguration) {
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
-    const schemaNode = schemas[schemaName];
+    // const schemaNode = schemas[schemaName];
 
     const location = core.NodeLocation.parse(pathToTest);
     // generate package
@@ -107,11 +107,10 @@ async function main(configuration: MainConfiguration) {
       const context = new core.Jns42DocumentContextContainer(cache);
       context.registerWellKnownFactories();
 
-      await context.loadFromNode(
-        location.clone(),
+      await context.loadFromLocation(
+        location.pushPointer(["schemas", schemaName]),
         location.clone(),
         undefined,
-        schemaNode,
         defaultMetaSchema,
       );
 

@@ -5,7 +5,6 @@ use crate::models::DocumentSchemaItem;
 use crate::utils::NodeCache;
 use crate::utils::NodeCacheContainer;
 use crate::utils::NodeLocation;
-use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeMap;
 use std::iter;
 use std::rc;
@@ -275,14 +274,18 @@ impl DocumentContext {
         .ok_or(Jns42Error::NotFound)?
         .clone();
 
-      // read the meta schema id from the node. The node is a document node, so meta
-      // schema may be set by this node.
-      let meta_schema_id =
-        documents::discover_meta_schema(&document_node).unwrap_or(&default_meta_schema_id);
-      let factory = self
-        .factories
-        .get(meta_schema_id)
-        .ok_or(Jns42Error::NotFound)?;
+      let factory = {
+        let cache = self.cache.borrow();
+
+        let meta_schema_id =
+          documents::discover_meta_schema_id(&cache, &document_retrieval_location)
+            .unwrap_or(&default_meta_schema_id);
+
+        self
+          .factories
+          .get(meta_schema_id)
+          .ok_or(Jns42Error::NotFound)?
+      };
 
       let document = factory(
         rc::Rc::downgrade(self),
@@ -371,132 +374,6 @@ impl DocumentContext {
     Ok(())
   }
 
-  pub async fn load_from_node(
-    self: &rc::Rc<Self>,
-    document_retrieval_location: NodeLocation,
-    document_given_location: NodeLocation,
-    document_antecedent_location: Option<NodeLocation>,
-    document_node: serde_json::Value,
-    default_meta_schema_id: String,
-  ) -> Result<(), Jns42Error> {
-    // If a document with this retrieval location is already loaded
-    if self
-      .documents
-      .borrow()
-      .contains_key(&document_retrieval_location)
-    {
-      return Err(Jns42Error::Conflict);
-    }
-
-    // Ensure the node is in the cache
-    self
-      .cache
-      .borrow_mut()
-      .load_from_node(&document_retrieval_location, document_node)?;
-
-    let document_node = self
-      .cache
-      .borrow()
-      .get_node(&document_retrieval_location)
-      .ok_or(Jns42Error::NotFound)?
-      .clone();
-
-    // read the meta schema id from the node. The node is a document node, so meta
-    // schema may be set by this node.
-    let meta_schema_id =
-      documents::discover_meta_schema(&document_node).unwrap_or(&default_meta_schema_id);
-    let factory = self
-      .factories
-      .get(meta_schema_id)
-      .ok_or(Jns42Error::NotFound)?;
-
-    let document = factory(
-      rc::Rc::downgrade(self),
-      DocumentConfiguration {
-        retrieval_location: document_retrieval_location.clone(),
-        given_location: document_given_location.clone(),
-        antecedent_location: document_antecedent_location.clone(),
-        document_node,
-      },
-    );
-
-    let document_identity_location = document.get_identity_location();
-
-    if self
-      .documents
-      .borrow_mut()
-      .insert(document_retrieval_location.clone(), document.clone())
-      .is_some()
-    {
-      Err(Jns42Error::Conflict)?;
-    }
-
-    // Map node pointers and anchors to this document
-    for (node_retrieval_location, node_identity_location) in iter::empty()
-      .chain(document.get_node_pointers().into_iter().map(|pointer| {
-        (
-          document_retrieval_location.push_pointer(pointer.clone()),
-          document_identity_location.push_pointer(pointer.clone()),
-        )
-      }))
-      .chain(document.get_node_anchors().into_iter().map(|anchor| {
-        (
-          document_retrieval_location.set_anchor(anchor.clone()),
-          document_identity_location.set_anchor(anchor.clone()),
-        )
-      }))
-    {
-      if self
-        .node_to_document_retrieval_locations
-        .borrow_mut()
-        .insert(
-          node_retrieval_location.clone(),
-          document_retrieval_location.clone(),
-        )
-        .is_some()
-      {
-        Err(Jns42Error::Conflict)?;
-      }
-      if self
-        .retrieval_to_identity_locations
-        .borrow_mut()
-        .insert(
-          node_retrieval_location.clone(),
-          node_identity_location.clone(),
-        )
-        .is_some()
-      {
-        Err(Jns42Error::Conflict)?;
-      }
-      if self
-        .identity_to_retrieval_locations
-        .borrow_mut()
-        .insert(
-          node_identity_location.clone(),
-          node_retrieval_location.clone(),
-        )
-        .is_some()
-      {
-        Err(Jns42Error::Conflict)?;
-      }
-    }
-
-    let referenced_locations = document.get_referenced_locations();
-    for referenced_location in referenced_locations {
-      let retrieval_location = document_retrieval_location.join(&referenced_location);
-      let given_location = document_identity_location.join(&referenced_location);
-      self
-        .load_from_location(
-          retrieval_location,
-          given_location,
-          Some(document_identity_location.clone()),
-          default_meta_schema_id.clone(),
-        )
-        .await?;
-    }
-
-    Ok(())
-  }
   pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem> {
     self
       .documents
@@ -615,27 +492,6 @@ impl Jns42DocumentContextContainer {
       )
       .await
   }
-
-  #[wasm_bindgen(js_name = "loadFromNode")]
-  pub async fn load_from_node(
-    &self,
-    retrieval_location: NodeLocation,
-    given_location: NodeLocation,
-    antecedent_location: Option<NodeLocation>,
-    node: JsValue,
-    default_meta_schema_id: String,
-  ) -> Result<(), Jns42Error> {
-    self
-      .0
-      .load_from_node(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        JsValue::into_serde(&node).unwrap_or(serde_json::Value::Null),
-        default_meta_schema_id,
-      )
-      .await
-  }
 }
 
 impl From<rc::Rc<DocumentContext>> for Jns42DocumentContextContainer {
@@ -670,38 +526,6 @@ mod tests {
         location.clone(),
         location.clone(),
         None,
-        documents::draft_2020_12::META_SCHEMA_ID.to_owned(),
-      )
-      .await
-      .unwrap();
-
-    let mut nodes = document_context.get_schema_nodes();
-    assert_eq!(nodes.len(), 1);
-
-    let (_key, node) = nodes.pop_last().unwrap();
-    assert_eq!(node.types, Some(vec![SchemaType::String]));
-  }
-
-  #[async_std::test]
-  async fn test_load_string_from_node() {
-    let mut document_context = rc::Rc::new(DocumentContext::default());
-    document_context.register_well_known_factories().unwrap();
-
-    let location: NodeLocation = "/schema.json#".parse().unwrap();
-
-    document_context
-      .load_from_node(
-        location.clone(),
-        location.clone(),
-        None,
-        serde_json::from_str(
-          r#"
-            {
-              "type": "string"
-            }
-          "#,
-        )
-        .unwrap(),
         documents::draft_2020_12::META_SCHEMA_ID.to_owned(),
       )
       .await
