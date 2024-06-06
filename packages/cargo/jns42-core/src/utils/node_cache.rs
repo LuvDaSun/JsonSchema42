@@ -27,53 +27,35 @@ impl NodeCache {
     })
   }
 
-  fn get_child_pointers(node: &serde_json::Value) -> impl Iterator<Item = Vec<String>> {
-    let mut result = Vec::new();
-
-    match node {
-      serde_json::Value::Array(array_node) => {
-        for index in 0..array_node.len() {
-          let member = index.to_string();
-          result.push(iter::once(member.clone()).collect());
-          for pointer in Self::get_child_pointers(node) {
-            result.push(iter::once(member.clone()).chain(pointer).collect());
-          }
-        }
-      }
-      serde_json::Value::Object(object_node) => {
-        for key in object_node.keys() {
-          let member = key.to_owned();
-          result.push(iter::once(member.clone()).collect());
-          for pointer in Self::get_child_pointers(node) {
-            result.push(iter::once(member.clone()).chain(pointer).collect());
-          }
-        }
-      }
-      _ => {}
-    }
-
-    result.into_iter()
+  ///.Retrieves a list of nodes with the node at the retrieval location last,
+  /// and all of the ancestors of the node before. The root node is first.
+  ///
+  /// Returns an empty vec when the node is not found.
+  ///
+  pub fn get_node_with_ancestors(
+    &self,
+    retrieval_location: &NodeLocation,
+  ) -> Vec<(NodeLocation, &serde_json::Value)> {
+    let mut location = retrieval_location.set_root();
+    self
+      .get_node_path_with_member(retrieval_location)
+      .unwrap_or_default()
+      .into_iter()
+      .map(|(member, node)| {
+        let next_location = location.push_pointer(iter::once(member).collect());
+        let result = (location.clone(), node);
+        location = next_location;
+        result
+      })
+      .collect()
   }
 
   /// Retrieves the node
   ///
   pub fn get_node(&self, retrieval_location: &NodeLocation) -> Option<&serde_json::Value> {
-    let root_location = retrieval_location.set_root();
-    let pointer = retrieval_location.get_pointer().unwrap_or_default();
-    let mut node = self.root_nodes.get(&root_location)?;
+    let mut nodes = self.get_node_path_with_member(retrieval_location)?;
 
-    for member in pointer {
-      match node {
-        serde_json::Value::Array(array_node) => {
-          let index: usize = member.parse().ok()?;
-          node = array_node.get(index)?;
-        }
-        serde_json::Value::Object(object_node) => {
-          node = object_node.get(&member)?;
-        }
-        _ => return None,
-      }
-    }
+    let (_member, node) = nodes.pop()?;
 
     Some(node)
   }
@@ -123,6 +105,60 @@ impl NodeCache {
     } else {
       Err(NodeCacheError::Conflict)
     }
+  }
+
+  fn get_node_path_with_member(
+    &self,
+    retrieval_location: &NodeLocation,
+  ) -> Option<Vec<(String, &serde_json::Value)>> {
+    let mut result = Vec::new();
+    let root_location = retrieval_location.set_root();
+    let pointer = retrieval_location.get_pointer().unwrap_or_default();
+    let mut node = self.root_nodes.get(&root_location)?;
+
+    for member in pointer {
+      result.push((member.clone(), node));
+      match node {
+        serde_json::Value::Array(array_node) => {
+          let index: usize = member.parse().ok()?;
+          node = array_node.get(index)?;
+        }
+        serde_json::Value::Object(object_node) => {
+          node = object_node.get(&member)?;
+        }
+        _ => return None,
+      }
+    }
+
+    Some(result)
+  }
+
+  fn get_child_pointers(node: &serde_json::Value) -> impl Iterator<Item = Vec<String>> {
+    let mut result = Vec::new();
+
+    match node {
+      serde_json::Value::Array(array_node) => {
+        for index in 0..array_node.len() {
+          let member = index.to_string();
+          result.push(iter::once(member.clone()).collect());
+          for pointer in Self::get_child_pointers(node) {
+            result.push(iter::once(member.clone()).chain(pointer).collect());
+          }
+        }
+      }
+      serde_json::Value::Object(object_node) => {
+        for key in object_node.keys() {
+          let member = key.to_owned();
+          result.push(iter::once(member.clone()).collect());
+          for pointer in Self::get_child_pointers(node) {
+            result.push(iter::once(member.clone()).chain(pointer).collect());
+          }
+        }
+      }
+      _ => {}
+    }
+
+    result.into_iter()
   }
 }
 
