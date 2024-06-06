@@ -34,23 +34,19 @@ pub fn find_version_node(
 ) -> Option<NodeLocation> {
   let nodes = node_cache.get_node_with_ancestors(retrieval_location);
 
-  for (location, node) in nodes.into_iter().rev() {
-    let Some(node) = node.as_object() else {
-      continue;
-    };
-
-    if node.contains_key("$schema") {
-      return Some(location);
-    }
-    if node.contains_key("openapi") {
-      return Some(location);
-    }
-  }
-
-  None
+  nodes
+    .into_iter()
+    .rev()
+    .find(|(_location, node)| {
+      node
+        .as_object()
+        .map(|node| node.contains_key("$schema") || node.contains_key("openapi"))
+        .unwrap_or_default()
+    })
+    .map(|(location, _node)| location)
 }
 
-/// find the farthest ancestor (or self) node that is a document
+/// find the closest ancestor (or self) node that is a document
 ///
 pub fn find_document_node(
   node_cache: &NodeCache,
@@ -58,17 +54,18 @@ pub fn find_document_node(
 ) -> Option<NodeLocation> {
   let nodes = node_cache.get_node_with_ancestors(retrieval_location);
 
-  for (location, node) in nodes {
-    let Some(node) = node.as_object() else {
-      continue;
-    };
-
-    if node.contains_key("$id") || node.contains_key("$schema") || node.contains_key("openapi") {
-      return Some(location);
-    }
-  }
-
-  None
+  nodes
+    .into_iter()
+    .rev()
+    .find(|(_location, node)| {
+      node
+        .as_object()
+        .map(|node| {
+          node.contains_key("$id") || node.contains_key("$schema") || node.contains_key("openapi")
+        })
+        .unwrap_or_default()
+    })
+    .map(|(location, _node)| location)
 }
 
 fn select_schema(node: &serde_json::Value) -> Option<&str> {
