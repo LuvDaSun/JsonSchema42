@@ -25,18 +25,6 @@ pub fn discover_meta_schema_id(version_node: &serde_json::Value) -> Option<&str>
   None
 }
 
-fn select_schema(node: &serde_json::Value) -> Option<&str> {
-  node.as_object()?.get("$schema")?.as_str()
-}
-
-fn select_openapi(node: &serde_json::Value) -> Option<&str> {
-  node.as_object()?.get("openapi")?.as_str()
-}
-
-fn select_json_schema_dialect(node: &serde_json::Value) -> Option<&str> {
-  node.as_object()?.get("jsonSchemaDialect")?.as_str()
-}
-
 /// find the nearest ancestor (or self) node that defines the version of the
 /// node's schema
 ///
@@ -81,4 +69,16 @@ pub fn find_document_node(
   }
 
   None
+}
+
+fn select_schema(node: &serde_json::Value) -> Option<&str> {
+  node.as_object()?.get("$schema")?.as_str()
+}
+
+fn select_openapi(node: &serde_json::Value) -> Option<&str> {
+  node.as_object()?.get("openapi")?.as_str()
+}
+
+fn select_json_schema_dialect(node: &serde_json::Value) -> Option<&str> {
+  node.as_object()?.get("jsonSchemaDialect")?.as_str()
 }
