@@ -46,28 +46,6 @@ pub fn find_version_node(
     .map(|(location, _node)| location)
 }
 
-/// find the closest ancestor (or self) node that is a document
-///
-pub fn find_document_node(
-  node_cache: &NodeCache,
-  retrieval_location: &NodeLocation,
-) -> Option<NodeLocation> {
-  let nodes = node_cache.get_node_with_ancestors(retrieval_location);
-
-  nodes
-    .into_iter()
-    .rev()
-    .find(|(_location, node)| {
-      node
-        .as_object()
-        .map(|node| {
-          node.contains_key("$id") || node.contains_key("$schema") || node.contains_key("openapi")
-        })
-        .unwrap_or_default()
-    })
-    .map(|(location, _node)| location)
-}
-
 fn select_schema(node: &serde_json::Value) -> Option<&str> {
   node.as_object()?.get("$schema")?.as_str()
 }
