@@ -245,17 +245,26 @@ impl DocumentContext {
       document_antecedent_location,
     ));
 
-    while let Some((
-      document_retrieval_location,
-      document_given_location,
-      document_antecedent_location,
-    )) = queue.pop()
+    // drain the queue
+    while let Some((retrieval_location, given_location, document_antecedent_location)) = queue.pop()
     {
-      // If a document with this retrieval location is already loaded
+      // let's load some documents! This involves figuring out the document type
+      // via the meta schema id and some interesting logic. This logic is about
+      // nodes being loaded multiple times. If this is the case of course
+      // we do not want to double load the document. This is
+      // how we check for that:
+      if self.documents.borrow().contains_key(&retrieval_location) {
+        continue;
+      }
+
+      // There might be a situation where we load a node that is already loaded as
+      // part of a larger document. The node is then a child of that document. If
+      // that is the case then we don't want to load another document but just use
+      // the larger, parent document.
       if self
-        .documents
+        .node_to_document_retrieval_locations
         .borrow()
-        .contains_key(&document_retrieval_location)
+        .contains_key(&retrieval_location)
       {
         continue;
       }
@@ -264,22 +273,22 @@ impl DocumentContext {
       self
         .cache
         .borrow_mut()
-        .load_from_location(&document_retrieval_location)
+        .load_from_location(&retrieval_location)
         .await?;
 
       // Get the node from the cache
       let document_node = self
         .cache
         .borrow()
-        .get_node(&document_retrieval_location)
+        .get_node(&retrieval_location)
         .ok_or(Jns42Error::NotFound)?
         .clone();
 
       let factory = {
         let cache = self.cache.borrow();
 
-        let version_retrieval_location = find_version_node(&cache, &document_retrieval_location)
-          .unwrap_or_else(|| document_retrieval_location.clone());
+        let version_retrieval_location = find_version_node(&cache, &retrieval_location)
+          .unwrap_or_else(|| retrieval_location.clone());
         let version_node = cache
           .get_node(&version_retrieval_location)
           .ok_or(Jns42Error::NotFound)?;
@@ -295,8 +304,8 @@ impl DocumentContext {
       let document = factory(
         rc::Rc::downgrade(self),
         DocumentConfiguration {
-          retrieval_location: document_retrieval_location.clone(),
-          given_location: document_given_location.clone(),
+          retrieval_location: retrieval_location.clone(),
+          given_location: given_location.clone(),
           antecedent_location: document_antecedent_location.clone(),
           document_node,
         },
@@ -307,7 +316,7 @@ impl DocumentContext {
       if self
         .documents
         .borrow_mut()
-        .insert(document_retrieval_location.clone(), document.clone())
+        .insert(retrieval_location.clone(), document.clone())
         .is_some()
       {
         Err(Jns42Error::Conflict)?;
@@ -317,63 +326,52 @@ impl DocumentContext {
       for (node_retrieval_location, node_identity_location) in iter::empty()
         .chain(document.get_node_pointers().into_iter().map(|pointer| {
           (
-            document_retrieval_location.push_pointer(pointer.clone()),
+            retrieval_location.push_pointer(pointer.clone()),
             document_identity_location.push_pointer(pointer.clone()),
           )
         }))
         .chain(document.get_node_anchors().into_iter().map(|anchor| {
           (
-            document_retrieval_location.set_anchor(anchor.clone()),
+            retrieval_location.set_anchor(anchor.clone()),
             document_identity_location.set_anchor(anchor.clone()),
           )
         }))
       {
-        if self
+        // it is possible that the node is already related to a document, this
+        // is the case when a child node is loaded before the parent document.
+        if let Some(document_retrieval_location) = self
           .node_to_document_retrieval_locations
           .borrow_mut()
-          .insert(
-            node_retrieval_location.clone(),
-            document_retrieval_location.clone(),
-          )
-          .is_some()
+          .insert(node_retrieval_location.clone(), retrieval_location.clone())
         {
-          Err(Jns42Error::Conflict)?;
+          // document might already be removed
+          self
+            .documents
+            .borrow_mut()
+            .remove(&document_retrieval_location);
         }
-        if self
-          .retrieval_to_identity_locations
-          .borrow_mut()
-          .insert(
-            node_retrieval_location.clone(),
-            node_identity_location.clone(),
-          )
-          .is_some()
-        {
-          Err(Jns42Error::Conflict)?;
-        }
-        if self
-          .identity_to_retrieval_locations
-          .borrow_mut()
-          .insert(
-            node_identity_location.clone(),
-            node_retrieval_location.clone(),
-          )
-          .is_some()
-        {
-          Err(Jns42Error::Conflict)?;
-        }
+
+        // possibly overwrite value
+        self.retrieval_to_identity_locations.borrow_mut().insert(
+          node_retrieval_location.clone(),
+          node_identity_location.clone(),
+        );
+
+        // possibly overwrite value
+        self.identity_to_retrieval_locations.borrow_mut().insert(
+          node_identity_location.clone(),
+          node_retrieval_location.clone(),
+        );
       }
 
       let referenced_locations = document.get_referenced_locations();
       for referenced_location in referenced_locations {
-        let retrieval_location = document_retrieval_location.join(&referenced_location);
+        let retrieval_location = retrieval_location.join(&referenced_location);
         let given_location = document_identity_location.join(&referenced_location);
 
-        let document_retrieval_location = retrieval_location; // TODO
-        let document_given_location = given_location; // TODO
-
         queue.push((
-          document_retrieval_location,
-          document_given_location,
+          retrieval_location,
+          given_location,
           // antecedent location points to the identity location!
           Some(document_identity_location.clone()),
         ));
