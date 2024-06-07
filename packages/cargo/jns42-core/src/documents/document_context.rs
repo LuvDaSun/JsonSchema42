@@ -233,18 +233,13 @@ impl DocumentContext {
   #[allow(clippy::await_holding_refcell_ref)]
   pub async fn load_from_location(
     self: &rc::Rc<Self>,
-    document_retrieval_location: NodeLocation,
-    document_given_location: NodeLocation,
-    document_antecedent_location: Option<NodeLocation>,
+    retrieval_location: NodeLocation,
+    given_location: NodeLocation,
+    antecedent_location: Option<NodeLocation>,
     default_meta_schema_id: String,
   ) -> Result<(), Jns42Error> {
     let mut queue = Vec::new();
-    queue.push((
-      document_retrieval_location,
-      document_given_location,
-      document_antecedent_location,
-    ));
-
+    queue.push((retrieval_location, given_location, antecedent_location));
     // drain the queue
     while let Some((retrieval_location, given_location, document_antecedent_location)) = queue.pop()
     {

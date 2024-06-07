@@ -37,15 +37,17 @@ impl NodeCache {
     retrieval_location: &NodeLocation,
   ) -> Vec<(NodeLocation, &serde_json::Value)> {
     let mut location = retrieval_location.set_root();
+    let pointer = retrieval_location.get_pointer().unwrap_or_default();
     self
-      .get_node_path_with_member(retrieval_location)
+      .get_node_path_with_member(&location, pointer.clone())
       .unwrap_or_default()
       .into_iter()
-      .map(|(member, node)| {
-        let next_location = location.push_pointer(iter::once(member).collect());
-        let result = (location.clone(), node);
-        location = next_location;
-        result
+      .enumerate()
+      .map(|(index, node)| {
+        if index > 0 {
+          location = location.push_pointer(pointer[0..index - 1].to_vec());
+        }
+        (location.clone(), node)
       })
       .collect()
   }
@@ -53,11 +55,11 @@ impl NodeCache {
   /// Retrieves the node
   ///
   pub fn get_node(&self, retrieval_location: &NodeLocation) -> Option<&serde_json::Value> {
-    let mut nodes = self.get_node_path_with_member(retrieval_location)?;
+    let root_location = retrieval_location.set_root();
+    let pointer = retrieval_location.get_pointer().unwrap_or_default();
+    let mut nodes = self.get_node_path_with_member(&root_location, pointer)?;
 
-    let (_member, node) = nodes.pop()?;
-
-    Some(node)
+    nodes.pop()
   }
 
   /// Load nodes from a location. The retrieval location is the physical location of
@@ -88,36 +90,17 @@ impl NodeCache {
     Ok(())
   }
 
-  pub fn load_from_node(
-    &mut self,
-    retrieval_location: &NodeLocation,
-    node: serde_json::Value,
-  ) -> Result<(), NodeCacheError> {
-    /*
-    If the document is not in the cache
-    */
-    if let btree_map::Entry::Vacant(entry) = self.root_nodes.entry(retrieval_location.clone()) {
-      /*
-      populate the cache with this document
-      */
-      entry.insert(node);
-      Ok(())
-    } else {
-      Err(NodeCacheError::Conflict)
-    }
-  }
-
   fn get_node_path_with_member(
     &self,
-    retrieval_location: &NodeLocation,
-  ) -> Option<Vec<(String, &serde_json::Value)>> {
+    root_location: &NodeLocation,
+    pointer: Vec<String>,
+  ) -> Option<Vec<&serde_json::Value>> {
     let mut result = Vec::new();
-    let root_location = retrieval_location.set_root();
-    let pointer = retrieval_location.get_pointer().unwrap_or_default();
-    let mut node = self.root_nodes.get(&root_location)?;
+    let mut node = self.root_nodes.get(root_location)?;
+
+    result.push(node);
 
     for member in pointer {
-      result.push((member.clone(), node));
       match node {
         serde_json::Value::Array(array_node) => {
           let index: usize = member.parse().ok()?;
@@ -128,6 +111,7 @@ impl NodeCache {
         }
         _ => return None,
       }
+      result.push(node);
     }
 
     Some(result)
