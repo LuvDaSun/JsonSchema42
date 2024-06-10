@@ -10,7 +10,6 @@ use std::collections::BTreeMap;
 use std::iter;
 use std::rc;
 use std::{cell::RefCell, collections::HashMap};
-use tokio::sync;
 use wasm_bindgen::prelude::*;
 
 pub struct DocumentConfiguration {
@@ -63,7 +62,7 @@ the node_resolved map to translate identity locations to retrieval locations.
 pub struct DocumentContext {
   /// nodes are stored in the cache, and indexed by their retrieval location
   ///
-  cache: rc::Rc<sync::Mutex<NodeCache>>,
+  cache: rc::Rc<RefCell<NodeCache>>,
 
   /// document factories by schema identifier
   ///
@@ -88,7 +87,7 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-  pub fn new(cache: rc::Rc<sync::Mutex<NodeCache>>) -> Self {
+  pub fn new(cache: rc::Rc<RefCell<NodeCache>>) -> Self {
     Self {
       cache,
       factories: Default::default(),
@@ -231,6 +230,7 @@ impl DocumentContext {
   Load nodes from a location. The retrieval location is the physical location of the node,
   it should be a root location
   */
+  #[allow(clippy::await_holding_refcell_ref)]
   pub async fn load_from_location(
     self: &rc::Rc<Self>,
     retrieval_location: NodeLocation,
@@ -267,22 +267,20 @@ impl DocumentContext {
       // Ensure the node is in the cache
       self
         .cache
-        .lock()
-        .await
+        .borrow_mut()
         .load_from_location(&retrieval_location)
         .await?;
 
       // Get the node from the cache
       let document_node = self
         .cache
-        .lock()
-        .await
+        .borrow()
         .get_node(&retrieval_location)
         .ok_or(Jns42Error::NotFound)?
         .clone();
 
       let factory = {
-        let cache = self.cache.lock().await;
+        let cache = self.cache.borrow();
 
         let version_retrieval_location = find_version_node(&cache, &retrieval_location)
           .unwrap_or_else(|| retrieval_location.clone());
