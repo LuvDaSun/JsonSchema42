@@ -1,6 +1,6 @@
 {
   "name": "@jns42/core",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "sideEffects": false,
   "description": "core library",
   "type": "commonjs",
@@ -36,7 +36,7 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
-    "@rollup/plugin-replace": "^5.0.6",
+    "@rollup/plugin-replace": "^5.0.7",
     "@tsconfig/node20": "^20.1.4",
     "c8": "^9.1.0",
     "rollup": "^4.18.0",
@@ -46,7 +46,7 @@
     "@types/node": "^20.14.2",
     "p-defer": "^4.0.1",
     "tslib": "^2.6.3",
-    "type-fest": "^4.19.0"
+    "type-fest": "^4.20.0"
   },
   "engines": {
     "node": ">=18"

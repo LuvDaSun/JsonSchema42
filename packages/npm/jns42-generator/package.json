@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -44,22 +44,22 @@
   ],
   "homepage": "https://www.JsonSchema42.org",
   "devDependencies": {
-    "@rollup/plugin-replace": "^5.0.6",
+    "@rollup/plugin-replace": "^5.0.7",
     "@tsconfig/node20": "^20.1.4",
     "c8": "^9.1.0",
     "rollup": "^4.18.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@jns42/core": "^0.4.1",
+    "@jns42/core": "^0.4.2",
     "@types/node": "^20.14.2",
     "@types/yargs": "^17.0.32",
     "entities": "^4.5.0",
     "hash.js": "^1.1.7",
     "immutable": "^5.0.0-beta.5",
     "tslib": "^2.6.3",
-    "type-fest": "^4.19.0",
-    "yaml": "^2.4.3",
+    "type-fest": "^4.20.0",
+    "yaml": "^2.4.5",
     "yargs": "^17.7.2"
   },
   "engines": {
