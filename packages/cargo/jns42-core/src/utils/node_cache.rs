@@ -1,4 +1,5 @@
 use super::{fetch_text, FetchTextError, NodeLocation};
+use gloo::utils::format::JsValueSerdeExt;
 use std::cell::RefCell;
 use std::collections::{btree_map, BTreeMap};
 use std::{iter, rc};
@@ -90,6 +91,25 @@ impl NodeCache {
     Ok(())
   }
 
+  pub fn load_from_node(
+    &mut self,
+    retrieval_location: &NodeLocation,
+    node: serde_json::Value,
+  ) -> Result<(), NodeCacheError> {
+    /*
+    If the document is not in the cache
+    */
+    if let btree_map::Entry::Vacant(entry) = self.root_nodes.entry(retrieval_location.clone()) {
+      /*
+      populate the cache with this document
+      */
+      entry.insert(node);
+      Ok(())
+    } else {
+      Err(NodeCacheError::Conflict)
+    }
+  }
+
   fn get_node_path_with_member(
     &self,
     root_location: &NodeLocation,
@@ -156,6 +176,29 @@ impl NodeCacheContainer {
   pub fn new() -> Self {
     Default::default()
   }
+
+  #[wasm_bindgen(js_name = "loadFromLocation")]
+  pub async fn load_from_location(
+    &self,
+    retrieval_location: &NodeLocation,
+  ) -> Result<(), NodeCacheError> {
+    self
+      .0
+      .borrow_mut()
+      .load_from_location(retrieval_location)
+      .await
+  }
+
+  #[wasm_bindgen(js_name = "loadFromNode")]
+  pub fn load_from_node(
+    &self,
+    retrieval_location: &NodeLocation,
+    node: &JsValue,
+  ) -> Result<(), NodeCacheError> {
+    let node = JsValue::into_serde(node).unwrap_or_default();
+
+    self.0.borrow_mut().load_from_node(retrieval_location, node)
+  }
 }
 
 #[wasm_bindgen]
@@ -179,6 +222,7 @@ impl From<rc::Rc<RefCell<NodeCache>>> for NodeCacheContainer {
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub enum NodeCacheError {
   SerializationError,
   Conflict,
