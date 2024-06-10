@@ -40,8 +40,8 @@ pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
 
 #[cfg(not(target_os = "unknown"))]
 pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  use async_std::fs::File;
-  use async_std::io::ReadExt;
+  use tokio::fs::File;
+  use tokio::io::AsyncReadExt;
 
   if location.starts_with("http://") || location.starts_with("https://") {
     let mut response = surf::get(location).await?;

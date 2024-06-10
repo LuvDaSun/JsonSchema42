@@ -1,7 +1,8 @@
 use super::{fetch_text, FetchTextError, NodeLocation};
-use std::cell::RefCell;
+use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{btree_map, BTreeMap};
 use std::{iter, rc};
+use tokio::sync;
 use wasm_bindgen::prelude::*;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
@@ -27,32 +28,29 @@ impl NodeCache {
     })
   }
 
-  fn get_child_pointers(node: &serde_json::Value) -> impl Iterator<Item = Vec<String>> {
-    let mut result = Vec::new();
-
-    match node {
-      serde_json::Value::Array(array_node) => {
-        for index in 0..array_node.len() {
-          let member = index.to_string();
-          result.push(iter::once(member.clone()).collect());
-          for pointer in Self::get_child_pointers(node) {
-            result.push(iter::once(member.clone()).chain(pointer).collect());
-          }
+  ///.Retrieves a list of nodes with the node at the retrieval location last,
+  /// and all of the ancestors of the node before. The root node is first.
+  ///
+  /// Returns an empty vec when the node is not found.
+  ///
+  pub fn get_node_with_ancestors(
+    &self,
+    retrieval_location: &NodeLocation,
+  ) -> Vec<(NodeLocation, &serde_json::Value)> {
+    let mut location = retrieval_location.set_root();
+    let pointer = retrieval_location.get_pointer().unwrap_or_default();
+    self
+      .get_node_path_with_member(&location, pointer.clone())
+      .unwrap_or_default()
+      .into_iter()
+      .enumerate()
+      .map(|(index, node)| {
+        if index > 0 {
+          location = location.push_pointer(pointer[0..index - 1].to_vec());
         }
-      }
-      serde_json::Value::Object(object_node) => {
-        for key in object_node.keys() {
-          let member = key.to_owned();
-          result.push(iter::once(member.clone()).collect());
-          for pointer in Self::get_child_pointers(node) {
-            result.push(iter::once(member.clone()).chain(pointer).collect());
-          }
-        }
-      }
-      _ => {}
-    }
-
-    result.into_iter()
+        (location.clone(), node)
+      })
+      .collect()
   }
 
   /// Retrieves the node
@@ -60,22 +58,9 @@ impl NodeCache {
   pub fn get_node(&self, retrieval_location: &NodeLocation) -> Option<&serde_json::Value> {
     let root_location = retrieval_location.set_root();
     let pointer = retrieval_location.get_pointer().unwrap_or_default();
-    let mut node = self.root_nodes.get(&root_location)?;
+    let mut nodes = self.get_node_path_with_member(&root_location, pointer)?;
 
-    for member in pointer {
-      match node {
-        serde_json::Value::Array(array_node) => {
-          let index: usize = member.parse().ok()?;
-          node = array_node.get(index)?;
-        }
-        serde_json::Value::Object(object_node) => {
-          node = object_node.get(&member)?;
-        }
-        _ => return None,
-      }
-    }
-
-    Some(node)
+    nodes.pop()
   }
 
   /// Load nodes from a location. The retrieval location is the physical location of
@@ -124,17 +109,99 @@ impl NodeCache {
       Err(NodeCacheError::Conflict)
     }
   }
+
+  fn get_node_path_with_member(
+    &self,
+    root_location: &NodeLocation,
+    pointer: Vec<String>,
+  ) -> Option<Vec<&serde_json::Value>> {
+    let mut result = Vec::new();
+    let mut node = self.root_nodes.get(root_location)?;
+
+    result.push(node);
+
+    for member in pointer {
+      match node {
+        serde_json::Value::Array(array_node) => {
+          let index: usize = member.parse().ok()?;
+          node = array_node.get(index)?;
+        }
+        serde_json::Value::Object(object_node) => {
+          node = object_node.get(&member)?;
+        }
+        _ => return None,
+      }
+      result.push(node);
+    }
+
+    Some(result)
+  }
+
+  fn get_child_pointers(node: &serde_json::Value) -> impl Iterator<Item = Vec<String>> {
+    let mut result = Vec::new();
+
+    match node {
+      serde_json::Value::Array(array_node) => {
+        for index in 0..array_node.len() {
+          let member = index.to_string();
+          result.push(iter::once(member.clone()).collect());
+          for pointer in Self::get_child_pointers(node) {
+            result.push(iter::once(member.clone()).chain(pointer).collect());
+          }
+        }
+      }
+      serde_json::Value::Object(object_node) => {
+        for key in object_node.keys() {
+          let member = key.to_owned();
+          result.push(iter::once(member.clone()).collect());
+          for pointer in Self::get_child_pointers(node) {
+            result.push(iter::once(member.clone()).chain(pointer).collect());
+          }
+        }
+      }
+      _ => {}
+    }
+
+    result.into_iter()
+  }
 }
 
 #[wasm_bindgen]
 #[derive(Default, Clone)]
-pub struct NodeCacheContainer(rc::Rc<RefCell<NodeCache>>);
+pub struct NodeCacheContainer(rc::Rc<sync::Mutex<NodeCache>>);
 
 #[wasm_bindgen]
 impl NodeCacheContainer {
   #[wasm_bindgen(constructor)]
   pub fn new() -> Self {
     Default::default()
+  }
+
+  #[wasm_bindgen(js_name = "loadFromLocation")]
+  pub async fn load_from_location(
+    &self,
+    retrieval_location: &NodeLocation,
+  ) -> Result<(), NodeCacheError> {
+    self
+      .0
+      .lock()
+      .await
+      .load_from_location(retrieval_location)
+      .await
+  }
+
+  #[wasm_bindgen(js_name = "loadFromNode")]
+  pub fn load_from_node(
+    &self,
+    retrieval_location: &NodeLocation,
+    node: &JsValue,
+  ) -> Result<(), NodeCacheError> {
+    let node = JsValue::into_serde(node).unwrap_or_default();
+
+    self
+      .0
+      .blocking_lock()
+      .load_from_node(retrieval_location, node)
   }
 }
 
@@ -146,19 +213,20 @@ impl NodeCacheContainer {
   }
 }
 
-impl From<NodeCacheContainer> for rc::Rc<RefCell<NodeCache>> {
+impl From<NodeCacheContainer> for rc::Rc<sync::Mutex<NodeCache>> {
   fn from(value: NodeCacheContainer) -> Self {
     value.0
   }
 }
 
-impl From<rc::Rc<RefCell<NodeCache>>> for NodeCacheContainer {
-  fn from(value: rc::Rc<RefCell<NodeCache>>) -> Self {
+impl From<rc::Rc<sync::Mutex<NodeCache>>> for NodeCacheContainer {
+  fn from(value: rc::Rc<sync::Mutex<NodeCache>>) -> Self {
     Self(value)
   }
 }
 
 #[derive(Debug)]
+#[wasm_bindgen]
 pub enum NodeCacheError {
   SerializationError,
   Conflict,
@@ -185,7 +253,7 @@ impl From<serde_yaml::Error> for NodeCacheError {
 mod tests {
   use super::*;
 
-  #[async_std::test]
+  #[tokio::test]
   async fn test_load_from_location() {
     let mut cache = NodeCache::new();
 

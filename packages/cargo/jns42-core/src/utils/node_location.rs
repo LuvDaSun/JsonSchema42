@@ -1,6 +1,6 @@
 use once_cell::sync::Lazy;
 use regex::{Regex, RegexBuilder};
-use std::{error::Error, fmt::Display, hash::Hash, iter::once, str::FromStr};
+use std::{error::Error, fmt, hash::Hash, iter, str::FromStr};
 use wasm_bindgen::prelude::*;
 
 pub static URL_REGEX: Lazy<Regex> = Lazy::new(|| {
@@ -74,7 +74,7 @@ impl NodeLocation {
   #[wasm_bindgen(js_name = "setAnchor")]
   pub fn set_anchor(&self, value: String) -> Self {
     let mut cloned = self.clone();
-    cloned.hash = once(value).collect();
+    cloned.hash = iter::once(value).collect();
     cloned
   }
 
@@ -84,18 +84,36 @@ impl NodeLocation {
   #[wasm_bindgen(js_name = "setPointer")]
   pub fn set_pointer(&self, value: Vec<String>) -> Self {
     let mut cloned = self.clone();
-    cloned.hash = normalize_hash(once(String::new()).chain(value));
+    cloned.hash = normalize_hash(iter::once(String::new()).chain(value));
     cloned
   }
 
   /*
-  Removes pointer and anchor (the has) from this location.
+  Removes pointer and anchor (the hash) from this location.
   */
   #[wasm_bindgen(js_name = "setRoot")]
   pub fn set_root(&self) -> Self {
     let mut cloned = self.clone();
     cloned.hash = Default::default();
     cloned
+  }
+
+  /*
+  Return a location that is the parent of this one
+  */
+  #[wasm_bindgen(js_name = "setParent")]
+  pub fn set_parent(&self) -> Self {
+    let pointer = self.get_pointer();
+    let Some(mut pointer) = pointer else {
+      return self.clone();
+    };
+    pointer.pop();
+
+    if pointer.is_empty() {
+      self.set_root()
+    } else {
+      self.set_pointer(pointer)
+    }
   }
 
   /*
@@ -279,7 +297,7 @@ impl From<NodeLocation> for String {
   }
 }
 
-impl Display for NodeLocation {
+impl fmt::Display for NodeLocation {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     let s: String = self.into();
     write!(f, "{}", s)
@@ -301,7 +319,7 @@ pub enum ParseLocationError {
   DecodeError,
 }
 
-impl Display for ParseLocationError {
+impl fmt::Display for ParseLocationError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     match self {
       ParseLocationError::InvalidInput => write!(f, "Invalid input"),

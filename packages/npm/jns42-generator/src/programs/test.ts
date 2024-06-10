@@ -107,11 +107,12 @@ async function main(configuration: MainConfiguration) {
       const context = new core.Jns42DocumentContextContainer(cache);
       context.registerWellKnownFactories();
 
-      await context.loadFromNode(
+      cache.loadFromNode(location, schemaNode);
+
+      await context.loadFromLocation(
         location.clone(),
         location.clone(),
         undefined,
-        schemaNode,
         defaultMetaSchema,
       );
 
