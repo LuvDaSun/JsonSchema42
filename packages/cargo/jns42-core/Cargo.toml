@@ -29,10 +29,10 @@ wasm-bindgen = "0.2.92"
 wasm-bindgen-futures = "0.4.42"
 gloo = "0.11.0"
 semver = "1.0.23"
+tokio = { version = "1.38.0", features = ["sync"] }
 
 
 [target.'cfg(not(target_os = "unknown"))'.dependencies]
-async-std = { version = "1.12.0", features = ["attributes"] }
 surf = "2.3.2"
 
 [lib]

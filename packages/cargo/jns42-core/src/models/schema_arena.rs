@@ -208,6 +208,14 @@ pub struct SchemaArenaContainer(SchemaArena);
 
 #[wasm_bindgen]
 impl SchemaArenaContainer {
+  #[wasm_bindgen(js_name = clone)]
+  pub fn _clone(&self) -> Self {
+    Self(self.0.clone())
+  }
+}
+
+#[wasm_bindgen]
+impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = fromDocumentContext)]
   pub fn from_document_context(document_context: Jns42DocumentContextContainer) -> Self {
     SchemaArena::from_document_context(&document_context.into()).into()
@@ -226,12 +234,6 @@ impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = getNameParts)]
   pub fn get_name_parts(&self, key: usize) -> Vec<String> {
     self.0.get_name_parts(key).collect()
-  }
-
-  #[wasm_bindgen(js_name = clone)]
-  #[allow(clippy::should_implement_trait)]
-  pub fn clone(&self) -> Self {
-    Self(self.0.clone())
   }
 
   /// Applies a series of transformations to the schema items within the arena.

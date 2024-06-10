@@ -1,8 +1,8 @@
 use super::{fetch_text, FetchTextError, NodeLocation};
 use gloo::utils::format::JsValueSerdeExt;
-use std::cell::RefCell;
 use std::collections::{btree_map, BTreeMap};
 use std::{iter, rc};
+use tokio::sync;
 use wasm_bindgen::prelude::*;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
@@ -168,7 +168,7 @@ impl NodeCache {
 
 #[wasm_bindgen]
 #[derive(Default, Clone)]
-pub struct NodeCacheContainer(rc::Rc<RefCell<NodeCache>>);
+pub struct NodeCacheContainer(rc::Rc<sync::Mutex<NodeCache>>);
 
 #[wasm_bindgen]
 impl NodeCacheContainer {
@@ -184,7 +184,8 @@ impl NodeCacheContainer {
   ) -> Result<(), NodeCacheError> {
     self
       .0
-      .borrow_mut()
+      .lock()
+      .await
       .load_from_location(retrieval_location)
       .await
   }
@@ -197,7 +198,10 @@ impl NodeCacheContainer {
   ) -> Result<(), NodeCacheError> {
     let node = JsValue::into_serde(node).unwrap_or_default();
 
-    self.0.borrow_mut().load_from_node(retrieval_location, node)
+    self
+      .0
+      .blocking_lock()
+      .load_from_node(retrieval_location, node)
   }
 }
 
@@ -209,14 +213,14 @@ impl NodeCacheContainer {
   }
 }
 
-impl From<NodeCacheContainer> for rc::Rc<RefCell<NodeCache>> {
+impl From<NodeCacheContainer> for rc::Rc<sync::Mutex<NodeCache>> {
   fn from(value: NodeCacheContainer) -> Self {
     value.0
   }
 }
 
-impl From<rc::Rc<RefCell<NodeCache>>> for NodeCacheContainer {
-  fn from(value: rc::Rc<RefCell<NodeCache>>) -> Self {
+impl From<rc::Rc<sync::Mutex<NodeCache>>> for NodeCacheContainer {
+  fn from(value: rc::Rc<sync::Mutex<NodeCache>>) -> Self {
     Self(value)
   }
 }
@@ -249,7 +253,7 @@ impl From<serde_yaml::Error> for NodeCacheError {
 mod tests {
   use super::*;
 
-  #[async_std::test]
+  #[tokio::test]
   async fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
