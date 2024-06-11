@@ -185,7 +185,7 @@ impl From<serde_yaml::Error> for NodeCacheError {
   }
 }
 
-#[cfg(not(target_os = "unknown"))]
+#[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]
 mod tests {
   use super::*;

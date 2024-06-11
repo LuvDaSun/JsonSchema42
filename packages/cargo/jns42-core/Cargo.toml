@@ -31,7 +31,7 @@ gloo = "0.11.0"
 semver = "1.0.23"
 
 
-[target.'cfg(not(target_os = "unknown"))'.dependencies]
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 surf = "2.3.2"
 tokio = { version = "1.38.0", features = ["full"] }
 

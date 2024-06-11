@@ -471,8 +471,8 @@ impl ArenaSchemaItemContainer {
     self.0.parent
   }
   #[wasm_bindgen(getter = location)]
-  pub fn location_get(&self) -> Option<NodeLocation> {
-    Some(self.0.location.as_ref()?.clone())
+  pub fn location_get(&self) -> Option<String> {
+    Some(self.0.location.as_ref()?.to_string())
   }
 
   // metadata
