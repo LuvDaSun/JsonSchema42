@@ -11,7 +11,7 @@ import {
 } from "../utils/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
-  yield core.jns42Banner("//", `v${packageInfo.version}`);
+  yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 

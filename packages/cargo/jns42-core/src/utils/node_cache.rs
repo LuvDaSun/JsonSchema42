@@ -1,9 +1,6 @@
 use super::{fetch_text, FetchTextError, NodeLocation};
-use gloo::utils::format::JsValueSerdeExt;
-use std::cell::RefCell;
 use std::collections::{btree_map, BTreeMap};
-use std::{iter, rc};
-use wasm_bindgen::prelude::*;
+use std::iter;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
 /// Nodes have a retrieval location that is the physical (possibly globally
@@ -166,64 +163,7 @@ impl NodeCache {
   }
 }
 
-#[wasm_bindgen]
-#[derive(Default, Clone)]
-pub struct NodeCacheContainer(rc::Rc<RefCell<NodeCache>>);
-
-#[wasm_bindgen]
-impl NodeCacheContainer {
-  #[wasm_bindgen(constructor)]
-  pub fn new() -> Self {
-    Default::default()
-  }
-
-  #[wasm_bindgen(js_name = "loadFromLocation")]
-  #[allow(clippy::await_holding_refcell_ref)]
-  pub async fn load_from_location(
-    &self,
-    retrieval_location: &NodeLocation,
-  ) -> Result<(), NodeCacheError> {
-    self
-      .0
-      .borrow_mut()
-      .load_from_location(retrieval_location)
-      .await
-  }
-
-  #[wasm_bindgen(js_name = "loadFromNode")]
-  pub fn load_from_node(
-    &self,
-    retrieval_location: &NodeLocation,
-    node: &JsValue,
-  ) -> Result<(), NodeCacheError> {
-    let node = JsValue::into_serde(node).unwrap_or_default();
-
-    self.0.borrow_mut().load_from_node(retrieval_location, node)
-  }
-}
-
-#[wasm_bindgen]
-impl NodeCacheContainer {
-  #[wasm_bindgen(js_name = "clone")]
-  pub fn _clone(&self) -> Self {
-    Clone::clone(self)
-  }
-}
-
-impl From<NodeCacheContainer> for rc::Rc<RefCell<NodeCache>> {
-  fn from(value: NodeCacheContainer) -> Self {
-    value.0
-  }
-}
-
-impl From<rc::Rc<RefCell<NodeCache>>> for NodeCacheContainer {
-  fn from(value: rc::Rc<RefCell<NodeCache>>) -> Self {
-    Self(value)
-  }
-}
-
 #[derive(Debug)]
-#[wasm_bindgen]
 pub enum NodeCacheError {
   SerializationError,
   Conflict,

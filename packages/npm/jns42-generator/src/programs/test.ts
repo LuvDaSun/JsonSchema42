@@ -103,16 +103,14 @@ async function main(configuration: MainConfiguration) {
     const location = core.NodeLocation.parse(pathToTest);
     // generate package
     {
-      const cache = new core.NodeCacheContainer();
-      const context = new core.Jns42DocumentContextContainer(cache);
+      const context = new core.DocumentContextContainer();
       context.registerWellKnownFactories();
 
-      cache.loadFromNode(location, schemaNode);
-
-      await context.loadFromLocation(
+      await context.loadFromNode(
         location.clone(),
         location.clone(),
         undefined,
+        schemaNode,
         defaultMetaSchema,
       );
 
