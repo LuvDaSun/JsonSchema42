@@ -49,7 +49,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
       schema_location.clone(),
       schema_location.clone(),
       None,
-      default_meta_schema_id.to_owned(),
+      &default_meta_schema_id,
     )
     .await
     .unwrap();

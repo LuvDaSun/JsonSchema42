@@ -75,8 +75,7 @@ async function main(configuration: MainConfiguration) {
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
     configuration;
 
-  const cache = new core.NodeCacheContainer();
-  const context = new core.Jns42DocumentContextContainer(cache);
+  const context = new core.DocumentContextContainer();
   context.registerWellKnownFactories();
 
   await context.loadFromLocation(

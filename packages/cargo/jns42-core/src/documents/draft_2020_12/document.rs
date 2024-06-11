@@ -1,6 +1,6 @@
 use super::Node;
 use crate::documents::{DocumentContext, SchemaDocument};
-use crate::error::Jns42Error;
+use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeLocation;
 use std::collections::{BTreeMap, HashMap};
@@ -30,7 +30,7 @@ impl Document {
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
     document_node: Node,
-  ) -> Result<Self, Jns42Error> {
+  ) -> Result<Self, Error> {
     let node_id = document_node.select_id();
 
     let identity_location = if let Some(node_id) = node_id {
@@ -98,7 +98,7 @@ impl Document {
 
   /// resolve reference to identity location
   ///
-  pub fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Jns42Error> {
+  pub fn resolve_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let reference_location = self.identity_location.join(&reference_location);
@@ -117,12 +117,12 @@ impl Document {
       return Ok(reference_location);
     }
 
-    Err(Jns42Error::NotFound)
+    Err(Error::NotFound)
   }
 
   /// resolve dynamic reference to identity location
   ///
-  pub fn resolve_dynamic_reference(&self, reference: &str) -> Result<NodeLocation, Jns42Error> {
+  pub fn resolve_dynamic_reference(&self, reference: &str) -> Result<NodeLocation, Error> {
     let document_context = self.document_context.upgrade().unwrap();
     let reference_location = reference.parse()?;
     let mut antecedent_documents =
@@ -138,11 +138,11 @@ impl Document {
           return Ok(reference_location);
         };
       } else {
-        return Err(Jns42Error::Unknown);
+        return Err(Error::Unknown);
       }
     }
 
-    Err(Jns42Error::NotFound)
+    Err(Error::NotFound)
   }
 }
 

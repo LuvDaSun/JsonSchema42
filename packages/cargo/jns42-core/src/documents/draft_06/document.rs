@@ -1,6 +1,6 @@
 use super::Node;
 use crate::documents::SchemaDocument;
-use crate::error::Jns42Error;
+use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeLocation;
 use std::collections::{BTreeMap, HashMap};
@@ -20,7 +20,7 @@ impl Document {
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
     document_node: Node,
-  ) -> Result<Self, Jns42Error> {
+  ) -> Result<Self, Error> {
     let node_id = document_node.select_id();
 
     let identity_location = if let Some(node_id) = node_id {

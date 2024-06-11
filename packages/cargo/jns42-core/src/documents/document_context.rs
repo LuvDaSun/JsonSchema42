@@ -1,11 +1,11 @@
 use super::find_version_node;
 use super::schema_document::SchemaDocument;
 use crate::documents;
-use crate::error::Jns42Error;
+use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeCache;
-use crate::utils::NodeCacheContainer;
 use crate::utils::NodeLocation;
+use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeMap;
 use std::iter;
 use std::rc;
@@ -59,6 +59,8 @@ retrieval locations. This step need to be done first when retrieving a reference
 the node_resolved map to translate identity locations to retrieval locations.
 
 */
+
+#[derive(Default)]
 pub struct DocumentContext {
   /// nodes are stored in the cache, and indexed by their retrieval location
   ///
@@ -87,35 +89,28 @@ pub struct DocumentContext {
 }
 
 impl DocumentContext {
-  pub fn new(cache: rc::Rc<RefCell<NodeCache>>) -> Self {
-    Self {
-      cache,
-      factories: Default::default(),
-      node_to_document_retrieval_locations: Default::default(),
-      documents: Default::default(),
-      retrieval_to_identity_locations: Default::default(),
-      identity_to_retrieval_locations: Default::default(),
-    }
+  pub fn new() -> Self {
+    Self::default()
   }
 
   pub fn register_factory(
     self: &mut rc::Rc<Self>,
     schema: &str,
     factory: Box<DocumentFactory>,
-  ) -> Result<(), Jns42Error> {
+  ) -> Result<(), Error> {
     /*
     don't check if the factory is already registered here so we can
     override factories
     */
     rc::Rc::get_mut(self)
-      .ok_or(Jns42Error::Unknown)?
+      .ok_or(Error::Unknown)?
       .factories
       .insert(schema.to_owned(), factory);
 
     Ok(())
   }
 
-  pub fn register_well_known_factories(self: &mut rc::Rc<Self>) -> Result<(), Jns42Error> {
+  pub fn register_well_known_factories(self: &mut rc::Rc<Self>) -> Result<(), Error> {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|context, configuration| {
@@ -236,8 +231,8 @@ impl DocumentContext {
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
-    default_meta_schema_id: String,
-  ) -> Result<(), Jns42Error> {
+    default_meta_schema_id: &str,
+  ) -> Result<(), Error> {
     let mut queue = Vec::new();
     queue.push((retrieval_location, given_location, antecedent_location));
     // drain the queue
@@ -276,7 +271,7 @@ impl DocumentContext {
         .cache
         .borrow()
         .get_node(&retrieval_location)
-        .ok_or(Jns42Error::NotFound)?
+        .ok_or(Error::NotFound)?
         .clone();
 
       let factory = {
@@ -286,14 +281,11 @@ impl DocumentContext {
           .unwrap_or_else(|| retrieval_location.clone());
         let version_node = cache
           .get_node(&version_retrieval_location)
-          .ok_or(Jns42Error::NotFound)?;
+          .ok_or(Error::NotFound)?;
         let meta_schema_id =
-          documents::discover_meta_schema_id(version_node).unwrap_or(&default_meta_schema_id);
+          documents::discover_meta_schema_id(version_node).unwrap_or(default_meta_schema_id);
 
-        self
-          .factories
-          .get(meta_schema_id)
-          .ok_or(Jns42Error::NotFound)?
+        self.factories.get(meta_schema_id).ok_or(Error::NotFound)?
       };
 
       let document = factory(
@@ -314,7 +306,7 @@ impl DocumentContext {
         .insert(retrieval_location.clone(), document.clone())
         .is_some()
       {
-        Err(Jns42Error::Conflict)?;
+        Err(Error::Conflict)?;
       }
 
       // Map node pointers and anchors to this document
@@ -376,6 +368,29 @@ impl DocumentContext {
     Ok(())
   }
 
+  pub async fn load_from_node(
+    self: &rc::Rc<Self>,
+    retrieval_location: NodeLocation,
+    given_location: NodeLocation,
+    antecedent_location: Option<NodeLocation>,
+    node: serde_json::Value,
+    default_meta_schema_id: &str,
+  ) -> Result<(), Error> {
+    self
+      .cache
+      .borrow_mut()
+      .load_from_node(&retrieval_location, node)?;
+
+    self
+      .load_from_location(
+        retrieval_location,
+        given_location,
+        antecedent_location,
+        default_meta_schema_id,
+      )
+      .await
+  }
+
   pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem> {
     self
       .documents
@@ -388,55 +403,55 @@ impl DocumentContext {
   pub fn resolve_document_retrieval_location(
     &self,
     node_retrieval_location: &NodeLocation,
-  ) -> Result<NodeLocation, Jns42Error> {
+  ) -> Result<NodeLocation, Error> {
     self
       .node_to_document_retrieval_locations
       .borrow()
       .get(node_retrieval_location)
       .cloned()
-      .ok_or(Jns42Error::NotFound)
+      .ok_or(Error::NotFound)
   }
 
   pub fn resolve_identity_location(
     &self,
     retrieval_location: &NodeLocation,
-  ) -> Result<NodeLocation, Jns42Error> {
+  ) -> Result<NodeLocation, Error> {
     self
       .retrieval_to_identity_locations
       .borrow()
       .get(retrieval_location)
       .cloned()
-      .ok_or(Jns42Error::NotFound)
+      .ok_or(Error::NotFound)
   }
 
   pub fn resolve_retrieval_location(
     &self,
     identity_location: &NodeLocation,
-  ) -> Result<NodeLocation, Jns42Error> {
+  ) -> Result<NodeLocation, Error> {
     self
       .identity_to_retrieval_locations
       .borrow()
       .get(identity_location)
       .cloned()
-      .ok_or(Jns42Error::NotFound)
+      .ok_or(Error::NotFound)
   }
 
   pub fn get_document(
     &self,
     document_retrieval_location: &NodeLocation,
-  ) -> Result<rc::Rc<dyn SchemaDocument>, Jns42Error> {
+  ) -> Result<rc::Rc<dyn SchemaDocument>, Error> {
     self
       .documents
       .borrow()
       .get(document_retrieval_location)
       .cloned()
-      .ok_or(Jns42Error::NotFound)
+      .ok_or(Error::NotFound)
   }
 
   pub fn get_document_and_antecedents(
     &self,
     document_identity_location: &NodeLocation,
-  ) -> Result<Vec<rc::Rc<dyn SchemaDocument>>, Jns42Error> {
+  ) -> Result<Vec<rc::Rc<dyn SchemaDocument>>, Error> {
     let mut results = Vec::new();
     let mut document_identity_location = document_identity_location.clone();
 
@@ -455,24 +470,19 @@ impl DocumentContext {
   }
 }
 
-impl Default for DocumentContext {
-  fn default() -> Self {
-    Self::new(Default::default())
-  }
-}
+#[wasm_bindgen]
+#[derive(Default)]
+pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
 
 #[wasm_bindgen]
-pub struct Jns42DocumentContextContainer(rc::Rc<DocumentContext>);
-
-#[wasm_bindgen]
-impl Jns42DocumentContextContainer {
+impl DocumentContextContainer {
   #[wasm_bindgen(constructor)]
-  pub fn new(cache: &NodeCacheContainer) -> Self {
-    Self(rc::Rc::new(DocumentContext::new(cache.clone().into())))
+  pub fn new() -> Self {
+    Self::default()
   }
 
   #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), Jns42Error> {
+  pub fn register_well_known_factories(&mut self) -> Result<(), Error> {
     self.0.register_well_known_factories()
   }
 
@@ -482,8 +492,8 @@ impl Jns42DocumentContextContainer {
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
     antecedent_location: Option<NodeLocation>,
-    default_meta_schema_id: String,
-  ) -> Result<(), Jns42Error> {
+    default_meta_schema_id: &str,
+  ) -> Result<(), Error> {
     self
       .0
       .load_from_location(
@@ -494,16 +504,38 @@ impl Jns42DocumentContextContainer {
       )
       .await
   }
+
+  #[wasm_bindgen(js_name = "loadFromNode")]
+  pub async fn load_from_node(
+    &self,
+    retrieval_location: NodeLocation,
+    given_location: NodeLocation,
+    antecedent_location: Option<NodeLocation>,
+    node: &JsValue,
+    default_meta_schema_id: &str,
+  ) -> Result<(), Error> {
+    let node = JsValue::into_serde(node).unwrap();
+    self
+      .0
+      .load_from_node(
+        retrieval_location,
+        given_location,
+        antecedent_location,
+        node,
+        default_meta_schema_id,
+      )
+      .await
+  }
 }
 
-impl From<rc::Rc<DocumentContext>> for Jns42DocumentContextContainer {
+impl From<rc::Rc<DocumentContext>> for DocumentContextContainer {
   fn from(value: rc::Rc<DocumentContext>) -> Self {
     Self(value)
   }
 }
 
-impl From<Jns42DocumentContextContainer> for rc::Rc<DocumentContext> {
-  fn from(value: Jns42DocumentContextContainer) -> Self {
+impl From<DocumentContextContainer> for rc::Rc<DocumentContext> {
+  fn from(value: DocumentContextContainer) -> Self {
     value.0
   }
 }
@@ -528,7 +560,7 @@ mod tests {
         location.clone(),
         location.clone(),
         None,
-        documents::draft_2020_12::META_SCHEMA_ID.to_owned(),
+        documents::draft_2020_12::META_SCHEMA_ID,
       )
       .await
       .unwrap();
