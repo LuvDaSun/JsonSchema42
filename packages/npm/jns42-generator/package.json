@@ -1,6 +1,6 @@
 {
   "name": "jns42-generator",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -51,7 +51,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@jns42/core": "^0.4.2",
+    "@jns42/core": "^0.5.0",
     "@types/node": "^20.14.2",
     "@types/yargs": "^17.0.32",
     "entities": "^4.5.0",
