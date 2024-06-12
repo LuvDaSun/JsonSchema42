@@ -79,8 +79,8 @@ async function main(configuration: MainConfiguration) {
   context.registerWellKnownFactories();
 
   await context.loadFromLocation(
-    core.NodeLocation.parse(instanceSchemaLocation),
-    core.NodeLocation.parse(instanceSchemaLocation),
+    instanceSchemaLocation,
+    instanceSchemaLocation,
     undefined,
     defaultMetaSchema,
   );
