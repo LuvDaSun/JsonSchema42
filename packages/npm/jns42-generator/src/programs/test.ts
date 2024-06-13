@@ -100,19 +100,12 @@ async function main(configuration: MainConfiguration) {
 
     const schemaNode = schemas[schemaName];
 
-    const location = core.NodeLocation.parse(pathToTest);
     // generate package
     {
       const context = new core.DocumentContextContainer();
       context.registerWellKnownFactories();
 
-      await context.loadFromNode(
-        location.clone(),
-        location.clone(),
-        undefined,
-        schemaNode,
-        defaultMetaSchema,
-      );
+      await context.loadFromNode(pathToTest, pathToTest, undefined, schemaNode, defaultMetaSchema);
 
       const specification = models.loadSpecification(context, {
         transformMaximumIterations,

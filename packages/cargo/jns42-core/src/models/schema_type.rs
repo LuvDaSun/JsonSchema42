@@ -43,6 +43,7 @@ impl SchemaType {
   }
 }
 
+#[allow(clippy::to_string_trait_impl)]
 impl ToString for SchemaType {
   fn to_string(&self) -> String {
     match self {

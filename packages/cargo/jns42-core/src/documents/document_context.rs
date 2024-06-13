@@ -489,11 +489,17 @@ impl DocumentContextContainer {
   #[wasm_bindgen(js_name = "loadFromLocation")]
   pub async fn load_from_location(
     &self,
-    retrieval_location: NodeLocation,
-    given_location: NodeLocation,
-    antecedent_location: Option<NodeLocation>,
+    retrieval_location: String,
+    given_location: String,
+    antecedent_location: Option<String>,
     default_meta_schema_id: &str,
   ) -> Result<(), Error> {
+    let retrieval_location = retrieval_location.parse()?;
+    let given_location = given_location.parse()?;
+    let antecedent_location = antecedent_location
+      .map(|location| location.parse())
+      .transpose()?;
+
     self
       .0
       .load_from_location(
@@ -508,13 +514,20 @@ impl DocumentContextContainer {
   #[wasm_bindgen(js_name = "loadFromNode")]
   pub async fn load_from_node(
     &self,
-    retrieval_location: NodeLocation,
-    given_location: NodeLocation,
-    antecedent_location: Option<NodeLocation>,
+    retrieval_location: String,
+    given_location: String,
+    antecedent_location: Option<String>,
     node: &JsValue,
     default_meta_schema_id: &str,
   ) -> Result<(), Error> {
+    let retrieval_location = retrieval_location.parse()?;
+    let given_location = given_location.parse()?;
+    let antecedent_location = antecedent_location
+      .map(|location| location.parse())
+      .transpose()?;
+
     let node = JsValue::into_serde(node).unwrap();
+
     self
       .0
       .load_from_node(
@@ -540,7 +553,7 @@ impl From<DocumentContextContainer> for rc::Rc<DocumentContext> {
   }
 }
 
-#[cfg(not(target_os = "unknown"))]
+#[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]
 mod tests {
   use super::*;

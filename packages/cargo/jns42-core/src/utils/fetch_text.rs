@@ -17,7 +17,7 @@ impl From<JsValue> for FetchTextError {
   }
 }
 
-#[cfg(not(target_os = "unknown"))]
+#[cfg(not(target_arch = "wasm32"))]
 impl From<surf::Error> for FetchTextError {
   fn from(_value: surf::Error) -> Self {
     Self::HttpError
@@ -30,7 +30,7 @@ extern "C" {
   async fn fetch_text_js(location: &str) -> Result<JsValue, JsValue>;
 }
 
-#[cfg(target_os = "unknown")]
+#[cfg(target_arch = "wasm32")]
 pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   let text = fetch_text_js(location).await?;
   let text = text.as_string().unwrap_or_default();
@@ -38,7 +38,7 @@ pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   Ok(text)
 }
 
-#[cfg(not(target_os = "unknown"))]
+#[cfg(not(target_arch = "wasm32"))]
 pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   use tokio::fs::File;
   use tokio::io::AsyncReadExt;
