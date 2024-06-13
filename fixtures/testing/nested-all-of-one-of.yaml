@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: NestedAllOfOneOfYaml
+rootTypeName: NestedAllOfOneOf
 
 schemas:
   original:
