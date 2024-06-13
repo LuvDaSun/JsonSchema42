@@ -123,7 +123,6 @@ where
   fn make_optimized_names(
     part_map: BTreeMap<K, BTreeSet<NamePart>>,
   ) -> BTreeMap<Sentence, BTreeSet<K>> {
-    let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
     let mut optimization_map: BTreeMap<K, (Sentence, BTreeSet<NamePart>)> = part_map
       .into_iter()
       .map(|(key, name_parts)| (key, (Sentence::empty(), name_parts)))
@@ -131,6 +130,7 @@ where
 
     loop {
       let mut done = true;
+      let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
 
       for (key, part) in &optimization_map {
         let keys = optimized_names.entry(part.0.clone()).or_default();
@@ -160,14 +160,12 @@ where
         }
       }
 
+      // TODO we should check if the optimization was useful. If the new name has the same cardinality as the old one, revert it.
+
       if done {
-        break;
+        return optimized_names;
       }
-
-      optimized_names = BTreeMap::new();
     }
-
-    optimized_names
   }
 
   fn make_default_names(
