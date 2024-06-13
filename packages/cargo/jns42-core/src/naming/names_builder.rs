@@ -360,9 +360,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("a")),
-      (2, Sentence::new("b a")),
-      (3, Sentence::new("c a")),
+      (1, Sentence::new("")),
+      (2, Sentence::new("b")),
+      (3, Sentence::new("c")),
     ]
     .into_iter()
     .collect();
@@ -395,9 +395,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("dog id")),
-      (3, Sentence::new("goat id")),
+      (1, Sentence::new("cat")),
+      (2, Sentence::new("dog")),
+      (3, Sentence::new("goat")),
     ]
     .into_iter()
     .collect();
@@ -412,12 +412,9 @@ mod tests {
       .build()
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("schema id")),
-    ]
-    .into_iter()
-    .collect();
+    let expected: BTreeSet<_> = [(1, Sentence::new("cat")), (2, Sentence::new("schema"))]
+      .into_iter()
+      .collect();
     assert_eq!(actual, expected);
   }
 
@@ -429,12 +426,9 @@ mod tests {
       .build()
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("schema id")),
-    ]
-    .into_iter()
-    .collect();
+    let expected: BTreeSet<_> = [(1, Sentence::new("cat")), (2, Sentence::new("schema"))]
+      .into_iter()
+      .collect();
     assert_eq!(actual, expected);
   }
 }
