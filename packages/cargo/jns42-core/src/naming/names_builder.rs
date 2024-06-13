@@ -1,7 +1,9 @@
-use crate::naming::NamesContainer;
-
 use super::{NamePart, Names, Sentence};
-use std::collections::{BTreeMap, BTreeSet};
+use crate::naming::NamesContainer;
+use std::{
+  collections::{BTreeMap, BTreeSet},
+  fmt::Debug,
+};
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
@@ -12,7 +14,7 @@ pub struct NamesBuilder<K> {
 
 impl<K> NamesBuilder<K>
 where
-  K: Clone + PartialOrd + Ord,
+  K: Clone + PartialOrd + Ord + Debug,
 {
   pub fn new() -> Self {
     Self {
@@ -36,13 +38,44 @@ where
   }
 
   pub fn build(&self) -> Names<K> {
-    let cardinality_counters = Self::make_cardinality_counters(&self.sentences_map);
-    let part_map = Self::make_parts_map(&self.sentences_map, &cardinality_counters);
+    let prefix_length = Self::find_prefix_length(self.sentences_map.values().collect());
+    let sentences_map = self
+      .sentences_map
+      .iter()
+      .map(|(key, sentences)| (key.clone(), sentences[prefix_length..].to_vec()))
+      .collect();
+
+    let cardinality_counters = Self::make_cardinality_counters(&sentences_map);
+    let part_map = Self::make_parts_map(&sentences_map, &cardinality_counters);
     let optimized_names = Self::make_optimized_names(part_map);
     let optimized_names = Self::make_default_names(optimized_names, self.default_sentence.clone());
     let names = Self::make_names(optimized_names);
 
     Names::new(names)
+  }
+
+  fn find_prefix_length(sentence_list: Vec<&Vec<Sentence>>) -> usize {
+    let mut index = 0;
+
+    loop {
+      let mut compare_sentence = None;
+      for sentences in &sentence_list {
+        let Some(sentence) = sentences.get(index) else {
+          return index;
+        };
+
+        let Some(compare_sentence) = compare_sentence else {
+          compare_sentence = Some(sentence);
+          continue;
+        };
+
+        if compare_sentence != sentence {
+          return index;
+        }
+      }
+
+      index += 1;
+    }
   }
 
   /// create a new, normalized, sentences map and cardinality counters
@@ -124,19 +157,20 @@ where
   fn make_optimized_names(
     part_map: BTreeMap<K, BTreeSet<NamePart>>,
   ) -> BTreeMap<Sentence, BTreeSet<K>> {
-    let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
-    let mut optimization_map: BTreeMap<K, (Sentence, BTreeSet<NamePart>)> = part_map
+    let mut optimization_map: BTreeMap<K, (Sentence, Sentence, BTreeSet<NamePart>)> = part_map
       .into_iter()
-      .map(|(key, name_parts)| (key, (Sentence::empty(), name_parts)))
+      .map(|(key, name_parts)| (key, (Sentence::empty(), Sentence::empty(), name_parts)))
       .collect();
 
-    loop {
-      let mut done = true;
+    let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
+    for (key, part) in &optimization_map {
+      let keys = optimized_names.entry(part.1.clone()).or_default();
+      (*keys).insert(key.clone());
+    }
 
-      for (key, part) in &optimization_map {
-        let keys = optimized_names.entry(part.0.clone()).or_default();
-        (*keys).insert(key.clone());
-      }
+    let mut done = false;
+    while !done {
+      done = true;
 
       for (name, keys) in &optimized_names {
         if !name.is_empty() && keys.len() == 1 {
@@ -149,23 +183,49 @@ where
         // so unique names are more likely to popup. More unique names (lower cardinality) will
         // be at the beginning of the set.
         for key in keys {
-          let (optimized_name, parts) = optimization_map.get_mut(key).unwrap();
+          let (optimized_name_previous, optimized_name, parts) =
+            optimization_map.get_mut(key).unwrap();
           let part = parts.pop_last();
           let Some(part) = part else {
             continue;
           };
 
+          *optimized_name_previous = optimized_name.clone();
           *optimized_name = part.sentence.join(optimized_name);
 
           done = false;
         }
       }
 
-      if done {
-        break;
+      {
+        let optimized_names_previous = optimized_names;
+
+        optimized_names = BTreeMap::new();
+        for (key, part) in &optimization_map {
+          let keys = optimized_names.entry(part.1.clone()).or_default();
+          (*keys).insert(key.clone());
+        }
+
+        for (optimized_name_previous, optimized_name, _parts) in optimization_map.values_mut() {
+          let Some(keys_next) = optimized_names.get(optimized_name) else {
+            continue;
+          };
+          let Some(keys_previous) = optimized_names_previous.get(optimized_name_previous) else {
+            continue;
+          };
+
+          if keys_next == keys_previous {
+            *optimized_name = optimized_name_previous.clone();
+            // done = false
+          }
+        }
       }
 
       optimized_names = BTreeMap::new();
+      for (key, part) in &optimization_map {
+        let keys = optimized_names.entry(part.1.clone()).or_default();
+        (*keys).insert(key.clone());
+      }
     }
 
     optimized_names
@@ -208,7 +268,7 @@ where
 
 impl<K> Default for NamesBuilder<K>
 where
-  K: Clone + PartialOrd + Ord,
+  K: Clone + PartialOrd + Ord + Debug,
 {
   fn default() -> Self {
     Self::new()
@@ -264,6 +324,101 @@ mod tests {
   use super::*;
 
   #[test]
+  fn test_positive_integer_file() {
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(
+        1,
+        [
+          "home",
+          "workspace",
+          "JsonSchema42",
+          "fixtures",
+          "testing",
+          "positive-integer",
+        ],
+      )
+      .add(
+        2,
+        [
+          "home",
+          "workspace",
+          "JsonSchema42",
+          "fixtures",
+          "testing",
+          "positive-integer",
+          "definitions",
+          "positiveInteger",
+        ],
+      )
+      .add(
+        3,
+        [
+          "home",
+          "workspace",
+          "JsonSchema42",
+          "fixtures",
+          "testing",
+          "positive-integer",
+          "definitions",
+          "positiveIntegerDefault0",
+        ],
+      )
+      .set_default_name("default")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("default")),
+      (2, Sentence::new("positive-integer")),
+      (3, Sentence::new("positiveIntegerDefault0")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
+  fn test_names_duplicate() {
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, ["a", "b", "c"])
+      .add(2, ["a", "b", "c"])
+      .add(3, ["a", "b", "c"])
+      .set_default_name("default")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("default")),
+      (2, Sentence::new("default1")),
+      (3, Sentence::new("default2")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, ["a", "b", "c"])
+      .add(2, ["a", "b", "c"])
+      .add(3, ["a", "b", "c"])
+      .add(4, ["a", "b"])
+      .add(5, ["a", "b"])
+      .set_default_name("default")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("c")),
+      (2, Sentence::new("c-1")),
+      (3, Sentence::new("c-2")),
+      (4, Sentence::new("default")),
+      (5, Sentence::new("default-1")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
   fn test_names_1() {
     let actual: BTreeSet<_> = NamesBuilder::new()
       .add(1, ["a"])
@@ -273,7 +428,7 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = vec![
-      (1, Sentence::new("a")),
+      (1, Sentence::new("")),
       (2, Sentence::new("b")),
       (3, Sentence::new("c")),
     ]
@@ -289,9 +444,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("a")),
-      (2, Sentence::new("b a")),
-      (3, Sentence::new("c a")),
+      (1, Sentence::new("")),
+      (2, Sentence::new("b")),
+      (3, Sentence::new("c")),
     ]
     .into_iter()
     .collect();
@@ -324,9 +479,9 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("dog id")),
-      (3, Sentence::new("goat id")),
+      (1, Sentence::new("cat")),
+      (2, Sentence::new("dog")),
+      (3, Sentence::new("goat")),
     ]
     .into_iter()
     .collect();
@@ -341,12 +496,9 @@ mod tests {
       .build()
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("schema id")),
-    ]
-    .into_iter()
-    .collect();
+    let expected: BTreeSet<_> = [(1, Sentence::new("cat")), (2, Sentence::new("schema"))]
+      .into_iter()
+      .collect();
     assert_eq!(actual, expected);
   }
 
@@ -358,12 +510,9 @@ mod tests {
       .build()
       .into_iter()
       .collect();
-    let expected: BTreeSet<_> = [
-      (1, Sentence::new("cat id")),
-      (2, Sentence::new("schema id")),
-    ]
-    .into_iter()
-    .collect();
+    let expected: BTreeSet<_> = [(1, Sentence::new("cat")), (2, Sentence::new("schema"))]
+      .into_iter()
+      .collect();
     assert_eq!(actual, expected);
   }
 }

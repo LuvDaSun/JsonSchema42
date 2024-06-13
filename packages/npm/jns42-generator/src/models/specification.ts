@@ -30,9 +30,9 @@ export function loadSpecification(
   const count = typesArena.count();
   for (let key = 0; key < count; key++) {
     const parts = typesArena.getNameParts(key);
-    const path = parts.filter((part) => /^[a-zA-Z]/.test(part));
+    const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
 
-    namesBuilder.add(key, path);
+    namesBuilder.add(key, filteredParts);
   }
 
   const names = namesBuilder.build();

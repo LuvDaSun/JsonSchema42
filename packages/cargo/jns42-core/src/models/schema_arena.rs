@@ -2,7 +2,7 @@ use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform,
 use crate::{
   documents::{DocumentContext, DocumentContextContainer},
   models::ArenaSchemaItemContainer,
-  utils::{arena::Arena, NodeLocation},
+  utils::{Arena, NodeLocation},
 };
 use std::{collections::HashMap, iter, rc::Rc};
 use wasm_bindgen::prelude::*;
@@ -187,12 +187,22 @@ impl Arena<ArenaSchemaItem> {
       })
       .map(|(_item_previous, item)| {
         iter::empty()
-          .chain(
-            item
-              .location
-              .as_ref()
-              .map(|id| iter::empty().chain(id.get_path()).chain(id.get_hash())),
-          )
+          .chain(item.location.as_ref().map(|id| {
+            iter::empty()
+              .chain(
+                id.get_path()
+                  .into_iter()
+                  .map(|part| {
+                    if let Some(index) = part.find('.') {
+                      part[..index].to_owned()
+                    } else {
+                      part
+                    }
+                  })
+                  .filter(|part| !part.is_empty()),
+              )
+              .chain(id.get_hash())
+          }))
           .flatten()
           .chain(item.name.clone())
           .filter(|part| !part.is_empty())

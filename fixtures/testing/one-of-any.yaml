@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: OneOfAnyYaml
+rootTypeName: SchemaDocument
 
 schemas:
   schema:

@@ -30,8 +30,8 @@ impl Ord for NamePart {
     };
 
     match self.index.cmp(&other.index) {
-      Ordering::Less => return Ordering::Greater,
-      Ordering::Greater => return Ordering::Less,
+      Ordering::Less => return Ordering::Less,
+      Ordering::Greater => return Ordering::Greater,
       _ => {}
     };
 
@@ -86,8 +86,8 @@ mod tests {
     actual.sort();
 
     let expected: Vec<_> = vec![
-      &part_info_c,
       &part_info_a,
+      &part_info_c,
       &part_info_d,
       &part_info_b,
       &part_info_e,

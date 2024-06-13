@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: UuidOrHandleYaml
+rootTypeName: SchemaDocument
 
 schemas:
   draft_2020-12:
