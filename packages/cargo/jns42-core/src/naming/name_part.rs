@@ -86,8 +86,8 @@ mod tests {
     actual.sort();
 
     let expected: Vec<_> = vec![
-      &part_info_c,
       &part_info_a,
+      &part_info_c,
       &part_info_d,
       &part_info_b,
       &part_info_e,
