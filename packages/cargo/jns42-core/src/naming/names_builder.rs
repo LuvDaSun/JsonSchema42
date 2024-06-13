@@ -1,6 +1,5 @@
-use crate::naming::NamesContainer;
-
 use super::{NamePart, Names, Sentence};
+use crate::naming::NamesContainer;
 use std::collections::{BTreeMap, BTreeSet};
 use wasm_bindgen::prelude::*;
 

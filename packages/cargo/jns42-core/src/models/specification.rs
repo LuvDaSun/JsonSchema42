@@ -3,7 +3,7 @@ use crate::{
   documents::DocumentContext,
   naming::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::arena::Arena,
+  utils::Arena,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};

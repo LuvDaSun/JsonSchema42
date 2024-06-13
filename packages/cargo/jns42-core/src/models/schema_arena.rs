@@ -2,7 +2,7 @@ use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform,
 use crate::{
   documents::{DocumentContext, DocumentContextContainer},
   models::ArenaSchemaItemContainer,
-  utils::{arena::Arena, NodeLocation},
+  utils::{Arena, NodeLocation},
 };
 use std::{collections::HashMap, iter, rc::Rc};
 use wasm_bindgen::prelude::*;
