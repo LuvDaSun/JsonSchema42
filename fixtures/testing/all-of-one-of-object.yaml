@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: AllOfOneOfObject
+rootTypeName: SchemaDocument
 
 schemas:
   original:

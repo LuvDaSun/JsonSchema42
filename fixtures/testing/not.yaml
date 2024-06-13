@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: Not
+rootTypeName: SchemaDocument
 
 schemas:
   draft_2020-12:

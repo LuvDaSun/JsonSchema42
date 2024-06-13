@@ -38,13 +38,44 @@ where
   }
 
   pub fn build(&self) -> Names<K> {
-    let cardinality_counters = Self::make_cardinality_counters(&self.sentences_map);
-    let part_map = Self::make_parts_map(&self.sentences_map, &cardinality_counters);
+    let prefix_length = Self::find_prefix_length(self.sentences_map.values().collect());
+    let sentences_map = self
+      .sentences_map
+      .iter()
+      .map(|(key, sentences)| (key.clone(), sentences[prefix_length..].to_vec()))
+      .collect();
+
+    let cardinality_counters = Self::make_cardinality_counters(&sentences_map);
+    let part_map = Self::make_parts_map(&sentences_map, &cardinality_counters);
     let optimized_names = Self::make_optimized_names(part_map);
     let optimized_names = Self::make_default_names(optimized_names, self.default_sentence.clone());
     let names = Self::make_names(optimized_names);
 
     Names::new(names)
+  }
+
+  fn find_prefix_length(sentence_list: Vec<&Vec<Sentence>>) -> usize {
+    let mut index = 0;
+
+    loop {
+      let mut compare_sentence = None;
+      for sentences in &sentence_list {
+        let Some(sentence) = sentences.get(index) else {
+          return index;
+        };
+
+        let Some(compare_sentence) = compare_sentence else {
+          compare_sentence = Some(sentence);
+          continue;
+        };
+
+        if compare_sentence != sentence {
+          return index;
+        }
+      }
+
+      index += 1;
+    }
   }
 
   /// create a new, normalized, sentences map and cardinality counters
@@ -130,14 +161,16 @@ where
       .into_iter()
       .map(|(key, name_parts)| (key, (Sentence::empty(), Sentence::empty(), name_parts)))
       .collect();
+
     let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
     for (key, part) in &optimization_map {
       let keys = optimized_names.entry(part.1.clone()).or_default();
       (*keys).insert(key.clone());
     }
 
-    loop {
-      let mut done = true;
+    let mut done = false;
+    while !done {
+      done = true;
 
       for (name, keys) in &optimized_names {
         if !name.is_empty() && keys.len() == 1 {
@@ -183,6 +216,7 @@ where
 
           if keys_next == keys_previous {
             *optimized_name = optimized_name_previous.clone();
+            // done = false
           }
         }
       }
@@ -191,10 +225,6 @@ where
       for (key, part) in &optimization_map {
         let keys = optimized_names.entry(part.1.clone()).or_default();
         (*keys).insert(key.clone());
-      }
-
-      if done {
-        break;
       }
     }
 
@@ -294,6 +324,60 @@ mod tests {
   use super::*;
 
   #[test]
+  fn test_positive_integer_file() {
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(
+        1,
+        [
+          "home",
+          "workspace",
+          "JsonSchema42",
+          "fixtures",
+          "testing",
+          "positive-integer",
+        ],
+      )
+      .add(
+        2,
+        [
+          "home",
+          "workspace",
+          "JsonSchema42",
+          "fixtures",
+          "testing",
+          "positive-integer",
+          "definitions",
+          "positiveInteger",
+        ],
+      )
+      .add(
+        3,
+        [
+          "home",
+          "workspace",
+          "JsonSchema42",
+          "fixtures",
+          "testing",
+          "positive-integer",
+          "definitions",
+          "positiveIntegerDefault0",
+        ],
+      )
+      .set_default_name("default")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("default")),
+      (2, Sentence::new("positive-integer")),
+      (3, Sentence::new("positiveIntegerDefault0")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
+
+  #[test]
   fn test_names_duplicate() {
     let actual: BTreeSet<_> = NamesBuilder::new()
       .add(1, ["a", "b", "c"])
@@ -326,8 +410,8 @@ mod tests {
       (1, Sentence::new("c")),
       (2, Sentence::new("c-1")),
       (3, Sentence::new("c-2")),
-      (4, Sentence::new("b")),
-      (5, Sentence::new("b-1")),
+      (4, Sentence::new("default")),
+      (5, Sentence::new("default-1")),
     ]
     .into_iter()
     .collect();
@@ -344,7 +428,7 @@ mod tests {
       .into_iter()
       .collect();
     let expected: BTreeSet<_> = vec![
-      (1, Sentence::new("a")),
+      (1, Sentence::new("")),
       (2, Sentence::new("b")),
       (3, Sentence::new("c")),
     ]

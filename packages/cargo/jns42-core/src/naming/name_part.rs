@@ -30,8 +30,8 @@ impl Ord for NamePart {
     };
 
     match self.index.cmp(&other.index) {
-      Ordering::Less => return Ordering::Greater,
-      Ordering::Greater => return Ordering::Less,
+      Ordering::Less => return Ordering::Less,
+      Ordering::Greater => return Ordering::Greater,
       _ => {}
     };
 
