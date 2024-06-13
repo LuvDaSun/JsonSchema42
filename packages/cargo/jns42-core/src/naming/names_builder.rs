@@ -127,17 +127,18 @@ where
       .into_iter()
       .map(|(key, name_parts)| (key, (Sentence::empty(), name_parts)))
       .collect();
+    let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
 
     loop {
       let mut done = true;
-      let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
+      let mut optimized_names_next: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
 
       for (key, part) in &optimization_map {
-        let keys = optimized_names.entry(part.0.clone()).or_default();
+        let keys = optimized_names_next.entry(part.0.clone()).or_default();
         (*keys).insert(key.clone());
       }
 
-      for (name, keys) in &optimized_names {
+      for (name, keys) in &optimized_names_next {
         if !name.is_empty() && keys.len() == 1 {
           // hurray! this name is unique!
           continue;
@@ -162,10 +163,14 @@ where
 
       // TODO we should check if the optimization was useful. If the new name has the same cardinality as the old one, revert it.
 
+      optimized_names = optimized_names_next;
+
       if done {
-        return optimized_names;
+        break;
       }
     }
+
+    optimized_names
   }
 
   fn make_default_names(
