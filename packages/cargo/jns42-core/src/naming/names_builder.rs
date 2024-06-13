@@ -1,6 +1,9 @@
 use super::{NamePart, Names, Sentence};
 use crate::naming::NamesContainer;
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+  collections::{BTreeMap, BTreeSet},
+  fmt::Debug,
+};
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
@@ -11,7 +14,7 @@ pub struct NamesBuilder<K> {
 
 impl<K> NamesBuilder<K>
 where
-  K: Clone + PartialOrd + Ord,
+  K: Clone + PartialOrd + Ord + Debug,
 {
   pub fn new() -> Self {
     Self {
@@ -123,22 +126,20 @@ where
   fn make_optimized_names(
     part_map: BTreeMap<K, BTreeSet<NamePart>>,
   ) -> BTreeMap<Sentence, BTreeSet<K>> {
-    let mut optimization_map: BTreeMap<K, (Sentence, BTreeSet<NamePart>)> = part_map
+    let mut optimization_map: BTreeMap<K, (Sentence, Sentence, BTreeSet<NamePart>)> = part_map
       .into_iter()
-      .map(|(key, name_parts)| (key, (Sentence::empty(), name_parts)))
+      .map(|(key, name_parts)| (key, (Sentence::empty(), Sentence::empty(), name_parts)))
       .collect();
     let mut optimized_names: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
+    for (key, part) in &optimization_map {
+      let keys = optimized_names.entry(part.1.clone()).or_default();
+      (*keys).insert(key.clone());
+    }
 
     loop {
       let mut done = true;
-      let mut optimized_names_next: BTreeMap<Sentence, BTreeSet<K>> = BTreeMap::new();
 
-      for (key, part) in &optimization_map {
-        let keys = optimized_names_next.entry(part.0.clone()).or_default();
-        (*keys).insert(key.clone());
-      }
-
-      for (name, keys) in &optimized_names_next {
+      for (name, keys) in &optimized_names {
         if !name.is_empty() && keys.len() == 1 {
           // hurray! this name is unique!
           continue;
@@ -149,21 +150,48 @@ where
         // so unique names are more likely to popup. More unique names (lower cardinality) will
         // be at the beginning of the set.
         for key in keys {
-          let (optimized_name, parts) = optimization_map.get_mut(key).unwrap();
+          let (optimized_name_previous, optimized_name, parts) =
+            optimization_map.get_mut(key).unwrap();
           let part = parts.pop_last();
           let Some(part) = part else {
             continue;
           };
 
+          *optimized_name_previous = optimized_name.clone();
           *optimized_name = part.sentence.join(optimized_name);
 
           done = false;
         }
       }
 
-      // TODO we should check if the optimization was useful. If the new name has the same cardinality as the old one, revert it.
+      {
+        let optimized_names_previous = optimized_names;
 
-      optimized_names = optimized_names_next;
+        optimized_names = BTreeMap::new();
+        for (key, part) in &optimization_map {
+          let keys = optimized_names.entry(part.1.clone()).or_default();
+          (*keys).insert(key.clone());
+        }
+
+        for (optimized_name_previous, optimized_name, _parts) in optimization_map.values_mut() {
+          let Some(keys_next) = optimized_names.get(optimized_name) else {
+            continue;
+          };
+          let Some(keys_previous) = optimized_names_previous.get(optimized_name_previous) else {
+            continue;
+          };
+
+          if keys_next == keys_previous {
+            *optimized_name = optimized_name_previous.clone();
+          }
+        }
+      }
+
+      optimized_names = BTreeMap::new();
+      for (key, part) in &optimization_map {
+        let keys = optimized_names.entry(part.1.clone()).or_default();
+        (*keys).insert(key.clone());
+      }
 
       if done {
         break;
@@ -210,7 +238,7 @@ where
 
 impl<K> Default for NamesBuilder<K>
 where
-  K: Clone + PartialOrd + Ord,
+  K: Clone + PartialOrd + Ord + Debug,
 {
   fn default() -> Self {
     Self::new()
@@ -264,6 +292,47 @@ impl From<NamesBuilderContainer> for NamesBuilder<usize> {
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn test_names_duplicate() {
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, ["a", "b", "c"])
+      .add(2, ["a", "b", "c"])
+      .add(3, ["a", "b", "c"])
+      .set_default_name("default")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("default")),
+      (2, Sentence::new("default1")),
+      (3, Sentence::new("default2")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+
+    let actual: BTreeSet<_> = NamesBuilder::new()
+      .add(1, ["a", "b", "c"])
+      .add(2, ["a", "b", "c"])
+      .add(3, ["a", "b", "c"])
+      .add(4, ["a", "b"])
+      .add(5, ["a", "b"])
+      .set_default_name("default")
+      .build()
+      .into_iter()
+      .collect();
+    let expected: BTreeSet<_> = vec![
+      (1, Sentence::new("c")),
+      (2, Sentence::new("c-1")),
+      (3, Sentence::new("c-2")),
+      (4, Sentence::new("b")),
+      (5, Sentence::new("b-1")),
+    ]
+    .into_iter()
+    .collect();
+    assert_eq!(actual, expected);
+  }
 
   #[test]
   fn test_names_1() {
