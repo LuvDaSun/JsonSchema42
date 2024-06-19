@@ -57,6 +57,10 @@ where
   fn find_prefix_length(sentence_list: Vec<&Vec<Sentence>>) -> usize {
     let mut index = 0;
 
+    if sentence_list.is_empty() {
+      return index;
+    }
+
     loop {
       let mut compare_sentence = None;
       for sentences in &sentence_list {
