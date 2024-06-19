@@ -22,6 +22,8 @@ impl Arena<ArenaSchemaItem> {
     let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
     for (id, schema) in &schema_nodes {
       let item = ArenaSchemaItem {
+        exact: Some(true),
+        primary: Some(true),
         ..Default::default()
       };
 
