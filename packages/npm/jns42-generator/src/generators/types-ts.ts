@@ -116,13 +116,13 @@ export function* generateTypesTsCode(specification: models.Specification) {
         case core.SchemaType.Array: {
           yield itt`
           [
-            ${generateInterfaceContent()}
+            ${generateArrayContent()}
           ]
         `;
 
           return;
 
-          function* generateInterfaceContent() {
+          function* generateArrayContent() {
             if (item.tupleItems != null) {
               for (const elementKey of item.tupleItems) {
                 yield itt`

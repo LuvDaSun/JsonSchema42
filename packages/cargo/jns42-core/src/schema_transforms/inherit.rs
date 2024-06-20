@@ -84,7 +84,6 @@ macro_rules! generate_mod {
         // the base item has no meta or non inheritable properties
         let base_item_new = ArenaSchemaItem {
           name: None,
-          primary: None,
           parent: None,
           location: None,
           title: None,
@@ -299,7 +298,6 @@ pub mod reference {
     // the base item has no meta or non inheritable properties
     let base_item_new = ArenaSchemaItem {
       name: None,
-      primary: None,
       parent: None,
       location: None,
       title: None,

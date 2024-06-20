@@ -22,8 +22,6 @@ impl Arena<ArenaSchemaItem> {
     let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
     for (id, schema) in &schema_nodes {
       let item = ArenaSchemaItem {
-        exact: Some(true),
-        primary: Some(true),
         ..Default::default()
       };
 
@@ -81,7 +79,6 @@ impl Arena<ArenaSchemaItem> {
           .get(location)
           .map(|value| iter::once(*value).collect())
       });
-      // schema.primary = if *id == root_id { Some(true) } else { None };
 
       let item = schema.map_keys(|location| *key_map.get(location).unwrap());
 

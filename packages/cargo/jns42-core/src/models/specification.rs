@@ -54,18 +54,6 @@ impl Specification {
       }
     }
 
-    // then set schema primary field
-
-    {
-      while arena.apply_transform(transformer) > 0 {
-        //
-      }
-
-      fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
-        schema_transforms::primary::transform(arena, key);
-      }
-    }
-
     // generate names
 
     let mut primary_names = NamesBuilder::new();
@@ -79,11 +67,7 @@ impl Specification {
           .to_string()
       });
 
-      if item.primary.unwrap_or_default() {
-        primary_names.add(key, parts);
-      } else {
-        secondary_names.add(key, parts);
-      }
+      primary_names.add(key, parts);
     }
 
     let primary_names = primary_names.build().into_iter();

@@ -61,7 +61,6 @@ impl Node {
       name: None,
 
       parent: None,
-      primary: Some(true),
       exact: Some(true),
 
       reference,
