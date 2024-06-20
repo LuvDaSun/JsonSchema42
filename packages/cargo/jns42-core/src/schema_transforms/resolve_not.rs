@@ -11,7 +11,7 @@ use std::collections::HashSet;
  *   not: 1
  * - required
  *   - a
- *
+ * ```
  *
  * will become
  *
