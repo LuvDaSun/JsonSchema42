@@ -10,7 +10,7 @@ pub fn generate_file_token_stream(
   let mut tokens = quote! {};
 
   for (key, item) in specification.arena.iter().enumerate() {
-    if item.primary.unwrap_or_default() != is_primary {
+    if !is_primary {
       continue;
     }
 
