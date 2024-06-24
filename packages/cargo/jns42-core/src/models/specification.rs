@@ -3,14 +3,14 @@ use crate::{
   documents::DocumentContext,
   naming::{NamesBuilder, Sentence},
   schema_transforms,
-  utils::Arena,
+  utils::{Arena, NodeLocation},
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 use regex::Regex;
-use std::iter::empty;
 use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashSet, iter::empty};
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
@@ -20,7 +20,7 @@ pub struct Specification {
 }
 
 impl Specification {
-  pub fn new(document_context: &Rc<DocumentContext>) -> Self {
+  pub fn new(document_context: &Rc<DocumentContext>, roots: HashSet<NodeLocation>) -> Self {
     // first load schemas in the arena
 
     let mut arena = Arena::from_document_context(document_context);
@@ -56,9 +56,26 @@ impl Specification {
 
     // generate names
 
+    let roots = arena
+      .iter()
+      .enumerate()
+      .filter_map(|(key, item)| {
+        let location = item.location.clone()?;
+        if roots.contains(&location) {
+          Some(key)
+        } else {
+          None
+        }
+      })
+      .flat_map(|key| arena.get_all_descendants(key));
+
+    let primaries: HashSet<_> = roots
+      .flat_map(|key| arena.get_all_descendants(key))
+      .collect();
+
     let mut primary_names = NamesBuilder::new();
     let mut secondary_names = NamesBuilder::new();
-    for (key, item) in arena.iter().enumerate() {
+    for (key, _item) in arena.iter().enumerate() {
       let parts = arena.get_name_parts(key).map(|part| {
         NON_IDENTIFIER_REGEX
           .replace_all(part.as_str(), " ")
@@ -67,7 +84,11 @@ impl Specification {
           .to_string()
       });
 
-      primary_names.add(key, parts);
+      if primaries.contains(&key) {
+        primary_names.add(key, parts);
+      } else {
+        secondary_names.add(key, parts);
+      }
     }
 
     let primary_names = primary_names.build().into_iter();

@@ -4,7 +4,11 @@ use crate::{
   models::ArenaSchemaItemContainer,
   utils::{Arena, NodeLocation},
 };
-use std::{collections::HashMap, iter, rc::Rc};
+use std::{
+  collections::{HashMap, HashSet},
+  iter,
+  rc::Rc,
+};
 use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
@@ -213,12 +217,8 @@ impl Arena<ArenaSchemaItem> {
 
   pub fn get_all_descendants(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
     let item = self.get_item(key);
-
-    item.get_children().flat_map(|key| {
-      iter::once(key)
-        .chain(self.get_all_descendants(key))
-        .collect::<Vec<_>>()
-    })
+    // TODO get all descendants!
+    item.get_children()
   }
 }
 
