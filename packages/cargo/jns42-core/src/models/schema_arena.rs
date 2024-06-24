@@ -210,6 +210,16 @@ impl Arena<ArenaSchemaItem> {
 
     ancestors.into_iter().rev().flatten()
   }
+
+  pub fn get_all_descendants(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
+    let item = self.get_item(key);
+
+    item.get_children().flat_map(|key| {
+      iter::once(key)
+        .chain(self.get_all_descendants(key))
+        .collect::<Vec<_>>()
+    })
+  }
 }
 
 #[wasm_bindgen]
@@ -243,6 +253,11 @@ impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = getNameParts)]
   pub fn get_name_parts(&self, key: usize) -> Vec<String> {
     self.0.get_name_parts(key).collect()
+  }
+
+  #[wasm_bindgen(js_name = getNameParts)]
+  pub fn get_all_descendants(&self, key: usize) -> Vec<usize> {
+    self.0.get_all_descendants(key).collect()
   }
 
   /// Applies a series of transformations to the schema items within the arena.
