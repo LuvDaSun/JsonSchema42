@@ -21,8 +21,8 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
-    const { primary, name } = names[itemKey];
-    if (!primary) {
+    const name = names.getName(itemKey);
+    if (name == null) {
       continue;
     }
 

@@ -65,8 +65,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    const { primary, name } = names[itemKey];
-    if (!primary) {
+    const name = names.getName(itemKey);
+    if (name == null) {
       continue;
     }
 
@@ -114,8 +114,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
-    const { primary, name } = names[itemKey];
-    if (item.location == null || name == null || !primary) {
+    const name = names.getName(itemKey);
+    if (item.location == null || name == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
       yield itt`mock${name.toPascalCase()}()`;

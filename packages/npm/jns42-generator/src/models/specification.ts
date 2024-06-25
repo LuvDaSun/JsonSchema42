@@ -1,12 +1,9 @@
 import * as core from "@jns42/core";
-import assert from "assert";
-
-export type Names = Record<number, { primary: boolean; name: core.Sentence }>;
 
 export interface Specification {
   typesArena: core.SchemaArenaContainer;
   validatorsArena: core.SchemaArenaContainer;
-  names: Names;
+  names: core.NamesContainer;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -93,38 +90,21 @@ export function loadSpecification(
 
   const primaryTypeKeys = new Set(rootKeys.flatMap((key) => [...typesArena.getAllRelated(key)]));
 
-  const primaryNamesBuilder = new core.NamesBuilderContainer();
-  primaryNamesBuilder.setDefaultName(defaultTypeName);
-
-  const secondaryNamesBuilder = new core.NamesBuilderContainer();
-  secondaryNamesBuilder.setDefaultName(defaultTypeName);
+  const namesBuilder = new core.NamesBuilderContainer();
+  namesBuilder.setDefaultName(defaultTypeName);
 
   for (let key = 0; key < typesArena.count(); key++) {
+    if (!primaryTypeKeys.has(key)) {
+      continue;
+    }
+
     const parts = typesArena.getNameParts(key);
     const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
 
-    if (primaryTypeKeys.has(key)) {
-      primaryNamesBuilder.add(key, filteredParts);
-    } else {
-      secondaryNamesBuilder.add(key, filteredParts);
-    }
+    namesBuilder.add(key, filteredParts);
   }
 
-  const primaryNames = primaryNamesBuilder.build();
-  const secondaryNames = secondaryNamesBuilder.build();
-
-  const names: Names = {};
-  for (let key = 0; key < typesArena.count(); key++) {
-    if (primaryTypeKeys.has(key)) {
-      const name = primaryNames.getName(key);
-      assert(name != null);
-      names[key] = { primary: true, name };
-    } else {
-      const name = secondaryNames.getName(key);
-      assert(name != null);
-      names[key] = { primary: false, name };
-    }
-  }
+  const names = namesBuilder.build();
 
   return {
     typesArena,

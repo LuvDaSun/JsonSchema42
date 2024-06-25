@@ -21,8 +21,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
       continue;
     }
 
-    const { primary, name } = names[itemKey];
-    if (!primary) {
+    const name = names.getName(itemKey);
+    if (name == null) {
       continue;
     }
 
@@ -36,8 +36,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    const { primary, name } = names[itemKey];
-    if (item.location == null || name == null || !primary) {
+    const name = names.getName(itemKey);
+    if (item.location == null || name == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
       yield name.toPascalCase();
