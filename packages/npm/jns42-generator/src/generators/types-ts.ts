@@ -21,22 +21,26 @@ export function* generateTypesTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const { primary, name } = names[itemKey];
+    if (!primary) {
+      continue;
+    }
+
     const definition = generateTypeDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${typeName.toPascalCase()} = (${definition});
+      export type ${name.toPascalCase()} = (${definition});
     `;
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    if (item.location == null) {
+    const { primary, name } = names[itemKey];
+    if (item.location == null || name == null || !primary) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      const typeName = names.getName(itemKey);
-      yield typeName.toPascalCase();
+      yield name.toPascalCase();
     }
   }
 

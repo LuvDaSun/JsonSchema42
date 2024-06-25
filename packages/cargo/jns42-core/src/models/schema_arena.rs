@@ -215,10 +215,22 @@ impl Arena<ArenaSchemaItem> {
     ancestors.into_iter().rev().flatten()
   }
 
-  pub fn get_all_descendants(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
-    let item = self.get_item(key);
-    // TODO get all descendants!
-    item.get_children()
+  pub fn get_all_related(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
+    let mut result: HashSet<_> = iter::once(key).collect();
+    let mut queue: Vec<_> = iter::once(key).collect();
+
+    while let Some(key) = queue.pop() {
+      let item = self.get_item(key);
+      for key in item.get_children() {
+        if !result.insert(key) {
+          continue;
+        }
+
+        queue.push(key);
+      }
+    }
+
+    result.into_iter()
   }
 }
 
@@ -255,9 +267,9 @@ impl SchemaArenaContainer {
     self.0.get_name_parts(key).collect()
   }
 
-  #[wasm_bindgen(js_name = getNameParts)]
-  pub fn get_all_descendants(&self, key: usize) -> Vec<usize> {
-    self.0.get_all_descendants(key).collect()
+  #[wasm_bindgen(js_name = getAllRelated)]
+  pub fn get_all_related(&self, key: usize) -> Vec<usize> {
+    self.0.get_all_related(key).collect()
   }
 
   /// Applies a series of transformations to the schema items within the arena.

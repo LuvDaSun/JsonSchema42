@@ -75,9 +75,12 @@ async function main(configuration: MainConfiguration) {
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
     configuration;
 
+  const rootLocations = new Set<string>();
+
   const context = new core.DocumentContextContainer();
   context.registerWellKnownFactories();
 
+  rootLocations.add(instanceSchemaLocation + (instanceSchemaLocation.endsWith("#") ? "" : "#"));
   await context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
@@ -85,7 +88,7 @@ async function main(configuration: MainConfiguration) {
     defaultMetaSchema,
   );
 
-  const specification = models.loadSpecification(context, {
+  const specification = models.loadSpecification(context, rootLocations, {
     transformMaximumIterations,
     defaultTypeName,
   });

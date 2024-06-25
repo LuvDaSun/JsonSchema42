@@ -65,12 +65,16 @@ export function* generateMocksTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const { primary, name } = names[itemKey];
+    if (!primary) {
+      continue;
+    }
+
     const definition = generateMockDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function mock${typeName.toPascalCase()}(options: MockGeneratorOptions = {}): types.${typeName.toPascalCase()} {
+      export function mock${name.toPascalCase()}(options: MockGeneratorOptions = {}): types.${name.toPascalCase()} {
         const configuration = {
           ...defaultMockGeneratorOptions,
           ...options,
@@ -110,11 +114,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     const item = typesArena.getItem(itemKey);
-    if (item.location == null) {
+    const { primary, name } = names[itemKey];
+    if (item.location == null || name == null || !primary) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
-      const typeName = names.getName(itemKey);
-      yield itt`mock${typeName.toPascalCase()}()`;
+      yield itt`mock${name.toPascalCase()}()`;
     }
   }
 

@@ -26,13 +26,16 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const { primary, name } = names[itemKey];
+    if (!primary) {
+      continue;
+    }
 
     yield itt`
       ${generateJsDocComments(item)}
-      test(${JSON.stringify(typeName.toPascalCase())}, () => {
-        const mock = mocks.mock${typeName.toPascalCase()}();
-        const valid = validators.is${typeName.toPascalCase()}(mock);
+      test(${JSON.stringify(name.toPascalCase())}, () => {
+        const mock = mocks.mock${name.toPascalCase()}();
+        const valid = validators.is${name.toPascalCase()}(mock);
         assert.equal(valid, true);
       });
     `;

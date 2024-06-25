@@ -141,7 +141,8 @@ where
               let cardinality = key_count.min(
                 cardinality_counters
                   .get(sentence)
-                  .unwrap()
+                  .copied()
+                  .unwrap_or_default()
                   .saturating_sub(adjust_cardinality),
               );
 

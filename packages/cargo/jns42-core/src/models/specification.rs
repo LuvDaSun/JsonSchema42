@@ -56,7 +56,7 @@ impl Specification {
 
     // generate names
 
-    let roots = arena
+    let roots: HashSet<_> = arena
       .iter()
       .enumerate()
       .filter_map(|(key, item)| {
@@ -67,10 +67,11 @@ impl Specification {
           None
         }
       })
-      .flat_map(|key| arena.get_all_descendants(key));
+      .collect();
 
     let primaries: HashSet<_> = roots
-      .flat_map(|key| arena.get_all_descendants(key))
+      .into_iter()
+      .flat_map(|key| arena.get_all_related(key))
       .collect();
 
     let mut primary_names = NamesBuilder::new();
