@@ -13,7 +13,6 @@ export interface LoadSpecificationConfiguration {
 
 export function loadSpecification(
   documentContext: core.DocumentContextContainer,
-  rootLocations: Set<string>,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;
@@ -25,17 +24,18 @@ export function loadSpecification(
 
   // generate root keys
 
-  const rootKeys = [];
+  const explicitLocations = new Set(documentContext.getExplicitLocations());
+  const explicitTypeKeys = [];
   for (let key = 0; key < typesArena.count(); key++) {
     const item = typesArena.getItem(key);
     if (item.location == null) {
       continue;
     }
-    if (!rootLocations.has(item.location)) {
+    if (!explicitLocations.has(item.location)) {
       continue;
     }
 
-    rootKeys.push(key);
+    explicitTypeKeys.push(key);
   }
 
   // transform the validatorsArena
@@ -90,7 +90,9 @@ export function loadSpecification(
 
   // generate names
 
-  const primaryTypeKeys = new Set(rootKeys.flatMap((key) => [...typesArena.getAllRelated(key)]));
+  const primaryTypeKeys = new Set(
+    explicitTypeKeys.flatMap((key) => [...typesArena.getAllRelated(key)]),
+  );
 
   const namesBuilder = new core.NamesBuilderContainer();
   namesBuilder.setDefaultName(defaultTypeName);

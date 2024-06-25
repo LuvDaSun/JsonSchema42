@@ -235,6 +235,7 @@ impl Arena<ArenaSchemaItem> {
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct SchemaArenaContainer(SchemaArena);
 
 #[wasm_bindgen]
@@ -248,7 +249,8 @@ impl SchemaArenaContainer {
 #[wasm_bindgen]
 impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = fromDocumentContext)]
-  pub fn from_document_context(document_context: DocumentContextContainer) -> Self {
+  pub fn from_document_context(document_context: &DocumentContextContainer) -> Self {
+    let document_context = document_context.clone();
     SchemaArena::from_document_context(&document_context.into()).into()
   }
 

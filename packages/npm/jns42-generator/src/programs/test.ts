@@ -102,15 +102,12 @@ async function main(configuration: MainConfiguration) {
 
     // generate package
     {
-      const rootLocations = new Set<string>();
-
       const context = new core.DocumentContextContainer();
       context.registerWellKnownFactories();
 
-      rootLocations.add(pathToTest + (pathToTest.endsWith("#") ? "" : "#"));
       await context.loadFromNode(pathToTest, pathToTest, undefined, schemaNode, defaultMetaSchema);
 
-      const specification = models.loadSpecification(context, rootLocations, {
+      const specification = models.loadSpecification(context, {
         transformMaximumIterations,
         defaultTypeName: defaultTypeName.toPascalCase(),
       });
