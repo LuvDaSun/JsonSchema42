@@ -23,6 +23,21 @@ export function loadSpecification(
   const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
+  // generate root keys
+
+  const rootKeys = [];
+  for (let key = 0; key < typesArena.count(); key++) {
+    const item = typesArena.getItem(key);
+    if (item.location == null) {
+      continue;
+    }
+    if (!rootLocations.has(item.location)) {
+      continue;
+    }
+
+    rootKeys.push(key);
+  }
+
   // transform the validatorsArena
   {
     const transformers = [] as Transformer[];
@@ -74,19 +89,6 @@ export function loadSpecification(
   }
 
   // generate names
-
-  const rootKeys = [];
-  for (let key = 0; key < typesArena.count(); key++) {
-    const item = typesArena.getItem(key);
-    if (item.location == null) {
-      continue;
-    }
-    if (!rootLocations.has(item.location)) {
-      continue;
-    }
-
-    rootKeys.push(key);
-  }
 
   const primaryTypeKeys = new Set(rootKeys.flatMap((key) => [...typesArena.getAllRelated(key)]));
 

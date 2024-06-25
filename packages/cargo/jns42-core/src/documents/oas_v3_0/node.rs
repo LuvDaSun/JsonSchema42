@@ -126,6 +126,7 @@ impl Node {
         .0
         .node_location_list(&location, "oneOf")
         .map(|value| value.collect()),
+      definitions: None,
       tuple_items: self
         .0
         .node_location_list(&location, "items")
