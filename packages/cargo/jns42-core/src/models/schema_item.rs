@@ -324,7 +324,7 @@ where
     }
   }
 
-  pub fn get_children(&self) -> impl Iterator<Item = K> + '_ {
+  pub fn get_dependencies(&self) -> impl Iterator<Item = K> + '_ {
     empty()
       .chain(self.reference)
       .chain(self.r#if)

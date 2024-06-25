@@ -221,7 +221,7 @@ impl Arena<ArenaSchemaItem> {
 
     while let Some(key) = queue.pop() {
       let item = self.get_item(key);
-      for key in item.get_children() {
+      for key in item.get_dependencies() {
         if !result.insert(key) {
           continue;
         }
