@@ -12,8 +12,8 @@ where
     Self(interior)
   }
 
-  pub fn get_name(&self, key: &K) -> &Sentence {
-    let sentence = self.0.get(key).unwrap();
+  pub fn get_name(&self, key: &K) -> Option<&Sentence> {
+    let sentence = self.0.get(key);
     sentence
   }
 }
@@ -33,8 +33,8 @@ pub struct NamesContainer(Names<usize>);
 #[wasm_bindgen]
 impl NamesContainer {
   #[wasm_bindgen(js_name = getName)]
-  pub fn get_name(&self, key: usize) -> Sentence {
-    self.0.get_name(&key).clone()
+  pub fn get_name(&self, key: usize) -> Option<Sentence> {
+    self.0.get_name(&key).cloned()
   }
 }
 

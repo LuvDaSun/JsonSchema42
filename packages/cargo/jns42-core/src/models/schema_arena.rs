@@ -4,7 +4,11 @@ use crate::{
   models::ArenaSchemaItemContainer,
   utils::{Arena, NodeLocation},
 };
-use std::{collections::HashMap, iter, rc::Rc};
+use std::{
+  collections::{HashMap, HashSet},
+  iter,
+  rc::Rc,
+};
 use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
@@ -79,7 +83,6 @@ impl Arena<ArenaSchemaItem> {
           .get(location)
           .map(|value| iter::once(*value).collect())
       });
-      // schema.primary = if *id == root_id { Some(true) } else { None };
 
       let item = schema.map_keys(|location| *key_map.get(location).unwrap());
 
@@ -211,9 +214,28 @@ impl Arena<ArenaSchemaItem> {
 
     ancestors.into_iter().rev().flatten()
   }
+
+  pub fn get_all_related(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
+    let mut result: HashSet<_> = iter::once(key).collect();
+    let mut queue: Vec<_> = iter::once(key).collect();
+
+    while let Some(key) = queue.pop() {
+      let item = self.get_item(key);
+      for key in item.get_dependencies() {
+        if !result.insert(key) {
+          continue;
+        }
+
+        queue.push(key);
+      }
+    }
+
+    result.into_iter()
+  }
 }
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct SchemaArenaContainer(SchemaArena);
 
 #[wasm_bindgen]
@@ -227,7 +249,8 @@ impl SchemaArenaContainer {
 #[wasm_bindgen]
 impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = fromDocumentContext)]
-  pub fn from_document_context(document_context: DocumentContextContainer) -> Self {
+  pub fn from_document_context(document_context: &DocumentContextContainer) -> Self {
+    let document_context = document_context.clone();
     SchemaArena::from_document_context(&document_context.into()).into()
   }
 
@@ -244,6 +267,11 @@ impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = getNameParts)]
   pub fn get_name_parts(&self, key: usize) -> Vec<String> {
     self.0.get_name_parts(key).collect()
+  }
+
+  #[wasm_bindgen(js_name = getAllRelated)]
+  pub fn get_all_related(&self, key: usize) -> Vec<usize> {
+    self.0.get_all_related(key).collect()
   }
 
   /// Applies a series of transformations to the schema items within the arena.

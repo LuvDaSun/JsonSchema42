@@ -140,9 +140,9 @@ async function main(configuration: MainConfiguration) {
         let data = testData.valid[testName];
         await test(testName, async () => {
           if (parseData) {
-            data = packageMain[`parse${rootTypeName}`](data);
+            data = packageMain.parsers[`parse${rootTypeName}`](data);
           }
-          const valid = packageMain[`is${rootTypeName}`](data);
+          const valid = packageMain.validators[`is${rootTypeName}`](data);
           assert.equal(valid, true);
         });
       }
@@ -156,9 +156,9 @@ async function main(configuration: MainConfiguration) {
         let data = testData.invalid[testName];
         await test(testName, async () => {
           if (parseData) {
-            data = packageMain[`parse${rootTypeName}`](data);
+            data = packageMain.parsers[`parse${rootTypeName}`](data);
           }
-          const valid = packageMain[`is${rootTypeName}`](data);
+          const valid = packageMain.validators[`is${rootTypeName}`](data);
           assert.equal(valid, false);
         });
       }

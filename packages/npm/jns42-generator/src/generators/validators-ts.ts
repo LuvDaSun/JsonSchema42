@@ -87,19 +87,23 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const name = names.getName(itemKey);
+    if (name == null) {
+      continue;
+    }
+
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function is${typeName.toPascalCase()}(value: unknown): value is types.${typeName.toPascalCase()} {
+      export function is${name.toPascalCase()}(value: unknown): value is types.${name.toPascalCase()} {
         if(depth === 0) {
           resetErrors();
         }
   
         depth += 1;
         try{
-          return withType(${JSON.stringify(typeName.toPascalCase())}, () => {
+          return withType(${JSON.stringify(name.toPascalCase())}, () => {
             ${statements};
           });
         }
@@ -111,19 +115,19 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
   }
 
   function* generateValidatorReference(
-    typeKey: number,
+    itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = validatorsArena.getItem(typeKey);
-    if (item.location == null) {
+    const item = validatorsArena.getItem(itemKey);
+    const name = names.getName(itemKey);
+    if (item.location == null || name == null) {
       yield itt`
         ((value: unknown) => {
-            ${generateValidatorStatements(typeKey, "value")}
+            ${generateValidatorStatements(itemKey, "value")}
         })(${valueExpression})
       `;
     } else {
-      const typeName = names.getName(typeKey);
-      yield itt`is${typeName.toPascalCase()}(${valueExpression})`;
+      yield itt`is${name.toPascalCase()}(${valueExpression})`;
     }
   }
 

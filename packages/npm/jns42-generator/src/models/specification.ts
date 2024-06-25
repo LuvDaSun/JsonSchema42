@@ -22,20 +22,21 @@ export function loadSpecification(
   const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
-  // generate names
+  // generate root keys
 
-  const namesBuilder = new core.NamesBuilderContainer();
-  namesBuilder.setDefaultName(defaultTypeName);
+  const explicitLocations = new Set(documentContext.getExplicitLocations());
+  const explicitTypeKeys = [];
+  for (let key = 0; key < typesArena.count(); key++) {
+    const item = typesArena.getItem(key);
+    if (item.location == null) {
+      continue;
+    }
+    if (!explicitLocations.has(item.location)) {
+      continue;
+    }
 
-  const count = typesArena.count();
-  for (let key = 0; key < count; key++) {
-    const parts = typesArena.getNameParts(key);
-    const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
-
-    namesBuilder.add(key, filteredParts);
+    explicitTypeKeys.push(key);
   }
-
-  const names = namesBuilder.build();
 
   // transform the validatorsArena
   {
@@ -86,6 +87,28 @@ export function loadSpecification(
       throw new Error("maximum number of iterations reached");
     }
   }
+
+  // generate names
+
+  const primaryTypeKeys = new Set(
+    explicitTypeKeys.flatMap((key) => [...typesArena.getAllRelated(key)]),
+  );
+
+  const namesBuilder = new core.NamesBuilderContainer();
+  namesBuilder.setDefaultName(defaultTypeName);
+
+  for (let key = 0; key < typesArena.count(); key++) {
+    if (!primaryTypeKeys.has(key)) {
+      continue;
+    }
+
+    const parts = typesArena.getNameParts(key);
+    const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
+
+    namesBuilder.add(key, filteredParts);
+  }
+
+  const names = namesBuilder.build();
 
   return {
     typesArena,

@@ -46,7 +46,6 @@ impl Node {
       name: None,
 
       parent: None,
-      primary: Some(true),
       exact: Some(true),
 
       reference,
@@ -114,6 +113,7 @@ impl Node {
         .map(|value| value.collect()),
       any_of: None,
       one_of: None,
+      definitions: None,
       tuple_items: self
         .0
         .node_location_list(&location, "items")

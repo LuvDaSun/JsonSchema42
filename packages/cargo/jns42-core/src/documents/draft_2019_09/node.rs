@@ -61,7 +61,6 @@ impl Node {
       name: None,
 
       parent: None,
-      primary: Some(true),
       exact: Some(true),
 
       reference,
@@ -134,6 +133,10 @@ impl Node {
         .0
         .node_location_list(&location, "oneOf")
         .map(|value| value.collect()),
+      definitions: self
+        .0
+        .node_location_object(&location, "$defs")
+        .map(|value| value.map(|(_name, location)| location).collect()),
       tuple_items: self
         .0
         .node_location_list(&location, "items")

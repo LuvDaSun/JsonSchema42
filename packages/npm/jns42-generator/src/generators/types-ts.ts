@@ -21,22 +21,26 @@ export function* generateTypesTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const name = names.getName(itemKey);
+    if (name == null) {
+      continue;
+    }
+
     const definition = generateTypeDefinition(itemKey);
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${typeName.toPascalCase()} = (${definition});
+      export type ${name.toPascalCase()} = (${definition});
     `;
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    if (item.location == null) {
+    const name = names.getName(itemKey);
+    if (item.location == null || name == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      const typeName = names.getName(itemKey);
-      yield typeName.toPascalCase();
+      yield name.toPascalCase();
     }
   }
 
@@ -116,13 +120,13 @@ export function* generateTypesTsCode(specification: models.Specification) {
         case core.SchemaType.Array: {
           yield itt`
           [
-            ${generateInterfaceContent()}
+            ${generateArrayContent()}
           ]
         `;
 
           return;
 
-          function* generateInterfaceContent() {
+          function* generateArrayContent() {
             if (item.tupleItems != null) {
               for (const elementKey of item.tupleItems) {
                 yield itt`

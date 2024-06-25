@@ -7,6 +7,7 @@ use crate::utils::NodeCache;
 use crate::utils::NodeLocation;
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::iter;
 use std::rc;
 use std::{cell::RefCell, collections::HashMap};
@@ -86,6 +87,9 @@ pub struct DocumentContext {
 
   /// this maps retrieval locations to identity locations
   identity_to_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
+
+  /// locations that were loaded explicitly
+  explicit_locations: RefCell<BTreeSet<NodeLocation>>,
 }
 
 impl DocumentContext {
@@ -233,6 +237,15 @@ impl DocumentContext {
     antecedent_location: Option<NodeLocation>,
     default_meta_schema_id: &str,
   ) -> Result<(), Error> {
+    if !self
+      .explicit_locations
+      .borrow_mut()
+      .insert(retrieval_location.clone())
+    {
+      // if is was already explicitly loaded, do nothing
+      return Ok(());
+    }
+
     let mut queue = Vec::new();
     queue.push((retrieval_location, given_location, antecedent_location));
     // drain the queue
@@ -391,6 +404,10 @@ impl DocumentContext {
       .await
   }
 
+  pub fn get_explicit_locations(&self) -> BTreeSet<NodeLocation> {
+    self.explicit_locations.borrow().iter().cloned().collect()
+  }
+
   pub fn get_schema_nodes(&self) -> BTreeMap<NodeLocation, DocumentSchemaItem> {
     self
       .documents
@@ -471,7 +488,7 @@ impl DocumentContext {
 }
 
 #[wasm_bindgen]
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
 
 #[wasm_bindgen]
@@ -538,6 +555,16 @@ impl DocumentContextContainer {
         default_meta_schema_id,
       )
       .await
+  }
+
+  #[wasm_bindgen(js_name = "getExplicitLocations")]
+  pub fn get_explicit_locations(&self) -> Vec<String> {
+    self
+      .0
+      .get_explicit_locations()
+      .into_iter()
+      .map(|location| location.to_string())
+      .collect()
   }
 }
 

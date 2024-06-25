@@ -37,12 +37,16 @@ export function* generateParsersTsCode(specification: models.Specification) {
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const name = names.getName(itemKey);
+    if (name == null) {
+      continue;
+    }
+
     const definition = generateParserDefinition(itemKey, "value");
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function parse${typeName.toPascalCase()}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
+      export function parse${name.toPascalCase()}(value: unknown, options: ParserGeneratorOptions = {}): unknown {
         const configuration = {
           ...defaultParserGeneratorOptions,
           ...options,
@@ -58,11 +62,11 @@ export function* generateParsersTsCode(specification: models.Specification) {
     valueExpression: string,
   ): Iterable<NestedText> {
     const item = typesArena.getItem(itemKey);
-    if (item.location == null) {
+    const name = names.getName(itemKey);
+    if (item.location == null || name == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
-      const typeName = names.getName(itemKey);
-      yield itt`parse${typeName.toPascalCase()}(${valueExpression}, configuration)`;
+      yield itt`parse${name.toPascalCase()}(${valueExpression}, configuration)`;
     }
   }
 
