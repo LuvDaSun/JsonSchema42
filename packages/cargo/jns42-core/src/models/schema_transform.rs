@@ -19,7 +19,6 @@ pub enum SchemaTransform {
   InheritAnyOf,
   InheritOneOf,
   InheritReference,
-  Primary,
   ResolveAllOf,
   ResolveAnyOf,
   ResolveIfThenElse,
@@ -53,8 +52,6 @@ impl From<SchemaTransform> for BoxedSchemaTransform {
       SchemaTransform::InheritAnyOf => schema_transforms::inherit::any_of::transform,
       SchemaTransform::InheritOneOf => schema_transforms::inherit::one_of::transform,
       SchemaTransform::InheritReference => schema_transforms::inherit::reference::transform,
-
-      SchemaTransform::Primary => schema_transforms::primary::transform,
 
       SchemaTransform::ResolveAllOf => schema_transforms::resolve_all_of::transform,
       SchemaTransform::ResolveAnyOf => schema_transforms::resolve_any_of::transform,

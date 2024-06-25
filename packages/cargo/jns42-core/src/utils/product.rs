@@ -34,7 +34,7 @@ where
       indices[index] = 0
     }
 
-    if indices.iter().all(|index| index == &0) {
+    if indices.iter().all(|index| *index == 0) {
       break;
     }
   }

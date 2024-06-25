@@ -6,9 +6,9 @@ export function* generateMainTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);
 
   yield itt`
-    export * from "./types.js";
-    export * from "./validators.js";
-    export * from "./parsers.js";
-    export * from "./mocks.js";
+    export * as types from "./types.js";
+    export * as validators from "./validators.js";
+    export * as parsers from "./parsers.js";
+    export * as mocks from "./mocks.js";
   `;
 }

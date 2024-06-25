@@ -21,14 +21,17 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       continue;
     }
 
-    const typeName = names.getName(itemKey);
+    const name = names.getName(itemKey);
+    if (name == null) {
+      continue;
+    }
 
     yield mapIterable(
       item.examples ?? [],
       (example) => itt`
-        test(${JSON.stringify(typeName.toPascalCase())}, () => {
+        test(${JSON.stringify(name.toPascalCase())}, () => {
           const example = ${JSON.stringify(example)};
-          const valid = validators.is${typeName.toPascalCase()}(example);
+          const valid = validators.is${name.toPascalCase()}(example);
           assert.equal(valid, true);
         });
       `,

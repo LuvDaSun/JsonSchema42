@@ -18,7 +18,6 @@ where
   pub name: Option<String>,
   pub exact: Option<bool>,
 
-  pub primary: Option<bool>,
   pub parent: Option<K>,
   pub location: Option<NodeLocation>,
 
@@ -53,6 +52,8 @@ where
   pub object_properties: Option<HashMap<String, K>>,
   pub pattern_properties: Option<HashMap<String, K>>,
   pub dependent_schemas: Option<HashMap<String, K>>,
+
+  pub definitions: Option<BTreeSet<K>>,
 
   // assertions
   pub options: Option<Vec<serde_json::Value>>,
@@ -217,7 +218,6 @@ where
     Self {
       name: self.name.clone(),
       exact,
-      primary: self.primary,
       parent: self.parent.clone(),
       location: self.location.clone(),
 
@@ -236,6 +236,7 @@ where
       all_of: None,
       any_of: None,
       one_of: None,
+      definitions: None,
 
       r#if: None,
       then: None,
@@ -323,7 +324,7 @@ where
     }
   }
 
-  pub fn get_children(&self) -> impl Iterator<Item = K> + '_ {
+  pub fn get_dependencies(&self) -> impl Iterator<Item = K> + '_ {
     empty()
       .chain(self.reference)
       .chain(self.r#if)
@@ -338,6 +339,7 @@ where
       .chain(self.all_of.iter().flat_map(|v| v.iter().copied()))
       .chain(self.any_of.iter().flat_map(|v| v.iter().copied()))
       .chain(self.one_of.iter().flat_map(|v| v.iter().copied()))
+      .chain(self.definitions.iter().flat_map(|v| v.iter().copied()))
       .chain(
         self
           .object_properties
@@ -393,7 +395,6 @@ where
     SchemaItem {
       name: self.name.clone(),
       exact: self.exact,
-      primary: self.primary,
       types: self.types.clone(),
 
       parent: map_single(&self.parent),
@@ -440,6 +441,7 @@ where
       all_of: map_set(&self.all_of),
       any_of: map_set(&self.any_of),
       one_of: map_set(&self.one_of),
+      definitions: map_set(&self.definitions),
 
       dependent_schemas: map_map(&self.dependent_schemas),
       object_properties: map_map(&self.object_properties),
@@ -462,10 +464,6 @@ impl ArenaSchemaItemContainer {
     self.0.exact
   }
 
-  #[wasm_bindgen(getter = primary)]
-  pub fn primary_get(&self) -> Option<bool> {
-    self.0.primary
-  }
   #[wasm_bindgen(getter = parent)]
   pub fn parent_get(&self) -> Option<usize> {
     self.0.parent
