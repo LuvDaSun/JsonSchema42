@@ -16,11 +16,6 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
     const item = typesArena.getItem(itemKey);
-    const { location: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
 
     if (!isMockable(typesArena, itemKey)) {
       continue;

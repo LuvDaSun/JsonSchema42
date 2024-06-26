@@ -81,11 +81,6 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   for (let itemKey = 0; itemKey < validatorsArena.count(); itemKey++) {
     const item = validatorsArena.getItem(itemKey);
-    const { location: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
 
     const name = names.getName(itemKey);
     if (name == null) {
