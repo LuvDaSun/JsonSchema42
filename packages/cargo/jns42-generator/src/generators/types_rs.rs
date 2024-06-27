@@ -37,7 +37,9 @@ fn generate_type_token_stream(
     #[doc = #documentation]
   });
 
-  let identifier = specification.get_identifier(key);
+  let Some(identifier) = specification.get_identifier(key) else {
+    return Ok(quote! {});
+  };
 
   if let Some(reference) = &item.reference {
     let reference_identifier = specification.get_identifier(reference);

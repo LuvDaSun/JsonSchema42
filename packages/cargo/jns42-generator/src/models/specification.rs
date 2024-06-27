@@ -99,33 +99,38 @@ impl Specification {
 }
 
 impl Specification {
-  pub fn get_identifier(&self, key: &usize) -> Ident {
-    let name = self.get_name(key);
-    format_ident!("r#{}", name)
+  pub fn get_identifier(&self, key: &usize) -> Option<Ident> {
+    let name = self.get_name(key)?;
+    Some(format_ident!("r#{}", name))
   }
 
-  pub fn get_name(&self, key: &usize) -> String {
-    let sentence = self.names.get_name(key).unwrap();
-    format!("T{}", sentence.to_pascal_case())
+  pub fn get_name(&self, key: &usize) -> Option<String> {
+    let sentence = self.names.get_name(key)?;
+
+    if sentence.is_empty() {
+      return Some(format!("T{}", key));
+    }
+
+    Some(sentence.to_pascal_case())
   }
 
-  pub fn get_interior_identifier(&self, key: &usize) -> TokenStream {
-    let identifier = self.get_identifier(key);
-    quote! {crate::interiors::#identifier}
+  pub fn get_interior_identifier(&self, key: &usize) -> Option<TokenStream> {
+    let identifier = self.get_identifier(key)?;
+    Some(quote! {crate::interiors::#identifier})
   }
 
-  pub fn get_interior_name(&self, key: &usize) -> String {
-    let name = self.get_name(key);
-    format!("crate::interiors::{}", name)
+  pub fn get_interior_name(&self, key: &usize) -> Option<String> {
+    let name = self.get_name(key)?;
+    Some(format!("crate::interiors::{}", name))
   }
 
-  pub fn get_type_identifier(&self, key: &usize) -> TokenStream {
-    let identifier = self.get_identifier(key);
-    quote! {crate::types::#identifier}
+  pub fn get_type_identifier(&self, key: &usize) -> Option<TokenStream> {
+    let identifier = self.get_identifier(key)?;
+    Some(quote! {crate::types::#identifier})
   }
 
-  pub fn _get_type_name(&self, key: &usize) -> String {
-    let name = self.get_name(key);
-    format!("crate::types::{}", name)
+  pub fn _get_type_name(&self, key: &usize) -> Option<String> {
+    let name = self.get_name(key)?;
+    Some(format!("crate::types::{}", name))
   }
 }
