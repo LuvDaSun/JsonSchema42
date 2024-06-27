@@ -108,9 +108,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       throw new TypeError("cannot mock non-mockable type");
     }
 
-    const item = typesArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (item.location == null || name == null) {
+    if (name == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
       yield itt`mock${name.toPascalCase()}()`;

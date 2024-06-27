@@ -113,9 +113,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = validatorsArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (item.location == null || name == null) {
+    if (name == null) {
       yield itt`
         ((value: unknown) => {
             ${generateValidatorStatements(itemKey, "value")}
