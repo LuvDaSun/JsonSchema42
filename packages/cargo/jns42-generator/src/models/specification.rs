@@ -1,6 +1,6 @@
-use super::schema_item::ArenaSchemaItem;
-use crate::{
+use jns42_core::{
   documents::DocumentContext,
+  models::ArenaSchemaItem,
   naming::{NamesBuilder, Sentence},
   schema_transforms,
   utils::{Arena, NodeLocation},

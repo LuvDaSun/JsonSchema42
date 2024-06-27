@@ -1,8 +1,8 @@
 use crate::generators::package::{generate_package, PackageConfiguration};
+use crate::models::Specification;
 use clap::Parser;
 use jns42_core::documents;
 use jns42_core::documents::DocumentContext;
-use jns42_core::models::Specification;
 use jns42_core::utils::NodeLocation;
 use std::collections::HashSet;
 use std::error::Error;

@@ -1,5 +1,6 @@
+use crate::models::Specification;
 use jns42_core::{
-  models::{ArenaSchemaItem, SchemaType, Specification},
+  models::{ArenaSchemaItem, SchemaType},
   naming::Sentence,
 };
 use proc_macro2::TokenStream;

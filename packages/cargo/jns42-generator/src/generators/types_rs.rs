@@ -1,4 +1,5 @@
-use jns42_core::models::{ArenaSchemaItem, SchemaType, Specification};
+use crate::models::Specification;
+use jns42_core::models::{ArenaSchemaItem, SchemaType};
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;
