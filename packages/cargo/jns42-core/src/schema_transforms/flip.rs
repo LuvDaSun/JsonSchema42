@@ -101,8 +101,6 @@ macro_rules! generate_mod {
         let item = item.clone();
         for set in product(other_keys.values().cloned()) {
           let sub_item = ArenaSchemaItem {
-            name: Some("flip".to_owned()),
-            parent: Some(key),
             $base_member: Some(
               sub_keys
                 .iter()
@@ -176,22 +174,18 @@ macro_rules! generate_mod {
               ..Default::default()
             }, // 7
             ArenaSchemaItem {
-              parent: Some(7),
               $base_member: Some([0, 1, 3].into()),
               ..Default::default()
             }, // 8
             ArenaSchemaItem {
-              parent: Some(7),
               $base_member: Some([0, 1, 4].into()),
               ..Default::default()
             }, // 9
             ArenaSchemaItem {
-              parent: Some(7),
               $base_member: Some([0, 2, 3].into()),
               ..Default::default()
             }, // 10
             ArenaSchemaItem {
-              parent: Some(7),
               $base_member: Some([0, 2, 4].into()),
               ..Default::default()
             }, // 11
