@@ -1,3 +1,5 @@
+use std::iter;
+
 use crate::models::{ArenaSchemaItem, SchemaArena};
 
 /**
@@ -60,7 +62,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: Some("types".to_string()),
+      name: item.name.as_ref().map(|name| {
+        name
+          .iter()
+          .cloned()
+          .chain(iter::once("types".to_owned()))
+          .collect()
+      }),
       types: item.types.clone(),
       ..Default::default()
     })
@@ -68,7 +76,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if item.reference.is_some() {
     sub_items.push(ArenaSchemaItem {
-      name: Some("reference".to_string()),
+      name: item.name.as_ref().map(|name| {
+        name
+          .iter()
+          .cloned()
+          .chain(iter::once("reference".to_owned()))
+          .collect()
+      }),
       reference: item.reference,
       ..Default::default()
     })
@@ -82,7 +96,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: Some("all_of".to_string()),
+      name: item.name.as_ref().map(|name| {
+        name
+          .iter()
+          .cloned()
+          .chain(iter::once("all-of".to_owned()))
+          .collect()
+      }),
       all_of: item.all_of.clone(),
       ..Default::default()
     })
@@ -96,7 +116,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: Some("any_of".to_string()),
+      name: item.name.as_ref().map(|name| {
+        name
+          .iter()
+          .cloned()
+          .chain(iter::once("any-of".to_owned()))
+          .collect()
+      }),
       any_of: item.any_of.clone(),
       ..Default::default()
     })
@@ -110,7 +136,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: Some("one_of".to_string()),
+      name: item.name.as_ref().map(|name| {
+        name
+          .iter()
+          .cloned()
+          .chain(iter::once("one-of".to_owned()))
+          .collect()
+      }),
       one_of: item.one_of.clone(),
       ..Default::default()
     })
@@ -118,7 +150,13 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if item.r#if.is_some() || item.then.is_some() || item.r#else.is_some() {
     sub_items.push(ArenaSchemaItem {
-      name: Some("if_then_else".to_string()),
+      name: item.name.as_ref().map(|name| {
+        name
+          .iter()
+          .cloned()
+          .chain(iter::once("if-then-else".to_owned()))
+          .collect()
+      }),
       r#if: item.r#if,
       then: item.then,
       r#else: item.r#else,
@@ -159,6 +197,7 @@ mod tests {
     let mut arena = SchemaArena::new();
 
     arena.add_item(ArenaSchemaItem {
+      name: Some(vec!["base".to_owned()]),
       reference: Some(10),
       all_of: Some([100, 200].into()),
       any_of: Some([300, 400].into()),
@@ -180,27 +219,27 @@ mod tests {
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("reference".to_string()),
+        name: Some(vec!["base".to_owned(), "reference".to_owned()]),
         reference: Some(10),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("all_of".to_string()),
+        name: Some(vec!["base".to_owned(), "all-of".to_owned()]),
         all_of: Some([100, 200].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("any_of".to_string()),
+        name: Some(vec!["base".to_owned(), "any-of".to_owned()]),
         any_of: Some([300, 400].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("one_of".to_string()),
+        name: Some(vec!["base".to_owned(), "one-of".to_owned()]),
         one_of: Some([500, 600].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("if_then_else".to_string()),
+        name: Some(vec!["base".to_owned(), "if-then-else".to_owned()]),
         r#if: Some(700),
         then: Some(800),
         r#else: Some(900),

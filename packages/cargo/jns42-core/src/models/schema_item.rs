@@ -16,7 +16,7 @@ pub struct SchemaItem<K>
 where
   K: Ord,
 {
-  pub name: Option<String>,
+  pub name: Option<Vec<String>>,
   pub exact: Option<bool>,
 
   pub location: Option<NodeLocation>,
@@ -457,7 +457,7 @@ pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
 #[wasm_bindgen]
 impl ArenaSchemaItemContainer {
   #[wasm_bindgen(getter = name)]
-  pub fn name_get(&self) -> Option<String> {
+  pub fn name_get(&self) -> Option<Vec<String>> {
     Some(self.0.name.as_ref()?.clone())
   }
   #[wasm_bindgen(getter = exact)]

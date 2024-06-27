@@ -96,7 +96,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     }
 
     let item_new = ArenaSchemaItem {
-      name: Some("all-of".to_owned()),
+      name: None,
       all_of: Some([*key, *other_key].into()),
       ..Default::default()
     };
