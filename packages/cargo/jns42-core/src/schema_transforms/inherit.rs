@@ -83,7 +83,7 @@ macro_rules! generate_mod {
 
         // the base item has no meta or non inheritable properties
         let base_item_new = ArenaSchemaItem {
-          name: None,
+          name: Some("inherit".to_owned()),
           parent: None,
           location: None,
           title: None,

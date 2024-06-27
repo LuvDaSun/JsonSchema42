@@ -4,6 +4,7 @@ use crate::utils::{merge_either, merge_option};
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
+use std::iter;
 use std::{collections::HashMap, iter::empty};
 use wasm_bindgen::prelude::*;
 
@@ -236,7 +237,11 @@ where
       all_of: None,
       any_of: None,
       one_of: None,
-      definitions: None,
+      definitions: merge_option!(definitions, |base, other| iter::empty()
+        .chain(base)
+        .chain(other)
+        .cloned()
+        .collect()),
 
       r#if: None,
       then: None,
