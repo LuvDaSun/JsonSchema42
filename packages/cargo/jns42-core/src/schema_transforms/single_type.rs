@@ -17,11 +17,9 @@ use std::iter::once;
  * - oneOf:
  *   - 1
  *   - 2
- * - parent: 0
- *   types:
+ * - types:
  *   - number
- * - parent: 0
- *   types:
+ * - types:
  *   - string
  * ```
  */
@@ -61,7 +59,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
             .into_iter()
             .map(|r#type| {
               arena.add_item(ArenaSchemaItem {
-                parent: Some(key),
                 name: Some(r#type.to_string()),
                 types: Some(once(r#type).collect()),
                 ..Default::default()
@@ -101,13 +98,11 @@ mod tests {
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("string".to_string()),
         types: Some(vec![SchemaType::String]),
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("number".to_string()),
         types: Some(vec![SchemaType::Number]),
         ..Default::default()
