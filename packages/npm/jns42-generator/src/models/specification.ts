@@ -90,6 +90,19 @@ export function loadSpecification(
 
   // generate names
 
+  {
+    const transformers = [core.SchemaTransform.Name];
+    let transformIterations = 0;
+    while (typesArena.transform(transformers) > 0) {
+      transformIterations++;
+
+      if (transformIterations < transformMaximumIterations) {
+        continue;
+      }
+      throw new Error("maximum number of iterations reached");
+    }
+  }
+
   const primaryTypeKeys = new Set(
     explicitTypeKeys.flatMap((key) => [...typesArena.getAllRelated(key)]),
   );
@@ -97,14 +110,14 @@ export function loadSpecification(
   const namesBuilder = new core.NamesBuilderContainer();
   namesBuilder.setDefaultName(defaultTypeName);
 
-  for (let key = 0; key < typesArena.count(); key++) {
-    if (!primaryTypeKeys.has(key)) {
+  for (const key of primaryTypeKeys) {
+    const item = typesArena.getItem(key);
+
+    if (item.name == null) {
       continue;
     }
 
-    const parts = typesArena.getNameParts(key);
-    const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
-
+    const filteredParts = item.name.filter((part) => /^[a-zA-Z]/.test(part));
     namesBuilder.add(key, filteredParts);
   }
 

@@ -55,11 +55,6 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
     const item = typesArena.getItem(itemKey);
-    const { location: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
 
     if (!isMockable(typesArena, itemKey)) {
       continue;
@@ -113,9 +108,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       throw new TypeError("cannot mock non-mockable type");
     }
 
-    const item = typesArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (item.location == null || name == null) {
+    if (name == null) {
       yield itt`(${generateMockDefinition(itemKey)})`;
     } else {
       yield itt`mock${name.toPascalCase()}()`;

@@ -23,13 +23,13 @@ impl Arena<ArenaSchemaItem> {
     let mut arena = Arena::new();
 
     let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
-    for (id, schema) in &schema_nodes {
+    for (location, schema) in &schema_nodes {
       let item = ArenaSchemaItem {
         ..Default::default()
       };
 
       let key = arena.add_item(item);
-      key_map.insert(id.clone(), key);
+      key_map.insert(location.clone(), key);
 
       if let Some(child_id) = &schema.property_names {
         implicit_types.insert(child_id.clone(), SchemaType::String);
@@ -38,6 +38,15 @@ impl Arena<ArenaSchemaItem> {
 
     for (location, key) in &key_map {
       let mut schema = schema_nodes.get(location).unwrap().clone();
+
+      schema.name = Some(
+        iter::empty()
+          .chain(location.get_path())
+          .chain(location.get_hash())
+          .flat_map(|part| part.split('.').map(str::to_owned).rev().collect::<Vec<_>>())
+          .collect(),
+      );
+
       schema.types = schema.types.or_else(|| {
         implicit_types
           .get(location)
@@ -76,39 +85,6 @@ impl Arena<ArenaSchemaItem> {
     }
 
     (resolved_key, resolved_item)
-  }
-
-  /// Generates an iterator over the name parts of a schema item and its ancestors.
-  ///
-  /// This method constructs an iterator that yields the name parts (path and hash) of
-  /// the specified schema item and its ancestors, in reverse order (from the root ancestor
-  /// to the item itself).
-  ///
-  /// # Parameters
-  /// - `key`: The `usize` of the item whose name parts are to be retrieved.
-  ///
-  /// # Returns
-  /// An iterator over string slices (`&str`) representing the name parts.
-  pub fn get_name_parts(&self, key: usize) -> impl Iterator<Item = String> {
-    let item = self.get_item(key);
-
-    item.location.clone().into_iter().flat_map(|location| {
-      iter::empty()
-        .chain(
-          location
-            .get_path()
-            .into_iter()
-            .map(|part| {
-              if let Some(index) = part.find('.') {
-                part[..index].to_owned()
-              } else {
-                part
-              }
-            })
-            .filter(|part| !part.is_empty()),
-        )
-        .chain(location.get_hash())
-    })
   }
 
   pub fn get_all_related(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
@@ -158,11 +134,6 @@ impl SchemaArenaContainer {
   #[wasm_bindgen(js_name = count)]
   pub fn count(&self) -> usize {
     self.0.count()
-  }
-
-  #[wasm_bindgen(js_name = getNameParts)]
-  pub fn get_name_parts(&self, key: usize) -> Vec<String> {
-    self.0.get_name_parts(key).collect()
   }
 
   #[wasm_bindgen(js_name = getAllRelated)]

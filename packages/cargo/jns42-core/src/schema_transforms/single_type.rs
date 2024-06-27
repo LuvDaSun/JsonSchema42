@@ -1,5 +1,5 @@
 use crate::models::{ArenaSchemaItem, SchemaArena};
-use std::iter::once;
+use std::iter;
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -59,8 +59,14 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
             .into_iter()
             .map(|r#type| {
               arena.add_item(ArenaSchemaItem {
-                name: Some(r#type.to_string()),
-                types: Some(once(r#type).collect()),
+                name: item.name.as_ref().map(|name| {
+                  name
+                    .iter()
+                    .cloned()
+                    .chain(iter::once(r#type.to_string()))
+                    .collect()
+                }),
+                types: Some(iter::once(r#type).collect()),
                 ..Default::default()
               })
             })
@@ -83,6 +89,7 @@ mod tests {
     let mut arena = SchemaArena::new();
 
     arena.add_item(ArenaSchemaItem {
+      name: Some(vec!["base".to_owned()]),
       types: Some(vec![SchemaType::String, SchemaType::Number]),
       ..Default::default()
     });
@@ -94,16 +101,17 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
       ArenaSchemaItem {
+        name: Some(vec!["base".to_owned()]),
         one_of: Some([1, 2].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("string".to_string()),
+        name: Some(vec!["base".to_owned(), "string".to_owned()]),
         types: Some(vec![SchemaType::String]),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some("number".to_string()),
+        name: Some(vec!["base".to_owned(), "number".to_owned()]),
         types: Some(vec![SchemaType::Number]),
         ..Default::default()
       },

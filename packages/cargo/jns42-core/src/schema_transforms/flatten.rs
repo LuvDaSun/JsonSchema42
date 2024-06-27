@@ -2,7 +2,7 @@ macro_rules! generate_mod {
   ( $member: ident ) => {
     pub mod $member {
       use crate::models::SchemaArena;
-      use std::iter::once;
+      use std::iter;
 
       pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
@@ -18,7 +18,7 @@ macro_rules! generate_mod {
                 if let Some(sub_sub_keys) = &sub_item.$member {
                   sub_sub_keys.clone()
                 } else {
-                  once(sub_key).collect()
+                  iter::once(sub_key).collect()
                 }
               })
               .collect(),

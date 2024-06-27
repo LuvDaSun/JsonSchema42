@@ -1,5 +1,6 @@
+use crate::models::Specification;
 use jns42_core::{
-  models::{ArenaSchemaItem, SchemaType, Specification},
+  models::{ArenaSchemaItem, SchemaType},
   naming::Sentence,
 };
 use proc_macro2::TokenStream;
@@ -39,8 +40,10 @@ fn generate_type_token_stream(
     #[doc = #documentation]
   });
 
-  let identifier = specification.get_identifier(key);
-  let type_identifier = specification.get_type_identifier(key);
+  let Some(identifier) = specification.get_identifier(key) else {
+    return Ok(quote! {});
+  };
+  let type_identifier = specification.get_type_identifier(key).unwrap();
 
   if let Some(reference) = &item.reference {
     let reference_identifier = specification.get_identifier(reference);
@@ -60,7 +63,7 @@ fn generate_type_token_stream(
         }
         SchemaType::Any => {
           tokens.append_all(quote! {
-            pub type #identifier = std::any:Any;
+            pub type #identifier = std::any::Any;
           });
         }
         SchemaType::Null => {

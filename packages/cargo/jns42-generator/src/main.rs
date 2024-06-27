@@ -1,4 +1,5 @@
 mod generators;
+mod models;
 mod programs;
 
 use clap::Parser;

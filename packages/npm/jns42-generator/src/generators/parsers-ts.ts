@@ -31,11 +31,6 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
     const item = typesArena.getItem(itemKey);
-    const { location: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
 
     const name = names.getName(itemKey);
     if (name == null) {
@@ -61,9 +56,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (item.location == null || name == null) {
+    if (name == null) {
       yield itt`(${generateParserDefinition(itemKey, valueExpression)})`;
     } else {
       yield itt`parse${name.toPascalCase()}(${valueExpression}, configuration)`;

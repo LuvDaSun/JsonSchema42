@@ -81,11 +81,6 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   for (let itemKey = 0; itemKey < validatorsArena.count(); itemKey++) {
     const item = validatorsArena.getItem(itemKey);
-    const { location: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
 
     const name = names.getName(itemKey);
     if (name == null) {
@@ -118,9 +113,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = validatorsArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (item.location == null || name == null) {
+    if (name == null) {
       yield itt`
         ((value: unknown) => {
             ${generateValidatorStatements(itemKey, "value")}

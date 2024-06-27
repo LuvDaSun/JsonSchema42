@@ -49,7 +49,7 @@ macro_rules! generate_mod {
           return;
         };
 
-        // if we have at least on inheritable property
+        // if we have at least one inheritable property
         if item.types.is_none()
           && item.map_properties.is_none()
           && item.array_items.is_none()

@@ -4,6 +4,7 @@ use crate::utils::{merge_either, merge_option};
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
+use std::iter;
 use std::{collections::HashMap, iter::empty};
 use wasm_bindgen::prelude::*;
 
@@ -15,7 +16,7 @@ pub struct SchemaItem<K>
 where
   K: Ord,
 {
-  pub name: Option<String>,
+  pub name: Option<Vec<String>>,
   pub exact: Option<bool>,
 
   pub location: Option<NodeLocation>,
@@ -234,7 +235,11 @@ where
       all_of: None,
       any_of: None,
       one_of: None,
-      definitions: None,
+      definitions: merge_option!(definitions, |base, other| iter::empty()
+        .chain(base)
+        .chain(other)
+        .cloned()
+        .collect()),
 
       r#if: None,
       then: None,
@@ -452,7 +457,7 @@ pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
 #[wasm_bindgen]
 impl ArenaSchemaItemContainer {
   #[wasm_bindgen(getter = name)]
-  pub fn name_get(&self) -> Option<String> {
+  pub fn name_get(&self) -> Option<Vec<String>> {
     Some(self.0.name.as_ref()?.clone())
   }
   #[wasm_bindgen(getter = exact)]

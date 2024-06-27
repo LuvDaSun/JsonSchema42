@@ -15,19 +15,15 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
   `;
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    const item = typesArena.getItem(itemKey);
-    const { location: nodeId } = item;
-
-    if (nodeId == null) {
-      continue;
-    }
-
     if (!isMockable(typesArena, itemKey)) {
       continue;
     }
 
+    const item = typesArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (name == null) {
+    if (item.location == null || name == null) {
+      // only is the location is set can we be sure that the name of the type and validator
+      // are the same
       continue;
     }
 

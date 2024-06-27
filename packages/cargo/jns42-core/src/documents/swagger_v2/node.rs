@@ -45,7 +45,7 @@ impl Node {
       location: Some(location.clone()),
       name: None,
 
-            exact: Some(true),
+      exact: Some(true),
 
       reference,
       types,

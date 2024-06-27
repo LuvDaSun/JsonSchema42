@@ -1,5 +1,4 @@
 use super::NodeLocation;
-use std::iter::once;
 
 #[derive(Clone, Debug)]
 pub struct JsonValue(serde_json::Value);
@@ -62,11 +61,7 @@ impl JsonValue {
 impl JsonValue {
   pub fn node_entry(&self, pointer: &[String], field: &str) -> Option<(Vec<String>, JsonValue)> {
     let selected = self.0.as_object()?.get(field)?;
-    let pointer: Vec<_> = pointer
-      .iter()
-      .cloned()
-      .chain(once(field.to_string()))
-      .collect();
+    let pointer: Vec<_> = pointer.iter().cloned().chain([field.to_string()]).collect();
 
     let result = (pointer, selected.clone().into());
     Some(result)
@@ -82,7 +77,7 @@ impl JsonValue {
       .iter()
       .cloned()
       .map(|part| part.to_string())
-      .chain(once(field.to_string()))
+      .chain([field.to_string()])
       .collect();
 
     let result = selected
@@ -91,11 +86,7 @@ impl JsonValue {
       .enumerate()
       .map(move |(key, sub_node)| {
         (
-          pointer
-            .iter()
-            .cloned()
-            .chain(once(key.to_string()))
-            .collect(),
+          pointer.iter().cloned().chain([key.to_string()]).collect(),
           sub_node.clone().into(),
         )
       });
@@ -113,16 +104,12 @@ impl JsonValue {
       .iter()
       .cloned()
       .map(|part| part.to_string())
-      .chain(once(field.to_string()))
+      .chain([field.to_string()])
       .collect();
 
     let result = selected.as_object()?.iter().map(move |(key, sub_node)| {
       (
-        pointer
-          .iter()
-          .cloned()
-          .chain(once(key.to_string()))
-          .collect(),
+        pointer.iter().cloned().chain([key.to_string()]).collect(),
         sub_node.clone().into(),
       )
     });

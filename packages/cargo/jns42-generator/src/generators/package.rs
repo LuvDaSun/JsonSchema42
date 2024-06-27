@@ -1,4 +1,4 @@
-use jns42_core::models::Specification;
+use crate::models::Specification;
 use std::{error::Error, path::PathBuf};
 use tokio::fs;
 
