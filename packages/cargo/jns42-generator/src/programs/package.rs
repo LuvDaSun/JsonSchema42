@@ -1,5 +1,5 @@
 use crate::generators::package::{generate_package, PackageConfiguration};
-use crate::models::Specification;
+use crate::models::{Specification, SpecificationConfiguration};
 use clap::Parser;
 use jns42_core::documents;
 use jns42_core::documents::DocumentContext;
@@ -24,11 +24,11 @@ pub struct CommandOptions {
   #[arg(long)]
   pub package_version: String,
 
-  #[arg(long)]
-  pub generate_test: bool,
+  #[arg(long, default_value = "schema-document")]
+  pub default_type_name: String,
 
-  #[arg(long, default_value_t = 0)]
-  pub unique_name_seed: usize,
+  #[arg(long, default_value = "100")]
+  pub transform_maximum_iterations: usize,
 }
 
 pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
@@ -38,6 +38,8 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     package_directory,
     package_name,
     package_version,
+    default_type_name,
+    transform_maximum_iterations,
     ..
   } = options;
 
@@ -54,7 +56,13 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     .await
     .unwrap();
 
-  let specification = Specification::new(&context);
+  let specification = Specification::new(
+    &context,
+    SpecificationConfiguration {
+      default_type_name,
+      transform_maximum_iterations,
+    },
+  );
   generate_package(
     PackageConfiguration {
       package_name: package_name.as_str(),

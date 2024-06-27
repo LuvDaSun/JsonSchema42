@@ -14,13 +14,26 @@ use std::rc::Rc;
 
 pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
 
+pub struct SpecificationConfiguration {
+  pub default_type_name: String,
+  pub transform_maximum_iterations: usize,
+}
+
 pub struct Specification {
   pub arena: Arena<ArenaSchemaItem>,
   pub names: Names<usize>,
 }
 
 impl Specification {
-  pub fn new(document_context: &Rc<DocumentContext>) -> Self {
+  pub fn new(
+    document_context: &Rc<DocumentContext>,
+    configuration: SpecificationConfiguration,
+  ) -> Self {
+    let SpecificationConfiguration {
+      default_type_name,
+      transform_maximum_iterations,
+    } = configuration;
+
     // first load schemas in the arena
 
     let mut arena = Arena::from_document_context(document_context);
@@ -45,8 +58,13 @@ impl Specification {
     // then optimize the schemas
 
     {
+      let mut transform_iterations = 0;
       while arena.apply_transform(transformer) > 0 {
-        //
+        transform_iterations += 1;
+        if transform_iterations < transform_maximum_iterations {
+          continue;
+        }
+        panic!("too many iterations");
       }
 
       fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
@@ -74,8 +92,13 @@ impl Specification {
     // generate names
 
     {
+      let mut transform_iterations = 0;
       while arena.apply_transform(transformer) > 0 {
-        //
+        transform_iterations += 1;
+        if transform_iterations < transform_maximum_iterations {
+          continue;
+        }
+        panic!("too many iterations");
       }
 
       fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
@@ -89,6 +112,7 @@ impl Specification {
       .collect();
 
     let mut names_builder = NamesBuilder::new();
+    names_builder.set_default_name(default_type_name);
 
     for key in primary_type_keys {
       let item = arena.get_item(key);
