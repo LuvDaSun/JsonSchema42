@@ -215,6 +215,7 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected = vec![
       ArenaSchemaItem {
+        name: Some(vec!["base".to_owned()]),
         all_of: Some([1, 2, 3, 4, 5].into()),
         ..Default::default()
       },
