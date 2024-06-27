@@ -63,7 +63,7 @@ fn generate_type_token_stream(
         }
         SchemaType::Any => {
           tokens.append_all(quote! {
-            pub type #identifier = std::any:Any;
+            pub type #identifier = std::any::Any;
           });
         }
         SchemaType::Null => {

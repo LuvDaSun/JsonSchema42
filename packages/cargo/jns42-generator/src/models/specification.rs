@@ -12,7 +12,7 @@ use regex::Regex;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z0-9]").unwrap());
+pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z]").unwrap());
 
 pub struct SpecificationConfiguration {
   pub default_type_name: String,
@@ -123,13 +123,7 @@ impl Specification {
 
       let parts = name
         .iter()
-        .map(|part| {
-          NON_IDENTIFIER_REGEX
-            .replace_all(part.as_str(), " ")
-            .into_owned()
-            .trim()
-            .to_string()
-        })
+        .filter(|part| !NON_IDENTIFIER_REGEX.is_match(part))
         .filter(|part| !part.is_empty());
 
       names_builder.add(key, parts);
