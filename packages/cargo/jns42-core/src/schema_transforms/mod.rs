@@ -2,6 +2,7 @@ pub mod explode;
 pub mod flatten;
 pub mod flip;
 pub mod inherit;
+pub mod name;
 pub mod resolve_all_of;
 pub mod resolve_any_of;
 pub mod resolve_if_then_else;

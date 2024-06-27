@@ -1,5 +1,3 @@
-use std::iter;
-
 use crate::models::{ArenaSchemaItem, SchemaArena};
 
 /**
@@ -62,13 +60,10 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: item.name.as_ref().map(|name| {
-        name
-          .iter()
-          .cloned()
-          .chain(iter::once("types".to_owned()))
-          .collect()
-      }),
+      name: item
+        .name
+        .as_ref()
+        .map(|name| name.iter().cloned().chain(["types".to_owned()]).collect()),
       types: item.types.clone(),
       ..Default::default()
     })
@@ -80,7 +75,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
         name
           .iter()
           .cloned()
-          .chain(iter::once("reference".to_owned()))
+          .chain(["reference".to_owned()])
           .collect()
       }),
       reference: item.reference,
@@ -96,13 +91,10 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: item.name.as_ref().map(|name| {
-        name
-          .iter()
-          .cloned()
-          .chain(iter::once("all-of".to_owned()))
-          .collect()
-      }),
+      name: item
+        .name
+        .as_ref()
+        .map(|name| name.iter().cloned().chain(["all-of".to_owned()]).collect()),
       all_of: item.all_of.clone(),
       ..Default::default()
     })
@@ -116,13 +108,10 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: item.name.as_ref().map(|name| {
-        name
-          .iter()
-          .cloned()
-          .chain(iter::once("any-of".to_owned()))
-          .collect()
-      }),
+      name: item
+        .name
+        .as_ref()
+        .map(|name| name.iter().cloned().chain(["any-of".to_owned()]).collect()),
       any_of: item.any_of.clone(),
       ..Default::default()
     })
@@ -136,13 +125,10 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      name: item.name.as_ref().map(|name| {
-        name
-          .iter()
-          .cloned()
-          .chain(iter::once("one-of".to_owned()))
-          .collect()
-      }),
+      name: item
+        .name
+        .as_ref()
+        .map(|name| name.iter().cloned().chain(["one-of".to_owned()]).collect()),
       one_of: item.one_of.clone(),
       ..Default::default()
     })
@@ -154,7 +140,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
         name
           .iter()
           .cloned()
-          .chain(iter::once("if-then-else".to_owned()))
+          .chain(["if-then-else".to_owned()])
           .collect()
       }),
       r#if: item.r#if,

@@ -28,6 +28,8 @@ pub enum SchemaTransform {
   ResolveSingleOneOf,
   SingleType,
   Unalias,
+
+  Name,
 }
 
 pub type BoxedSchemaTransform = Box<dyn Fn(&mut SchemaArena, usize)>;
@@ -65,6 +67,8 @@ impl From<SchemaTransform> for BoxedSchemaTransform {
       SchemaTransform::SingleType => schema_transforms::single_type::transform,
 
       SchemaTransform::Unalias => schema_transforms::unalias::transform,
+
+      SchemaTransform::Name => schema_transforms::name::transform,
     };
     Box::new(transform)
   }

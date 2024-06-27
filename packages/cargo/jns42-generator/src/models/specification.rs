@@ -73,6 +73,16 @@ impl Specification {
 
     // generate names
 
+    {
+      while arena.apply_transform(transformer) > 0 {
+        //
+      }
+
+      fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
+        schema_transforms::name::transform(arena, key);
+      }
+    }
+
     let primary_type_keys: HashSet<_> = explicit_type_keys
       .into_iter()
       .flat_map(|key| arena.get_all_related(key))

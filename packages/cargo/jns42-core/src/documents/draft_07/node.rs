@@ -1,8 +1,9 @@
+use std::iter;
+
 use crate::{
   models::{DocumentSchemaItem, SchemaType},
   utils::{JsonValue, NodeLocation},
 };
-use std::iter::{empty, once};
 
 #[derive(Clone, Debug)]
 pub struct Node(JsonValue);
@@ -45,7 +46,7 @@ impl Node {
       location: Some(location.clone()),
       name: None,
 
-            exact: Some(true),
+      exact: Some(true),
 
       reference,
       types,
@@ -65,7 +66,7 @@ impl Node {
           self
             .0
             .value("const")
-            .map(once)
+            .map(iter::once)
             .map(|value| value.cloned().collect())
         })
         .or_else(|| {
@@ -158,7 +159,7 @@ impl Node {
     &self,
     pointer: &[String],
   ) -> impl Iterator<Item = (Vec<String>, Node)> + '_ {
-    empty()
+    iter::empty()
       .chain(self.0.node_entry(pointer, "not"))
       .chain(self.0.node_entry(pointer, "additionalProperties"))
       .chain(self.0.node_entry(pointer, "items"))

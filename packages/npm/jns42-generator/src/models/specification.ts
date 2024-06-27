@@ -90,6 +90,19 @@ export function loadSpecification(
 
   // generate names
 
+  {
+    const transformers = [core.SchemaTransform.Name];
+    let transformIterations = 0;
+    while (typesArena.transform(transformers) > 0) {
+      transformIterations++;
+
+      if (transformIterations < transformMaximumIterations) {
+        continue;
+      }
+      throw new Error("maximum number of iterations reached");
+    }
+  }
+
   const primaryTypeKeys = new Set(
     explicitTypeKeys.flatMap((key) => [...typesArena.getAllRelated(key)]),
   );

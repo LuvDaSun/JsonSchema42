@@ -1,8 +1,5 @@
 use super::Word;
-use std::{
-  iter::{empty, once},
-  slice::Iter,
-};
+use std::{iter, slice::Iter};
 use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -155,7 +152,7 @@ impl Sentence {
 
   pub fn join(&self, other: &Self) -> Self {
     Self(
-      empty()
+      iter::empty()
         .chain(self.iter())
         .chain(other.iter())
         .cloned()
@@ -164,7 +161,7 @@ impl Sentence {
   }
 
   pub fn push(&self, word: Word) -> Self {
-    Self(self.0.iter().cloned().chain(once(word)).collect())
+    Self(self.0.iter().cloned().chain([word]).collect())
   }
 
   pub fn iter(&self) -> Iter<Word> {

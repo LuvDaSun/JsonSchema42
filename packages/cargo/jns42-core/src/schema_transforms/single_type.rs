@@ -1,5 +1,5 @@
 use crate::models::{ArenaSchemaItem, SchemaArena};
-use std::iter::{self, once};
+use std::iter;
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -66,7 +66,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
                     .chain(iter::once(r#type.to_string()))
                     .collect()
                 }),
-                types: Some(once(r#type).collect()),
+                types: Some(iter::once(r#type).collect()),
                 ..Default::default()
               })
             })
