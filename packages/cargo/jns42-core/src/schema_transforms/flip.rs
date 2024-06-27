@@ -101,7 +101,7 @@ macro_rules! generate_mod {
         let item = item.clone();
         for set in product(other_keys.values().cloned()) {
           let sub_item = ArenaSchemaItem {
-            name: Some("flip".to_owned()),
+            name: None, // Some("flip".to_owned()),
             $base_member: Some(
               sub_keys
                 .iter()

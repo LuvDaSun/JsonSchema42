@@ -42,7 +42,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if let Some(then) = item.then {
     let new_sub_item = ArenaSchemaItem {
-      name: Some("if-then".to_owned()),
+      name: None, // Some("if-then".to_owned()),
       all_of: Some([r#if, then].into()),
       ..Default::default()
     };
@@ -52,14 +52,14 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if let Some(r#else) = item.r#else {
     let new_sub_sub_item = ArenaSchemaItem {
-      name: Some("if-not".to_owned()),
+      name: None, // Some("if-not".to_owned()),
       not: Some(r#if),
       ..Default::default()
     };
     let new_sub_sub_key = arena.add_item(new_sub_sub_item);
 
     let new_sub_item = ArenaSchemaItem {
-      name: Some("if-else".to_owned()),
+      name: None, // Some("if-else".to_owned()),
       all_of: Some([new_sub_sub_key, r#else].into()),
       ..Default::default()
     };
