@@ -19,7 +19,6 @@ where
   pub name: Option<String>,
   pub exact: Option<bool>,
 
-  pub parent: Option<K>,
   pub location: Option<NodeLocation>,
 
   // metadata
@@ -219,7 +218,6 @@ where
     Self {
       name: self.name.clone(),
       exact,
-      parent: self.parent.clone(),
       location: self.location.clone(),
 
       title: self.title.clone(),
@@ -402,8 +400,6 @@ where
       exact: self.exact,
       types: self.types.clone(),
 
-      parent: map_single(&self.parent),
-
       location: self.location.clone(),
       title: self.title.clone(),
       description: self.description.clone(),
@@ -469,10 +465,6 @@ impl ArenaSchemaItemContainer {
     self.0.exact
   }
 
-  #[wasm_bindgen(getter = parent)]
-  pub fn parent_get(&self) -> Option<usize> {
-    self.0.parent
-  }
   #[wasm_bindgen(getter = location)]
   pub fn location_get(&self) -> Option<String> {
     Some(self.0.location.as_ref()?.to_string())
