@@ -30,9 +30,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
     const name = names.getName(itemKey);
-    if (item.location == null || name == null) {
+    if (name == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
       yield name.toPascalCase();
