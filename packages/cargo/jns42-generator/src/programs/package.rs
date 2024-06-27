@@ -4,7 +4,6 @@ use clap::Parser;
 use jns42_core::documents;
 use jns42_core::documents::DocumentContext;
 use jns42_core::utils::NodeLocation;
-use std::collections::HashSet;
 use std::error::Error;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -45,9 +44,6 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
   let mut context = Rc::new(DocumentContext::default());
   context.register_well_known_factories().unwrap();
 
-  let mut roots = HashSet::new();
-
-  roots.insert(schema_location.clone());
   context
     .load_from_location(
       schema_location.clone(),
@@ -58,7 +54,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
     .await
     .unwrap();
 
-  let specification = Specification::new(&context, roots);
+  let specification = Specification::new(&context);
   generate_package(
     PackageConfiguration {
       package_name: package_name.as_str(),

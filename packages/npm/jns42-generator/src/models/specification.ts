@@ -97,11 +97,7 @@ export function loadSpecification(
   const namesBuilder = new core.NamesBuilderContainer();
   namesBuilder.setDefaultName(defaultTypeName);
 
-  for (let key = 0; key < typesArena.count(); key++) {
-    if (!primaryTypeKeys.has(key)) {
-      continue;
-    }
-
+  for (const key of primaryTypeKeys) {
     const parts = typesArena.getNameParts(key);
     const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
 
