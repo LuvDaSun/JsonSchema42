@@ -31,23 +31,17 @@ use crate::models::{ArenaSchemaItem, SchemaArena};
  *   - 2
  *   - 3
  *   - 4
- * - parent: 0
- *   reference: 10
+ * - reference: 10
  * - allOf
- *   parent: 0
- *   allOf
  *   - 100
  *   - 200
- * - parent: 0
- *   anyOf
+ * - anyOf
  *   - 300
  *   - 400
- * - parent: 0
- *   oneOf
+ * - oneOf
  *   - 500
  *   - 600
- * - parent: 0
- *   if: 700
+ * - if: 700
  *   then: 800
  *   else: 900
  *
@@ -66,7 +60,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      parent: Some(key),
       name: Some("types".to_string()),
       types: item.types.clone(),
       ..Default::default()
@@ -75,7 +68,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if item.reference.is_some() {
     sub_items.push(ArenaSchemaItem {
-      parent: Some(key),
       name: Some("reference".to_string()),
       reference: item.reference,
       ..Default::default()
@@ -90,7 +82,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      parent: Some(key),
       name: Some("all_of".to_string()),
       all_of: item.all_of.clone(),
       ..Default::default()
@@ -105,7 +96,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      parent: Some(key),
       name: Some("any_of".to_string()),
       any_of: item.any_of.clone(),
       ..Default::default()
@@ -120,7 +110,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     > 0
   {
     sub_items.push(ArenaSchemaItem {
-      parent: Some(key),
       name: Some("one_of".to_string()),
       one_of: item.one_of.clone(),
       ..Default::default()
@@ -129,7 +118,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if item.r#if.is_some() || item.then.is_some() || item.r#else.is_some() {
     sub_items.push(ArenaSchemaItem {
-      parent: Some(key),
       name: Some("if_then_else".to_string()),
       r#if: item.r#if,
       then: item.then,
@@ -192,31 +180,26 @@ mod tests {
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("reference".to_string()),
         reference: Some(10),
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("all_of".to_string()),
         all_of: Some([100, 200].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("any_of".to_string()),
         any_of: Some([300, 400].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("one_of".to_string()),
         one_of: Some([500, 600].into()),
         ..Default::default()
       },
       ArenaSchemaItem {
-        parent: Some(0),
         name: Some("if_then_else".to_string()),
         r#if: Some(700),
         then: Some(800),

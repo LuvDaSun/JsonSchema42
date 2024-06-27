@@ -50,7 +50,6 @@ impl Node {
       location: Some(location.clone()),
       name: None,
 
-      parent: None,
       exact: Some(true),
 
       reference,
