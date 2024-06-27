@@ -1,6 +1,6 @@
 $schema: "./schema.json"
 
-rootTypeName: Nullable
+rootTypeName: SchemaDocument
 
 schemas:
   draft-04:

@@ -98,9 +98,13 @@ export function loadSpecification(
   namesBuilder.setDefaultName(defaultTypeName);
 
   for (const key of primaryTypeKeys) {
-    const parts = typesArena.getNameParts(key);
-    const filteredParts = parts.filter((part) => /^[a-zA-Z]/.test(part));
+    const item = typesArena.getItem(key);
 
+    if (item.name == null) {
+      continue;
+    }
+
+    const filteredParts = item.name.filter((part) => /^[a-zA-Z]/.test(part));
     namesBuilder.add(key, filteredParts);
   }
 

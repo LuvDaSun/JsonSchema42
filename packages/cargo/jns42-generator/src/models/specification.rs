@@ -81,13 +81,22 @@ impl Specification {
     let mut names_builder = NamesBuilder::new();
 
     for key in primary_type_keys {
-      let parts = arena.get_name_parts(key).map(|part| {
-        NON_IDENTIFIER_REGEX
-          .replace_all(part.as_str(), " ")
-          .into_owned()
-          .trim()
-          .to_string()
-      });
+      let item = arena.get_item(key);
+
+      let Some(name) = item.name.as_ref() else {
+        continue;
+      };
+
+      let parts = name
+        .iter()
+        .map(|part| {
+          NON_IDENTIFIER_REGEX
+            .replace_all(part.as_str(), " ")
+            .into_owned()
+            .trim()
+            .to_string()
+        })
+        .filter(|part| !part.is_empty());
 
       names_builder.add(key, parts);
     }
