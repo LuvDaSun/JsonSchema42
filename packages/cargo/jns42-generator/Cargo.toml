@@ -38,5 +38,5 @@ jns42-core = { path = "../jns42-core" }
 path = "src/lib.rs"
 
 [[bin]]
-name = "@jns42/generator"
+name = "jns42-generator"
 path = "src/main.rs"
