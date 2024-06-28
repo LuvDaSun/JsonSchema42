@@ -1,1 +1,1 @@
-# jns42-generator, Rust edition
+# @jns42/generator, Rust edition
