@@ -1,5 +1,5 @@
 {
-  "name": "jns42-generator",
+  "name": "@jns42/generator",
   "version": "0.21.0",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
