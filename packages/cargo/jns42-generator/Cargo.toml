@@ -1,5 +1,5 @@
 [package]
-name = "@jns42/generator"
+name = "jns42-generator"
 version = "0.0.0"
 edition = "2021"
 description = "Generate structs and validators from json schema"
