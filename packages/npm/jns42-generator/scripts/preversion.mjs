@@ -17,7 +17,7 @@ assert.equal(status, "");
 
 // check if we are on the main branch
 const branch = cp.execFileSync("git", ["branch", "--show-current"], pipeOptions).toString();
-assert.equal(branch, "main");
+assert.equal(branch, "main\n");
 
 cp.execFileSync("npm", ["run", "formatting"], options);
 cp.execFileSync("npm", ["run", "spelling"], options);
