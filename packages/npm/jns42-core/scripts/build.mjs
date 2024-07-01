@@ -12,7 +12,7 @@ const options = {
   shell: true,
   stdio: "inherit",
   env: process.env,
-  cwd: projectRoot,
+  cwd: workspaceRoot,
 };
 
 cp.execFileSync(
