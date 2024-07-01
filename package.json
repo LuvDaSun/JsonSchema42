@@ -1,6 +1,6 @@
 {
   "private": true,
-  "packageManager": "npm@10.3.0",
+  "packageManager": "npm@10.8.1",
   "workspaces": [
     "generated/npm/*",
     "packages/npm/jns42-core",
@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "cspell": "^8.9.1",
-    "jns42-generator": "^0.21.0",
     "prettier": "^3.3.2"
   }
 }
