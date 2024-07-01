@@ -1,6 +1,6 @@
 {
   "private": true,
-  "packageManager": "npm@10.3.0",
+  "packageManager": "npm@10.8.1",
   "workspaces": [
     "generated/npm/*",
     "packages/npm/jns42-core",
