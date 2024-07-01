@@ -20,7 +20,10 @@ words:
   - notdir
   - oneshot
   - openapi
+  - postpublish
+  - postversion
   - presolved
+  - preversion
   - realloc
   - repr
   - reqwest
