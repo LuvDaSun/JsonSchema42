@@ -9,7 +9,7 @@ const options = {
   cwd: process.env.npm_config_local_prefix,
 };
 
-const tag = `npm:${process.env.npm_package_name}@${process.env.npm_new_version}`;
+const tag = `npm_${process.env.npm_package_name}@${process.env.npm_new_version}`;
 
 cp.execFileSync("git", ["add", process.env.npm_package_json], options);
 cp.execFileSync("git", ["commit", "--message", tag], options);
