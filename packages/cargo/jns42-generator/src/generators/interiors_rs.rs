@@ -34,11 +34,13 @@ fn generate_type_token_stream(
   .into_iter()
   .flatten()
   .collect();
-  let documentation = documentation.join("\n\n");
 
-  tokens.append_all(quote! {
-    #[doc = #documentation]
-  });
+  let documentation = documentation.join("\n\n");
+  if !documentation.is_empty() {
+    tokens.append_all(quote! {
+      #[doc = #documentation]
+    });
+  }
 
   let Some(identifier) = specification.get_identifier(key) else {
     return Ok(quote! {});
@@ -63,7 +65,7 @@ fn generate_type_token_stream(
         }
         SchemaType::Any => {
           tokens.append_all(quote! {
-            pub type #identifier = std::any::Any;
+            pub type #identifier = serde_json::Value;
           });
         }
         SchemaType::Null => {
@@ -168,13 +170,30 @@ fn generate_type_token_stream(
         }
       };
 
-      tokens.append_all(quote! {
-        impl From<#type_identifier> for #identifier {
-          fn from(value: #type_identifier) -> Self {
-              value.0
+      let boxed = item
+        .types
+        .iter()
+        .flatten()
+        .any(|r#type| *r#type == SchemaType::Object)
+        || item.one_of.is_some();
+
+      if boxed {
+        tokens.append_all(quote! {
+          impl From<#type_identifier> for #identifier {
+            fn from(value: #type_identifier) -> Self {
+                *value.0
+            }
           }
-        }
-      });
+        });
+      } else {
+        tokens.append_all(quote! {
+          impl From<#type_identifier> for #identifier {
+            fn from(value: #type_identifier) -> Self {
+                value.0
+            }
+          }
+        });
+      }
 
       return Ok(tokens);
     }
@@ -190,6 +209,7 @@ fn generate_type_token_stream(
     }
 
     tokens.append_all(quote! {
+      #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
       pub enum #identifier {
         #inner_tokens
       }

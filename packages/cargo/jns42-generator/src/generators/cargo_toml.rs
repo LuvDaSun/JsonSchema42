@@ -33,6 +33,14 @@ pub fn generate_file_content(
         map
       }),
     );
+    map.insert(
+      "serde_json".to_owned(),
+      toml::Value::Table({
+        let mut map = toml::map::Map::new();
+        map.insert("version".to_owned(), toml::Value::String("1.0".to_owned()));
+        map
+      }),
+    );
     map
   });
 

@@ -1,6 +1,10 @@
 [workspace]
 resolver = "2"
-members = ["packages/cargo/jns42-core", "packages/cargo/jns42-generator"]
+members = [
+  "packages/cargo/jns42-core",
+  "packages/cargo/jns42-generator",
+  "generated/cargo/*",
+]
 
 [profile.release]
 lto = true

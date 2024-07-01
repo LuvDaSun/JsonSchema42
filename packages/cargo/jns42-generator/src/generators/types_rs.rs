@@ -31,11 +31,13 @@ fn generate_type_token_stream(
   .into_iter()
   .flatten()
   .collect();
-  let documentation = documentation.join("\n\n");
 
-  tokens.append_all(quote! {
-    #[doc = #documentation]
-  });
+  let documentation = documentation.join("\n\n");
+  if !documentation.is_empty() {
+    tokens.append_all(quote! {
+      #[doc = #documentation]
+    });
+  }
 
   let Some(identifier) = specification.get_identifier(key) else {
     return Ok(quote! {});
@@ -50,23 +52,61 @@ fn generate_type_token_stream(
     let name = specification.get_name(key);
     let interior_name = specification.get_interior_name(key);
     let interior_identifier = specification.get_interior_identifier(key);
-
-    tokens.append_all(quote! {
-      #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
-      #[serde(try_from = #interior_name)]
-      pub struct #identifier(pub(super) #interior_identifier);
+    let boxed = item
+      .types
+      .iter()
+      .flatten()
+      .any(|r#type| *r#type == SchemaType::Object)
+      || item.one_of.is_some();
+    let to_string = item.types.iter().flatten().any(|r#type| {
+      matches!(
+        *r#type,
+        SchemaType::Boolean | SchemaType::Integer | SchemaType::Number | SchemaType::String
+      )
     });
+
+    if boxed {
+      tokens.append_all(quote! {
+        #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+        #[serde(try_from = #interior_name)]
+        pub struct #identifier(pub(super) Box<#interior_identifier>);
+      });
+
+      tokens.append_all(quote! {
+        impl #identifier {
+            fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
+                let instance = Self(Box::new(value));
+                if instance.validate() {
+                    Ok(instance)
+                } else {
+                    Err(crate::errors::ValidationError::new(#name))
+                }
+            }
+        }
+      });
+    } else {
+      tokens.append_all(quote! {
+        #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+        #[serde(try_from = #interior_name)]
+        pub struct #identifier(pub(super) #interior_identifier);
+      });
+
+      tokens.append_all(quote! {
+        impl #identifier {
+            fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
+                let instance = Self(value);
+                if instance.validate() {
+                    Ok(instance)
+                } else {
+                    Err(crate::errors::ValidationError::new(#name))
+                }
+            }
+        }
+      });
+    }
 
     tokens.append_all(quote! {
       impl #identifier {
-          fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
-              let instance = Self(value);
-              if instance.validate() {
-                  Ok(instance)
-              } else {
-                  Err(crate::errors::ValidationError::new(#name))
-              }
-          }
           fn validate(&self) -> bool {
             true
           }
@@ -91,22 +131,14 @@ fn generate_type_token_stream(
       }
     });
 
-    if let Some(types) = &item.types {
-      if types.len() == 1 {
-        let r#type = types.first().unwrap();
-        match r#type {
-          SchemaType::Boolean | SchemaType::Integer | SchemaType::Number | SchemaType::String => {
-            tokens.append_all(quote! {
-              impl ToString for #identifier {
-                  fn to_string(&self) -> String {
-                      self.0.to_string()
-                  }
-              }
-            });
+    if to_string {
+      tokens.append_all(quote! {
+        impl std::fmt::Display for #identifier {
+          fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{}", self.0)
           }
-          _ => {}
-        };
-      }
+        }
+      });
     }
   }
 
