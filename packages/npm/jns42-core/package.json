@@ -1,6 +1,6 @@
 {
   "name": "@jns42/core",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "sideEffects": false,
   "description": "core library",
   "type": "commonjs",
@@ -43,7 +43,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
-    "@types/node": "^20.14.8",
+    "@types/node": "^20.14.9",
     "p-defer": "^4.0.1",
     "tslib": "^2.6.3",
     "type-fest": "^4.20.1"
