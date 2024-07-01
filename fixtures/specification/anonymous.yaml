@@ -7,3 +7,5 @@ allOf:
   - properties:
       name:
         type: string
+examples:
+  - name: Piet

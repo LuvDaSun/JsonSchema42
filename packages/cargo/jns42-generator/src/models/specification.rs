@@ -136,6 +136,16 @@ impl Specification {
 }
 
 impl Specification {
+  pub fn get_snake_identifier(&self, key: &usize) -> Option<Ident> {
+    let name = self.get_snake_name(key)?;
+    Some(format_ident!("r#{}", name))
+  }
+
+  pub fn get_snake_name(&self, key: &usize) -> Option<String> {
+    let sentence = self.names.get_name(key)?;
+    Some(sentence.to_snake_case())
+  }
+
   pub fn get_identifier(&self, key: &usize) -> Option<Ident> {
     let name = self.get_name(key)?;
     Some(format_ident!("r#{}", name))
@@ -143,11 +153,6 @@ impl Specification {
 
   pub fn get_name(&self, key: &usize) -> Option<String> {
     let sentence = self.names.get_name(key)?;
-
-    if sentence.is_empty() {
-      return Some(format!("T{}", key));
-    }
-
     Some(sentence.to_pascal_case())
   }
 
