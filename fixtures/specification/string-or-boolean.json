@@ -1,3 +1,4 @@
 {
-  "type": ["string", "boolean"]
+  "type": ["string", "boolean"],
+  "examples": ["hi", true]
 }
