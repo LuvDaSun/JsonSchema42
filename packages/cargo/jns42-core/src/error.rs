@@ -1,4 +1,4 @@
-use crate::utils::{FetchTextError, NodeCacheError, ParseLocationError};
+use crate::utils::{FetchTextError, NodeCacheError, NodeLocation, ParseLocationError};
 use std::fmt::Display;
 use wasm_bindgen::prelude::*;
 
@@ -7,7 +7,13 @@ use wasm_bindgen::prelude::*;
 pub enum Error {
   Unknown,
   Conflict,
-  NotFound,
+  DocumentNodeNotFound,
+  VersionNodeNotFound,
+  FactoryNotFound,
+  RetrievalLocationNotFound,
+  IdentityLocationNotFound,
+  DocumentNotFound,
+  ReferenceNotFound,
   InvalidLocation,
   FetchError,
   SerializationError,
@@ -20,7 +26,13 @@ impl Display for Error {
     match self {
       Self::Unknown => write!(f, "Unknown"),
       Self::Conflict => write!(f, "Conflict"),
-      Self::NotFound => write!(f, "NotFound"),
+      Self::DocumentNodeNotFound => write!(f, "DocumentNodeNotFound"),
+      Self::VersionNodeNotFound => write!(f, "VersionNodeNotFound"),
+      Self::FactoryNotFound => write!(f, "FactoryNotFound"),
+      Self::RetrievalLocationNotFound => write!(f, "RetrievalLocationNotFound"),
+      Self::IdentityLocationNotFound => write!(f, "IdentityLocationNotFound"),
+      Self::DocumentNotFound => write!(f, "DocumentNotFound"),
+      Self::ReferenceNotFound => write!(f, "ReferenceNotFound"),
       Self::InvalidLocation => write!(f, "InvalidLocation"),
       Self::FetchError => write!(f, "FetchError"),
       Self::SerializationError => write!(f, "SerializationError"),

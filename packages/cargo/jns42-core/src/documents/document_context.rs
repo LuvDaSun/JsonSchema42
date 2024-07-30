@@ -80,12 +80,12 @@ pub struct DocumentContext {
   ///
   documents: RefCell<HashMap<NodeLocation, rc::Rc<dyn SchemaDocument>>>,
 
+  /// this maps retrieval locations to identity locations
+  retrieval_to_identity_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
+
   /// This maps identity locations to retrieval locations. Use this table every time you
   /// need to fetch a node by it's identity location and you have a retrieval location
   ///
-  retrieval_to_identity_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
-
-  /// this maps retrieval locations to identity locations
   identity_to_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
   /// locations that were loaded explicitly
@@ -284,7 +284,7 @@ impl DocumentContext {
         .cache
         .borrow()
         .get_node(&retrieval_location)
-        .ok_or(Error::NotFound)?
+        .ok_or(Error::DocumentNodeNotFound)?
         .clone();
 
       let factory = {
@@ -294,11 +294,14 @@ impl DocumentContext {
           .unwrap_or_else(|| retrieval_location.clone());
         let version_node = cache
           .get_node(&version_retrieval_location)
-          .ok_or(Error::NotFound)?;
+          .ok_or(Error::VersionNodeNotFound)?;
         let meta_schema_id =
           documents::discover_meta_schema_id(version_node).unwrap_or(default_meta_schema_id);
 
-        self.factories.get(meta_schema_id).ok_or(Error::NotFound)?
+        self
+          .factories
+          .get(meta_schema_id)
+          .ok_or(Error::FactoryNotFound)?
       };
 
       let document = factory(
@@ -352,13 +355,13 @@ impl DocumentContext {
         }
 
         // possibly overwrite value
-        self.retrieval_to_identity_locations.borrow_mut().insert(
+        self.identity_to_retrieval_locations.borrow_mut().insert(
           node_retrieval_location.clone(),
           node_identity_location.clone(),
         );
 
         // possibly overwrite value
-        self.identity_to_retrieval_locations.borrow_mut().insert(
+        self.retrieval_to_identity_locations.borrow_mut().insert(
           node_identity_location.clone(),
           node_retrieval_location.clone(),
         );
@@ -426,7 +429,7 @@ impl DocumentContext {
       .borrow()
       .get(node_retrieval_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or(Error::RetrievalLocationNotFound)
   }
 
   pub fn resolve_identity_location(
@@ -434,11 +437,11 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
   ) -> Result<NodeLocation, Error> {
     self
-      .retrieval_to_identity_locations
+      .identity_to_retrieval_locations
       .borrow()
       .get(retrieval_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or(Error::RetrievalLocationNotFound)
   }
 
   pub fn resolve_retrieval_location(
@@ -446,11 +449,11 @@ impl DocumentContext {
     identity_location: &NodeLocation,
   ) -> Result<NodeLocation, Error> {
     self
-      .identity_to_retrieval_locations
+      .retrieval_to_identity_locations
       .borrow()
       .get(identity_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or(Error::IdentityLocationNotFound)
   }
 
   pub fn get_document(
@@ -462,7 +465,7 @@ impl DocumentContext {
       .borrow()
       .get(document_retrieval_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or(Error::DocumentNotFound)
   }
 
   pub fn get_document_and_antecedents(

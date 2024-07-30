@@ -119,7 +119,7 @@ impl Document {
       return Ok(reference_location);
     }
 
-    Err(Error::NotFound)
+    Err(Error::ReferenceNotFound)
   }
 
   /// resolve recursive reference to identity location
@@ -144,7 +144,7 @@ impl Document {
       }
     }
 
-    Err(Error::NotFound)
+    Err(Error::ReferenceNotFound)
   }
 }
 
