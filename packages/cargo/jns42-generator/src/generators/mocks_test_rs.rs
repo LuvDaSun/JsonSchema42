@@ -19,7 +19,7 @@ pub fn generate_file_token_stream(
 fn generate_test_token_stream(
   specification: &Specification,
   key: &usize,
-  item: &ArenaSchemaItem,
+  _item: &ArenaSchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
