@@ -38,7 +38,7 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
     },
     author: "",
     license: "ISC",
-    dependencies: withDependencies(["@types/node", "@types/yargs", "yargs", "yaml"]),
+    dependencies: withDependencies(["@types/node", "@types/yargs", "yargs"]),
     devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
     engines: {
       node: ">=18",

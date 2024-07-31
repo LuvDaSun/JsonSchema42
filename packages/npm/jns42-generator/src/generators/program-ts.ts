@@ -42,7 +42,6 @@ export function* generateProgramTsCode(
 
   yield itt`
     import * as consumers from "node:stream/consumers";
-    import YAML from "yaml";
     import { hideBin } from "yargs/helpers";
     import yargs from "yargs/yargs";
     import * as validators from "./validators.js";
@@ -58,7 +57,7 @@ export function* generateProgramTsCode(
 
     program.command(
       "assert",
-      "asserts JSON or YAML from stdin",
+      "asserts JSON from stdin",
       yargs => yargs.
         option("parse", {
           description: "parse the data before asserting",
@@ -66,7 +65,7 @@ export function* generateProgramTsCode(
         }),
       async argv => {
         const stdinData = await consumers.text(process.stdin);
-        let data = YAML.parse(stdinData);
+        let data = JSON.parse(stdinData);
         if(argv.parse) {
           data = parsers.${parseFunction}(data);
         }
