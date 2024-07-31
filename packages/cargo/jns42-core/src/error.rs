@@ -1,4 +1,4 @@
-use crate::utils::{FetchTextError, NodeCacheError, NodeLocation, ParseLocationError};
+use crate::utils::{FetchTextError, NodeCacheError, ParseLocationError};
 use std::fmt::Display;
 use wasm_bindgen::prelude::*;
 
@@ -37,6 +37,12 @@ impl Display for Error {
       Self::FetchError => write!(f, "FetchError"),
       Self::SerializationError => write!(f, "SerializationError"),
     }
+  }
+}
+
+impl From<Error> for String {
+  fn from(value: Error) -> Self {
+    value.to_string()
   }
 }
 

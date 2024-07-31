@@ -294,6 +294,12 @@ impl fmt::Display for ParseLocationError {
   }
 }
 
+impl From<ParseLocationError> for String {
+  fn from(value: ParseLocationError) -> Self {
+    value.to_string()
+  }
+}
+
 impl Error for ParseLocationError {}
 
 fn escape_hash(input: impl AsRef<str>) -> String {

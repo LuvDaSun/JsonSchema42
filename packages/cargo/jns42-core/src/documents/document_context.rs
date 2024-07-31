@@ -502,8 +502,8 @@ impl DocumentContextContainer {
   }
 
   #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), Error> {
-    self.0.register_well_known_factories()
+  pub fn register_well_known_factories(&mut self) -> Result<(), String> {
+    Ok(self.0.register_well_known_factories()?)
   }
 
   #[wasm_bindgen(js_name = "loadFromLocation")]
@@ -513,22 +513,24 @@ impl DocumentContextContainer {
     given_location: String,
     antecedent_location: Option<String>,
     default_meta_schema_id: &str,
-  ) -> Result<(), Error> {
+  ) -> Result<(), String> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
       .map(|location| location.parse())
       .transpose()?;
 
-    self
-      .0
-      .load_from_location(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        default_meta_schema_id,
-      )
-      .await
+    Ok(
+      self
+        .0
+        .load_from_location(
+          retrieval_location,
+          given_location,
+          antecedent_location,
+          default_meta_schema_id,
+        )
+        .await?,
+    )
   }
 
   #[wasm_bindgen(js_name = "loadFromNode")]
