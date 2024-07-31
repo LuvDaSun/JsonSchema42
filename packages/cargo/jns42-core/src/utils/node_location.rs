@@ -294,9 +294,9 @@ impl fmt::Display for ParseLocationError {
   }
 }
 
-impl From<ParseLocationError> for String {
+impl From<ParseLocationError> for js_sys::Error {
   fn from(value: ParseLocationError) -> Self {
-    value.to_string()
+    js_sys::Error::new(&value.to_string())
   }
 }
 

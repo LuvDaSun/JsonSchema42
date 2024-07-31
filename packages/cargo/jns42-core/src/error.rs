@@ -1,9 +1,7 @@
 use crate::utils::{FetchTextError, NodeCacheError, ParseLocationError};
 use std::fmt::Display;
-use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
-#[wasm_bindgen]
 pub enum Error {
   Unknown,
   Conflict,
@@ -40,9 +38,9 @@ impl Display for Error {
   }
 }
 
-impl From<Error> for String {
+impl From<Error> for js_sys::Error {
   fn from(value: Error) -> Self {
-    value.to_string()
+    js_sys::Error::new(&value.to_string())
   }
 }
 

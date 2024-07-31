@@ -502,7 +502,7 @@ impl DocumentContextContainer {
   }
 
   #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), String> {
+  pub fn register_well_known_factories(&mut self) -> Result<(), js_sys::Error> {
     Ok(self.0.register_well_known_factories()?)
   }
 
@@ -513,7 +513,7 @@ impl DocumentContextContainer {
     given_location: String,
     antecedent_location: Option<String>,
     default_meta_schema_id: &str,
-  ) -> Result<(), String> {
+  ) -> Result<(), js_sys::Error> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
@@ -541,7 +541,7 @@ impl DocumentContextContainer {
     antecedent_location: Option<String>,
     node: &JsValue,
     default_meta_schema_id: &str,
-  ) -> Result<(), Error> {
+  ) -> Result<(), js_sys::Error> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
@@ -550,16 +550,18 @@ impl DocumentContextContainer {
 
     let node = JsValue::into_serde(node).unwrap();
 
-    self
-      .0
-      .load_from_node(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        node,
-        default_meta_schema_id,
-      )
-      .await
+    Ok(
+      self
+        .0
+        .load_from_node(
+          retrieval_location,
+          given_location,
+          antecedent_location,
+          node,
+          default_meta_schema_id,
+        )
+        .await?,
+    )
   }
 
   #[wasm_bindgen(js_name = "getExplicitLocations")]
