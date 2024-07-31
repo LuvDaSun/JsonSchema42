@@ -10,6 +10,8 @@ import { generateMocksTestTsCode } from "./mocks-test-ts.js";
 import { generateMocksTsCode } from "./mocks-ts.js";
 import { generatePackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
+import { generateProgramTsCode } from "./program-ts.js";
+import { generateRollupConfigJsCode } from "./rollup-config-js.js";
 import { generateTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
@@ -18,13 +20,14 @@ export interface PackageConfiguration {
   packageName: string;
   packageVersion: string;
   packageDirectoryPath: string;
+  entryLocation: string;
 }
 
 export function generatePackage(
   specification: models.Specification,
   configuration: PackageConfiguration,
 ) {
-  const { packageDirectoryPath, packageName, packageVersion } = configuration;
+  const { packageDirectoryPath, packageName, packageVersion, entryLocation } = configuration;
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
@@ -43,8 +46,25 @@ export function generatePackage(
   }
 
   {
+    const content = generateRollupConfigJsCode();
+    const filePath = path.join(packageDirectoryPath, "rollup.config.js");
+    writeContentToFile(filePath, content);
+  }
+
+  {
     const content = generateMainTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "main.ts");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateProgramTsCode(
+      specification,
+      packageName,
+      packageVersion,
+      entryLocation,
+    );
+    const filePath = path.join(packageDirectoryPath, "src", "program.ts");
     writeContentToFile(filePath, content);
   }
 

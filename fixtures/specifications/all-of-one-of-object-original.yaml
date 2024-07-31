@@ -1,0 +1,18 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+allOf:
+  - type: object
+    required: [a, b]
+    properties:
+      a: { type: string }
+      b: { type: string }
+  - oneOf:
+      - type: object
+        required: [c, d]
+        properties:
+          c: { type: string }
+          d: { type: string }
+      - type: object
+        required: [e, f]
+        properties:
+          e: { type: string }
+          f: { type: string }

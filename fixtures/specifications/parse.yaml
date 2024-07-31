@@ -1,0 +1,16 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: "An object"
+type:
+  - number
+  - object
+properties:
+  boolean:
+    type: boolean
+  number:
+    type: number
+  string:
+    type: string
+  array:
+    type: array
+    items:
+      type: number
