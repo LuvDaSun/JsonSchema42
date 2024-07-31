@@ -598,7 +598,7 @@ mod tests {
     let mut document_context = rc::Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
-    let location: NodeLocation = "../../../fixtures/specification/string.json"
+    let location: NodeLocation = "../../../fixtures/specifications/string.json"
       .parse()
       .unwrap();
 

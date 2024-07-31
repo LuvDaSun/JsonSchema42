@@ -194,7 +194,7 @@ mod tests {
   async fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
-    let location: NodeLocation = "../../../fixtures/specification/nwd.yaml".parse().unwrap();
+    let location: NodeLocation = "../../../fixtures/specifications/nwd.yaml".parse().unwrap();
 
     cache.load_from_location(&location).await.unwrap();
 
