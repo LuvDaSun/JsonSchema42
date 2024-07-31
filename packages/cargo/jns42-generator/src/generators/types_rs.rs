@@ -67,38 +67,38 @@ fn generate_type_token_stream(
 
     if boxed {
       tokens.append_all(quote! {
-        #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+        #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
         #[serde(try_from = #interior_name)]
         pub struct #identifier(pub(super) Box<#interior_identifier>);
       });
 
       tokens.append_all(quote! {
         impl #identifier {
-            fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
+            fn new(value: #interior_identifier) -> core::result::Result<Self, crate::errors::ValidationError> {
                 let instance = Self(Box::new(value));
                 if instance.validate() {
-                    Ok(instance)
+                  core::result::Result::Ok(instance)
                 } else {
-                    Err(crate::errors::ValidationError::new(#name))
+                  core::result::Result::Err(crate::errors::ValidationError::new(#name))
                 }
             }
         }
       });
     } else {
       tokens.append_all(quote! {
-        #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+        #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
         #[serde(try_from = #interior_name)]
         pub struct #identifier(pub(super) #interior_identifier);
       });
 
       tokens.append_all(quote! {
         impl #identifier {
-            fn new(value: #interior_identifier) -> Result<Self, crate::errors::ValidationError> {
+            fn new(value: #interior_identifier) -> core::result::Result<Self, crate::errors::ValidationError> {
                 let instance = Self(value);
                 if instance.validate() {
-                    Ok(instance)
+                  core::result::Result::Ok(instance)
                 } else {
-                    Err(crate::errors::ValidationError::new(#name))
+                  core::result::Result::Err(crate::errors::ValidationError::new(#name))
                 }
             }
         }
@@ -114,9 +114,9 @@ fn generate_type_token_stream(
     });
 
     tokens.append_all(quote! {
-      impl TryFrom<#interior_identifier> for #identifier {
+      impl core::convert::TryFrom<#interior_identifier> for #identifier {
         type Error = crate::errors::ValidationError;
-        fn try_from(value: #interior_identifier) -> Result<Self, Self::Error> {
+        fn try_from(value: #interior_identifier) -> core::result::Result<Self, Self::Error> {
             Self::new(value)
         }
       }

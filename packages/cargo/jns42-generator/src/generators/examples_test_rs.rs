@@ -40,12 +40,12 @@ fn generate_test_token_stream(
     let data = serde_json::to_string(example)?;
     tokens.append_all(quote! {
       #[test]
-      fn #test_identifier() -> Result<(), Box<dyn std::error::Error>> {
+      fn #test_identifier() -> core::result::Result<(), std::boxed::Box<dyn std::error::Error>> {
         let data = #data;
 
         serde_json::from_str::<#type_identifier>(data)?;
 
-        Ok(())
+        core::result::Result::Ok(())
       }
     });
   }

@@ -90,7 +90,7 @@ fn generate_type_token_stream(
         }
         SchemaType::String => {
           tokens.append_all(quote! {
-            pub type #identifier = String;
+            pub type #identifier = std::string::String;
           });
         }
         SchemaType::Array => {
@@ -114,11 +114,11 @@ fn generate_type_token_stream(
             let array_items_identifier = specification.get_type_identifier(array_items_key);
 
             tokens.append_all(quote! {
-              pub type #identifier = Vec<#array_items_identifier>;
+              pub type #identifier = std::vec::Vec<#array_items_identifier>;
             });
           } else {
             tokens.append_all(quote! {
-              pub type #identifier = Vec<()>;
+              pub type #identifier = std::vec::Vec<()>;
             });
           }
         }
@@ -143,7 +143,7 @@ fn generate_type_token_stream(
                   }
                 } else {
                   quote! {
-                    pub #member_identifier: Option<#object_properties_identifier>
+                    pub #member_identifier: std::option::Option<#object_properties_identifier>
                   }
                 }
               })
@@ -151,7 +151,7 @@ fn generate_type_token_stream(
               .unwrap_or_default();
 
             tokens.append_all(quote! {
-              #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+              #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
               pub struct #identifier {
                 #inner_tokens
               }
@@ -160,11 +160,11 @@ fn generate_type_token_stream(
             let map_properties_identifier = specification.get_type_identifier(map_properties_key);
 
             tokens.append_all(quote! {
-              pub type #identifier = std::collections::HashMap<String, #map_properties_identifier>;
+              pub type #identifier = std::collections::HashMap<std::string::String, #map_properties_identifier>;
             });
           } else {
             tokens.append_all(quote! {
-              pub type #identifier = std::collections::HashMap<String, ()>;
+              pub type #identifier = std::collections::HashMap<std::string::String, ()>;
             });
           }
         }
@@ -179,7 +179,7 @@ fn generate_type_token_stream(
 
       if boxed {
         tokens.append_all(quote! {
-          impl From<#type_identifier> for #identifier {
+          impl core::convert::From<#type_identifier> for #identifier {
             fn from(value: #type_identifier) -> Self {
                 *value.0
             }
@@ -187,7 +187,7 @@ fn generate_type_token_stream(
         });
       } else {
         tokens.append_all(quote! {
-          impl From<#type_identifier> for #identifier {
+          impl core::convert::From<#type_identifier> for #identifier {
             fn from(value: #type_identifier) -> Self {
                 value.0
             }
@@ -209,7 +209,8 @@ fn generate_type_token_stream(
     }
 
     tokens.append_all(quote! {
-      #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+      #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
+      #[serde(untagged)]
       pub enum #identifier {
         #inner_tokens
       }
@@ -219,7 +220,7 @@ fn generate_type_token_stream(
   }
 
   tokens.append_all(quote! {
-    #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+    #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
     pub struct #identifier();
   });
 
