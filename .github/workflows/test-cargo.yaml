@@ -29,7 +29,5 @@ jobs:
     runs-on: ubuntu-latest
     container: rust:1.80.0
     steps:
-      - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli
       - uses: actions/checkout@v4
       - run: ./package-fixtures-cargo

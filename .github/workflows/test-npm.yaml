@@ -11,18 +11,14 @@ jobs:
       - run: npm --workspaces audit --audit-level high
 
   test:
-    strategy:
-      matrix:
-        node-version: [22.5.1]
-        rust-version: [1.80.0]
-        runs-on: [ubuntu-latest]
-    runs-on: ${{ matrix.runs-on }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.5.1
       - run: corepack enable
-      - run: rustup default ${{ matrix.rust-version }}
+      - run: rustup default 1.80.0
+
       - run: rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-bindgen-cli
 
@@ -34,19 +30,14 @@ jobs:
       - if: ${{ matrix.node-version >= 21 }}
         run: npm --workspaces test --if-present
 
-  test-fixtures:
-    strategy:
-      matrix:
-        node-version: [22.5.1]
-        rust-version: [1.80.0]
-        runs-on: [ubuntu-latest]
-    runs-on: ${{ matrix.runs-on }}
+  fixtures:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.5.1
       - run: corepack enable
-      - run: rustup default ${{ matrix.rust-version }}
+      - run: rustup default 1.80.0
 
       - run: rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-bindgen-cli
