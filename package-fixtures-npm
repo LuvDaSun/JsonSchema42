@@ -15,7 +15,7 @@ ERROR=0
 for F in $(ls fixtures/specifications); do
   echo $F
 
-  if ! ./packages/npm/jns42-generator/bundled/program.js package \
+  if ! node ./packages/npm/jns42-generator/bundled/program.js package \
     fixtures/specifications/$F \
     --package-directory .package/package/npm \
     --package-name $(basename $F) \
