@@ -44,7 +44,9 @@ pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   use tokio::io::AsyncReadExt;
 
   if location.starts_with("http://") || location.starts_with("https://") {
-    let mut response = surf::get(location).await?;
+    let mut response = surf::get(location)
+      .middleware(surf::middleware::Redirect::new(5))
+      .await?;
     let data = response.body_string().await?;
     Ok(data)
   } else {
