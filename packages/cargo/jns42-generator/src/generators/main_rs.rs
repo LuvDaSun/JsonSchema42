@@ -1,19 +1,35 @@
 use crate::models::Specification;
+use jns42_core::utils::NodeLocation;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::error::Error;
 
 pub fn generate_file_token_stream(
   specification: &Specification,
+  entry_location: &NodeLocation,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
 
+  let entry_key = specification
+    .arena
+    .iter()
+    .enumerate()
+    .find_map(|(key, item)| (item.location.as_ref()? == entry_location).then_some(key))
+    .unwrap();
+
+  let Some(identifier) = specification.get_type_identifier(&entry_key) else {
+    return Ok(quote! {});
+  };
+
   tokens.append_all(quote! {
+    mod errors;
+    mod interiors;
+    mod types;
+
     use std::io::Read;
     use clap::Parser;
 
-    #[tokio::main]
-    async fn main() -> core::result::Result<(), std::boxed::Box<dyn std::error::Error>> {
+    fn main() -> core::result::Result<(), std::boxed::Box<dyn std::error::Error>> {
       let options: ProgramOptions = ProgramOptions::parse();
 
       match options.command {
@@ -21,7 +37,7 @@ pub fn generate_file_token_stream(
           let mut buffer = String::new();
           std::io::stdin().read_to_string(&mut buffer)?;
 
-          println!("{}", buffer);
+          let _entity: #identifier = serde_json::from_str(&buffer)?;
         },
       }
 

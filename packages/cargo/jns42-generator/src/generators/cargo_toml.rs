@@ -53,21 +53,6 @@ pub fn generate_file_content(
         map
       }),
     );
-    map.insert(
-      "tokio".to_owned(),
-      toml::Value::Table({
-        let mut map = toml::map::Map::new();
-        map.insert(
-          "version".to_owned(),
-          toml::Value::String("1.36.0".to_owned()),
-        );
-        map.insert(
-          "features".to_owned(),
-          toml::Value::Array(vec![toml::Value::String("full".to_owned())]),
-        );
-        map
-      }),
-    );
     map
   });
 
