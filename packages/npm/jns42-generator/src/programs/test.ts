@@ -128,6 +128,8 @@ async function main(configuration: MainConfiguration) {
 
     cp.execFileSync("npm", ["install"], options);
 
+    cp.execFileSync("npm", ["run", "build"], options);
+
     // test("test package", () => {
     //   cp.execFileSync("npm", ["test"], options);
     // });
