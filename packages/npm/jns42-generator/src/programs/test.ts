@@ -128,9 +128,9 @@ async function main(configuration: MainConfiguration) {
 
     cp.execFileSync("npm", ["install"], options);
 
-    test("test package", () => {
-      cp.execFileSync("npm", ["test"], options);
-    });
+    // test("test package", () => {
+    //   cp.execFileSync("npm", ["test"], options);
+    // });
 
     await test("valid", async () => {
       const packageMain = await import(

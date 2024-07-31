@@ -17,10 +17,14 @@ for F in $(ls fixtures/specifications); do
 
   if ! node ./packages/npm/jns42-generator/bundled/program.js package \
     fixtures/specifications/$F \
-    --package-directory .package/package/npm \
-    --package-name $(basename $F) \
+    --package-directory .package/packaged/npm/$F \
+    --package-name $F \
     --package-version "0.0.0" \
   ; then 
+    ERROR=1;
+  fi;
+
+  if ! ( cd .package/packaged/npm/$F ; npm install ; npm test); then
     ERROR=1;
   fi;
 

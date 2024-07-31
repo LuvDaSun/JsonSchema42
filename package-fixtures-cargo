@@ -15,10 +15,14 @@ for F in $(ls fixtures/specifications); do
 
   if ! cargo run --package jns42-generator package \
     fixtures/specifications/$F \
-    --package-directory .package/package/cargo \
-    --package-name $(basename $F) \
+    --package-directory .package/packaged/cargo/$F \
+    --package-name $F \
     --package-version "0.0.0" \
   ; then 
+    ERROR=1;
+  fi;
+
+  if ! ( cd .package/packaged/cargo/$F ; cargo test); then
     ERROR=1;
   fi;
 
