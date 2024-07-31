@@ -6,9 +6,6 @@ cd $(dirname $0)
 
 export NODE_ENV=development
 
-npm run build --workspaces --if-present
-npm install --no-package-lock
-
 set +e
 
 ERROR=0
@@ -16,7 +13,7 @@ ERROR=0
 for F in $(ls fixtures/specifications); do
   echo $F
 
-  if ! cargo run jns42-generator package \
+  if ! cargo run --package jns42-generator package \
     fixtures/specifications/$F \
     --package-directory .package/package/cargo \
     --package-name $(basename $F) \

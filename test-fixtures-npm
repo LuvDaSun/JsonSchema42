@@ -7,7 +7,6 @@ cd $(dirname $0)
 export NODE_ENV=development
 
 npm run build --workspaces --if-present
-npm install --no-package-lock
 
 set +e
 
@@ -16,8 +15,8 @@ ERROR=0
 for F in $(ls fixtures/testing/*); do
   echo $F
 
-  if ! npx jns42-generator test \
-    $F \
+if ! ./packages/npm/jns42-generator/bundled/program.js package \
+      $F \
     --package-directory .package/test/npm \
     --package-name $(basename $F .yaml) \
     --package-version "0.0.0" \
