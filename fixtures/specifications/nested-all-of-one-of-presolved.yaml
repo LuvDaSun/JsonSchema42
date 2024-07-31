@@ -15,4 +15,3 @@ oneOf:
         type: string
       d:
         type: string
-

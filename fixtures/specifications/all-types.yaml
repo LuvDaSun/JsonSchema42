@@ -39,4 +39,3 @@ $defs:
   record-model:
     type: "object"
     additionalProperties: { type: "string" }
-
