@@ -80,12 +80,12 @@ pub struct DocumentContext {
   ///
   documents: RefCell<HashMap<NodeLocation, rc::Rc<dyn SchemaDocument>>>,
 
+  /// this maps retrieval locations to identity locations
+  retrieval_to_identity_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
+
   /// This maps identity locations to retrieval locations. Use this table every time you
   /// need to fetch a node by it's identity location and you have a retrieval location
   ///
-  retrieval_to_identity_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
-
-  /// this maps retrieval locations to identity locations
   identity_to_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
 
   /// locations that were loaded explicitly
@@ -284,7 +284,7 @@ impl DocumentContext {
         .cache
         .borrow()
         .get_node(&retrieval_location)
-        .ok_or(Error::NotFound)?
+        .ok_or_else(|| Error::DocumentNodeNotFound(retrieval_location.clone()))?
         .clone();
 
       let factory = {
@@ -294,11 +294,14 @@ impl DocumentContext {
           .unwrap_or_else(|| retrieval_location.clone());
         let version_node = cache
           .get_node(&version_retrieval_location)
-          .ok_or(Error::NotFound)?;
+          .ok_or_else(|| Error::VersionNodeNotFound(version_retrieval_location.clone()))?;
         let meta_schema_id =
           documents::discover_meta_schema_id(version_node).unwrap_or(default_meta_schema_id);
 
-        self.factories.get(meta_schema_id).ok_or(Error::NotFound)?
+        self
+          .factories
+          .get(meta_schema_id)
+          .ok_or_else(|| Error::FactoryNotFound(meta_schema_id.to_owned()))?
       };
 
       let document = factory(
@@ -352,13 +355,13 @@ impl DocumentContext {
         }
 
         // possibly overwrite value
-        self.retrieval_to_identity_locations.borrow_mut().insert(
+        self.identity_to_retrieval_locations.borrow_mut().insert(
           node_retrieval_location.clone(),
           node_identity_location.clone(),
         );
 
         // possibly overwrite value
-        self.identity_to_retrieval_locations.borrow_mut().insert(
+        self.retrieval_to_identity_locations.borrow_mut().insert(
           node_identity_location.clone(),
           node_retrieval_location.clone(),
         );
@@ -426,7 +429,7 @@ impl DocumentContext {
       .borrow()
       .get(node_retrieval_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or_else(|| Error::RetrievalLocationNotFound(node_retrieval_location.clone()))
   }
 
   pub fn resolve_identity_location(
@@ -434,11 +437,11 @@ impl DocumentContext {
     retrieval_location: &NodeLocation,
   ) -> Result<NodeLocation, Error> {
     self
-      .retrieval_to_identity_locations
+      .identity_to_retrieval_locations
       .borrow()
       .get(retrieval_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or_else(|| Error::RetrievalLocationNotFound(retrieval_location.clone()))
   }
 
   pub fn resolve_retrieval_location(
@@ -446,11 +449,11 @@ impl DocumentContext {
     identity_location: &NodeLocation,
   ) -> Result<NodeLocation, Error> {
     self
-      .identity_to_retrieval_locations
+      .retrieval_to_identity_locations
       .borrow()
       .get(identity_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or_else(|| Error::IdentityLocationNotFound(identity_location.clone()))
   }
 
   pub fn get_document(
@@ -462,7 +465,7 @@ impl DocumentContext {
       .borrow()
       .get(document_retrieval_location)
       .cloned()
-      .ok_or(Error::NotFound)
+      .ok_or_else(|| Error::DocumentNotFound(document_retrieval_location.clone()))
   }
 
   pub fn get_document_and_antecedents(
@@ -499,8 +502,8 @@ impl DocumentContextContainer {
   }
 
   #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), Error> {
-    self.0.register_well_known_factories()
+  pub fn register_well_known_factories(&mut self) -> Result<(), js_sys::Error> {
+    Ok(self.0.register_well_known_factories()?)
   }
 
   #[wasm_bindgen(js_name = "loadFromLocation")]
@@ -510,22 +513,24 @@ impl DocumentContextContainer {
     given_location: String,
     antecedent_location: Option<String>,
     default_meta_schema_id: &str,
-  ) -> Result<(), Error> {
+  ) -> Result<(), js_sys::Error> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
       .map(|location| location.parse())
       .transpose()?;
 
-    self
-      .0
-      .load_from_location(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        default_meta_schema_id,
-      )
-      .await
+    Ok(
+      self
+        .0
+        .load_from_location(
+          retrieval_location,
+          given_location,
+          antecedent_location,
+          default_meta_schema_id,
+        )
+        .await?,
+    )
   }
 
   #[wasm_bindgen(js_name = "loadFromNode")]
@@ -536,7 +541,7 @@ impl DocumentContextContainer {
     antecedent_location: Option<String>,
     node: &JsValue,
     default_meta_schema_id: &str,
-  ) -> Result<(), Error> {
+  ) -> Result<(), js_sys::Error> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
@@ -545,16 +550,18 @@ impl DocumentContextContainer {
 
     let node = JsValue::into_serde(node).unwrap();
 
-    self
-      .0
-      .load_from_node(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        node,
-        default_meta_schema_id,
-      )
-      .await
+    Ok(
+      self
+        .0
+        .load_from_node(
+          retrieval_location,
+          given_location,
+          antecedent_location,
+          node,
+          default_meta_schema_id,
+        )
+        .await?,
+    )
   }
 
   #[wasm_bindgen(js_name = "getExplicitLocations")]
@@ -591,7 +598,7 @@ mod tests {
     let mut document_context = rc::Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
-    let location: NodeLocation = "../../../fixtures/specification/string.json"
+    let location: NodeLocation = "../../../fixtures/specifications/string.json"
       .parse()
       .unwrap();
 

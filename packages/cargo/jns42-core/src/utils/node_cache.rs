@@ -139,7 +139,7 @@ impl NodeCache {
 
     match node {
       serde_json::Value::Array(array_node) => {
-        for index in 0..array_node.len() {
+        for (index, node) in array_node.iter().enumerate() {
           let member = index.to_string();
           result.push(iter::once(member.clone()).collect());
           for pointer in Self::get_child_pointers(node) {
@@ -148,7 +148,7 @@ impl NodeCache {
         }
       }
       serde_json::Value::Object(object_node) => {
-        for key in object_node.keys() {
+        for (key, node) in object_node {
           let member = key.to_owned();
           result.push(iter::once(member.clone()).collect());
           for pointer in Self::get_child_pointers(node) {
@@ -194,7 +194,7 @@ mod tests {
   async fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
-    let location: NodeLocation = "../../../fixtures/specification/nwd.yaml".parse().unwrap();
+    let location: NodeLocation = "../../../fixtures/specifications/nwd.yaml".parse().unwrap();
 
     cache.load_from_location(&location).await.unwrap();
 

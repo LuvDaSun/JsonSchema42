@@ -12,7 +12,7 @@ use regex::Regex;
 use std::collections::HashSet;
 use std::rc::Rc;
 
-pub static NON_IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^a-zA-Z]").unwrap());
+pub static IDENTIFIER_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[a-zA-Z]").unwrap());
 
 pub struct SpecificationConfiguration {
   pub default_type_name: String,
@@ -86,6 +86,8 @@ impl Specification {
         schema_transforms::resolve_all_of::transform(arena, key);
         schema_transforms::resolve_not::transform(arena, key);
         schema_transforms::resolve_if_then_else::transform(arena, key);
+
+        schema_transforms::unalias::transform(arena, key);
       }
     }
 
@@ -123,7 +125,7 @@ impl Specification {
 
       let parts = name
         .iter()
-        .filter(|part| !NON_IDENTIFIER_REGEX.is_match(part))
+        .filter(|part| IDENTIFIER_REGEX.is_match(part))
         .filter(|part| !part.is_empty());
 
       names_builder.add(key, parts);
@@ -136,6 +138,16 @@ impl Specification {
 }
 
 impl Specification {
+  pub fn get_snake_identifier(&self, key: &usize) -> Option<Ident> {
+    let name = self.get_snake_name(key)?;
+    Some(format_ident!("r#{}", name))
+  }
+
+  pub fn get_snake_name(&self, key: &usize) -> Option<String> {
+    let sentence = self.names.get_name(key)?;
+    Some(sentence.to_snake_case())
+  }
+
   pub fn get_identifier(&self, key: &usize) -> Option<Ident> {
     let name = self.get_name(key)?;
     Some(format_ident!("r#{}", name))
@@ -143,11 +155,6 @@ impl Specification {
 
   pub fn get_name(&self, key: &usize) -> Option<String> {
     let sentence = self.names.get_name(key)?;
-
-    if sentence.is_empty() {
-      return Some(format!("T{}", key));
-    }
-
     Some(sentence.to_pascal_case())
   }
 

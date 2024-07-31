@@ -9,7 +9,7 @@ pub fn generate_file_token_stream(
   let mut tokens = quote! {};
 
   tokens.append_all(quote! {
-    #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Ord)]
+    #[derive(core::clone::Clone, core::fmt::Debug, core::cmp::PartialEq, core::cmp::PartialOrd, core::cmp::Eq, core::cmp::Ord)]
     pub struct ValidationError {
         r#type: &'static str,
     }
@@ -24,8 +24,8 @@ pub fn generate_file_token_stream(
   });
 
   tokens.append_all(quote! {
-    impl std::fmt::Display for ValidationError {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    impl core::fmt::Display for ValidationError {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
             write!(f, "validation error for type {}", self.r#type)
         }
     }

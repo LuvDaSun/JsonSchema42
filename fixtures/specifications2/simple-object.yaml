@@ -11,9 +11,9 @@ type: object
 required:
   - id
 properties:
-  id: { $ref: "../specifications/models.json#/$defs/id" }
-  name: { $ref: "../specifications/models.json#/$defs/name" }
-  child: { $ref: "../specifications/models.json#/$defs/child" }
+  id: { $ref: "./models.json#/$defs/id" }
+  name: { $ref: "./models.json#/$defs/name" }
+  child: { $ref: "./models.json#/$defs/child" }
 examples:
   - id: 1
   - id: 2

@@ -12,6 +12,10 @@ pub fn generate_file_token_stream(
     pub mod errors;
     pub mod interiors;
     pub mod types;
+    #[cfg(test)]
+    pub mod examples_test;
+    #[cfg(test)]
+    pub mod mocks_test;
   });
 
   Ok(tokens)
