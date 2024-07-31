@@ -1,13 +1,17 @@
-use crate::utils::{FetchTextError, NodeCacheError, ParseLocationError};
+use crate::utils::{FetchTextError, NodeCacheError, NodeLocation, ParseLocationError};
 use std::fmt::Display;
-use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
-#[wasm_bindgen]
+#[derive(Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum Error {
   Unknown,
   Conflict,
-  NotFound,
+  DocumentNodeNotFound(NodeLocation),
+  VersionNodeNotFound(NodeLocation),
+  FactoryNotFound(String),
+  RetrievalLocationNotFound(NodeLocation),
+  IdentityLocationNotFound(NodeLocation),
+  DocumentNotFound(NodeLocation),
+  ReferenceNotFound(NodeLocation),
   InvalidLocation,
   FetchError,
   SerializationError,
@@ -20,11 +24,27 @@ impl Display for Error {
     match self {
       Self::Unknown => write!(f, "Unknown"),
       Self::Conflict => write!(f, "Conflict"),
-      Self::NotFound => write!(f, "NotFound"),
+      Self::DocumentNodeNotFound(location) => write!(f, "DocumentNodeNotFound: {}", location),
+      Self::VersionNodeNotFound(location) => write!(f, "VersionNodeNotFound: {}", location),
+      Self::FactoryNotFound(location) => write!(f, "FactoryNotFound: {}", location),
+      Self::RetrievalLocationNotFound(location) => {
+        write!(f, "RetrievalLocationNotFound: {}", location)
+      }
+      Self::IdentityLocationNotFound(location) => {
+        write!(f, "IdentityLocationNotFound: {}", location)
+      }
+      Self::DocumentNotFound(location) => write!(f, "DocumentNotFound: {}", location),
+      Self::ReferenceNotFound(location) => write!(f, "ReferenceNotFound: {}", location),
       Self::InvalidLocation => write!(f, "InvalidLocation"),
       Self::FetchError => write!(f, "FetchError"),
       Self::SerializationError => write!(f, "SerializationError"),
     }
+  }
+}
+
+impl From<Error> for js_sys::Error {
+  fn from(value: Error) -> Self {
+    js_sys::Error::new(&value.to_string())
   }
 }
 

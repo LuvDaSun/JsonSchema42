@@ -4,7 +4,7 @@ on:
 jobs:
   formatting:
     runs-on: ubuntu-latest
-    container: node:21.5.0-alpine3.19
+    container: node:22.5.1-alpine3.19
     steps:
       - uses: actions/checkout@v4
       - run: npm ci --workspace-root
@@ -12,7 +12,7 @@ jobs:
 
   spelling:
     runs-on: ubuntu-latest
-    container: node:21.5.0-alpine3.19
+    container: node:22.5.1-alpine3.19
     steps:
       - uses: actions/checkout@v4
       - run: npm ci --workspace-root

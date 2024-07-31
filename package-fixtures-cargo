@@ -6,24 +6,27 @@ cd $(dirname $0)
 
 export NODE_ENV=development
 
-npm run build --workspaces --if-present
-
 set +e
 
 ERROR=0
 
 export DIRECTORY=/tmp/jns42/$RANDOM
 
-for F in $(ls fixtures/testing); do
+for F in $(ls fixtures/specifications); do
   export N=${F%.*};
+  
   echo $N;
 
-  if ! node ./packages/npm/jns42-generator/bundled/program.js test \
-    fixtures/testing/$F \
+  if ! cargo run --package jns42-generator package \
+    fixtures/specifications/$F \
     --package-directory $DIRECTORY/$N \
     --package-name $N \
     --package-version "0.0.0" \
   ; then 
+    ERROR=1;
+  fi;
+
+  if ! ( cd $DIRECTORY/$N ; cargo test); then
     ERROR=1;
   fi;
 

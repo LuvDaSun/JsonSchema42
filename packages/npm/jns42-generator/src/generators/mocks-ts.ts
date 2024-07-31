@@ -19,7 +19,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   yield itt`
-    const depthCounters: Record<string, number> = {};
+    let depthCounter = 0;
 
     export const unknownValue: any = Symbol();
     export const anyValue: any = Symbol();
@@ -39,15 +39,15 @@ export function* generateMocksTsCode(specification: models.Specification) {
       defaultMaximumStringLength?: number;
     }
     const defaultMockGeneratorOptions = {
-      maximumDepth: 1,
+      maximumDepth: 3,
       numberPrecision: 1000,
       stringCharacters: "abcdefghijklmnopqrstuvwxyz",
       defaultMinimumValue: -1000,
       defaultMaximumValue: 1000,
       defaultMinimumItems: 1,
-      defaultMaximumItems: 5,
+      defaultMaximumItems: 3,
       defaultMinimumProperties: 1,
-      defaultMaximumProperties: 5,
+      defaultMaximumProperties: 3,
       defaultMinimumStringLength: 5,
       defaultMaximumStringLength: 20,
     }
@@ -74,15 +74,13 @@ export function* generateMocksTsCode(specification: models.Specification) {
           ...defaultMockGeneratorOptions,
           ...options,
         };
-        depthCounters[${JSON.stringify(itemKey)}] ??= 0;
-
         try {
-          depthCounters[${JSON.stringify(itemKey)}]++;
+          depthCounter ++;
           
           return (${definition});
         }
         finally {
-          depthCounters[${JSON.stringify(itemKey)}]--;
+          depthCounter --;
         }
       }
     `;
@@ -94,8 +92,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
       // https://en.wikipedia.org/wiki/Linear_congruential_generator
       // https://statmath.wu.ac.at/software/src/prng-3.0.2/doc/prng.html/Table_LCG.html
       const p = Math.pow(2, 31) - 1;
-      const a = 950706376;
-      const b = 0;
+      const a = 25214903917;
+      const b = 11;
   
       seed = (a * seed + b) % p;
 
@@ -381,7 +379,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
                     yield itt`
                       [${JSON.stringify(name)}]:
-                        (depthCounters[${JSON.stringify(objectProperties[name])}] ?? 0) < configuration.maximumDepth ?
+                        depthCounter < configuration.maximumDepth ?
                         ${generateMockReference(objectProperties[name])} :
                         undefined,
                     `;
