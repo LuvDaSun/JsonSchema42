@@ -10,23 +10,27 @@ set +e
 
 ERROR=0
 
+export $DIRECTORY=/tmp/jns42/$RANDOM
+
 for F in $(ls fixtures/specifications); do
   echo $F
 
   if ! cargo run --package jns42-generator package \
-    fixtures/specifications/$F \
-    --package-directory .package/packaged/cargo/$F \
-    --package-name $F \
+    $DIRECTORY/$F \
+    --package-directory $DIRECTORY/${F%.*} \
+    --package-name ${F%.*} \
     --package-version "0.0.0" \
   ; then 
     ERROR=1;
   fi;
 
-  if ! ( cd .package/packaged/cargo/$F ; cargo test); then
+  if ! ( cd $DIRECTORY/${F%.*} ; cargo test); then
     ERROR=1;
   fi;
 
 done;
+
+rm -rf $DIRECTORY
 
 exit $ERROR
 

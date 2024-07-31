@@ -25,7 +25,8 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci
 
-      - run: npm --workspaces test --if-present --unsafe-perms
+      - run: npm --workspaces run build --if-present
+      - run: npm --workspaces test --if-present
 
   fixtures:
     runs-on: ubuntu-latest
