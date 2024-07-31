@@ -3,7 +3,7 @@ $schema: "./schema.json"
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/uuid-or-handle.yaml
+  - ../specifications/uuid-or-handle.yaml
 
 valid:
   uuid: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a

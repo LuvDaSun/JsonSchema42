@@ -1,7 +1,7 @@
 rootTypeName: SimpleObject
 
 schemas:
-  - specifications/simple-object.yaml
+  - ../specifications/simple-object.yaml
 
 valid:
   with-child:

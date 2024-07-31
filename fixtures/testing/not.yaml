@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/not.yaml
+  - ../specifications/not.yaml
 
 valid:
   empty: {}

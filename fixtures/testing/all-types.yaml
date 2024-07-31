@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/all-types.yaml
+  - ../specifications/all-types.yaml
 
 valid:
   "null": null

@@ -1,8 +1,8 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/if-then-else-original.yaml
-  - specifications/if-then-else-presolved.yaml
+  - ../specifications/if-then-else-original.yaml
+  - ../specifications/if-then-else-presolved.yaml
 
 valid:
   string:

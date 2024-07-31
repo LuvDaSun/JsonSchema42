@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/nullable.yaml
+  - ../specifications/numbers.yaml
 
 valid:
   numbers:

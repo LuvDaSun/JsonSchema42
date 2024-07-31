@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/positive-integer.yaml
+  - ../specifications/positive-integer.yaml
 
 valid:
   zero: 0

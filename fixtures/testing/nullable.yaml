@@ -1,9 +1,9 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - nullable-draft-04
-  - nullable-draft_2020-12
-  - nullable-oas_v3_0
+  - ../specifications/nullable-draft-04.yaml
+  - ../specifications/nullable-draft_2020-12.yaml
+  - ../specifications/nullable-oas_v3_0.yaml
 
 valid:
   hi: "hi!"

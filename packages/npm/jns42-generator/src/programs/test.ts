@@ -93,19 +93,19 @@ async function main(configuration: MainConfiguration) {
 
   const parseData = testData.parse ?? false;
   const rootTypeName = testData.rootTypeName ?? defaultTypeName;
-  const schemas = testData.schemas as Record<string, unknown>;
-  for (const schemaName in schemas) {
+  const schemas = testData.schemas as Array<string>;
+  for (const schemaFilePath of schemas) {
+    const schemaPath = path.resolve(path.dirname(pathToTest), schemaFilePath);
+    const schemaName = path.basename(schemaFilePath, path.extname(schemaPath));
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
-
-    const schemaNode = schemas[schemaName];
 
     // generate package
     {
       const context = new core.DocumentContextContainer();
       context.registerWellKnownFactories();
 
-      await context.loadFromNode(pathToTest, pathToTest, undefined, schemaNode, defaultMetaSchema);
+      await context.loadFromLocation(schemaPath, schemaPath, undefined, defaultMetaSchema);
 
       const specification = models.loadSpecification(context, {
         transformMaximumIterations,

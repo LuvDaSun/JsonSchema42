@@ -3,7 +3,7 @@ rootTypeName: SchemaDocument
 parse: true
 
 schemas:
-  - specifications/parse.yaml
+  - ../specifications/parse.yaml
 
 valid:
   one: "1"

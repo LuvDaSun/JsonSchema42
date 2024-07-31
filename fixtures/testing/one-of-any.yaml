@@ -3,7 +3,7 @@ $schema: "./schema.json"
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/one-of-any.yaml
+  - ../specifications/one-of-any.yaml
 
 invalid:
   one: 1

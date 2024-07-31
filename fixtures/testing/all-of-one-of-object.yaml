@@ -1,8 +1,8 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/all-of-one-of-object-original.yaml
-  - specifications/all-of-one-of-object-presolved.yaml
+  - ../specifications/all-of-one-of-object-original.yaml
+  - ../specifications/all-of-one-of-object-presolved.yaml
 
 valid:
   abcd:

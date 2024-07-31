@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/nwd.yaml
+  - ../specifications/nwd.yaml
 
 valid:
   basic:

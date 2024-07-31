@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/options.yaml
+  - ../specifications/options.yaml
 
 valid:
   a: a

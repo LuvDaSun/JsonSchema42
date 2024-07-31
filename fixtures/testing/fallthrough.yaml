@@ -1,7 +1,7 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/fallthrough.yaml
+  - ../specifications/fallthrough.yaml
 
 valid:
   strings:

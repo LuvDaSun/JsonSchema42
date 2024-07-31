@@ -1,8 +1,8 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specified/nested-all-of-one-of-original.yaml
-  - specified/nested-all-of-one-of-presolved.yaml
+  - ../specifications/nested-all-of-one-of-original.yaml
+  - ../specifications/nested-all-of-one-of-presolved.yaml
 
 valid:
   "true": true

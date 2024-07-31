@@ -1,8 +1,8 @@
 rootTypeName: SchemaDocument
 
 schemas:
-  - specifications/any-of-object-draft_2020-12.yaml
-  - specifications/any-of-object-draft-04.yaml
+  - ../specifications/any-of-object-draft_2020-12.yaml
+  - ../specifications/any-of-object-draft-04.yaml
 
 valid:
   ab:
