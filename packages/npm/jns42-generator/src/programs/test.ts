@@ -6,7 +6,7 @@ import * as path from "node:path";
 import test from "node:test";
 import YAML from "yaml";
 import * as yargs from "yargs";
-import { generatePackage } from "../generators/index.js";
+import { generatePackage } from "../generators/package.js";
 import * as models from "../models/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
@@ -92,7 +92,6 @@ async function main(configuration: MainConfiguration) {
   const testData = YAML.parse(testContent);
 
   const parseData = testData.parse ?? false;
-  const rootTypeName = testData.rootTypeName ?? defaultTypeName;
   const schemas = testData.schemas as Array<string>;
   for (const schemaFilePath of schemas) {
     const schemaPath = path.resolve(path.dirname(pathToTest), schemaFilePath);
@@ -105,7 +104,12 @@ async function main(configuration: MainConfiguration) {
       const context = new core.DocumentContextContainer();
       context.registerWellKnownFactories();
 
-      await context.loadFromLocation(schemaPath, schemaPath, undefined, defaultMetaSchema);
+      const entryLocation = await context.loadFromLocation(
+        schemaPath,
+        schemaPath,
+        undefined,
+        defaultMetaSchema,
+      );
 
       const specification = models.loadSpecification(context, {
         transformMaximumIterations,
@@ -116,11 +120,11 @@ async function main(configuration: MainConfiguration) {
         packageDirectoryPath,
         packageName,
         packageVersion,
+        entryLocation,
       });
     }
 
     const options = {
-      stdio: "inherit",
       shell: true,
       cwd: packageDirectoryPath,
       env: process.env,
@@ -130,36 +134,42 @@ async function main(configuration: MainConfiguration) {
 
     cp.execFileSync("npm", ["run", "build"], options);
 
-    // test("test package", () => {
-    //   cp.execFileSync("npm", ["test"], options);
-    // });
-
     await test("valid", async () => {
-      const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
-      );
-      for (let data of testData.valid as Array<unknown>) {
+      for (let data of (testData.valid ?? []) as Array<unknown>) {
         await test(async () => {
-          if (parseData) {
-            data = packageMain.parsers[`parse${rootTypeName}`](data);
-          }
-          const valid = packageMain.validators[`is${rootTypeName}`](data);
-          assert.equal(valid, true);
+          cp.execFileSync(
+            "node",
+            [
+              path.join(packageDirectoryPath, "bundled", "program.js"),
+              "assert",
+              parseData ? "--parse" : "",
+            ],
+            {
+              ...options,
+              input: JSON.stringify(data),
+            },
+          );
         });
       }
     });
 
     await test("invalid", async () => {
-      const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
-      );
-      for (let data of testData.invalid as Array<unknown>) {
+      for (let data of (testData.invalid ?? []) as Array<unknown>) {
         await test(async () => {
-          if (parseData) {
-            data = packageMain.parsers[`parse${rootTypeName}`](data);
-          }
-          const valid = packageMain.validators[`is${rootTypeName}`](data);
-          assert.equal(valid, false);
+          assert.throws(() =>
+            cp.execFileSync(
+              "node",
+              [
+                path.join(packageDirectoryPath, "bundled", "program.js"),
+                "assert",
+                parseData ? "--parse" : "",
+              ],
+              {
+                ...options,
+                input: JSON.stringify(data),
+              },
+            ),
+          );
         });
       }
     });

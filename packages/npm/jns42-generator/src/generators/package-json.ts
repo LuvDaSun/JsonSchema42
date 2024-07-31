@@ -1,10 +1,18 @@
 import { PackageJson } from "type-fest";
 import { packageInfo } from "../utils/index.js";
 
-export function generatePackageJsonData(name: string, version: string) {
+export function generatePackageJsonData(packageName: string, packageVersion: string) {
+  const packageNameMatch = /^(?:(@[a-z][a-z0-9\-_\.]*?)\/)?([a-z][a-z0-9\-_\.]*)$/.exec(
+    packageName,
+  );
+
+  if (packageNameMatch == null) {
+    throw new Error("invalid package name");
+  }
+
   const content: PackageJson = {
-    name,
-    version,
+    name: packageName,
+    version: packageVersion,
     sideEffects: false,
     type: "module",
     main: "./bundled/main.cjs",
@@ -18,6 +26,9 @@ export function generatePackageJsonData(name: string, version: string) {
       },
     },
     files: ["./typed/**", "./bundled/**"],
+    bin: {
+      [packageNameMatch[2]]: "bundled/program.js",
+    },
     scripts: {
       prepack: "node ./scripts/build.js",
       pretest: "tsc",
@@ -27,7 +38,7 @@ export function generatePackageJsonData(name: string, version: string) {
     },
     author: "",
     license: "ISC",
-    dependencies: withDependencies(["@types/node"]),
+    dependencies: withDependencies(["@types/node", "@types/yargs", "yargs", "yaml"]),
     devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
     engines: {
       node: ">=18",
