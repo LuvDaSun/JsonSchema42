@@ -12,15 +12,16 @@ set +e
 
 ERROR=0
 
-export $DIRECTORY=/tmp/jns42/$RANDOM
+export DIRECTORY=/tmp/jns42/$RANDOM
 
-for F in $(ls fixtures/testing/*); do
-  echo $F
+for F in $(ls fixtures/testing); do
+  export N=${F%.*};
+  echo $N;
 
   if ! node ./packages/npm/jns42-generator/bundled/program.js test \
     fixtures/testing/$F \
-    --package-directory $DIRECTORY/${F%.*} \
-    --package-name ${F%.*} \
+    --package-directory $DIRECTORY/$N \
+    --package-name $N \
     --package-version "0.0.0" \
   ; then 
     ERROR=1;

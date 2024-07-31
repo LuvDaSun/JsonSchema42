@@ -12,21 +12,23 @@ set +e
 
 ERROR=0
 
-export $DIRECTORY=/tmp/jns42/$RANDOM
+export DIRECTORY=/tmp/jns42/$RANDOM
 
 for F in $(ls fixtures/specifications); do
-  echo $F
+  export N=${F%.*};
+  
+  echo $N;
 
   if ! node ./packages/npm/jns42-generator/bundled/program.js package \
     fixtures/specifications/$F \
-    --package-directory $DIRECTORY/${F%.*} \
-    --package-name ${F%.*} \
+    --package-directory $DIRECTORY/$N \
+    --package-name $N \
     --package-version "0.0.0" \
   ; then 
     ERROR=1;
   fi;
 
-  if ! ( cd $DIRECTORY/${F%.*} ; npm install ; npm test); then
+  if ! ( cd $DIRECTORY/$N ; npm install ; npm test); then
     ERROR=1;
   fi;
 
