@@ -4,14 +4,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: rust:1.77.0
+    container: rust:1.80.0
     steps:
       - uses: actions/checkout@v4
       - run: cargo test --workspace --all-targets
 
   clippy:
     runs-on: ubuntu-latest
-    container: rust:1.77.0
+    container: rust:1.80.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add clippy
@@ -19,8 +19,17 @@ jobs:
 
   rustfmt:
     runs-on: ubuntu-latest
-    container: rust:1.77.0
+    container: rust:1.80.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add rustfmt
       - run: cargo fmt --check
+
+  fixtures:
+    runs-on: ubuntu-latest
+    container: rust:1.80.0
+    steps:
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo install wasm-bindgen-cli
+      - uses: actions/checkout@v4
+      - run: ./package-fixtures-cargo
