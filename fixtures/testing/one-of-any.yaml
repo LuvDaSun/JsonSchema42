@@ -3,12 +3,7 @@ $schema: "./schema.json"
 rootTypeName: SchemaDocument
 
 schemas:
-  schema:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
-    oneOf:
-      - true
-      - true
-      - true
+  - specifications/one-of-any.yaml
 
 invalid:
   one: 1

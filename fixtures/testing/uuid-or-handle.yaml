@@ -3,21 +3,7 @@ $schema: "./schema.json"
 rootTypeName: SchemaDocument
 
 schemas:
-  draft_2020-12:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
-    oneOf:
-      - $ref: "#/$defs/uuid"
-      - $ref: "#/$defs/handle"
-    $defs:
-      uuid:
-        type: string
-        format: uuid
-      handle:
-        type: string
-        minLength: 5
-        pattern: ^[a-z0-9]+$
-        not:
-          format: uuid
+  - specifications/uuid-or-handle.yaml
 
 valid:
   uuid: 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a

@@ -1,21 +1,8 @@
-$schema: "./schema.json"
-
 rootTypeName: SchemaDocument
 
 schemas:
-  draft-04:
-    $schema: "http://json-schema.org/draft-04/schema#"
-    type:
-      - "string"
-      - "boolean"
-    examples:
-      - "hi!"
-      - false
-  draft_2020-12:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
-    type:
-      - "string"
-      - "boolean"
+  - specifications/string-or-boolean-draft-04.yaml
+  - specifications/string-or-boolean-draft_2020-12.yaml
 
 valid:
   hi: "hi!"

@@ -1,0 +1,20 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: A simple object
+description: |
+  This is a very simple object
+
+  You cannot do a lot of complex things with it!
+
+  <b>xx</b>
+$dynamicAnchor: "child"
+type: object
+required:
+  - id
+properties:
+  id: { $ref: "../specifications/models.json#/$defs/id" }
+  name: { $ref: "../specifications/models.json#/$defs/name" }
+  child: { $ref: "../specifications/models.json#/$defs/child" }
+examples:
+  - id: 1
+  - id: 2
+    name: "hi"

@@ -1,60 +1,8 @@
-$schema: "./schema.json"
-
 rootTypeName: SchemaDocument
 
 schemas:
-  original:
-    allOf:
-      - type:
-          - object
-          - boolean
-        required:
-          - a
-          - b
-        properties:
-          a:
-            type: string
-          b:
-            type: string
-      - type:
-          - object
-          - boolean
-        allOf:
-          - type:
-              - object
-              - boolean
-            required:
-              - c
-            properties:
-              c:
-                type: string
-          - type:
-              - object
-              - boolean
-            required:
-              - d
-            properties:
-              d:
-                type: string
-
-  presolved:
-    oneOf:
-      - type: boolean
-      - type: object
-        required:
-          - a
-          - b
-          - c
-          - d
-        properties:
-          a:
-            type: string
-          b:
-            type: string
-          c:
-            type: string
-          d:
-            type: string
+  - specified/nested-all-of-one-of-original.yaml
+  - specified/nested-all-of-one-of-presolved.yaml
 
 valid:
   "true": true
