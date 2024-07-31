@@ -4,19 +4,15 @@ schemas:
   - ../specifications/fallthrough.yaml
 
 valid:
-  strings:
-    x-1: "hi!"
+  - x-1: "hi!"
     x-2: "bye"
-  strings-and-booleans:
-    x-1: "hi!"
+  - x-1: "hi!"
     x-2: "bye"
     b-1: true
     b-2: false
 
 invalid:
-  invalid-strings:
-    s-1: "hi!"
+  - s-1: "hi!"
     s-2: "bye"
-  invalid-booleans:
-    x-1: true
+  - x-1: true
     x-2: false

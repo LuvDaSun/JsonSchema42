@@ -6,9 +6,9 @@ schemas:
   - ../specifications/nullable-oas_v3_0.yaml
 
 valid:
-  hi: "hi!"
-  "null": null
+  - "hi!"
+  - null
 
 invalid:
-  one: 1
-  object: {}
+  - 1
+  - {}

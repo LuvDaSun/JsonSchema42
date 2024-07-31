@@ -5,20 +5,17 @@ schemas:
   - ../specifications/all-of-object-draft-04.yaml
 
 valid:
-  abcd:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"
     d: "d"
-  abcde:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"
     d: "d"
     e: "e"
 
 invalid:
-  abc:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"

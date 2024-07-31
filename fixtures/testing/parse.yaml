@@ -6,27 +6,21 @@ schemas:
   - ../specifications/parse.yaml
 
 valid:
-  one: "1"
-  two:
-    - "2"
-  "true": true
-  "false": false
-  "obj1":
-    boolean: "true"
+  - "1"
+  - - "2"
+  - true
+  - false
+  - boolean: "true"
     number: "1"
     string: 123
-  array1:
-    array: "123"
-  array2:
-    array:
+  - array: "123"
+  - array:
       - "456"
       - "789"
 invalid:
-  a: "a"
-  b:
-    - "b"
-  c: "c"
-  "obj1":
-    boolean: "true"
+  - "a"
+  - - "b"
+  - "c"
+  - boolean: "true"
     number: "o"
     string: 123

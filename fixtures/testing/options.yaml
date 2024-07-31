@@ -4,13 +4,13 @@ schemas:
   - ../specifications/options.yaml
 
 valid:
-  a: a
-  "1": 1
-  "5": 5
-  "true": true
+  - a
+  - 1
+  - 5
+  - true
 
 invalid:
-  z: z
-  "1": "1"
-  "6": 6
-  "false": false
+  - z
+  - "1"
+  - 6
+  - false

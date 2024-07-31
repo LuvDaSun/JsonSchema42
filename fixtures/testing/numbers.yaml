@@ -4,37 +4,27 @@ schemas:
   - ../specifications/numbers.yaml
 
 valid:
-  numbers:
-    negative: -1.1
+  - negative: -1.1
     negativeOrZero: 0
     positive: 1.1
     positiveOrZero: 0
-  integers:
-    negative: -1
+  - negative: -1
     negativeOrZero: 0
     positive: 1
     positiveOrZero: 0
-  one:
-    one: 1
-  twoEven:
-    even: 2
-  fourEven:
-    even: -4
+  - one: 1
+  - even: 2
+  - even: -4
 
 invalid:
-  numbers:
-    negative: 0
+  - negative: 0
     negativeOrZero: 1.1
     positive: 0
     positiveOrZero: -1.1
-  integers:
-    negativeInteger: 0
+  - negativeInteger: 0
     negativeIntegerOrZero: 1
     positiveInteger: 0
     positiveIntegerOrZero: -1
-  two:
-    one: 2
-  threeEven:
-    even: 3
-  fiveEven:
-    even: -5
+  - one: 2
+  - even: 3
+  - even: -5

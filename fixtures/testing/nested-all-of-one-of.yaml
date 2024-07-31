@@ -5,19 +5,16 @@ schemas:
   - ../specifications/nested-all-of-one-of-presolved.yaml
 
 valid:
-  "true": true
-  abcd:
-    a: "a"
+  - true
+  - a: "a"
     b: "b"
     c: "c"
     d: "d"
 
 invalid:
-  "1": 1
-  bcd:
-    b: "b"
+  - 1
+  - b: "b"
     c: "c"
     d: "d"
-  ab:
-    a: "a"
+  - a: "a"
     b: "b"

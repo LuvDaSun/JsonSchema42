@@ -4,21 +4,16 @@ schemas:
   - ../specifications/nwd.yaml
 
 valid:
-  basic:
-    id: 1
+  - id: 1
     name: hi
 
 invalid:
-  no-id:
+  - name: hi
+
+  - id: -1
     name: hi
 
-  negative-id:
-    id: -1
+  - id: 1.1
     name: hi
 
-  fractional-id:
-    id: 1.1
-    name: hi
-
-  no-name:
-    id: 1
+  - id: 1

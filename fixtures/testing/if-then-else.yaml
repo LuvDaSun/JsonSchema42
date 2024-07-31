@@ -5,20 +5,15 @@ schemas:
   - ../specifications/if-then-else-presolved.yaml
 
 valid:
-  string:
-    type: string
+  - type: string
     value: yeah
-  number:
-    type: number
+  - type: number
     value: 1
 
 invalid:
-  invalid-string:
-    type: string
+  - type: string
     value: 100
-  invalid-number:
-    type: number
+  - type: number
     value: not-a-number
-  unknown-type:
-    type: something
+  - type: something
     value: {}

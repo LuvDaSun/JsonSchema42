@@ -4,18 +4,18 @@ schemas:
   - ../specifications/all-types.yaml
 
 valid:
-  "null": null
-  boolean: true
-  # integer: 1
-  number: 0.5
-  string: "hi"
-  tuple: [1, "hi"]
-  array: ["hi"]
-  object: { "a": 1 }
-  record: { "z": "z" }
+  - null
+  - true
+  # - 1
+  - 0.5
+  - "hi"
+  - [1, "hi"]
+  - ["hi"]
+  - { "a": 1 }
+  - { "z": "z" }
 
 invalid:
-  # tuple: [1, 2]
-  array: [1]
-  object: { "b": 1 }
-  record: { "0": 0 }
+  # - [1, 2]
+  - [1]
+  - { "b": 1 }
+  - { "0": 0 }

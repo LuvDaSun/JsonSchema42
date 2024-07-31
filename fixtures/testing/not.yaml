@@ -4,13 +4,10 @@ schemas:
   - ../specifications/not.yaml
 
 valid:
-  empty: {}
-  onlyA:
-    a: "A"
-  onlyB:
-    b: "B"
+  - {}
+  - a: "A"
+  - b: "B"
 
 invalid:
-  bothAAndB:
-    a: "A"
+  - a: "A"
     b: "B"

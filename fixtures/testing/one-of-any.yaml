@@ -6,5 +6,5 @@ schemas:
   - ../specifications/one-of-any.yaml
 
 invalid:
-  one: 1
-  object: {}
+  - 1
+  - {}

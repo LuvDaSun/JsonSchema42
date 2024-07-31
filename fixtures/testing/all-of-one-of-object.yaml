@@ -5,24 +5,20 @@ schemas:
   - ../specifications/all-of-one-of-object-presolved.yaml
 
 valid:
-  abcd:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"
     d: "d"
-  abcde:
-    a: "a"
+  - a: "a"
     b: "b"
     e: "e"
     f: "f"
 
 invalid:
-  abc:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"
-  def:
-    d: "d"
+  - d: "d"
     e: "e"
     f: "f"
-  "true": true
+  - true

@@ -4,8 +4,8 @@ schemas:
   - ../specifications/positive-integer.yaml
 
 valid:
-  zero: 0
-  one: 1
+  - 0
+  - 1
 
 invalid:
-  minus-one: -1
+  - -1

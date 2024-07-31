@@ -5,9 +5,9 @@ schemas:
   - ../specifications/string-or-boolean-draft_2020-12.yaml
 
 valid:
-  hi: "hi!"
-  "false": false
+  - "hi!"
+  - false
 
 invalid:
-  one: 1
-  object: {}
+  - 1
+  - {}

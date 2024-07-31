@@ -138,9 +138,8 @@ async function main(configuration: MainConfiguration) {
       const packageMain = await import(
         "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
       );
-      for (const testName in testData.valid as Record<string, unknown>) {
-        let data = testData.valid[testName];
-        await test(testName, async () => {
+      for (let data of testData.valid as Array<unknown>) {
+        await test(async () => {
           if (parseData) {
             data = packageMain.parsers[`parse${rootTypeName}`](data);
           }
@@ -154,9 +153,8 @@ async function main(configuration: MainConfiguration) {
       const packageMain = await import(
         "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
       );
-      for (const testName in testData.invalid as Record<string, unknown>) {
-        let data = testData.invalid[testName];
-        await test(testName, async () => {
+      for (let data of testData.invalid as Array<unknown>) {
+        await test(async () => {
           if (parseData) {
             data = packageMain.parsers[`parse${rootTypeName}`](data);
           }
