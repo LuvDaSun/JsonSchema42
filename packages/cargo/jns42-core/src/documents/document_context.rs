@@ -284,7 +284,7 @@ impl DocumentContext {
         .cache
         .borrow()
         .get_node(&retrieval_location)
-        .ok_or(Error::DocumentNodeNotFound)?
+        .ok_or_else(|| Error::DocumentNodeNotFound(retrieval_location.clone()))?
         .clone();
 
       let factory = {
@@ -294,14 +294,14 @@ impl DocumentContext {
           .unwrap_or_else(|| retrieval_location.clone());
         let version_node = cache
           .get_node(&version_retrieval_location)
-          .ok_or(Error::VersionNodeNotFound)?;
+          .ok_or_else(|| Error::VersionNodeNotFound(version_retrieval_location.clone()))?;
         let meta_schema_id =
           documents::discover_meta_schema_id(version_node).unwrap_or(default_meta_schema_id);
 
         self
           .factories
           .get(meta_schema_id)
-          .ok_or(Error::FactoryNotFound)?
+          .ok_or_else(|| Error::FactoryNotFound(meta_schema_id.to_owned()))?
       };
 
       let document = factory(
@@ -429,7 +429,7 @@ impl DocumentContext {
       .borrow()
       .get(node_retrieval_location)
       .cloned()
-      .ok_or(Error::RetrievalLocationNotFound)
+      .ok_or_else(|| Error::RetrievalLocationNotFound(node_retrieval_location.clone()))
   }
 
   pub fn resolve_identity_location(
@@ -441,7 +441,7 @@ impl DocumentContext {
       .borrow()
       .get(retrieval_location)
       .cloned()
-      .ok_or(Error::RetrievalLocationNotFound)
+      .ok_or_else(|| Error::RetrievalLocationNotFound(retrieval_location.clone()))
   }
 
   pub fn resolve_retrieval_location(
@@ -453,7 +453,7 @@ impl DocumentContext {
       .borrow()
       .get(identity_location)
       .cloned()
-      .ok_or(Error::IdentityLocationNotFound)
+      .ok_or_else(|| Error::IdentityLocationNotFound(identity_location.clone()))
   }
 
   pub fn get_document(
@@ -465,7 +465,7 @@ impl DocumentContext {
       .borrow()
       .get(document_retrieval_location)
       .cloned()
-      .ok_or(Error::DocumentNotFound)
+      .ok_or_else(|| Error::DocumentNotFound(document_retrieval_location.clone()))
   }
 
   pub fn get_document_and_antecedents(
