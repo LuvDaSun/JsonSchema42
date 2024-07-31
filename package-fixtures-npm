@@ -13,13 +13,13 @@ set +e
 
 ERROR=0
 
-for F in $(ls fixtures/testing/*); do
+for F in $(ls fixtures/specifications); do
   echo $F
 
-  if ! npx jns42-generator test \
-    $F \
-    --package-directory .package/test/npm \
-    --package-name $(basename $F .yaml) \
+  if ! npx jns42-generator package \
+    fixtures/specifications/$F \
+    --package-directory .package/package/npm \
+    --package-name $(basename $F) \
     --package-version "0.0.0" \
   ; then 
     ERROR=1;
