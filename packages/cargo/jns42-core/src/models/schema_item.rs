@@ -2,7 +2,7 @@ use super::SchemaType;
 use crate::utils::NodeLocation;
 use crate::utils::{merge_either, merge_option};
 use gloo::utils::format::JsValueSerdeExt;
-use std::collections::{BTreeSet, HashSet};
+use std::collections::BTreeSet;
 use std::fmt::Debug;
 use std::iter;
 use std::{collections::BTreeMap, iter::empty};
@@ -57,7 +57,7 @@ where
 
   // assertions
   pub options: Option<Vec<serde_json::Value>>,
-  pub required: Option<HashSet<String>>,
+  pub required: Option<BTreeSet<String>>,
 
   pub minimum_inclusive: Option<serde_json::Number>,
   pub minimum_exclusive: Option<serde_json::Number>,
@@ -165,7 +165,7 @@ where
           self.$member.as_ref(),
           other.$member.as_ref(),
           |base, other| {
-            let properties: HashSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
+            let properties: BTreeSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
             properties
               .into_iter()
               .map(|property| {

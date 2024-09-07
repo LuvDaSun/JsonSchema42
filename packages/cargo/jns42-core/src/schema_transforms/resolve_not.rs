@@ -1,5 +1,5 @@
 use crate::models::{ArenaSchemaItem, SchemaArena};
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 
 /**
  * This transformer turns resolves the not field
@@ -43,7 +43,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if let Some(required) = &item.required {
     if let Some(exclude_required) = &sub_item.required {
-      let exclude_required: HashSet<_> = exclude_required.iter().collect();
+      let exclude_required: BTreeSet<_> = exclude_required.iter().collect();
       let required_new = required
         .iter()
         .filter(|value| !exclude_required.contains(value))

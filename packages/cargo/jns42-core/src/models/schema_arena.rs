@@ -5,7 +5,7 @@ use crate::{
   utils::{Arena, NodeLocation},
 };
 use std::{
-  collections::{BTreeMap, HashSet},
+  collections::{BTreeMap, BTreeSet},
   iter,
   rc::Rc,
 };
@@ -88,7 +88,7 @@ impl Arena<ArenaSchemaItem> {
   }
 
   pub fn get_all_related(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
-    let mut result: HashSet<_> = iter::once(key).collect();
+    let mut result: BTreeSet<_> = iter::once(key).collect();
     let mut queue: Vec<_> = iter::once(key).collect();
 
     while let Some(key) = queue.pop() {
