@@ -1,6 +1,6 @@
 {
   "name": "@jns42/core",
-  "version": "0.7.9",
+  "version": "0.7.11",
   "sideEffects": false,
   "description": "core library",
   "type": "commonjs",

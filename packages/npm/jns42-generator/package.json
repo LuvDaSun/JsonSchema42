@@ -1,6 +1,6 @@
 {
   "name": "@jns42/generator",
-  "version": "0.21.11",
+  "version": "0.21.13",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -47,19 +47,19 @@
     "@rollup/plugin-replace": "^5.0.7",
     "@tsconfig/node20": "^20.1.4",
     "c8": "^10.1.2",
-    "rollup": "^4.18.0",
-    "typescript": "^5.5.2"
+    "rollup": "^4.21.2",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@jns42/core": "^0.7.9",
-    "@types/node": "^20.14.9",
-    "@types/yargs": "^17.0.32",
+    "@jns42/core": "^0.7.11",
+    "@types/node": "^20.16.5",
+    "@types/yargs": "^17.0.33",
     "entities": "^4.5.0",
     "hash.js": "^1.1.7",
     "immutable": "^5.0.0-beta.5",
-    "tslib": "^2.6.3",
-    "type-fest": "^4.20.1",
-    "yaml": "^2.4.5",
+    "tslib": "^2.7.0",
+    "type-fest": "^4.26.0",
+    "yaml": "^2.5.1",
     "yargs": "^17.7.2"
   },
   "engines": {
