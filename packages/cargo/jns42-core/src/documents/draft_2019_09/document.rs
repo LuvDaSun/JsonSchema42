@@ -3,7 +3,7 @@ use crate::documents::{DocumentContext, SchemaDocument};
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeLocation;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::{BTreeMap};
 use std::rc::Weak;
 
 pub struct Document {
@@ -14,11 +14,11 @@ pub struct Document {
   /**
   Nodes that belong to this document, indexed by their pointer
   */
-  nodes: HashMap<Vec<String>, Node>,
+  nodes: BTreeMap<Vec<String>, Node>,
   referenced_locations: Vec<NodeLocation>,
 
   // maps anchors to their pointers
-  anchors: HashMap<String, Vec<String>>,
+  anchors: BTreeMap<String, Vec<String>>,
 
   // pointer to the anchor
   recursive_anchor: Option<Vec<String>>,
@@ -44,9 +44,9 @@ impl Document {
       given_location.clone()
     };
 
-    let mut nodes = HashMap::new();
+    let mut nodes = BTreeMap::new();
     let mut referenced_locations = Vec::new();
-    let mut anchors = HashMap::new();
+    let mut anchors = BTreeMap::new();
     let mut recursive_anchor = None;
 
     let mut node_queue = Vec::new();

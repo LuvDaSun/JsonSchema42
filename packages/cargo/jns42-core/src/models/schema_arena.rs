@@ -5,7 +5,7 @@ use crate::{
   utils::{Arena, NodeLocation},
 };
 use std::{
-  collections::{HashMap, HashSet},
+  collections::{BTreeMap, HashSet},
   iter,
   rc::Rc,
 };
@@ -16,13 +16,13 @@ pub type SchemaArena = Arena<ArenaSchemaItem>;
 impl Arena<ArenaSchemaItem> {
   pub fn from_document_context(document_context: &Rc<DocumentContext>) -> Self {
     let schema_nodes = document_context.get_schema_nodes();
-    let mut implicit_types: HashMap<NodeLocation, SchemaType> = HashMap::new();
+    let mut implicit_types: BTreeMap<NodeLocation, SchemaType> = BTreeMap::new();
 
     // first load schemas in the arena
 
     let mut arena = Arena::new();
 
-    let mut key_map: HashMap<NodeLocation, usize> = HashMap::new();
+    let mut key_map: BTreeMap<NodeLocation, usize> = BTreeMap::new();
     for (location, schema) in &schema_nodes {
       let item = ArenaSchemaItem {
         ..Default::default()

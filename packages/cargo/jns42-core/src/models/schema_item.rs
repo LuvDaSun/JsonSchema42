@@ -5,7 +5,7 @@ use gloo::utils::format::JsValueSerdeExt;
 use std::collections::{BTreeSet, HashSet};
 use std::fmt::Debug;
 use std::iter;
-use std::{collections::HashMap, iter::empty};
+use std::{collections::BTreeMap, iter::empty};
 use wasm_bindgen::prelude::*;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
@@ -49,9 +49,9 @@ where
   pub one_of: Option<BTreeSet<K>>,
   pub tuple_items: Option<Vec<K>>,
 
-  pub object_properties: Option<HashMap<String, K>>,
-  pub pattern_properties: Option<HashMap<String, K>>,
-  pub dependent_schemas: Option<HashMap<String, K>>,
+  pub object_properties: Option<BTreeMap<String, K>>,
+  pub pattern_properties: Option<BTreeMap<String, K>>,
+  pub dependent_schemas: Option<BTreeMap<String, K>>,
 
   pub definitions: Option<BTreeSet<K>>,
 
@@ -386,12 +386,12 @@ where
         .as_ref()
         .map(|value| value.iter().map(&map_key).collect::<BTreeSet<K1>>())
     };
-    let map_map = |value: &Option<HashMap<String, K>>| {
+    let map_map = |value: &Option<BTreeMap<String, K>>| {
       value.as_ref().map(|value| {
         value
           .iter()
           .map(|(key, value)| (key.clone(), map_key(value)))
-          .collect::<HashMap<String, K1>>()
+          .collect::<BTreeMap<String, K1>>()
       })
     };
 
