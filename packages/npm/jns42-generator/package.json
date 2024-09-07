@@ -1,6 +1,6 @@
 {
   "name": "@jns42/generator",
-  "version": "0.21.6",
+  "version": "0.21.8",
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
@@ -26,9 +26,7 @@
     "pretest": "tsc",
     "build": "node ./scripts/build.js",
     "clean": "node ./scripts/clean.js",
-    "test": "node --test ./transpiled/**/*.test.js",
-    "preversion": "node ./scripts/preversion.mjs",
-    "postversion": "node ./scripts/postversion.mjs"
+    "test": "node --test ./transpiled/**/*.test.js"
   },
   "repository": {
     "type": "git",
