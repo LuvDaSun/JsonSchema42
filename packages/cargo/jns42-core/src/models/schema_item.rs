@@ -2,10 +2,10 @@ use super::SchemaType;
 use crate::utils::NodeLocation;
 use crate::utils::{merge_either, merge_option};
 use gloo::utils::format::JsValueSerdeExt;
-use std::collections::{BTreeSet, HashSet};
+use std::collections::BTreeSet;
 use std::fmt::Debug;
 use std::iter;
-use std::{collections::HashMap, iter::empty};
+use std::{collections::BTreeMap, iter::empty};
 use wasm_bindgen::prelude::*;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
@@ -49,15 +49,15 @@ where
   pub one_of: Option<BTreeSet<K>>,
   pub tuple_items: Option<Vec<K>>,
 
-  pub object_properties: Option<HashMap<String, K>>,
-  pub pattern_properties: Option<HashMap<String, K>>,
-  pub dependent_schemas: Option<HashMap<String, K>>,
+  pub object_properties: Option<BTreeMap<String, K>>,
+  pub pattern_properties: Option<BTreeMap<String, K>>,
+  pub dependent_schemas: Option<BTreeMap<String, K>>,
 
   pub definitions: Option<BTreeSet<K>>,
 
   // assertions
   pub options: Option<Vec<serde_json::Value>>,
-  pub required: Option<HashSet<String>>,
+  pub required: Option<BTreeSet<String>>,
 
   pub minimum_inclusive: Option<serde_json::Number>,
   pub minimum_exclusive: Option<serde_json::Number>,
@@ -165,7 +165,7 @@ where
           self.$member.as_ref(),
           other.$member.as_ref(),
           |base, other| {
-            let properties: HashSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
+            let properties: BTreeSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
             properties
               .into_iter()
               .map(|property| {
@@ -386,12 +386,12 @@ where
         .as_ref()
         .map(|value| value.iter().map(&map_key).collect::<BTreeSet<K1>>())
     };
-    let map_map = |value: &Option<HashMap<String, K>>| {
+    let map_map = |value: &Option<BTreeMap<String, K>>| {
       value.as_ref().map(|value| {
         value
           .iter()
           .map(|(key, value)| (key.clone(), map_key(value)))
-          .collect::<HashMap<String, K1>>()
+          .collect::<BTreeMap<String, K1>>()
       })
     };
 

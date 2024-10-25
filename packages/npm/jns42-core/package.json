@@ -1,6 +1,6 @@
 {
   "name": "@jns42/core",
-  "version": "0.7.9",
+  "version": "0.7.11",
   "sideEffects": false,
   "description": "core library",
   "type": "commonjs",
@@ -18,10 +18,7 @@
   "scripts": {
     "prepack": "node ./scripts/build.mjs",
     "build": "node ./scripts/build.mjs",
-    "clean": "node ./scripts/clean.mjs",
-    "preversion": "node ./scripts/preversion.mjs",
-    "postversion": "node ./scripts/postversion.mjs",
-    "postpublish": "node ./scripts/postpublish.mjs"
+    "clean": "node ./scripts/clean.mjs"
   },
   "repository": {
     "type": "git",
