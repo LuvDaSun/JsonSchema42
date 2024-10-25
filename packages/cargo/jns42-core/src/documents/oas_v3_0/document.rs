@@ -3,7 +3,7 @@ use crate::documents::SchemaDocument;
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utils::NodeLocation;
-use std::collections::{BTreeMap};
+use std::collections::BTreeMap;
 
 pub struct Document {
   document_location: NodeLocation,
