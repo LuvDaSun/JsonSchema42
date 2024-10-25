@@ -136,9 +136,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
             }
 
             if (item.tupleItems == null && item.arrayItems == null) {
+              // TODO should be unknown, but that does not really fly
               yield itt`
-              ...unknown
-            `;
+                ...unknown[]
+              `;
             }
           }
         }
