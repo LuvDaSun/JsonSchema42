@@ -1,73 +1,24 @@
-$schema: "./schema.json"
-
 rootTypeName: SchemaDocument
 
 schemas:
-  original:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
-    allOf:
-      - type: object
-        required: [a, b]
-        properties:
-          a: { type: string }
-          b: { type: string }
-      - oneOf:
-          - type: object
-            required: [c, d]
-            properties:
-              c: { type: string }
-              d: { type: string }
-          - type: object
-            required: [e, f]
-            properties:
-              e: { type: string }
-              f: { type: string }
-
-  presolved:
-    $schema: "https://json-schema.org/draft/2020-12/schema"
-    oneOf:
-      - allOf:
-          - type: object
-            required: [a, b]
-            properties:
-              a: { type: string }
-              b: { type: string }
-          - type: object
-            required: [c, d]
-            properties:
-              c: { type: string }
-              d: { type: string }
-      - allOf:
-          - type: object
-            required: [a, b]
-            properties:
-              a: { type: string }
-              b: { type: string }
-          - type: object
-            required: [e, f]
-            properties:
-              e: { type: string }
-              f: { type: string }
+  - ../specifications/all-of-one-of-object-original.yaml
+  - ../specifications/all-of-one-of-object-presolved.yaml
 
 valid:
-  abcd:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"
     d: "d"
-  abcde:
-    a: "a"
+  - a: "a"
     b: "b"
     e: "e"
     f: "f"
 
 invalid:
-  abc:
-    a: "a"
+  - a: "a"
     b: "b"
     c: "c"
-  def:
-    d: "d"
+  - d: "d"
     e: "e"
     f: "f"
-  "true": true
+  - true
