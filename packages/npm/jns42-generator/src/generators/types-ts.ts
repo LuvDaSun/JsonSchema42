@@ -91,7 +91,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
         case core.SchemaType.Any:
-          yield "any";
+          yield "unknown";
           return;
 
         case core.SchemaType.Null:
@@ -136,9 +136,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
             }
 
             if (item.tupleItems == null && item.arrayItems == null) {
+              // TODO should be unknown, but that does not really fly
               yield itt`
-              ...any
-            `;
+                ...unknown[]
+              `;
             }
           }
         }
@@ -153,7 +154,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
           function* generateInterfaceContent() {
-            let undefinedProperty = false;
+            let hasUndefinedProperty = false;
+            let hasUnknownProperty = false;
 
             if (item.objectProperties != null || item.required != null) {
               const required = new Set(item.required);
@@ -164,11 +166,15 @@ export function* generateTypesTsCode(specification: models.Specification) {
               ] as string[]);
 
               for (const name of propertyNames) {
-                undefinedProperty ||= !required.has(name);
+                if (!required.has(name)) {
+                  hasUndefinedProperty = true;
+                }
 
                 if (objectProperties[name] == null) {
+                  hasUnknownProperty = true;
+
                   yield itt`
-                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: any,
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: unknown,
                   `;
                 } else {
                   yield itt`
@@ -192,19 +198,23 @@ export function* generateTypesTsCode(specification: models.Specification) {
               }
 
               if (elementKeys.length > 0) {
-                const typeNames = [
+                const typeReferences = [
                   ...elementKeys,
                   ...Object.values((item.objectProperties as Record<string, number>) ?? {}),
                 ].map((elementKey) => generateTypeReference(elementKey));
 
-                if (undefinedProperty) {
-                  typeNames.push("undefined");
+                if (hasUnknownProperty) {
+                  typeReferences.push("unknown");
+                }
+
+                if (hasUndefinedProperty) {
+                  typeReferences.push("undefined");
                 }
 
                 yield itt`
                 [
                   name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
-                ]: ${joinIterable(typeNames, " |\n")}
+                ]: ${joinIterable(typeReferences, " |\n")}
               `;
                 return;
               }
@@ -212,7 +222,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
               yield itt`
               [
                 name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
-              ]: any
+              ]: unknown
             `;
             }
           }
