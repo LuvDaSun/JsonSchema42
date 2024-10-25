@@ -91,7 +91,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
         case core.SchemaType.Any:
-          yield "any";
+          yield "unknown";
           return;
 
         case core.SchemaType.Null:
@@ -137,7 +137,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
             if (item.tupleItems == null && item.arrayItems == null) {
               yield itt`
-              ...any
+              ...unknown
             `;
             }
           }
@@ -168,7 +168,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
                 if (objectProperties[name] == null) {
                   yield itt`
-                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: any,
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: unknown,
                   `;
                 } else {
                   yield itt`
@@ -212,7 +212,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
               yield itt`
               [
                 name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
-              ]: any
+              ]: unknown
             `;
             }
           }
