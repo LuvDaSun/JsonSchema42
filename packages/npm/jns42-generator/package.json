@@ -4,13 +4,13 @@
   "sideEffects": false,
   "description": "generate interfaces and validators from a json schema",
   "type": "module",
-  "main": "./bundled/main.cjs",
   "module": "./bundled/main.js",
+  "main": "./bundled/main.cjs",
   "types": "./typed/main.d.ts",
   "exports": {
     ".": {
-      "require": "./bundled/main.cjs",
       "import": "./bundled/main.js",
+      "require": "./bundled/main.cjs",
       "types": "./typed/main.d.ts"
     }
   },
