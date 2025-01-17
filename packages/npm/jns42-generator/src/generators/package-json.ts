@@ -7,13 +7,13 @@ export function generatePackageJsonData(name: string, version: string) {
     version,
     sideEffects: false,
     type: "module",
-    main: "./bundled/main.cjs",
     module: "./bundled/main.js",
+    main: "./bundled/main.cjs",
     types: "./typed/main.d.ts",
     exports: {
       ".": {
-        require: "./bundled/main.cjs",
         import: "./bundled/main.js",
+        require: "./bundled/main.cjs",
         types: "./typed/main.d.ts",
       },
     },
