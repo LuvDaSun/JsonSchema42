@@ -68,6 +68,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
       package_name: package_name.as_str(),
       package_version: package_version.as_str(),
       package_directory: &package_directory,
+      entry_location: &schema_location,
     },
     &specification,
   )

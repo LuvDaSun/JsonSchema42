@@ -1,0 +1,23 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: "object"
+required:
+  - type
+properties:
+  type:
+    type: string
+  value: true
+oneOf:
+  - $ref: "#/$defs/type-is-string"
+    properties:
+      value:
+        type: string
+  - not:
+      $ref: "#/$defs/type-is-string"
+    properties:
+      value:
+        type: number
+$defs:
+  type-is-string:
+    properties:
+      type:
+        const: string

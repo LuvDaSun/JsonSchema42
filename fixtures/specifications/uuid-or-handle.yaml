@@ -1,0 +1,14 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+oneOf:
+  - $ref: "#/$defs/uuid"
+  - $ref: "#/$defs/handle"
+$defs:
+  uuid:
+    type: string
+    format: uuid
+  handle:
+    type: string
+    minLength: 5
+    pattern: ^[a-z0-9]+$
+    not:
+      format: uuid

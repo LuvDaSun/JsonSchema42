@@ -41,6 +41,18 @@ pub fn generate_file_content(
         map
       }),
     );
+    map.insert(
+      "clap".to_owned(),
+      toml::Value::Table({
+        let mut map = toml::map::Map::new();
+        map.insert("version".to_owned(), toml::Value::String("4.1".to_owned()));
+        map.insert(
+          "features".to_owned(),
+          toml::Value::Array(vec![toml::Value::String("derive".to_owned())]),
+        );
+        map
+      }),
+    );
     map
   });
 
@@ -52,6 +64,19 @@ pub fn generate_file_content(
     );
     map
   });
+
+  let bin_table = toml::Value::Array(vec![toml::Value::Table({
+    let mut map = toml::map::Map::new();
+    map.insert(
+      "name".to_owned(),
+      toml::Value::String(package_name.to_owned()),
+    );
+    map.insert(
+      "path".to_owned(),
+      toml::Value::String("src/main.rs".to_owned()),
+    );
+    map
+  })]);
 
   let features_table = toml::Value::Table({
     let mut map = toml::map::Map::new();
@@ -65,6 +90,7 @@ pub fn generate_file_content(
     map.insert("package".to_owned(), package_table);
     map.insert("dependencies".to_owned(), dependencies_table);
     map.insert("lib".to_owned(), lib_table);
+    map.insert("bin".to_owned(), bin_table);
     map.insert("features".to_string(), features_table);
     map
   });

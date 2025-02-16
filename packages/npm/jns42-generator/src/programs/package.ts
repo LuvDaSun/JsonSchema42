@@ -78,7 +78,7 @@ async function main(configuration: MainConfiguration) {
   const context = new core.DocumentContextContainer();
   context.registerWellKnownFactories();
 
-  await context.loadFromLocation(
+  const entryLocation = await context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
     undefined,
@@ -94,5 +94,6 @@ async function main(configuration: MainConfiguration) {
     packageDirectoryPath,
     packageName,
     packageVersion,
+    entryLocation,
   });
 }

@@ -6,7 +6,7 @@ import * as path from "node:path";
 import test from "node:test";
 import YAML from "yaml";
 import * as yargs from "yargs";
-import { generatePackage } from "../generators/index.js";
+import { generatePackage } from "../generators/package.js";
 import * as models from "../models/index.js";
 
 export function configureTestProgram(argv: yargs.Argv) {
@@ -92,20 +92,24 @@ async function main(configuration: MainConfiguration) {
   const testData = YAML.parse(testContent);
 
   const parseData = testData.parse ?? false;
-  const rootTypeName = testData.rootTypeName ?? defaultTypeName;
-  const schemas = testData.schemas as Record<string, unknown>;
-  for (const schemaName in schemas) {
+  const schemas = testData.schemas as Array<string>;
+  for (const schemaFilePath of schemas) {
+    const schemaPath = path.resolve(path.dirname(pathToTest), schemaFilePath);
+    const schemaName = path.basename(schemaFilePath, path.extname(schemaPath));
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
-
-    const schemaNode = schemas[schemaName];
 
     // generate package
     {
       const context = new core.DocumentContextContainer();
       context.registerWellKnownFactories();
 
-      await context.loadFromNode(pathToTest, pathToTest, undefined, schemaNode, defaultMetaSchema);
+      const entryLocation = await context.loadFromLocation(
+        schemaPath,
+        schemaPath,
+        undefined,
+        defaultMetaSchema,
+      );
 
       const specification = models.loadSpecification(context, {
         transformMaximumIterations,
@@ -116,11 +120,11 @@ async function main(configuration: MainConfiguration) {
         packageDirectoryPath,
         packageName,
         packageVersion,
+        entryLocation,
       });
     }
 
     const options = {
-      stdio: "inherit",
       shell: true,
       cwd: packageDirectoryPath,
       env: process.env,
@@ -130,38 +134,42 @@ async function main(configuration: MainConfiguration) {
 
     cp.execFileSync("npm", ["run", "build"], options);
 
-    // test("test package", () => {
-    //   cp.execFileSync("npm", ["test"], options);
-    // });
-
     await test("valid", async () => {
-      const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
-      );
-      for (const testName in testData.valid as Record<string, unknown>) {
-        let data = testData.valid[testName];
-        await test(testName, async () => {
-          if (parseData) {
-            data = packageMain.parsers[`parse${rootTypeName}`](data);
-          }
-          const valid = packageMain.validators[`is${rootTypeName}`](data);
-          assert.equal(valid, true);
+      for (let data of (testData.valid ?? []) as Array<unknown>) {
+        await test(async () => {
+          cp.execFileSync(
+            "node",
+            [
+              path.join(packageDirectoryPath, "bundled", "program.js"),
+              "assert",
+              parseData ? "--parse" : "",
+            ],
+            {
+              ...options,
+              input: JSON.stringify(data),
+            },
+          );
         });
       }
     });
 
     await test("invalid", async () => {
-      const packageMain = await import(
-        "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
-      );
-      for (const testName in testData.invalid as Record<string, unknown>) {
-        let data = testData.invalid[testName];
-        await test(testName, async () => {
-          if (parseData) {
-            data = packageMain.parsers[`parse${rootTypeName}`](data);
-          }
-          const valid = packageMain.validators[`is${rootTypeName}`](data);
-          assert.equal(valid, false);
+      for (let data of (testData.invalid ?? []) as Array<unknown>) {
+        await test(async () => {
+          assert.throws(() =>
+            cp.execFileSync(
+              "node",
+              [
+                path.join(packageDirectoryPath, "bundled", "program.js"),
+                "assert",
+                parseData ? "--parse" : "",
+              ],
+              {
+                ...options,
+                input: JSON.stringify(data),
+              },
+            ),
+          );
         });
       }
     });
