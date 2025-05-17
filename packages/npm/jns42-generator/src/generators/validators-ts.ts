@@ -21,61 +21,50 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   yield itt`
     export interface ValidationError {
-      path: string;
+      path: string[];
+      typeName: string;
       rule: string;
-      typeName?: string;
     }
 
-    const pathPartStack = new Array<string>();
+    const pathStack = new Array<string>();
     const typeNameStack = new Array<string>();
     let errors = new Array<ValidationError>();
-    let depth = 0;
 
     export function getValidationErrors() {
       return errors;
     }
 
-    export function getLastValidationError() {
-      if(errors.length === 0) {
-        throw new TypeError("no validation errors");
-      }
-      return errors[errors.length - 1];
-    }
-
-    function withPath<T>(pathPart: string, job: () => T): T {
-      pathPartStack.push(pathPart);
-      try {
-        return job();
-      }
-      finally {
-        pathPartStack.pop();
-      }
-    }
-
-    function withType<T>(typeName: string, job: () => T): T {
-      if(typeNameStack.length === 0) {
+    function withType<T>(typeName: string, job: () => T) {
+      if (typeNameStack.length === 0) {
         resetErrors();
       }
-  
       typeNameStack.push(typeName);
       try {
         return job();
-      }
-      finally {
+      } finally {
         typeNameStack.pop();
+      }
+    }
+
+    function withPath<T>(path: string, job: () => T): T {
+      pathStack.push(path);
+      try {
+        return job();
+      } finally {
+        pathStack.pop();
       }
     }
 
     function resetErrors() {
       errors = [];
     }
-
     function recordError(rule: string) {
+      const typeName = typeNameStack[typeNameStack.length - 1]!;
       errors.push({
-        path: pathPartStack.join("/"),
-        typeName: typeNameStack[typeNameStack.length - 1],
+        path: [...pathStack],
+        typeName,
         rule,
-      })
+      });
     }
   `;
 
@@ -91,21 +80,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function is${name.toPascalCase()}(value: unknown): value is types.${name.toPascalCase()} {
-        if(depth === 0) {
-          resetErrors();
-        }
-  
-        depth += 1;
-        try{
-          return withType(${JSON.stringify(name.toPascalCase())}, () => {
-            ${statements};
-          });
-        }
-        finally {
-          depth -= 1;
-        }
-      }
+      export const is${name.toPascalCase()} = (value: unknown): value is types.${name.toPascalCase()} => withType(${JSON.stringify(name.toPascalCase())}, () => {
+        ${statements};
+      });
     `;
   }
 
