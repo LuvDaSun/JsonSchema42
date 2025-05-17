@@ -34,7 +34,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       ${generateJsDocComments(item)}
       export const is${name.toPascalCase()} =
         (value: unknown): value is types.${name.toPascalCase()} => lib.validation.withValidationType(
-          (${JSON.stringify(name.toPascalCase())},
+          ${JSON.stringify(name.toPascalCase())},
           () => {
             ${statements};
           },
@@ -452,14 +452,14 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
          */
         for (const propertyName of item.required ?? []) {
           yield itt`
-            if(!lib.withValidationPath(
+            if(!lib.validation.withValidationPath(
               ${JSON.stringify(propertyName)},
               () => {
                 if(
                   !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
                   ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
                 ) {
-                  lib.recordValidationError("required");
+                  lib.validation.recordValidationError("required");
                   return false;
                 }
                 return true;
@@ -485,7 +485,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.minimumProperties != null) {
           yield itt`
             if(propertyCount < ${JSON.stringify(item.minimumProperties)}) {
-              lib.recordValidationError("minimumProperties");
+              lib.validation.recordValidationError("minimumProperties");
               return false;
               }
           `;
@@ -509,7 +509,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.maximumProperties != null) {
           yield itt`
             if(propertyCount > ${JSON.stringify(item.maximumProperties)}) {
-              lib.recordValidationError("maximumProperties");
+              lib.validation.recordValidationError("maximumProperties");
               return false;
             }
           `;
@@ -527,7 +527,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           for (const propertyName in item.objectProperties) {
             yield itt`
               case ${JSON.stringify(propertyName)}:
-                if(!lib.withValidationPath(
+                if(!lib.validation.withValidationPath(
                   propertyName,
                   () => ${generateValidatorReference(
                     item.objectProperties[propertyName],
@@ -553,7 +553,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           for (const propertyPattern in item.patternProperties) {
             yield itt`
               if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
-                if(!lib.withValidationPath(
+                if(!lib.validation.withValidationPath(
                   propertyName,
                   () => ${generateValidatorReference(
                     item.patternProperties[propertyPattern],
@@ -570,7 +570,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
         if (item.mapProperties != null) {
           yield itt`
-            if(!lib.withValidationPath(
+            if(!lib.validation.withValidationPath(
               propertyName,
               () => ${generateValidatorReference(item.mapProperties, `propertyValue`)},
             )) {
@@ -597,7 +597,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           ${generateInnerStatements()}
 
           if(counter < ${JSON.stringify(item.allOf.length)}) {
-            lib.recordValidationError("allOf");
+            lib.validation.recordValidationError("allOf");
             return false;
           }
         }
@@ -624,16 +624,16 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         {
           let counter = 0;
-          const errorsPre = errors;
+          lib.validation.saveValidationErrors();
 
           ${generateInnerStatements()}
 
           if(counter < 1) {
-            lib.recordValidationError("anyOf");
+            lib.validation.recordValidationError("anyOf");
             return false;
           }
 
-          errors = errorsPre;
+          lib.validation.restoreValidationErrors();
         }
       `;
 
@@ -655,16 +655,16 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         {
           let counter = 0;
-          const errorsPre = errors;
+          lib.validation.saveValidationErrors();
 
           ${generateInnerStatements()}
 
           if(counter !== 1) {
-            lib.recordValidationError("oneOf");
+            lib.validation.recordValidationError("oneOf");
             return false;
           }
           
-          errors = errorsPre;
+          lib.validation.restoreValidationErrors();
         }
       `;
 
@@ -696,7 +696,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.thenSchema != null) {
           yield itt`
             if(!${generateValidatorReference(item.thenSchema, valueExpression)}) {
-              lib.recordValidationError("then");
+              lib.validation.recordValidationError("then");
               return false;
             }
           `;
@@ -707,7 +707,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.elseSchema != null) {
           yield itt`
             if(!${generateValidatorReference(item.elseSchema, valueExpression)}) {
-              lib.recordValidationError("else");
+              lib.validation.recordValidationError("else");
               return false;
             }
           `;
@@ -718,7 +718,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     if (item.not != null) {
       yield itt`
         if(${generateValidatorReference(item.not, valueExpression)}) {
-          lib.recordValidationError("not");
+          lib.validation.recordValidationError("not");
           return false;
         }
       `;
