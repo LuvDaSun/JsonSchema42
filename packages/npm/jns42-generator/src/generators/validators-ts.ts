@@ -17,55 +17,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
   yield itt`
     import * as types from "./types.js";
-  `;
-
-  yield itt`
-    export interface ValidationError {
-      path: string[];
-      typeName: string;
-      rule: string;
-    }
-
-    const pathStack = new Array<string>();
-    const typeNameStack = new Array<string>();
-    let errors = new Array<ValidationError>();
-
-    export function getValidationErrors() {
-      return errors;
-    }
-
-    function withType<T>(typeName: string, job: () => T) {
-      if (typeNameStack.length === 0) {
-        resetErrors();
-      }
-      typeNameStack.push(typeName);
-      try {
-        return job();
-      } finally {
-        typeNameStack.pop();
-      }
-    }
-
-    function withPath<T>(path: string, job: () => T): T {
-      pathStack.push(path);
-      try {
-        return job();
-      } finally {
-        pathStack.pop();
-      }
-    }
-
-    function resetErrors() {
-      errors = [];
-    }
-    function recordError(rule: string) {
-      const typeName = typeNameStack[typeNameStack.length - 1]!;
-      errors.push({
-        path: [...pathStack],
-        typeName,
-        rule,
-      });
-    }
+    import * as lib from "@jns42/lib";
   `;
 
   for (let itemKey = 0; itemKey < validatorsArena.count(); itemKey++) {
@@ -80,9 +32,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export const is${name.toPascalCase()} = (value: unknown): value is types.${name.toPascalCase()} => withType(${JSON.stringify(name.toPascalCase())}, () => {
-        ${statements};
-      });
+      export const is${name.toPascalCase()} =
+        (value: unknown): value is types.${name.toPascalCase()} => lib.validation.withValidationType(
+          (${JSON.stringify(name.toPascalCase())},
+          () => {
+            ${statements};
+          },
+        );
     `;
   }
 
@@ -126,7 +82,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             " &&\n",
           )}
         ) {
-          recordError("options");
+          lib.validation.recordValidationError("options");
           return false;
         }
       `;
@@ -138,7 +94,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         mapIterable(generateSubAssertions(), (assertion) => itt`(${assertion})`),
         " ||\n",
       )})) {
-        recordError("types");
+        lib.validation.recordValidationError("types");
         return false;
       }
     `;
@@ -227,7 +183,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} < ${JSON.stringify(item.minimumInclusive)}
             ) {
-              recordError("minimumInclusive");
+              lib.validation.recordValidationError("minimumInclusive");
               return false;
             }
           `;
@@ -238,7 +194,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} <= ${JSON.stringify(item.minimumExclusive)}
             ) {
-              recordError("minimumExclusive");
+              lib.validation.recordValidationError("minimumExclusive");
               return false;
             }
           `;
@@ -249,7 +205,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} > ${JSON.stringify(item.maximumInclusive)}
             ) {
-              recordError("maximumInclusive");
+              lib.validation.recordValidationError("maximumInclusive");
               return false;
             }
           `;
@@ -260,7 +216,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} >= ${JSON.stringify(item.maximumExclusive)}
             ) {
-              recordError("maximumExclusive");
+              lib.validation.recordValidationError("maximumExclusive");
               return false;
             }
           `;
@@ -271,7 +227,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} % ${JSON.stringify(item.multipleOf)} !== 0
             ) {
-              recordError("multipleOf");
+              lib.validation.recordValidationError("multipleOf");
               return false;
             }
           `;
@@ -299,7 +255,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression}.length < ${JSON.stringify(item.minimumLength)}
             ) {
-              recordError("minimumLength");
+              lib.validation.recordValidationError("minimumLength");
               return false;
             }
           `;
@@ -310,7 +266,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               value.length > ${JSON.stringify(item.maximumLength)}
             ) {
-              recordError("maximumLength");
+              lib.validation.recordValidationError("maximumLength");
               return false;
             }
           `;
@@ -321,7 +277,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               !new RegExp(${JSON.stringify(item.valuePattern)}).test(${valueExpression})
             ) {
-              recordError("valuePattern");
+              lib.validation.recordValidationError("valuePattern");
               return false;
             }
           `;
@@ -336,7 +292,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               !${isValueFormatExpression}
             ) {
-              recordError("valueFormat");
+              lib.validation.recordValidationError("valueFormat");
               return false;
             }
           `;
@@ -367,7 +323,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression}.length < ${JSON.stringify(item.tupleItems.length)}
             ) {
-              recordError("tupleItems");
+              lib.validation.recordValidationError("tupleItems");
               return false;
             }
           `;
@@ -376,7 +332,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.minimumItems != null) {
           yield itt`
             if(${valueExpression}.length < ${JSON.stringify(item.minimumItems)}) {
-              recordError("minimumItems");
+              lib.validation.recordValidationError("minimumItems");
               return false;
             }
           `;
@@ -385,7 +341,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.maximumItems != null) {
           yield itt`
             if(${valueExpression}.length > ${JSON.stringify(item.maximumItems)}) {
-              recordError("maximumItems");
+              lib.validation.recordValidationError("maximumItems");
               return false;
             }
           `;
@@ -412,7 +368,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.uniqueItems ?? false) {
           yield itt`
             if(elementValueSeen.has(elementValue)) {
-              recordError("uniqueItems");
+              lib.validation.recordValidationError("uniqueItems");
               return false;
             }
           `;
@@ -437,7 +393,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             const elementKey = item.tupleItems[elementIndex];
             yield itt`
               case ${JSON.stringify(elementIndex)}:
-                if(!withPath(
+                if(!lib.validation.withValidationPath(
                   String(elementIndex),
                   () => ${generateValidatorReference(elementKey, `elementValue`)},
                 )) {
@@ -458,7 +414,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       function* generateDefaultCaseStatements() {
         if (item.arrayItems != null) {
           yield itt`
-            if(!withPath(
+            if(!lib.validation.withValidationPath(
               String(elementIndex),
               () =>  ${generateValidatorReference(item.arrayItems, `elementValue`)},
             )) {
@@ -496,14 +452,14 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
          */
         for (const propertyName of item.required ?? []) {
           yield itt`
-            if(!withPath(
+            if(!lib.withValidationPath(
               ${JSON.stringify(propertyName)},
               () => {
                 if(
                   !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
                   ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
                 ) {
-                  recordError("required");
+                  lib.recordValidationError("required");
                   return false;
                 }
                 return true;
@@ -529,7 +485,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.minimumProperties != null) {
           yield itt`
             if(propertyCount < ${JSON.stringify(item.minimumProperties)}) {
-              recordError("minimumProperties");
+              lib.recordValidationError("minimumProperties");
               return false;
               }
           `;
@@ -553,7 +509,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.maximumProperties != null) {
           yield itt`
             if(propertyCount > ${JSON.stringify(item.maximumProperties)}) {
-              recordError("maximumProperties");
+              lib.recordValidationError("maximumProperties");
               return false;
             }
           `;
@@ -571,7 +527,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           for (const propertyName in item.objectProperties) {
             yield itt`
               case ${JSON.stringify(propertyName)}:
-                if(!withPath(
+                if(!lib.withValidationPath(
                   propertyName,
                   () => ${generateValidatorReference(
                     item.objectProperties[propertyName],
@@ -597,7 +553,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           for (const propertyPattern in item.patternProperties) {
             yield itt`
               if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
-                if(!withPath(
+                if(!lib.withValidationPath(
                   propertyName,
                   () => ${generateValidatorReference(
                     item.patternProperties[propertyPattern],
@@ -614,7 +570,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
         if (item.mapProperties != null) {
           yield itt`
-            if(!withPath(
+            if(!lib.withValidationPath(
               propertyName,
               () => ${generateValidatorReference(item.mapProperties, `propertyValue`)},
             )) {
@@ -641,7 +597,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           ${generateInnerStatements()}
 
           if(counter < ${JSON.stringify(item.allOf.length)}) {
-            recordError("allOf");
+            lib.recordValidationError("allOf");
             return false;
           }
         }
@@ -673,7 +629,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           ${generateInnerStatements()}
 
           if(counter < 1) {
-            recordError("anyOf");
+            lib.recordValidationError("anyOf");
             return false;
           }
 
@@ -704,7 +660,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           ${generateInnerStatements()}
 
           if(counter !== 1) {
-            recordError("oneOf");
+            lib.recordValidationError("oneOf");
             return false;
           }
           
@@ -740,7 +696,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.thenSchema != null) {
           yield itt`
             if(!${generateValidatorReference(item.thenSchema, valueExpression)}) {
-              recordError("then");
+              lib.recordValidationError("then");
               return false;
             }
           `;
@@ -751,7 +707,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.elseSchema != null) {
           yield itt`
             if(!${generateValidatorReference(item.elseSchema, valueExpression)}) {
-              recordError("else");
+              lib.recordValidationError("else");
               return false;
             }
           `;
@@ -762,7 +718,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     if (item.not != null) {
       yield itt`
         if(${generateValidatorReference(item.not, valueExpression)}) {
-          recordError("not");
+          lib.recordValidationError("not");
           return false;
         }
       `;
