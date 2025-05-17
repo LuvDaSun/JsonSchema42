@@ -437,13 +437,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             const elementKey = item.tupleItems[elementIndex];
             yield itt`
               case ${JSON.stringify(elementIndex)}:
-                if(!withPath(String(elementIndex), () => {
-                  if(!${generateValidatorReference(elementKey, `elementValue`)}) {
-                    recordError("elementValue");
-                    return false;
-                  }
-                  return true;
-                })) {
+                if(!withPath(
+                  String(elementIndex),
+                  () => ${generateValidatorReference(elementKey, `elementValue`)},
+                )) {
                   return false;
                 }
                 break;
@@ -461,13 +458,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       function* generateDefaultCaseStatements() {
         if (item.arrayItems != null) {
           yield itt`
-            if(!withPath(String(elementIndex), () => {
-              if(!${generateValidatorReference(item.arrayItems, `elementValue`)}) {
-                recordError("elementValue");
-                return false;
-              }
-              return true;
-            })) {
+            if(!withPath(
+              String(elementIndex),
+              () =>  ${generateValidatorReference(item.arrayItems, `elementValue`)},
+            )) {
               return false;
             }
             break;
@@ -502,11 +496,19 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
          */
         for (const propertyName of item.required ?? []) {
           yield itt`
-            if(
-              !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
-              ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
-            ) {
-              recordError("required");
+            if(!withPath(
+              ${JSON.stringify(propertyName)},
+              () => {
+                if(
+                  !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
+                  ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
+                ) {
+                  recordError("required");
+                  return false;
+                }
+                return true;
+              }
+            )) {
               return false;
             }
           `;
@@ -569,16 +571,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           for (const propertyName in item.objectProperties) {
             yield itt`
               case ${JSON.stringify(propertyName)}:
-                if(!withPath(propertyName, () => {
-                  if(!${generateValidatorReference(
+                if(!withPath(
+                  propertyName,
+                  () => ${generateValidatorReference(
                     item.objectProperties[propertyName],
                     `propertyValue`,
-                  )}) {
-                    recordError("objectProperties");
-                    return false;
-                  }
-                  return true;
-                })) {
+                  )},
+                )) {
                   return false
                 }
                 break;
@@ -598,17 +597,13 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           for (const propertyPattern in item.patternProperties) {
             yield itt`
               if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
-                if(!withPath(propertyName, () => {
-                  if(
-                    !${generateValidatorReference(
-                      item.patternProperties[propertyPattern],
-                      `propertyValue`,
-                    )}
-                  ) {
-                    return false;
-                  }  
-                  return true;
-                })) {
+                if(!withPath(
+                  propertyName,
+                  () => ${generateValidatorReference(
+                    item.patternProperties[propertyPattern],
+                    `propertyValue`,
+                  )},
+                )) {
                   return false
                 }
                 continue;
@@ -619,14 +614,10 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
         if (item.mapProperties != null) {
           yield itt`
-            if(!withPath(propertyName, () => {
-              if(
-                !${generateValidatorReference(item.mapProperties, `propertyValue`)}
-              ) {
-                return false;
-              }  
-              return true;
-            })) {
+            if(!withPath(
+              propertyName,
+              () => ${generateValidatorReference(item.mapProperties, `propertyValue`)},
+            )) {
               return false
             }
           `;
@@ -637,7 +628,6 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     if (item.reference != null) {
       yield itt`
         if(!${generateValidatorReference(item.reference, valueExpression)}) {
-          recordError("reference");
           return false;
         }
       `;
@@ -678,6 +668,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         {
           let counter = 0;
+          const errorsPre = errors;
 
           ${generateInnerStatements()}
 
@@ -685,6 +676,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             recordError("anyOf");
             return false;
           }
+
+          errors = errorsPre;
         }
       `;
 
@@ -706,6 +699,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         {
           let counter = 0;
+          const errorsPre = errors;
 
           ${generateInnerStatements()}
 
@@ -713,6 +707,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             recordError("oneOf");
             return false;
           }
+          
+          errors = errorsPre;
         }
       `;
 
