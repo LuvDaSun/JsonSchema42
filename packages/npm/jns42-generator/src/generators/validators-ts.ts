@@ -542,7 +542,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         }
 
         yield itt`
-          for(const propertyName in ${valueExpression}) {
+          for(const [propertyName, propertyValue] of Object.entries(${valueExpression})) {
             ${generateLoopContent()}
           }
         `;
@@ -559,7 +559,6 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
       function* generateLoopContent() {
         yield itt`
-          const propertyValue = value[propertyName as keyof typeof value];
           if(propertyValue === undefined) {
             continue;
           }
