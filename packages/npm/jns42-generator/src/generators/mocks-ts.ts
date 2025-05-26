@@ -77,7 +77,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
         try {
           depthCounter ++;
           
-          return (${definition});
+          return (${definition}) as types.${name.toPascalCase()};
         }
         finally {
           depthCounter --;
