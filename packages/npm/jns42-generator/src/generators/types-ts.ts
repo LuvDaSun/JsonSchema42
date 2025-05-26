@@ -13,6 +13,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   const { names, typesArena } = specification;
 
+  yield itt`
+    declare const typeIndex: unique symbol;
+  `;
+
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
     const item = typesArena.getItem(itemKey);
 
@@ -25,8 +29,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${name.toPascalCase()} = (${definition});
-    `;
+        export type ${name.toPascalCase()} = (${definition}) & { [typeIndex]: ${JSON.stringify(itemKey)} };
+      `;
   }
 
   function* generateTypeReference(itemKey: number): Iterable<NestedText> {

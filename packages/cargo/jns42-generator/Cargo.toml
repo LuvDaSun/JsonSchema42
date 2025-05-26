@@ -1,7 +1,7 @@
 [package]
 name = "jns42-generator"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 description = "Generate structs and validators from json schema"
 license = "ISC"
 authors = ["Elmer Bulthuis"]
