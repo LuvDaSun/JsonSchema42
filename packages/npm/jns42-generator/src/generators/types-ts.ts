@@ -17,7 +17,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     declare const _brand: unique symbol;
 
     type _SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
-      ? BaseType & { [_brand]?: TypeIndex }
+      ? BaseType & { readonly [_brand]: TypeIndex }
       : BaseType ;
   `;
 
