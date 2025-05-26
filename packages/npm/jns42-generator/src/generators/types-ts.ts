@@ -16,7 +16,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
   yield itt`
     declare const brand: unique symbol;
 
-    type SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
+    type _SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
       ? BaseType & { [brand]: TypeIndex }
       : BaseType ;
   `;
@@ -33,7 +33,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()}<Branded extends boolean = true> = SchemaType<(${definition}), ${JSON.stringify(itemKey)}, Branded>;
+        export type ${name.toPascalCase()}<Branded extends boolean = true> = _SchemaType<(${definition}), ${JSON.stringify(itemKey)}, Branded>;
       `;
   }
 
