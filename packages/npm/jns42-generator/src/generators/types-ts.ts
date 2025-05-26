@@ -17,7 +17,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     declare const _brand: unique symbol;
 
     type _SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
-      ? BaseType & { [_brand]: TypeIndex }
+      ? BaseType & { [_brand]?: TypeIndex }
       : BaseType ;
   `;
 
@@ -37,12 +37,12 @@ export function* generateTypesTsCode(specification: models.Specification) {
       `;
   }
 
-  function* generateTypeReference(itemKey: number): Iterable<NestedText> {
+  function* generateTypeReference(itemKey: number, branded?: boolean): Iterable<NestedText> {
     const name = names.getName(itemKey);
     if (name == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      yield `${name.toPascalCase()}<Branded>`;
+      yield `${name.toPascalCase()}<${branded == null ? "Branded" : JSON.stringify(branded)}>`;
     }
   }
 
@@ -221,7 +221,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
                 yield itt`
                 [
-                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames, false)}
                 ]: ${joinIterable(typeReferences, " |\n")}
               `;
                 return;
