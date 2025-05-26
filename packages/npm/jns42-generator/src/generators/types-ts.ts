@@ -14,10 +14,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
   const { names, typesArena } = specification;
 
   yield itt`
-    declare const brand: unique symbol;
+    declare const _brand: unique symbol;
 
     type _SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
-      ? BaseType & { [brand]: TypeIndex }
+      ? BaseType & { [_brand]: TypeIndex }
       : BaseType ;
   `;
 
