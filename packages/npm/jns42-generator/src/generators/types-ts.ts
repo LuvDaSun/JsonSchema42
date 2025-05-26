@@ -14,7 +14,11 @@ export function* generateTypesTsCode(specification: models.Specification) {
   const { names, typesArena } = specification;
 
   yield itt`
-    declare const typeIndex: unique symbol;
+    declare const brand: unique symbol;
+
+    type WithBrand<Type, Brand, Branded extends boolean = true> = Branded extends true
+      ? Type & { [brand]: Brand }
+      : Type ;
   `;
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
@@ -29,7 +33,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()} = (${definition}) & { [typeIndex]: ${JSON.stringify(itemKey)} };
+        export type ${name.toPascalCase()}<Branded extends boolean = true> = WithBrand<(${definition}), ${JSON.stringify(itemKey)}, Branded>;
       `;
   }
 
@@ -38,7 +42,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     if (name == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      yield name.toPascalCase();
+      yield `${name.toPascalCase()}<Branded>`;
     }
   }
 
