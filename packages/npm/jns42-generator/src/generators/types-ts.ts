@@ -16,9 +16,9 @@ export function* generateTypesTsCode(specification: models.Specification) {
   yield itt`
     declare const brand: unique symbol;
 
-    type WithBrand<Type, Brand, Branded extends boolean = true> = Branded extends true
-      ? Type & { [brand]: Brand }
-      : Type ;
+    type SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
+      ? BaseType & { [brand]: TypeIndex }
+      : BaseType ;
   `;
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
@@ -33,7 +33,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()}<Branded extends boolean = true> = WithBrand<(${definition}), ${JSON.stringify(itemKey)}, Branded>;
+        export type ${name.toPascalCase()}<Branded extends boolean = true> = SchemaType<(${definition}), ${JSON.stringify(itemKey)}, Branded>;
       `;
   }
 
