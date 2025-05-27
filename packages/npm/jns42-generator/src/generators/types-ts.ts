@@ -14,11 +14,33 @@ export function* generateTypesTsCode(specification: models.Specification) {
   const { names, typesArena } = specification;
 
   yield itt`
-    declare const _brand: unique symbol;
+    declare const _tags: unique symbol;
 
-    type _SchemaType<BaseType, TypeIndex extends number, Branded extends boolean = true> = Branded extends true
-      ? BaseType & { readonly [_brand]: TypeIndex }
-      : BaseType ;
+    type _Tagged<T, N extends PropertyKey> = T extends
+      | boolean
+      | number
+      | bigint
+      | string
+      | symbol
+      | object
+      ? T & {
+          readonly [_tags]: { [K in N]: void };
+        }
+      : T;
+      
+    type Plain<T> = T extends undefined
+      ? boolean
+      : T extends number
+      ? number
+      : T extends bigint
+      ? bigint
+      : T extends string
+      ? string
+      : T extends symbol
+      ? symbol
+      : T extends object
+      ? { [K in Exclude<keyof T, symbol>]: Plain<T[K]> }
+      : T;
   `;
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
@@ -33,16 +55,20 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()}<Branded extends boolean = true> = _SchemaType<(${definition}), ${JSON.stringify(itemKey)}, Branded>;
+        export type ${name.toPascalCase()} = _Tagged<(${definition}), ${JSON.stringify(itemKey)}>;
       `;
   }
 
-  function* generateTypeReference(itemKey: number, branded?: boolean): Iterable<NestedText> {
+  function* generateTypeReference(itemKey: number, plain = false): Iterable<NestedText> {
     const name = names.getName(itemKey);
     if (name == null) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      yield `${name.toPascalCase()}<${branded == null ? "Branded" : JSON.stringify(branded)}>`;
+      if (plain) {
+        yield `Plain<${name.toPascalCase()}>`;
+      } else {
+        yield name.toPascalCase();
+      }
     }
   }
 
@@ -221,7 +247,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
                 yield itt`
                 [
-                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames, false)}
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames, true)}
                 ]: ${joinIterable(typeReferences, " |\n")}
               `;
                 return;
