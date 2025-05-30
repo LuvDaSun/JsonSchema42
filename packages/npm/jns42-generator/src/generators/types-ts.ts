@@ -45,16 +45,12 @@ export function* generateTypesTsCode(specification: models.Specification) {
       `;
   }
 
-  function* generateTypeReference(itemKey: number, plain = false): Iterable<NestedText> {
+  function* generateTypeReference(itemKey: number, forceInline = false): Iterable<NestedText> {
     const name = names.getName(itemKey);
-    if (name == null) {
+    if (name == null || forceInline) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
-      if (plain) {
-        yield `Plain<${name.toPascalCase()}>`;
-      } else {
-        yield name.toPascalCase();
-      }
+      yield name.toPascalCase();
     }
   }
 
