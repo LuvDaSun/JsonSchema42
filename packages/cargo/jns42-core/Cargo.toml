@@ -30,6 +30,7 @@ wasm-bindgen-futures = "0.4.42"
 gloo = "0.11.0"
 semver = "1.0.23"
 js-sys = "0.3.69"
+wit-bindgen = "0.42.1"
 
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
