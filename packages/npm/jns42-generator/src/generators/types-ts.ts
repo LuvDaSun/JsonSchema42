@@ -16,7 +16,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
   yield itt`
     declare const _tags: unique symbol;
 
-    type _Tagged<T, N extends PropertyKey> = T extends
+    type _Wrap<T, N extends PropertyKey> = T extends
       | boolean
       | number
       | bigint
@@ -41,7 +41,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()} = _Tagged<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
+        export type ${name.toPascalCase()} = _Wrap<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
       `;
   }
 
