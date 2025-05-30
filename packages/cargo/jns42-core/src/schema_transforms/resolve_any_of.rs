@@ -55,7 +55,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     .into_iter()
     .map(|(key, item)| (*item.types.as_ref().unwrap().first().unwrap(), key, item))
     .sorted_by_key(|(r#type, _key, _item)| *r#type)
-    .group_by(|(r#type, _key, _item)| *r#type);
+    .chunk_by(|(r#type, _key, _item)| *r#type);
 
   let grouped_sub_entries = grouped_sub_entries
     .into_iter()

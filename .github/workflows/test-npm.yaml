@@ -20,7 +20,7 @@ jobs:
       - run: rustup default 1.82.0
 
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli@0.2.93
+      - run: cargo install wasm-bindgen-cli@0.2.100
 
       - uses: actions/checkout@v4
       - run: npm ci
@@ -38,7 +38,7 @@ jobs:
       - run: rustup default 1.82.0
 
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli@0.2.93
+      - run: cargo install wasm-bindgen-cli@0.2.100
 
       - uses: actions/checkout@v4
       - run: npm ci
