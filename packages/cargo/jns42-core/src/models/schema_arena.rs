@@ -1,4 +1,4 @@
-use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform, SchemaType};
+use super::{BoxedSchemaTransform, SchemaTransform, SchemaType, schema_item::ArenaSchemaItem};
 use crate::{
   documents::{DocumentContext, DocumentContextContainer},
   models::ArenaSchemaItemContainer,

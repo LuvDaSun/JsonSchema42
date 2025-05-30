@@ -225,10 +225,9 @@ where
       examples: self.examples.clone(),
       deprecated: merge_option!(deprecated, &|base, other| base | other),
 
-      types: merge_option!(types, |base, other| vec![base
-        .first()
-        .unwrap()
-        .intersection(other.first().unwrap())]),
+      types: merge_option!(types, |base, other| vec![
+        base.first().unwrap().intersection(other.first().unwrap())
+      ]),
 
       reference: None,
 
@@ -320,11 +319,7 @@ where
       && self.minimum_properties.is_none()
       && self.maximum_properties.is_none();
 
-    if is_alias_maybe {
-      self.reference
-    } else {
-      None
-    }
+    if is_alias_maybe { self.reference } else { None }
   }
 
   pub fn get_dependencies(&self) -> impl Iterator<Item = K> + '_ {

@@ -55,15 +55,19 @@ impl Document {
       assert!(nodes.insert(node_pointer.clone(), node.clone()).is_none());
 
       if let Some(node_anchor) = node.select_anchor() {
-        assert!(anchors
-          .insert(node_anchor.to_owned(), node_pointer.clone())
-          .is_none());
+        assert!(
+          anchors
+            .insert(node_anchor.to_owned(), node_pointer.clone())
+            .is_none()
+        );
       }
 
       if let Some(node_dynamic_anchor) = node.select_dynamic_anchor() {
-        assert!(dynamic_anchors
-          .insert(node_dynamic_anchor.to_owned(), node_pointer.clone())
-          .is_none());
+        assert!(
+          dynamic_anchors
+            .insert(node_dynamic_anchor.to_owned(), node_pointer.clone())
+            .is_none()
+        );
       }
 
       if let Some(node_reference) = node.select_reference() {
