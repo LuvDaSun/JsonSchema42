@@ -1,4 +1,4 @@
-use crate::utils::{FetchTextError, NodeCacheError, NodeLocation, ParseLocationError};
+use crate::utilities::{FetchTextError, NodeCacheError, NodeLocation, ParseLocationError};
 use std::fmt::Display;
 
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]

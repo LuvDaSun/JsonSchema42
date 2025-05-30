@@ -1,4 +1,4 @@
-use jns42_core::utils::banner;
+use jns42_core::utilities::banner;
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use rust_format::Formatter;

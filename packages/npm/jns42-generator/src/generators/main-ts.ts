@@ -1,6 +1,6 @@
 import * as core from "@jns42/core";
 import * as models from "../models/index.js";
-import { itt, packageInfo } from "../utils/index.js";
+import { itt, packageInfo } from "../utilities/index.js";
 
 export function* generateMainTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);

@@ -2,7 +2,7 @@ use super::{schema_item::ArenaSchemaItem, BoxedSchemaTransform, SchemaTransform,
 use crate::{
   documents::{DocumentContext, DocumentContextContainer},
   models::ArenaSchemaItemContainer,
-  utils::{Arena, NodeLocation},
+  utilities::{Arena, NodeLocation},
 };
 use std::{
   collections::{BTreeMap, BTreeSet},

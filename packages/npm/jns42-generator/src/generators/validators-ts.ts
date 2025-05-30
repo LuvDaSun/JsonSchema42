@@ -8,7 +8,7 @@ import {
   joinIterable,
   mapIterable,
   packageInfo,
-} from "../utils/index.js";
+} from "../utilities/index.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);

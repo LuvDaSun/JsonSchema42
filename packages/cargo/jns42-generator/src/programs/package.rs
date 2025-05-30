@@ -3,7 +3,7 @@ use crate::models::{Specification, SpecificationConfiguration};
 use clap::Parser;
 use jns42_core::documents;
 use jns42_core::documents::DocumentContext;
-use jns42_core::utils::NodeLocation;
+use jns42_core::utilities::NodeLocation;
 use std::error::Error;
 use std::path::PathBuf;
 use std::rc::Rc;

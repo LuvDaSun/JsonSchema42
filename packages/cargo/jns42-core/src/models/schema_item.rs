@@ -1,6 +1,6 @@
 use super::SchemaType;
-use crate::utils::NodeLocation;
-use crate::utils::{merge_either, merge_option};
+use crate::utilities::NodeLocation;
+use crate::utilities::{merge_either, merge_option};
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeSet;
 use std::fmt::Debug;

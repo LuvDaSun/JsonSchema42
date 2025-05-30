@@ -7,7 +7,7 @@ import {
   itt,
   joinIterable,
   packageInfo,
-} from "../utils/index.js";
+} from "../utilities/index.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);
