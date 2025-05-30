@@ -1,0 +1,30 @@
+package jns42:core;
+
+interface utilities {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+interface schema-transforms {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+interface naming {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+interface models {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+interface documents {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+world core {
+  export utilities;
+  export schema-transforms;
+  export naming;
+  export models;
+  export documents;
+}
+

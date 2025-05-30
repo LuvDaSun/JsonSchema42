@@ -1,3 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+mod exports;
+
 mod document_context;
 mod meta;
 mod schema_document;
