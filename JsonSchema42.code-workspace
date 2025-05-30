@@ -9,6 +9,10 @@
       "path": "fixtures",
     },
     {
+      "name": "wit",
+      "path": "wit",
+    },
+    {
       "name": "npm/jns42-generator",
       "path": "packages/npm/jns42-generator",
     },
