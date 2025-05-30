@@ -1,6 +1,6 @@
 import * as core from "@jns42/core";
 import assert from "assert";
-import * as models from "../models/index.js";
+import * as models from "../models.js";
 import {
   NestedText,
   generateJsDocComments,
@@ -8,7 +8,7 @@ import {
   joinIterable,
   mapIterable,
   packageInfo,
-} from "../utils/index.js";
+} from "../utilities.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);

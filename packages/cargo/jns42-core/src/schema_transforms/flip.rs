@@ -52,7 +52,7 @@ macro_rules! generate_mod {
      */
     pub mod $name {
       use crate::models::{ArenaSchemaItem, SchemaArena};
-      use crate::utils::product;
+      use crate::utilities::product;
       use std::collections::{BTreeMap, BTreeSet};
 
       pub fn transform(arena: &mut SchemaArena, key: usize) {

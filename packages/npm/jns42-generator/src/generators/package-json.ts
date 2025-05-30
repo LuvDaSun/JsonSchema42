@@ -1,5 +1,5 @@
 import { PackageJson } from "type-fest";
-import { packageInfo } from "../utils/index.js";
+import { packageInfo } from "../utilities.js";
 
 export function generatePackageJsonData(name: string, version: string) {
   const content: PackageJson = {

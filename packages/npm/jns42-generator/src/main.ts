@@ -1,3 +1,3 @@
-export * from "./generators/index.js";
-export * from "./models/index.js";
-export * from "./utils/index.js";
+export * from "./generators.js";
+export * from "./models.js";
+export * from "./utilities.js";

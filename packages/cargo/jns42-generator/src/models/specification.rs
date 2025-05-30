@@ -3,7 +3,7 @@ use jns42_core::{
   models::ArenaSchemaItem,
   naming::{Names, NamesBuilder},
   schema_transforms,
-  utils::Arena,
+  utilities::Arena,
 };
 use once_cell::sync::Lazy;
 use proc_macro2::{Ident, TokenStream};
