@@ -1,4 +1,4 @@
-use crate::{models::DocumentSchemaItem, utils::NodeLocation};
+use crate::{models::DocumentSchemaItem, utilities::NodeLocation};
 use std::collections::BTreeMap;
 
 pub trait SchemaDocument {

@@ -24,7 +24,7 @@ impl From<surf::Error> for FetchTextError {
   }
 }
 
-#[wasm_bindgen(module = "/src/utils/fetch_text.js")]
+#[wasm_bindgen(module = "/src/utilities/fetch_text.js")]
 extern "C" {
   #[wasm_bindgen(catch, js_name = "fetchText")]
   async fn fetch_text_js(location: &str) -> Result<JsValue, JsValue>;

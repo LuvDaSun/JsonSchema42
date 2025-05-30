@@ -1,4 +1,4 @@
-use crate::utils::{NodeCache, NodeLocation};
+use crate::utilities::{NodeCache, NodeLocation};
 use semver::Version;
 
 pub fn discover_meta_schema_id(version_node: &serde_json::Value) -> Option<&str> {
