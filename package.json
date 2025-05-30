@@ -10,7 +10,6 @@
   },
   "devDependencies": {
     "cspell": "^8.17.2",
-    "just-install": "^2.0.2",
     "prettier": "^3.4.2"
   }
 }
