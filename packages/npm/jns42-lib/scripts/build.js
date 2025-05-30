@@ -5,9 +5,6 @@ import path from "path";
 
 const options = { shell: true, stdio: "inherit", env: process.env };
 
-cp.execFileSync("npm", ["--workspace", "@jns42/core", "run", "build"], options);
-cp.execFileSync("npm", ["--workspace", "@jns42/lib", "run", "build"], options);
-
 cp.execFileSync("tsc", [], options);
 
 cp.execFileSync("rollup", ["--config", path.resolve("rollup.config.js")], options);

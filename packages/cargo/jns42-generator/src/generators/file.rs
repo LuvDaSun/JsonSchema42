@@ -1,6 +1,6 @@
 use jns42_core::utilities::banner;
 use proc_macro2::TokenStream;
-use quote::{quote, TokenStreamExt};
+use quote::{TokenStreamExt, quote};
 use rust_format::Formatter;
 use std::error::Error;
 

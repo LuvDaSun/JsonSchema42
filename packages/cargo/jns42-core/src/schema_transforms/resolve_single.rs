@@ -1,22 +1,22 @@
-/**
- * This transformer makes a reference if there is a single allOf, anyOf or oneOf.
- *
- * ```yaml
- * - oneOf:
- *   - 1
- * ```
- *
- * will become
- *
- * ```yaml
- * - reference: 1
- * ```
- */
 macro_rules! generate_mod {
   ( $member: ident ) => {
     pub mod $member {
       use crate::models::SchemaArena;
 
+      /**
+       * This transformer makes a reference if there is a single allOf, anyOf or oneOf.
+       *
+       * ```yaml
+       * - oneOf:
+       *   - 1
+       * ```
+       *
+       * will become
+       *
+       * ```yaml
+       * - reference: 1
+       * ```
+       */
       pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 

@@ -253,7 +253,7 @@ where
   }
 
   fn make_names(optimized_names: BTreeMap<Sentence, BTreeSet<K>>) -> BTreeMap<K, Sentence> {
-    let names = optimized_names
+    optimized_names
       .into_iter()
       .flat_map(|(optimized_name, keys)| {
         keys.into_iter().enumerate().map(move |(index, key)| {
@@ -266,8 +266,7 @@ where
           }
         })
       })
-      .collect();
-    names
+      .collect()
   }
 }
 

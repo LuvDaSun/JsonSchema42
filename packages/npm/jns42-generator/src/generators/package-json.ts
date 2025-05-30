@@ -27,7 +27,7 @@ export function generatePackageJsonData(name: string, version: string) {
     },
     author: "",
     license: "ISC",
-    dependencies: withDependencies(["@types/node"]),
+    dependencies: withDependencies(["@types/node", "@jns42/lib"]),
     devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
     engines: {
       node: ">=18",

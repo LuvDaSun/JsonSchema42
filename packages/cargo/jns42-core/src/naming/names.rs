@@ -13,8 +13,7 @@ where
   }
 
   pub fn get_name(&self, key: &K) -> Option<&Sentence> {
-    let sentence = self.0.get(key);
-    sentence
+    self.0.get(key)
   }
 }
 

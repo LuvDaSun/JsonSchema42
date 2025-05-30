@@ -7,6 +7,22 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   const { names, typesArena } = specification;
 
+  yield itt`
+    declare const _tags: unique symbol;
+
+    type _Wrap<T, N extends PropertyKey> = T extends
+      | boolean
+      | number
+      | bigint
+      | string
+      | symbol
+      | object
+      ? T & {
+          readonly [_tags]: { [K in N]: void };
+        }
+      : T;
+  `;
+
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
     const item = typesArena.getItem(itemKey);
 
@@ -19,13 +35,13 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${name.toPascalCase()} = (${definition});
-    `;
+        export type ${name.toPascalCase()} = _Wrap<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
+      `;
   }
 
-  function* generateTypeReference(itemKey: number): Iterable<NestedText> {
+  function* generateTypeReference(itemKey: number, forceInline = false): Iterable<NestedText> {
     const name = names.getName(itemKey);
-    if (name == null) {
+    if (name == null || forceInline) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
       yield name.toPascalCase();
@@ -207,7 +223,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
                 yield itt`
                 [
-                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames, true)}
                 ]: ${joinIterable(typeReferences, " |\n")}
               `;
                 return;
