@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import * as models from "../models/index.js";
-import { NestedText, flattenNestedText, itt, splitIterableText } from "../utilities/index.js";
+import * as models from "../models.js";
+import { NestedText, flattenNestedText, itt, splitIterableText } from "../utilities.js";
 import { generateBuildJsCode } from "./build-js.js";
 import { generateCleanJsCode } from "./clean-js.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
