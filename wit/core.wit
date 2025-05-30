@@ -1,7 +1,7 @@
 package jns42:core;
 
 interface utilities {
-  add: func(a: u32, b: u32) -> u32;
+  banner: func(prefix: string, version: string) -> string;
 }
 
 interface schema-transforms {

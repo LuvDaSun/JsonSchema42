@@ -1,6 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-mod exports;
-
 mod arena;
 mod banner;
 mod fetch_text;
