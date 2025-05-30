@@ -3,7 +3,7 @@ mod models;
 mod programs;
 
 use clap::Parser;
-use programs::{run_program, ProgramOptions};
+use programs::{ProgramOptions, run_program};
 use std::error::Error;
 
 #[tokio::main]

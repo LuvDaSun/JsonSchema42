@@ -55,9 +55,11 @@ impl Document {
       assert!(nodes.insert(node_pointer.clone(), node.clone()).is_none());
 
       if let Some(node_anchor) = node.select_anchor() {
-        assert!(anchors
-          .insert(node_anchor.to_owned(), node_pointer.clone())
-          .is_none());
+        assert!(
+          anchors
+            .insert(node_anchor.to_owned(), node_pointer.clone())
+            .is_none()
+        );
       }
 
       if node.select_recursive_anchor().unwrap_or_default() {

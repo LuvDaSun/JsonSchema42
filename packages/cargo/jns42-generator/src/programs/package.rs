@@ -1,4 +1,4 @@
-use crate::generators::package::{generate_package, PackageConfiguration};
+use crate::generators::package::{PackageConfiguration, generate_package};
 use crate::models::{Specification, SpecificationConfiguration};
 use clap::Parser;
 use jns42_core::documents;

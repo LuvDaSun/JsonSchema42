@@ -10,5 +10,7 @@ export function* generateMainTsCode(specification: models.Specification) {
     export * as validators from "./validators.js";
     export * as parsers from "./parsers.js";
     export * as mocks from "./mocks.js";
+
+    export * as lib from "@jns42/lib";
   `;
 }

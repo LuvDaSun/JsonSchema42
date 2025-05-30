@@ -4,7 +4,7 @@ use jns42_core::{
   naming::Sentence,
 };
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, TokenStreamExt};
+use quote::{TokenStreamExt, format_ident, quote};
 use std::{collections::HashSet, error::Error};
 
 pub fn generate_file_token_stream(

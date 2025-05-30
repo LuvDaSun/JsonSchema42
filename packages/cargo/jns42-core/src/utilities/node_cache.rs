@@ -1,5 +1,5 @@
-use super::{fetch_text, FetchTextError, NodeLocation};
-use std::collections::{btree_map, BTreeMap};
+use super::{FetchTextError, NodeLocation, fetch_text};
+use std::collections::{BTreeMap, btree_map};
 use std::iter;
 
 /// Caches nodes (json / yaml) and indexes the nodes by their location.
