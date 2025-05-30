@@ -1,6 +1,6 @@
 import * as core from "@jns42/core";
-import * as models from "../models/index.js";
-import { generateJsDocComments, isMockable, itt, packageInfo } from "../utilities/index.js";
+import * as models from "../models.js";
+import { generateJsDocComments, isMockable, itt, packageInfo } from "../utilities.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);

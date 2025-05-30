@@ -1,5 +1,5 @@
 import * as core from "@jns42/core";
-import * as models from "../models/index.js";
+import * as models from "../models.js";
 import {
   NestedText,
   generateJsDocComments,
@@ -7,7 +7,7 @@ import {
   itt,
   joinIterable,
   packageInfo,
-} from "../utilities/index.js";
+} from "../utilities.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);
