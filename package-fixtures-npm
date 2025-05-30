@@ -6,7 +6,7 @@ cd $(dirname $0)
 
 export NODE_ENV=development
 
-npm run build --workspaces --if-present
+just build-npm-jns42-generator
 
 set +e
 
