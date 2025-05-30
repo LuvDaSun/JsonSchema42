@@ -28,7 +28,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
         }
       : T;
       
-    type Plain<T> = T extends undefined
+    export type Plain<T> = T extends undefined
       ? boolean
       : T extends number
       ? number
@@ -55,7 +55,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()} = _Tagged<(${definition}), ${JSON.stringify(itemKey)}>;
+        export type ${name.toPascalCase()} = _Tagged<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
       `;
   }
 
