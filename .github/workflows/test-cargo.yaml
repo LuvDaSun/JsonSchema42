@@ -31,4 +31,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add rustfmt
-      - run: ./package-fixtures-cargo
+      - run: cargo install just
+      - run: just package-specification-cargo-all
