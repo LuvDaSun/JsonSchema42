@@ -3,36 +3,35 @@ pub enum FetchTextError {
   HttpError,
 }
 
+#[cfg(target_arch = "wasm32")]
+impl From<crate::jns42::core::imports::FetchTextError> for FetchTextError {
+  fn from(value: crate::jns42::core::imports::FetchTextError) -> Self {
+    match value {
+      crate::jns42::core::imports::FetchTextError::IoError => FetchTextError::IoError,
+      crate::jns42::core::imports::FetchTextError::HttpError => FetchTextError::HttpError,
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
+  let text = crate::jns42::core::imports::fetch_text(location)?;
+
+  Ok(text)
+}
+
+#[cfg(not(target_arch = "wasm32"))]
 impl From<std::io::Error> for FetchTextError {
   fn from(_value: std::io::Error) -> Self {
     Self::IoError
   }
 }
 
-// impl From<JsValue> for FetchTextError {
-//   fn from(_value: JsValue) -> Self {
-//     Self::HttpError
-//   }
-// }
-
 #[cfg(not(target_arch = "wasm32"))]
 impl From<surf::Error> for FetchTextError {
   fn from(_value: surf::Error) -> Self {
     Self::HttpError
   }
-}
-
-// #[wasm_bindgen(module = "/src/utilities/fetch_text.js")]
-// extern "C" {
-//   #[wasm_bindgen(catch, js_name = "fetchText")]
-//   async fn fetch_text_js(location: &str) -> Result<JsValue, JsValue>;
-// }
-
-#[cfg(target_arch = "wasm32")]
-pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  let text = crate::jns42::core::imports::get_text(location);
-
-  Ok(text)
 }
 
 #[cfg(not(target_arch = "wasm32"))]

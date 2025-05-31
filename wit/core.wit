@@ -1,7 +1,13 @@
 package jns42:core;
 
+
 interface imports {
-  get-text: func(location: string) -> string;
+  enum fetch-text-error {
+    io-error,
+    http-error,
+  }
+
+  fetch-text: func(location: string) -> result<string, fetch-text-error>;
 }
 
 interface utilities {

@@ -9,16 +9,24 @@ async function getCoreModule(path) {
 
 const instance = await instantiate(getCoreModule, {
   imports: {
-    async "get-text"(location) {
+    async "fetch-text"(location) {
       const locationLower = location.toLowerCase();
-      if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
-        const result = await fetch(location);
-        const text = await result.text();
-        return text;
+      try {
+        if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
+          const result = await fetch(location);
+          const text = await result.text();
+          return { tag: "ok", val: text };
+        }
+      } catch (error) {
+        return { tag: "err", val: "http-error" };
       }
 
-      const text = await fs.readFile(location, "utf-8");
-      return text;
+      try {
+        const text = await fs.readFile(location, "utf-8");
+        return { tag: "ok", val: text };
+      } catch (error) {
+        return { tag: "err", val: "io-error" };
+      }
     },
   },
 });
