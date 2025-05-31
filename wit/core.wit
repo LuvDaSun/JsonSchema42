@@ -42,7 +42,7 @@ interface naming {
 }
 
 interface models {
-  resource schema-item {
+  resource arena-schema-item {
     name-get: func() -> list<string>;
   }
 }
