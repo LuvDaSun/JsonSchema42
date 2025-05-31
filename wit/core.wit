@@ -19,7 +19,9 @@ interface schema-transforms {
 }
 
 interface naming {
-  resource names {}
+  resource names {
+    get-name: func(key: u32) -> option<sentence>;
+  }
 
   resource names-builder {
     constructor();

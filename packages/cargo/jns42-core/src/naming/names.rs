@@ -24,26 +24,3 @@ impl<K> IntoIterator for Names<K> {
     self.0.into_iter()
   }
 }
-
-// #[wasm_bindgen]
-pub struct NamesContainer(Names<usize>);
-
-// #[wasm_bindgen]
-impl NamesContainer {
-  // #[wasm_bindgen(js_name = getName)]
-  pub fn get_name(&self, key: usize) -> Option<Sentence> {
-    self.0.get_name(&key).cloned()
-  }
-}
-
-impl From<Names<usize>> for NamesContainer {
-  fn from(value: Names<usize>) -> Self {
-    Self(value)
-  }
-}
-
-impl From<NamesContainer> for Names<usize> {
-  fn from(value: NamesContainer) -> Self {
-    value.0
-  }
-}

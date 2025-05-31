@@ -1,5 +1,4 @@
 use super::{NamePart, Names, Sentence};
-use crate::{exports::jns42::core::naming::GuestNamesBuilder, naming::NamesContainer};
 use std::{
   collections::{BTreeMap, BTreeSet},
   fmt::Debug,
