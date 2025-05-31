@@ -1,4 +1,4 @@
-import core from "@jns42/core";
+import * as core from "@jns42/core";
 import { packageInfo } from "../utilities.js";
 import { itt } from "../utilities/iterable-text-template.js";
 
@@ -7,7 +7,7 @@ export function* generateCleanJsCode() {
     #!/usr/bin/env node
   `;
 
-  yield core.utilities.banner("//", `v${packageInfo.version}`);
+  yield core.instance.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
     import fs from "fs";

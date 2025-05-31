@@ -7,7 +7,7 @@ async function getCoreModule(path) {
   return module;
 }
 
-const instance = await instantiate(getCoreModule, {
+export const instance = await instantiate(getCoreModule, {
   imports: {
     async "fetch-text"(location) {
       const locationLower = location.toLowerCase();
@@ -30,5 +30,3 @@ const instance = await instantiate(getCoreModule, {
     },
   },
 });
-
-export default instance;

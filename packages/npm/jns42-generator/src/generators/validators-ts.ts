@@ -1,4 +1,4 @@
-import core from "@jns42/core";
+import * as core from "@jns42/core";
 import assert from "assert";
 import * as models from "../models.js";
 import {
@@ -11,7 +11,7 @@ import {
 } from "../utilities.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
-  yield core.utilities.banner("//", `v${packageInfo.version}`);
+  yield core.instance.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 

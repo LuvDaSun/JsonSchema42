@@ -1,4 +1,4 @@
-import core from "@jns42/core";
+import * as core from "@jns42/core";
 
 export function isMockable(arena: core.SchemaArenaContainer, key: number) {
   const item = arena.getItem(key);

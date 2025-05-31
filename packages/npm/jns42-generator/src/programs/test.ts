@@ -1,4 +1,4 @@
-import core from "@jns42/core";
+import * as core from "@jns42/core";
 import assert from "assert";
 import cp from "child_process";
 import fs from "node:fs";

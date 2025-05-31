@@ -1,4 +1,4 @@
-import core from "@jns42/core";
+import * as core from "@jns42/core";
 
 export interface Specification {
   typesArena: core.SchemaArenaContainer;
