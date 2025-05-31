@@ -42,7 +42,9 @@ interface naming {
 }
 
 interface models {
-  add: func(a: u32, b: u32) -> u32;
+  resource schema-item {
+    name-get: func() -> list<string>;
+  }
 }
 
 interface documents {

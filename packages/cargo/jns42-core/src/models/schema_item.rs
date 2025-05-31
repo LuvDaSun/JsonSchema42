@@ -474,7 +474,7 @@ impl ArenaSchemaItemContainer {
   }
   // #[wasm_bindgen(getter = examples)]
   pub fn examples_get(&self) -> Option<Vec<serde_json::Value>> {
-    Some(self.0.examples.as_ref()?.iter().cloned().collect())
+    Some(self.0.examples.as_ref()?.to_vec())
   }
   // #[wasm_bindgen(getter = deprecated)]
   pub fn deprecated_get(&self) -> Option<bool> {
