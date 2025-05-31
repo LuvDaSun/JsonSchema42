@@ -294,11 +294,11 @@ impl fmt::Display for ParseLocationError {
   }
 }
 
-impl From<ParseLocationError> for js_sys::Error {
-  fn from(value: ParseLocationError) -> Self {
-    js_sys::Error::new(&value.to_string())
-  }
-}
+// impl From<ParseLocationError> for js_sys::Error {
+//   fn from(value: ParseLocationError) -> Self {
+//     js_sys::Error::new(&value.to_string())
+//   }
+// }
 
 impl Error for ParseLocationError {}
 

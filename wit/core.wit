@@ -1,0 +1,63 @@
+package jns42:core;
+
+
+interface imports {
+  enum fetch-text-error {
+    io-error,
+    http-error,
+  }
+
+  fetch-text: func(location: string) -> result<string, fetch-text-error>;
+}
+
+interface utilities {
+  banner: func(prefix: string, version: string) -> string;
+}
+
+interface schema-transforms {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+interface naming {
+  resource names {
+    get-name: func(key: u32) -> option<sentence>;
+  }
+
+  resource names-builder {
+    constructor();
+    
+    set-default-name: func(value: string);
+    add: func(key: u32, values: list<string>);
+    build: func() -> names;
+  }
+
+  resource sentence {
+    constructor(input: string);
+
+    to-pascal-case: func() -> string;
+    to-camel-case: func() -> string;
+    to-snake-case: func() -> string;
+    to-screaming-snake-case: func() -> string;
+  }
+}
+
+interface models {
+  resource arena-schema-item {
+    name-get: func() -> list<string>;
+  }
+}
+
+interface documents {
+  add: func(a: u32, b: u32) -> u32;
+}
+
+world core {
+  export utilities;
+  export schema-transforms;
+  export naming;
+  export models;
+  export documents;
+
+  import imports;
+}
+
