@@ -1,4 +1,4 @@
-import * as core from "@jns42/core";
+import core from "@jns42/core";
 import * as path from "node:path";
 import * as yargs from "yargs";
 import { generatePackage } from "../generators.js";

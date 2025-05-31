@@ -1,4 +1,4 @@
-import * as core from "@jns42/core";
+import core from "@jns42/core";
 import assert from "assert";
 import * as models from "../models.js";
 import {

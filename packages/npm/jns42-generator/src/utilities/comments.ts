@@ -1,4 +1,3 @@
-import * as core from "@jns42/core";
 import { encode } from "entities";
 import { NestedText } from "./iterable-text-template.js";
 

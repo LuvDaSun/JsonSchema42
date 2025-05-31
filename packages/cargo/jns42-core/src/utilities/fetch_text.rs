@@ -30,8 +30,7 @@ impl From<surf::Error> for FetchTextError {
 
 #[cfg(target_arch = "wasm32")]
 pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  // let text = fetch_text_js(location).await?;
-  let text = "{}".to_string();
+  let text = crate::jns42::core::imports::get_text(location);
 
   Ok(text)
 }

@@ -1,4 +1,4 @@
-import * as core from "@jns42/core";
+import core from "@jns42/core";
 import { packageInfo } from "../utilities.js";
 import { itt } from "../utilities/iterable-text-template.js";
 

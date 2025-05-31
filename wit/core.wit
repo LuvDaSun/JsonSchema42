@@ -1,5 +1,9 @@
 package jns42:core;
 
+interface imports {
+  get-text: func(location: string) -> string;
+}
+
 interface utilities {
   banner: func(prefix: string, version: string) -> string;
 }
@@ -26,5 +30,7 @@ world core {
   export naming;
   export models;
   export documents;
+
+  import imports;
 }
 
