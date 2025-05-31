@@ -8,11 +8,11 @@ build-all: \
 
 build-cargo-jns42-core: \
 
-  cargo build --package jns42-core --target wasm32-unknown-unknown
+  cargo build --package jns42-core --target wasm32-unknown-unknown --release
 
 build-cargo-jns42-generator: \
 
-  cargo build --package jns42-generator
+  cargo build --package jns42-generator --release
 
 build-npm-jns42-core: \
   build-cargo-jns42-core \

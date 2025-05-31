@@ -22,7 +22,7 @@
     "prepack": "just build-npm-jns42-lib",
     "pretest": "just build-npm-jns42-lib",
     "compile": "tsc --build",
-    "bundle": "rollup --config rollup.config.js",
+    "bundle": "rollup --config rollup.config.mjs",
     "test": "node --test ./transpiled/**/*.test.js"
   },
   "repository": {
