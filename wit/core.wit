@@ -19,7 +19,13 @@ interface schema-transforms {
 }
 
 interface naming {
-  add: func(a: u32, b: u32) -> u32;
+  resource sentence {
+    constructor(input: string);
+    to-pascal-case: func() -> string;
+    to-camel-case: func() -> string;
+    to-snake-case: func() -> string;
+    to-screaming-snake-case: func() -> string;
+  }
 }
 
 interface models {
