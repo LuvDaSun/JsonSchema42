@@ -11,7 +11,7 @@ import {
 } from "../utilities.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 

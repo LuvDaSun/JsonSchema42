@@ -3,7 +3,7 @@ import * as models from "../models.js";
 import { itt, mapIterable, packageInfo } from "../utilities.js";
 
 export function* generateExamplesTestTsCode(specification: models.Specification) {
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 

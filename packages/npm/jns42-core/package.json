@@ -3,13 +3,13 @@
   "version": "0.7.11",
   "sideEffects": false,
   "description": "core library",
-  "type": "commonjs",
-  "module": "./dist/jns42_core.js",
-  "types": "./dist/jns42_core.d.ts",
+  "type": "module",
+  "module": "./dist/jns42_core.component.js",
+  "types": "./dist/jns42_core.component.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/jns42_core.js",
-      "types": "./dist/jns42_core.d.ts"
+      "import": "./dist/jns42_core.component.js",
+      "types": "./dist/jns42_core.component.d.ts"
     }
   },
   "files": [
@@ -18,7 +18,7 @@
   "scripts": {
     "prepack": "npm run build",
     "build": "just build-npm-jns42-core",
-    "generate": "wasm-bindgen --target nodejs --out-dir dist $npm_config_local_prefix/target/wasm32-unknown-unknown/release/jns42_core.wasm"
+    "generate": "jco transpile --out-dir dist $npm_config_local_prefix/target/wasm32-unknown-unknown/release/jns42_core.component.wasm"
   },
   "repository": {
     "type": "git",
@@ -39,8 +39,9 @@
     "core"
   ],
   "homepage": "https://www.JsonSchema42.org",
-  "devDependencies": {},
-  "dependencies": {},
+  "devDependencies": {
+    "@bytecodealliance/jco": "^1.11.2"
+  },
   "engines": {
     "node": ">=18"
   }
