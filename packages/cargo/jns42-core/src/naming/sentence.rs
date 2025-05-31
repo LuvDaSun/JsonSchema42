@@ -1,14 +1,14 @@
 use super::Word;
 use std::{iter, slice::Iter};
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct Sentence(Vec<Word>);
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl Sentence {
-  #[wasm_bindgen(constructor)]
+  // #[wasm_bindgen(constructor)]
   pub fn new(input: &str) -> Self {
     #[derive(Debug, Clone, Copy)]
     enum CharType {
@@ -81,7 +81,7 @@ impl Sentence {
   }
 
   /// ToPascalCase
-  #[wasm_bindgen(js_name = "toPascalCase")]
+  // #[wasm_bindgen(js_name = "toPascalCase")]
   pub fn to_pascal_case(&self) -> String {
     let mut output = String::new();
 
@@ -93,7 +93,7 @@ impl Sentence {
   }
 
   /// toCamelCase
-  #[wasm_bindgen(js_name = "toCamelCase")]
+  // #[wasm_bindgen(js_name = "toCamelCase")]
   pub fn to_camel_case(&self) -> String {
     let mut output = String::new();
 
@@ -109,7 +109,7 @@ impl Sentence {
   }
 
   /// to_snake_case
-  #[wasm_bindgen(js_name = "toSnakeCase")]
+  // #[wasm_bindgen(js_name = "toSnakeCase")]
   pub fn to_snake_case(&self) -> String {
     let mut output = String::new();
 
@@ -125,7 +125,7 @@ impl Sentence {
   }
 
   /// TO_SCREAMING_SNAKE_CASE
-  #[wasm_bindgen(js_name = "toScreamingSnakeCase")]
+  // #[wasm_bindgen(js_name = "toScreamingSnakeCase")]
   pub fn to_screaming_snake_case(&self) -> String {
     let mut output = String::new();
 

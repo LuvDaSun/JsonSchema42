@@ -1,12 +1,12 @@
 use super::SchemaType;
 use crate::utilities::NodeLocation;
 use crate::utilities::{merge_either, merge_option};
-use gloo::utils::format::JsValueSerdeExt;
+// use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeSet;
 use std::fmt::Debug;
 use std::iter;
 use std::{collections::BTreeMap, iter::empty};
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;
@@ -446,214 +446,186 @@ where
   }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl ArenaSchemaItemContainer {
-  #[wasm_bindgen(getter = name)]
+  // #[wasm_bindgen(getter = name)]
   pub fn name_get(&self) -> Option<Vec<String>> {
     Some(self.0.name.as_ref()?.clone())
   }
-  #[wasm_bindgen(getter = exact)]
+  // #[wasm_bindgen(getter = exact)]
   pub fn exact_get(&self) -> Option<bool> {
     self.0.exact
   }
 
-  #[wasm_bindgen(getter = location)]
+  // #[wasm_bindgen(getter = location)]
   pub fn location_get(&self) -> Option<String> {
     Some(self.0.location.as_ref()?.to_string())
   }
 
   // metadata
-  #[wasm_bindgen(getter = title)]
+  // #[wasm_bindgen(getter = title)]
   pub fn title_get(&self) -> Option<String> {
     Some(self.0.title.as_ref()?.clone())
   }
-  #[wasm_bindgen(getter = description)]
+  // #[wasm_bindgen(getter = description)]
   pub fn description_get(&self) -> Option<String> {
     Some(self.0.description.as_ref()?.clone())
   }
-  #[wasm_bindgen(getter = examples)]
-  pub fn examples_get(&self) -> Option<Vec<JsValue>> {
-    Some(
-      self
-        .0
-        .examples
-        .as_ref()?
-        .iter()
-        .filter_map(|value| JsValue::from_serde(value).ok())
-        .collect(),
-    )
+  // #[wasm_bindgen(getter = examples)]
+  pub fn examples_get(&self) -> Option<Vec<serde_json::Value>> {
+    Some(self.0.examples.as_ref()?.iter().cloned().collect())
   }
-  #[wasm_bindgen(getter = deprecated)]
+  // #[wasm_bindgen(getter = deprecated)]
   pub fn deprecated_get(&self) -> Option<bool> {
     self.0.deprecated
   }
 
   // types
-  #[wasm_bindgen(getter = types)]
+  // #[wasm_bindgen(getter = types)]
   pub fn types_get(&self) -> Option<Vec<SchemaType>> {
     Some(self.0.types.as_ref()?.clone())
   }
 
   // applicators
-  #[wasm_bindgen(getter = reference)]
+  // #[wasm_bindgen(getter = reference)]
   pub fn reference_get(&self) -> Option<usize> {
     self.0.reference
   }
 
-  #[wasm_bindgen(getter = ifSchema)]
+  // #[wasm_bindgen(getter = ifSchema)]
   pub fn if_get(&self) -> Option<usize> {
     self.0.r#if
   }
-  #[wasm_bindgen(getter = thenSchema)]
+  // #[wasm_bindgen(getter = thenSchema)]
   pub fn then_get(&self) -> Option<usize> {
     self.0.then
   }
-  #[wasm_bindgen(getter = elseSchema)]
+  // #[wasm_bindgen(getter = elseSchema)]
   pub fn else_get(&self) -> Option<usize> {
     self.0.r#else
   }
 
-  #[wasm_bindgen(getter = not)]
+  // #[wasm_bindgen(getter = not)]
   pub fn not_get(&self) -> Option<usize> {
     self.0.not
   }
 
-  #[wasm_bindgen(getter = propertyNames)]
+  // #[wasm_bindgen(getter = propertyNames)]
   pub fn property_names_get(&self) -> Option<usize> {
     self.0.property_names
   }
-  #[wasm_bindgen(getter = mapProperties)]
+  // #[wasm_bindgen(getter = mapProperties)]
   pub fn map_properties_get(&self) -> Option<usize> {
     self.0.map_properties
   }
-  #[wasm_bindgen(getter = arrayItems)]
+  // #[wasm_bindgen(getter = arrayItems)]
   pub fn array_items_get(&self) -> Option<usize> {
     self.0.array_items
   }
-  #[wasm_bindgen(getter = contains)]
+  // #[wasm_bindgen(getter = contains)]
   pub fn contains_get(&self) -> Option<usize> {
     self.0.contains
   }
 
-  #[wasm_bindgen(getter = allOf)]
+  // #[wasm_bindgen(getter = allOf)]
   pub fn all_of_get(&self) -> Option<Vec<usize>> {
     Some(self.0.all_of.as_ref()?.iter().copied().collect())
   }
-  #[wasm_bindgen(getter = anyOf)]
+  // #[wasm_bindgen(getter = anyOf)]
   pub fn any_of_get(&self) -> Option<Vec<usize>> {
     Some(self.0.any_of.as_ref()?.iter().copied().collect())
   }
-  #[wasm_bindgen(getter = oneOf)]
+  // #[wasm_bindgen(getter = oneOf)]
   pub fn one_of_get(&self) -> Option<Vec<usize>> {
     Some(self.0.one_of.as_ref()?.iter().copied().collect())
   }
-  #[wasm_bindgen(getter = tupleItems)]
+  // #[wasm_bindgen(getter = tupleItems)]
   pub fn tuple_items_get(&self) -> Option<Vec<usize>> {
     Some(self.0.tuple_items.as_ref()?.clone())
   }
 
-  #[wasm_bindgen(getter = objectProperties)]
-  pub fn object_properties_get(&self) -> JsValue {
-    let Some(value) = self.0.object_properties.as_ref() else {
-      return JsValue::undefined();
-    };
-
-    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  // #[wasm_bindgen(getter = objectProperties)]
+  pub fn object_properties_get(&self) -> Option<BTreeMap<String, usize>> {
+    self.0.object_properties.clone()
   }
-  #[wasm_bindgen(getter = patternProperties)]
-  pub fn pattern_properties_get(&self) -> JsValue {
-    let Some(value) = self.0.pattern_properties.as_ref() else {
-      return JsValue::undefined();
-    };
-
-    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  // #[wasm_bindgen(getter = patternProperties)]
+  pub fn pattern_properties_get(&self) -> Option<BTreeMap<String, usize>> {
+    self.0.pattern_properties.clone()
   }
-  #[wasm_bindgen(getter = dependentSchemas)]
-  pub fn dependent_schemas_get(&self) -> JsValue {
-    let Some(value) = self.0.dependent_schemas.as_ref() else {
-      return JsValue::undefined();
-    };
-
-    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
+  // #[wasm_bindgen(getter = dependentSchemas)]
+  pub fn dependent_schemas_get(&self) -> Option<BTreeMap<String, usize>> {
+    self.0.dependent_schemas.clone()
   }
 
   // assertions
-  #[wasm_bindgen(getter = options)]
-  pub fn options_get(&self) -> Option<Vec<JsValue>> {
-    Some(
-      self
-        .0
-        .options
-        .as_ref()?
-        .iter()
-        .filter_map(|value| JsValue::from_serde(value).ok())
-        .collect(),
-    )
+  // #[wasm_bindgen(getter = options)]
+  pub fn options_get(&self) -> Option<Vec<serde_json::Value>> {
+    self.0.options.clone()
   }
-  #[wasm_bindgen(getter = required)]
+  // #[wasm_bindgen(getter = required)]
   pub fn required_get(&self) -> Option<Vec<String>> {
     Some(self.0.required.as_ref()?.iter().cloned().collect())
   }
 
-  #[wasm_bindgen(getter = minimumInclusive)]
+  // #[wasm_bindgen(getter = minimumInclusive)]
   pub fn minimum_inclusive_get(&self) -> Option<f64> {
     self.0.minimum_inclusive.as_ref()?.as_f64()
   }
-  #[wasm_bindgen(getter = minimumExclusive)]
+  // #[wasm_bindgen(getter = minimumExclusive)]
   pub fn minimum_exclusive_get(&self) -> Option<f64> {
     self.0.minimum_exclusive.as_ref()?.as_f64()
   }
-  #[wasm_bindgen(getter = maximumInclusive)]
+  // #[wasm_bindgen(getter = maximumInclusive)]
   pub fn maximum_inclusive_get(&self) -> Option<f64> {
     self.0.maximum_inclusive.as_ref()?.as_f64()
   }
-  #[wasm_bindgen(getter = maximumExclusive)]
+  // #[wasm_bindgen(getter = maximumExclusive)]
   pub fn maximum_exclusive_get(&self) -> Option<f64> {
     self.0.maximum_exclusive.as_ref()?.as_f64()
   }
-  #[wasm_bindgen(getter = multipleOf)]
+  // #[wasm_bindgen(getter = multipleOf)]
   pub fn multiple_of_get(&self) -> Option<f64> {
     self.0.multiple_of.as_ref()?.as_f64()
   }
 
-  #[wasm_bindgen(getter = minimumLength)]
+  // #[wasm_bindgen(getter = minimumLength)]
   pub fn minimum_length_get(&self) -> Option<usize> {
     self.0.minimum_length?.try_into().ok()
   }
-  #[wasm_bindgen(getter = maximumLength)]
+  // #[wasm_bindgen(getter = maximumLength)]
   pub fn maximum_length_get(&self) -> Option<usize> {
     self.0.maximum_length?.try_into().ok()
   }
-  #[wasm_bindgen(getter = valuePattern)]
+  // #[wasm_bindgen(getter = valuePattern)]
   pub fn value_pattern_get(&self) -> Option<String> {
     Some(self.0.value_pattern.as_ref()?.clone())
   }
-  #[wasm_bindgen(getter = valueFormat)]
+  // #[wasm_bindgen(getter = valueFormat)]
   pub fn value_format_get(&self) -> Option<String> {
     Some(self.0.value_format.as_ref()?.clone())
   }
 
-  #[wasm_bindgen(getter = minimumItems)]
+  // #[wasm_bindgen(getter = minimumItems)]
   pub fn minimum_items_get(&self) -> Option<usize> {
     self.0.minimum_items?.try_into().ok()
   }
-  #[wasm_bindgen(getter = maximumItems)]
+  // #[wasm_bindgen(getter = maximumItems)]
   pub fn maximum_items_get(&self) -> Option<usize> {
     self.0.maximum_items?.try_into().ok()
   }
-  #[wasm_bindgen(getter = uniqueItems)]
+  // #[wasm_bindgen(getter = uniqueItems)]
   pub fn unique_items_get(&self) -> Option<bool> {
     self.0.unique_items
   }
 
-  #[wasm_bindgen(getter = minimumProperties)]
+  // #[wasm_bindgen(getter = minimumProperties)]
   pub fn minimum_properties_get(&self) -> Option<usize> {
     self.0.minimum_properties?.try_into().ok()
   }
-  #[wasm_bindgen(getter = maximumProperties)]
+  // #[wasm_bindgen(getter = maximumProperties)]
   pub fn maximum_properties_get(&self) -> Option<usize> {
     self.0.maximum_properties?.try_into().ok()
   }

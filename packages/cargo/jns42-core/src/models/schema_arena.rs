@@ -9,7 +9,7 @@ use std::{
   iter,
   rc::Rc,
 };
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
 
@@ -106,37 +106,37 @@ impl Arena<ArenaSchemaItem> {
   }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Clone)]
 pub struct SchemaArenaContainer(SchemaArena);
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl SchemaArenaContainer {
-  #[wasm_bindgen(js_name = clone)]
+  // #[wasm_bindgen(js_name = clone)]
   pub fn _clone(&self) -> Self {
     Self(self.0.clone())
   }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl SchemaArenaContainer {
-  #[wasm_bindgen(js_name = fromDocumentContext)]
+  // #[wasm_bindgen(js_name = fromDocumentContext)]
   pub fn from_document_context(document_context: &DocumentContextContainer) -> Self {
     let document_context = document_context.clone();
     SchemaArena::from_document_context(&document_context.into()).into()
   }
 
-  #[wasm_bindgen(js_name = getItem)]
+  // #[wasm_bindgen(js_name = getItem)]
   pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
     self.0.get_item(key).clone().into()
   }
 
-  #[wasm_bindgen(js_name = count)]
+  // #[wasm_bindgen(js_name = count)]
   pub fn count(&self) -> usize {
     self.0.count()
   }
 
-  #[wasm_bindgen(js_name = getAllRelated)]
+  // #[wasm_bindgen(js_name = getAllRelated)]
   pub fn get_all_related(&self, key: usize) -> Vec<usize> {
     self.0.get_all_related(key).collect()
   }
@@ -151,7 +151,7 @@ impl SchemaArenaContainer {
   ///
   /// # Returns
   /// The number of transformations applied.
-  #[wasm_bindgen(js_name = transform)]
+  // #[wasm_bindgen(js_name = transform)]
   pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
     self
       .0

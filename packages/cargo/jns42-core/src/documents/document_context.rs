@@ -5,13 +5,13 @@ use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utilities::NodeCache;
 use crate::utilities::NodeLocation;
-use gloo::utils::format::JsValueSerdeExt;
+// use gloo::utils::format::JsValueSerdeExt;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::iter;
 use std::rc;
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 pub struct DocumentConfiguration {
   pub retrieval_location: NodeLocation,
@@ -490,30 +490,30 @@ impl DocumentContext {
   }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 #[derive(Default, Clone)]
 pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl DocumentContextContainer {
-  #[wasm_bindgen(constructor)]
+  // #[wasm_bindgen(constructor)]
   pub fn new() -> Self {
     Self::default()
   }
 
-  #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), js_sys::Error> {
+  // #[wasm_bindgen(js_name = "registerWellKnownFactories")]
+  pub fn register_well_known_factories(&mut self) -> Result<(), Box<dyn std::error::Error>> {
     Ok(self.0.register_well_known_factories()?)
   }
 
-  #[wasm_bindgen(js_name = "loadFromLocation")]
+  // #[wasm_bindgen(js_name = "loadFromLocation")]
   pub async fn load_from_location(
     &self,
     retrieval_location: String,
     given_location: String,
     antecedent_location: Option<String>,
     default_meta_schema_id: &str,
-  ) -> Result<(), js_sys::Error> {
+  ) -> Result<(), Box<dyn std::error::Error>> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
@@ -533,22 +533,20 @@ impl DocumentContextContainer {
     )
   }
 
-  #[wasm_bindgen(js_name = "loadFromNode")]
+  // #[wasm_bindgen(js_name = "loadFromNode")]
   pub async fn load_from_node(
     &self,
     retrieval_location: String,
     given_location: String,
     antecedent_location: Option<String>,
-    node: &JsValue,
+    node: serde_json::Value,
     default_meta_schema_id: &str,
-  ) -> Result<(), js_sys::Error> {
+  ) -> Result<(), Box<dyn std::error::Error>> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
       .map(|location| location.parse())
       .transpose()?;
-
-    let node = JsValue::into_serde(node).unwrap();
 
     Ok(
       self
@@ -564,7 +562,7 @@ impl DocumentContextContainer {
     )
   }
 
-  #[wasm_bindgen(js_name = "getExplicitLocations")]
+  // #[wasm_bindgen(js_name = "getExplicitLocations")]
   pub fn get_explicit_locations(&self) -> Vec<String> {
     self
       .0

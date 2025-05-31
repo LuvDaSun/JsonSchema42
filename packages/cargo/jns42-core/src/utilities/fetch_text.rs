@@ -1,4 +1,4 @@
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 pub enum FetchTextError {
   IoError,
@@ -11,11 +11,11 @@ impl From<std::io::Error> for FetchTextError {
   }
 }
 
-impl From<JsValue> for FetchTextError {
-  fn from(_value: JsValue) -> Self {
-    Self::HttpError
-  }
-}
+// impl From<JsValue> for FetchTextError {
+//   fn from(_value: JsValue) -> Self {
+//     Self::HttpError
+//   }
+// }
 
 #[cfg(not(target_arch = "wasm32"))]
 impl From<surf::Error> for FetchTextError {
@@ -24,16 +24,16 @@ impl From<surf::Error> for FetchTextError {
   }
 }
 
-#[wasm_bindgen(module = "/src/utilities/fetch_text.js")]
-extern "C" {
-  #[wasm_bindgen(catch, js_name = "fetchText")]
-  async fn fetch_text_js(location: &str) -> Result<JsValue, JsValue>;
-}
+// #[wasm_bindgen(module = "/src/utilities/fetch_text.js")]
+// extern "C" {
+//   #[wasm_bindgen(catch, js_name = "fetchText")]
+//   async fn fetch_text_js(location: &str) -> Result<JsValue, JsValue>;
+// }
 
 #[cfg(target_arch = "wasm32")]
 pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  let text = fetch_text_js(location).await?;
-  let text = text.as_string().unwrap_or_default();
+  // let text = fetch_text_js(location).await?;
+  let text = "{}".to_string();
 
   Ok(text)
 }

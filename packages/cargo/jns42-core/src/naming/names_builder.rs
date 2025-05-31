@@ -4,7 +4,7 @@ use std::{
   collections::{BTreeMap, BTreeSet},
   fmt::Debug,
 };
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 pub struct NamesBuilder<K> {
@@ -279,27 +279,27 @@ where
   }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct NamesBuilderContainer(NamesBuilder<usize>);
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl NamesBuilderContainer {
-  #[wasm_bindgen(constructor)]
+  // #[wasm_bindgen(constructor)]
   pub fn new() -> Self {
     Self(NamesBuilder::new())
   }
 
-  #[wasm_bindgen(js_name = setDefaultName)]
+  // #[wasm_bindgen(js_name = setDefaultName)]
   pub fn set_default_name(&mut self, value: &str) {
     self.0.set_default_name(value);
   }
 
-  #[wasm_bindgen(js_name = add)]
+  // #[wasm_bindgen(js_name = add)]
   pub fn add(&mut self, key: usize, values: Vec<String>) {
     self.0.add(key, values);
   }
 
-  #[wasm_bindgen(js_name = build)]
+  // #[wasm_bindgen(js_name = build)]
   pub fn build(&self) -> NamesContainer {
     self.0.build().into()
   }

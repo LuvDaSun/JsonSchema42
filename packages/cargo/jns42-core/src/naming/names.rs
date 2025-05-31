@@ -1,6 +1,6 @@
 use super::Sentence;
 use std::collections::BTreeMap;
-use wasm_bindgen::prelude::*;
+// use wasm_bindgen::prelude::*;
 
 pub struct Names<K>(BTreeMap<K, Sentence>);
 
@@ -26,12 +26,12 @@ impl<K> IntoIterator for Names<K> {
   }
 }
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 pub struct NamesContainer(Names<usize>);
 
-#[wasm_bindgen]
+// #[wasm_bindgen]
 impl NamesContainer {
-  #[wasm_bindgen(js_name = getName)]
+  // #[wasm_bindgen(js_name = getName)]
   pub fn get_name(&self, key: usize) -> Option<Sentence> {
     self.0.get_name(&key).cloned()
   }
