@@ -3,7 +3,7 @@ import * as models from "../models.js";
 import { NestedText, generateJsDocComments, itt, joinIterable, packageInfo } from "../utilities.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
-  yield core.instance.utilities.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 

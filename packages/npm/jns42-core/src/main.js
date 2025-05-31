@@ -7,7 +7,7 @@ async function getCoreModule(path) {
   return module;
 }
 
-export const instance = await instantiate(getCoreModule, {
+const instance = await instantiate(getCoreModule, {
   imports: {
     async "fetch-text"(location) {
       const locationLower = location.toLowerCase();
@@ -30,3 +30,9 @@ export const instance = await instantiate(getCoreModule, {
     },
   },
 });
+
+export const documents = instance.documents;
+export const models = instance.models;
+export const naming = instance.naming;
+export const schemaTransforms = instance.schemaTransforms;
+export const utilities = instance.utilities;

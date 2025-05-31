@@ -10,7 +10,7 @@ import {
 } from "../utilities.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
-  yield core.instance.utilities.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
