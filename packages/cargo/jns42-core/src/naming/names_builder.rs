@@ -1,5 +1,5 @@
 use super::{NamePart, Names, Sentence};
-use crate::naming::NamesContainer;
+use crate::{exports::jns42::core::naming::GuestNamesBuilder, naming::NamesContainer};
 use std::{
   collections::{BTreeMap, BTreeSet},
   fmt::Debug,
@@ -275,50 +275,6 @@ where
 {
   fn default() -> Self {
     Self::new()
-  }
-}
-
-// #[wasm_bindgen]
-pub struct NamesBuilderContainer(NamesBuilder<usize>);
-
-// #[wasm_bindgen]
-impl NamesBuilderContainer {
-  // #[wasm_bindgen(constructor)]
-  pub fn new() -> Self {
-    Self(NamesBuilder::new())
-  }
-
-  // #[wasm_bindgen(js_name = setDefaultName)]
-  pub fn set_default_name(&mut self, value: &str) {
-    self.0.set_default_name(value);
-  }
-
-  // #[wasm_bindgen(js_name = add)]
-  pub fn add(&mut self, key: usize, values: Vec<String>) {
-    self.0.add(key, values);
-  }
-
-  // #[wasm_bindgen(js_name = build)]
-  pub fn build(&self) -> NamesContainer {
-    self.0.build().into()
-  }
-}
-
-impl Default for NamesBuilderContainer {
-  fn default() -> Self {
-    Self::new()
-  }
-}
-
-impl From<NamesBuilder<usize>> for NamesBuilderContainer {
-  fn from(value: NamesBuilder<usize>) -> Self {
-    Self(value)
-  }
-}
-
-impl From<NamesBuilderContainer> for NamesBuilder<usize> {
-  fn from(value: NamesBuilderContainer) -> Self {
-    value.0
   }
 }
 

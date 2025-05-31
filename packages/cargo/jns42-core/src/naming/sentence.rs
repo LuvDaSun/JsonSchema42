@@ -176,34 +176,6 @@ impl FromIterator<Word> for Sentence {
   }
 }
 
-#[cfg(target_arch = "wasm32")]
-impl crate::exports::jns42::core::naming::GuestSentence for Sentence {
-  fn new(input: String) -> Self {
-    Sentence::new(&input)
-  }
-
-  fn to_pascal_case(&self) -> String {
-    self.to_pascal_case()
-  }
-
-  fn to_camel_case(&self) -> String {
-    self.to_camel_case()
-  }
-
-  fn to_snake_case(&self) -> String {
-    self.to_snake_case()
-  }
-
-  fn to_screaming_snake_case(&self) -> String {
-    self.to_screaming_snake_case()
-  }
-}
-
-#[cfg(target_arch = "wasm32")]
-impl crate::exports::jns42::core::naming::Guest for crate::Host {
-  type Sentence = Sentence;
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;

@@ -19,8 +19,19 @@ interface schema-transforms {
 }
 
 interface naming {
+  resource names {}
+
+  resource names-builder {
+    constructor();
+    
+    set-default-name: func(value: string);
+    add: func(key: u32, values: list<string>);
+    build: func() -> names;
+  }
+
   resource sentence {
     constructor(input: string);
+
     to-pascal-case: func() -> string;
     to-camel-case: func() -> string;
     to-snake-case: func() -> string;

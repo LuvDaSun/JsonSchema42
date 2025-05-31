@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-mod exports;
+mod host;
 
 pub mod explode;
 pub mod flatten;

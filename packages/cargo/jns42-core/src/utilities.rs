@@ -1,3 +1,6 @@
+#[cfg(target_arch = "wasm32")]
+mod host;
+
 mod arena;
 mod banner;
 mod fetch_text;

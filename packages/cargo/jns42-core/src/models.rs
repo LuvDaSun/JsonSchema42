@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-mod exports;
+mod host;
 
 mod schema_arena;
 mod schema_item;

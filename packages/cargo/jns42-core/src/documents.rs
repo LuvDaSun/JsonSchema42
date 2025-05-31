@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-mod exports;
+mod host;
 
 mod document_context;
 mod meta;
