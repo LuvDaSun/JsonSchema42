@@ -60,7 +60,6 @@ package-specification-npm +FILES: \
   done;
 
 package-specification-cargo +FILES: \
-  build-cargo-jns42-generator \
 
   #!/usr/bin/env bash
 
