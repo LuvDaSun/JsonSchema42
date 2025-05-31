@@ -1,6 +1,5 @@
 use super::SchemaArena;
 use crate::schema_transforms;
-// use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
 // #[wasm_bindgen]

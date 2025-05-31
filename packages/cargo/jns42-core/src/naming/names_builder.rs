@@ -4,7 +4,6 @@ use std::{
   collections::{BTreeMap, BTreeSet},
   fmt::Debug,
 };
-// use wasm_bindgen::prelude::*;
 
 #[derive(Debug)]
 pub struct NamesBuilder<K> {

@@ -1,6 +1,5 @@
 use super::Word;
 use std::{iter, slice::Iter};
-// use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 // #[wasm_bindgen]

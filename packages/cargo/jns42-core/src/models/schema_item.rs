@@ -1,12 +1,10 @@
 use super::SchemaType;
 use crate::utilities::NodeLocation;
 use crate::utilities::{merge_either, merge_option};
-// use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeSet;
 use std::fmt::Debug;
 use std::iter;
 use std::{collections::BTreeMap, iter::empty};
-// use wasm_bindgen::prelude::*;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;

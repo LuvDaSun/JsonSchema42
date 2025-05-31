@@ -9,7 +9,6 @@ use std::{
   iter,
   rc::Rc,
 };
-// use wasm_bindgen::prelude::*;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
 

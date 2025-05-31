@@ -1,6 +1,5 @@
 use super::Sentence;
 use std::collections::BTreeMap;
-// use wasm_bindgen::prelude::*;
 
 pub struct Names<K>(BTreeMap<K, Sentence>);
 

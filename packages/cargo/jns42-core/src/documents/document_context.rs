@@ -5,13 +5,11 @@ use crate::error::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utilities::NodeCache;
 use crate::utilities::NodeLocation;
-// use gloo::utils::format::JsValueSerdeExt;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::iter;
 use std::rc;
-// use wasm_bindgen::prelude::*;
 
 pub struct DocumentConfiguration {
   pub retrieval_location: NodeLocation,

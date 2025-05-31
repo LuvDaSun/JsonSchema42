@@ -1,5 +1,3 @@
-// use wasm_bindgen::prelude::*;
-
 pub enum FetchTextError {
   IoError,
   HttpError,
