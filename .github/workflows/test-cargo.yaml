@@ -30,4 +30,5 @@ jobs:
     container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
+      - run: cargo install just
       - run: just package-specification-cargo-all

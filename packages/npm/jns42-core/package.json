@@ -16,7 +16,8 @@
     "./dist/**"
   ],
   "scripts": {
-    "prepack": "just build-npm-jns42-core",
+    "prepack": "npm run build",
+    "build": "just build-npm-jns42-core",
     "generate": "wasm-bindgen --target nodejs --out-dir dist $npm_config_local_prefix/target/wasm32-unknown-unknown/release/jns42_core.wasm"
   },
   "repository": {

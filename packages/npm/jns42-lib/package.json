@@ -19,8 +19,9 @@
     "./bundled/**"
   ],
   "scripts": {
-    "prepack": "just build-npm-jns42-lib",
-    "pretest": "just build-npm-jns42-lib",
+    "prepack": "npm run build",
+    "pretest": "npm run build",
+    "build": "just build-npm-jns42-lib",
     "compile": "tsc --build",
     "bundle": "rollup --config rollup.config.mjs",
     "test": "node --test ./transpiled/**/*.test.js"
