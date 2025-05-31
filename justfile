@@ -6,6 +6,11 @@ build-all: \
   build-npm-jns42-lib \
 
 
+install-all: \
+
+  npm install
+
+
 build-cargo-jns42-core: \
 
   cargo build --package jns42-core --target wasm32-unknown-unknown --release
