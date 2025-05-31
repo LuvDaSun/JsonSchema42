@@ -45,6 +45,5 @@ jobs:
       - uses: actions/checkout@v4
       - run: npm ci
 
-      - run: just build-all
-      - run: ./test-fixtures-npm
-      - run: ./package-fixtures-npm
+      - run: just package-specification-npm-all
+      - run: just test-fixture-npm-all
