@@ -42,6 +42,8 @@ package-specification-npm +FILES: \
 
   #!/usr/bin/env bash
 
+  set -e
+
   export FILES="{{FILES}}"
 
   for FILE in ${FILES}; do
@@ -62,6 +64,8 @@ package-specification-cargo +FILES: \
 
   #!/usr/bin/env bash
 
+  set -e
+
   export FILES="{{FILES}}"
 
   for FILE in ${FILES}; do
@@ -81,6 +85,8 @@ test-fixture-npm +FILES: \
   build-npm-jns42-generator \
 
   #!/usr/bin/env bash
+
+  set -e
 
   export FILES="{{FILES}}"
 
