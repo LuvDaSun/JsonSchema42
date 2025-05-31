@@ -42,6 +42,18 @@ interface naming {
 }
 
 interface models {
+  enum schema-type {
+    any,
+    never,
+    null,
+    boolean,
+    integer,
+    number,
+    str,
+    array,
+    object,
+  }
+
   resource arena-schema-item {
     name-get: func() -> list<string>;
   }

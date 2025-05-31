@@ -99,29 +99,29 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     `;
       function* generateSubAssertions() {
-        for (const type of item.types ?? ([] as core.SchemaType[])) {
+        for (const type of item.types ?? ([] as core.models.SchemaType[])) {
           switch (type) {
-            case core.SchemaType.Any: {
+            case "any": {
               yield JSON.stringify(true);
               break;
             }
 
-            case core.SchemaType.Never: {
+            case "never": {
               yield JSON.stringify(false);
               return;
             }
 
-            case core.SchemaType.Null: {
+            case "null": {
               yield itt`${valueExpression} === null`;
               break;
             }
 
-            case core.SchemaType.Boolean: {
+            case "boolean": {
               yield itt`typeof ${valueExpression} === "boolean"`;
               break;
             }
 
-            case core.SchemaType.Integer: {
+            case "integer": {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression}) &&
@@ -130,7 +130,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case core.SchemaType.Number: {
+            case "number": {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression})
@@ -138,17 +138,17 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case core.SchemaType.String: {
+            case "str": {
               yield itt`typeof ${valueExpression} === "string"`;
               break;
             }
 
-            case core.SchemaType.Array: {
+            case "array": {
               yield itt`Array.isArray(${valueExpression})`;
               break;
             }
 
-            case core.SchemaType.Object: {
+            case "object": {
               yield itt`
                 ${valueExpression} !== null &&
                 typeof ${valueExpression} === "object" &&
