@@ -7,7 +7,7 @@ interface imports {
     http-error,
   }
 
-  fetch-text: func(location: string) -> result<string, fetch-text-error>;
+  fetch-text: async func(location: string) -> result<string, fetch-text-error>;
 }
 
 interface utilities {

@@ -15,7 +15,9 @@ impl From<crate::jns42::core::imports::FetchTextError> for FetchTextError {
 
 #[cfg(target_arch = "wasm32")]
 pub fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  let text = crate::jns42::core::imports::fetch_text(location)?;
+  let text = futures::executor::block_on(crate::jns42::core::imports::fetch_text(
+    location.to_string(),
+  ))?;
 
   Ok(text)
 }
