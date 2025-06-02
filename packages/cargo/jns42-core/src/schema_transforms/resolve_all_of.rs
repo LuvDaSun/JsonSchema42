@@ -28,7 +28,7 @@ use std::{cell::RefCell, collections::BTreeMap};
  *   - 300
  * ```
  */
-pub fn transform(arena: &mut SchemaArena, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: u32) {
   let item = arena.get_item(key);
 
   let Some(sub_keys) = item.all_of.clone() else {
@@ -90,7 +90,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   // this is so that the following closures don't have to be FnMut
   let arena = RefCell::new(arena);
 
-  let merge_key = |key: &usize, other_key: &usize| {
+  let merge_key = |key: &u32, other_key: &u32| {
     if key == other_key {
       return *key;
     }

@@ -1,6 +1,6 @@
 use crate::models::SchemaArena;
 
-pub fn transform(arena: &mut SchemaArena, key: usize) {
+pub fn transform(arena: &mut SchemaArena, key: u32) {
   let item_base = arena.get_item(key);
   let item_base = item_base.clone();
 

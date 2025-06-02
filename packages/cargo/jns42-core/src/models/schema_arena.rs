@@ -53,7 +53,7 @@ impl Arena<ArenaSchemaItem> {
 
       let item = schema.map_keys(|location| *key_map.get(location).unwrap());
 
-      arena.replace_item(*key as usize, item);
+      arena.replace_item(*key , item);
     }
 
     arena
@@ -72,14 +72,14 @@ impl Arena<ArenaSchemaItem> {
   /// A tuple containing the resolved `usize` and a reference to the resolved `ArenaSchemaItem`.
   pub fn resolve_entry(&self, key: u32) -> (u32, &ArenaSchemaItem) {
     let mut resolved_key = key;
-    let mut resolved_item = self.get_item(resolved_key as usize);
+    let mut resolved_item = self.get_item(resolved_key );
 
     loop {
       let Some(alias_key) = resolved_item.get_alias_key() else {
         break;
       };
       resolved_key = alias_key;
-      resolved_item = self.get_item(resolved_key as usize);
+      resolved_item = self.get_item(resolved_key );
     }
 
     (resolved_key, resolved_item)
@@ -90,7 +90,7 @@ impl Arena<ArenaSchemaItem> {
     let mut queue: Vec<_> = iter::once(key).collect();
 
     while let Some(key) = queue.pop() {
-      let item = self.get_item(key as usize);
+      let item = self.get_item(key );
       for key in item.get_dependencies() {
         if !result.insert(key) {
           continue;

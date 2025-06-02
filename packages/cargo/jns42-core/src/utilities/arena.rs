@@ -47,8 +47,8 @@ where
   /// # Panics
   ///
   /// Panics if `key` is out of bounds.
-  pub fn get_item(&self, key: usize) -> &I {
-    self.0.get(key).unwrap()
+  pub fn get_item(&self, key: u32) -> &I {
+    self.0.get(key as usize).unwrap()
   }
 
   /// Replaces the item at the specified key with a new item.
@@ -61,8 +61,8 @@ where
   /// # Returns
   ///
   /// The item that was replaced.
-  pub fn replace_item(&mut self, key: usize, item: I) -> I {
-    self.0.set(key, item)
+  pub fn replace_item(&mut self, key: u32, item: I) -> I {
+    self.0.set(key as usize, item)
   }
 
   /// Adds a new item to the end of the arena and returns its key.
@@ -74,8 +74,8 @@ where
   /// # Returns
   ///
   /// The key (index) of the newly added item.
-  pub fn add_item(&mut self, item: I) -> usize {
-    let key = self.0.len();
+  pub fn add_item(&mut self, item: I) -> u32 {
+    let key = self.0.len() as u32;
     self.0.push_back(item);
     key
   }
@@ -98,10 +98,10 @@ where
   /// # Returns
   ///
   /// The number of items that were changed by the transformation.
-  pub fn apply_transform(&mut self, transform: impl Fn(&mut Self, usize)) -> usize {
+  pub fn apply_transform(&mut self, transform: impl Fn(&mut Self, u32)) -> u32 {
     let mut count = 0;
-    let mut key = 0;
-    while key < self.0.len() {
+    let mut key = 0 as u32;
+    while key < self.0.len() as u32 {
       let self_previous = self.clone();
 
       transform(self, key);

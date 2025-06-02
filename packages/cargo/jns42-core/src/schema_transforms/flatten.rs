@@ -4,7 +4,7 @@ macro_rules! generate_mod {
       use crate::models::SchemaArena;
       use std::iter;
 
-      pub fn transform(arena: &mut SchemaArena, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: u32) {
         let item = arena.get_item(key);
 
         let mut item_new = item.clone();

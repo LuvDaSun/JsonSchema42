@@ -17,7 +17,7 @@ macro_rules! generate_mod {
        * - reference: 1
        * ```
        */
-      pub fn transform(arena: &mut SchemaArena, key: usize) {
+      pub fn transform(arena: &mut SchemaArena, key: u32) {
         let item = arena.get_item(key);
 
         if let Some(sub_keys) = &item.$member {

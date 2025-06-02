@@ -109,7 +109,7 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
     &self,
     key: crate::exports::jns42::core::models::Key,
   ) -> crate::exports::jns42::core::models::ArenaSchemaItem {
-    self.0.borrow().get_item(key as usize).clone().into()
+    self.0.borrow().get_item(key).clone().into()
   }
 
   fn get_all_related(
@@ -132,7 +132,7 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
     self
       .0
       .borrow_mut()
-      .apply_transform(|arena: &mut super::SchemaArena, key: usize| {
+      .apply_transform(|arena: &mut super::SchemaArena, key: u32| {
         for transform in &transforms {
           let transform: super::BoxedSchemaTransform = (*transform).into();
           transform(arena, key)
