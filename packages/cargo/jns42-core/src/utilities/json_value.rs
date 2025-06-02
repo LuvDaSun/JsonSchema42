@@ -156,6 +156,7 @@ impl JsonValue {
   }
 }
 
+#[cfg(target_arch = "wasm32")]
 impl From<&serde_json::Value> for exports::jns42::core::utilities::JsonType {
   fn from(value: &serde_json::Value) -> Self {
     match value {
