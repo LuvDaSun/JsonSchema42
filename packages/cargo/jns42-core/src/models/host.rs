@@ -10,19 +10,13 @@ impl From<super::SchemaArena> for SchemaArenaHost {
 
 impl From<SchemaArenaHost> for crate::exports::jns42::core::models::SchemaArena {
   fn from(value: SchemaArenaHost) -> Self {
-    todo!()
+    Self::new(value)
   }
 }
 
 impl From<super::SchemaArena> for crate::exports::jns42::core::models::SchemaArena {
   fn from(value: super::SchemaArena) -> Self {
-    todo!()
-  }
-}
-
-impl From<SchemaArenaHost> for super::SchemaArena {
-  fn from(value: SchemaArenaHost) -> Self {
-    value.0.into_inner()
+    SchemaArenaHost::from(value).into()
   }
 }
 
@@ -166,7 +160,9 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
   }
 
   fn clone(&self) -> crate::exports::jns42::core::models::SchemaArena {
-    todo!()
+    crate::exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(
+      self.0.borrow().clone(),
+    ))
   }
 }
 
@@ -264,11 +260,6 @@ impl From<super::ArenaSchemaItem> for crate::exports::jns42::core::models::Arena
 impl crate::exports::jns42::core::models::Guest for crate::Host {
   type SchemaArena = SchemaArenaHost;
 }
-
-//   pub fn from_document_context(document_context: &DocumentContextContainer) -> Self {
-//     let document_context = document_context.clone();
-//     SchemaArena::from_document_context(&document_context.into()).into()
-//   }
 
 // #[cfg(test)]
 // mod tests {

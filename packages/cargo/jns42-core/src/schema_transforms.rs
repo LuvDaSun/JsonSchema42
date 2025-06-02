@@ -1,6 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-mod host;
-
 pub mod explode;
 pub mod flatten;
 pub mod flip;

@@ -14,10 +14,6 @@ interface utilities {
   banner: func(prefix: string, version: string) -> string;
 }
 
-interface schema-transforms {
-  add: func(a: u32, b: u32) -> u32;
-}
-
 interface naming {
   resource names {
     get-name: func(key: u32) -> option<sentence>;
@@ -151,7 +147,6 @@ interface documents {
 
 world core {
   export utilities;
-  export schema-transforms;
   export naming;
   export models;
   export documents;
