@@ -31,7 +31,7 @@ pub struct CommandOptions {
   pub transform_maximum_iterations: usize,
 }
 
-pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
+pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
   let CommandOptions {
     schema_location,
     default_meta_schema_id,
@@ -69,8 +69,7 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
       package_directory: &package_directory,
     },
     &specification,
-  )
-  .await?;
+  )?;
 
   Ok(())
 }
