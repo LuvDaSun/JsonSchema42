@@ -64,7 +64,7 @@ impl From<exports::jns42::core::documents::DocumentContext> for DocumentContextH
   }
 }
 
-impl From<exports::jns42::core::documents::DocumentContext> for Rc<DocumentContext> {
+impl From<exports::jns42::core::documents::DocumentContext> for rc::Rc<DocumentContext> {
   fn from(value: exports::jns42::core::documents::DocumentContext) -> Self {
     DocumentContextHost::from(value).0
   }
@@ -76,9 +76,7 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
   }
 
   fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
-    let context = self.0;
-    context.register_well_known_factories()?;
-    Ok(())
+    todo!()
   }
 
   fn load_from_location(
@@ -88,13 +86,14 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     antecedent_location: Option<String>,
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
-    self.0.load_from_location(
-      retrieval_location.try_into()?,
-      given_location.try_into()?,
-      antecedent_location.map(|value| value.try_into()?),
-      &default_meta_schema_id,
-    )?;
-    Ok(())
+    todo!()
+    // self.0.load_from_location(
+    //   retrieval_location.try_into()?,
+    //   given_location.try_into()?,
+    //   antecedent_location.map(|value| value.try_into()?),
+    //   &default_meta_schema_id,
+    // )?;
+    // Ok(())
   }
 
   fn load_from_node(
