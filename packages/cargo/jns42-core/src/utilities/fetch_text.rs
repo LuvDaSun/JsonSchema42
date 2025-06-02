@@ -48,7 +48,7 @@ pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   } else {
     let mut file = File::open(location).await?;
     let metadata = file.metadata().await?;
-    let mut data = String::with_capacity(metadata.len());
+    let mut data = String::with_capacity(metadata.len() as usize);
     file.read_to_string(&mut data).await?;
     Ok(data)
   }
