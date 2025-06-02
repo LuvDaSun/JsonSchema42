@@ -3,7 +3,6 @@ use std::str::FromStr;
 #[derive(
   Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, Debug, serde::Serialize, serde::Deserialize,
 )]
-// #[wasm_bindgen]
 pub enum SchemaType {
   Never,
   Any,
