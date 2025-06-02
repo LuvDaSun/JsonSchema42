@@ -1,5 +1,4 @@
 use super::SchemaArena;
-use crate::schema_transforms;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum SchemaTransform {

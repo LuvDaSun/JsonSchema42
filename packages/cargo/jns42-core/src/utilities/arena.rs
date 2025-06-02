@@ -100,7 +100,7 @@ where
   /// The number of items that were changed by the transformation.
   pub fn apply_transform(&mut self, transform: impl Fn(&mut Self, u32)) -> u32 {
     let mut count = 0;
-    let mut key = 0 as u32;
+    let mut key = 0;
     while key < self.0.len() as u32 {
       let self_previous = self.clone();
 

@@ -102,7 +102,7 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
   }
 
   fn count(&self) -> u32 {
-    self.0.borrow().count() as u32
+    self.0.borrow().count()
   }
 
   fn get_item(
@@ -137,7 +137,7 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
           let transform: super::BoxedSchemaTransform = (*transform).into();
           transform(arena, key)
         }
-      }) as u32
+      })
   }
 }
 
@@ -211,23 +211,11 @@ impl From<super::ArenaSchemaItem> for crate::exports::jns42::core::models::Arena
       options: Default::default(), // value.options,
       required: value.required.map(|value| value.into_iter().collect()),
 
-      minimum_inclusive: value
-        .minimum_inclusive
-        .map(|value| value.as_f64())
-        .flatten(),
-      minimum_exclusive: value
-        .minimum_exclusive
-        .map(|value| value.as_f64())
-        .flatten(),
-      maximum_inclusive: value
-        .maximum_inclusive
-        .map(|value| value.as_f64())
-        .flatten(),
-      maximum_exclusive: value
-        .maximum_exclusive
-        .map(|value| value.as_f64())
-        .flatten(),
-      multiple_of: value.multiple_of.map(|value| value.as_f64()).flatten(),
+      minimum_inclusive: value.minimum_inclusive.and_then(|value| value.as_f64()),
+      minimum_exclusive: value.minimum_exclusive.and_then(|value| value.as_f64()),
+      maximum_inclusive: value.maximum_inclusive.and_then(|value| value.as_f64()),
+      maximum_exclusive: value.maximum_exclusive.and_then(|value| value.as_f64()),
+      multiple_of: value.multiple_of.and_then(|value| value.as_f64()),
 
       minimum_length: value.minimum_length,
       maximum_length: value.maximum_length,
