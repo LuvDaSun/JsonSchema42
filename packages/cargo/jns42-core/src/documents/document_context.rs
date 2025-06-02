@@ -574,6 +574,27 @@ impl DocumentContext {
 // }
 
 #[cfg(target_arch = "wasm32")]
+pub struct DocumentContextBuilderHost(std::cell::RefCell<Option<DocumentContext>>);
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::documents::GuestDocumentContextBuilder for DocumentContextBuilderHost {
+  fn new() -> Self {
+    Self(Default::default())
+  }
+
+  fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
+    todo!()
+  }
+
+  #[allow(async_fn_in_trait)]
+  fn build(&self) -> exports::jns42::core::documents::DocumentContext {
+    let document_context = self.0.borrow_mut().take().unwrap();
+    let document_context: DocumentContextHost = document_context.into();
+    exports::jns42::core::documents::DocumentContext::new(document_context)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
 pub struct DocumentContextHost(rc::Rc<DocumentContext>);
 
 #[cfg(target_arch = "wasm32")]
@@ -613,14 +634,6 @@ impl From<exports::jns42::core::documents::DocumentContext> for rc::Rc<DocumentC
 
 #[cfg(target_arch = "wasm32")]
 impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHost {
-  fn new() -> Self {
-    Self(Default::default())
-  }
-
-  fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
-    todo!()
-  }
-
   fn load_from_location(
     &self,
     retrieval_location: String,

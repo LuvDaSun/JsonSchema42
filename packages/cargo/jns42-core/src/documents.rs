@@ -20,4 +20,5 @@ pub mod swagger_v2;
 #[cfg(target_arch = "wasm32")]
 impl crate::exports::jns42::core::documents::Guest for crate::Host {
   type DocumentContext = DocumentContextHost;
+  type DocumentContextBuilder = DocumentContextBuilderHost;
 }

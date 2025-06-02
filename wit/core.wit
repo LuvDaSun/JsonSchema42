@@ -157,11 +157,14 @@ interface documents {
     serialization-error,
   }
 
-  resource document-context {
+  resource document-context-builder {
     constructor();
 
     register-well-known-factories: func() -> result<_, error>;
+    build: func() -> document-context;
+  }
 
+  resource document-context {
     load-from-location: func(
       retrieval-location: string,
       given-location: string,
