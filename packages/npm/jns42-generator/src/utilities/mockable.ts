@@ -42,13 +42,13 @@ export function isMockable(arena: core.models.SchemaArena, key: number) {
     mockableCounter++;
   }
 
-  if (item.ifSchema != null) {
+  if (item.if != null) {
     return false;
   }
-  if (item.thenSchema != null) {
+  if (item.then != null) {
     return false;
   }
-  if (item.elseSchema != null) {
+  if (item.else != null) {
     return false;
   }
   if (item.not != null) {
@@ -98,7 +98,7 @@ export function isMockable(arena: core.models.SchemaArena, key: number) {
   if (item.objectProperties != null && Object.keys(item.objectProperties).length > 0) {
     const required = new Set(item.required);
     if (
-      !Object.entries(item.objectProperties as Record<string, number>)
+      !item.objectProperties
         .filter(([name, key]) => required.has(name))
         .every(([name, key]) => isMockable(arena, key))
     ) {

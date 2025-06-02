@@ -12,7 +12,7 @@ export interface LoadSpecificationConfiguration {
 }
 
 export function loadSpecification(
-  documentContext: core.DocumentContextContainer,
+  documentContext: core.documents.DocumentContext,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;
@@ -107,7 +107,7 @@ export function loadSpecification(
     explicitTypeKeys.flatMap((key) => [...typesArena.getAllRelated(key)]),
   );
 
-  const namesBuilder = new core.NamesBuilderContainer();
+  const namesBuilder = new core.naming.NamesBuilder();
   namesBuilder.setDefaultName(defaultTypeName);
 
   for (const key of primaryTypeKeys) {
