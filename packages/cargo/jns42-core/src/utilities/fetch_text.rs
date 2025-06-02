@@ -14,7 +14,7 @@ impl From<crate::jns42::core::imports::FetchTextError> for FetchTextError {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
+pub fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   let text = crate::jns42::core::imports::fetch_text(location)?;
 
   Ok(text)
@@ -35,21 +35,16 @@ impl From<surf::Error> for FetchTextError {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub async fn fetch_text(location: &str) -> Result<String, FetchTextError> {
-  use tokio::fs::File;
-  use tokio::io::AsyncReadExt;
-
+pub fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   if location.starts_with("http://") || location.starts_with("https://") {
-    let mut response = surf::get(location)
-      .middleware(surf::middleware::Redirect::new(5))
-      .await?;
-    let data = response.body_string().await?;
+    let mut response = surf::get(location).middleware(surf::middleware::Redirect::new(5))?;
+    let data = response.body_string()?;
     Ok(data)
   } else {
-    let mut file = File::open(location).await?;
-    let metadata = file.metadata().await?;
+    let mut file = File::open(location)?;
+    let metadata = file.metadata()?;
     let mut data = String::with_capacity(metadata.len() as usize);
-    file.read_to_string(&mut data).await?;
+    file.read_to_string(&mut data)?;
     Ok(data)
   }
 }

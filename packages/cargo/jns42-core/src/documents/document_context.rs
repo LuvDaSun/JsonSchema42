@@ -227,8 +227,7 @@ impl DocumentContext {
   Load nodes from a location. The retrieval location is the physical location of the node,
   it should be a root location
   */
-  #[allow(clippy::await_holding_refcell_ref)]
-  pub async fn load_from_location(
+  pub fn load_from_location(
     self: &rc::Rc<Self>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
@@ -274,8 +273,7 @@ impl DocumentContext {
       self
         .cache
         .borrow_mut()
-        .load_from_location(&retrieval_location)
-        .await?;
+        .load_from_location(&retrieval_location)?;
 
       // Get the node from the cache
       let document_node = self
@@ -382,7 +380,7 @@ impl DocumentContext {
     Ok(())
   }
 
-  pub async fn load_from_node(
+  pub fn load_from_node(
     self: &rc::Rc<Self>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
@@ -395,14 +393,12 @@ impl DocumentContext {
       .borrow_mut()
       .load_from_node(&retrieval_location, node)?;
 
-    self
-      .load_from_location(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        default_meta_schema_id,
-      )
-      .await
+    self.load_from_location(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      default_meta_schema_id,
+    )
   }
 
   pub fn get_explicit_locations(&self) -> BTreeSet<NodeLocation> {
@@ -505,7 +501,7 @@ impl DocumentContextContainer {
   }
 
   // #[wasm_bindgen(js_name = "loadFromLocation")]
-  pub async fn load_from_location(
+  pub fn load_from_location(
     &self,
     retrieval_location: String,
     given_location: String,
@@ -518,21 +514,16 @@ impl DocumentContextContainer {
       .map(|location| location.parse())
       .transpose()?;
 
-    Ok(
-      self
-        .0
-        .load_from_location(
-          retrieval_location,
-          given_location,
-          antecedent_location,
-          default_meta_schema_id,
-        )
-        .await?,
-    )
+    Ok(self.0.load_from_location(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      default_meta_schema_id,
+    )?)
   }
 
   // #[wasm_bindgen(js_name = "loadFromNode")]
-  pub async fn load_from_node(
+  pub fn load_from_node(
     &self,
     retrieval_location: String,
     given_location: String,
@@ -546,18 +537,13 @@ impl DocumentContextContainer {
       .map(|location| location.parse())
       .transpose()?;
 
-    Ok(
-      self
-        .0
-        .load_from_node(
-          retrieval_location,
-          given_location,
-          antecedent_location,
-          node,
-          default_meta_schema_id,
-        )
-        .await?,
-    )
+    Ok(self.0.load_from_node(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      node,
+      default_meta_schema_id,
+    )?)
   }
 
   // #[wasm_bindgen(js_name = "getExplicitLocations")]
@@ -589,8 +575,7 @@ mod tests {
   use super::*;
   use crate::models::SchemaType;
 
-  #[tokio::test]
-  async fn test_load_string_from_location() {
+  fn test_load_string_from_location() {
     let mut document_context = rc::Rc::new(DocumentContext::default());
     document_context.register_well_known_factories().unwrap();
 
@@ -605,7 +590,6 @@ mod tests {
         None,
         documents::draft_2020_12::META_SCHEMA_ID,
       )
-      .await
       .unwrap();
 
     let mut nodes = document_context.get_schema_nodes();

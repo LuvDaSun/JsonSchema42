@@ -142,7 +142,43 @@ interface models {
 }
 
 interface documents {
-  resource document-context {}
+  variant error {
+    unknown,
+    conflict,
+    document-node-not-found(string),
+    version-node-not-found(string),
+    factory-not-found(string),
+    retrieval-location-not-found(string),
+    identity-location-not-found(string),
+    document-not-found(string),
+    reference-not-found(string),
+    invalid-location,
+    fetch-error,
+    serialization-error,
+  }
+
+  resource document-context {
+    constructor();
+
+    register-well-known-factories: func() -> result<_, error>;
+
+    load-from-location: func(
+      retrieval-location: string,
+      given-location: string,
+      antecedent-location: option<string>,
+      default-meta-schema-id: string,
+    ) -> result<_, error>;
+
+    load-from-node: func(
+      retrieval-location: string,
+      given-location: string,
+      antecedent-location: option<string>,
+      node: string,
+      default-meta-schema-id: string,
+    ) -> result<_, error>;
+
+    get-explicit-locations: func() -> list<string>;
+  }
 }
 
 world core {

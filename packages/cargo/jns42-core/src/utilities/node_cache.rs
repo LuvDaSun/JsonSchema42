@@ -63,7 +63,7 @@ impl NodeCache {
   /// Load nodes from a location. The retrieval location is the physical location of
   /// the node, it should be a root location
   ///
-  pub async fn load_from_location(
+  pub fn load_from_location(
     &mut self,
     retrieval_location: &NodeLocation,
   ) -> Result<(), NodeCacheError> {
@@ -76,7 +76,7 @@ impl NodeCache {
       /*
       retrieve the document
       */
-      let data = fetch_text(&entry.key().to_fetch_string()).await?;
+      let data = fetch_text(&entry.key().to_fetch_string())?;
       let root_node = serde_yaml::from_str(&data)?;
 
       /*
@@ -190,13 +190,12 @@ impl From<serde_yaml::Error> for NodeCacheError {
 mod tests {
   use super::*;
 
-  #[tokio::test]
-  async fn test_load_from_location() {
+  fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
     let location: NodeLocation = "../../../fixtures/specifications/nwd.yaml".parse().unwrap();
 
-    cache.load_from_location(&location).await.unwrap();
+    cache.load_from_location(&location).unwrap();
 
     cache.get_node(&location).unwrap();
 

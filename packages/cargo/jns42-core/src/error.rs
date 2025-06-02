@@ -42,12 +42,6 @@ impl Display for Error {
   }
 }
 
-// impl From<Error> for js_sys::Error {
-//   fn from(value: Error) -> Self {
-//     js_sys::Error::new(&value.to_string())
-//   }
-// }
-
 impl From<ParseLocationError> for Error {
   fn from(value: ParseLocationError) -> Self {
     match value {
