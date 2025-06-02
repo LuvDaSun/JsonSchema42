@@ -31,6 +31,7 @@ words:
   - rlib
   - ryanluker
   - serde
+  - Skiffa
   - smol
   - snakecase
   - structs
