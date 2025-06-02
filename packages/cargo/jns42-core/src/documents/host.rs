@@ -20,10 +20,22 @@ impl From<super::DocumentContext> for crate::exports::jns42::core::documents::Do
   }
 }
 
-impl crate::exports::jns42::core::documents::Guest for crate::Host {
-  type DocumentContext = DocumentContextHost;
+impl From<crate::exports::jns42::core::documents::DocumentContext> for DocumentContextHost {
+  fn from(value: crate::exports::jns42::core::documents::DocumentContext) -> Self {
+    value.into_inner()
+  }
+}
+
+impl From<crate::exports::jns42::core::documents::DocumentContext> for Rc<super::DocumentContext> {
+  fn from(value: crate::exports::jns42::core::documents::DocumentContext) -> Self {
+    DocumentContextHost::from(value).0
+  }
 }
 
 impl crate::exports::jns42::core::documents::GuestDocumentContext for DocumentContextHost {
   //
+}
+
+impl crate::exports::jns42::core::documents::Guest for crate::Host {
+  type DocumentContext = DocumentContextHost;
 }

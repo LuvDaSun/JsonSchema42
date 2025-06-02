@@ -20,6 +20,64 @@ impl From<super::SchemaArena> for crate::exports::jns42::core::models::SchemaAre
   }
 }
 
+impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
+  fn new() -> Self {
+    super::SchemaArena::new().into()
+  }
+
+  fn count(&self) -> u32 {
+    self.0.borrow().count()
+  }
+
+  fn get_item(
+    &self,
+    key: crate::exports::jns42::core::models::Key,
+  ) -> crate::exports::jns42::core::models::ArenaSchemaItem {
+    self.0.borrow().get_item(key).clone().into()
+  }
+
+  fn get_all_related(
+    &self,
+    key: crate::exports::jns42::core::models::Key,
+  ) -> Vec<crate::exports::jns42::core::models::Key> {
+    self
+      .0
+      .borrow()
+      .get_all_related(key)
+      .map(|value| value as crate::exports::jns42::core::models::Key)
+      .collect()
+  }
+
+  fn transform(
+    &self,
+    transforms: Vec<crate::exports::jns42::core::models::SchemaTransform>,
+  ) -> u32 {
+    self
+      .0
+      .borrow_mut()
+      .apply_transform(|arena: &mut super::SchemaArena, key: u32| {
+        for transform in &transforms {
+          let transform: super::BoxedSchemaTransform = (*transform).into();
+          transform(arena, key)
+        }
+      })
+  }
+
+  fn from_document_context(
+    document_context: crate::exports::jns42::core::documents::DocumentContext,
+  ) -> crate::exports::jns42::core::models::SchemaArena {
+    let document_context = document_context.into();
+    let schema_arena = super::SchemaArena::from_document_context(&document_context);
+    schema_arena.into()
+  }
+
+  fn clone(&self) -> crate::exports::jns42::core::models::SchemaArena {
+    crate::exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(
+      self.0.borrow().clone(),
+    ))
+  }
+}
+
 impl From<crate::exports::jns42::core::models::SchemaTransform> for super::BoxedSchemaTransform {
   fn from(value: crate::exports::jns42::core::models::SchemaTransform) -> Self {
     let transform = match value {
@@ -105,64 +163,6 @@ impl From<crate::exports::jns42::core::models::SchemaTransform> for super::Boxed
       }
     };
     Box::new(transform)
-  }
-}
-
-impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
-  fn new() -> Self {
-    super::SchemaArena::new().into()
-  }
-
-  fn count(&self) -> u32 {
-    self.0.borrow().count()
-  }
-
-  fn get_item(
-    &self,
-    key: crate::exports::jns42::core::models::Key,
-  ) -> crate::exports::jns42::core::models::ArenaSchemaItem {
-    self.0.borrow().get_item(key).clone().into()
-  }
-
-  fn get_all_related(
-    &self,
-    key: crate::exports::jns42::core::models::Key,
-  ) -> Vec<crate::exports::jns42::core::models::Key> {
-    self
-      .0
-      .borrow()
-      .get_all_related(key)
-      .map(|value| value as crate::exports::jns42::core::models::Key)
-      .collect()
-  }
-
-  fn transform(
-    &self,
-    transforms: Vec<crate::exports::jns42::core::models::SchemaTransform>,
-  ) -> u32 {
-    self
-      .0
-      .borrow_mut()
-      .apply_transform(|arena: &mut super::SchemaArena, key: u32| {
-        for transform in &transforms {
-          let transform: super::BoxedSchemaTransform = (*transform).into();
-          transform(arena, key)
-        }
-      })
-  }
-
-  fn from_document_context(
-    document_context: crate::exports::jns42::core::documents::DocumentContext,
-  ) -> crate::exports::jns42::core::models::SchemaArena {
-    let document_context = document_context.into();
-    let schema_arena = super::SchemaArena::from_document_context(&document_context);
-    schema_arena.into()
-  }
-
-  fn clone(&self) -> crate::exports::jns42::core::models::SchemaArena {
-    crate::exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(
-      self.0.borrow().clone(),
-    ))
   }
 }
 
@@ -275,7 +275,7 @@ impl crate::exports::jns42::core::models::Guest for crate::Host {
 //     transforms: impl IntoIterator<Item = SchemaTransform>,
 //   ) {
 //     let expected: Vec<_> = expected.into_iter().collect();
-//     let arena_input = SchemaArena::from_iter(initial);
+//     let arena_input = crate::models::SchemaArena::from_iter(initial);
 //     let transforms: Vec<_> = transforms.into_iter().collect();
 
 //     // the order of transforms should not matter! we test that here
