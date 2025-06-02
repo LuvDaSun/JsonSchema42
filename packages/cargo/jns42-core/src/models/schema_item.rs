@@ -6,6 +6,9 @@ use std::fmt::Debug;
 use std::iter;
 use std::{collections::BTreeMap, iter::empty};
 
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
+
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;
 
@@ -440,6 +443,101 @@ where
       dependent_schemas: map_map(&self.dependent_schemas),
       object_properties: map_map(&self.object_properties),
       pattern_properties: map_map(&self.pattern_properties),
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
+  fn from(value: ArenaSchemaItem) -> Self {
+    Self {
+      name: value.name,
+      exact: value.exact,
+
+      location: value.location.map(Into::into),
+
+      // metadata
+      title: value.title,
+      description: value.description,
+      examples: Default::default(), //value.examples.map(Into::into),
+      deprecated: value.deprecated,
+
+      // types
+      types: value
+        .types
+        .map(|value| value.into_iter().map(Into::into).collect()),
+
+      // applicators
+      reference: value.reference.map(|value| value as u32),
+
+      if_: value.r#if.map(|value| value as u32),
+      then: value.then.map(|value| value as u32),
+      else_: value.r#else.map(|value| value as u32),
+
+      not: value.not.map(|value| value as u32),
+
+      property_names: value.property_names.map(|value| value as u32),
+      map_properties: value.map_properties.map(|value| value as u32),
+      array_items: value.array_items.map(|value| value as u32),
+      contains: value.contains.map(|value| value as u32),
+
+      all_of: value
+        .all_of
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      any_of: value
+        .any_of
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      one_of: value
+        .one_of
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      tuple_items: value
+        .tuple_items
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+
+      object_properties: value.object_properties.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as u32))
+          .collect()
+      }),
+      pattern_properties: value.pattern_properties.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as u32))
+          .collect()
+      }),
+      dependent_schemas: value.dependent_schemas.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as u32))
+          .collect()
+      }),
+
+      definitions: value
+        .definitions
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+
+      // assertions
+      options: Default::default(), // value.options,
+      required: value.required.map(|value| value.into_iter().collect()),
+
+      minimum_inclusive: value.minimum_inclusive.and_then(|value| value.as_f64()),
+      minimum_exclusive: value.minimum_exclusive.and_then(|value| value.as_f64()),
+      maximum_inclusive: value.maximum_inclusive.and_then(|value| value.as_f64()),
+      maximum_exclusive: value.maximum_exclusive.and_then(|value| value.as_f64()),
+      multiple_of: value.multiple_of.and_then(|value| value.as_f64()),
+
+      minimum_length: value.minimum_length.map(|value| value as u32),
+      maximum_length: value.maximum_length.map(|value| value as u32),
+      value_pattern: value.value_pattern,
+      value_format: value.value_format,
+
+      minimum_items: value.minimum_items.map(|value| value as u32),
+      maximum_items: value.maximum_items.map(|value| value as u32),
+      unique_items: value.unique_items,
+
+      minimum_properties: value.minimum_properties.map(|value| value as u32),
+      maximum_properties: value.maximum_properties.map(|value| value as u32),
     }
   }
 }

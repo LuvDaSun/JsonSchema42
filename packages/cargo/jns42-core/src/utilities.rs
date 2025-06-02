@@ -1,6 +1,3 @@
-#[cfg(target_arch = "wasm32")]
-mod host;
-
 mod arena;
 mod banner;
 mod fetch_text;
@@ -18,3 +15,10 @@ pub use merge::*;
 pub use node_cache::*;
 pub use node_location::*;
 pub use product::*;
+
+#[cfg(target_arch = "wasm32")]
+impl crate::exports::jns42::core::utilities::Guest for crate::Host {
+  fn banner(prefix: String, version: String) -> String {
+    banner(&prefix, &version)
+  }
+}

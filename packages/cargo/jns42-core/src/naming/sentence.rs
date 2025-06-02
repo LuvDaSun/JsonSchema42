@@ -1,6 +1,9 @@
 use super::Word;
 use std::{iter, slice::Iter};
 
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
+
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Sentence(Vec<Word>);
 
@@ -173,6 +176,53 @@ impl IntoIterator for Sentence {
 impl FromIterator<Word> for Sentence {
   fn from_iter<T: IntoIterator<Item = Word>>(iter: T) -> Self {
     Self(iter.into_iter().collect())
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub struct SentenceHost(Sentence);
+
+#[cfg(target_arch = "wasm32")]
+impl From<Sentence> for SentenceHost {
+  fn from(value: Sentence) -> Self {
+    Self(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<SentenceHost> for exports::jns42::core::naming::Sentence {
+  fn from(value: SentenceHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<Sentence> for exports::jns42::core::naming::Sentence {
+  fn from(value: Sentence) -> Self {
+    SentenceHost::from(value).into()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::naming::GuestSentence for SentenceHost {
+  fn new(input: String) -> Self {
+    Sentence::new(&input).into()
+  }
+
+  fn to_pascal_case(&self) -> String {
+    self.0.to_pascal_case()
+  }
+
+  fn to_camel_case(&self) -> String {
+    self.0.to_camel_case()
+  }
+
+  fn to_snake_case(&self) -> String {
+    self.0.to_snake_case()
+  }
+
+  fn to_screaming_snake_case(&self) -> String {
+    self.0.to_screaming_snake_case()
   }
 }
 

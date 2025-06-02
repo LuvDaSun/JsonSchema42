@@ -2,11 +2,9 @@ use crate::generators::package::{PackageConfiguration, generate_package};
 use crate::models::{Specification, SpecificationConfiguration};
 use clap::Parser;
 use jns42_core::documents;
-use jns42_core::documents::DocumentContext;
 use jns42_core::utilities::NodeLocation;
 use std::error::Error;
-use std::path::PathBuf;
-use std::rc::Rc;
+use std::path;
 
 #[derive(Parser, Debug)]
 pub struct CommandOptions {
@@ -16,7 +14,7 @@ pub struct CommandOptions {
   pub default_meta_schema_id: String,
 
   #[arg(long)]
-  pub package_directory: PathBuf,
+  pub package_directory: path::PathBuf,
 
   #[arg(long)]
   pub package_name: String,
@@ -43,10 +41,10 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
     ..
   } = options;
 
-  let mut context = DocumentContext::default();
+  let mut context = documents::DocumentContext::default();
   context.register_well_known_factories().unwrap();
 
-  let context = Rc::new(context);
+  let context = context.build();
   context
     .load_from_location(
       schema_location.clone(),

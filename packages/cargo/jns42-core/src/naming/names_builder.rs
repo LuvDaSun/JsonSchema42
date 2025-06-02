@@ -4,6 +4,9 @@ use std::{
   fmt::Debug,
 };
 
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
+
 #[derive(Debug)]
 pub struct NamesBuilder<K> {
   sentences_map: BTreeMap<K, Vec<Sentence>>,
@@ -274,6 +277,35 @@ where
 {
   fn default() -> Self {
     Self::new()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub struct NamesBuilderHost(std::cell::RefCell<NamesBuilder<u32>>);
+
+#[cfg(target_arch = "wasm32")]
+impl From<NamesBuilder<u32>> for NamesBuilderHost {
+  fn from(value: NamesBuilder<u32>) -> Self {
+    Self(value.into())
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::naming::GuestNamesBuilder for NamesBuilderHost {
+  fn new() -> Self {
+    NamesBuilder::new().into()
+  }
+
+  fn set_default_name(&self, value: String) {
+    self.0.borrow_mut().set_default_name(value);
+  }
+
+  fn add(&self, key: u32, values: Vec<String>) {
+    self.0.borrow_mut().add(key, values);
+  }
+
+  fn build(&self) -> exports::jns42::core::naming::Names {
+    self.0.borrow().build().into()
   }
 }
 

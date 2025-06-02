@@ -1,7 +1,7 @@
 use super::find_version_node;
 use super::schema_document::SchemaDocument;
 use crate::documents;
-use crate::error::Error;
+use crate::documents::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utilities::NodeCache;
 use crate::utilities::NodeLocation;
@@ -10,6 +10,9 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::iter;
 use std::rc;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 pub struct DocumentConfiguration {
   pub retrieval_location: NodeLocation,
@@ -218,6 +221,10 @@ impl DocumentContext {
       }),
     )?;
     Ok(())
+  }
+
+  pub fn build(self) -> rc::Rc<Self> {
+    rc::Rc::new(self)
   }
 
   /**
@@ -565,6 +572,92 @@ impl DocumentContext {
 //     value.0
 //   }
 // }
+
+#[cfg(target_arch = "wasm32")]
+pub struct DocumentContextHost(rc::Rc<DocumentContext>);
+
+#[cfg(target_arch = "wasm32")]
+impl From<DocumentContext> for DocumentContextHost {
+  fn from(value: DocumentContext) -> Self {
+    Self(value.into())
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<DocumentContextHost> for exports::jns42::core::documents::DocumentContext {
+  fn from(value: DocumentContextHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<DocumentContext> for exports::jns42::core::documents::DocumentContext {
+  fn from(value: DocumentContext) -> Self {
+    DocumentContextHost::from(value).into()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<exports::jns42::core::documents::DocumentContext> for DocumentContextHost {
+  fn from(value: exports::jns42::core::documents::DocumentContext) -> Self {
+    value.into_inner()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<exports::jns42::core::documents::DocumentContext> for rc::Rc<DocumentContext> {
+  fn from(value: exports::jns42::core::documents::DocumentContext) -> Self {
+    DocumentContextHost::from(value).0
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHost {
+  fn new() -> Self {
+    Self(Default::default())
+  }
+
+  fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
+    todo!()
+  }
+
+  fn load_from_location(
+    &self,
+    retrieval_location: String,
+    given_location: String,
+    antecedent_location: Option<String>,
+    default_meta_schema_id: String,
+  ) -> Result<(), exports::jns42::core::documents::Error> {
+    todo!()
+    // self.0.load_from_location(
+    //   retrieval_location.try_into()?,
+    //   given_location.try_into()?,
+    //   antecedent_location.map(|value| value.try_into()?),
+    //   &default_meta_schema_id,
+    // )?;
+    // Ok(())
+  }
+
+  fn load_from_node(
+    &self,
+    retrieval_location: String,
+    given_location: String,
+    antecedent_location: Option<String>,
+    node: String,
+    default_meta_schema_id: String,
+  ) -> Result<(), exports::jns42::core::documents::Error> {
+    todo!()
+  }
+
+  fn get_explicit_locations(&self) -> Vec<String> {
+    self
+      .0
+      .get_explicit_locations()
+      .iter()
+      .map(Into::into)
+      .collect()
+  }
+}
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]
