@@ -586,7 +586,6 @@ impl exports::jns42::core::documents::GuestDocumentContextBuilder for DocumentCo
     todo!()
   }
 
-  #[allow(async_fn_in_trait)]
   fn build(&self) -> exports::jns42::core::documents::DocumentContext {
     let document_context = self.0.borrow_mut().take().unwrap();
     let document_context: DocumentContextHost = document_context.into();
@@ -641,14 +640,20 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     antecedent_location: Option<String>,
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
-    todo!()
-    // self.0.load_from_location(
-    //   retrieval_location.try_into()?,
-    //   given_location.try_into()?,
-    //   antecedent_location.map(|value| value.try_into()?),
-    //   &default_meta_schema_id,
-    // )?;
-    // Ok(())
+    let retrieval_location = retrieval_location.try_into()?;
+    let given_location = given_location.try_into()?;
+    let antecedent_location = antecedent_location
+      .map(|value| value.try_into())
+      .transpose()?;
+
+    self.0.load_from_location(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      &default_meta_schema_id,
+    )?;
+
+    Ok(())
   }
 
   fn load_from_node(
@@ -659,7 +664,21 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     node: String,
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
-    todo!()
+    let retrieval_location = retrieval_location.try_into()?;
+    let given_location = given_location.try_into()?;
+    let antecedent_location = antecedent_location
+      .map(|value| value.try_into())
+      .transpose()?;
+
+    self.0.load_from_node(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      serde_json::Value::Null, // TODO
+      &default_meta_schema_id,
+    )?;
+
+    Ok(())
   }
 
   fn get_explicit_locations(&self) -> Vec<String> {

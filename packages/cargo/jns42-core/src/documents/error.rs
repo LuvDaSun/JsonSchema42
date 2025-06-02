@@ -45,34 +45,6 @@ impl Display for Error {
   }
 }
 
-impl From<ParseLocationError> for Error {
-  fn from(value: ParseLocationError) -> Self {
-    match value {
-      ParseLocationError::InvalidInput => Self::InvalidLocation,
-      ParseLocationError::DecodeError => Self::InvalidLocation,
-    }
-  }
-}
-
-impl From<FetchTextError> for Error {
-  fn from(value: FetchTextError) -> Self {
-    match value {
-      FetchTextError::HttpError => Self::FetchError,
-      FetchTextError::IoError => Self::FetchError,
-    }
-  }
-}
-
-impl From<NodeCacheError> for Error {
-  fn from(value: NodeCacheError) -> Self {
-    match value {
-      NodeCacheError::SerializationError => Self::SerializationError,
-      NodeCacheError::FetchError => Self::FetchError,
-      NodeCacheError::Conflict => Self::Conflict,
-    }
-  }
-}
-
 #[cfg(target_arch = "wasm32")]
 impl From<Error> for exports::jns42::core::documents::Error {
   fn from(value: Error) -> Self {
@@ -104,5 +76,57 @@ impl From<Error> for exports::jns42::core::documents::Error {
       Error::FetchError => exports::jns42::core::documents::Error::FetchError,
       Error::SerializationError => exports::jns42::core::documents::Error::SerializationError,
     }
+  }
+}
+
+impl From<ParseLocationError> for Error {
+  fn from(value: ParseLocationError) -> Self {
+    match value {
+      ParseLocationError::InvalidInput => Self::InvalidLocation,
+      ParseLocationError::DecodeError => Self::InvalidLocation,
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<ParseLocationError> for exports::jns42::core::documents::Error {
+  fn from(value: ParseLocationError) -> Self {
+    let value: Error = value.into();
+    value.into()
+  }
+}
+
+impl From<FetchTextError> for Error {
+  fn from(value: FetchTextError) -> Self {
+    match value {
+      FetchTextError::HttpError => Self::FetchError,
+      FetchTextError::IoError => Self::FetchError,
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<FetchTextError> for exports::jns42::core::documents::Error {
+  fn from(value: FetchTextError) -> Self {
+    let value: Error = value.into();
+    value.into()
+  }
+}
+
+impl From<NodeCacheError> for Error {
+  fn from(value: NodeCacheError) -> Self {
+    match value {
+      NodeCacheError::SerializationError => Self::SerializationError,
+      NodeCacheError::FetchError => Self::FetchError,
+      NodeCacheError::Conflict => Self::Conflict,
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<NodeCacheError> for exports::jns42::core::documents::Error {
+  fn from(value: NodeCacheError) -> Self {
+    let value: Error = value.into();
+    value.into()
   }
 }
