@@ -29,11 +29,7 @@ export function isMockable(arena: core.SchemaArenaContainer, key: number) {
 
   if (item.types != null) {
     // we cannot mock never and any types
-    if (
-      item.types.every(
-        (type: core.SchemaType) => type === core.SchemaType.Never || type === core.SchemaType.Any,
-      )
-    ) {
+    if (item.types.every((type: core.models.SchemaType) => type === "never" || type === "any")) {
       return false;
     }
     mockableCounter++;

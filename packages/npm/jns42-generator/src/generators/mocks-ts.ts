@@ -166,24 +166,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length == 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Never:
+      switch (item.types[0] as core.models.SchemaType) {
+        case "never":
           yield "neverValue";
           return;
 
-        case core.SchemaType.Any:
+        case "any":
           yield "anyValue";
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield JSON.stringify(null);
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield `Boolean(nextSeed() % 2)`;
           return;
 
-        case core.SchemaType.Integer: {
+        case "integer": {
           let multipleOf = item.multipleOf ?? 1;
 
           let minimumValue = Number.NEGATIVE_INFINITY;
@@ -226,7 +226,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.Number: {
+        case "number": {
           let minimumValue = Number.NEGATIVE_INFINITY;
           let isMinimumExclusive: boolean | undefined;
           if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
@@ -272,7 +272,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.String: {
+        case "str": {
           const minimumStringLengthExpression =
             item.minimumLength == null
               ? "configuration.defaultMinimumStringLength"
@@ -296,7 +296,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
             [
               ${generateInterfaceContent()}
@@ -341,7 +341,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
             {
               ${generateInterfaceContent()}

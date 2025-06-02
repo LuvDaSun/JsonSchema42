@@ -81,12 +81,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length === 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Any:
+      switch (item.types[0] as core.models.SchemaType) {
+        case "any":
           yield valueExpression;
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield `
             ((value: unknown) => {
               if(value == null) {
@@ -122,7 +122,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield `
             ((value: unknown) => {
               if(value == null) {
@@ -165,7 +165,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Integer:
+        case "integer":
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -191,7 +191,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Number:
+        case "number":
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -217,7 +217,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.String:
+        case "str":
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -243,7 +243,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
             Array.isArray(${valueExpression}) ?
               ${valueExpression}.map((value, index) => {
@@ -287,7 +287,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(

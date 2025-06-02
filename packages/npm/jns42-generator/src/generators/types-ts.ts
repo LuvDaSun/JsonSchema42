@@ -95,33 +95,33 @@ export function* generateTypesTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length === 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Never:
+      switch (item.types[0] as core.models.SchemaType) {
+        case "never":
           yield "never";
           return;
 
-        case core.SchemaType.Any:
+        case "any":
           yield "unknown";
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield "null";
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield "boolean";
           return;
 
-        case core.SchemaType.Integer:
-        case core.SchemaType.Number:
+        case "integer":
+        case "number":
           yield "number";
           return;
 
-        case core.SchemaType.String:
+        case "str":
           yield "string";
           return;
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
           [
             ${generateArrayContent()}
@@ -154,7 +154,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
           {
             ${generateInterfaceContent()}
