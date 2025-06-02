@@ -53,29 +53,29 @@ export function loadSpecification(
 
   // transform the typesArena
   {
-    const transformers = [
-      core.SchemaTransform.Explode,
-      core.SchemaTransform.SingleType,
-      core.SchemaTransform.ResolveSingleAllOf,
-      core.SchemaTransform.ResolveSingleAnyOf,
-      core.SchemaTransform.ResolveSingleOneOf,
-      core.SchemaTransform.FlattenAllOf,
-      core.SchemaTransform.FlattenAnyOf,
-      core.SchemaTransform.FlattenOneOf,
-      core.SchemaTransform.FlipAllOfOneOf,
-      core.SchemaTransform.FlipAnyOfOneOf,
-      core.SchemaTransform.InheritAllOf,
-      core.SchemaTransform.InheritAnyOf,
-      core.SchemaTransform.InheritOneOf,
-      core.SchemaTransform.InheritReference,
-      core.SchemaTransform.ResolveAllOf,
-      core.SchemaTransform.ResolveAnyOf,
-      core.SchemaTransform.ResolveNot,
-      core.SchemaTransform.ResolveIfThenElse,
-      core.SchemaTransform.ResolveSingleAllOf,
-      core.SchemaTransform.ResolveSingleAnyOf,
-      core.SchemaTransform.ResolveSingleOneOf,
-      core.SchemaTransform.Unalias,
+    const transformers: core.models.SchemaTransform[] = [
+      "explode",
+      "single-type",
+      "resolve-single-all-of",
+      "resolve-single-any-of",
+      "resolve-single-one-of",
+      "flatten-all-of",
+      "flatten-any-of",
+      "flatten-one-of",
+      "flip-all-of-one-of",
+      "flip-any-of-one-of",
+      "inherit-all-of",
+      "inherit-any-of",
+      "inherit-one-of",
+      "inherit-reference",
+      "resolve-all-of",
+      "resolve-any-of",
+      "resolve-not",
+      "resolve-if-then-else",
+      "resolve-single-all-of",
+      "resolve-single-any-of",
+      "resolve-single-one-of",
+      "unalias",
     ];
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
@@ -91,7 +91,7 @@ export function loadSpecification(
   // generate names
 
   {
-    const transformers = [core.SchemaTransform.Name];
+    const transformers: core.models.SchemaTransform[] = ["name"];
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
       transformIterations++;
