@@ -1,31 +1,32 @@
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import { instantiate } from "../dist/jns42_core.component.js";
 
 async function getCoreModule(path) {
-  const bytes = await fs.readFile(new URL(`../dist/${path}`, import.meta.url));
+  const bytes = fs.readFileSync(new URL(`../dist/${path}`, import.meta.url));
   const module = await WebAssembly.compile(bytes);
   return module;
 }
 
 const instance = await instantiate(getCoreModule, {
   "jns42:core/imports": {
-    async fetchText(location) {
+    fetchText(location) {
       const locationLower = location.toLowerCase();
       try {
         if (locationLower.startsWith("http://") || locationLower.startsWith("https://")) {
-          const result = await fetch(location);
-          const text = await result.text();
-          return { tag: "ok", val: text };
+          throw "TODO";
+          // const result = await fetch(location);
+          // const text = await result.text();
+          // return text;
         }
       } catch (error) {
-        return { tag: "err", val: "http-error" };
+        throw "http-error";
       }
 
       try {
-        const text = await fs.readFile(location, "utf-8");
-        return { tag: "ok", val: text };
+        const text = fs.readFileSync(location, "utf-8");
+        return text;
       } catch (error) {
-        return { tag: "err", val: "io-error" };
+        throw "io-error";
       }
     },
   },

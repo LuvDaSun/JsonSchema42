@@ -172,14 +172,6 @@ impl exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
       }) as u32
   }
 
-  fn from_document_context(
-    document_context: exports::jns42::core::documents::DocumentContext,
-  ) -> exports::jns42::core::models::SchemaArena {
-    let document_context = document_context.into();
-    let schema_arena = SchemaArena::from_document_context(&document_context);
-    schema_arena.into()
-  }
-
   fn clone(&self) -> exports::jns42::core::models::SchemaArena {
     exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(self.0.borrow().clone()))
   }

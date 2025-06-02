@@ -38,8 +38,6 @@ interface naming {
 }
 
 interface models {
-  use documents.{document-context};
-
   type key = u32;
   type key-set = list<key>;
   type key-map = list<tuple<string, key>>;
@@ -136,12 +134,12 @@ interface models {
 
     clone: func() -> schema-arena;
     transform: func(transforms: list<schema-transform>) -> u32;
-
-    from-document-context: static func(document-context: document-context) -> schema-arena;
   }
 }
 
 interface documents {
+  use models.{schema-arena};
+
   variant error {
     unknown,
     conflict,
@@ -181,6 +179,8 @@ interface documents {
     ) -> result<_, error>;
 
     get-explicit-locations: func() -> list<string>;
+
+    make-schema-arena: func() -> schema-arena;
   }
 }
 

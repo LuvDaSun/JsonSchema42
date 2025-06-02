@@ -579,7 +579,7 @@ pub struct DocumentContextBuilderHost(std::cell::RefCell<Option<DocumentContext>
 #[cfg(target_arch = "wasm32")]
 impl exports::jns42::core::documents::GuestDocumentContextBuilder for DocumentContextBuilderHost {
   fn new() -> Self {
-    Self(Default::default())
+    Self(std::cell::RefCell::new(Some(DocumentContext::new())))
   }
 
   fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
@@ -695,6 +695,12 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
       .iter()
       .map(Into::into)
       .collect()
+  }
+
+  fn make_schema_arena(&self) -> exports::jns42::core::models::SchemaArena {
+    let document_context = self.0.clone();
+    let schema_arena = crate::models::SchemaArena::from_document_context(&document_context);
+    schema_arena.into()
   }
 }
 

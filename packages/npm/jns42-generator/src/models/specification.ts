@@ -19,7 +19,7 @@ export function loadSpecification(
 
   // load the arena
 
-  const typesArena = core.models.SchemaArena.fromDocumentContext(documentContext);
+  const typesArena = documentContext.makeSchemaArena();
   const validatorsArena = typesArena.clone();
 
   // generate root keys
