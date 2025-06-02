@@ -96,7 +96,7 @@ impl DocumentContext {
   }
 
   pub fn register_factory(
-    self: &mut rc::Rc<Self>,
+    &mut self,
     schema: &str,
     factory: Box<DocumentFactory>,
   ) -> Result<(), Error> {
@@ -104,15 +104,12 @@ impl DocumentContext {
     don't check if the factory is already registered here so we can
     override factories
     */
-    rc::Rc::get_mut(self)
-      .ok_or(Error::Unknown)?
-      .factories
-      .insert(schema.to_owned(), factory);
+    self.factories.insert(schema.to_owned(), factory);
 
     Ok(())
   }
 
-  pub fn register_well_known_factories(self: &mut rc::Rc<Self>) -> Result<(), Error> {
+  pub fn register_well_known_factories(&mut self) -> Result<(), Error> {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|context, configuration| {
@@ -484,90 +481,90 @@ impl DocumentContext {
   }
 }
 
-// #[wasm_bindgen]
-#[derive(Default, Clone)]
-pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
+// // #[wasm_bindgen]
+// #[derive(Default, Clone)]
+// pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
 
-// #[wasm_bindgen]
-impl DocumentContextContainer {
-  // #[wasm_bindgen(constructor)]
-  pub fn new() -> Self {
-    Self::default()
-  }
+// // #[wasm_bindgen]
+// impl DocumentContextContainer {
+//   // #[wasm_bindgen(constructor)]
+//   pub fn new() -> Self {
+//     Self::default()
+//   }
 
-  // #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-    Ok(self.0.register_well_known_factories()?)
-  }
+//   // #[wasm_bindgen(js_name = "registerWellKnownFactories")]
+//   pub fn register_well_known_factories(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+//     Ok(self.0.register_well_known_factories()?)
+//   }
 
-  // #[wasm_bindgen(js_name = "loadFromLocation")]
-  pub fn load_from_location(
-    &self,
-    retrieval_location: String,
-    given_location: String,
-    antecedent_location: Option<String>,
-    default_meta_schema_id: &str,
-  ) -> Result<(), Box<dyn std::error::Error>> {
-    let retrieval_location = retrieval_location.parse()?;
-    let given_location = given_location.parse()?;
-    let antecedent_location = antecedent_location
-      .map(|location| location.parse())
-      .transpose()?;
+//   // #[wasm_bindgen(js_name = "loadFromLocation")]
+//   pub fn load_from_location(
+//     &self,
+//     retrieval_location: String,
+//     given_location: String,
+//     antecedent_location: Option<String>,
+//     default_meta_schema_id: &str,
+//   ) -> Result<(), Box<dyn std::error::Error>> {
+//     let retrieval_location = retrieval_location.parse()?;
+//     let given_location = given_location.parse()?;
+//     let antecedent_location = antecedent_location
+//       .map(|location| location.parse())
+//       .transpose()?;
 
-    Ok(self.0.load_from_location(
-      retrieval_location,
-      given_location,
-      antecedent_location,
-      default_meta_schema_id,
-    )?)
-  }
+//     Ok(self.0.load_from_location(
+//       retrieval_location,
+//       given_location,
+//       antecedent_location,
+//       default_meta_schema_id,
+//     )?)
+//   }
 
-  // #[wasm_bindgen(js_name = "loadFromNode")]
-  pub fn load_from_node(
-    &self,
-    retrieval_location: String,
-    given_location: String,
-    antecedent_location: Option<String>,
-    node: serde_json::Value,
-    default_meta_schema_id: &str,
-  ) -> Result<(), Box<dyn std::error::Error>> {
-    let retrieval_location = retrieval_location.parse()?;
-    let given_location = given_location.parse()?;
-    let antecedent_location = antecedent_location
-      .map(|location| location.parse())
-      .transpose()?;
+//   // #[wasm_bindgen(js_name = "loadFromNode")]
+//   pub fn load_from_node(
+//     &self,
+//     retrieval_location: String,
+//     given_location: String,
+//     antecedent_location: Option<String>,
+//     node: serde_json::Value,
+//     default_meta_schema_id: &str,
+//   ) -> Result<(), Box<dyn std::error::Error>> {
+//     let retrieval_location = retrieval_location.parse()?;
+//     let given_location = given_location.parse()?;
+//     let antecedent_location = antecedent_location
+//       .map(|location| location.parse())
+//       .transpose()?;
 
-    Ok(self.0.load_from_node(
-      retrieval_location,
-      given_location,
-      antecedent_location,
-      node,
-      default_meta_schema_id,
-    )?)
-  }
+//     Ok(self.0.load_from_node(
+//       retrieval_location,
+//       given_location,
+//       antecedent_location,
+//       node,
+//       default_meta_schema_id,
+//     )?)
+//   }
 
-  // #[wasm_bindgen(js_name = "getExplicitLocations")]
-  pub fn get_explicit_locations(&self) -> Vec<String> {
-    self
-      .0
-      .get_explicit_locations()
-      .into_iter()
-      .map(|location| location.to_string())
-      .collect()
-  }
-}
+//   // #[wasm_bindgen(js_name = "getExplicitLocations")]
+//   pub fn get_explicit_locations(&self) -> Vec<String> {
+//     self
+//       .0
+//       .get_explicit_locations()
+//       .into_iter()
+//       .map(|location| location.to_string())
+//       .collect()
+//   }
+// }
 
-impl From<rc::Rc<DocumentContext>> for DocumentContextContainer {
-  fn from(value: rc::Rc<DocumentContext>) -> Self {
-    Self(value)
-  }
-}
+// impl From<rc::Rc<DocumentContext>> for DocumentContextContainer {
+//   fn from(value: rc::Rc<DocumentContext>) -> Self {
+//     Self(value)
+//   }
+// }
 
-impl From<DocumentContextContainer> for rc::Rc<DocumentContext> {
-  fn from(value: DocumentContextContainer) -> Self {
-    value.0
-  }
-}
+// impl From<DocumentContextContainer> for rc::Rc<DocumentContext> {
+//   fn from(value: DocumentContextContainer) -> Self {
+//     value.0
+//   }
+// }
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(test)]

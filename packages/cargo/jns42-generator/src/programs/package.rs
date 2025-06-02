@@ -43,9 +43,10 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
     ..
   } = options;
 
-  let mut context = Rc::new(DocumentContext::default());
+  let mut context = DocumentContext::default();
   context.register_well_known_factories().unwrap();
 
+  let context = Rc::new(context);
   context
     .load_from_location(
       schema_location.clone(),
