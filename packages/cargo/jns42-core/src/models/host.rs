@@ -8,6 +8,12 @@ impl From<super::SchemaArena> for SchemaArenaHost {
   }
 }
 
+impl From<SchemaArenaHost> for super::SchemaArena {
+  fn from(value: SchemaArenaHost) -> Self {
+    value.0.into_inner()
+  }
+}
+
 impl From<crate::exports::jns42::core::models::SchemaTransform> for super::BoxedSchemaTransform {
   fn from(value: crate::exports::jns42::core::models::SchemaTransform) -> Self {
     let transform = match value {
@@ -124,7 +130,6 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
       .collect()
   }
 
-  #[allow(async_fn_in_trait)]
   fn transform(
     &self,
     transforms: Vec<crate::exports::jns42::core::models::SchemaTransform>,
@@ -240,3 +245,96 @@ impl crate::exports::jns42::core::models::Guest for crate::Host {
 //     let document_context = document_context.clone();
 //     SchemaArena::from_document_context(&document_context.into()).into()
 //   }
+
+// #[cfg(test)]
+// mod tests {
+//   use super::*;
+//   use crate::exports::jns42::core::models::{
+//     ArenaSchemaItem, GuestSchemaArena, SchemaTransform, SchemaType,
+//   };
+//   use itertools::Itertools;
+
+//   fn run_test(
+//     initial: impl IntoIterator<Item = ArenaSchemaItem>,
+//     expected: impl IntoIterator<Item = ArenaSchemaItem>,
+//     transforms: impl IntoIterator<Item = SchemaTransform>,
+//   ) {
+//     let expected: Vec<_> = expected.into_iter().collect();
+//     let arena_input = SchemaArena::from_iter(initial);
+//     let transforms: Vec<_> = transforms.into_iter().collect();
+
+//     // the order of transforms should not matter! we test that here
+//     for transforms in transforms.iter().permutations(transforms.len()) {
+//       let arena: SchemaArenaHost = arena_input.clone().into();
+//       let transforms = transforms.into_iter().cloned().collect::<Vec<_>>();
+
+//       let mut iteration = 0;
+//       while arena.transform(transforms.clone()) > 0 {
+//         iteration += 1;
+//         assert!(iteration < 100);
+//         assert!(arena.count() < 100);
+//       }
+
+//       let arena: SchemaArena = arena.into();
+//       let actual: Vec<_> = arena.iter().cloned().collect();
+
+//       assert_eq!(actual, expected)
+//     }
+//   }
+
+//   #[test]
+//   fn test_transform_1() {
+//     let transforms = [
+//       SchemaTransform::FlattenAllOf,
+//       SchemaTransform::InheritAllOf,
+//       SchemaTransform::InheritReference,
+//       SchemaTransform::ResolveAllOf,
+//       SchemaTransform::ResolveSingleAllOf,
+//       SchemaTransform::Unalias,
+//     ];
+
+//     let initial = [
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Str].into()),
+//         ..Default::default()
+//       }, // 0
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Object].into()),
+//         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 1
+//       ArenaSchemaItem {
+//         object_properties: Some([("c".into(), 0)].into()),
+//         reference: Some(1),
+//         ..Default::default()
+//       }, // 2
+//     ];
+
+//     let expected = [
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Str].into()),
+//         ..Default::default()
+//       }, // 0
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Object].into()),
+//         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 1
+//       ArenaSchemaItem {
+//         reference: Some(4),
+//         ..Default::default()
+//       }, // 2
+//       ArenaSchemaItem {
+//         object_properties: Some([("c".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 3
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Object].into()),
+//         object_properties: Some([("a".into(), 0), ("b".into(), 0), ("c".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 4
+//     ];
+
+//     run_test(initial, expected, transforms);
+//   }
+// }
