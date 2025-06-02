@@ -26,14 +26,14 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
   }
 
   fn count(&self) -> u32 {
-    self.0.borrow().count()
+    self.0.borrow().count() as u32
   }
 
   fn get_item(
     &self,
     key: crate::exports::jns42::core::models::Key,
   ) -> crate::exports::jns42::core::models::ArenaSchemaItem {
-    self.0.borrow().get_item(key).clone().into()
+    self.0.borrow().get_item(key as usize).clone().into()
   }
 
   fn get_all_related(
@@ -43,7 +43,7 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
     self
       .0
       .borrow()
-      .get_all_related(key)
+      .get_all_related(key as usize)
       .map(|value| value as crate::exports::jns42::core::models::Key)
       .collect()
   }
@@ -55,12 +55,12 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
     self
       .0
       .borrow_mut()
-      .apply_transform(|arena: &mut super::SchemaArena, key: u32| {
+      .apply_transform(|arena: &mut super::SchemaArena, key: usize| {
         for transform in &transforms {
           let transform: super::BoxedSchemaTransform = (*transform).into();
           transform(arena, key)
         }
-      })
+      }) as u32
   }
 
   fn from_document_context(
@@ -202,35 +202,54 @@ impl From<super::ArenaSchemaItem> for crate::exports::jns42::core::models::Arena
         .map(|value| value.into_iter().map(Into::into).collect()),
 
       // applicators
-      reference: value.reference,
+      reference: value.reference.map(|value| value as u32),
 
-      if_: value.r#if,
-      then: value.then,
-      else_: value.r#else,
+      if_: value.r#if.map(|value| value as u32),
+      then: value.then.map(|value| value as u32),
+      else_: value.r#else.map(|value| value as u32),
 
-      not: value.not,
+      not: value.not.map(|value| value as u32),
 
-      property_names: value.property_names,
-      map_properties: value.map_properties,
-      array_items: value.array_items,
-      contains: value.contains,
+      property_names: value.property_names.map(|value| value as u32),
+      map_properties: value.map_properties.map(|value| value as u32),
+      array_items: value.array_items.map(|value| value as u32),
+      contains: value.contains.map(|value| value as u32),
 
-      all_of: value.all_of.map(|value| value.into_iter().collect()),
-      any_of: value.any_of.map(|value| value.into_iter().collect()),
-      one_of: value.one_of.map(|value| value.into_iter().collect()),
-      tuple_items: value.tuple_items,
+      all_of: value
+        .all_of
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      any_of: value
+        .any_of
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      one_of: value
+        .one_of
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      tuple_items: value
+        .tuple_items
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
 
-      object_properties: value
-        .object_properties
-        .map(|value| value.into_iter().collect()),
-      pattern_properties: value
-        .pattern_properties
-        .map(|value| value.into_iter().collect()),
-      dependent_schemas: value
-        .dependent_schemas
-        .map(|value| value.into_iter().collect()),
+      object_properties: value.object_properties.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as u32))
+          .collect()
+      }),
+      pattern_properties: value.pattern_properties.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as u32))
+          .collect()
+      }),
+      dependent_schemas: value.dependent_schemas.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as u32))
+          .collect()
+      }),
 
-      definitions: value.definitions.map(|value| value.into_iter().collect()),
+      definitions: value
+        .definitions
+        .map(|value| value.into_iter().map(|value| value as u32).collect()),
 
       // assertions
       options: Default::default(), // value.options,
@@ -242,17 +261,17 @@ impl From<super::ArenaSchemaItem> for crate::exports::jns42::core::models::Arena
       maximum_exclusive: value.maximum_exclusive.and_then(|value| value.as_f64()),
       multiple_of: value.multiple_of.and_then(|value| value.as_f64()),
 
-      minimum_length: value.minimum_length,
-      maximum_length: value.maximum_length,
+      minimum_length: value.minimum_length.map(|value| value as u32),
+      maximum_length: value.maximum_length.map(|value| value as u32),
       value_pattern: value.value_pattern,
       value_format: value.value_format,
 
-      minimum_items: value.minimum_items,
-      maximum_items: value.maximum_items,
+      minimum_items: value.minimum_items.map(|value| value as u32),
+      maximum_items: value.maximum_items.map(|value| value as u32),
       unique_items: value.unique_items,
 
-      minimum_properties: value.minimum_properties,
-      maximum_properties: value.maximum_properties,
+      minimum_properties: value.minimum_properties.map(|value| value as u32),
+      maximum_properties: value.maximum_properties.map(|value| value as u32),
     }
   }
 }

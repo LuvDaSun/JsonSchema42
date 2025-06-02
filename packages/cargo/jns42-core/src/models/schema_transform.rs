@@ -29,4 +29,4 @@ pub enum SchemaTransform {
   Name,
 }
 
-pub type BoxedSchemaTransform = Box<dyn Fn(&mut SchemaArena, u32)>;
+pub type BoxedSchemaTransform = Box<dyn Fn(&mut SchemaArena, usize)>;
