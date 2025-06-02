@@ -182,6 +182,14 @@ impl NodeLocation {
   }
 }
 
+impl TryFrom<String> for NodeLocation {
+  type Error = ParseLocationError;
+
+  fn try_from(value: String) -> Result<Self, Self::Error> {
+    value.as_str().try_into()
+  }
+}
+
 impl TryFrom<&str> for NodeLocation {
   type Error = ParseLocationError;
 
@@ -294,11 +302,11 @@ impl fmt::Display for ParseLocationError {
   }
 }
 
-impl From<ParseLocationError> for js_sys::Error {
-  fn from(value: ParseLocationError) -> Self {
-    js_sys::Error::new(&value.to_string())
-  }
-}
+// impl From<ParseLocationError> for js_sys::Error {
+//   fn from(value: ParseLocationError) -> Self {
+//     js_sys::Error::new(&value.to_string())
+//   }
+// }
 
 impl Error for ParseLocationError {}
 

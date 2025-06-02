@@ -15,8 +15,8 @@ pub enum ProgramCommands {
   Package(package::CommandOptions),
 }
 
-pub async fn run_program(options: ProgramOptions) -> Result<(), Box<dyn Error>> {
+pub fn run_program(options: ProgramOptions) -> Result<(), Box<dyn Error>> {
   match options.command {
-    ProgramCommands::Package(options) => package::run_command(options).await,
+    ProgramCommands::Package(options) => package::run_command(options),
   }
 }

@@ -1,10 +1,11 @@
 use super::{NamePart, Names, Sentence};
-use crate::naming::NamesContainer;
 use std::{
   collections::{BTreeMap, BTreeSet},
   fmt::Debug,
 };
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 #[derive(Debug)]
 pub struct NamesBuilder<K> {
@@ -279,47 +280,32 @@ where
   }
 }
 
-#[wasm_bindgen]
-pub struct NamesBuilderContainer(NamesBuilder<usize>);
+#[cfg(target_arch = "wasm32")]
+pub struct NamesBuilderHost(std::cell::RefCell<NamesBuilder<u32>>);
 
-#[wasm_bindgen]
-impl NamesBuilderContainer {
-  #[wasm_bindgen(constructor)]
-  pub fn new() -> Self {
-    Self(NamesBuilder::new())
-  }
-
-  #[wasm_bindgen(js_name = setDefaultName)]
-  pub fn set_default_name(&mut self, value: &str) {
-    self.0.set_default_name(value);
-  }
-
-  #[wasm_bindgen(js_name = add)]
-  pub fn add(&mut self, key: usize, values: Vec<String>) {
-    self.0.add(key, values);
-  }
-
-  #[wasm_bindgen(js_name = build)]
-  pub fn build(&self) -> NamesContainer {
-    self.0.build().into()
+#[cfg(target_arch = "wasm32")]
+impl From<NamesBuilder<u32>> for NamesBuilderHost {
+  fn from(value: NamesBuilder<u32>) -> Self {
+    Self(value.into())
   }
 }
 
-impl Default for NamesBuilderContainer {
-  fn default() -> Self {
-    Self::new()
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::naming::GuestNamesBuilder for NamesBuilderHost {
+  fn new() -> Self {
+    NamesBuilder::new().into()
   }
-}
 
-impl From<NamesBuilder<usize>> for NamesBuilderContainer {
-  fn from(value: NamesBuilder<usize>) -> Self {
-    Self(value)
+  fn set_default_name(&self, value: String) {
+    self.0.borrow_mut().set_default_name(value);
   }
-}
 
-impl From<NamesBuilderContainer> for NamesBuilder<usize> {
-  fn from(value: NamesBuilderContainer) -> Self {
-    value.0
+  fn add(&self, key: u32, values: Vec<String>) {
+    self.0.borrow_mut().add(key, values);
+  }
+
+  fn build(&self) -> exports::jns42::core::naming::Names {
+    self.0.borrow().build().into()
   }
 }
 

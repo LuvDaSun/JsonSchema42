@@ -75,10 +75,12 @@ async function main(configuration: MainConfiguration) {
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
     configuration;
 
-  const context = new core.DocumentContextContainer();
-  context.registerWellKnownFactories();
+  const contextBuilder = new core.documents.DocumentContextBuilder();
+  contextBuilder.registerWellKnownFactories();
 
-  await context.loadFromLocation(
+  const context = contextBuilder.build();
+
+  context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
     undefined,

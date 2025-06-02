@@ -86,7 +86,7 @@ async function main(configuration: MainConfiguration) {
     defaultTypeName: defaultName,
   } = configuration;
 
-  const defaultTypeName = new core.Sentence(defaultName);
+  const defaultTypeName = new core.naming.Sentence(defaultName);
 
   const testContent = fs.readFileSync(pathToTest, "utf8");
   const testData = YAML.parse(testContent);
@@ -98,12 +98,14 @@ async function main(configuration: MainConfiguration) {
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
-    const schemaNode = schemas[schemaName];
+    const schemaNode = core.utilities.JsonValue.deserialize(JSON.stringify(schemas[schemaName]));
 
     // generate package
     {
-      const context = new core.DocumentContextContainer();
-      context.registerWellKnownFactories();
+      const contextBuilder = new core.documents.DocumentContextBuilder();
+      contextBuilder.registerWellKnownFactories();
+
+      const context = contextBuilder.build();
 
       await context.loadFromNode(pathToTest, pathToTest, undefined, schemaNode, defaultMetaSchema);
 

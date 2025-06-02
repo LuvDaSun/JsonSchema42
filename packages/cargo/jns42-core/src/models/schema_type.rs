@@ -1,10 +1,11 @@
 use std::str::FromStr;
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 #[derive(
   Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord, Debug, serde::Serialize, serde::Deserialize,
 )]
-#[wasm_bindgen]
 pub enum SchemaType {
   Never,
   Any,
@@ -75,6 +76,23 @@ impl FromStr for SchemaType {
       "array" => Ok(Self::Array),
       "object" => Ok(Self::Object),
       _ => Err(()),
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<SchemaType> for exports::jns42::core::models::SchemaType {
+  fn from(value: SchemaType) -> Self {
+    match value {
+      SchemaType::Never => Self::Never,
+      SchemaType::Any => Self::Any,
+      SchemaType::Null => Self::Null,
+      SchemaType::Boolean => Self::Boolean,
+      SchemaType::Integer => Self::Integer,
+      SchemaType::Number => Self::Number,
+      SchemaType::String => Self::Str,
+      SchemaType::Array => Self::Array,
+      SchemaType::Object => Self::Object,
     }
   }
 }
