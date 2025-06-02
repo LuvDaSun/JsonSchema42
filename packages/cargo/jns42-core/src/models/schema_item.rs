@@ -468,54 +468,87 @@ impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
         .map(|value| value.into_iter().map(Into::into).collect()),
 
       // applicators
-      reference: value.reference.map(|value| value as u32),
+      reference: value
+        .reference
+        .map(|value| value as exports::jns42::core::models::Key),
 
-      if_: value.r#if.map(|value| value as u32),
-      then: value.then.map(|value| value as u32),
-      else_: value.r#else.map(|value| value as u32),
+      if_: value
+        .r#if
+        .map(|value| value as exports::jns42::core::models::Key),
+      then: value
+        .then
+        .map(|value| value as exports::jns42::core::models::Key),
+      else_: value
+        .r#else
+        .map(|value| value as exports::jns42::core::models::Key),
 
-      not: value.not.map(|value| value as u32),
+      not: value
+        .not
+        .map(|value| value as exports::jns42::core::models::Key),
 
-      property_names: value.property_names.map(|value| value as u32),
-      map_properties: value.map_properties.map(|value| value as u32),
-      array_items: value.array_items.map(|value| value as u32),
-      contains: value.contains.map(|value| value as u32),
+      property_names: value
+        .property_names
+        .map(|value| value as exports::jns42::core::models::Key),
+      map_properties: value
+        .map_properties
+        .map(|value| value as exports::jns42::core::models::Key),
+      array_items: value
+        .array_items
+        .map(|value| value as exports::jns42::core::models::Key),
+      contains: value
+        .contains
+        .map(|value| value as exports::jns42::core::models::Key),
 
-      all_of: value
-        .all_of
-        .map(|value| value.into_iter().map(|value| value as u32).collect()),
-      any_of: value
-        .any_of
-        .map(|value| value.into_iter().map(|value| value as u32).collect()),
-      one_of: value
-        .one_of
-        .map(|value| value.into_iter().map(|value| value as u32).collect()),
-      tuple_items: value
-        .tuple_items
-        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      all_of: value.all_of.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+      any_of: value.any_of.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+      one_of: value.one_of.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+      tuple_items: value.tuple_items.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
 
       object_properties: value.object_properties.map(|value| {
         value
           .into_iter()
-          .map(|(key, value)| (key, value as u32))
+          .map(|(key, value)| (key, value as exports::jns42::core::models::Key))
           .collect()
       }),
       pattern_properties: value.pattern_properties.map(|value| {
         value
           .into_iter()
-          .map(|(key, value)| (key, value as u32))
+          .map(|(key, value)| (key, value as exports::jns42::core::models::Key))
           .collect()
       }),
       dependent_schemas: value.dependent_schemas.map(|value| {
         value
           .into_iter()
-          .map(|(key, value)| (key, value as u32))
+          .map(|(key, value)| (key, value as exports::jns42::core::models::Key))
           .collect()
       }),
 
-      definitions: value
-        .definitions
-        .map(|value| value.into_iter().map(|value| value as u32).collect()),
+      definitions: value.definitions.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
 
       // assertions
       options: Default::default(), // value.options,
