@@ -1,9 +1,9 @@
 use super::*;
 use crate::error;
-use crate::exports;
+use crate::{Host, exports};
 use std::rc;
 
-impl From<crate::error::Error> for exports::jns42::core::documents::Error {
+impl From<error::Error> for exports::jns42::core::documents::Error {
   fn from(value: error::Error) -> Self {
     match value {
       error::Error::Unknown => exports::jns42::core::documents::Error::Unknown,
@@ -117,6 +117,6 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
   }
 }
 
-impl exports::jns42::core::documents::Guest for crate::Host {
+impl exports::jns42::core::documents::Guest for Host {
   type DocumentContext = DocumentContextHost;
 }

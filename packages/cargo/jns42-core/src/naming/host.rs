@@ -1,42 +1,50 @@
-use std::cell::RefCell;
+use super::*;
+use crate::{Host, exports};
+use std::cell;
 
-pub struct NamesHost(super::Names<u32>);
+impl exports::jns42::core::naming::Guest for Host {
+  type Names = NamesHost;
+  type NamesBuilder = NamesBuilderHost;
+  type Sentence = SentenceHost;
+}
 
-impl From<super::Names<u32>> for NamesHost {
-  fn from(value: super::Names<u32>) -> Self {
+pub struct NamesHost(Names<u32>);
+
+impl From<Names<u32>> for NamesHost {
+  fn from(value: Names<u32>) -> Self {
     Self(value)
   }
 }
 
-impl From<NamesHost> for crate::exports::jns42::core::naming::Names {
+impl From<NamesHost> for exports::jns42::core::naming::Names {
   fn from(value: NamesHost) -> Self {
     Self::new(value)
   }
 }
 
-impl From<super::Names<u32>> for crate::exports::jns42::core::naming::Names {
-  fn from(value: super::Names<u32>) -> Self {
+impl From<Names<u32>> for exports::jns42::core::naming::Names {
+  fn from(value: Names<u32>) -> Self {
     NamesHost::from(value).into()
   }
 }
 
-impl crate::exports::jns42::core::naming::GuestNames for NamesHost {
-  fn get_name(&self, key: u32) -> Option<crate::exports::jns42::core::naming::Sentence> {
+impl exports::jns42::core::naming::GuestNames for NamesHost {
+  fn get_name(&self, key: u32) -> Option<exports::jns42::core::naming::Sentence> {
     self.0.get_name(&key).cloned().map(Into::into)
   }
 }
 
-pub struct NamesBuilderHost(RefCell<super::NamesBuilder<u32>>);
+pub struct NamesBuilderHost(cell::RefCell<NamesBuilder<u32>>);
 
-impl From<super::NamesBuilder<u32>> for NamesBuilderHost {
-  fn from(value: super::NamesBuilder<u32>) -> Self {
+impl From<NamesBuilder<u32>> for NamesBuilderHost {
+  fn from(value: NamesBuilder<u32>) -> Self {
     Self(value.into())
   }
 }
 
-impl crate::exports::jns42::core::naming::GuestNamesBuilder for NamesBuilderHost {
+impl exports::jns42::core::naming::GuestNamesBuilder for NamesBuilderHost {
   fn new() -> Self {
-    super::NamesBuilder::new().into()
+    NamesBuilder::new().into()
   }
 
   fn set_default_name(&self, value: String) {
@@ -47,34 +55,34 @@ impl crate::exports::jns42::core::naming::GuestNamesBuilder for NamesBuilderHost
     self.0.borrow_mut().add(key, values);
   }
 
-  fn build(&self) -> crate::exports::jns42::core::naming::Names {
+  fn build(&self) -> exports::jns42::core::naming::Names {
     self.0.borrow().build().into()
   }
 }
 
-pub struct SentenceHost(super::Sentence);
+pub struct SentenceHost(Sentence);
 
-impl From<super::Sentence> for SentenceHost {
-  fn from(value: super::Sentence) -> Self {
+impl From<Sentence> for SentenceHost {
+  fn from(value: Sentence) -> Self {
     Self(value)
   }
 }
 
-impl From<SentenceHost> for crate::exports::jns42::core::naming::Sentence {
+impl From<SentenceHost> for exports::jns42::core::naming::Sentence {
   fn from(value: SentenceHost) -> Self {
     Self::new(value)
   }
 }
 
-impl From<super::Sentence> for crate::exports::jns42::core::naming::Sentence {
-  fn from(value: super::Sentence) -> Self {
+impl From<Sentence> for exports::jns42::core::naming::Sentence {
+  fn from(value: Sentence) -> Self {
     SentenceHost::from(value).into()
   }
 }
 
-impl crate::exports::jns42::core::naming::GuestSentence for SentenceHost {
+impl exports::jns42::core::naming::GuestSentence for SentenceHost {
   fn new(input: String) -> Self {
-    super::Sentence::new(&input).into()
+    Sentence::new(&input).into()
   }
 
   fn to_pascal_case(&self) -> String {
@@ -92,10 +100,4 @@ impl crate::exports::jns42::core::naming::GuestSentence for SentenceHost {
   fn to_screaming_snake_case(&self) -> String {
     self.0.to_screaming_snake_case()
   }
-}
-
-impl crate::exports::jns42::core::naming::Guest for crate::Host {
-  type Names = NamesHost;
-  type NamesBuilder = NamesBuilderHost;
-  type Sentence = SentenceHost;
 }

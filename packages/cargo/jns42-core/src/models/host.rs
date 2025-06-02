@@ -1,28 +1,35 @@
-use std::cell::RefCell;
+use super::*;
+use crate::schema_transforms;
+use crate::{Host, exports};
+use std::cell;
 
-pub struct SchemaArenaHost(RefCell<super::SchemaArena>);
+impl exports::jns42::core::models::Guest for Host {
+  type SchemaArena = SchemaArenaHost;
+}
 
-impl From<super::SchemaArena> for SchemaArenaHost {
-  fn from(value: super::SchemaArena) -> Self {
+pub struct SchemaArenaHost(cell::RefCell<SchemaArena>);
+
+impl From<SchemaArena> for SchemaArenaHost {
+  fn from(value: SchemaArena) -> Self {
     Self(value.into())
   }
 }
 
-impl From<SchemaArenaHost> for crate::exports::jns42::core::models::SchemaArena {
+impl From<SchemaArenaHost> for exports::jns42::core::models::SchemaArena {
   fn from(value: SchemaArenaHost) -> Self {
     Self::new(value)
   }
 }
 
-impl From<super::SchemaArena> for crate::exports::jns42::core::models::SchemaArena {
-  fn from(value: super::SchemaArena) -> Self {
+impl From<SchemaArena> for exports::jns42::core::models::SchemaArena {
+  fn from(value: SchemaArena) -> Self {
     SchemaArenaHost::from(value).into()
   }
 }
 
-impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
+impl exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
   fn new() -> Self {
-    super::SchemaArena::new().into()
+    SchemaArena::new().into()
   }
 
   fn count(&self) -> u32 {
@@ -31,159 +38,152 @@ impl crate::exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
 
   fn get_item(
     &self,
-    key: crate::exports::jns42::core::models::Key,
-  ) -> crate::exports::jns42::core::models::ArenaSchemaItem {
+    key: exports::jns42::core::models::Key,
+  ) -> exports::jns42::core::models::ArenaSchemaItem {
     self.0.borrow().get_item(key as usize).clone().into()
   }
 
   fn get_all_related(
     &self,
-    key: crate::exports::jns42::core::models::Key,
-  ) -> Vec<crate::exports::jns42::core::models::Key> {
+    key: exports::jns42::core::models::Key,
+  ) -> Vec<exports::jns42::core::models::Key> {
     self
       .0
       .borrow()
       .get_all_related(key as usize)
-      .map(|value| value as crate::exports::jns42::core::models::Key)
+      .map(|value| value as exports::jns42::core::models::Key)
       .collect()
   }
 
-  fn transform(
-    &self,
-    transforms: Vec<crate::exports::jns42::core::models::SchemaTransform>,
-  ) -> u32 {
+  fn transform(&self, transforms: Vec<exports::jns42::core::models::SchemaTransform>) -> u32 {
     self
       .0
       .borrow_mut()
-      .apply_transform(|arena: &mut super::SchemaArena, key: usize| {
+      .apply_transform(|arena: &mut SchemaArena, key: usize| {
         for transform in &transforms {
-          let transform: super::BoxedSchemaTransform = (*transform).into();
+          let transform: BoxedSchemaTransform = (*transform).into();
           transform(arena, key)
         }
       }) as u32
   }
 
   fn from_document_context(
-    document_context: crate::exports::jns42::core::documents::DocumentContext,
-  ) -> crate::exports::jns42::core::models::SchemaArena {
+    document_context: exports::jns42::core::documents::DocumentContext,
+  ) -> exports::jns42::core::models::SchemaArena {
     let document_context = document_context.into();
-    let schema_arena = super::SchemaArena::from_document_context(&document_context);
+    let schema_arena = SchemaArena::from_document_context(&document_context);
     schema_arena.into()
   }
 
-  fn clone(&self) -> crate::exports::jns42::core::models::SchemaArena {
-    crate::exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(
-      self.0.borrow().clone(),
-    ))
+  fn clone(&self) -> exports::jns42::core::models::SchemaArena {
+    exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(self.0.borrow().clone()))
   }
 }
 
-impl From<crate::exports::jns42::core::models::SchemaTransform> for super::BoxedSchemaTransform {
-  fn from(value: crate::exports::jns42::core::models::SchemaTransform) -> Self {
+impl From<exports::jns42::core::models::SchemaTransform> for BoxedSchemaTransform {
+  fn from(value: exports::jns42::core::models::SchemaTransform) -> Self {
     let transform = match value {
-      crate::exports::jns42::core::models::SchemaTransform::Explode => {
-        crate::schema_transforms::explode::transform
+      exports::jns42::core::models::SchemaTransform::Explode => {
+        schema_transforms::explode::transform
       }
 
-      crate::exports::jns42::core::models::SchemaTransform::FlattenAllOf => {
-        crate::schema_transforms::flatten::all_of::transform
+      exports::jns42::core::models::SchemaTransform::FlattenAllOf => {
+        schema_transforms::flatten::all_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::FlattenAnyOf => {
-        crate::schema_transforms::flatten::any_of::transform
+      exports::jns42::core::models::SchemaTransform::FlattenAnyOf => {
+        schema_transforms::flatten::any_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::FlattenOneOf => {
-        crate::schema_transforms::flatten::one_of::transform
-      }
-
-      crate::exports::jns42::core::models::SchemaTransform::FlipAllOfAnyOf => {
-        crate::schema_transforms::flip::all_of_any_of::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::FlipAllOfOneOf => {
-        crate::schema_transforms::flip::all_of_one_of::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::FlipAnyOfAllOf => {
-        crate::schema_transforms::flip::any_of_all_of::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::FlipAnyOfOneOf => {
-        crate::schema_transforms::flip::any_of_one_of::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::FlipOneOfAllOf => {
-        crate::schema_transforms::flip::one_of_all_of::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::FlipOneOfAnyOf => {
-        crate::schema_transforms::flip::one_of_any_of::transform
+      exports::jns42::core::models::SchemaTransform::FlattenOneOf => {
+        schema_transforms::flatten::one_of::transform
       }
 
-      crate::exports::jns42::core::models::SchemaTransform::InheritAllOf => {
-        crate::schema_transforms::inherit::all_of::transform
+      exports::jns42::core::models::SchemaTransform::FlipAllOfAnyOf => {
+        schema_transforms::flip::all_of_any_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::InheritAnyOf => {
-        crate::schema_transforms::inherit::any_of::transform
+      exports::jns42::core::models::SchemaTransform::FlipAllOfOneOf => {
+        schema_transforms::flip::all_of_one_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::InheritOneOf => {
-        crate::schema_transforms::inherit::one_of::transform
+      exports::jns42::core::models::SchemaTransform::FlipAnyOfAllOf => {
+        schema_transforms::flip::any_of_all_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::InheritReference => {
-        crate::schema_transforms::inherit::reference::transform
+      exports::jns42::core::models::SchemaTransform::FlipAnyOfOneOf => {
+        schema_transforms::flip::any_of_one_of::transform
       }
-
-      crate::exports::jns42::core::models::SchemaTransform::ResolveAllOf => {
-        crate::schema_transforms::resolve_all_of::transform
+      exports::jns42::core::models::SchemaTransform::FlipOneOfAllOf => {
+        schema_transforms::flip::one_of_all_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::ResolveAnyOf => {
-        crate::schema_transforms::resolve_any_of::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::ResolveIfThenElse => {
-        crate::schema_transforms::resolve_if_then_else::transform
-      }
-      crate::exports::jns42::core::models::SchemaTransform::ResolveNot => {
-        crate::schema_transforms::resolve_not::transform
+      exports::jns42::core::models::SchemaTransform::FlipOneOfAnyOf => {
+        schema_transforms::flip::one_of_any_of::transform
       }
 
-      crate::exports::jns42::core::models::SchemaTransform::ResolveSingleAllOf => {
-        crate::schema_transforms::resolve_single::all_of::transform
+      exports::jns42::core::models::SchemaTransform::InheritAllOf => {
+        schema_transforms::inherit::all_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::ResolveSingleAnyOf => {
-        crate::schema_transforms::resolve_single::any_of::transform
+      exports::jns42::core::models::SchemaTransform::InheritAnyOf => {
+        schema_transforms::inherit::any_of::transform
       }
-      crate::exports::jns42::core::models::SchemaTransform::ResolveSingleOneOf => {
-        crate::schema_transforms::resolve_single::one_of::transform
+      exports::jns42::core::models::SchemaTransform::InheritOneOf => {
+        schema_transforms::inherit::one_of::transform
       }
-
-      crate::exports::jns42::core::models::SchemaTransform::SingleType => {
-        crate::schema_transforms::single_type::transform
-      }
-
-      crate::exports::jns42::core::models::SchemaTransform::Unalias => {
-        crate::schema_transforms::unalias::transform
+      exports::jns42::core::models::SchemaTransform::InheritReference => {
+        schema_transforms::inherit::reference::transform
       }
 
-      crate::exports::jns42::core::models::SchemaTransform::Name => {
-        crate::schema_transforms::name::transform
+      exports::jns42::core::models::SchemaTransform::ResolveAllOf => {
+        schema_transforms::resolve_all_of::transform
       }
+      exports::jns42::core::models::SchemaTransform::ResolveAnyOf => {
+        schema_transforms::resolve_any_of::transform
+      }
+      exports::jns42::core::models::SchemaTransform::ResolveIfThenElse => {
+        schema_transforms::resolve_if_then_else::transform
+      }
+      exports::jns42::core::models::SchemaTransform::ResolveNot => {
+        schema_transforms::resolve_not::transform
+      }
+
+      exports::jns42::core::models::SchemaTransform::ResolveSingleAllOf => {
+        schema_transforms::resolve_single::all_of::transform
+      }
+      exports::jns42::core::models::SchemaTransform::ResolveSingleAnyOf => {
+        schema_transforms::resolve_single::any_of::transform
+      }
+      exports::jns42::core::models::SchemaTransform::ResolveSingleOneOf => {
+        schema_transforms::resolve_single::one_of::transform
+      }
+
+      exports::jns42::core::models::SchemaTransform::SingleType => {
+        schema_transforms::single_type::transform
+      }
+
+      exports::jns42::core::models::SchemaTransform::Unalias => {
+        schema_transforms::unalias::transform
+      }
+
+      exports::jns42::core::models::SchemaTransform::Name => schema_transforms::name::transform,
     };
     Box::new(transform)
   }
 }
 
-impl From<super::SchemaType> for crate::exports::jns42::core::models::SchemaType {
-  fn from(value: super::SchemaType) -> Self {
+impl From<SchemaType> for exports::jns42::core::models::SchemaType {
+  fn from(value: SchemaType) -> Self {
     match value {
-      super::SchemaType::Never => Self::Never,
-      super::SchemaType::Any => Self::Any,
-      super::SchemaType::Null => Self::Null,
-      super::SchemaType::Boolean => Self::Boolean,
-      super::SchemaType::Integer => Self::Integer,
-      super::SchemaType::Number => Self::Number,
-      super::SchemaType::String => Self::Str,
-      super::SchemaType::Array => Self::Array,
-      super::SchemaType::Object => Self::Object,
+      SchemaType::Never => Self::Never,
+      SchemaType::Any => Self::Any,
+      SchemaType::Null => Self::Null,
+      SchemaType::Boolean => Self::Boolean,
+      SchemaType::Integer => Self::Integer,
+      SchemaType::Number => Self::Number,
+      SchemaType::String => Self::Str,
+      SchemaType::Array => Self::Array,
+      SchemaType::Object => Self::Object,
     }
   }
 }
 
-impl From<super::ArenaSchemaItem> for crate::exports::jns42::core::models::ArenaSchemaItem {
-  fn from(value: super::ArenaSchemaItem) -> Self {
+impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
+  fn from(value: ArenaSchemaItem) -> Self {
     Self {
       name: value.name,
       exact: value.exact,
@@ -276,14 +276,10 @@ impl From<super::ArenaSchemaItem> for crate::exports::jns42::core::models::Arena
   }
 }
 
-impl crate::exports::jns42::core::models::Guest for crate::Host {
-  type SchemaArena = SchemaArenaHost;
-}
-
 // #[cfg(test)]
 // mod tests {
-//   use super::*;
-//   use crate::exports::jns42::core::models::{
+//   use *;
+//   use exports::jns42::core::models::{
 //     ArenaSchemaItem, GuestSchemaArena, SchemaTransform, SchemaType,
 //   };
 //   use itertools::Itertools;
@@ -294,7 +290,7 @@ impl crate::exports::jns42::core::models::Guest for crate::Host {
 //     transforms: impl IntoIterator<Item = SchemaTransform>,
 //   ) {
 //     let expected: Vec<_> = expected.into_iter().collect();
-//     let arena_input = crate::models::SchemaArena::from_iter(initial);
+//     let arena_input = models::SchemaArena::from_iter(initial);
 //     let transforms: Vec<_> = transforms.into_iter().collect();
 
 //     // the order of transforms should not matter! we test that here
