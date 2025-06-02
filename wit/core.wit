@@ -12,6 +12,28 @@ interface imports {
 
 interface utilities {
   banner: func(prefix: string, version: string) -> string;
+
+  enum json-type {
+    null,
+    boolean,
+    number,
+    str,
+    array,
+    object,
+  }
+
+  resource json-value {
+    get-type: func() -> json-type;
+    
+    as-boolean: func() -> option<bool>;
+    as-number: func() -> option<f64>;
+    as-string: func() -> option<string>;
+    as-array: func() -> option<list<json-value>>;
+    as-object: func() -> option<list<tuple<string, json-value>>>;
+
+    serialize: func() -> string;
+    deserialize: static func(value: string) -> json-value;
+  }
 }
 
 interface naming {
@@ -38,6 +60,8 @@ interface naming {
 }
 
 interface models {
+  use utilities.{json-value};
+
   type key = u32;
   type key-set = list<key>;
   type key-map = list<tuple<string, key>>;
@@ -88,9 +112,9 @@ interface models {
     location: option<string>,
     title: option<string>,
     description: option<string>,
-    examples: option<list<string>>,
+    examples: option<list<json-value>>,
     deprecated: option<bool>,
-    options: option<list<string>>,
+    options: option<list<json-value>>,
     minimum-inclusive: option<f64>,
     minimum-exclusive: option<f64>,
     maximum-inclusive: option<f64>,
@@ -139,6 +163,7 @@ interface models {
 
 interface documents {
   use models.{schema-arena};
+  use utilities.{json-value};
 
   variant error {
     unknown,
@@ -174,7 +199,7 @@ interface documents {
       retrieval-location: string,
       given-location: string,
       antecedent-location: option<string>,
-      node: string,
+      node: json-value,
       default-meta-schema-id: string,
     ) -> result<_, error>;
 

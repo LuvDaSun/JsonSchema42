@@ -668,7 +668,7 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     retrieval_location: String,
     given_location: String,
     antecedent_location: Option<String>,
-    _node: String,
+    node: exports::jns42::core::utilities::JsonValue,
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
     let retrieval_location = retrieval_location.try_into()?;
@@ -677,11 +677,14 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
       .map(|value| value.try_into())
       .transpose()?;
 
+    let node: crate::utilities::JsonValueHost = node.into_inner();
+    let node = node.into();
+
     self.0.load_from_node(
       retrieval_location,
       given_location,
       antecedent_location,
-      serde_json::Value::Null, // TODO
+      node,
       &default_meta_schema_id,
     )?;
 

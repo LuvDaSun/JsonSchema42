@@ -459,7 +459,13 @@ impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
       // metadata
       title: value.title,
       description: value.description,
-      examples: Default::default(), //value.examples.map(Into::into),
+      examples: value.examples.map(|value| {
+        value
+          .into_iter()
+          .map(crate::utilities::JsonValueHost::from)
+          .map(Into::into)
+          .collect()
+      }),
       deprecated: value.deprecated,
 
       // types
@@ -551,7 +557,14 @@ impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
       }),
 
       // assertions
-      options: Default::default(), // value.options,
+      options: value.options.map(|value| {
+        value
+          .into_iter()
+          .map(crate::utilities::JsonValueHost::from)
+          .map(Into::into)
+          .collect()
+      }),
+
       required: value.required.map(|value| value.into_iter().collect()),
 
       minimum_inclusive: value.minimum_inclusive.and_then(|value| value.as_f64()),
