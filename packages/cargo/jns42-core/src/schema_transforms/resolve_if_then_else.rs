@@ -25,7 +25,7 @@ use std::collections::BTreeSet;
  *   - 300
  * ```
  */
-pub fn transform(arena: &mut SchemaArena, key: u32) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   if item.one_of.is_some() {

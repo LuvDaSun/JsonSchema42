@@ -55,7 +55,7 @@ macro_rules! generate_mod {
       use crate::utilities::product;
       use std::collections::{BTreeMap, BTreeSet};
 
-      pub fn transform(arena: &mut SchemaArena, key: u32) {
+      pub fn transform(arena: &mut SchemaArena, key: usize) {
         let item = arena.get_item(key);
 
         let Some(base_keys) = &item.$base_member else {

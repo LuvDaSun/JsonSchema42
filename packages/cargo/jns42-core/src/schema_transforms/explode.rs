@@ -48,7 +48,7 @@ use crate::models::{ArenaSchemaItem, SchemaArena};
  * ```
  *
  */
-pub fn transform(arena: &mut SchemaArena, key: u32) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
   let mut sub_items = Vec::new();
 

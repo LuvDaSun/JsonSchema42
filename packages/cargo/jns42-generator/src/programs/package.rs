@@ -53,7 +53,6 @@ pub async fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> 
       None,
       &default_meta_schema_id,
     )
-    .await
     .unwrap();
 
   let specification = Specification::new(

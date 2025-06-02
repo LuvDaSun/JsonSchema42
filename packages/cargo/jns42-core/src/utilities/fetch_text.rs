@@ -28,20 +28,13 @@ impl From<std::io::Error> for FetchTextError {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-impl From<surf::Error> for FetchTextError {
-  fn from(_value: surf::Error) -> Self {
-    Self::HttpError
-  }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
 pub fn fetch_text(location: &str) -> Result<String, FetchTextError> {
   if location.starts_with("http://") || location.starts_with("https://") {
-    let mut response = surf::get(location).middleware(surf::middleware::Redirect::new(5))?;
-    let data = response.body_string()?;
-    Ok(data)
+    Err(FetchTextError::HttpError)
   } else {
-    let mut file = File::open(location)?;
+    use std::{fs, io::Read};
+
+    let mut file = fs::File::open(location)?;
     let metadata = file.metadata()?;
     let mut data = String::with_capacity(metadata.len() as usize);
     file.read_to_string(&mut data)?;

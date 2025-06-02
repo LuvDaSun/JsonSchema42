@@ -20,7 +20,7 @@ impl Arena<ArenaSchemaItem> {
 
     let mut arena = Arena::new();
 
-    let mut key_map: BTreeMap<NodeLocation, u32> = BTreeMap::new();
+    let mut key_map: BTreeMap<NodeLocation, usize> = BTreeMap::new();
     for (location, schema) in &schema_nodes {
       let item = ArenaSchemaItem {
         ..Default::default()
@@ -70,7 +70,7 @@ impl Arena<ArenaSchemaItem> {
   ///
   /// # Returns
   /// A tuple containing the resolved `usize` and a reference to the resolved `ArenaSchemaItem`.
-  pub fn resolve_entry(&self, key: u32) -> (u32, &ArenaSchemaItem) {
+  pub fn resolve_entry(&self, key: usize) -> (usize, &ArenaSchemaItem) {
     let mut resolved_key = key;
     let mut resolved_item = self.get_item(resolved_key);
 
@@ -85,7 +85,7 @@ impl Arena<ArenaSchemaItem> {
     (resolved_key, resolved_item)
   }
 
-  pub fn get_all_related(&self, key: u32) -> impl Iterator<Item = u32> + '_ {
+  pub fn get_all_related(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
     let mut result: BTreeSet<_> = iter::once(key).collect();
     let mut queue: Vec<_> = iter::once(key).collect();
 

@@ -3,7 +3,7 @@ use itertools::Itertools;
 use std::collections::BTreeMap;
 use std::{cell::RefCell, collections::BTreeSet};
 
-pub fn transform(arena: &mut SchemaArena, key: u32) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key).clone();
 
   let Some(sub_keys) = item.any_of.clone() else {
@@ -66,7 +66,7 @@ pub fn transform(arena: &mut SchemaArena, key: u32) {
   // this is so that the following closures don't have to be FnMut
   let arena = RefCell::new(arena);
 
-  let merge_key = |key: &u32, other_key: &u32| {
+  let merge_key = |key: &usize, other_key: &usize| {
     if key == other_key {
       return *key;
     }

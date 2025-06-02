@@ -22,7 +22,7 @@ use std::collections::BTreeSet;
  *   - a
  * ```
  */
-pub fn transform(arena: &mut SchemaArena, key: u32) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   let Some(not) = item.not else {

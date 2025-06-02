@@ -23,7 +23,7 @@ use std::iter;
  *   - string
  * ```
  */
-pub fn transform(arena: &mut SchemaArena, key: u32) {
+pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
   // ew got nothing to do if there are no types

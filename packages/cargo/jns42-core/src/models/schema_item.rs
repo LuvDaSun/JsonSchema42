@@ -7,7 +7,7 @@ use std::iter;
 use std::{collections::BTreeMap, iter::empty};
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
-pub type ArenaSchemaItem = SchemaItem<u32>;
+pub type ArenaSchemaItem = SchemaItem<usize>;
 
 #[derive(Clone, PartialEq, Default, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SchemaItem<K>
@@ -63,17 +63,17 @@ where
   pub maximum_exclusive: Option<serde_json::Number>,
   pub multiple_of: Option<serde_json::Number>,
 
-  pub minimum_length: Option<u32>,
-  pub maximum_length: Option<u32>,
+  pub minimum_length: Option<usize>,
+  pub maximum_length: Option<usize>,
   pub value_pattern: Option<String>,
   pub value_format: Option<String>,
 
-  pub minimum_items: Option<u32>,
-  pub maximum_items: Option<u32>,
+  pub minimum_items: Option<usize>,
+  pub maximum_items: Option<usize>,
   pub unique_items: Option<bool>,
 
-  pub minimum_properties: Option<u32>,
-  pub maximum_properties: Option<u32>,
+  pub minimum_properties: Option<usize>,
+  pub maximum_properties: Option<usize>,
 }
 
 impl<K> SchemaItem<K>
