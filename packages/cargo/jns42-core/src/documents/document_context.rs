@@ -583,7 +583,14 @@ impl exports::jns42::core::documents::GuestDocumentContextBuilder for DocumentCo
   }
 
   fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
-    todo!()
+    self
+      .0
+      .borrow_mut()
+      .as_mut()
+      .unwrap()
+      .register_well_known_factories()?;
+
+    Ok(())
   }
 
   fn build(&self) -> exports::jns42::core::documents::DocumentContext {
