@@ -665,9 +665,12 @@ mod tests {
   use super::*;
   use crate::models::SchemaType;
 
+  #[test]
   fn test_load_string_from_location() {
-    let mut document_context = rc::Rc::new(DocumentContext::default());
+    let mut document_context = DocumentContext::default();
     document_context.register_well_known_factories().unwrap();
+
+    let document_context = document_context.build();
 
     let location: NodeLocation = "../../../fixtures/specifications/string.json"
       .parse()

@@ -190,6 +190,7 @@ impl From<serde_yaml::Error> for NodeCacheError {
 mod tests {
   use super::*;
 
+  #[test]
   fn test_load_from_location() {
     let mut cache = NodeCache::new();
 
