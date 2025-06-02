@@ -2,7 +2,6 @@ use super::SchemaArena;
 use crate::schema_transforms;
 
 #[derive(Debug, Clone, Copy, Hash, Eq, PartialEq, Ord, PartialOrd)]
-// #[wasm_bindgen]
 pub enum SchemaTransform {
   Explode,
   FlattenAllOf,
