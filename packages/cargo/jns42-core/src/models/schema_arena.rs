@@ -1,7 +1,6 @@
-use super::{BoxedSchemaTransform, SchemaTransform, SchemaType, schema_item::ArenaSchemaItem};
+use super::{SchemaType, schema_item::ArenaSchemaItem};
 use crate::{
-  documents::{DocumentContext, DocumentContextContainer},
-  models::ArenaSchemaItemContainer,
+  documents::DocumentContext,
   utilities::{Arena, NodeLocation},
 };
 use std::{
@@ -21,14 +20,14 @@ impl Arena<ArenaSchemaItem> {
 
     let mut arena = Arena::new();
 
-    let mut key_map: BTreeMap<NodeLocation, usize> = BTreeMap::new();
+    let mut key_map: BTreeMap<NodeLocation, u32> = BTreeMap::new();
     for (location, schema) in &schema_nodes {
       let item = ArenaSchemaItem {
         ..Default::default()
       };
 
       let key = arena.add_item(item);
-      key_map.insert(location.clone(), key);
+      key_map.insert(location.clone(), key as u32);
 
       if let Some(child_id) = &schema.property_names {
         implicit_types.insert(child_id.clone(), SchemaType::String);
@@ -54,7 +53,7 @@ impl Arena<ArenaSchemaItem> {
 
       let item = schema.map_keys(|location| *key_map.get(location).unwrap());
 
-      arena.replace_item(*key, item);
+      arena.replace_item(*key as usize, item);
     }
 
     arena
@@ -71,27 +70,27 @@ impl Arena<ArenaSchemaItem> {
   ///
   /// # Returns
   /// A tuple containing the resolved `usize` and a reference to the resolved `ArenaSchemaItem`.
-  pub fn resolve_entry(&self, key: usize) -> (usize, &ArenaSchemaItem) {
+  pub fn resolve_entry(&self, key: u32) -> (u32, &ArenaSchemaItem) {
     let mut resolved_key = key;
-    let mut resolved_item = self.get_item(resolved_key);
+    let mut resolved_item = self.get_item(resolved_key as usize);
 
     loop {
       let Some(alias_key) = resolved_item.get_alias_key() else {
         break;
       };
       resolved_key = alias_key;
-      resolved_item = self.get_item(resolved_key);
+      resolved_item = self.get_item(resolved_key as usize);
     }
 
     (resolved_key, resolved_item)
   }
 
-  pub fn get_all_related(&self, key: usize) -> impl Iterator<Item = usize> + '_ {
+  pub fn get_all_related(&self, key: u32) -> impl Iterator<Item = u32> + '_ {
     let mut result: BTreeSet<_> = iter::once(key).collect();
     let mut queue: Vec<_> = iter::once(key).collect();
 
     while let Some(key) = queue.pop() {
-      let item = self.get_item(key);
+      let item = self.get_item(key as usize);
       for key in item.get_dependencies() {
         if !result.insert(key) {
           continue;
@@ -102,75 +101,5 @@ impl Arena<ArenaSchemaItem> {
     }
 
     result.into_iter()
-  }
-}
-
-// #[wasm_bindgen]
-#[derive(Clone)]
-pub struct SchemaArenaContainer(SchemaArena);
-
-// #[wasm_bindgen]
-impl SchemaArenaContainer {
-  // #[wasm_bindgen(js_name = clone)]
-  pub fn _clone(&self) -> Self {
-    Self(self.0.clone())
-  }
-}
-
-// #[wasm_bindgen]
-impl SchemaArenaContainer {
-  // #[wasm_bindgen(js_name = fromDocumentContext)]
-  pub fn from_document_context(document_context: &DocumentContextContainer) -> Self {
-    let document_context = document_context.clone();
-    SchemaArena::from_document_context(&document_context.into()).into()
-  }
-
-  // #[wasm_bindgen(js_name = getItem)]
-  pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
-    self.0.get_item(key).clone().into()
-  }
-
-  // #[wasm_bindgen(js_name = count)]
-  pub fn count(&self) -> usize {
-    self.0.count()
-  }
-
-  // #[wasm_bindgen(js_name = getAllRelated)]
-  pub fn get_all_related(&self, key: usize) -> Vec<usize> {
-    self.0.get_all_related(key).collect()
-  }
-
-  /// Applies a series of transformations to the schema items within the arena.
-  ///
-  /// This method iterates over each transformation provided and applies it to the arena.
-  /// The transformations are applied in the order they are provided.
-  ///
-  /// # Parameters
-  /// - `transforms`: A reference to a vector of `SchemaTransform` instances to be applied.
-  ///
-  /// # Returns
-  /// The number of transformations applied.
-  // #[wasm_bindgen(js_name = transform)]
-  pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
-    self
-      .0
-      .apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
-        for transform in &transforms {
-          let transform: BoxedSchemaTransform = (*transform).into();
-          transform(arena, key)
-        }
-      })
-  }
-}
-
-impl From<SchemaArena> for SchemaArenaContainer {
-  fn from(value: SchemaArena) -> Self {
-    Self(value)
-  }
-}
-
-impl From<SchemaArenaContainer> for SchemaArena {
-  fn from(value: SchemaArenaContainer) -> Self {
-    value.0
   }
 }

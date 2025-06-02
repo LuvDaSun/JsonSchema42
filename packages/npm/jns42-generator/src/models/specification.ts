@@ -1,9 +1,9 @@
 import * as core from "@jns42/core";
 
 export interface Specification {
-  typesArena: core.SchemaArenaContainer;
-  validatorsArena: core.SchemaArenaContainer;
-  names: core.NamesContainer;
+  typesArena: core.models.SchemaArena;
+  validatorsArena: core.models.SchemaArena;
+  names: core.naming.Names;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -19,7 +19,7 @@ export function loadSpecification(
 
   // load the arena
 
-  const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
+  const typesArena = core.models.SchemaArena.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
   // generate root keys

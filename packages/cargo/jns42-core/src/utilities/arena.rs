@@ -29,9 +29,9 @@ where
   ///
   /// # Returns
   ///
-  /// The number of elements as `usize`.
-  pub fn count(&self) -> usize {
-    self.0.len()
+  /// The number of elements as `u32`.
+  pub fn count(&self) -> u32 {
+    self.0.len() as u32
   }
 
   /// Retrieves a reference to the item at the specified key.

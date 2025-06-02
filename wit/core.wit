@@ -86,9 +86,9 @@ interface models {
   }
 
   record arena-schema-item {
-    name: option<string>,
+    name: option<list<string>>,
     exact: option<bool>,
-    types: option<list<schema-transform>>,
+    types: option<list<schema-type>>,
     location: option<string>,
     title: option<string>,
     description: option<string>,
@@ -109,7 +109,7 @@ interface models {
     unique-items: option<bool>,
     minimum-properties: option<u32>,
     maximum-properties: option<u32>,
-    required: option<bool>,
+    required: option<list<string>>,
     reference: option<key>,
     contains: option<key>,
     property-names: option<key>,
@@ -127,6 +127,16 @@ interface models {
     dependent-schemas: option<key-map>,
     object-properties: option<key-map>,
     pattern-properties: option<key-map>,
+  }
+
+  resource schema-arena {
+    constructor();
+
+    count: func() -> u32;
+    get-item: func(key: key) -> arena-schema-item;
+    get-all-related: func(key: key) -> list<key>;
+
+    transform: func(transforms: list<schema-transform>) -> u32;
   }
 }
 
