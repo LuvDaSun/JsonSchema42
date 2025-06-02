@@ -98,7 +98,7 @@ async function main(configuration: MainConfiguration) {
     const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
     fs.rmSync(packageDirectoryPath, { force: true, recursive: true });
 
-    const schemaNode = schemas[schemaName];
+    const schemaNode = core.utilities.JsonValue.deserialize(JSON.stringify(schemas[schemaName]));
 
     // generate package
     {
@@ -107,13 +107,7 @@ async function main(configuration: MainConfiguration) {
 
       const context = contextBuilder.build();
 
-      await context.loadFromNode(
-        pathToTest,
-        pathToTest,
-        undefined,
-        JSON.stringify(schemaNode),
-        defaultMetaSchema,
-      );
+      await context.loadFromNode(pathToTest, pathToTest, undefined, schemaNode, defaultMetaSchema);
 
       const specification = models.loadSpecification(context, {
         transformMaximumIterations,
