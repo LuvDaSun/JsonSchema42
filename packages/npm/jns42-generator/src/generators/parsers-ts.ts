@@ -303,14 +303,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateCaseClauses() {
             if (item.objectProperties != null) {
-              for (const name in item.objectProperties) {
-                const elementKey = item.objectProperties[name];
-
+              for (const [propertyName, propertyKey] of item.objectProperties) {
                 yield itt`
-                  case ${JSON.stringify(name)}:
+                  case ${JSON.stringify(propertyName)}:
                     return [
                       name,
-                      ${generateParserReference(elementKey, `value`)},
+                      ${generateParserReference(propertyKey, `value`)},
                     ]
                 `;
               }
@@ -328,9 +326,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
               elementKeys.push(item.mapProperties);
             }
             if (item.patternProperties != null) {
-              for (const elementKey of Object.values(
-                item.patternProperties as Record<string, number>,
-              )) {
+              for (const [, elementKey] of item.patternProperties) {
                 elementKeys.push(elementKey);
               }
             }

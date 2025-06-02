@@ -40,7 +40,7 @@ export function loadSpecification(
 
   // transform the validatorsArena
   {
-    const transformers = [] as Transformer[];
+    const transformers = [] as core.models.SchemaTransform[];
     let transformIterations = 0;
     while (validatorsArena.transform(transformers) > 0) {
       transformIterations++;

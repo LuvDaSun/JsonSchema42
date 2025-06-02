@@ -169,18 +169,20 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
             if (item.objectProperties != null || item.required != null) {
               const required = new Set(item.required);
-              const objectProperties = item.objectProperties ?? {};
+              const objectProperties = new Map(item.objectProperties);
               const propertyNames = new Set([
                 ...Object.keys(objectProperties),
                 ...required,
               ] as string[]);
 
               for (const name of propertyNames) {
+                const propertyKey = objectProperties.get(name);
+
                 if (!required.has(name)) {
                   hasUndefinedProperty = true;
                 }
 
-                if (objectProperties[name] == null) {
+                if (propertyKey == null) {
                   hasUnknownProperty = true;
 
                   yield itt`
@@ -188,7 +190,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
                   `;
                 } else {
                   yield itt`
-                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(objectProperties[name])},
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(propertyKey)},
                   `;
                 }
               }
@@ -200,9 +202,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
                 elementKeys.push(item.mapProperties);
               }
               if (item.patternProperties != null) {
-                for (const elementKey of Object.values(
-                  item.patternProperties as Record<string, number>,
-                )) {
+                for (const [, elementKey] of item.patternProperties) {
                   elementKeys.push(elementKey);
                 }
               }
@@ -210,7 +210,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
               if (elementKeys.length > 0) {
                 const typeReferences = [
                   ...elementKeys,
-                  ...Object.values((item.objectProperties as Record<string, number>) ?? {}),
+                  ...(item.objectProperties ?? []).map(([, elementKey]) => elementKey),
                 ].map((elementKey) => generateTypeReference(elementKey));
 
                 if (hasUnknownProperty) {

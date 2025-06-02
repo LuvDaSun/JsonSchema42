@@ -354,8 +354,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
             let propertiesCount = 0;
 
             if (item.objectProperties != null || item.required != null) {
+              const objectProperties = new Map(item.objectProperties);
               const required = new Set(item.required);
-              const objectProperties = item.objectProperties ?? {};
               const propertyNames = new Set([
                 ...Object.keys(objectProperties),
                 ...required,
@@ -363,24 +363,25 @@ export function* generateMocksTsCode(specification: models.Specification) {
               propertiesCount = propertyNames.size;
 
               for (const name of propertyNames) {
-                if ((objectProperties as Record<string, number>)[name] == null) {
+                const objectPropertyKey = objectProperties.get(name);
+                if (objectPropertyKey == null) {
                   yield itt`
                     [${JSON.stringify(name)}]: anyValue,
                   `;
                 } else {
                   if (required.has(name)) {
                     yield itt`
-                      [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
+                      [${JSON.stringify(name)}]: ${generateMockReference(objectPropertyKey)},
                     `;
                   } else {
-                    if (!isMockable(typesArena, objectProperties[name])) {
+                    if (!isMockable(typesArena, objectPropertyKey)) {
                       continue;
                     }
 
                     yield itt`
                       [${JSON.stringify(name)}]:
                         depthCounter < configuration.maximumDepth ?
-                        ${generateMockReference(objectProperties[name])} :
+                        ${generateMockReference(objectPropertyKey)} :
                         undefined,
                     `;
                   }

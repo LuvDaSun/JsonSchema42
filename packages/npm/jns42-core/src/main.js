@@ -34,5 +34,4 @@ const instance = await instantiate(getCoreModule, {
 export const documents = instance.documents;
 export const models = instance.models;
 export const naming = instance.naming;
-export const schemaTransforms = instance.schemaTransforms;
 export const utilities = instance.utilities;

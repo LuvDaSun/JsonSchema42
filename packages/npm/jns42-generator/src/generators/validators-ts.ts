@@ -523,15 +523,12 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
       function* generateCaseClauses() {
         if (item.objectProperties != null) {
-          for (const propertyName in item.objectProperties) {
+          for (const [propertyName, propertyKey] of item.objectProperties) {
             yield itt`
               case ${JSON.stringify(propertyName)}:
                 if(!lib.validation.withValidationPath(
                   propertyName,
-                  () => ${generateValidatorReference(
-                    item.objectProperties[propertyName],
-                    `propertyValue`,
-                  )},
+                  () => ${generateValidatorReference(propertyKey, `propertyValue`)},
                 )) {
                   return false
                 }
@@ -549,15 +546,12 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
       function* generateDefaultCaseStatements() {
         if (item.patternProperties != null) {
-          for (const propertyPattern in item.patternProperties) {
+          for (const [propertyPattern, propertyKey] of item.patternProperties) {
             yield itt`
               if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
                 if(!lib.validation.withValidationPath(
                   propertyName,
-                  () => ${generateValidatorReference(
-                    item.patternProperties[propertyPattern],
-                    `propertyValue`,
-                  )},
+                  () => ${generateValidatorReference(propertyKey, `propertyValue`)},
                 )) {
                   return false
                 }
@@ -681,9 +675,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (item.ifSchema != null) {
+    if (item.if != null) {
       yield itt`
-        if(${generateValidatorReference(item.ifSchema, valueExpression)}) {
+        if(${generateValidatorReference(item.if, valueExpression)}) {
           ${generateInnerThenStatements()}
         }
         else {
@@ -692,9 +686,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerThenStatements() {
-        if (item.thenSchema != null) {
+        if (item.then != null) {
           yield itt`
-            if(!${generateValidatorReference(item.thenSchema, valueExpression)}) {
+            if(!${generateValidatorReference(item.then, valueExpression)}) {
               lib.validation.recordValidationError("then");
               return false;
             }
@@ -703,9 +697,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateInnerElseStatements() {
-        if (item.elseSchema != null) {
+        if (item.else != null) {
           yield itt`
-            if(!${generateValidatorReference(item.elseSchema, valueExpression)}) {
+            if(!${generateValidatorReference(item.else, valueExpression)}) {
               lib.validation.recordValidationError("else");
               return false;
             }

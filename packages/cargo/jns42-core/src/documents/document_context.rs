@@ -661,7 +661,7 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     retrieval_location: String,
     given_location: String,
     antecedent_location: Option<String>,
-    node: String,
+    _node: String,
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
     let retrieval_location = retrieval_location.try_into()?;
