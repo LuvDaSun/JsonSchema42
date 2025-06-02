@@ -87,7 +87,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     if (item.options !== null) {
       if (item.options != null && item.options.length > 0) {
         yield joinIterable(
-          (item.options as any[]).map((option) => JSON.stringify(option)),
+          item.options.map((option) => option.serialize()),
           " |\n",
         );
         return;

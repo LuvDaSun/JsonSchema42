@@ -25,7 +25,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
       item.examples ?? [],
       (example) => itt`
         test(${JSON.stringify(name.toPascalCase())}, () => {
-          const example = ${JSON.stringify(example)};
+          const example = ${example.serialize()};
           const valid = validators.is${name.toPascalCase()}(example);
           assert.equal(valid, true);
         });

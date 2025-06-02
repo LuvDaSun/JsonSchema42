@@ -76,9 +76,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         if(
           ${joinIterable(
-            (item.options as any[]).map(
-              (option) => itt`${valueExpression} !== ${JSON.stringify(option)}`,
-            ),
+            item.options.map((option) => itt`${valueExpression} !== ${option.serialize()}`),
             " &&\n",
           )}
         ) {
