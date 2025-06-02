@@ -1,22 +1,22 @@
-use std::{cell::RefCell, rc::Rc};
+use std::rc::Rc;
 
 pub struct DocumentContextHost(Rc<super::DocumentContext>);
 
-impl From<Rc<super::DocumentContext>> for DocumentContextHost {
-  fn from(value: Rc<super::DocumentContext>) -> Self {
-    Self(value)
+impl From<super::DocumentContext> for DocumentContextHost {
+  fn from(value: super::DocumentContext) -> Self {
+    Self(value.into())
   }
 }
 
-impl From<DocumentContextHost> for Rc<super::DocumentContext> {
+impl From<DocumentContextHost> for crate::exports::jns42::core::documents::DocumentContext {
   fn from(value: DocumentContextHost) -> Self {
-    value.0
+    Self::new(value)
   }
 }
 
-impl From<crate::exports::jns42::core::documents::DocumentContext> for Rc<super::DocumentContext> {
-  fn from(value: crate::exports::jns42::core::documents::DocumentContext) -> Self {
-    todo!()
+impl From<super::DocumentContext> for crate::exports::jns42::core::documents::DocumentContext {
+  fn from(value: super::DocumentContext) -> Self {
+    DocumentContextHost::from(value).into()
   }
 }
 
