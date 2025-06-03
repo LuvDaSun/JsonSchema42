@@ -20,9 +20,8 @@ export function generatePackageJsonData(name: string, version: string) {
     files: ["./typed/**", "./bundled/**"],
     scripts: {
       prepack: "node ./scripts/build.js",
-      pretest: "tsc",
+      pretest: "tsc --build",
       build: "node ./scripts/build.js",
-      clean: "node ./scripts/clean.js",
       test: "node --test ./transpiled/examples.test.js ./transpiled/mocks.test.js",
     },
     author: "",

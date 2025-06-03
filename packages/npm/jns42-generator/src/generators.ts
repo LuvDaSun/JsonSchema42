@@ -1,5 +1,4 @@
 export * from "./generators/build-js.js";
-export * from "./generators/clean-js.js";
 export * from "./generators/examples-test-ts.js";
 export * from "./generators/mocks-test-ts.js";
 export * from "./generators/mocks-ts.js";

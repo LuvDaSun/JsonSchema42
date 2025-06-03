@@ -2,16 +2,17 @@ import * as core from "@jns42/core";
 import cp from "child_process";
 import assert from "node:assert";
 import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import YAML from "yaml";
 import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
-import { projectRoot, workspaceRoot } from "./root.js";
+import { workspaceRoot } from "./root.js";
 
 await test.suite("fixtures/testing", { concurrency: true }, async () => {
   const fixturesDirectoryPath = path.join(workspaceRoot, "fixtures", "testing");
-  const packageDirectoryRoot = path.join(projectRoot, ".generated", "testing");
+  const packageDirectoryRoot = await fs.mkdtemp(os.tmpdir() + "/");
 
   const files = await fs.readdir(fixturesDirectoryPath);
   for (const fileName of files) {
@@ -83,7 +84,21 @@ await test.suite("fixtures/testing", { concurrency: true }, async () => {
         });
 
         await test("test package", async () => {
-          cp.execFileSync("npm", ["test"], options);
+          const transpiledDirectoryPath = path.join(packageDirectoryPath, "transpiled");
+          const files = await fs.readdir(transpiledDirectoryPath);
+          for (const fileName of files) {
+            if (!fileName.endsWith(".test.js")) {
+              continue;
+            }
+
+            const filePath = path.join(transpiledDirectoryPath, fileName);
+            const fileStat = await fs.stat(filePath);
+            if (!fileStat.isFile()) {
+              continue;
+            }
+
+            await import(filePath);
+          }
         });
 
         await test("valid", async () => {
