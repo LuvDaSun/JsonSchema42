@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: |
@@ -15,13 +16,13 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - uses: actions/checkout@v4
       - run: cargo test --workspace --all-targets
 
   clippy:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: |
@@ -32,13 +33,13 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup component add clippy
-      - uses: actions/checkout@v4
       - run: cargo clippy --all-targets
 
   rustfmt:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: |
@@ -49,13 +50,13 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup component add rustfmt
-      - uses: actions/checkout@v4
       - run: cargo fmt --check
 
   fixtures:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/cache@v4
         with:
           path: |
@@ -67,5 +68,4 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: extractions/setup-just@v2
       - run: rustup component add rustfmt
-      - uses: actions/checkout@v4
       - run: just package-specification-cargo-all
