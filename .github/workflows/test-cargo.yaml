@@ -13,6 +13,7 @@ jobs:
             ~/.cargo/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - run: rustup component add rustfmt
       - run: cargo test --workspace --all-targets
 
   clippy:
