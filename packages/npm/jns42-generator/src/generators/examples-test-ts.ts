@@ -24,7 +24,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     yield mapIterable(
       item.examples ?? [],
       (example) => itt`
-        test(${JSON.stringify(name.toPascalCase())}, () => {
+        await test(${JSON.stringify(name.toPascalCase())}, () => {
           const example = ${JSON.stringify(example)};
           const valid = validators.is${name.toPascalCase()}(example);
           assert.equal(valid, true);

@@ -10,7 +10,7 @@ import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
 import { workspaceRoot } from "./root.js";
 
-await test.suite("fixtures/testing", { concurrency: true }, async () => {
+await test.suite("fixtures/testing", { concurrency: false }, async () => {
   const fixturesDirectoryPath = path.join(workspaceRoot, "fixtures", "testing");
   const packageDirectoryRoot = await fs.mkdtemp(os.tmpdir() + "/");
 
