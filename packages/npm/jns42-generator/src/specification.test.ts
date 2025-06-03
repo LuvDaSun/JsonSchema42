@@ -7,9 +7,9 @@ import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
 import { projectRoot, workspaceRoot } from "./root.js";
 
-await test.suite("specifications", { concurrency: true }, async () => {
+await test.suite("fixtures/specifications", { concurrency: true }, async () => {
   const specificationDirectoryPath = path.join(workspaceRoot, "fixtures", "specifications");
-  const packageDirectoryRoot = path.join(projectRoot, ".generated");
+  const packageDirectoryRoot = path.join(projectRoot, ".generated", "specifications");
 
   const files = await fs.readdir(specificationDirectoryPath);
   for (const fileName of files) {
