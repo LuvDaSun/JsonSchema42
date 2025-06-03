@@ -1,4 +1,5 @@
 import * as core from "@jns42/core";
+import cp from "child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
@@ -8,7 +9,7 @@ import { projectRoot, workspaceRoot } from "./root.js";
 
 await test.suite("specifications", { concurrency: true }, async () => {
   const specificationDirectoryPath = path.join(workspaceRoot, "fixtures", "specifications");
-  const generatedDirectoryPath = path.join(projectRoot, ".generated");
+  const packageDirectoryRoot = path.join(projectRoot, ".generated");
 
   const files = await fs.readdir(specificationDirectoryPath);
   for (const fileName of files) {
@@ -26,28 +27,46 @@ await test.suite("specifications", { concurrency: true }, async () => {
     const packageVersion = "0.1.0";
 
     await test(packageName, async () => {
-      const packageDirectoryPath = path.join(generatedDirectoryPath, packageName);
-      await fs.mkdir(packageDirectoryPath, { recursive: true });
+      const packageDirectoryPath = path.join(packageDirectoryRoot, packageName);
+      await fs.rm(packageDirectoryPath, { force: true, recursive: true });
 
-      const context = new core.DocumentContextContainer();
-      context.registerWellKnownFactories();
+      await test("generate package", async () => {
+        const context = new core.DocumentContextContainer();
+        context.registerWellKnownFactories();
 
-      await context.loadFromLocation(
-        filePath,
-        filePath,
-        undefined,
-        "https://json-schema.org/draft/2020-12/schema",
-      );
+        await context.loadFromLocation(
+          filePath,
+          filePath,
+          undefined,
+          "https://json-schema.org/draft/2020-12/schema",
+        );
 
-      const specification = models.loadSpecification(context, {
-        transformMaximumIterations: 100,
-        defaultTypeName: "schema-document",
+        const specification = models.loadSpecification(context, {
+          transformMaximumIterations: 100,
+          defaultTypeName: "schema-document",
+        });
+
+        generatePackage(specification, {
+          packageDirectoryPath,
+          packageName,
+          packageVersion,
+        });
       });
 
-      generatePackage(specification, {
-        packageDirectoryPath,
-        packageName,
-        packageVersion,
+      const options = {
+        stdio: "inherit",
+        shell: true,
+        cwd: packageDirectoryPath,
+        env: process.env,
+      } as const;
+
+      await test("install and build package", () => {
+        cp.execFileSync("npm", ["install"], options);
+        cp.execFileSync("npm", ["run", "build"], options);
+      });
+
+      await test("test package", () => {
+        cp.execFileSync("npm", ["test"], options);
       });
     });
   }
