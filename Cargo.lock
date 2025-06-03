@@ -1532,6 +1532,7 @@ dependencies = [
  "hyper-util",
  "im",
  "jns42-core",
+ "jns42-macros",
  "once_cell",
  "proc-macro2",
  "quote",
@@ -1545,6 +1546,16 @@ dependencies = [
  "toml",
  "url",
  "urlencoding",
+]
+
+[[package]]
+name = "jns42-macros"
+version = "0.1.0"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.101",
 ]
 
 [[package]]
