@@ -3,13 +3,13 @@ import path from "node:path";
 import * as models from "../models.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utilities.js";
 import { generateBuildJsCode } from "./build-js.js";
-import { generateCleanJsCode } from "./clean-js.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { generateMocksTestTsCode } from "./mocks-test-ts.js";
 import { generateMocksTsCode } from "./mocks-ts.js";
 import { generatePackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
+import { generateRollupConfigJsCode } from "./rollup-config-js.js";
 import { generateTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
@@ -40,6 +40,12 @@ export function generatePackage(
     const content = generateTsconfigJsonData();
     const filePath = path.join(packageDirectoryPath, "tsconfig.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
+  }
+
+  {
+    const content = generateRollupConfigJsCode();
+    const filePath = path.join(packageDirectoryPath, "rollup.config.js");
+    writeContentToFile(filePath, content);
   }
 
   {
@@ -87,13 +93,6 @@ export function generatePackage(
   {
     const content = generateBuildJsCode();
     const filePath = path.join(packageDirectoryPath, "scripts", "build.js");
-    writeContentToFile(filePath, content);
-    fs.chmodSync(filePath, 0o755);
-  }
-
-  {
-    const content = generateCleanJsCode();
-    const filePath = path.join(packageDirectoryPath, "scripts", "clean.js");
     writeContentToFile(filePath, content);
     fs.chmodSync(filePath, 0o755);
   }

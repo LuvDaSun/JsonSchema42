@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "process",
+      "command": "cargo",
+      "args": ["build", "--package", "${workspaceFolderBasename}"],
+      "problemMatcher": ["$rustc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "label": "build"
+    }
+  ]
+}

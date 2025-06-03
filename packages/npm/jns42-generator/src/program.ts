@@ -11,10 +11,6 @@ async function main() {
   const program = yargs(hideBin(process.argv));
 
   programs.configurePackageProgram(program);
-  if (process.env.NODE_ENV === "development") {
-    // only enabled when debugging
-    programs.configureTestProgram(program);
-  }
 
   program.version(packageInfo.version!);
   program.demandCommand();
