@@ -16,12 +16,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.5.1
+      - uses: extractions/setup-just@v2
       - run: corepack enable
       - run: rustup default 1.87.0
 
       - run: rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-bindgen-cli@0.2.100
-      - run: cargo install just
 
       - uses: actions/checkout@v4
       - run: npm ci

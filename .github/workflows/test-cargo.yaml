@@ -13,23 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
-      - uses: actions/checkout@v4
       - run: rustup component add clippy
+      - uses: actions/checkout@v4
       - run: cargo clippy --all-targets
 
   rustfmt:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
-      - uses: actions/checkout@v4
       - run: rustup component add rustfmt
+      - uses: actions/checkout@v4
       - run: cargo fmt --check
 
   fixtures:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: extractions/setup-just@v2
       - run: rustup component add rustfmt
-      - run: cargo install just
+      - uses: actions/checkout@v4
       - run: just package-specification-cargo-all
