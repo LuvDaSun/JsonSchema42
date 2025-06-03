@@ -7,7 +7,7 @@ import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
 import { projectRoot, workspaceRoot } from "./root.js";
 
-await test.suite("fixtures/specifications", { concurrency: true }, async () => {
+await test.suite("fixtures/specifications", {}, async () => {
   const specificationDirectoryPath = path.join(workspaceRoot, "fixtures", "specifications");
   const packageDirectoryRoot = path.join(projectRoot, ".generated", "specifications");
 
@@ -54,18 +54,21 @@ await test.suite("fixtures/specifications", { concurrency: true }, async () => {
       });
 
       const options = {
-        stdio: "inherit",
+        stdio: "ignore",
         shell: true,
         cwd: packageDirectoryPath,
         env: process.env,
       } as const;
 
-      await test("install and build package", () => {
+      await test("install package", () => {
         cp.execFileSync("npm", ["install"], options);
+      });
+
+      await test("build package", () => {
         cp.execFileSync("npm", ["run", "build"], options);
       });
 
-      await test("test package", () => {
+      await test("test package", async () => {
         cp.execFileSync("npm", ["test"], options);
       });
     });

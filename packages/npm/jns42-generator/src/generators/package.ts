@@ -10,6 +10,7 @@ import { generateMocksTestTsCode } from "./mocks-test-ts.js";
 import { generateMocksTsCode } from "./mocks-ts.js";
 import { generatePackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
+import { generateRollupConfigJsCode } from "./rollup-config-js.js";
 import { generateTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
@@ -40,6 +41,12 @@ export function generatePackage(
     const content = generateTsconfigJsonData();
     const filePath = path.join(packageDirectoryPath, "tsconfig.json");
     fs.writeFileSync(filePath, JSON.stringify(content, undefined, 2));
+  }
+
+  {
+    const content = generateRollupConfigJsCode();
+    const filePath = path.join(packageDirectoryPath, "rollup.config.js");
+    writeContentToFile(filePath, content);
   }
 
   {

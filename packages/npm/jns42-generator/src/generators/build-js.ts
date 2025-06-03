@@ -18,34 +18,6 @@ export function* generateBuildJsCode() {
     const options = { shell: true, stdio: "inherit" };
 
     cp.execFileSync("tsc", [], options);
-    
-    cp.execFileSync(
-      "rollup",
-      [
-        "--input",
-        path.resolve("transpiled", "main.js"),
-        "--file",
-        path.resolve("bundled", "main.js"),
-        "--sourcemap",
-        "--format",
-        "module",
-      ],
-      options,
-    );
-    
-    cp.execFileSync(
-      "rollup",
-      [
-        "--input",
-        path.resolve("transpiled", "main.js"),
-        "--file",
-        path.resolve("bundled", "main.cjs"),
-        "--sourcemap",
-        "--format",
-        "commonjs",
-      ],
-      options,
-    );
-    
+    cp.execFileSync("rollup", ["--config"], options);
   `;
 }

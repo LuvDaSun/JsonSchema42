@@ -5,5 +5,6 @@ export * from "./generators/mocks-test-ts.js";
 export * from "./generators/mocks-ts.js";
 export * from "./generators/package.js";
 export * from "./generators/parsers-ts.js";
+export * from "./generators/rollup-config-js.js";
 export * from "./generators/types-ts.js";
 export * from "./generators/validators-ts.js";
