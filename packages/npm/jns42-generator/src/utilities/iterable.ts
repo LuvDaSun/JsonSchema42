@@ -1,3 +1,5 @@
+import assert from "assert";
+
 export function* joinIterable<T, G>(iterable: Iterable<T>, glue: G): Iterable<T | G> {
   let count = 0;
   for (const item of iterable) {
@@ -15,7 +17,11 @@ export function* mapIterable<T, R>(iterable: Iterable<T>, mapper: (item: T) => R
   }
 }
 
-export function* splitIterableText(texts: Iterable<string>, separator = /\r?\n/): Iterable<string> {
+export function* splitIterableText(
+  texts: Iterable<string>,
+  separator = /\r?\n/,
+): Iterable<string> {
+  assert(!separator.global, "global regexes are not supported");
   let buffer = "";
 
   for (const text of texts) {
