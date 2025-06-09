@@ -1,6 +1,5 @@
 import * as core from "@jns42/core";
-import { packageInfo } from "../utils/index.js";
-import { itt } from "../utils/iterable-text-template.js";
+import { itt, packageInfo } from "../utilities.js";
 
 export function* generateRollupConfigJsCode() {
   yield core.banner("//", `v${packageInfo.version}`);

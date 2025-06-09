@@ -1,7 +1,7 @@
 import * as core from "@jns42/core";
 import assert from "node:assert";
-import * as models from "../models/index.js";
-import { itt, packageInfo } from "../utils/index.js";
+import * as models from "../models.js";
+import { itt, packageInfo } from "../utilities.js";
 
 export function* generateProgramTsCode(
   specification: models.Specification,

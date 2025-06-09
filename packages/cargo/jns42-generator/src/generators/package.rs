@@ -1,5 +1,5 @@
 use crate::models::Specification;
-use jns42_core::utils::NodeLocation;
+use jns42_core::utilities::NodeLocation;
 use std::{error::Error, path::PathBuf};
 use tokio::fs;
 
