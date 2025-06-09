@@ -1,7 +1,7 @@
 use super::Document;
 use crate::{
   models::{DocumentSchemaItem, SchemaType},
-  utils::{JsonValue, NodeLocation},
+  utilities::{JsonValue, NodeLocation},
 };
 use std::iter;
 

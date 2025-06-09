@@ -1,6 +1,6 @@
 use crate::models::Specification;
 use proc_macro2::TokenStream;
-use quote::{quote, TokenStreamExt};
+use quote::{TokenStreamExt, quote};
 use std::error::Error;
 
 pub fn generate_file_token_stream(

@@ -1,5 +1,5 @@
 use crate::models::{ArenaSchemaItem, SchemaArena};
-use std::{cell::RefCell, collections::HashMap};
+use std::{cell::RefCell, collections::BTreeMap};
 
 /**
  * This transformer merges all sub schemas in allOf.
@@ -57,7 +57,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     return;
   }
 
-  let sub_entries: HashMap<_, _> = sub_keys
+  let sub_entries: BTreeMap<_, _> = sub_keys
     .into_iter()
     .map(|key| (key, arena.get_item(key).clone()))
     .collect();

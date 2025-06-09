@@ -15,7 +15,8 @@ export function* generateJsDocComments(item: core.ArenaSchemaItemContainer): Ite
   }
 
   if (nodeId != null) {
-    yield ` * @see {@link ${nodeId}}\n`;
+    // TODO make this stable (relative paths)
+    // yield ` * @see {@link ${nodeId}}\n`;
   }
 
   if (item.deprecated ?? false) {

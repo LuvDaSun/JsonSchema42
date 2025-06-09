@@ -2,8 +2,8 @@ use super::Node;
 use crate::documents::SchemaDocument;
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
-use crate::utils::NodeLocation;
-use std::collections::{BTreeMap, HashMap};
+use crate::utilities::NodeLocation;
+use std::collections::BTreeMap;
 
 pub struct Document {
   document_location: NodeLocation,
@@ -11,7 +11,7 @@ pub struct Document {
   /**
   Nodes that belong to this document, indexed by their pointer
   */
-  nodes: HashMap<Vec<String>, Node>,
+  nodes: BTreeMap<Vec<String>, Node>,
   referenced_locations: Vec<NodeLocation>,
 }
 
@@ -34,7 +34,7 @@ impl Document {
       given_location.clone()
     };
 
-    let mut nodes = HashMap::new();
+    let mut nodes = BTreeMap::new();
     let mut referenced_locations = Vec::new();
 
     let mut node_queue = Vec::new();

@@ -1,8 +1,8 @@
 import * as core from "@jns42/core";
 import * as path from "node:path";
 import * as yargs from "yargs";
-import { generatePackage } from "../generators/index.js";
-import * as models from "../models/index.js";
+import { generatePackage } from "../generators.js";
+import * as models from "../models.js";
 
 export function configurePackageProgram(argv: yargs.Argv) {
   return argv.command(

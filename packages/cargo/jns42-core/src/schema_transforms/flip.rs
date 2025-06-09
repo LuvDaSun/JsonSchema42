@@ -1,59 +1,58 @@
-/**
- * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
- * will flip em! It will become a oneOf with a few allOfs in it.
- *
- * We can generate code for a oneOf with some allOfs in it, but for an allOf with
- * a bunch of oneOfs, we cannot generate code.
- *
- * this
-
-```yaml
-- allOf:
-    - 1
-    - 2
-    - 3
-- type: object
-- oneOf:
-    - 100
-    - 200
-- oneOf:
-    - 300
-    - 400
-```
-
-will become
-
-```yaml
-- oneOf:
-    - 2
-    - 3
-    - 4
-    - 5
-- type: object
-- allOf:
-    - 1
-    - 100
-    - 300
-- allOf:
-    - 1
-    - 100
-    - 400
-- allOf:
-    - 1
-    - 200
-    - 300
-- allOf:
-    - 1
-    - 200
-    - 400
-```
- */
-
 macro_rules! generate_mod {
   ( $name: ident, $base_member: ident, $other_member: ident  ) => {
+    /**
+     * Flips oneOf and allOf types. If an allOf has a oneOf in it, this transform
+     * will flip em! It will become a oneOf with a few allOfs in it.
+     *
+     * We can generate code for a oneOf with some allOfs in it, but for an allOf with
+     * a bunch of oneOfs, we cannot generate code.
+     *
+     * this
+
+    ```yaml
+    - allOf:
+        - 1
+        - 2
+        - 3
+    - type: object
+    - oneOf:
+        - 100
+        - 200
+    - oneOf:
+        - 300
+        - 400
+    ```
+
+    will become
+
+    ```yaml
+    - oneOf:
+        - 2
+        - 3
+        - 4
+        - 5
+    - type: object
+    - allOf:
+        - 1
+        - 100
+        - 300
+    - allOf:
+        - 1
+        - 100
+        - 400
+    - allOf:
+        - 1
+        - 200
+        - 300
+    - allOf:
+        - 1
+        - 200
+        - 400
+    ```
+     */
     pub mod $name {
       use crate::models::{ArenaSchemaItem, SchemaArena};
-      use crate::utils::product;
+      use crate::utilities::product;
       use std::collections::{BTreeMap, BTreeSet};
 
       pub fn transform(arena: &mut SchemaArena, key: usize) {

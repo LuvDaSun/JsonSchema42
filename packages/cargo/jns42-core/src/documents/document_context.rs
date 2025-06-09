@@ -3,14 +3,14 @@ use super::schema_document::SchemaDocument;
 use crate::documents;
 use crate::error::Error;
 use crate::models::DocumentSchemaItem;
-use crate::utils::NodeCache;
-use crate::utils::NodeLocation;
+use crate::utilities::NodeCache;
+use crate::utilities::NodeLocation;
 use gloo::utils::format::JsValueSerdeExt;
+use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::iter;
 use std::rc;
-use std::{cell::RefCell, collections::HashMap};
 use wasm_bindgen::prelude::*;
 
 pub struct DocumentConfiguration {
@@ -69,24 +69,24 @@ pub struct DocumentContext {
 
   /// document factories by schema identifier
   ///
-  factories: HashMap<String, Box<DocumentFactory>>,
+  factories: BTreeMap<String, Box<DocumentFactory>>,
 
   /// Maps node retrieval locations to their documents retrieval location. We can work with the
   /// node via it's document.
   ///
-  node_to_document_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
+  node_to_document_retrieval_locations: RefCell<BTreeMap<NodeLocation, NodeLocation>>,
 
   /// all documents, indexed by the retrieval location of the document
   ///
-  documents: RefCell<HashMap<NodeLocation, rc::Rc<dyn SchemaDocument>>>,
+  documents: RefCell<BTreeMap<NodeLocation, rc::Rc<dyn SchemaDocument>>>,
 
   /// this maps retrieval locations to identity locations
-  retrieval_to_identity_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
+  retrieval_to_identity_locations: RefCell<BTreeMap<NodeLocation, NodeLocation>>,
 
   /// This maps identity locations to retrieval locations. Use this table every time you
   /// need to fetch a node by it's identity location and you have a retrieval location
   ///
-  identity_to_retrieval_locations: RefCell<HashMap<NodeLocation, NodeLocation>>,
+  identity_to_retrieval_locations: RefCell<BTreeMap<NodeLocation, NodeLocation>>,
 
   /// locations that were loaded explicitly
   explicit_locations: RefCell<BTreeSet<NodeLocation>>,

@@ -4,14 +4,14 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: rust:1.80.0
+    container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
       - run: cargo test --workspace --all-targets
 
   clippy:
     runs-on: ubuntu-latest
-    container: rust:1.80.0
+    container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add clippy
@@ -19,7 +19,7 @@ jobs:
 
   rustfmt:
     runs-on: ubuntu-latest
-    container: rust:1.80.0
+    container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add rustfmt
@@ -27,8 +27,9 @@ jobs:
 
   fixtures:
     runs-on: ubuntu-latest
-    container: rust:1.80.0
+    container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
       - run: rustup component add rustfmt
-      - run: ./package-fixtures-cargo
+      - run: cargo install just
+      - run: just package-specification-cargo-all

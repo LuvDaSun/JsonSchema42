@@ -1,6 +1,6 @@
 import * as core from "@jns42/core";
-import { packageInfo } from "../utils/index.js";
-import { itt } from "../utils/iterable-text-template.js";
+import { packageInfo } from "../utilities.js";
+import { itt } from "../utilities/iterable-text-template.js";
 
 export function* generateCleanJsCode() {
   yield itt`

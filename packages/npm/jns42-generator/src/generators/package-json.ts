@@ -1,5 +1,5 @@
 import { PackageJson } from "type-fest";
-import { packageInfo } from "../utils/index.js";
+import { packageInfo } from "../utilities.js";
 
 export function generatePackageJsonData(packageName: string, packageVersion: string) {
   const packageNameMatch = /^(?:(@[a-z][a-z0-9\-_\.]*?)\/)?([a-z][a-z0-9\-_\.]*)$/.exec(
@@ -15,13 +15,13 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
     version: packageVersion,
     sideEffects: false,
     type: "module",
-    main: "./bundled/main.cjs",
     module: "./bundled/main.js",
+    main: "./bundled/main.cjs",
     types: "./typed/main.d.ts",
     exports: {
       ".": {
-        require: "./bundled/main.cjs",
         import: "./bundled/main.js",
+        require: "./bundled/main.cjs",
         types: "./typed/main.d.ts",
       },
     },
@@ -38,7 +38,7 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
     },
     author: "",
     license: "ISC",
-    dependencies: withDependencies(["@types/node", "@types/yargs", "yargs"]),
+    dependencies: withDependencies(["@types/node", "@jns42/lib", "@types/yargs", "yargs"]),
     devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
     engines: {
       node: ">=18",

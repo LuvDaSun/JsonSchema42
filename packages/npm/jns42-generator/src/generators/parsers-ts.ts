@@ -1,12 +1,6 @@
 import * as core from "@jns42/core";
-import * as models from "../models/index.js";
-import {
-  NestedText,
-  generateJsDocComments,
-  itt,
-  joinIterable,
-  packageInfo,
-} from "../utils/index.js";
+import * as models from "../models.js";
+import { NestedText, generateJsDocComments, itt, joinIterable, packageInfo } from "../utilities.js";
 
 export function* generateParsersTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);

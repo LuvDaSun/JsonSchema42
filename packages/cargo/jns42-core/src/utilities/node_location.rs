@@ -132,7 +132,7 @@ impl NodeLocation {
       .join("/");
     let query = &self.query;
 
-    return origin.to_string() + path.as_str() + query.as_str();
+    origin.to_string() + path.as_str() + query.as_str()
   }
 
   pub fn join(&self, other: &NodeLocation) -> Self {
@@ -254,7 +254,7 @@ impl From<&NodeLocation> for String {
         .collect::<Vec<_>>()
         .join("/");
 
-    return origin.to_string() + path.as_str() + query.as_str() + hash.as_str();
+    origin.to_string() + path.as_str() + query.as_str() + hash.as_str()
   }
 }
 

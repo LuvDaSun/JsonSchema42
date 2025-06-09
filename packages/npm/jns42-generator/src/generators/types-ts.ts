@@ -1,17 +1,27 @@
 import * as core from "@jns42/core";
-import * as models from "../models/index.js";
-import {
-  NestedText,
-  generateJsDocComments,
-  itt,
-  joinIterable,
-  packageInfo,
-} from "../utils/index.js";
+import * as models from "../models.js";
+import { NestedText, generateJsDocComments, itt, joinIterable, packageInfo } from "../utilities.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
   yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
+
+  yield itt`
+    declare const _tags: unique symbol;
+
+    type _Wrap<T, N extends PropertyKey> = T extends
+      | boolean
+      | number
+      | bigint
+      | string
+      | symbol
+      | object
+      ? T & {
+          readonly [_tags]: { [K in N]: void };
+        }
+      : T;
+  `;
 
   for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
     const item = typesArena.getItem(itemKey);
@@ -25,13 +35,13 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export type ${name.toPascalCase()} = (${definition});
-    `;
+        export type ${name.toPascalCase()} = _Wrap<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
+      `;
   }
 
-  function* generateTypeReference(itemKey: number): Iterable<NestedText> {
+  function* generateTypeReference(itemKey: number, forceInline = false): Iterable<NestedText> {
     const name = names.getName(itemKey);
-    if (name == null) {
+    if (name == null || forceInline) {
       yield itt`(${generateTypeDefinition(itemKey)})`;
     } else {
       yield name.toPascalCase();
@@ -91,7 +101,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
         case core.SchemaType.Any:
-          yield "any";
+          yield "unknown";
           return;
 
         case core.SchemaType.Null:
@@ -136,9 +146,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
             }
 
             if (item.tupleItems == null && item.arrayItems == null) {
+              // TODO should be unknown, but that does not really fly
               yield itt`
-              ...any
-            `;
+                ...unknown[]
+              `;
             }
           }
         }
@@ -153,7 +164,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
           function* generateInterfaceContent() {
-            let undefinedProperty = false;
+            let hasUndefinedProperty = false;
+            let hasUnknownProperty = false;
 
             if (item.objectProperties != null || item.required != null) {
               const required = new Set(item.required);
@@ -164,11 +176,15 @@ export function* generateTypesTsCode(specification: models.Specification) {
               ] as string[]);
 
               for (const name of propertyNames) {
-                undefinedProperty ||= !required.has(name);
+                if (!required.has(name)) {
+                  hasUndefinedProperty = true;
+                }
 
                 if (objectProperties[name] == null) {
+                  hasUnknownProperty = true;
+
                   yield itt`
-                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: any,
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: unknown,
                   `;
                 } else {
                   yield itt`
@@ -192,19 +208,23 @@ export function* generateTypesTsCode(specification: models.Specification) {
               }
 
               if (elementKeys.length > 0) {
-                const typeNames = [
+                const typeReferences = [
                   ...elementKeys,
                   ...Object.values((item.objectProperties as Record<string, number>) ?? {}),
                 ].map((elementKey) => generateTypeReference(elementKey));
 
-                if (undefinedProperty) {
-                  typeNames.push("undefined");
+                if (hasUnknownProperty) {
+                  typeReferences.push("unknown");
+                }
+
+                if (hasUndefinedProperty) {
+                  typeReferences.push("undefined");
                 }
 
                 yield itt`
                 [
-                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
-                ]: ${joinIterable(typeNames, " |\n")}
+                  name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames, true)}
+                ]: ${joinIterable(typeReferences, " |\n")}
               `;
                 return;
               }
@@ -212,7 +232,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
               yield itt`
               [
                 name: ${item.propertyNames == null ? "string" : generateTypeReference(item.propertyNames)}
-              ]: any
+              ]: unknown
             `;
             }
           }

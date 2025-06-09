@@ -1,6 +1,6 @@
 use crate::models::{ArenaSchemaItem, SchemaArena};
-use im::HashMap;
 use itertools::Itertools;
+use std::collections::BTreeMap;
 use std::{cell::RefCell, collections::BTreeSet};
 
 pub fn transform(arena: &mut SchemaArena, key: usize) {
@@ -27,7 +27,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     return;
   }
 
-  let sub_entries: HashMap<_, _> = sub_keys
+  let sub_entries: BTreeMap<_, _> = sub_keys
     .into_iter()
     .map(|key| (key, arena.get_item(key).clone()))
     .collect();
@@ -55,7 +55,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     .into_iter()
     .map(|(key, item)| (*item.types.as_ref().unwrap().first().unwrap(), key, item))
     .sorted_by_key(|(r#type, _key, _item)| *r#type)
-    .group_by(|(r#type, _key, _item)| *r#type);
+    .chunk_by(|(r#type, _key, _item)| *r#type);
 
   let grouped_sub_entries = grouped_sub_entries
     .into_iter()
@@ -80,7 +80,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   };
 
   for (r#type, sub_entries) in grouped_sub_entries.into_iter() {
-    let sub_entries: HashMap<_, _> = sub_entries.collect();
+    let sub_entries: BTreeMap<_, _> = sub_entries.collect();
     if sub_entries.len() < 2 {
       for sub_key in sub_entries.keys() {
         sub_keys_new.insert(*sub_key);

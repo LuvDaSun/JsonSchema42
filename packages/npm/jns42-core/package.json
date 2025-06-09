@@ -1,6 +1,6 @@
 {
   "name": "@jns42/core",
-  "version": "0.7.9",
+  "version": "0.7.11",
   "sideEffects": false,
   "description": "core library",
   "type": "commonjs",
@@ -16,16 +16,17 @@
     "./dist/**"
   ],
   "scripts": {
-    "prepack": "node ./scripts/build.mjs",
-    "build": "node ./scripts/build.mjs",
-    "clean": "node ./scripts/clean.mjs",
-    "preversion": "node ./scripts/preversion.mjs",
-    "postversion": "node ./scripts/postversion.mjs",
-    "postpublish": "node ./scripts/postpublish.mjs"
+    "prepack": "npm run build",
+    "build": "just build-npm-jns42-core",
+    "generate": "wasm-bindgen --target nodejs --out-dir dist $npm_config_local_prefix/target/wasm32-unknown-unknown/release/jns42_core.wasm"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/LuvDaSun/JsonSchema42.git"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/LuvDaSun"
   },
   "author": "LuvDaSun Software B.V.",
   "license": "ISC",

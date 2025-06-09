@@ -17,15 +17,16 @@ jobs:
         with:
           node-version: 22.5.1
       - run: corepack enable
-      - run: rustup default 1.80.0
+      - run: rustup default 1.87.0
 
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli
+      - run: cargo install wasm-bindgen-cli@0.2.100
+      - run: cargo install just
 
       - uses: actions/checkout@v4
       - run: npm ci
 
-      - run: npm --workspaces run build --if-present
+      - run: just build-all
       - run: npm --workspaces test --if-present
 
   fixtures:
@@ -35,13 +36,14 @@ jobs:
         with:
           node-version: 22.5.1
       - run: corepack enable
-      - run: rustup default 1.80.0
+      - run: rustup default 1.87.0
 
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli
+      - run: cargo install wasm-bindgen-cli@0.2.100
+      - run: cargo install just
 
       - uses: actions/checkout@v4
       - run: npm ci
 
-      - run: ./test-fixtures-npm
-      - run: ./package-fixtures-npm
+      - run: just package-specification-npm-all
+      - run: just test-fixture-npm-all
