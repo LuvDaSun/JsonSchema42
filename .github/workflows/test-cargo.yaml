@@ -7,6 +7,13 @@ jobs:
     container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - run: rustup component add rustfmt
       - run: cargo test --workspace --all-targets
 
   clippy:
@@ -14,6 +21,12 @@ jobs:
     container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup component add clippy
       - run: cargo clippy --all-targets
 
@@ -22,14 +35,11 @@ jobs:
     container: rust:1.87.0
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup component add rustfmt
       - run: cargo fmt --check
-
-  fixtures:
-    runs-on: ubuntu-latest
-    container: rust:1.87.0
-    steps:
-      - uses: actions/checkout@v4
-      - run: rustup component add rustfmt
-      - run: cargo install just
-      - run: just package-specification-cargo-all
