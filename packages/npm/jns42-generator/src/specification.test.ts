@@ -50,6 +50,7 @@ await test.suite("fixtures/specifications", { concurrency: false }, async () => 
           packageDirectoryPath,
           packageName,
           packageVersion,
+          entryLocation: filePath,
         });
       });
 
