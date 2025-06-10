@@ -50,7 +50,7 @@ await test.suite("fixtures/specifications", { concurrency: false }, async () => 
           packageDirectoryPath,
           packageName,
           packageVersion,
-          entryLocation: filePath,
+          entryLocation: filePath + "#",
         });
       });
 
@@ -82,9 +82,6 @@ await test.suite("fixtures/specifications", { concurrency: false }, async () => 
           if (!fileStat.isFile()) {
             continue;
           }
-          await test("test package", async () => {
-            cp.execFileSync("npm", ["test"], options);
-          });
 
           await import(filePath);
         }

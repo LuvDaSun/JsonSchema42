@@ -19,15 +19,18 @@ export function* generateProgramTsCode(
 
   const { names, typesArena } = specification;
 
-  let entryKey: number;
-  for (entryKey = 0; entryKey < typesArena.count(); entryKey++) {
+  let foundEntryKey: number | undefined;
+  for (let entryKey = 0; entryKey < typesArena.count(); entryKey++) {
     const item = typesArena.getItem(entryKey);
     if (item.location === entryLocation) {
+      foundEntryKey = entryKey;
       break;
     }
   }
 
-  const entryTypeName = names.getName(entryKey);
+  assert(foundEntryKey != null);
+
+  const entryTypeName = names.getName(foundEntryKey);
 
   assert(entryTypeName != null);
 
