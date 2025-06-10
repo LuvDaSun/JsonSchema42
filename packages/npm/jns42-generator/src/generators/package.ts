@@ -3,7 +3,6 @@ import path from "node:path";
 import * as models from "../models.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utilities.js";
 import { generateBuildJsCode } from "./build-js.js";
-import { generateCleanJsCode } from "./clean-js.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { generateMocksTestTsCode } from "./mocks-test-ts.js";
@@ -107,13 +106,6 @@ export function generatePackage(
   {
     const content = generateBuildJsCode();
     const filePath = path.join(packageDirectoryPath, "scripts", "build.js");
-    writeContentToFile(filePath, content);
-    fs.chmodSync(filePath, 0o755);
-  }
-
-  {
-    const content = generateCleanJsCode();
-    const filePath = path.join(packageDirectoryPath, "scripts", "clean.js");
     writeContentToFile(filePath, content);
     fs.chmodSync(filePath, 0o755);
   }

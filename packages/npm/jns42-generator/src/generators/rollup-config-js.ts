@@ -5,6 +5,7 @@ export function* generateRollupConfigJsCode() {
   yield core.banner("//", `v${packageInfo.version}`);
 
   yield itt`
+    import replace from "@rollup/plugin-replace";
     import path from "path";
     import { defineConfig } from "rollup";
   `;
@@ -18,21 +19,42 @@ export function* generateRollupConfigJsCode() {
         input: path.resolve("transpiled", "main.js"),
         output: { file: path.resolve("bundled", "main.js"), format: "module", sourcemap: true },
         context: "global",
-        plugins: [],
+        plugins: [
+          replace({
+            values: {
+              "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+            },
+            preventAssignment: true,
+          }),
+        ],
       },
       {
         external,
         input: path.resolve("transpiled", "main.js"),
         output: { file: path.resolve("bundled", "main.cjs"), format: "commonjs", sourcemap: true },
         context: "global",
-        plugins: [],
+        plugins: [
+          replace({
+            values: {
+              "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+            },
+            preventAssignment: true,
+          }),
+        ],
       },
       {
         external,
         input: path.resolve("transpiled", "program.js"),
         output: { file: path.resolve("bundled", "program.js"), format: "module", sourcemap: true },
         context: "global",
-        plugins: [],
+        plugins: [
+          replace({
+            values: {
+              "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+            },
+            preventAssignment: true,
+          }),
+        ],
       },
     ]);
   `;

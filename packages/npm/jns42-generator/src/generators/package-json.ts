@@ -31,15 +31,19 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
     },
     scripts: {
       prepack: "node ./scripts/build.js",
-      pretest: "tsc",
+      pretest: "tsc --build",
       build: "node ./scripts/build.js",
-      clean: "node ./scripts/clean.js",
       test: "node --test ./transpiled/examples.test.js ./transpiled/mocks.test.js",
     },
     author: "",
     license: "ISC",
     dependencies: withDependencies(["@types/node", "@jns42/lib", "@types/yargs", "yargs"]),
-    devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
+    devDependencies: withDependencies([
+      "typescript",
+      "@tsconfig/node20",
+      "rollup",
+      "@rollup/plugin-replace",
+    ]),
     engines: {
       node: ">=18",
     },

@@ -1,0 +1,23 @@
+[package]
+name = "jns42-macros"
+version = "0.1.0"
+edition = "2024"
+description = "Test support"
+license = "ISC"
+authors = ["Elmer Bulthuis"]
+homepage = "https://www.JsonSchema42.org"
+keywords = ["json", "schema", "generator"]
+repository = "git@github.com:LuvDaSun/JsonSchema42"
+
+[badges]
+maintenance = { status = "actively-developed" }
+
+[dependencies]
+proc-macro2 = "^1.0.78"
+quote = "^1.0.35"
+syn = "2.0.101"
+heck = { version = "0.5" }
+
+[lib]
+proc-macro = true
+path = "src/lib.rs"

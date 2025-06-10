@@ -29,7 +29,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      test(${JSON.stringify(name.toPascalCase())}, () => {
+      await test(${JSON.stringify(name.toPascalCase())}, () => {
         const mock = mocks.mock${name.toPascalCase()}();
         const valid = validators.is${name.toPascalCase()}(mock);
         assert.equal(valid, true);
