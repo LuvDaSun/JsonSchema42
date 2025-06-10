@@ -81,7 +81,7 @@ await test.suite("cases", { concurrency: false }, async () => {
             cp.execFileSync("npm", ["run", "build"], options);
           });
 
-          await test("valid", async () => {
+          await test("assert valid", async () => {
             for (const testCase of testData.valid as unknown[]) {
               cp.execFileSync(
                 "npm",
@@ -94,7 +94,7 @@ await test.suite("cases", { concurrency: false }, async () => {
             }
           });
 
-          await test("invalid", async () => {
+          await test("assert invalid", async () => {
             for (const testCase of testData.invalid as unknown[]) {
               assert.throws(() => {
                 cp.execFileSync(
