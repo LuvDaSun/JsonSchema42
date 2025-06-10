@@ -44,6 +44,7 @@ export function* generateProgramTsCode(
   yield core.banner("//", `v${packageInfo.version}`);
 
   yield itt`
+    import * as lib from "@jns42/lib";
     import * as consumers from "node:stream/consumers";
     import { hideBin } from "yargs/helpers";
     import yargs from "yargs/yargs";
@@ -73,9 +74,7 @@ export function* generateProgramTsCode(
           data = parsers.${parseFunction}(data);
         }
         if(!validators.${validatorFunction}(data)) {
-          const lastError = validators.getLastValidationError();
-          console.error(\`Invalid data, "\${lastError.rule}" violated in "\${lastError.path}" for type "\${lastError.typeName}".\`);
-          process.exit(1);
+          lib.validation.assertValidationErrors();
         }
       },
     );

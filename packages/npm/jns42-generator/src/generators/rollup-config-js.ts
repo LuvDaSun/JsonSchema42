@@ -6,7 +6,7 @@ export function* generateRollupConfigJsCode() {
 
   yield itt`
     import replace from "@rollup/plugin-replace";
-    import path from "path";
+    import path from "node:path";
     import { defineConfig } from "rollup";
   `;
 
