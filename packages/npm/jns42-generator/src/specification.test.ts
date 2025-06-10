@@ -67,22 +67,8 @@ await test.suite("specifications", { concurrency: false }, async () => {
         cp.execFileSync("npm", ["run", "build"], options);
       });
 
-      await test("test package", async () => {
-        const transpiledDirectoryPath = path.join(packageDirectoryPath, "transpiled");
-        const files = await fs.readdir(transpiledDirectoryPath);
-        for (const fileName of files) {
-          if (!fileName.endsWith(".test.js")) {
-            continue;
-          }
-
-          const filePath = path.join(transpiledDirectoryPath, fileName);
-          const fileStat = await fs.stat(filePath);
-          if (!fileStat.isFile()) {
-            continue;
-          }
-
-          await import(filePath);
-        }
+      await test("test package", () => {
+        cp.execFileSync("npm", ["test"], options);
       });
     });
   }
