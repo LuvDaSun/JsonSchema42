@@ -16,10 +16,11 @@
   },
   "files": [
     "./typed/**",
-    "./bundled/**"
+    "./bundled/**",
+    "./bin/**"
   ],
   "bin": {
-    "jns42-generator": "bundled/program.js"
+    "jns42-generator": "bin/program.js"
   },
   "scripts": {
     "prepack": "npm run build",
