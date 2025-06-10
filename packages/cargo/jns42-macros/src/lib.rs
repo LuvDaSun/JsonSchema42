@@ -128,6 +128,7 @@ pub fn test_specification(input: TokenStream) -> TokenStream {
           package_name: #name,
           package_version: "0.1.0",
           package_directory: &std::path::PathBuf::from(#target),
+          entry_location: &schema_location,
         },
         &specification,
       )

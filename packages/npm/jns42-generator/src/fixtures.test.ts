@@ -65,6 +65,7 @@ await test.suite("fixtures/testing", { concurrency: false }, async () => {
             packageDirectoryPath,
             packageName,
             packageVersion,
+            entryLocation: filePath,
           });
         });
 
