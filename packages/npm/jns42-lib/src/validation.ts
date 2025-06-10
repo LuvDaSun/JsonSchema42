@@ -6,20 +6,19 @@ export interface ValidationFailures {
 
 export class ValidationError extends Error {
   constructor(public readonly failures: ValidationFailures[]) {
-    if (failures.length === 0) {
-      super("No validation errors");
-    } else {
-      super(
-        [
-          `Validation failed`,
-          ...failures
-            .toReversed()
-            .map(
-              (item) => `  -> rule ${item.rule} for ${item.typeName} at /${item.path.join("/")}`,
-            ),
-        ].join("\n"),
-      );
-    }
+    const message =
+      failures.length === 0
+        ? "No validation errors"
+        : [
+            `Validation failed`,
+            ...failures
+              .toReversed()
+              .map(
+                (item) => `  -> rule ${item.rule} for ${item.typeName} at /${item.path.join("/")}`,
+              ),
+          ].join("\n");
+
+    super(message);
   }
 }
 
