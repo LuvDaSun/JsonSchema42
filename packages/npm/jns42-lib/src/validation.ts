@@ -1,38 +1,48 @@
-export interface ValidationError {
+export interface ValidationFailures {
   path: string[];
   typeName: string;
   rule: string;
 }
 
-export class ValidationAssertionError extends Error {
-  constructor(public readonly validationErrors: ValidationError[]) {
-    super("validation failed");
+export class ValidationError extends Error {
+  constructor(public readonly failures: ValidationFailures[]) {
+    if (failures.length === 0) {
+      super("No validation errors");
+    } else {
+      super(
+        [
+          `Validation failed`,
+          ...failures
+            .toReversed()
+            .map(
+              (item) => `  -> rule ${item.rule} for ${item.typeName} at /${item.path.join("/")}`,
+            ),
+        ].join("\n"),
+      );
+    }
   }
 }
 
-let currentValidationErrors = new Array<ValidationError>();
-export function getValidationErrors() {
-  return currentValidationErrors;
-}
-export function assertValidationErrors() {
-  const validationErrors = currentValidationErrors;
-  currentValidationErrors = [];
-  throw new ValidationAssertionError(validationErrors);
+let currentValidationFailures = new Array<ValidationFailures>();
+export function getValidationError() {
+  const validationErrors = currentValidationFailures;
+  currentValidationFailures = [];
+  return new ValidationError(validationErrors);
 }
 
-const validationErrorsStack = new Array<ValidationError[]>();
-export function saveValidationErrors() {
-  validationErrorsStack.push([...currentValidationErrors]);
+const validationFailuresStack = new Array<ValidationFailures[]>();
+export function saveValidationFailures() {
+  validationFailuresStack.push([...currentValidationFailures]);
 }
-export function restoreValidationErrors() {
-  currentValidationErrors = validationErrorsStack.pop()!;
+export function restoreValidationFailures() {
+  currentValidationFailures = validationFailuresStack.pop()!;
 }
 
 const typeNameStack = new Array<string>();
 export function withValidationType<T>(typeName: string, job: () => T) {
   if (typeNameStack.length === 0) {
-    currentValidationErrors = [];
-    validationErrorsStack.splice(0, validationErrorsStack.length);
+    currentValidationFailures = [];
+    validationFailuresStack.splice(0, validationFailuresStack.length);
   }
   typeNameStack.push(typeName);
   try {
@@ -51,9 +61,9 @@ export function withValidationPath<T>(path: string, job: () => T): T {
     pathStack.pop();
   }
 }
-export function recordValidationError(rule: string) {
+export function recordValidationFailure(rule: string) {
   const typeName = typeNameStack[typeNameStack.length - 1]!;
-  currentValidationErrors.push({
+  currentValidationFailures.push({
     path: [...pathStack],
     typeName,
     rule,

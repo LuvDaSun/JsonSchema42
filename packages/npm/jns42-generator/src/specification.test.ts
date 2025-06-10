@@ -55,6 +55,7 @@ await test.suite("specifications", { concurrency: false }, async () => {
       });
 
       const options = {
+        shell: true,
         cwd: packageDirectoryPath,
         env: process.env,
       } as const;

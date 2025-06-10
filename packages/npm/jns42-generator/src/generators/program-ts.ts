@@ -74,7 +74,7 @@ export function* generateProgramTsCode(
           data = parsers.${parseFunction}(data);
         }
         if(!validators.${validatorFunction}(data)) {
-          lib.validation.assertValidationErrors();
+          throw lib.validation.getValidationError();
         }
       },
     );
