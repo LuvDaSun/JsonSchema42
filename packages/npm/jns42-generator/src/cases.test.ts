@@ -16,7 +16,7 @@ await test.suite("cases", { concurrency: false }, async () => {
   const files = await fs.readdir(fixturesDirectoryPath);
   for (const fileName of files) {
     const extension = path.extname(fileName).toLowerCase();
-    if (!(extension === ".json" || extension === ".yaml")) {
+    if (!(extension === ".json" || extension === ".yaml" || extension === ".yml")) {
       continue;
     }
 
