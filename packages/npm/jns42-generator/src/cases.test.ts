@@ -72,7 +72,7 @@ await test.suite("cases", { concurrency: false }, async () => {
         });
 
         const options = {
-          stdio: "inherit",
+          stdio: "ignore",
           shell: true,
           cwd: packageDirectoryPath,
           env: process.env,
