@@ -38,67 +38,51 @@ await test.suite("cases", { concurrency: false }, async () => {
       const schemas = testData.schemas as string[];
       for (const schemaFileName of schemas) {
         const schemaFilePath = path.resolve(path.dirname(filePath), schemaFileName);
+        const schemaBaseName = path.basename(schemaFilePath);
 
-        const packageDirectoryPath = path.join(
-          packageDirectoryRoot,
-          packageName,
-          path.basename(schemaFilePath),
-        );
-        await fs.rm(packageDirectoryPath, { force: true, recursive: true });
+        await test(schemaBaseName, async () => {
+          const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaBaseName);
+          await fs.rm(packageDirectoryPath, { force: true, recursive: true });
 
-        await test("generate package", async () => {
-          const context = new core.DocumentContextContainer();
-          context.registerWellKnownFactories();
+          await test("generate package", async () => {
+            const context = new core.DocumentContextContainer();
+            context.registerWellKnownFactories();
 
-          await context.loadFromLocation(
-            schemaFilePath,
-            schemaFilePath,
-            undefined,
-            "https://json-schema.org/draft/2020-12/schema",
-          );
-
-          const specification = models.loadSpecification(context, {
-            transformMaximumIterations: 100,
-            defaultTypeName: defaultTypeName.toPascalCase(),
-          });
-
-          generatePackage(specification, {
-            packageDirectoryPath,
-            packageName,
-            packageVersion,
-            entryLocation: schemaFilePath + "#",
-          });
-        });
-
-        const options = {
-          cwd: packageDirectoryPath,
-          env: process.env,
-        } as const;
-
-        await test("install package", () => {
-          cp.execFileSync("npm", ["install"], options);
-        });
-
-        await test("build package", () => {
-          cp.execFileSync("npm", ["run", "build"], options);
-        });
-
-        await test("valid", async () => {
-          for (const testCase of testData.valid as unknown[]) {
-            cp.execFileSync(
-              "npm",
-              ["run", "program", "--", "assert", ...(parseData ? ["--parse"] : [])],
-              {
-                ...options,
-                input: JSON.stringify(testCase),
-              },
+            await context.loadFromLocation(
+              schemaFilePath,
+              schemaFilePath,
+              undefined,
+              "https://json-schema.org/draft/2020-12/schema",
             );
-          }
-        });
 
-        await test("invalid", async () => {
-          for (const testCase of testData.invalid as unknown[]) {
-            assert.throws(() => {
+            const specification = models.loadSpecification(context, {
+              transformMaximumIterations: 100,
+              defaultTypeName: defaultTypeName.toPascalCase(),
+            });
+
+            generatePackage(specification, {
+              packageDirectoryPath,
+              packageName,
+              packageVersion,
+              entryLocation: schemaFilePath + "#",
+            });
+          });
+
+          const options = {
+            cwd: packageDirectoryPath,
+            env: process.env,
+          } as const;
+
+          await test("install package", () => {
+            cp.execFileSync("npm", ["install"], options);
+          });
+
+          await test("build package", () => {
+            cp.execFileSync("npm", ["run", "build"], options);
+          });
+
+          await test("valid", async () => {
+            for (const testCase of testData.valid as unknown[]) {
               cp.execFileSync(
                 "npm",
                 ["run", "program", "--", "assert", ...(parseData ? ["--parse"] : [])],
@@ -107,8 +91,23 @@ await test.suite("cases", { concurrency: false }, async () => {
                   input: JSON.stringify(testCase),
                 },
               );
-            });
-          }
+            }
+          });
+
+          await test("invalid", async () => {
+            for (const testCase of testData.invalid as unknown[]) {
+              assert.throws(() => {
+                cp.execFileSync(
+                  "npm",
+                  ["run", "program", "--", "assert", ...(parseData ? ["--parse"] : [])],
+                  {
+                    ...options,
+                    input: JSON.stringify(testCase),
+                  },
+                );
+              });
+            }
+          });
         });
       }
     });
