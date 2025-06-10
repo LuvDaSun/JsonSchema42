@@ -2,17 +2,16 @@ import * as core from "@jns42/core";
 import cp from "child_process";
 import assert from "node:assert";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import YAML from "yaml";
 import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
-import { workspaceRoot } from "./root.js";
+import { projectRoot, workspaceRoot } from "./root.js";
 
 await test.suite("fixtures/testing", { concurrency: false }, async () => {
   const fixturesDirectoryPath = path.join(workspaceRoot, "fixtures", "testing");
-  const packageDirectoryRoot = await fs.mkdtemp(os.tmpdir() + "/");
+  const packageDirectoryRoot = path.join(projectRoot, ".generated", "cases");
 
   const files = await fs.readdir(fixturesDirectoryPath);
   for (const fileName of files) {
@@ -37,22 +36,25 @@ await test.suite("fixtures/testing", { concurrency: false }, async () => {
 
       const parseData = testData.parse ?? false;
       const rootTypeName = testData.rootTypeName ?? defaultTypeName;
-      const schemas = testData.schemas as Record<string, unknown>;
-      for (const schemaName in schemas) {
-        const packageDirectoryPath = path.join(packageDirectoryRoot, packageName, schemaName);
-        await fs.rm(packageDirectoryPath, { force: true, recursive: true });
+      const schemas = testData.schemas as string[];
+      for (const schemaFileName of schemas) {
+        const schemaFilePath = path.resolve(path.dirname(filePath), schemaFileName);
 
-        const schemaNode = schemas[schemaName];
+        const packageDirectoryPath = path.join(
+          packageDirectoryRoot,
+          packageName,
+          path.basename(schemaFilePath),
+        );
+        await fs.rm(packageDirectoryPath, { force: true, recursive: true });
 
         await test("generate package", async () => {
           const context = new core.DocumentContextContainer();
           context.registerWellKnownFactories();
 
-          await context.loadFromNode(
-            filePath,
-            filePath,
+          await context.loadFromLocation(
+            schemaFilePath,
+            schemaFilePath,
             undefined,
-            schemaNode,
             "https://json-schema.org/draft/2020-12/schema",
           );
 
@@ -65,12 +67,12 @@ await test.suite("fixtures/testing", { concurrency: false }, async () => {
             packageDirectoryPath,
             packageName,
             packageVersion,
-            entryLocation: filePath,
+            entryLocation: schemaFilePath + "#",
           });
         });
 
         const options = {
-          stdio: "ignore",
+          stdio: "inherit",
           shell: true,
           cwd: packageDirectoryPath,
           env: process.env,
