@@ -1,6 +1,6 @@
 {
   "name": "@jns42/lib",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "sideEffects": false,
   "description": "library for jns42",
   "type": "module",
