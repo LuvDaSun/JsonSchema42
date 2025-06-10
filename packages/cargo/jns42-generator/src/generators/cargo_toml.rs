@@ -87,6 +87,11 @@ pub fn generate_file_content(
 
   let manifest_table = toml::Value::Table({
     let mut map = toml::map::Map::new();
+
+    map.insert(
+      "workspace".to_owned(),
+      toml::Value::Table(Default::default()),
+    );
     map.insert("package".to_owned(), package_table);
     map.insert("dependencies".to_owned(), dependencies_table);
     map.insert("lib".to_owned(), lib_table);

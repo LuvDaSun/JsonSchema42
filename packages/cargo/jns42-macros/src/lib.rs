@@ -133,6 +133,14 @@ pub fn test_specification(input: TokenStream) -> TokenStream {
         &specification,
       )
       .await.unwrap();
+
+      let mut child = std::process::Command::new("cargo")
+        .current_dir(#target)
+        .arg("test")
+        .spawn()
+        .unwrap();
+      let status = child.wait().unwrap();
+      assert!(status.success());
     }
   }
   .into()
