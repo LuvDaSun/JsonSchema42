@@ -1,5 +1,3 @@
-rootTypeName: SimpleObject
-
 schemas:
   - ../specifications/simple-object.yaml
 

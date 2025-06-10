@@ -1,5 +1,3 @@
-rootTypeName: SchemaDocument
-
 schemas:
   - ../specifications/one-of-object-draft_2020-12.yaml
   - ../specifications/one-of-object-draft-04.yaml

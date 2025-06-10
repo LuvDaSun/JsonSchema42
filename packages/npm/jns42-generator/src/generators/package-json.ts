@@ -34,6 +34,7 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
       pretest: "tsc --build",
       build: "node ./scripts/build.js",
       test: "node --test ./transpiled/examples.test.js ./transpiled/mocks.test.js",
+      program: "node ./bundled/program.js",
     },
     author: "",
     license: "ISC",

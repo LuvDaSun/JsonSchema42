@@ -35,7 +35,6 @@ await test.suite("cases", { concurrency: false }, async () => {
       const testData = YAML.parse(testContent);
 
       const parseData = testData.parse ?? false;
-      const rootTypeName = testData.rootTypeName ?? defaultTypeName;
       const schemas = testData.schemas as string[];
       for (const schemaFileName of schemas) {
         const schemaFilePath = path.resolve(path.dirname(filePath), schemaFileName);
@@ -72,8 +71,6 @@ await test.suite("cases", { concurrency: false }, async () => {
         });
 
         const options = {
-          stdio: "ignore",
-          shell: true,
           cwd: packageDirectoryPath,
           env: process.env,
         } as const;
@@ -87,33 +84,29 @@ await test.suite("cases", { concurrency: false }, async () => {
         });
 
         await test("valid", async () => {
-          const packageMain = await import(
-            "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
-          );
-          for (const testName in testData.valid as Record<string, unknown>) {
-            let data = testData.valid[testName];
-            await test(testName, async () => {
-              if (parseData) {
-                data = packageMain.parsers[`parse${rootTypeName}`](data);
-              }
-              const valid = packageMain.validators[`is${rootTypeName}`](data);
-              assert.equal(valid, true);
-            });
+          for (const testCase of testData.valid as unknown[]) {
+            cp.execFileSync(
+              "npm",
+              ["run", "program", "--", "assert", ...(parseData ? ["--parse"] : [])],
+              {
+                ...options,
+                input: JSON.stringify(testCase),
+              },
+            );
           }
         });
 
         await test("invalid", async () => {
-          const packageMain = await import(
-            "file://" + path.join(packageDirectoryPath, "transpiled", "main.js")
-          );
-          for (const testName in testData.invalid as Record<string, unknown>) {
-            let data = testData.invalid[testName];
-            await test(testName, async () => {
-              if (parseData) {
-                data = packageMain.parsers[`parse${rootTypeName}`](data);
-              }
-              const valid = packageMain.validators[`is${rootTypeName}`](data);
-              assert.equal(valid, false);
+          for (const testCase of testData.invalid as unknown[]) {
+            assert.throws(() => {
+              cp.execFileSync(
+                "npm",
+                ["run", "program", "--", "assert", ...(parseData ? ["--parse"] : [])],
+                {
+                  ...options,
+                  input: JSON.stringify(testCase),
+                },
+              );
             });
           }
         });

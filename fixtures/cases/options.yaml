@@ -1,5 +1,3 @@
-rootTypeName: SchemaDocument
-
 schemas:
   - ../specifications/options.yaml
 
