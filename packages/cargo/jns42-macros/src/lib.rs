@@ -101,6 +101,8 @@ pub fn test_specification(input: TokenStream) -> TokenStream {
   quote::quote! {
     #[tokio::test]
     async fn #fname() {
+      let _ = std::fs::remove_dir_all(#path);
+
       let mut context = std::rc::Rc::new(jns42_core::documents::DocumentContext::default());
       context.register_well_known_factories().unwrap();
 

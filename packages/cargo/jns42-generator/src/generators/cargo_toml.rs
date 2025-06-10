@@ -5,102 +5,41 @@ pub fn generate_file_content(
   package_name: &str,
   package_version: &str,
 ) -> Result<String, Box<dyn Error>> {
-  let package_table = toml::Value::Table({
-    let mut map = toml::map::Map::new();
-    map.insert(
-      "name".to_owned(),
-      toml::Value::String(package_name.to_owned()),
-    );
-    map.insert(
-      "version".to_owned(),
-      toml::Value::String(package_version.to_owned()),
-    );
-    map.insert("edition".to_owned(), toml::Value::String("2021".to_owned()));
-    map
-  });
+  let manifest = toml::toml! {
+    [workspace]
 
-  let dependencies_table = toml::Value::Table({
-    let mut map = toml::map::Map::new();
-    map.insert(
-      "serde".to_owned(),
-      toml::Value::Table({
-        let mut map = toml::map::Map::new();
-        map.insert("version".to_owned(), toml::Value::String("1.0".to_owned()));
-        map.insert(
-          "features".to_owned(),
-          toml::Value::Array(vec![toml::Value::String("derive".to_owned())]),
-        );
-        map
-      }),
-    );
-    map.insert(
-      "serde_json".to_owned(),
-      toml::Value::Table({
-        let mut map = toml::map::Map::new();
-        map.insert("version".to_owned(), toml::Value::String("1.0".to_owned()));
-        map
-      }),
-    );
-    map.insert(
-      "clap".to_owned(),
-      toml::Value::Table({
-        let mut map = toml::map::Map::new();
-        map.insert("version".to_owned(), toml::Value::String("4.1".to_owned()));
-        map.insert(
-          "features".to_owned(),
-          toml::Value::Array(vec![toml::Value::String("derive".to_owned())]),
-        );
-        map
-      }),
-    );
-    map
-  });
+    [package]
+    name = package_name
+    version = package_version
+    edition = "2024"
 
-  let lib_table = toml::Value::Table({
-    let mut map = toml::map::Map::new();
-    map.insert(
-      "path".to_owned(),
-      toml::Value::String("src/lib.rs".to_owned()),
-    );
-    map
-  });
+    [dependencies]
 
-  let bin_table = toml::Value::Array(vec![toml::Value::Table({
-    let mut map = toml::map::Map::new();
-    map.insert(
-      "name".to_owned(),
-      toml::Value::String(package_name.to_owned()),
-    );
-    map.insert(
-      "path".to_owned(),
-      toml::Value::String("src/main.rs".to_owned()),
-    );
-    map
-  })]);
+    [lib]
+    path = "src/lib.rs"
 
-  let features_table = toml::Value::Table({
-    let mut map = toml::map::Map::new();
-    map.insert("default".to_owned(), toml::Value::Array(vec![]));
-    map.insert("deref".to_owned(), toml::Value::Array(vec![]));
-    map
-  });
+    [[bin]]
+    name = package_name
+    path = "src/main.rs"
 
-  let manifest_table = toml::Value::Table({
-    let mut map = toml::map::Map::new();
 
-    map.insert(
-      "workspace".to_owned(),
-      toml::Value::Table(Default::default()),
-    );
-    map.insert("package".to_owned(), package_table);
-    map.insert("dependencies".to_owned(), dependencies_table);
-    map.insert("lib".to_owned(), lib_table);
-    map.insert("bin".to_owned(), bin_table);
-    map.insert("features".to_string(), features_table);
-    map
-  });
+    [features]
+    default = []
+    deref = []
 
-  let content = toml::ser::to_string_pretty(&manifest_table)?;
+    [dependencies.clap]
+    features = ["derive"]
+    version = "4.1"
+
+    [dependencies.serde]
+    features = ["derive"]
+    version = "1.0"
+
+    [dependencies.serde_json]
+    version = "1.0"
+  };
+
+  let content = toml::ser::to_string_pretty(&manifest)?;
 
   Ok(format!(
     "{}\n\n{}",
