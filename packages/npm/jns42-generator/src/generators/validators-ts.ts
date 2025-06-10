@@ -1,5 +1,5 @@
 import * as core from "@jns42/core";
-import assert from "assert";
+import assert from "node:assert";
 import * as models from "../models.js";
 import {
   NestedText,
@@ -7,10 +7,12 @@ import {
   itt,
   joinIterable,
   mapIterable,
-  packageInfo,
+  readPackageInfo,
 } from "../utilities.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
+  const packageInfo = readPackageInfo();
+
   yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;

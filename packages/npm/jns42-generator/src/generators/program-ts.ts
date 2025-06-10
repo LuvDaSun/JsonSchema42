@@ -1,7 +1,7 @@
 import * as core from "@jns42/core";
 import assert from "node:assert";
 import * as models from "../models.js";
-import { itt, packageInfo } from "../utilities.js";
+import { itt, readPackageInfo } from "../utilities.js";
 
 export function* generateProgramTsCode(
   specification: models.Specification,
@@ -9,6 +9,8 @@ export function* generateProgramTsCode(
   packageVersion: string,
   entryLocation: string,
 ) {
+  const packageInfo = readPackageInfo();
+
   const packageNameMatch = /^(?:(@[a-z][a-z0-9\-_\.]*?)\/)?([a-z][a-z0-9\-_\.]*)$/.exec(
     packageName,
   );

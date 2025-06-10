@@ -7,9 +7,12 @@ import test from "node:test";
 import YAML from "yaml";
 import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
-import { projectRoot, workspaceRoot } from "./root.js";
+import { makeProjectRoot, makeWorkspaceRoot } from "./root.js";
 
 await test.suite("cases", { concurrency: false }, async () => {
+  const workspaceRoot = makeWorkspaceRoot();
+  const projectRoot = makeProjectRoot();
+
   const fixturesDirectoryPath = path.join(workspaceRoot, "fixtures", "cases");
   const packageDirectoryRoot = path.join(projectRoot, ".generated", "cases");
 

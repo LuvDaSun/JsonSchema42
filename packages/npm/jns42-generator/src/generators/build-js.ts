@@ -1,8 +1,10 @@
 import * as core from "@jns42/core";
-import { packageInfo } from "../utilities.js";
+import { readPackageInfo } from "../utilities.js";
 import { itt } from "../utilities/iterable-text-template.js";
 
 export function* generateBuildJsCode() {
+  const packageInfo = readPackageInfo();
+
   yield core.banner("//", `v${packageInfo.version}`);
 
   yield itt`

@@ -5,9 +5,12 @@ import path from "node:path";
 import test from "node:test";
 import { generatePackage } from "./generators.js";
 import * as models from "./models.js";
-import { projectRoot, workspaceRoot } from "./root.js";
+import { makeProjectRoot, makeWorkspaceRoot } from "./root.js";
 
 await test.suite("specifications", { concurrency: false }, async () => {
+  const workspaceRoot = makeWorkspaceRoot();
+  const projectRoot = makeProjectRoot();
+
   const specificationDirectoryPath = path.join(workspaceRoot, "fixtures", "specifications");
   const packageDirectoryRoot = path.join(projectRoot, ".generated", "specifications");
 

@@ -1,5 +1,5 @@
 import { PackageJson } from "type-fest";
-import { packageInfo } from "../utilities.js";
+import { readPackageInfo } from "../utilities.js";
 
 export function generatePackageJsonData(packageName: string, packageVersion: string) {
   const packageNameMatch = /^(?:(@[a-z][a-z0-9\-_\.]*?)\/)?([a-z][a-z0-9\-_\.]*)$/.exec(
@@ -54,6 +54,8 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
 }
 
 function withDependencies(names: string[]) {
+  const packageInfo = readPackageInfo();
+
   return names.reduce(
     (o, name) =>
       Object.assign(o, {

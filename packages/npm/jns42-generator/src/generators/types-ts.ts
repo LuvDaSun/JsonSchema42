@@ -1,8 +1,16 @@
 import * as core from "@jns42/core";
 import * as models from "../models.js";
-import { NestedText, generateJsDocComments, itt, joinIterable, packageInfo } from "../utilities.js";
+import {
+  NestedText,
+  generateJsDocComments,
+  itt,
+  joinIterable,
+  readPackageInfo,
+} from "../utilities.js";
 
 export function* generateTypesTsCode(specification: models.Specification) {
+  const packageInfo = readPackageInfo();
+
   yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
