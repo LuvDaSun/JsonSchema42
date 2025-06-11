@@ -4,6 +4,7 @@ pub mod examples_test_rs;
 pub mod file;
 pub mod interiors_rs;
 pub mod lib_rs;
+pub mod main_rs;
 pub mod mocks_test_rs;
 pub mod package;
 pub mod types_rs;

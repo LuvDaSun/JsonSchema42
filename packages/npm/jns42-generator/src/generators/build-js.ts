@@ -1,51 +1,21 @@
 import * as core from "@jns42/core";
-import { packageInfo } from "../utilities.js";
+import { readPackageInfo } from "../utilities.js";
 import { itt } from "../utilities/iterable-text-template.js";
 
 export function* generateBuildJsCode() {
-  yield itt`
-    #!/usr/bin/env node
-  `;
+  const packageInfo = readPackageInfo();
 
   yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
-    import cp from "child_process";
-    import path from "path";
+    import cp from "node:child_process";
+    import path from "node:path";
   `;
 
   yield itt`
-    const options = { shell: true, stdio: "inherit" };
+    const options = { stdio: "inherit", env: process.env };
 
     cp.execFileSync("tsc", [], options);
-    
-    cp.execFileSync(
-      "rollup",
-      [
-        "--input",
-        path.resolve("transpiled", "main.js"),
-        "--file",
-        path.resolve("bundled", "main.js"),
-        "--sourcemap",
-        "--format",
-        "module",
-      ],
-      options,
-    );
-    
-    cp.execFileSync(
-      "rollup",
-      [
-        "--input",
-        path.resolve("transpiled", "main.js"),
-        "--file",
-        path.resolve("bundled", "main.cjs"),
-        "--sourcemap",
-        "--format",
-        "commonjs",
-      ],
-      options,
-    );
-    
+    cp.execFileSync("rollup", ["--config", path.resolve("rollup.config.js")], options);
   `;
 }

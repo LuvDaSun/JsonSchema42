@@ -1,6 +1,6 @@
 use super::Node;
-use crate::documents::{DocumentContext, SchemaDocument};
 use crate::documents::Error;
+use crate::documents::{DocumentContext, SchemaDocument};
 use crate::models::DocumentSchemaItem;
 use crate::utilities::NodeLocation;
 use std::collections::BTreeMap;

@@ -13,37 +13,90 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22.5.1
+      - uses: extractions/setup-just@v2
       - run: corepack enable
       - run: rustup default 1.87.0
 
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli@0.2.100
-      - run: cargo install just
+      - run: cargo install wasm-tools
 
-      - uses: actions/checkout@v4
       - run: npm ci
+      - run: npm run build --workspaces
 
-      - run: just build-all
       - run: npm --workspaces test --if-present
 
-  fixtures:
+  test-specifications:
     runs-on: ubuntu-latest
+    container: rust:1.87.0
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22.5.1
+      - uses: extractions/setup-just@v2
       - run: corepack enable
       - run: rustup default 1.87.0
 
       - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-bindgen-cli@0.2.100
-      - run: cargo install just
+      - run: cargo install wasm-tools
 
-      - uses: actions/checkout@v4
       - run: npm ci
+      - run: npm run build --workspaces
 
-      - run: just package-specification-npm-all
-      - run: just test-fixture-npm-all
+      - run: >
+          cargo run 
+          --package jns42-tester
+          --
+          specifications
+          --type npm
+          --specifications-directory fixtures/specifications
+          --output-directory .generated
+
+  test-cases:
+    runs-on: ubuntu-latest
+    container: rust:1.87.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.5.1
+      - uses: extractions/setup-just@v2
+      - run: corepack enable
+      - run: rustup default 1.87.0
+
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo install wasm-tools
+
+      - run: npm ci
+      - run: npm run build --workspaces
+
+      - run: >
+          cargo run 
+          --package jns42-tester
+          --
+          cases
+          --type npm
+          --cases-directory fixtures/cases
+          --output-directory .generated

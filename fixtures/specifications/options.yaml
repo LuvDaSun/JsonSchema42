@@ -1,0 +1,11 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: "An object"
+oneOf:
+  - type: "string"
+    enum: ["a", "b"]
+  - type: "integer"
+    enum: [1, 2]
+  - type: "number"
+    enum: [3, 4, 5]
+  - type: "boolean"
+    enum: [true]

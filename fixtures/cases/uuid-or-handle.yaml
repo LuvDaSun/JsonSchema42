@@ -1,0 +1,12 @@
+$schema: "./schema.json"
+
+schemas:
+  - ../specifications/uuid-or-handle.yaml
+
+valid:
+  - 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568a
+  - handle123
+
+invalid:
+  - 3e4666bf-d5e5-4aa7-b8ce-cefe41c7568x
+  - handle-123

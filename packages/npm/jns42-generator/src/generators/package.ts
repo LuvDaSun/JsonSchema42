@@ -3,13 +3,15 @@ import path from "node:path";
 import * as models from "../models.js";
 import { NestedText, flattenNestedText, itt, splitIterableText } from "../utilities.js";
 import { generateBuildJsCode } from "./build-js.js";
-import { generateCleanJsCode } from "./clean-js.js";
 import { generateExamplesTestTsCode } from "./examples-test-ts.js";
 import { generateMainTsCode } from "./main-ts.js";
 import { generateMocksTestTsCode } from "./mocks-test-ts.js";
 import { generateMocksTsCode } from "./mocks-ts.js";
 import { generatePackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
+import { generateProgramJsCode } from "./program-js.js";
+import { generateProgramTsCode } from "./program-ts.js";
+import { generateRollupConfigJsCode } from "./rollup-config-js.js";
 import { generateTsconfigJsonData } from "./tsconfig-json.js";
 import { generateTypesTsCode } from "./types-ts.js";
 import { generateValidatorsTsCode } from "./validators-ts.js";
@@ -18,15 +20,17 @@ export interface PackageConfiguration {
   packageName: string;
   packageVersion: string;
   packageDirectoryPath: string;
+  entryLocation: string;
 }
 
 export function generatePackage(
   specification: models.Specification,
   configuration: PackageConfiguration,
 ) {
-  const { packageDirectoryPath, packageName, packageVersion } = configuration;
+  const { packageDirectoryPath, packageName, packageVersion, entryLocation } = configuration;
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
+  fs.mkdirSync(path.join(packageDirectoryPath, "bin"), { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "scripts"), { recursive: true });
 
@@ -43,8 +47,31 @@ export function generatePackage(
   }
 
   {
+    const content = generateRollupConfigJsCode();
+    const filePath = path.join(packageDirectoryPath, "rollup.config.js");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateProgramJsCode();
+    const filePath = path.join(packageDirectoryPath, "bin", "program.js");
+    writeContentToFile(filePath, content);
+  }
+
+  {
     const content = generateMainTsCode(specification);
     const filePath = path.join(packageDirectoryPath, "src", "main.ts");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateProgramTsCode(
+      specification,
+      packageName,
+      packageVersion,
+      entryLocation,
+    );
+    const filePath = path.join(packageDirectoryPath, "src", "program.ts");
     writeContentToFile(filePath, content);
   }
 
@@ -87,13 +114,6 @@ export function generatePackage(
   {
     const content = generateBuildJsCode();
     const filePath = path.join(packageDirectoryPath, "scripts", "build.js");
-    writeContentToFile(filePath, content);
-    fs.chmodSync(filePath, 0o755);
-  }
-
-  {
-    const content = generateCleanJsCode();
-    const filePath = path.join(packageDirectoryPath, "scripts", "clean.js");
     writeContentToFile(filePath, content);
     fs.chmodSync(filePath, 0o755);
   }

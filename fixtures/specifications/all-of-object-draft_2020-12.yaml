@@ -1,0 +1,13 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+description: "An object"
+allOf:
+  - type: "object"
+    required: ["a", "b"]
+    properties:
+      a: { type: "string" }
+      b: { type: "string" }
+  - type: "object"
+    required: ["c", "d"]
+    properties:
+      c: { type: "string" }
+      d: { type: "string" }

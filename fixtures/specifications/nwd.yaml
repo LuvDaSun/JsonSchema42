@@ -1,4 +1,6 @@
 $schema: "http://json-schema.org/draft-04/schema#"
+$ref: "#/definitions/main-category"
+
 definitions:
   #entity schemas
 
@@ -15,28 +17,6 @@ definitions:
   main-category-fields:
     description: |-
       Main category editable fields
-    type: object
-    required:
-      - name
-    properties:
-      name:
-        $ref: "#/definitions/entity-name"
-      description:
-        $ref: "#/definitions/entity-description"
-
-  sub-category:
-    description: |-
-      Full sub category entity
-    $ref: "#/definitions/sub-category-fields"
-    required:
-      - id
-    properties:
-      id:
-        $ref: "#/definitions/entity-id"
-
-  sub-category-fields:
-    description: |-
-      Sub category entity editable fields
     type: object
     required:
       - name

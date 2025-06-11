@@ -1,0 +1,16 @@
+schemas:
+  - ../specifications/fallthrough.yaml
+
+valid:
+  - x-1: "hi!"
+    x-2: "bye"
+  - x-1: "hi!"
+    x-2: "bye"
+    b-1: true
+    b-2: false
+
+invalid:
+  - s-1: "hi!"
+    s-2: "bye"
+  - x-1: true
+    x-2: false

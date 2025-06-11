@@ -1,0 +1,17 @@
+schemas:
+  - ../specifications/if-then-else-original.yaml
+  - ../specifications/if-then-else-presolved.yaml
+
+valid:
+  - type: string
+    value: yeah
+  - type: number
+    value: 1
+
+invalid:
+  - type: string
+    value: 100
+  - type: number
+    value: not-a-number
+  - type: something
+    value: {}
