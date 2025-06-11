@@ -12,6 +12,10 @@ pub fn generate_file_content(
     edition = "2024"
 
     [dependencies]
+    jns42-lib = "0.1"
+    clap = { version = "^4.1", features = ["derive"] }
+    serde = { version = "^1.0", features = ["derive"] }
+    serde_json = "1.0"
 
     [lib]
     path = "src/lib.rs"
@@ -20,21 +24,9 @@ pub fn generate_file_content(
     name = package_name
     path = "src/main.rs"
 
-
     [features]
     default = []
     deref = []
-
-    [dependencies.clap]
-    features = ["derive"]
-    version = "4.1"
-
-    [dependencies.serde]
-    features = ["derive"]
-    version = "1.0"
-
-    [dependencies.serde_json]
-    version = "1.0"
   };
 
   let content = toml::ser::to_string_pretty(&manifest)?;

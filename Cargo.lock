@@ -1532,6 +1532,7 @@ dependencies = [
  "hyper-util",
  "im",
  "jns42-core",
+ "jns42-lib",
  "once_cell",
  "proc-macro2",
  "quote",
@@ -1546,6 +1547,10 @@ dependencies = [
  "url",
  "urlencoding",
 ]
+
+[[package]]
+name = "jns42-lib"
+version = "0.1.0"
 
 [[package]]
 name = "jns42-tester"
