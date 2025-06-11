@@ -25,6 +25,10 @@
       "path": "packages/cargo/jns42-generator",
     },
     {
+      "name": "cargo/jns42-lib",
+      "path": "packages/cargo/jns42-lib",
+    },
+    {
       "name": "cargo/jns42-core",
       "path": "packages/cargo/jns42-core",
     },
