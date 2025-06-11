@@ -65,7 +65,7 @@ jobs:
           --specifications-directory fixtures/specifications
           --output-directory .generated
 
-  test-specifications:
+  test-cases:
     runs-on: ubuntu-latest
     container: rust:1.87.0
     steps:
