@@ -28,9 +28,9 @@ fn generate_test_token_stream(
   };
 
   tokens.append_all(quote! {
-    // #[test]
+    #[test]
     fn #identifier() {
-
+      //
     }
   });
 

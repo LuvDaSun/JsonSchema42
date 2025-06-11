@@ -74,12 +74,12 @@ fn generate_type_token_stream(
 
       tokens.append_all(quote! {
         impl #identifier {
-            fn new(value: #interior_identifier) -> core::result::Result<Self, crate::errors::ValidationError> {
+            fn new(value: #interior_identifier) -> core::result::Result<Self, jns42_lib::errors::ValidationError> {
                 let instance = Self(Box::new(value));
                 if instance.validate() {
                   core::result::Result::Ok(instance)
                 } else {
-                  core::result::Result::Err(crate::errors::ValidationError::new(#name))
+                  core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))
                 }
             }
         }
@@ -93,12 +93,12 @@ fn generate_type_token_stream(
 
       tokens.append_all(quote! {
         impl #identifier {
-            fn new(value: #interior_identifier) -> core::result::Result<Self, crate::errors::ValidationError> {
+            fn new(value: #interior_identifier) -> core::result::Result<Self, jns42_lib::errors::ValidationError> {
                 let instance = Self(value);
                 if instance.validate() {
                   core::result::Result::Ok(instance)
                 } else {
-                  core::result::Result::Err(crate::errors::ValidationError::new(#name))
+                  core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))
                 }
             }
         }
@@ -115,7 +115,7 @@ fn generate_type_token_stream(
 
     tokens.append_all(quote! {
       impl core::convert::TryFrom<#interior_identifier> for #identifier {
-        type Error = crate::errors::ValidationError;
+        type Error = jns42_lib::errors::ValidationError;
         fn try_from(value: #interior_identifier) -> core::result::Result<Self, Self::Error> {
             Self::new(value)
         }
