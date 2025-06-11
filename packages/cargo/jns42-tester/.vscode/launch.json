@@ -64,6 +64,54 @@
         ".generated/specifications/npm"
       ],
       "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test cases cargo",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "cases",
+        "--type",
+        "cargo",
+        "--cases-directory",
+        "../../../fixtures/cases",
+        "--output-directory",
+        ".generated/cases/cargo"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test cases npm",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "cases",
+        "--type",
+        "npm",
+        "--cases-directory",
+        "../../../fixtures/cases",
+        "--output-directory",
+        ".generated/cases/npm"
+      ],
+      "cwd": "${workspaceFolder}"
     }
   ]
 }

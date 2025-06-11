@@ -39,10 +39,6 @@ export function* generateProgramTsCode(
   const parseFunction = "parse" + entryTypeName.toPascalCase();
   const validatorFunction = "is" + entryTypeName.toPascalCase();
 
-  yield itt`
-    #!/usr/bin/env node
-  `;
-
   yield core.banner("//", `v${packageInfo.version}`);
 
   yield itt`

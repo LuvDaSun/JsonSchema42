@@ -9,6 +9,7 @@ import { generateMocksTestTsCode } from "./mocks-test-ts.js";
 import { generateMocksTsCode } from "./mocks-ts.js";
 import { generatePackageJsonData } from "./package-json.js";
 import { generateParsersTsCode } from "./parsers-ts.js";
+import { generateProgramJsCode } from "./program-js.js";
 import { generateProgramTsCode } from "./program-ts.js";
 import { generateRollupConfigJsCode } from "./rollup-config-js.js";
 import { generateTsconfigJsonData } from "./tsconfig-json.js";
@@ -29,6 +30,7 @@ export function generatePackage(
   const { packageDirectoryPath, packageName, packageVersion, entryLocation } = configuration;
 
   fs.mkdirSync(packageDirectoryPath, { recursive: true });
+  fs.mkdirSync(path.join(packageDirectoryPath, "bin"), { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "src"), { recursive: true });
   fs.mkdirSync(path.join(packageDirectoryPath, "scripts"), { recursive: true });
 
@@ -47,6 +49,12 @@ export function generatePackage(
   {
     const content = generateRollupConfigJsCode();
     const filePath = path.join(packageDirectoryPath, "rollup.config.js");
+    writeContentToFile(filePath, content);
+  }
+
+  {
+    const content = generateProgramJsCode();
+    const filePath = path.join(packageDirectoryPath, "bin", "program.js");
     writeContentToFile(filePath, content);
   }
 

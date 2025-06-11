@@ -4,6 +4,12 @@ use std::error::Error;
 use std::fs;
 use std::path::PathBuf;
 
+struct SpecificationInfo {
+  path: PathBuf,
+  name: String,
+  name_sentence: Sentence,
+}
+
 #[derive(Debug, Clone, ValueEnum)]
 pub enum PackageType {
   Cargo,
@@ -42,92 +48,87 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
   } = options;
 
   // read specifications directory
-  let schema_paths: Vec<_> = specifications_directory
-    .read_dir()?
-    .filter_map(|entry| {
-      let entry = entry.ok()?;
-      let path = entry.path();
-      let extension = path.extension()?;
-      let extension = extension.to_ascii_lowercase();
+  let mut specification_infos = Vec::new();
+  for entry in specifications_directory.read_dir()? {
+    let entry = entry?;
+    let path = entry.path();
+    let extension = path.extension().unwrap_or_default();
+    let extension = extension.to_ascii_lowercase();
 
-      if !(extension == "json" || extension == "yaml" || extension == "yml") {
-        return None;
-      }
+    if !(extension == "json" || extension == "yaml" || extension == "yml") {
+      continue;
+    }
 
-      let is_dir = entry.file_type().ok()?.is_dir();
-      if is_dir {
-        return None;
-      }
+    if entry.file_type()?.is_dir() {
+      continue;
+    }
 
-      Some(path)
-    })
-    .collect();
+    let Some(name) = path.file_stem() else {
+      continue;
+    };
+
+    let Some(name) = name.to_str() else {
+      continue;
+    };
+
+    let name = name.to_string();
+    let name_sentence = Sentence::new(&name);
+
+    specification_infos.push(SpecificationInfo {
+      name,
+      name_sentence,
+      path,
+    });
+  }
 
   // generate packages
-  for schema_path in &schema_paths {
-    let Some(schema_file_name) = schema_path.file_stem() else {
-      continue;
-    };
-    let Some(schema_file_name) = schema_file_name.to_str() else {
-      continue;
-    };
-    let package_directory = output_directory.join(schema_file_name);
-    let package_name = Sentence::new(schema_file_name);
-    match r#type {
-      PackageType::Cargo => {
-        let mut child = std::process::Command::new("cargo")
-          .arg("run")
-          .arg("--package")
-          .arg("jns42-generator")
-          .arg("--")
-          .arg("package")
-          .arg("--package-directory")
-          .arg(&package_directory)
-          .arg("--package-name")
-          .arg(package_name.to_snake_case())
-          .arg("--package-version")
-          .arg(&package_version)
-          .arg("--default-type-name")
-          .arg(&default_type_name)
-          .arg("--transform-maximum-iterations")
-          .arg(transform_maximum_iterations.to_string())
-          .arg(schema_path)
-          .spawn()?;
-        let status = child.wait()?;
-        assert!(status.success());
-      }
-      PackageType::Npm => {
-        let mut child = std::process::Command::new("npx")
-          .arg("jns42-generator")
-          .arg("package")
-          .arg("--package-directory")
-          .arg(&package_directory)
-          .arg("--package-name")
-          .arg(package_name.to_snake_case())
-          .arg("--package-version")
-          .arg(&package_version)
-          .arg("--default-type-name")
-          .arg(&default_type_name)
-          .arg("--transform-maximum-iterations")
-          .arg(transform_maximum_iterations.to_string())
-          .arg(schema_path)
-          .spawn()?;
-        let status = child.wait()?;
-        assert!(status.success());
-      }
-    }
+  for specification_info in &specification_infos {
+    let package_directory = output_directory.join(&specification_info.name);
+    let mut child = match r#type {
+      PackageType::Cargo => std::process::Command::new("cargo")
+        .arg("run")
+        .arg("--package")
+        .arg("jns42-generator")
+        .arg("--")
+        .arg("package")
+        .arg("--package-directory")
+        .arg(&package_directory)
+        .arg("--package-name")
+        .arg(specification_info.name_sentence.to_snake_case())
+        .arg("--package-version")
+        .arg(&package_version)
+        .arg("--default-type-name")
+        .arg(&default_type_name)
+        .arg("--transform-maximum-iterations")
+        .arg(transform_maximum_iterations.to_string())
+        .arg(&specification_info.path)
+        .spawn(),
+      PackageType::Npm => std::process::Command::new("npx")
+        .arg("jns42-generator")
+        .arg("package")
+        .arg("--package-directory")
+        .arg(&package_directory)
+        .arg("--package-name")
+        .arg(specification_info.name_sentence.to_snake_case())
+        .arg("--package-version")
+        .arg(&package_version)
+        .arg("--default-type-name")
+        .arg(&default_type_name)
+        .arg("--transform-maximum-iterations")
+        .arg(transform_maximum_iterations.to_string())
+        .arg(&specification_info.path)
+        .spawn(),
+    }?;
+    let status = child.wait()?;
+    assert!(status.success());
   }
 
   // prepare workspace
   match r#type {
     PackageType::Cargo => {
-      let members: Vec<_> = schema_paths
+      let members: Vec<_> = specification_infos
         .iter()
-        .filter_map(|schema_path| {
-          let schema_file_name = schema_path.file_stem()?;
-          let schema_file_name = schema_file_name.to_str()?;
-          Some(schema_file_name)
-        })
+        .map(|specification_info| specification_info.name.as_str())
         .collect();
 
       let manifest = toml::toml! {
@@ -140,13 +141,9 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
       fs::write(output_directory.join("Cargo.toml"), contents)?;
     }
     PackageType::Npm => {
-      let members: Vec<_> = schema_paths
+      let members: Vec<_> = specification_infos
         .iter()
-        .filter_map(|schema_path| {
-          let schema_file_name = schema_path.file_stem()?;
-          let schema_file_name = schema_file_name.to_str()?;
-          Some(schema_file_name)
-        })
+        .map(|specification_info| specification_info.name.as_str())
         .collect();
 
       let manifest = serde_json::json! {
@@ -162,66 +159,54 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
   }
 
   // install
-  match r#type {
-    PackageType::Cargo => {
-      let mut child = std::process::Command::new("cargo")
+  {
+    let mut child = match r#type {
+      PackageType::Cargo => std::process::Command::new("cargo")
         .current_dir(&output_directory)
         .arg("fetch")
-        .spawn()?;
-      let status = child.wait()?;
-      assert!(status.success());
-    }
-    PackageType::Npm => {
-      let mut child = std::process::Command::new("npm")
+        .spawn(),
+      PackageType::Npm => std::process::Command::new("npm")
         .current_dir(&output_directory)
         .arg("install")
-        .spawn()?;
-      let status = child.wait()?;
-      assert!(status.success());
-    }
+        .spawn(),
+    }?;
+    let status = child.wait()?;
+    assert!(status.success());
   }
 
   // build
-  match r#type {
-    PackageType::Cargo => {
-      let mut child = std::process::Command::new("cargo")
+  {
+    let mut child = match r#type {
+      PackageType::Cargo => std::process::Command::new("cargo")
         .current_dir(&output_directory)
         .arg("build")
-        .spawn()?;
-      let status = child.wait()?;
-      assert!(status.success());
-    }
-    PackageType::Npm => {
-      let mut child = std::process::Command::new("npm")
+        .spawn(),
+      PackageType::Npm => std::process::Command::new("npm")
         .current_dir(&output_directory)
         .arg("run")
         .arg("build")
         .arg("--workspaces")
-        .spawn()?;
-      let status = child.wait()?;
-      assert!(status.success());
-    }
+        .spawn(),
+    }?;
+    let status = child.wait()?;
+    assert!(status.success());
   }
 
   // test
-  match r#type {
-    PackageType::Cargo => {
-      let mut child = std::process::Command::new("cargo")
+  {
+    let mut child = match r#type {
+      PackageType::Cargo => std::process::Command::new("cargo")
         .current_dir(&output_directory)
         .arg("test")
-        .spawn()?;
-      let status = child.wait()?;
-      assert!(status.success());
-    }
-    PackageType::Npm => {
-      let mut child = std::process::Command::new("npm")
+        .spawn(),
+      PackageType::Npm => std::process::Command::new("npm")
         .current_dir(&output_directory)
         .arg("test")
         .arg("--workspaces")
-        .spawn()?;
-      let status = child.wait()?;
-      assert!(status.success());
-    }
+        .spawn(),
+    }?;
+    let status = child.wait()?;
+    assert!(status.success());
   }
 
   Ok(())

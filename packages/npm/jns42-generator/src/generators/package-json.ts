@@ -25,9 +25,9 @@ export function generatePackageJsonData(packageName: string, packageVersion: str
         types: "./typed/main.d.ts",
       },
     },
-    files: ["./typed/**", "./bundled/**"],
+    files: ["./typed/**", "./bundled/**", "./bin/**"],
     bin: {
-      [packageNameMatch[2]]: "bundled/program.js",
+      [packageNameMatch[2]]: "bin/program.js",
     },
     scripts: {
       prepack: "node ./scripts/build.js",
