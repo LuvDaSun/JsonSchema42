@@ -1,0 +1,17 @@
+schemas:
+  - ../specifications/nwd.yaml
+
+valid:
+  - id: 1
+    name: hi
+
+invalid:
+  - name: hi
+
+  - id: -1
+    name: hi
+
+  - id: 1.1
+    name: hi
+
+  - id: 1

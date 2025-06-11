@@ -28,6 +28,10 @@
       "name": "cargo/jns42-core",
       "path": "packages/cargo/jns42-core",
     },
+    {
+      "name": "cargo/jns42-tester",
+      "path": "packages/cargo/jns42-tester",
+    },
   ],
   "settings": {
     "editor.formatOnSave": true,

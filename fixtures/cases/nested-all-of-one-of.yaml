@@ -1,0 +1,18 @@
+schemas:
+  - ../specifications/nested-all-of-one-of-original.yaml
+  - ../specifications/nested-all-of-one-of-presolved.yaml
+
+valid:
+  - true
+  - a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+
+invalid:
+  - 1
+  - b: "b"
+    c: "c"
+    d: "d"
+  - a: "a"
+    b: "b"

@@ -34,7 +34,7 @@
         "package",
         "${file}",
         "--package-directory",
-        ".package/file/${fileBasenameNoExtension}",
+        ".generated/file/${fileBasenameNoExtension}",
         "--package-name",
         "${fileBasenameNoExtension}",
         "--package-version",

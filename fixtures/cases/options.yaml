@@ -1,0 +1,14 @@
+schemas:
+  - ../specifications/options.yaml
+
+valid:
+  - a
+  - 1
+  - 5
+  - true
+
+invalid:
+  - z
+  - "1"
+  - 6
+  - false

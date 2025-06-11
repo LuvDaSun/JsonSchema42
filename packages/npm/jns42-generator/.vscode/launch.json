@@ -25,31 +25,7 @@
         "package",
         "${file}",
         "--package-directory",
-        ".package/file/${fileBasenameNoExtension}",
-        "--package-name",
-        "${fileBasenameNoExtension}",
-        "--package-version",
-        "0.0.0"
-      ],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "cwd": "${workspaceFolder}",
-      "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/transpiled/**/*.js"],
-      "preLaunchTask": "build",
-      "outputCapture": "std"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "test fixture",
-      "program": "${workspaceFolder}/src/program.ts",
-      "args": [
-        "test",
-        "${file}",
-        "--package-directory",
-        ".package/test",
+        ".generated/file/${fileBasenameNoExtension}",
         "--package-name",
         "${fileBasenameNoExtension}",
         "--package-version",

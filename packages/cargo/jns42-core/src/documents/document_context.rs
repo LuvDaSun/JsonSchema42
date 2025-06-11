@@ -513,24 +513,24 @@ impl DocumentContextContainer {
     given_location: String,
     antecedent_location: Option<String>,
     default_meta_schema_id: &str,
-  ) -> Result<(), js_sys::Error> {
-    let retrieval_location = retrieval_location.parse()?;
+  ) -> Result<String, js_sys::Error> {
+    let retrieval_location: NodeLocation = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
     let antecedent_location = antecedent_location
       .map(|location| location.parse())
       .transpose()?;
 
-    Ok(
-      self
-        .0
-        .load_from_location(
-          retrieval_location,
-          given_location,
-          antecedent_location,
-          default_meta_schema_id,
-        )
-        .await?,
-    )
+    self
+      .0
+      .load_from_location(
+        retrieval_location.clone(),
+        given_location,
+        antecedent_location,
+        default_meta_schema_id,
+      )
+      .await?;
+
+    Ok(retrieval_location.to_string())
   }
 
   #[wasm_bindgen(js_name = "loadFromNode")]

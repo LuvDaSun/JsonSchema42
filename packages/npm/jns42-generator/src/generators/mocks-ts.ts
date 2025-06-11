@@ -6,10 +6,12 @@ import {
   isMockable,
   itt,
   joinIterable,
-  packageInfo,
+  readPackageInfo,
 } from "../utilities.js";
 
 export function* generateMocksTsCode(specification: models.Specification) {
+  const packageInfo = readPackageInfo();
+
   yield core.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;

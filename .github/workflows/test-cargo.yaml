@@ -2,20 +2,6 @@ on:
   pull_request: {}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    container: rust:1.87.0
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - run: rustup component add rustfmt
-      - run: cargo test --workspace --all-targets
-
   clippy:
     runs-on: ubuntu-latest
     container: rust:1.87.0
@@ -43,3 +29,38 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - run: rustup component add rustfmt
       - run: cargo fmt --check
+
+  test:
+    runs-on: ubuntu-latest
+    container: rust:1.87.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - run: rustup component add rustfmt
+      - run: cargo test --workspace --all-targets
+
+  test-specifications:
+    runs-on: ubuntu-latest
+    container: rust:1.87.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - run: rustup component add rustfmt
+      - run: >
+          cargo run 
+          --package jns42-tester
+          --
+          specifications
+          --type cargo
+          --specifications-directory fixtures/specifications
+          --output-directory .generated

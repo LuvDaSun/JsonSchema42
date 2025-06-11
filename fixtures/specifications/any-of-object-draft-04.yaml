@@ -1,0 +1,13 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+description: "An object"
+anyOf:
+  - type: "object"
+    required: ["a", "b"]
+    properties:
+      a: { type: "string" }
+      b: { type: "string" }
+  - type: "object"
+    required: ["c", "d"]
+    properties:
+      c: { type: "string" }
+      d: { type: "string" }
