@@ -8,7 +8,7 @@ export function* generateProgramJsCode() {
     #!/usr/bin/env node
   `;
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
     import "../bundled/program.js";
