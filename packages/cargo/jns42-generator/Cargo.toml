@@ -33,7 +33,6 @@ toml = "^0.8.10"
 url = "^2.3.1"
 urlencoding = "^2.1.2"
 jns42-core = { path = "../jns42-core" }
-jns42-macros = { path = "../jns42-macros" }
 
 [lib]
 path = "src/lib.rs"

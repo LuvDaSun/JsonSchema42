@@ -16,6 +16,27 @@ jobs:
       - run: rustup component add rustfmt
       - run: cargo test --workspace --all-targets
 
+  tester:
+    runs-on: ubuntu-latest
+    container: rust:1.87.0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - run: rustup component add rustfmt
+      - run: >
+          cargo run 
+            --package jns42-tester
+            --
+            specifications
+            --type cargo
+            --specifications-directory fixtures/specifications
+            --output-directory .generated
+
   clippy:
     runs-on: ubuntu-latest
     container: rust:1.87.0

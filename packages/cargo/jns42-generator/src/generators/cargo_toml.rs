@@ -6,8 +6,6 @@ pub fn generate_file_content(
   package_version: &str,
 ) -> Result<String, Box<dyn Error>> {
   let manifest = toml::toml! {
-    [workspace]
-
     [package]
     name = package_name
     version = package_version
