@@ -61,12 +61,12 @@ jobs:
       - run: just build-all
       - run: >
           cargo run 
-            --package jns42-tester
-            --
-            specifications
-            --type npm
-            --specifications-directory fixtures/specifications
-            --output-directory .generated
+          --package jns42-tester
+          --
+          specifications
+          --type npm
+          --specifications-directory fixtures/specifications
+          --output-directory .generated
 
   test-cases:
     runs-on: ubuntu-latest
@@ -94,9 +94,9 @@ jobs:
       - run: just build-all
       - run: >
           cargo run 
-            --package jns42-tester
-            --
-            cases
-            --type npm
-            --cases-directory fixtures/cases
-            --output-directory .generated
+          --package jns42-tester
+          --
+          cases
+          --type npm
+          --cases-directory fixtures/cases
+          --output-directory .generated
