@@ -1,0 +1,22 @@
+schemas:
+  - ../specifications/all-of-one-of-object-original.yaml
+  - ../specifications/all-of-one-of-object-presolved.yaml
+
+valid:
+  - a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+  - a: "a"
+    b: "b"
+    e: "e"
+    f: "f"
+
+invalid:
+  - a: "a"
+    b: "b"
+    c: "c"
+  - d: "d"
+    e: "e"
+    f: "f"
+  - true

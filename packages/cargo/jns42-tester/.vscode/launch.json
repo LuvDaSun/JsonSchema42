@@ -1,0 +1,117 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package",
+          "${workspaceFolderBasename}",
+          "--all-targets"
+        ]
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test specifications cargo",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "specifications",
+        "--type",
+        "cargo",
+        "--specifications-directory",
+        "../../../fixtures/specifications",
+        "--output-directory",
+        ".generated/specifications/cargo"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test specifications npm",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "specifications",
+        "--type",
+        "npm",
+        "--specifications-directory",
+        "../../../fixtures/specifications",
+        "--output-directory",
+        ".generated/specifications/npm"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test cases cargo",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "cases",
+        "--type",
+        "cargo",
+        "--cases-directory",
+        "../../../fixtures/cases",
+        "--output-directory",
+        ".generated/cases/cargo"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test cases npm",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "cases",
+        "--type",
+        "npm",
+        "--cases-directory",
+        "../../../fixtures/cases",
+        "--output-directory",
+        ".generated/cases/npm"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+schemas:
+  - ../specifications/not.yaml
+
+valid:
+  - {}
+  - a: "A"
+  - b: "B"
+
+invalid:
+  - a: "A"
+    b: "B"

@@ -1,0 +1,23 @@
+schemas:
+  - ../specifications/simple-object.yaml
+
+valid:
+  - id: 1
+    name: "hi"
+    child:
+      id: 2
+      name: "hi too"
+  - id: 1
+    name: "Good name"
+    excessive-field: true
+  - id: 1
+    name: "hi"
+
+invalid:
+  - id: 1
+    child:
+      id: 0
+  - id: 0
+    name: "hi"
+  - id: 1
+    name: "h"

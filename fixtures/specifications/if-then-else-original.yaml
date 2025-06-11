@@ -1,0 +1,20 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+type: "object"
+required:
+  - type
+properties:
+  type:
+    type: string
+  value: true
+if:
+  properties:
+    type:
+      const: string
+then:
+  properties:
+    value:
+      type: string
+else:
+  properties:
+    value:
+      type: number

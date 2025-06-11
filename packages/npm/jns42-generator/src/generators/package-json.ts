@@ -1,10 +1,18 @@
 import { PackageJson } from "type-fest";
-import { packageInfo } from "../utilities.js";
+import { readPackageInfo } from "../utilities.js";
 
-export function generatePackageJsonData(name: string, version: string) {
+export function generatePackageJsonData(packageName: string, packageVersion: string) {
+  const packageNameMatch = /^(?:(@[a-z][a-z0-9\-_\.]*?)\/)?([a-z][a-z0-9\-_\.]*)$/.exec(
+    packageName,
+  );
+
+  if (packageNameMatch == null) {
+    throw new Error("invalid package name");
+  }
+
   const content: PackageJson = {
-    name,
-    version,
+    name: packageName,
+    version: packageVersion,
     sideEffects: false,
     type: "module",
     module: "./bundled/main.js",
@@ -17,18 +25,26 @@ export function generatePackageJsonData(name: string, version: string) {
         types: "./typed/main.d.ts",
       },
     },
-    files: ["./typed/**", "./bundled/**"],
+    files: ["./typed/**", "./bundled/**", "./bin/**"],
+    bin: {
+      [packageNameMatch[2]]: "bin/program.js",
+    },
     scripts: {
       prepack: "node ./scripts/build.js",
-      pretest: "tsc",
+      pretest: "tsc --build",
       build: "node ./scripts/build.js",
-      clean: "node ./scripts/clean.js",
       test: "node --test ./transpiled/examples.test.js ./transpiled/mocks.test.js",
+      program: "node ./bundled/program.js",
     },
     author: "",
     license: "ISC",
-    dependencies: withDependencies(["@types/node", "@jns42/lib"]),
-    devDependencies: withDependencies(["typescript", "rollup", "@tsconfig/node20"]),
+    dependencies: withDependencies(["@types/node", "@jns42/lib", "@types/yargs", "yargs"]),
+    devDependencies: withDependencies([
+      "typescript",
+      "@tsconfig/node20",
+      "rollup",
+      "@rollup/plugin-replace",
+    ]),
     engines: {
       node: ">=18",
     },
@@ -38,6 +54,8 @@ export function generatePackageJsonData(name: string, version: string) {
 }
 
 function withDependencies(names: string[]) {
+  const packageInfo = readPackageInfo();
+
   return names.reduce(
     (o, name) =>
       Object.assign(o, {

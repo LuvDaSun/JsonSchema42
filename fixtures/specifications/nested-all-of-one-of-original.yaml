@@ -1,0 +1,32 @@
+allOf:
+  - type:
+      - object
+      - boolean
+    required:
+      - a
+      - b
+    properties:
+      a:
+        type: string
+      b:
+        type: string
+  - type:
+      - object
+      - boolean
+    allOf:
+      - type:
+          - object
+          - boolean
+        required:
+          - c
+        properties:
+          c:
+            type: string
+      - type:
+          - object
+          - boolean
+        required:
+          - d
+        properties:
+          d:
+            type: string

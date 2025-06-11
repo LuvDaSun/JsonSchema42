@@ -1,0 +1,19 @@
+schemas:
+  - ../specifications/all-types.yaml
+
+valid:
+  - null
+  - true
+  # - 1
+  - 0.5
+  - "hi"
+  - [1, "hi"]
+  - ["hi"]
+  - { "a": 1 }
+  - { "z": "z" }
+
+invalid:
+  # - [1, 2]
+  - [1]
+  - { "b": 1 }
+  - { "0": 0 }

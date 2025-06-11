@@ -1,5 +1,5 @@
 import * as core from "@jns42/core";
-import assert from "assert";
+import assert from "node:assert";
 import * as models from "../models.js";
 import {
   NestedText,
@@ -7,10 +7,12 @@ import {
   itt,
   joinIterable,
   mapIterable,
-  packageInfo,
+  readPackageInfo,
 } from "../utilities.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
+  const packageInfo = readPackageInfo();
+
   yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
@@ -80,7 +82,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             " &&\n",
           )}
         ) {
-          lib.validation.recordValidationError("options");
+          lib.validation.recordValidationFailure("options");
           return false;
         }
       `;
@@ -92,7 +94,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         mapIterable(generateSubAssertions(), (assertion) => itt`(${assertion})`),
         " ||\n",
       )})) {
-        lib.validation.recordValidationError("types");
+        lib.validation.recordValidationFailure("types");
         return false;
       }
     `;
@@ -181,7 +183,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} < ${JSON.stringify(item.minimumInclusive)}
             ) {
-              lib.validation.recordValidationError("minimumInclusive");
+              lib.validation.recordValidationFailure("minimumInclusive");
               return false;
             }
           `;
@@ -192,7 +194,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} <= ${JSON.stringify(item.minimumExclusive)}
             ) {
-              lib.validation.recordValidationError("minimumExclusive");
+              lib.validation.recordValidationFailure("minimumExclusive");
               return false;
             }
           `;
@@ -203,7 +205,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} > ${JSON.stringify(item.maximumInclusive)}
             ) {
-              lib.validation.recordValidationError("maximumInclusive");
+              lib.validation.recordValidationFailure("maximumInclusive");
               return false;
             }
           `;
@@ -214,7 +216,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} >= ${JSON.stringify(item.maximumExclusive)}
             ) {
-              lib.validation.recordValidationError("maximumExclusive");
+              lib.validation.recordValidationFailure("maximumExclusive");
               return false;
             }
           `;
@@ -225,7 +227,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression} % ${JSON.stringify(item.multipleOf)} !== 0
             ) {
-              lib.validation.recordValidationError("multipleOf");
+              lib.validation.recordValidationFailure("multipleOf");
               return false;
             }
           `;
@@ -253,7 +255,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression}.length < ${JSON.stringify(item.minimumLength)}
             ) {
-              lib.validation.recordValidationError("minimumLength");
+              lib.validation.recordValidationFailure("minimumLength");
               return false;
             }
           `;
@@ -264,7 +266,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               value.length > ${JSON.stringify(item.maximumLength)}
             ) {
-              lib.validation.recordValidationError("maximumLength");
+              lib.validation.recordValidationFailure("maximumLength");
               return false;
             }
           `;
@@ -275,7 +277,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               !new RegExp(${JSON.stringify(item.valuePattern)}).test(${valueExpression})
             ) {
-              lib.validation.recordValidationError("valuePattern");
+              lib.validation.recordValidationFailure("valuePattern");
               return false;
             }
           `;
@@ -290,7 +292,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               !${isValueFormatExpression}
             ) {
-              lib.validation.recordValidationError("valueFormat");
+              lib.validation.recordValidationFailure("valueFormat");
               return false;
             }
           `;
@@ -321,7 +323,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
             if(
               ${valueExpression}.length < ${JSON.stringify(item.tupleItems.length)}
             ) {
-              lib.validation.recordValidationError("tupleItems");
+              lib.validation.recordValidationFailure("tupleItems");
               return false;
             }
           `;
@@ -330,7 +332,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.minimumItems != null) {
           yield itt`
             if(${valueExpression}.length < ${JSON.stringify(item.minimumItems)}) {
-              lib.validation.recordValidationError("minimumItems");
+              lib.validation.recordValidationFailure("minimumItems");
               return false;
             }
           `;
@@ -339,7 +341,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.maximumItems != null) {
           yield itt`
             if(${valueExpression}.length > ${JSON.stringify(item.maximumItems)}) {
-              lib.validation.recordValidationError("maximumItems");
+              lib.validation.recordValidationFailure("maximumItems");
               return false;
             }
           `;
@@ -366,7 +368,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.uniqueItems ?? false) {
           yield itt`
             if(elementValueSeen.has(elementValue)) {
-              lib.validation.recordValidationError("uniqueItems");
+              lib.validation.recordValidationFailure("uniqueItems");
               return false;
             }
           `;
@@ -457,7 +459,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
                   !(${JSON.stringify(propertyName)} in ${valueExpression}) ||
                   ${valueExpression}[${JSON.stringify(propertyName)}] === undefined
                 ) {
-                  lib.validation.recordValidationError("required");
+                  lib.validation.recordValidationFailure("required");
                   return false;
                 }
                 return true;
@@ -483,7 +485,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.minimumProperties != null) {
           yield itt`
             if(propertyCount < ${JSON.stringify(item.minimumProperties)}) {
-              lib.validation.recordValidationError("minimumProperties");
+              lib.validation.recordValidationFailure("minimumProperties");
               return false;
               }
           `;
@@ -506,7 +508,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.maximumProperties != null) {
           yield itt`
             if(propertyCount > ${JSON.stringify(item.maximumProperties)}) {
-              lib.validation.recordValidationError("maximumProperties");
+              lib.validation.recordValidationFailure("maximumProperties");
               return false;
             }
           `;
@@ -588,7 +590,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
           ${generateInnerStatements()}
 
           if(counter < ${JSON.stringify(item.allOf.length)}) {
-            lib.validation.recordValidationError("allOf");
+            lib.validation.recordValidationFailure("allOf");
             return false;
           }
         }
@@ -615,16 +617,16 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         {
           let counter = 0;
-          lib.validation.saveValidationErrors();
+          lib.validation.saveValidationFailures();
 
           ${generateInnerStatements()}
 
           if(counter < 1) {
-            lib.validation.recordValidationError("anyOf");
+            lib.validation.recordValidationFailure("anyOf");
             return false;
           }
 
-          lib.validation.restoreValidationErrors();
+          lib.validation.restoreValidationFailures();
         }
       `;
 
@@ -646,16 +648,16 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         {
           let counter = 0;
-          lib.validation.saveValidationErrors();
+          lib.validation.saveValidationFailures();
 
           ${generateInnerStatements()}
 
           if(counter !== 1) {
-            lib.validation.recordValidationError("oneOf");
+            lib.validation.recordValidationFailure("oneOf");
             return false;
           }
           
-          lib.validation.restoreValidationErrors();
+          lib.validation.restoreValidationFailures();
         }
       `;
 
@@ -687,7 +689,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.then != null) {
           yield itt`
             if(!${generateValidatorReference(item.then, valueExpression)}) {
-              lib.validation.recordValidationError("then");
+              lib.validation.recordValidationFailure("then");
               return false;
             }
           `;
@@ -698,7 +700,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
         if (item.else != null) {
           yield itt`
             if(!${generateValidatorReference(item.else, valueExpression)}) {
-              lib.validation.recordValidationError("else");
+              lib.validation.recordValidationFailure("else");
               return false;
             }
           `;
@@ -709,7 +711,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     if (item.not != null) {
       yield itt`
         if(${generateValidatorReference(item.not, valueExpression)}) {
-          lib.validation.recordValidationError("not");
+          lib.validation.recordValidationFailure("not");
           return false;
         }
       `;

@@ -1,10 +1,12 @@
 use crate::models::Specification;
+use jns42_core::utilities::NodeLocation;
 use std::{error::Error, fs, path};
 
 pub struct PackageConfiguration<'s> {
   pub package_name: &'s str,
   pub package_version: &'s str,
   pub package_directory: &'s path::PathBuf,
+  pub entry_location: &'s NodeLocation,
 }
 
 pub fn generate_package(
@@ -15,6 +17,7 @@ pub fn generate_package(
     package_name,
     package_version,
     package_directory,
+    entry_location,
   } = configuration;
 
   let root_path = package_directory;
@@ -29,6 +32,10 @@ pub fn generate_package(
   let tokens = super::lib_rs::generate_file_token_stream(specification)?;
   let content = super::file::generate_file_content(tokens)?;
   fs::write(src_path.join("lib.rs"), content)?;
+
+  let tokens = super::main_rs::generate_file_token_stream(specification, entry_location)?;
+  let content = super::file::generate_file_content(tokens)?;
+  fs::write(src_path.join("main.rs"), content)?;
 
   let tokens = super::errors_rs::generate_file_token_stream(specification)?;
   let content = super::file::generate_file_content(tokens)?;

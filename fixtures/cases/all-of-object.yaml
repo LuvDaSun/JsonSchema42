@@ -1,0 +1,19 @@
+schemas:
+  - ../specifications/all-of-object-draft_2020-12.yaml
+  - ../specifications/all-of-object-draft-04.yaml
+
+valid:
+  - a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+  - a: "a"
+    b: "b"
+    c: "c"
+    d: "d"
+    e: "e"
+
+invalid:
+  - a: "a"
+    b: "b"
+    c: "c"

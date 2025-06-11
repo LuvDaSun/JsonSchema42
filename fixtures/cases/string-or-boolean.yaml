@@ -1,0 +1,11 @@
+schemas:
+  - ../specifications/string-or-boolean-draft-04.yaml
+  - ../specifications/string-or-boolean-draft_2020-12.yaml
+
+valid:
+  - "hi!"
+  - false
+
+invalid:
+  - 1
+  - {}

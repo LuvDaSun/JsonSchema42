@@ -1,0 +1,28 @@
+schemas:
+  - ../specifications/numbers.yaml
+
+valid:
+  - negative: -1.1
+    negativeOrZero: 0
+    positive: 1.1
+    positiveOrZero: 0
+  - negative: -1
+    negativeOrZero: 0
+    positive: 1
+    positiveOrZero: 0
+  - one: 1
+  - even: 2
+  - even: -4
+
+invalid:
+  - negative: 0
+    negativeOrZero: 1.1
+    positive: 0
+    positiveOrZero: -1.1
+  - negativeInteger: 0
+    negativeIntegerOrZero: 1
+    positiveInteger: 0
+    positiveIntegerOrZero: -1
+  - one: 2
+  - even: 3
+  - even: -5
