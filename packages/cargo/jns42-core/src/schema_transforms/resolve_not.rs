@@ -2,7 +2,8 @@ use crate::models::{ArenaSchemaItem, SchemaArena};
 use std::collections::BTreeSet;
 
 /**
- * This transformer turns resolves the not field
+ * This transformer turns resolves the not field.
+ * TODO in some cases the not can be represented as an allOf
  *
  * ```yaml
  * - required:
