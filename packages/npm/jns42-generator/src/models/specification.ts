@@ -4,10 +4,10 @@ import { toTypeModel, TypeModel } from "./type.js";
 import { toValidatorModel, ValidatorModel } from "./validator.js";
 
 export interface Specification {
-  typeModels: Map<number, TypeModel>;
-  validatorModels: Map<number, ValidatorModel>;
   locationToKeyMap: Map<string, number>;
   names: core.NamesContainer;
+  typeModels: Map<number, TypeModel>;
+  validatorModels: Map<number, ValidatorModel>;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -22,12 +22,10 @@ export function loadSpecification(
   const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
-
   const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
   // generate locationLookup
-
   const locationToKeyMap = new Map<string, number>();
   for (let key = 0; key < typesArena.count(); key++) {
     const item = typesArena.getItem(key);
@@ -37,27 +35,13 @@ export function loadSpecification(
   }
 
   // generate root keys
-
   const explicitTypeKeys = documentContext.getExplicitLocations().map((location) => {
     const key = locationToKeyMap.get(location);
     assert(key != null);
     return key;
   });
 
-  // transform the validatorsArena
-  {
-    const transformers = [] as Transformer[];
-    let transformIterations = 0;
-    while (validatorsArena.transform(transformers) > 0) {
-      transformIterations++;
-      if (transformIterations < transformMaximumIterations) {
-        continue;
-      }
-      throw new Error("maximum number of iterations reached");
-    }
-  }
-
-  // transform the typesArena
+  // transform the typesArena (note that we are not transforming the validatorsArena!)
   {
     const transformers = [
       core.SchemaTransform.Explode,
@@ -141,9 +125,9 @@ export function loadSpecification(
   }
 
   return {
-    typeModels,
-    validatorModels,
     locationToKeyMap,
     names,
+    typeModels,
+    validatorModels,
   };
 }
