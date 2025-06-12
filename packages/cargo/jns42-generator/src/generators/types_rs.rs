@@ -192,6 +192,7 @@ fn generate_type_token_stream(
         }
         Some(&SchemaType::String) => {
           if let Some(validation_value) = &item.minimum_length {
+            let validation_value: usize = (*validation_value).try_into().unwrap();
             tokens_validation.append_all(quote! {
               if value.len() < #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -199,6 +200,7 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.maximum_length {
+            let validation_value: usize = (*validation_value).try_into().unwrap();
             tokens_validation.append_all(quote! {
               if value.len() > #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -207,12 +209,12 @@ fn generate_type_token_stream(
           }
           if let Some(validation_value) = &item.value_pattern {
             tokens_validation.append_all(quote! {
-              todo!()
+              todo!();
             });
           }
           if let Some(validation_value) = &item.value_format {
             tokens_validation.append_all(quote! {
-              todo!()
+              todo!();
             });
           }
         }
