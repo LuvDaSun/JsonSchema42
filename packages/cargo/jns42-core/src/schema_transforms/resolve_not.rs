@@ -37,7 +37,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   let mut item_new = ArenaSchemaItem {
     not: None,
-    exact: Some(false),
+    exact: Some(false), // TODO well we could make this exact in some cases
     ..item.clone()
   };
 

@@ -197,6 +197,7 @@ where
       }};
     }
 
+    // TODO this could be exact in more cases, min and max could be merged
     let exact_merge = if (self.minimum_inclusive.is_none() || other.minimum_inclusive.is_none())
       && (self.minimum_exclusive.is_none() || other.minimum_exclusive.is_none())
       && (self.maximum_inclusive.is_none() || other.maximum_inclusive.is_none())
