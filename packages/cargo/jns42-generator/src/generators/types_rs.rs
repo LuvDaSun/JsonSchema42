@@ -81,11 +81,7 @@ fn generate_type_token_stream(
         }
         Some(&SchemaType::Any) => {}
         Some(&SchemaType::Null) => {}
-        Some(&SchemaType::Boolean) => {
-          tokens_validation.append_all(quote! {
-            core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
-          });
-        }
+        Some(&SchemaType::Boolean) => {}
         Some(&SchemaType::Integer) => {
           if let Some(validation_value) = &item.maximum_exclusive {
             let validation_value = validation_value
@@ -218,16 +214,8 @@ fn generate_type_token_stream(
             });
           }
         }
-        Some(&SchemaType::Array) => {
-          tokens_validation.append_all(quote! {
-            core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
-          });
-        }
-        Some(&SchemaType::Object) => {
-          tokens_validation.append_all(quote! {
-            core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
-          });
-        }
+        Some(&SchemaType::Array) => {}
+        Some(&SchemaType::Object) => {}
         None => {}
       };
 
