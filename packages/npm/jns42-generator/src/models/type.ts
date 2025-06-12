@@ -3,6 +3,12 @@ import { ArenaSchemaItemContainer } from "@jns42/core";
 import assert from "node:assert";
 
 export interface TypeModel {
+  readonly location: string | undefined;
+  readonly title: string | undefined;
+  readonly description: string | undefined;
+  readonly examples: any[] | undefined;
+  readonly deprecated: boolean | undefined;
+
   readonly type: core.SchemaType | undefined;
 
   readonly reference: number | undefined;
@@ -50,6 +56,8 @@ export function toTypeModel(item: ArenaSchemaItemContainer): TypeModel {
     assert(item.oneOf.length > 1);
   }
 
+  const { location, title, description, examples, deprecated } = item;
+
   const type = item.types?.[0];
 
   const { reference, propertyNames, mapProperties, arrayItems, contains } = item;
@@ -61,6 +69,12 @@ export function toTypeModel(item: ArenaSchemaItemContainer): TypeModel {
   const { options, required } = item;
 
   return {
+    location,
+    title,
+    description,
+    examples,
+    deprecated,
+
     type,
 
     reference,
