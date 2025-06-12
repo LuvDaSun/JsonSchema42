@@ -1,9 +1,16 @@
 import * as core from "@jns42/core";
+import { toTypeModel, TypeModel } from "./type.js";
+import { toValidatorModel, ValidatorModel } from "./validator.js";
 
 export interface Specification {
-  typesArena: core.SchemaArenaContainer;
-  validatorsArena: core.SchemaArenaContainer;
+  typeModels: Map<number, TypeModel>;
+  validatorModels: Map<number, ValidatorModel>;
   names: core.NamesContainer;
+
+  /** @deprecated */
+  typesArena: core.SchemaArenaContainer;
+  /** @deprecated */
+  validatorsArena: core.SchemaArenaContainer;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -89,7 +96,6 @@ export function loadSpecification(
   }
 
   // generate names
-
   {
     const transformers = [core.SchemaTransform.Name];
     let transformIterations = 0;
@@ -123,7 +129,23 @@ export function loadSpecification(
 
   const names = namesBuilder.build();
 
+  const typeModels = new Map<number, TypeModel>();
+  for (let key = 0; key < typesArena.count(); key++) {
+    const item = typesArena.getItem(key);
+    const model = toTypeModel(item);
+    typeModels.set(key, model);
+  }
+
+  const validatorModels = new Map<number, ValidatorModel>();
+  for (let key = 0; key < validatorsArena.count(); key++) {
+    const item = validatorsArena.getItem(key);
+    const model = toValidatorModel(item);
+    validatorModels.set(key, model);
+  }
+
   return {
+    typeModels,
+    validatorModels,
     typesArena,
     validatorsArena,
     names,
