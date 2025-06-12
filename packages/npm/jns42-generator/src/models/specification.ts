@@ -1,10 +1,12 @@
 import * as core from "@jns42/core";
+import assert from "node:assert";
 import { toTypeModel, TypeModel } from "./type.js";
 import { toValidatorModel, ValidatorModel } from "./validator.js";
 
 export interface Specification {
   typeModels: Map<number, TypeModel>;
   validatorModels: Map<number, ValidatorModel>;
+  locationToKeyMap: Map<string, number>;
   names: core.NamesContainer;
 
   /** @deprecated */
@@ -29,21 +31,23 @@ export function loadSpecification(
   const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
-  // generate root keys
+  // generate locationLookup
 
-  const explicitLocations = new Set(documentContext.getExplicitLocations());
-  const explicitTypeKeys = [];
+  const locationToKeyMap = new Map<string, number>();
   for (let key = 0; key < typesArena.count(); key++) {
     const item = typesArena.getItem(key);
-    if (item.location == null) {
-      continue;
-    }
-    if (!explicitLocations.has(item.location)) {
-      continue;
-    }
+    assert(item.location != null);
 
-    explicitTypeKeys.push(key);
+    locationToKeyMap.set(item.location, key);
   }
+
+  // generate root keys
+
+  const explicitTypeKeys = documentContext.getExplicitLocations().map((location) => {
+    const key = locationToKeyMap.get(location);
+    assert(key != null);
+    return key;
+  });
 
   // transform the validatorsArena
   {
@@ -144,6 +148,7 @@ export function loadSpecification(
   return {
     typeModels,
     validatorModels,
+    locationToKeyMap,
     typesArena,
     validatorsArena,
     names,
