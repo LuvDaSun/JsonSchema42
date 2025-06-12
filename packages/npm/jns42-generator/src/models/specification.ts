@@ -8,11 +8,6 @@ export interface Specification {
   validatorModels: Map<number, ValidatorModel>;
   locationToKeyMap: Map<string, number>;
   names: core.NamesContainer;
-
-  /** @deprecated */
-  typesArena: core.SchemaArenaContainer;
-  /** @deprecated */
-  validatorsArena: core.SchemaArenaContainer;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -149,8 +144,6 @@ export function loadSpecification(
     typeModels,
     validatorModels,
     locationToKeyMap,
-    typesArena,
-    validatorsArena,
     names,
   };
 }

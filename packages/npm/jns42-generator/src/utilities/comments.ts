@@ -1,11 +1,8 @@
-import * as core from "@jns42/core";
 import { encode } from "entities";
 import * as models from "../models.js";
 import { NestedText } from "./iterable-text-template.js";
 
-export function* generateJsDocComments(
-  item: models.TypeModel | core.ArenaSchemaItemContainer,
-): Iterable<NestedText> {
+export function* generateJsDocComments(item: models.TypeModel): Iterable<NestedText> {
   const { location: nodeId } = item;
 
   yield `/**\n`;
