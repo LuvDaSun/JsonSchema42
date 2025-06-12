@@ -1550,7 +1550,7 @@ dependencies = [
 
 [[package]]
 name = "jns42-lib"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "jns42-tester"
