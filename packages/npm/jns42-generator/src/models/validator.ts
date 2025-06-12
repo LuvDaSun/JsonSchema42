@@ -1,5 +1,4 @@
 import * as core from "@jns42/core";
-import { ArenaSchemaItemContainer } from "@jns42/core";
 import { assert } from "console";
 
 export interface ValidatorModel {
@@ -38,7 +37,9 @@ export interface ValidatorModel {
   readonly maximumProperties: number | undefined;
 }
 
-export function toValidatorModel(item: ArenaSchemaItemContainer): ValidatorModel {
+export function toValidatorModel(arena: core.SchemaArenaContainer, key: number): ValidatorModel {
+  const item = arena.getItem(key);
+
   assert(item.exact === true);
 
   const { types } = item;

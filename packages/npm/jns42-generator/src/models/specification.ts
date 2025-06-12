@@ -131,15 +131,13 @@ export function loadSpecification(
 
   const typeModels = new Map<number, TypeModel>();
   for (let key = 0; key < typesArena.count(); key++) {
-    const item = typesArena.getItem(key);
-    const model = toTypeModel(item);
+    const model = toTypeModel(typesArena, key);
     typeModels.set(key, model);
   }
 
   const validatorModels = new Map<number, ValidatorModel>();
   for (let key = 0; key < validatorsArena.count(); key++) {
-    const item = validatorsArena.getItem(key);
-    const model = toValidatorModel(item);
+    const model = toValidatorModel(validatorsArena, key);
     validatorModels.set(key, model);
   }
 

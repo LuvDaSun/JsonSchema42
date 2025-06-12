@@ -1,13 +1,13 @@
 import * as core from "@jns42/core";
 import * as models from "../models.js";
-import { generateJsDocComments, isMockable, itt, readPackageInfo } from "../utilities.js";
+import { generateJsDocComments, itt, readPackageInfo } from "../utilities.js";
 
 export function* generateMocksTestTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typesArena } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import assert from "node:assert";
@@ -16,12 +16,11 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
     import * as mocks from "./mocks.js";
   `;
 
-  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    if (!isMockable(typesArena, itemKey)) {
+  for (const [itemKey, item] of typeModels) {
+    if (!item.mockable) {
       continue;
     }
 
-    const item = typesArena.getItem(itemKey);
     const name = names.getName(itemKey);
     if (item.location == null || name == null) {
       // only is the location is set can we be sure that the name of the type and validator

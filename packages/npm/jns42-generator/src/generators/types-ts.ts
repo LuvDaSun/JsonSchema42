@@ -43,8 +43,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-        export type ${name.toPascalCase()} = _Wrap<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
-      `;
+      export type ${name.toPascalCase()} = _Wrap<(${definition}), ${JSON.stringify(name.toPascalCase())}>;
+    `;
   }
 
   function* generateTypeReference(itemKey: number, forceInline = false): Iterable<NestedText> {
