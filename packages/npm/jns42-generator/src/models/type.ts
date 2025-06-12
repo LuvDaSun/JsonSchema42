@@ -17,6 +17,7 @@ export interface TypeModel {
   readonly contains: number | undefined;
 
   readonly oneOf: [number, ...number[]] | undefined;
+  readonly allOf: [number, ...number[]] | undefined;
   readonly tupleItems: number[] | undefined;
 
   readonly objectProperties: Record<string, number>;
@@ -65,7 +66,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   }
 
   if (item.allOf != null) {
-    assert(item.allOf.length === 0);
+    assert(item.allOf.length > 1);
   }
   if (item.anyOf != null) {
     assert(item.anyOf.length === 0);
@@ -80,6 +81,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
 
   const { reference, propertyNames, mapProperties, arrayItems, contains } = item;
 
+  const allOf = item.allOf != null ? ([...item.allOf] as [number, ...number[]]) : undefined;
   const oneOf = item.oneOf != null ? ([...item.oneOf] as [number, ...number[]]) : undefined;
   const tupleItems = item.tupleItems != null ? [...item.tupleItems] : undefined;
 
@@ -120,6 +122,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
     arrayItems,
     contains,
 
+    allOf,
     oneOf,
     tupleItems,
 

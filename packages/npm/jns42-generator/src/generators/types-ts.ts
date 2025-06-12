@@ -1,4 +1,5 @@
 import * as core from "@jns42/core";
+import assert from "node:assert";
 import * as models from "../models.js";
 import {
   NestedText,
@@ -13,7 +14,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typesArena } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     declare const _tags: unique symbol;
@@ -31,9 +32,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
       : T;
   `;
 
-  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    const item = typesArena.getItem(itemKey);
-
+  for (const [itemKey, item] of typeModels) {
     const name = names.getName(itemKey);
     if (name == null) {
       continue;
@@ -57,7 +56,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
   }
 
   function* generateTypeDefinition(itemKey: number) {
-    const item = typesArena.getItem(itemKey);
+    const item = typeModels.get(itemKey);
+    assert(item != null);
 
     if (item.reference != null) {
       yield generateTypeReference(item.reference);
@@ -102,8 +102,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
       }
     }
 
-    if (item.types != null && item.types.length === 1) {
-      switch (item.types[0] as core.SchemaType) {
+    if (item.type != null) {
+      switch (item.type) {
         case core.SchemaType.Never:
           yield "never";
           return;
@@ -139,6 +139,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
           function* generateArrayContent() {
+            assert(item != null);
+
             if (item.tupleItems != null) {
               for (const elementKey of item.tupleItems) {
                 yield itt`
@@ -172,6 +174,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
           return;
 
           function* generateInterfaceContent() {
+            assert(item != null);
+
             let hasUndefinedProperty = false;
             let hasUnknownProperty = false;
 
