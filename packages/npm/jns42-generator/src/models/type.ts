@@ -1,7 +1,49 @@
 import * as core from "@jns42/core";
 import assert from "node:assert";
 
-export interface TypeModel {
+export interface NeverTypeModel {
+  type: "never";
+}
+
+export interface AnyTypeModel {
+  type: "any";
+}
+
+export interface NullTypeModel {
+  type: "null";
+}
+
+export interface BooleanTypeModel {
+  type: "boolean";
+}
+
+export interface IntegerTypeModel {
+  type: "integer";
+}
+
+export interface NumberTypeModel {
+  type: "number";
+}
+
+export interface StringTypeModel {
+  type: "string";
+}
+
+export interface ArrayTypeModel {
+  type: "array";
+}
+
+export interface ObjectTypeModel {
+  type: "object";
+}
+
+export interface AllOfTypeModel {}
+
+export interface OneOfTypeModel {}
+
+export interface ReferenceTypeModel {}
+
+export interface MetadataTypeModel {
   readonly location: string | undefined;
   readonly title: string | undefined;
   readonly description: string | undefined;
@@ -44,6 +86,22 @@ export interface TypeModel {
 
   readonly mockable: boolean;
 }
+
+export type TypeModel = MetadataTypeModel &
+  (
+    | NeverTypeModel
+    | AnyTypeModel
+    | NullTypeModel
+    | BooleanTypeModel
+    | IntegerTypeModel
+    | NumberTypeModel
+    | StringTypeModel
+    | ArrayTypeModel
+    | ObjectTypeModel
+    | AllOfTypeModel
+    | OneOfTypeModel
+    | ReferenceTypeModel
+  );
 
 export function toTypeModel(arena: core.SchemaArenaContainer, key: number): TypeModel {
   const item = arena.getItem(key);
