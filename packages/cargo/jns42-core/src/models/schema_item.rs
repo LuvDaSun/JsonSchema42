@@ -59,23 +59,23 @@ where
   pub options: Option<Vec<serde_json::Value>>,
   pub required: Option<BTreeSet<String>>,
 
-  pub minimum_inclusive: Option<serde_json::Number>,
-  pub minimum_exclusive: Option<serde_json::Number>,
-  pub maximum_inclusive: Option<serde_json::Number>,
-  pub maximum_exclusive: Option<serde_json::Number>,
-  pub multiple_of: Option<serde_json::Number>,
+  pub minimum_inclusive: Option<f64>,
+  pub minimum_exclusive: Option<f64>,
+  pub maximum_inclusive: Option<f64>,
+  pub maximum_exclusive: Option<f64>,
+  pub multiple_of: Option<f64>,
 
-  pub minimum_length: Option<u64>,
-  pub maximum_length: Option<u64>,
+  pub minimum_length: Option<u32>,
+  pub maximum_length: Option<u32>,
   pub value_pattern: Option<String>,
   pub value_format: Option<String>,
 
-  pub minimum_items: Option<u64>,
-  pub maximum_items: Option<u64>,
+  pub minimum_items: Option<u32>,
+  pub maximum_items: Option<u32>,
   pub unique_items: Option<bool>,
 
-  pub minimum_properties: Option<u64>,
-  pub maximum_properties: Option<u64>,
+  pub minimum_properties: Option<u32>,
+  pub maximum_properties: Option<u32>,
 }
 
 impl<K> SchemaItem<K>
@@ -197,12 +197,7 @@ where
       }};
     }
 
-    // TODO this could be exact in more cases, min and max could be merged
-    let exact_merge = if (self.minimum_inclusive.is_none() || other.minimum_inclusive.is_none())
-      && (self.minimum_exclusive.is_none() || other.minimum_exclusive.is_none())
-      && (self.maximum_inclusive.is_none() || other.maximum_inclusive.is_none())
-      && (self.maximum_exclusive.is_none() || other.maximum_exclusive.is_none())
-      && (self.multiple_of.is_none() || other.multiple_of.is_none())
+    let exact_merge = if (self.multiple_of.is_none() || other.multiple_of.is_none())
       && (self.value_pattern.is_none() || other.value_pattern.is_none())
       && (self.value_format.is_none() || other.value_format.is_none())
     {
@@ -261,11 +256,11 @@ where
       options: union_merge!(options), // TODO should be intersection?
       required: union_merge!(required),
 
-      minimum_inclusive: merge_either!(minimum_inclusive), // merge_option!(minimum_inclusive, |base, other| base.min(*other)),
-      minimum_exclusive: merge_either!(minimum_exclusive), // merge_option!(minimum_exclusive, |base, other| base.min(*other)),
-      maximum_inclusive: merge_either!(maximum_inclusive), // merge_option!(maximum_inclusive, |base, other| base.max(*other)),
-      maximum_exclusive: merge_either!(maximum_exclusive), // merge_option!(maximum_exclusive, |base, other| base.max(*other)),
-      multiple_of: merge_either!(multiple_of),             // TODO
+      minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      multiple_of: merge_either!(multiple_of), // TODO
 
       minimum_length: merge_option!(minimum_length, |base, other| *base.min(other)),
       maximum_length: merge_option!(maximum_length, |base, other| *base.max(other)),
@@ -404,11 +399,11 @@ where
 
       options: self.options.clone(),
 
-      minimum_inclusive: self.minimum_inclusive.clone(),
-      minimum_exclusive: self.minimum_exclusive.clone(),
-      maximum_inclusive: self.maximum_inclusive.clone(),
-      maximum_exclusive: self.maximum_exclusive.clone(),
-      multiple_of: self.multiple_of.clone(),
+      minimum_inclusive: self.minimum_inclusive,
+      minimum_exclusive: self.minimum_exclusive,
+      maximum_inclusive: self.maximum_inclusive,
+      maximum_exclusive: self.maximum_exclusive,
+      multiple_of: self.multiple_of,
 
       minimum_length: self.minimum_length,
       maximum_length: self.maximum_length,
@@ -601,32 +596,32 @@ impl ArenaSchemaItemContainer {
 
   #[wasm_bindgen(getter = minimumInclusive)]
   pub fn minimum_inclusive_get(&self) -> Option<f64> {
-    self.0.minimum_inclusive.as_ref()?.as_f64()
+    self.0.minimum_inclusive
   }
   #[wasm_bindgen(getter = minimumExclusive)]
   pub fn minimum_exclusive_get(&self) -> Option<f64> {
-    self.0.minimum_exclusive.as_ref()?.as_f64()
+    self.0.minimum_exclusive
   }
   #[wasm_bindgen(getter = maximumInclusive)]
   pub fn maximum_inclusive_get(&self) -> Option<f64> {
-    self.0.maximum_inclusive.as_ref()?.as_f64()
+    self.0.maximum_inclusive
   }
   #[wasm_bindgen(getter = maximumExclusive)]
   pub fn maximum_exclusive_get(&self) -> Option<f64> {
-    self.0.maximum_exclusive.as_ref()?.as_f64()
+    self.0.maximum_exclusive
   }
   #[wasm_bindgen(getter = multipleOf)]
   pub fn multiple_of_get(&self) -> Option<f64> {
-    self.0.multiple_of.as_ref()?.as_f64()
+    self.0.multiple_of
   }
 
   #[wasm_bindgen(getter = minimumLength)]
-  pub fn minimum_length_get(&self) -> Option<usize> {
-    self.0.minimum_length?.try_into().ok()
+  pub fn minimum_length_get(&self) -> Option<u32> {
+    self.0.minimum_length
   }
   #[wasm_bindgen(getter = maximumLength)]
-  pub fn maximum_length_get(&self) -> Option<usize> {
-    self.0.maximum_length?.try_into().ok()
+  pub fn maximum_length_get(&self) -> Option<u32> {
+    self.0.maximum_length
   }
   #[wasm_bindgen(getter = valuePattern)]
   pub fn value_pattern_get(&self) -> Option<String> {
@@ -638,12 +633,12 @@ impl ArenaSchemaItemContainer {
   }
 
   #[wasm_bindgen(getter = minimumItems)]
-  pub fn minimum_items_get(&self) -> Option<usize> {
-    self.0.minimum_items?.try_into().ok()
+  pub fn minimum_items_get(&self) -> Option<u32> {
+    self.0.minimum_items
   }
   #[wasm_bindgen(getter = maximumItems)]
-  pub fn maximum_items_get(&self) -> Option<usize> {
-    self.0.maximum_items?.try_into().ok()
+  pub fn maximum_items_get(&self) -> Option<u32> {
+    self.0.maximum_items
   }
   #[wasm_bindgen(getter = uniqueItems)]
   pub fn unique_items_get(&self) -> Option<bool> {
@@ -651,12 +646,12 @@ impl ArenaSchemaItemContainer {
   }
 
   #[wasm_bindgen(getter = minimumProperties)]
-  pub fn minimum_properties_get(&self) -> Option<usize> {
-    self.0.minimum_properties?.try_into().ok()
+  pub fn minimum_properties_get(&self) -> Option<u32> {
+    self.0.minimum_properties
   }
   #[wasm_bindgen(getter = maximumProperties)]
-  pub fn maximum_properties_get(&self) -> Option<usize> {
-    self.0.maximum_properties?.try_into().ok()
+  pub fn maximum_properties_get(&self) -> Option<u32> {
+    self.0.maximum_properties
   }
 }
 

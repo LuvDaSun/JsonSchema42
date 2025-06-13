@@ -65,24 +65,24 @@ impl Node {
       minimum_inclusive: if self.0.bool("exclusiveMinimum").unwrap_or_default() {
         None
       } else {
-        self.0.number("minimum").cloned()
+        self.0.float("minimum")
       },
       minimum_exclusive: if self.0.bool("exclusiveMinimum").unwrap_or_default() {
-        self.0.number("minimum").cloned()
+        self.0.float("minimum")
       } else {
         None
       },
       maximum_inclusive: if self.0.bool("exclusiveMaximum").unwrap_or_default() {
         None
       } else {
-        self.0.number("maximum").cloned()
+        self.0.float("maximum")
       },
       maximum_exclusive: if self.0.bool("exclusiveMaximum").unwrap_or_default() {
-        self.0.number("maximum").cloned()
+        self.0.float("maximum")
       } else {
         None
       },
-      multiple_of: self.0.number("multipleOf").cloned(),
+      multiple_of: self.0.float("multipleOf"),
       minimum_length: self.0.unsigned_integer("minLength"),
       maximum_length: self.0.unsigned_integer("maxLength"),
       value_pattern: self.0.string("pattern").map(str::to_owned),

@@ -36,12 +36,12 @@ impl JsonValue {
       .map(|value| value.iter().filter_map(|value| value.as_str()))
   }
 
-  pub fn unsigned_integer(&self, field: &str) -> Option<u64> {
-    self.0.as_object()?.get(field)?.as_u64()
+  pub fn unsigned_integer(&self, field: &str) -> Option<u32> {
+    self.0.as_object()?.get(field)?.as_u64()?.try_into().ok()
   }
 
-  pub fn number(&self, field: &str) -> Option<&serde_json::Number> {
-    self.0.as_object()?.get(field)?.as_number()
+  pub fn float(&self, field: &str) -> Option<f64> {
+    self.0.as_object()?.get(field)?.as_f64()
   }
 
   pub fn bool(&self, field: &str) -> Option<bool> {
