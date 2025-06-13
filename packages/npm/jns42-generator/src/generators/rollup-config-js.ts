@@ -4,7 +4,7 @@ import { itt, readPackageInfo } from "../utilities.js";
 export function* generateRollupConfigJsCode() {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
     import replace from "@rollup/plugin-replace";

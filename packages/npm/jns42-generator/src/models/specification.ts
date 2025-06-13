@@ -1,9 +1,9 @@
 import * as core from "@jns42/core";
 
 export interface Specification {
-  typesArena: core.SchemaArenaContainer;
-  validatorsArena: core.SchemaArenaContainer;
-  names: core.NamesContainer;
+  typesArena: core.models.SchemaArena;
+  validatorsArena: core.models.SchemaArena;
+  names: core.naming.Names;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -12,14 +12,14 @@ export interface LoadSpecificationConfiguration {
 }
 
 export function loadSpecification(
-  documentContext: core.DocumentContextContainer,
+  documentContext: core.documents.DocumentContext,
   configuration: LoadSpecificationConfiguration,
 ): Specification {
   const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
 
-  const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
+  const typesArena = documentContext.makeSchemaArena();
   const validatorsArena = typesArena.clone();
 
   // generate root keys
@@ -40,7 +40,7 @@ export function loadSpecification(
 
   // transform the validatorsArena
   {
-    const transformers = [] as Transformer[];
+    const transformers = [] as core.models.SchemaTransform[];
     let transformIterations = 0;
     while (validatorsArena.transform(transformers) > 0) {
       transformIterations++;
@@ -53,29 +53,29 @@ export function loadSpecification(
 
   // transform the typesArena
   {
-    const transformers = [
-      core.SchemaTransform.Explode,
-      core.SchemaTransform.SingleType,
-      core.SchemaTransform.ResolveSingleAllOf,
-      core.SchemaTransform.ResolveSingleAnyOf,
-      core.SchemaTransform.ResolveSingleOneOf,
-      core.SchemaTransform.FlattenAllOf,
-      core.SchemaTransform.FlattenAnyOf,
-      core.SchemaTransform.FlattenOneOf,
-      core.SchemaTransform.FlipAllOfOneOf,
-      core.SchemaTransform.FlipAnyOfOneOf,
-      core.SchemaTransform.InheritAllOf,
-      core.SchemaTransform.InheritAnyOf,
-      core.SchemaTransform.InheritOneOf,
-      core.SchemaTransform.InheritReference,
-      core.SchemaTransform.ResolveAllOf,
-      core.SchemaTransform.ResolveAnyOf,
-      core.SchemaTransform.ResolveNot,
-      core.SchemaTransform.ResolveIfThenElse,
-      core.SchemaTransform.ResolveSingleAllOf,
-      core.SchemaTransform.ResolveSingleAnyOf,
-      core.SchemaTransform.ResolveSingleOneOf,
-      core.SchemaTransform.Unalias,
+    const transformers: core.models.SchemaTransform[] = [
+      "explode",
+      "single-type",
+      "resolve-single-all-of",
+      "resolve-single-any-of",
+      "resolve-single-one-of",
+      "flatten-all-of",
+      "flatten-any-of",
+      "flatten-one-of",
+      "flip-all-of-one-of",
+      "flip-any-of-one-of",
+      "inherit-all-of",
+      "inherit-any-of",
+      "inherit-one-of",
+      "inherit-reference",
+      "resolve-all-of",
+      "resolve-any-of",
+      "resolve-not",
+      "resolve-if-then-else",
+      "resolve-single-all-of",
+      "resolve-single-any-of",
+      "resolve-single-one-of",
+      "unalias",
     ];
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
@@ -91,7 +91,7 @@ export function loadSpecification(
   // generate names
 
   {
-    const transformers = [core.SchemaTransform.Name];
+    const transformers: core.models.SchemaTransform[] = ["name"];
     let transformIterations = 0;
     while (typesArena.transform(transformers) > 0) {
       transformIterations++;
@@ -107,7 +107,7 @@ export function loadSpecification(
     explicitTypeKeys.flatMap((key) => [...typesArena.getAllRelated(key)]),
   );
 
-  const namesBuilder = new core.NamesBuilderContainer();
+  const namesBuilder = new core.naming.NamesBuilder();
   namesBuilder.setDefaultName(defaultTypeName);
 
   for (const key of primaryTypeKeys) {

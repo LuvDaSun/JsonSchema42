@@ -5,7 +5,7 @@ import { itt, readPackageInfo } from "../utilities.js";
 export function* generateMainTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
     export * as types from "./types.js";

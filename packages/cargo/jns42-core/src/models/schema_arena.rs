@@ -1,7 +1,6 @@
-use super::{BoxedSchemaTransform, SchemaTransform, SchemaType, schema_item::ArenaSchemaItem};
+use super::{SchemaType, schema_item::ArenaSchemaItem};
 use crate::{
-  documents::{DocumentContext, DocumentContextContainer},
-  models::ArenaSchemaItemContainer,
+  documents::DocumentContext,
   utilities::{Arena, NodeLocation},
 };
 use std::{
@@ -9,7 +8,9 @@ use std::{
   iter,
   rc::Rc,
 };
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 pub type SchemaArena = Arena<ArenaSchemaItem>;
 
@@ -106,72 +107,165 @@ impl Arena<ArenaSchemaItem> {
   }
 }
 
-#[wasm_bindgen]
-#[derive(Clone)]
-pub struct SchemaArenaContainer(SchemaArena);
+#[cfg(target_arch = "wasm32")]
+pub struct SchemaArenaHost(std::cell::RefCell<SchemaArena>);
 
-#[wasm_bindgen]
-impl SchemaArenaContainer {
-  #[wasm_bindgen(js_name = clone)]
-  pub fn _clone(&self) -> Self {
-    Self(self.0.clone())
+#[cfg(target_arch = "wasm32")]
+impl From<SchemaArena> for SchemaArenaHost {
+  fn from(value: SchemaArena) -> Self {
+    Self(value.into())
   }
 }
 
-#[wasm_bindgen]
-impl SchemaArenaContainer {
-  #[wasm_bindgen(js_name = fromDocumentContext)]
-  pub fn from_document_context(document_context: &DocumentContextContainer) -> Self {
-    let document_context = document_context.clone();
-    SchemaArena::from_document_context(&document_context.into()).into()
+#[cfg(target_arch = "wasm32")]
+impl From<SchemaArenaHost> for exports::jns42::core::models::SchemaArena {
+  fn from(value: SchemaArenaHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<SchemaArena> for exports::jns42::core::models::SchemaArena {
+  fn from(value: SchemaArena) -> Self {
+    SchemaArenaHost::from(value).into()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::models::GuestSchemaArena for SchemaArenaHost {
+  fn new() -> Self {
+    SchemaArena::new().into()
   }
 
-  #[wasm_bindgen(js_name = getItem)]
-  pub fn get_item(&self, key: usize) -> ArenaSchemaItemContainer {
-    self.0.get_item(key).clone().into()
+  fn count(&self) -> u32 {
+    self.0.borrow().count() as u32
   }
 
-  #[wasm_bindgen(js_name = count)]
-  pub fn count(&self) -> usize {
-    self.0.count()
+  fn get_item(
+    &self,
+    key: exports::jns42::core::models::Key,
+  ) -> exports::jns42::core::models::ArenaSchemaItem {
+    self.0.borrow().get_item(key as usize).clone().into()
   }
 
-  #[wasm_bindgen(js_name = getAllRelated)]
-  pub fn get_all_related(&self, key: usize) -> Vec<usize> {
-    self.0.get_all_related(key).collect()
-  }
-
-  /// Applies a series of transformations to the schema items within the arena.
-  ///
-  /// This method iterates over each transformation provided and applies it to the arena.
-  /// The transformations are applied in the order they are provided.
-  ///
-  /// # Parameters
-  /// - `transforms`: A reference to a vector of `SchemaTransform` instances to be applied.
-  ///
-  /// # Returns
-  /// The number of transformations applied.
-  #[wasm_bindgen(js_name = transform)]
-  pub fn transform(&mut self, transforms: Vec<SchemaTransform>) -> usize {
+  fn get_all_related(
+    &self,
+    key: exports::jns42::core::models::Key,
+  ) -> Vec<exports::jns42::core::models::Key> {
     self
       .0
-      .apply_transform(|arena: &mut Arena<ArenaSchemaItem>, key: usize| {
+      .borrow()
+      .get_all_related(key as usize)
+      .map(|value| value as exports::jns42::core::models::Key)
+      .collect()
+  }
+
+  fn transform(&self, transforms: Vec<exports::jns42::core::models::SchemaTransform>) -> u32 {
+    self
+      .0
+      .borrow_mut()
+      .apply_transform(|arena: &mut SchemaArena, key: usize| {
         for transform in &transforms {
-          let transform: BoxedSchemaTransform = (*transform).into();
+          let transform: super::schema_transform::BoxedSchemaTransform = (*transform).into();
           transform(arena, key)
         }
-      })
+      }) as u32
+  }
+
+  fn clone(&self) -> exports::jns42::core::models::SchemaArena {
+    exports::jns42::core::models::SchemaArena::new(SchemaArenaHost::from(self.0.borrow().clone()))
   }
 }
 
-impl From<SchemaArena> for SchemaArenaContainer {
-  fn from(value: SchemaArena) -> Self {
-    Self(value)
-  }
-}
+// #[cfg(test)]
+// mod tests {
+//   use *;
+//   use exports::jns42::core::models::{
+//     ArenaSchemaItem, GuestSchemaArena, SchemaTransform, SchemaType,
+//   };
+//   use itertools::Itertools;
 
-impl From<SchemaArenaContainer> for SchemaArena {
-  fn from(value: SchemaArenaContainer) -> Self {
-    value.0
-  }
-}
+//   fn run_test(
+//     initial: impl IntoIterator<Item = ArenaSchemaItem>,
+//     expected: impl IntoIterator<Item = ArenaSchemaItem>,
+//     transforms: impl IntoIterator<Item = SchemaTransform>,
+//   ) {
+//     let expected: Vec<_> = expected.into_iter().collect();
+//     let arena_input = models::SchemaArena::from_iter(initial);
+//     let transforms: Vec<_> = transforms.into_iter().collect();
+
+//     // the order of transforms should not matter! we test that here
+//     for transforms in transforms.iter().permutations(transforms.len()) {
+//       let arena: SchemaArenaHost = arena_input.clone().into();
+//       let transforms = transforms.into_iter().cloned().collect::<Vec<_>>();
+
+//       let mut iteration = 0;
+//       while arena.transform(transforms.clone()) > 0 {
+//         iteration += 1;
+//         assert!(iteration < 100);
+//         assert!(arena.count() < 100);
+//       }
+
+//       let arena: SchemaArena = arena.into();
+//       let actual: Vec<_> = arena.iter().cloned().collect();
+
+//       assert_eq!(actual, expected)
+//     }
+//   }
+
+//   #[test]
+//   fn test_transform_1() {
+//     let transforms = [
+//       SchemaTransform::FlattenAllOf,
+//       SchemaTransform::InheritAllOf,
+//       SchemaTransform::InheritReference,
+//       SchemaTransform::ResolveAllOf,
+//       SchemaTransform::ResolveSingleAllOf,
+//       SchemaTransform::Unalias,
+//     ];
+
+//     let initial = [
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Str].into()),
+//         ..Default::default()
+//       }, // 0
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Object].into()),
+//         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 1
+//       ArenaSchemaItem {
+//         object_properties: Some([("c".into(), 0)].into()),
+//         reference: Some(1),
+//         ..Default::default()
+//       }, // 2
+//     ];
+
+//     let expected = [
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Str].into()),
+//         ..Default::default()
+//       }, // 0
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Object].into()),
+//         object_properties: Some([("a".into(), 0), ("b".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 1
+//       ArenaSchemaItem {
+//         reference: Some(4),
+//         ..Default::default()
+//       }, // 2
+//       ArenaSchemaItem {
+//         object_properties: Some([("c".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 3
+//       ArenaSchemaItem {
+//         types: Some([SchemaType::Object].into()),
+//         object_properties: Some([("a".into(), 0), ("b".into(), 0), ("c".into(), 0)].into()),
+//         ..Default::default()
+//       }, // 4
+//     ];
+
+//     run_test(initial, expected, transforms);
+//   }
+// }

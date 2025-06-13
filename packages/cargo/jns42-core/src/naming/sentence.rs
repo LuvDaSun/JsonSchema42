@@ -1,14 +1,13 @@
 use super::Word;
 use std::{iter, slice::Iter};
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
-#[wasm_bindgen]
 pub struct Sentence(Vec<Word>);
 
-#[wasm_bindgen]
 impl Sentence {
-  #[wasm_bindgen(constructor)]
   pub fn new(input: &str) -> Self {
     #[derive(Debug, Clone, Copy)]
     enum CharType {
@@ -81,7 +80,6 @@ impl Sentence {
   }
 
   /// ToPascalCase
-  #[wasm_bindgen(js_name = "toPascalCase")]
   pub fn to_pascal_case(&self) -> String {
     let mut output = String::new();
 
@@ -93,7 +91,6 @@ impl Sentence {
   }
 
   /// toCamelCase
-  #[wasm_bindgen(js_name = "toCamelCase")]
   pub fn to_camel_case(&self) -> String {
     let mut output = String::new();
 
@@ -109,7 +106,6 @@ impl Sentence {
   }
 
   /// to_snake_case
-  #[wasm_bindgen(js_name = "toSnakeCase")]
   pub fn to_snake_case(&self) -> String {
     let mut output = String::new();
 
@@ -125,7 +121,6 @@ impl Sentence {
   }
 
   /// TO_SCREAMING_SNAKE_CASE
-  #[wasm_bindgen(js_name = "toScreamingSnakeCase")]
   pub fn to_screaming_snake_case(&self) -> String {
     let mut output = String::new();
 
@@ -181,6 +176,53 @@ impl IntoIterator for Sentence {
 impl FromIterator<Word> for Sentence {
   fn from_iter<T: IntoIterator<Item = Word>>(iter: T) -> Self {
     Self(iter.into_iter().collect())
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub struct SentenceHost(Sentence);
+
+#[cfg(target_arch = "wasm32")]
+impl From<Sentence> for SentenceHost {
+  fn from(value: Sentence) -> Self {
+    Self(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<SentenceHost> for exports::jns42::core::naming::Sentence {
+  fn from(value: SentenceHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<Sentence> for exports::jns42::core::naming::Sentence {
+  fn from(value: Sentence) -> Self {
+    SentenceHost::from(value).into()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::naming::GuestSentence for SentenceHost {
+  fn new(input: String) -> Self {
+    Sentence::new(&input).into()
+  }
+
+  fn to_pascal_case(&self) -> String {
+    self.0.to_pascal_case()
+  }
+
+  fn to_camel_case(&self) -> String {
+    self.0.to_camel_case()
+  }
+
+  fn to_snake_case(&self) -> String {
+    self.0.to_snake_case()
+  }
+
+  fn to_screaming_snake_case(&self) -> String {
+    self.0.to_screaming_snake_case()
   }
 }
 

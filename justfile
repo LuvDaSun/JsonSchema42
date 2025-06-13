@@ -15,6 +15,10 @@ build-cargo-jns42-core: \
 
   cargo build --package jns42-core --target wasm32-unknown-unknown --release
 
+  wasm-tools component new \
+    --output target/wasm32-unknown-unknown/release/jns42_core.component.wasm \
+    target/wasm32-unknown-unknown/release/jns42_core.wasm \
+
 build-cargo-jns42-generator: \
 
   cargo build --package jns42-generator --release
