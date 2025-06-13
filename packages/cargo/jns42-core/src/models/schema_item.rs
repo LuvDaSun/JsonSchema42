@@ -60,23 +60,23 @@ where
   pub options: Option<Vec<serde_json::Value>>,
   pub required: Option<BTreeSet<String>>,
 
-  pub minimum_inclusive: Option<serde_json::Number>,
-  pub minimum_exclusive: Option<serde_json::Number>,
-  pub maximum_inclusive: Option<serde_json::Number>,
-  pub maximum_exclusive: Option<serde_json::Number>,
-  pub multiple_of: Option<serde_json::Number>,
+  pub minimum_inclusive: Option<f64>,
+  pub minimum_exclusive: Option<f64>,
+  pub maximum_inclusive: Option<f64>,
+  pub maximum_exclusive: Option<f64>,
+  pub multiple_of: Option<f64>,
 
-  pub minimum_length: Option<usize>,
-  pub maximum_length: Option<usize>,
+  pub minimum_length: Option<u32>,
+  pub maximum_length: Option<u32>,
   pub value_pattern: Option<String>,
   pub value_format: Option<String>,
 
-  pub minimum_items: Option<usize>,
-  pub maximum_items: Option<usize>,
+  pub minimum_items: Option<u32>,
+  pub maximum_items: Option<u32>,
   pub unique_items: Option<bool>,
 
-  pub minimum_properties: Option<usize>,
-  pub maximum_properties: Option<usize>,
+  pub minimum_properties: Option<u32>,
+  pub maximum_properties: Option<u32>,
 }
 
 impl<K> SchemaItem<K>
@@ -198,11 +198,7 @@ where
       }};
     }
 
-    let exact_merge = if (self.minimum_inclusive.is_none() || other.minimum_inclusive.is_none())
-      && (self.minimum_exclusive.is_none() || other.minimum_exclusive.is_none())
-      && (self.maximum_inclusive.is_none() || other.maximum_inclusive.is_none())
-      && (self.maximum_exclusive.is_none() || other.maximum_exclusive.is_none())
-      && (self.multiple_of.is_none() || other.multiple_of.is_none())
+    let exact_merge = if (self.multiple_of.is_none() || other.multiple_of.is_none())
       && (self.value_pattern.is_none() || other.value_pattern.is_none())
       && (self.value_format.is_none() || other.value_format.is_none())
     {
@@ -261,11 +257,11 @@ where
       options: union_merge!(options), // TODO
       required: union_merge!(required),
 
-      minimum_inclusive: merge_either!(minimum_inclusive), // merge_option!(minimum_inclusive, |base, other| base.min(*other)),
-      minimum_exclusive: merge_either!(minimum_exclusive), // merge_option!(minimum_exclusive, |base, other| base.min(*other)),
-      maximum_inclusive: merge_either!(maximum_inclusive), // merge_option!(maximum_inclusive, |base, other| base.max(*other)),
-      maximum_exclusive: merge_either!(maximum_exclusive), // merge_option!(maximum_exclusive, |base, other| base.max(*other)),
-      multiple_of: merge_either!(multiple_of),             // TODO
+      minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      multiple_of: merge_either!(multiple_of), // TODO
 
       minimum_length: merge_option!(minimum_length, |base, other| *base.min(other)),
       maximum_length: merge_option!(maximum_length, |base, other| *base.max(other)),
@@ -404,11 +400,11 @@ where
 
       options: self.options.clone(),
 
-      minimum_inclusive: self.minimum_inclusive.clone(),
-      minimum_exclusive: self.minimum_exclusive.clone(),
-      maximum_inclusive: self.maximum_inclusive.clone(),
-      maximum_exclusive: self.maximum_exclusive.clone(),
-      multiple_of: self.multiple_of.clone(),
+      minimum_inclusive: self.minimum_inclusive,
+      minimum_exclusive: self.minimum_exclusive,
+      maximum_inclusive: self.maximum_inclusive,
+      maximum_exclusive: self.maximum_exclusive,
+      multiple_of: self.multiple_of,
 
       minimum_length: self.minimum_length,
       maximum_length: self.maximum_length,

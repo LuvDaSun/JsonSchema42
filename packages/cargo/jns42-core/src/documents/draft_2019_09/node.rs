@@ -89,11 +89,11 @@ impl Node {
             .map(|value| value.cloned().collect())
         }),
 
-      minimum_inclusive: self.0.number("minimum").cloned(),
-      minimum_exclusive: self.0.number("exclusiveMinimum").cloned(),
-      maximum_inclusive: self.0.number("maximum").cloned(),
-      maximum_exclusive: self.0.number("exclusiveMaximum").cloned(),
-      multiple_of: self.0.number("multipleOf").cloned(),
+      minimum_inclusive: self.0.float("minimum"),
+      minimum_exclusive: self.0.float("exclusiveMinimum"),
+      maximum_inclusive: self.0.float("maximum"),
+      maximum_exclusive: self.0.float("exclusiveMaximum"),
+      multiple_of: self.0.float("multipleOf"),
       minimum_length: self.0.unsigned_integer("minLength"),
       maximum_length: self.0.unsigned_integer("maxLength"),
       value_pattern: self.0.string("pattern").map(str::to_owned),
