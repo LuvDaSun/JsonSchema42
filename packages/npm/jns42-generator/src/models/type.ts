@@ -2,46 +2,88 @@ import * as core from "@jns42/core";
 import assert from "node:assert";
 
 export interface NeverTypeModel {
-  type: "never";
+  readonly type: "never";
 }
 
 export interface AnyTypeModel {
-  type: "any";
+  readonly type: "any";
 }
 
 export interface NullTypeModel {
-  type: "null";
+  readonly type: "null";
 }
 
 export interface BooleanTypeModel {
-  type: "boolean";
+  readonly type: "boolean";
+  readonly options: boolean[];
 }
 
 export interface IntegerTypeModel {
-  type: "integer";
+  readonly type: "integer";
+  readonly options: number[];
+
+  readonly minimumInclusive: number | undefined;
+  readonly minimumExclusive: number | undefined;
+  readonly maximumInclusive: number | undefined;
+  readonly maximumExclusive: number | undefined;
+  readonly multipleOf: number | undefined;
 }
 
 export interface NumberTypeModel {
-  type: "number";
+  readonly type: "number";
+  readonly options: number[];
+
+  readonly minimumInclusive: number | undefined;
+  readonly minimumExclusive: number | undefined;
+  readonly maximumInclusive: number | undefined;
+  readonly maximumExclusive: number | undefined;
+  readonly multipleOf: number | undefined;
 }
 
 export interface StringTypeModel {
-  type: "string";
+  readonly type: "string";
+  readonly options: string[];
+
+  readonly minimumLength: number | undefined;
+  readonly maximumLength: number | undefined;
+  readonly valuePattern: string | undefined;
+  readonly valueFormat: string | undefined;
 }
 
 export interface ArrayTypeModel {
-  type: "array";
+  readonly type: "array";
+  readonly arrayItems: number | undefined;
+  readonly contains: number | undefined;
+  readonly tupleItems: number[] | undefined;
+
+  readonly minimumItems: number | undefined;
+  readonly maximumItems: number | undefined;
+  readonly uniqueItems: boolean | undefined;
 }
 
 export interface ObjectTypeModel {
-  type: "object";
+  readonly type: "object";
+  readonly propertyNames: number | undefined;
+  readonly mapProperties: number | undefined;
+  readonly objectProperties: Record<string, number>;
+  readonly patternProperties: Record<string, number>;
+  readonly required: string[] | undefined;
+
+  readonly minimumProperties: number | undefined;
+  readonly maximumProperties: number | undefined;
 }
 
-export interface AllOfTypeModel {}
+export interface AllOfTypeModel {
+  readonly allOf: [number, ...number[]];
+}
 
-export interface OneOfTypeModel {}
+export interface OneOfTypeModel {
+  readonly oneOf: [number, ...number[]];
+}
 
-export interface ReferenceTypeModel {}
+export interface ReferenceTypeModel {
+  readonly reference: number;
+}
 
 export interface MetadataTypeModel {
   readonly location: string | undefined;
@@ -49,40 +91,6 @@ export interface MetadataTypeModel {
   readonly description: string | undefined;
   readonly examples: any[] | undefined;
   readonly deprecated: boolean | undefined;
-
-  readonly type: core.SchemaType | undefined;
-
-  readonly reference: number | undefined;
-  readonly propertyNames: number | undefined;
-  readonly mapProperties: number | undefined;
-  readonly arrayItems: number | undefined;
-  readonly contains: number | undefined;
-
-  readonly oneOf: [number, ...number[]] | undefined;
-  readonly allOf: [number, ...number[]] | undefined;
-  readonly tupleItems: number[] | undefined;
-
-  readonly objectProperties: Record<string, number>;
-  readonly patternProperties: Record<string, number>;
-  readonly dependentSchemas: Record<string, number>;
-
-  readonly options: any[] | undefined;
-  readonly required: string[] | undefined;
-
-  readonly minimumInclusive: number | undefined;
-  readonly minimumExclusive: number | undefined;
-  readonly maximumInclusive: number | undefined;
-  readonly maximumExclusive: number | undefined;
-  readonly multipleOf: number | undefined;
-  readonly minimumLength: number | undefined;
-  readonly maximumLength: number | undefined;
-  readonly valuePattern: string | undefined;
-  readonly valueFormat: string | undefined;
-  readonly minimumItems: number | undefined;
-  readonly maximumItems: number | undefined;
-  readonly uniqueItems: boolean | undefined;
-  readonly minimumProperties: number | undefined;
-  readonly maximumProperties: number | undefined;
 
   readonly mockable: boolean;
 }
@@ -135,7 +143,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
 
   const { location, title, description, examples, deprecated } = item;
 
-  const type = item.types?.[0];
+  const type = item.types?.[0] as core.SchemaType;
 
   const { reference, propertyNames, mapProperties, arrayItems, contains } = item;
 
@@ -165,49 +173,212 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
 
   const mockable = isMockable(arena, key);
 
-  return {
-    location,
-    title,
-    description,
-    examples,
-    deprecated,
+  if (type != null) {
+    assert(reference == null);
+    assert(oneOf == null);
+    assert(allOf == null);
 
-    type,
+    switch (type) {
+      case core.SchemaType.Never:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
 
-    reference,
-    propertyNames,
-    mapProperties,
-    arrayItems,
-    contains,
+          type: "never",
+        } as MetadataTypeModel & NeverTypeModel;
 
-    allOf,
-    oneOf,
-    tupleItems,
+      case core.SchemaType.Any:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
 
-    objectProperties,
-    patternProperties,
-    dependentSchemas,
+          type: "any",
+        } as MetadataTypeModel & AnyTypeModel;
 
-    options,
-    required,
+      case core.SchemaType.Null:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
 
-    minimumInclusive,
-    minimumExclusive,
-    maximumInclusive,
-    maximumExclusive,
-    multipleOf,
-    minimumLength,
-    maximumLength,
-    valuePattern,
-    valueFormat,
-    minimumItems,
-    maximumItems,
-    uniqueItems,
-    minimumProperties,
-    maximumProperties,
+          type: "null",
+        } as MetadataTypeModel & NullTypeModel;
 
-    mockable,
-  };
+      case core.SchemaType.Boolean:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
+
+          type: "boolean",
+          options: options?.filter((option) => typeof option === "boolean"),
+        } as MetadataTypeModel & BooleanTypeModel;
+
+      case core.SchemaType.Integer:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
+
+          type: "integer",
+          options: options?.filter((option) => typeof option === "number"),
+
+          minimumInclusive,
+          minimumExclusive,
+          maximumInclusive,
+          maximumExclusive,
+          multipleOf,
+        } as MetadataTypeModel & IntegerTypeModel;
+
+      case core.SchemaType.Number:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
+
+          type: "number",
+          options: options?.filter((option) => typeof option === "number"),
+
+          minimumInclusive,
+          minimumExclusive,
+          maximumInclusive,
+          maximumExclusive,
+          multipleOf,
+        } as MetadataTypeModel & NumberTypeModel;
+
+      case core.SchemaType.String:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
+
+          type: "string",
+          options: options?.filter((option) => typeof option === "string"),
+
+          minimumLength,
+          maximumLength,
+          valuePattern,
+          valueFormat,
+        } as MetadataTypeModel & StringTypeModel;
+
+      case core.SchemaType.Array:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
+
+          type: "array",
+
+          arrayItems,
+          contains,
+          tupleItems,
+
+          minimumItems,
+          maximumItems,
+          uniqueItems,
+        } as MetadataTypeModel & ArrayTypeModel;
+
+      case core.SchemaType.Object:
+        return {
+          location,
+          title,
+          description,
+          examples,
+          deprecated,
+          mockable,
+
+          type: "object",
+
+          propertyNames,
+          mapProperties,
+          objectProperties,
+          patternProperties,
+
+          required,
+          minimumProperties,
+          maximumProperties,
+        } as MetadataTypeModel & ObjectTypeModel;
+    }
+  }
+
+  if (reference != null) {
+    assert(type == null);
+    assert(oneOf == null);
+    assert(allOf == null);
+
+    return {
+      location,
+      title,
+      description,
+      examples,
+      deprecated,
+      mockable,
+
+      reference,
+    } as MetadataTypeModel & ReferenceTypeModel;
+  }
+
+  if (oneOf != null) {
+    assert(type == null);
+    assert(reference == null);
+    assert(allOf == null);
+
+    return {
+      location,
+      title,
+      description,
+      examples,
+      deprecated,
+      mockable,
+
+      oneOf,
+    } as MetadataTypeModel & OneOfTypeModel;
+  }
+
+  if (allOf != null) {
+    assert(type == null);
+    assert(reference == null);
+    assert(oneOf == null);
+
+    return {
+      location,
+      title,
+      description,
+      examples,
+      deprecated,
+      mockable,
+
+      allOf,
+    } as MetadataTypeModel & AllOfTypeModel;
+  }
+
+  assert.fail();
 }
 
 function isMockable(arena: core.SchemaArenaContainer, key: number) {
