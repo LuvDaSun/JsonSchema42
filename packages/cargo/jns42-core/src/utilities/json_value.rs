@@ -1,5 +1,8 @@
 use super::NodeLocation;
 
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
+
 #[derive(Clone, Debug)]
 pub struct JsonValue(serde_json::Value);
 
@@ -150,5 +153,101 @@ impl JsonValue {
           (pointer.last().unwrap().to_owned(), sub_location)
         })
       })
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<&serde_json::Value> for exports::jns42::core::utilities::JsonType {
+  fn from(value: &serde_json::Value) -> Self {
+    match value {
+      serde_json::Value::Null => exports::jns42::core::utilities::JsonType::Null,
+      serde_json::Value::Bool(_) => exports::jns42::core::utilities::JsonType::Boolean,
+      serde_json::Value::Number(_) => exports::jns42::core::utilities::JsonType::Number,
+      serde_json::Value::String(_) => exports::jns42::core::utilities::JsonType::Str,
+      serde_json::Value::Array(_) => exports::jns42::core::utilities::JsonType::Array,
+      serde_json::Value::Object(_) => exports::jns42::core::utilities::JsonType::Object,
+    }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<serde_json::Value> for JsonValueHost {
+  fn from(value: serde_json::Value) -> Self {
+    JsonValueHost(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<JsonValueHost> for serde_json::Value {
+  fn from(value: JsonValueHost) -> Self {
+    value.0
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<JsonValueHost> for exports::jns42::core::utilities::JsonValue {
+  fn from(value: JsonValueHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<exports::jns42::core::utilities::JsonValue> for JsonValueHost {
+  fn from(value: exports::jns42::core::utilities::JsonValue) -> Self {
+    value.into_inner()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub struct JsonValueHost(serde_json::Value);
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::utilities::GuestJsonValue for JsonValueHost {
+  fn get_type(&self) -> exports::jns42::core::utilities::JsonType {
+    (&self.0).into()
+  }
+
+  fn as_boolean(&self) -> Option<bool> {
+    self.0.as_bool()
+  }
+
+  fn as_number(&self) -> Option<f64> {
+    self.0.as_f64()
+  }
+
+  fn as_string(&self) -> Option<String> {
+    self.0.as_str().map(|value| value.to_string())
+  }
+
+  fn as_array(&self) -> Option<Vec<exports::jns42::core::utilities::JsonValue>> {
+    self.0.as_array().map(|value| {
+      value
+        .iter()
+        .cloned()
+        .map(JsonValueHost::from)
+        .map(Into::into)
+        .collect()
+    })
+  }
+
+  fn as_object(&self) -> Option<Vec<(String, exports::jns42::core::utilities::JsonValue)>> {
+    self.0.as_object().map(|value| {
+      value
+        .iter()
+        .map(|(key, value)| (key.clone(), value.clone()))
+        .map(|(key, value)| (key, JsonValueHost::from(value)))
+        .map(|(key, value)| (key, Into::into(value)))
+        .collect()
+    })
+  }
+
+  fn serialize(&self) -> String {
+    serde_json::to_string(&self.0).unwrap()
+  }
+
+  fn deserialize(value: String) -> exports::jns42::core::utilities::JsonValue {
+    let value: serde_json::Value = serde_json::from_str(&value).unwrap();
+    let value: JsonValueHost = value.into();
+    exports::jns42::core::utilities::JsonValue::new(value)
   }
 }

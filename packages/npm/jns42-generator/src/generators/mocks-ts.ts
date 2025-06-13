@@ -12,7 +12,7 @@ import {
 export function* generateMocksTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -156,7 +156,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           (
             [
               ${joinIterable(
-                (item.options as any[]).map((option) => JSON.stringify(option)),
+                item.options.map((option) => option.serialize()),
                 ", ",
               )}
             ] as const
@@ -168,24 +168,24 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length == 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Never:
+      switch (item.types[0] as core.models.SchemaType) {
+        case "never":
           yield "neverValue";
           return;
 
-        case core.SchemaType.Any:
+        case "any":
           yield "anyValue";
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield JSON.stringify(null);
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield `Boolean(nextSeed() % 2)`;
           return;
 
-        case core.SchemaType.Integer: {
+        case "integer": {
           let multipleOf = item.multipleOf ?? 1;
 
           let minimumValue = Number.NEGATIVE_INFINITY;
@@ -228,7 +228,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.Number: {
+        case "number": {
           let minimumValue = Number.NEGATIVE_INFINITY;
           let isMinimumExclusive: boolean | undefined;
           if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
@@ -274,7 +274,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.String: {
+        case "str": {
           const minimumStringLengthExpression =
             item.minimumLength == null
               ? "configuration.defaultMinimumStringLength"
@@ -298,7 +298,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
             [
               ${generateInterfaceContent()}
@@ -343,7 +343,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
             {
               ${generateInterfaceContent()}
@@ -356,8 +356,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
             let propertiesCount = 0;
 
             if (item.objectProperties != null || item.required != null) {
+              const objectProperties = new Map(item.objectProperties);
               const required = new Set(item.required);
-              const objectProperties = item.objectProperties ?? {};
               const propertyNames = new Set([
                 ...Object.keys(objectProperties),
                 ...required,
@@ -365,24 +365,25 @@ export function* generateMocksTsCode(specification: models.Specification) {
               propertiesCount = propertyNames.size;
 
               for (const name of propertyNames) {
-                if ((objectProperties as Record<string, number>)[name] == null) {
+                const objectPropertyKey = objectProperties.get(name);
+                if (objectPropertyKey == null) {
                   yield itt`
                     [${JSON.stringify(name)}]: anyValue,
                   `;
                 } else {
                   if (required.has(name)) {
                     yield itt`
-                      [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
+                      [${JSON.stringify(name)}]: ${generateMockReference(objectPropertyKey)},
                     `;
                   } else {
-                    if (!isMockable(typesArena, objectProperties[name])) {
+                    if (!isMockable(typesArena, objectPropertyKey)) {
                       continue;
                     }
 
                     yield itt`
                       [${JSON.stringify(name)}]:
                         depthCounter < configuration.maximumDepth ?
-                        ${generateMockReference(objectProperties[name])} :
+                        ${generateMockReference(objectPropertyKey)} :
                         undefined,
                     `;
                   }

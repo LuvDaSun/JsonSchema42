@@ -39,7 +39,7 @@ export function* generateProgramTsCode(
   const parseFunction = "parse" + entryTypeName.toPascalCase();
   const validatorFunction = "is" + entryTypeName.toPascalCase();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
     import * as lib from "@jns42/lib";

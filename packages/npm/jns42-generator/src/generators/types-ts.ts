@@ -11,7 +11,7 @@ import {
 export function* generateTypesTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -95,7 +95,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     if (item.options !== null) {
       if (item.options != null && item.options.length > 0) {
         yield joinIterable(
-          (item.options as any[]).map((option) => JSON.stringify(option)),
+          item.options.map((option) => option.serialize()),
           " |\n",
         );
         return;
@@ -103,33 +103,33 @@ export function* generateTypesTsCode(specification: models.Specification) {
     }
 
     if (item.types != null && item.types.length === 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Never:
+      switch (item.types[0] as core.models.SchemaType) {
+        case "never":
           yield "never";
           return;
 
-        case core.SchemaType.Any:
+        case "any":
           yield "unknown";
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield "null";
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield "boolean";
           return;
 
-        case core.SchemaType.Integer:
-        case core.SchemaType.Number:
+        case "integer":
+        case "number":
           yield "number";
           return;
 
-        case core.SchemaType.String:
+        case "str":
           yield "string";
           return;
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
           [
             ${generateArrayContent()}
@@ -162,7 +162,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
           {
             ${generateInterfaceContent()}
@@ -177,18 +177,20 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
             if (item.objectProperties != null || item.required != null) {
               const required = new Set(item.required);
-              const objectProperties = item.objectProperties ?? {};
+              const objectProperties = new Map(item.objectProperties);
               const propertyNames = new Set([
                 ...Object.keys(objectProperties),
                 ...required,
               ] as string[]);
 
               for (const name of propertyNames) {
+                const propertyKey = objectProperties.get(name);
+
                 if (!required.has(name)) {
                   hasUndefinedProperty = true;
                 }
 
-                if (objectProperties[name] == null) {
+                if (propertyKey == null) {
                   hasUnknownProperty = true;
 
                   yield itt`
@@ -196,7 +198,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
                   `;
                 } else {
                   yield itt`
-                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(objectProperties[name])},
+                    ${JSON.stringify(name)}${required.has(name) ? "" : "?"}: ${generateTypeReference(propertyKey)},
                   `;
                 }
               }
@@ -208,9 +210,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
                 elementKeys.push(item.mapProperties);
               }
               if (item.patternProperties != null) {
-                for (const elementKey of Object.values(
-                  item.patternProperties as Record<string, number>,
-                )) {
+                for (const [, elementKey] of item.patternProperties) {
                   elementKeys.push(elementKey);
                 }
               }
@@ -218,7 +218,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
               if (elementKeys.length > 0) {
                 const typeReferences = [
                   ...elementKeys,
-                  ...Object.values((item.objectProperties as Record<string, number>) ?? {}),
+                  ...(item.objectProperties ?? []).map(([, elementKey]) => elementKey),
                 ].map((elementKey) => generateTypeReference(elementKey));
 
                 if (hasUnknownProperty) {

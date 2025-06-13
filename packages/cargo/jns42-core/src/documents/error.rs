@@ -1,6 +1,9 @@
 use crate::utilities::{FetchTextError, NodeCacheError, NodeLocation, ParseLocationError};
 use std::fmt::Display;
 
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
+
 #[derive(Debug, Clone, Hash, Eq, PartialEq, Ord, PartialOrd)]
 pub enum Error {
   Unknown,
@@ -42,9 +45,37 @@ impl Display for Error {
   }
 }
 
-impl From<Error> for js_sys::Error {
+#[cfg(target_arch = "wasm32")]
+impl From<Error> for exports::jns42::core::documents::Error {
   fn from(value: Error) -> Self {
-    js_sys::Error::new(&value.to_string())
+    match value {
+      Error::Unknown => exports::jns42::core::documents::Error::Unknown,
+      Error::Conflict => exports::jns42::core::documents::Error::Conflict,
+      Error::DocumentNodeNotFound(node_location) => {
+        exports::jns42::core::documents::Error::DocumentNodeNotFound(node_location.into())
+      }
+      Error::VersionNodeNotFound(node_location) => {
+        exports::jns42::core::documents::Error::VersionNodeNotFound(node_location.into())
+      }
+      Error::FactoryNotFound(factory) => {
+        exports::jns42::core::documents::Error::FactoryNotFound(factory)
+      }
+      Error::RetrievalLocationNotFound(node_location) => {
+        exports::jns42::core::documents::Error::RetrievalLocationNotFound(node_location.into())
+      }
+      Error::IdentityLocationNotFound(node_location) => {
+        exports::jns42::core::documents::Error::IdentityLocationNotFound(node_location.into())
+      }
+      Error::DocumentNotFound(node_location) => {
+        exports::jns42::core::documents::Error::DocumentNotFound(node_location.into())
+      }
+      Error::ReferenceNotFound(node_location) => {
+        exports::jns42::core::documents::Error::ReferenceNotFound(node_location.into())
+      }
+      Error::InvalidLocation => exports::jns42::core::documents::Error::InvalidLocation,
+      Error::FetchError => exports::jns42::core::documents::Error::FetchError,
+      Error::SerializationError => exports::jns42::core::documents::Error::SerializationError,
+    }
   }
 }
 
@@ -57,12 +88,28 @@ impl From<ParseLocationError> for Error {
   }
 }
 
+#[cfg(target_arch = "wasm32")]
+impl From<ParseLocationError> for exports::jns42::core::documents::Error {
+  fn from(value: ParseLocationError) -> Self {
+    let value: Error = value.into();
+    value.into()
+  }
+}
+
 impl From<FetchTextError> for Error {
   fn from(value: FetchTextError) -> Self {
     match value {
       FetchTextError::HttpError => Self::FetchError,
       FetchTextError::IoError => Self::FetchError,
     }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<FetchTextError> for exports::jns42::core::documents::Error {
+  fn from(value: FetchTextError) -> Self {
+    let value: Error = value.into();
+    value.into()
   }
 }
 
@@ -73,5 +120,13 @@ impl From<NodeCacheError> for Error {
       NodeCacheError::FetchError => Self::FetchError,
       NodeCacheError::Conflict => Self::Conflict,
     }
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<NodeCacheError> for exports::jns42::core::documents::Error {
+  fn from(value: NodeCacheError) -> Self {
+    let value: Error = value.into();
+    value.into()
   }
 }
