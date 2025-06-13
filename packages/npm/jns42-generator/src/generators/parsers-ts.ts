@@ -1,4 +1,5 @@
 import * as core from "@jns42/core";
+import assert from "node:assert";
 import * as models from "../models.js";
 import {
   NestedText,
@@ -13,7 +14,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typesArena } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -31,9 +32,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   `;
 
-  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    const item = typesArena.getItem(itemKey);
-
+  for (const [itemKey, item] of typeModels) {
     const name = names.getName(itemKey);
     if (name == null) {
       continue;
@@ -67,7 +66,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
   }
 
   function* generateParserDefinition(itemKey: number, valueExpression: string) {
-    const item = typesArena.getItem(itemKey);
+    const item = typeModels.get(itemKey);
+    assert(item != null);
 
     if (item.reference != null) {
       yield generateParserReference(item.reference, valueExpression);
@@ -88,8 +88,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.types != null && item.types.length === 1) {
-      switch (item.types[0] as core.SchemaType) {
+    if (item.type != null) {
+      switch (item.type) {
         case core.SchemaType.Any:
           yield valueExpression;
           return;
@@ -264,6 +264,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
           return;
 
           function* generateCaseClauses() {
+            assert(item != null);
+
             if (item.tupleItems != null) {
               for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
                 const elementKey = item.tupleItems[elementIndex];
@@ -282,6 +284,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
 
           function* generateDefaultClauseContent() {
+            assert(item != null);
+
             if (item.arrayItems != null) {
               yield itt`
                 return ${generateParserReference(item.arrayItems, `value`)}
@@ -310,6 +314,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
           return;
 
           function* generateCaseClauses() {
+            assert(item != null);
+
             if (item.objectProperties != null) {
               for (const name in item.objectProperties) {
                 const elementKey = item.objectProperties[name];
@@ -331,6 +337,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
 
           function* generateDefaultClauseContent() {
+            assert(item != null);
+
             const elementKeys = new Array<number>();
             if (item.mapProperties != null) {
               elementKeys.push(item.mapProperties);

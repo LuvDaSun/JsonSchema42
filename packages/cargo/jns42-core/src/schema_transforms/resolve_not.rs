@@ -2,7 +2,8 @@ use crate::models::{ArenaSchemaItem, SchemaArena};
 use std::collections::BTreeSet;
 
 /**
- * This transformer turns resolves the not field
+ * This transformer turns resolves the not field.
+ * TODO in some cases the not can be represented as an allOf
  *
  * ```yaml
  * - required:
@@ -37,7 +38,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   let mut item_new = ArenaSchemaItem {
     not: None,
-    exact: Some(false),
+    exact: Some(false), // TODO well we could make this exact in some cases
     ..item.clone()
   };
 
