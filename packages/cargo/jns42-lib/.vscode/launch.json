@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package",
+          "${workspaceFolderBasename}",
+          "--all-targets"
+        ]
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

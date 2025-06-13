@@ -22,7 +22,6 @@ pub fn generate_file_token_stream(
   };
 
   tokens.append_all(quote! {
-    mod errors;
     mod interiors;
     mod types;
 

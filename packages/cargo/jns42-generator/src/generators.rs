@@ -1,5 +1,4 @@
 pub mod cargo_toml;
-pub mod errors_rs;
 pub mod examples_test_rs;
 pub mod file;
 pub mod interiors_rs;
