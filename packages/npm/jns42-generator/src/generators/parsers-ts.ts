@@ -69,33 +69,14 @@ export function* generateParsersTsCode(specification: models.Specification) {
     const item = typeModels.get(itemKey);
     assert(item != null);
 
-    if ("reference" in item) {
-      yield generateParserReference(item.reference, valueExpression);
-      return;
-    }
+    switch (item.type) {
+      case "never":
+      case "any":
+        yield valueExpression;
+        return;
 
-    if ("oneOf" in item) {
-      yield itt`
-        ${joinIterable(
-          [...item.oneOf].map(
-            (element) => itt`
-              ${generateParserReference(element, valueExpression)}
-            `,
-          ),
-          " ??\n",
-        )}
-      `;
-      return;
-    }
-
-    if ("type" in item) {
-      switch (item.type) {
-        case "any":
-          yield valueExpression;
-          return;
-
-        case "null":
-          yield `
+      case "null":
+        yield `
             ((value: unknown) => {
               if(value == null) {
                 return null;
@@ -128,10 +109,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case "boolean":
-          yield `
+      case "boolean":
+        yield `
             ((value: unknown) => {
               if(value == null) {
                 return false;
@@ -171,10 +152,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
               })(${valueExpression})
           `;
-          return;
+        return;
 
-        case "integer":
-          yield `
+      case "integer":
+        yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
                 switch(value.length) {
@@ -197,10 +178,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case "number":
-          yield `
+      case "number":
+        yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
                 switch(value.length) {
@@ -223,10 +204,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case "string":
-          yield `
+      case "string":
+        yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
                 switch(value.length) {
@@ -249,10 +230,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               }
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case "array": {
-          yield itt`
+      case "array": {
+        yield itt`
             Array.isArray(${valueExpression}) ?
               ${valueExpression}.map((value, index) => {
                 switch(index) {
@@ -261,50 +242,48 @@ export function* generateParsersTsCode(specification: models.Specification) {
               }) :
               undefined
           `;
-          return;
+        return;
 
-          function* generateCaseClauses() {
-            assert(item != null);
-            assert("type" in item);
-            assert(item.type === "array");
+        function* generateCaseClauses() {
+          assert(item != null);
+          assert(item.type === "array");
 
-            if (item.tupleItems != null) {
-              for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
-                const elementKey = item.tupleItems[elementIndex];
+          if (item.tupleItems != null) {
+            for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+              const elementKey = item.tupleItems[elementIndex];
 
-                yield itt`
+              yield itt`
                   case ${JSON.stringify(elementIndex)}:
                     return ${generateParserReference(elementKey, `value`)}
                 `;
-              }
             }
+          }
 
-            yield itt`
+          yield itt`
               default:
                 ${generateDefaultClauseContent()}
             `;
-          }
-
-          function* generateDefaultClauseContent() {
-            assert(item != null);
-            assert("type" in item);
-            assert(item.type === "array");
-
-            if (item.arrayItems != null) {
-              yield itt`
-                return ${generateParserReference(item.arrayItems, `value`)}
-              `;
-              return;
-            }
-
-            yield itt`
-              return value;
-            `;
-          }
         }
 
-        case "object": {
+        function* generateDefaultClauseContent() {
+          assert(item != null);
+          assert(item.type === "array");
+
+          if (item.arrayItems != null) {
+            yield itt`
+                return ${generateParserReference(item.arrayItems, `value`)}
+              `;
+            return;
+          }
+
           yield itt`
+              return value;
+            `;
+        }
+      }
+
+      case "object": {
+        yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(
                 Object.entries(${valueExpression}).map(([name, value]) => {
@@ -315,52 +294,50 @@ export function* generateParsersTsCode(specification: models.Specification) {
               ) :
               undefined
           `;
-          return;
+        return;
 
-          function* generateCaseClauses() {
-            assert(item != null);
-            assert("type" in item);
-            assert(item.type === "object");
+        function* generateCaseClauses() {
+          assert(item != null);
+          assert(item.type === "object");
 
-            if (item.objectProperties != null) {
-              for (const name in item.objectProperties) {
-                const elementKey = item.objectProperties[name];
+          if (item.objectProperties != null) {
+            for (const name in item.objectProperties) {
+              const elementKey = item.objectProperties[name];
 
-                yield itt`
+              yield itt`
                   case ${JSON.stringify(name)}:
                     return [
                       name,
                       ${generateParserReference(elementKey, `value`)},
                     ]
                 `;
-              }
             }
+          }
 
-            yield itt`
+          yield itt`
               default:
                 ${generateDefaultClauseContent()}
             `;
+        }
+
+        function* generateDefaultClauseContent() {
+          assert(item != null);
+          assert(item.type === "object");
+
+          const elementKeys = new Array<number>();
+          if (item.mapProperties != null) {
+            elementKeys.push(item.mapProperties);
+          }
+          if (item.patternProperties != null) {
+            for (const elementKey of Object.values(
+              item.patternProperties as Record<string, number>,
+            )) {
+              elementKeys.push(elementKey);
+            }
           }
 
-          function* generateDefaultClauseContent() {
-            assert(item != null);
-            assert("type" in item);
-            assert(item.type === "object");
-
-            const elementKeys = new Array<number>();
-            if (item.mapProperties != null) {
-              elementKeys.push(item.mapProperties);
-            }
-            if (item.patternProperties != null) {
-              for (const elementKey of Object.values(
-                item.patternProperties as Record<string, number>,
-              )) {
-                elementKeys.push(elementKey);
-              }
-            }
-
-            if (elementKeys.length > 0) {
-              yield itt`
+          if (elementKeys.length > 0) {
+            yield itt`
                 return [
                   name,
                   (${joinIterable(
@@ -369,17 +346,33 @@ export function* generateParsersTsCode(specification: models.Specification) {
                   )}),
                   ]
               `;
-              return;
-            }
+            return;
+          }
 
-            yield itt`
+          yield itt`
               return [name, value];
             `;
-          }
         }
       }
-    }
 
-    yield valueExpression;
+      case "reference": {
+        yield generateParserReference(item.reference, valueExpression);
+        return;
+      }
+
+      case "union": {
+        yield itt`
+            ${joinIterable(
+              [...item.members].map(
+                (element) => itt`
+                  ${generateParserReference(element, valueExpression)}
+                `,
+              ),
+              " ??\n",
+            )}
+          `;
+        return;
+      }
+    }
   }
 }

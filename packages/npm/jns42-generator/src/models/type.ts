@@ -73,15 +73,13 @@ export interface ObjectTypeModel {
   readonly maximumProperties: number | undefined;
 }
 
-export interface AllOfTypeModel {
-  readonly allOf: [number, ...number[]];
-}
-
-export interface OneOfTypeModel {
-  readonly oneOf: [number, ...number[]];
+export interface UnionTypeModel {
+  readonly type: "union";
+  readonly members: [number, ...number[]];
 }
 
 export interface ReferenceTypeModel {
+  readonly type: "reference";
   readonly reference: number;
 }
 
@@ -106,8 +104,7 @@ export type TypeModel = MetadataTypeModel &
     | StringTypeModel
     | ArrayTypeModel
     | ObjectTypeModel
-    | AllOfTypeModel
-    | OneOfTypeModel
+    | UnionTypeModel
     | ReferenceTypeModel
   );
 
@@ -132,7 +129,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   }
 
   if (item.allOf != null) {
-    assert(item.allOf.length > 1);
+    assert(item.allOf.length === 0);
   }
   if (item.anyOf != null) {
     assert(item.anyOf.length === 0);
@@ -147,7 +144,6 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
 
   const { reference, propertyNames, mapProperties, arrayItems, contains } = item;
 
-  const allOf = item.allOf != null ? ([...item.allOf] as [number, ...number[]]) : undefined;
   const oneOf = item.oneOf != null ? ([...item.oneOf] as [number, ...number[]]) : undefined;
   const tupleItems = item.tupleItems != null ? [...item.tupleItems] : undefined;
 
@@ -176,7 +172,6 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   if (type != null) {
     assert(reference == null);
     assert(oneOf == null);
-    assert(allOf == null);
 
     switch (type) {
       case core.SchemaType.Never:
@@ -330,7 +325,6 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   if (reference != null) {
     assert(type == null);
     assert(oneOf == null);
-    assert(allOf == null);
 
     return {
       location,
@@ -340,6 +334,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
       deprecated,
       mockable,
 
+      type: "reference",
       reference,
     } as MetadataTypeModel & ReferenceTypeModel;
   }
@@ -347,7 +342,6 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   if (oneOf != null) {
     assert(type == null);
     assert(reference == null);
-    assert(allOf == null);
 
     return {
       location,
@@ -357,25 +351,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
       deprecated,
       mockable,
 
-      oneOf,
-    } as MetadataTypeModel & OneOfTypeModel;
-  }
-
-  if (allOf != null) {
-    assert(type == null);
-    assert(reference == null);
-    assert(oneOf == null);
-
-    return {
-      location,
-      title,
-      description,
-      examples,
-      deprecated,
-      mockable,
-
-      allOf,
-    } as MetadataTypeModel & AllOfTypeModel;
+      type: "union",
+      members: oneOf,
+    } as MetadataTypeModel & UnionTypeModel;
   }
 
   assert.fail();

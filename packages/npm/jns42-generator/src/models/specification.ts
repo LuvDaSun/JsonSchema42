@@ -59,6 +59,7 @@ export function loadSpecification(
       core.SchemaTransform.InheritOneOf,
       core.SchemaTransform.InheritReference,
       core.SchemaTransform.ResolveAnyOf,
+      core.SchemaTransform.ResolveAllOf,
       core.SchemaTransform.ResolveNot,
       core.SchemaTransform.ResolveIfThenElse,
       core.SchemaTransform.ResolveSingleAllOf,
