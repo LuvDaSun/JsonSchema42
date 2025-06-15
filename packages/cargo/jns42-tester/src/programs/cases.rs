@@ -298,6 +298,7 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
             .arg(specification_info.name_sentence.to_snake_case())
             .arg("--")
             .arg("assert")
+            .arg("--quiet")
             .args(if case_info.parse {
               vec!["--parse"]
             } else {
@@ -311,6 +312,7 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
             .arg(specification_info.name_sentence.to_snake_case())
             .arg(specification_info.name_sentence.to_snake_case())
             .arg("assert")
+            .arg("--quiet")
             .args(if case_info.parse {
               vec!["--parse"]
             } else {
