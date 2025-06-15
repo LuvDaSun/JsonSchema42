@@ -70,6 +70,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
     assert(item != null);
 
     switch (item.type) {
+      case "unknown":
       case "never":
       case "any":
         yield valueExpression;

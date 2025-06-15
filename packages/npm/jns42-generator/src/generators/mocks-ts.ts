@@ -24,6 +24,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   yield itt`
     let depthCounter = 0;
 
+    export const unknownValue: any = Symbol();
     export const anyValue: any = Symbol();
     export const neverValue: any = Symbol();
 
@@ -138,6 +139,10 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
 
     switch (item.type) {
+      case "unknown":
+        yield "unknownValue";
+        return;
+
       case "never":
         yield "neverValue";
         return;

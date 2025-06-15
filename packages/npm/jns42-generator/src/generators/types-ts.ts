@@ -68,6 +68,10 @@ export function* generateTypesTsCode(specification: models.Specification) {
     }
 
     switch (item.type) {
+      case "unknown":
+        yield "unknown";
+        return;
+
       case "never":
         yield "never";
         return;
