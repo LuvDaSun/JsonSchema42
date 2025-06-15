@@ -19,21 +19,12 @@ export function* generateProgramTsCode(
     throw new Error("invalid package name");
   }
 
-  const { names, typesArena } = specification;
+  const { names, locationToKeyMap } = specification;
 
-  let foundEntryKey: number | undefined;
-  for (let entryKey = 0; entryKey < typesArena.count(); entryKey++) {
-    const item = typesArena.getItem(entryKey);
-    if (item.location === entryLocation) {
-      foundEntryKey = entryKey;
-      break;
-    }
-  }
+  const entryKey = locationToKeyMap.get(entryLocation);
+  assert(entryKey != null);
 
-  assert(foundEntryKey != null);
-
-  const entryTypeName = names.getName(foundEntryKey);
-
+  const entryTypeName = names.getName(entryKey);
   assert(entryTypeName != null);
 
   const parseFunction = "parse" + entryTypeName.toPascalCase();

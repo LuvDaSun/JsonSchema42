@@ -1,30 +1,21 @@
 import * as core from "@jns42/core";
 import assert from "node:assert";
 import * as models from "../models.js";
-import {
-  NestedText,
-  generateJsDocComments,
-  itt,
-  joinIterable,
-  mapIterable,
-  readPackageInfo,
-} from "../utilities.js";
+import { NestedText, itt, joinIterable, mapIterable, readPackageInfo } from "../utilities.js";
 
 export function* generateValidatorsTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, validatorsArena } = specification;
+  const { names, validatorModels } = specification;
 
   yield itt`
     import * as types from "./types.js";
     import * as lib from "@jns42/lib";
   `;
 
-  for (let itemKey = 0; itemKey < validatorsArena.count(); itemKey++) {
-    const item = validatorsArena.getItem(itemKey);
-
+  for (const [itemKey, item] of validatorModels) {
     const name = names.getName(itemKey);
     if (name == null) {
       continue;
@@ -33,7 +24,6 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     const statements = generateValidatorStatements(itemKey, "value");
 
     yield itt`
-      ${generateJsDocComments(item)}
       export const is${name.toPascalCase()} =
         (value: unknown): value is types.${name.toPascalCase()} => lib.validation.withValidationType(
           ${JSON.stringify(name.toPascalCase())},
@@ -64,7 +54,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     itemKey: number,
     valueExpression: string,
   ): Iterable<NestedText> {
-    const item = validatorsArena.getItem(itemKey);
+    const item = validatorModels.get(itemKey);
+    assert(item != null);
 
     if (item.reference != null) {
       yield itt`
@@ -101,7 +92,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     `;
       function* generateSubAssertions() {
-        for (const type of item.types ?? ([] as core.SchemaType[])) {
+        assert(item != null);
+
+        for (const type of item.types ?? []) {
           switch (type) {
             case core.SchemaType.Any: {
               yield JSON.stringify(true);
@@ -180,6 +173,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateSubValidators() {
+        assert(item != null);
+
         if (item.minimumInclusive != null) {
           yield itt`
             if(
@@ -252,6 +247,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateSubValidators() {
+        assert(item != null);
+
         if (item.minimumLength != null) {
           yield itt`
             if(
@@ -320,6 +317,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
     `;
 
       function* generateSubValidators() {
+        assert(item != null);
+
         if (item.tupleItems != null) {
           yield itt`
             if(
@@ -363,6 +362,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateLoopContent() {
+        assert(item != null);
+
         yield itt`
           const elementValue = ${valueExpression}[elementIndex];
         `;
@@ -390,6 +391,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateCaseClauses() {
+        assert(item != null);
+
         if (item.tupleItems != null) {
           for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
             const elementKey = item.tupleItems[elementIndex];
@@ -414,6 +417,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateDefaultCaseStatements() {
+        assert(item != null);
+
         if (item.arrayItems != null) {
           yield itt`
             if(!lib.validation.withValidationPath(
@@ -449,6 +454,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateSubValidators() {
+        assert(item != null);
+
         /**
          * check if all the required properties are present
          */
@@ -495,6 +502,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateLoopContent() {
+        assert(item != null);
+
         yield itt`
           if(propertyValue === undefined) {
             continue;
@@ -524,6 +533,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateCaseClauses() {
+        assert(item != null);
+
         if (item.objectProperties != null) {
           for (const propertyName in item.objectProperties) {
             yield itt`
@@ -550,6 +561,8 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateDefaultCaseStatements() {
+        assert(item != null);
+
         if (item.patternProperties != null) {
           for (const propertyPattern in item.patternProperties) {
             yield itt`
@@ -605,6 +618,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerStatements() {
+        assert(item != null);
         assert(item.allOf != null);
 
         for (let elementIndex = 0; elementIndex < item.allOf.length; elementIndex++) {
@@ -639,6 +653,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerStatements() {
+        assert(item != null);
         assert(item.anyOf != null);
 
         for (let elementIndex = 0; elementIndex < item.anyOf.length; elementIndex++) {
@@ -670,6 +685,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerStatements() {
+        assert(item != null);
         assert(item.oneOf != null);
 
         for (let elementIndex = 0; elementIndex < item.oneOf.length; elementIndex++) {
@@ -694,6 +710,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerThenStatements() {
+        assert(item != null);
         if (item.thenSchema != null) {
           yield itt`
             if(!${generateValidatorReference(item.thenSchema, valueExpression)}) {
@@ -705,6 +722,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateInnerElseStatements() {
+        assert(item != null);
         if (item.elseSchema != null) {
           yield itt`
             if(!${generateValidatorReference(item.elseSchema, valueExpression)}) {

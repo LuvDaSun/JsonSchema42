@@ -83,6 +83,8 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
 
   // generate packages
   for specification_info in &specification_infos {
+    println!("{}", specification_info.name);
+
     let package_directory = output_directory.join(&specification_info.name);
     let mut child = match r#type {
       PackageType::Cargo => std::process::Command::new("cargo")

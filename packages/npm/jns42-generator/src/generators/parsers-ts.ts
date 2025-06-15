@@ -1,4 +1,5 @@
 import * as core from "@jns42/core";
+import assert from "node:assert";
 import * as models from "../models.js";
 import {
   NestedText,
@@ -13,7 +14,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typesArena } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -31,9 +32,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
   `;
 
-  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    const item = typesArena.getItem(itemKey);
-
+  for (const [itemKey, item] of typeModels) {
     const name = names.getName(itemKey);
     if (name == null) {
       continue;
@@ -67,35 +66,18 @@ export function* generateParsersTsCode(specification: models.Specification) {
   }
 
   function* generateParserDefinition(itemKey: number, valueExpression: string) {
-    const item = typesArena.getItem(itemKey);
+    const item = typeModels.get(itemKey);
+    assert(item != null);
 
-    if (item.reference != null) {
-      yield generateParserReference(item.reference, valueExpression);
-      return;
-    }
+    switch (item.type) {
+      case "unknown":
+      case "never":
+      case "any":
+        yield valueExpression;
+        return;
 
-    if (item.oneOf != null && item.oneOf.length > 0) {
-      yield itt`
-        ${joinIterable(
-          [...item.oneOf].map(
-            (element) => itt`
-              ${generateParserReference(element, valueExpression)}
-            `,
-          ),
-          " ??\n",
-        )}
-      `;
-      return;
-    }
-
-    if (item.types != null && item.types.length === 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Any:
-          yield valueExpression;
-          return;
-
-        case core.SchemaType.Null:
-          yield `
+      case "null":
+        yield `
             ((value: unknown) => {
               if(value == null) {
                 return null;
@@ -128,10 +110,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case core.SchemaType.Boolean:
-          yield `
+      case "boolean":
+        yield `
             ((value: unknown) => {
               if(value == null) {
                 return false;
@@ -171,10 +153,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
               })(${valueExpression})
           `;
-          return;
+        return;
 
-        case core.SchemaType.Integer:
-          yield `
+      case "integer":
+        yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
                 switch(value.length) {
@@ -197,10 +179,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case core.SchemaType.Number:
-          yield `
+      case "number":
+        yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
                 switch(value.length) {
@@ -223,10 +205,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               return undefined;
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case core.SchemaType.String:
-          yield `
+      case "string":
+        yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
                 switch(value.length) {
@@ -249,10 +231,10 @@ export function* generateParsersTsCode(specification: models.Specification) {
               }
             })(${valueExpression})
           `;
-          return;
+        return;
 
-        case core.SchemaType.Array: {
-          yield itt`
+      case "array": {
+        yield itt`
             Array.isArray(${valueExpression}) ?
               ${valueExpression}.map((value, index) => {
                 switch(index) {
@@ -261,42 +243,48 @@ export function* generateParsersTsCode(specification: models.Specification) {
               }) :
               undefined
           `;
-          return;
+        return;
 
-          function* generateCaseClauses() {
-            if (item.tupleItems != null) {
-              for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
-                const elementKey = item.tupleItems[elementIndex];
+        function* generateCaseClauses() {
+          assert(item != null);
+          assert(item.type === "array");
 
-                yield itt`
+          if (item.tupleItems != null) {
+            for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
+              const elementKey = item.tupleItems[elementIndex];
+
+              yield itt`
                   case ${JSON.stringify(elementIndex)}:
                     return ${generateParserReference(elementKey, `value`)}
                 `;
-              }
             }
+          }
 
-            yield itt`
+          yield itt`
               default:
                 ${generateDefaultClauseContent()}
             `;
-          }
-
-          function* generateDefaultClauseContent() {
-            if (item.arrayItems != null) {
-              yield itt`
-                return ${generateParserReference(item.arrayItems, `value`)}
-              `;
-              return;
-            }
-
-            yield itt`
-              return value;
-            `;
-          }
         }
 
-        case core.SchemaType.Object: {
+        function* generateDefaultClauseContent() {
+          assert(item != null);
+          assert(item.type === "array");
+
+          if (item.arrayItems != null) {
+            yield itt`
+                return ${generateParserReference(item.arrayItems, `value`)}
+              `;
+            return;
+          }
+
           yield itt`
+              return value;
+            `;
+        }
+      }
+
+      case "object": {
+        yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(
                 Object.entries(${valueExpression}).map(([name, value]) => {
@@ -307,44 +295,50 @@ export function* generateParsersTsCode(specification: models.Specification) {
               ) :
               undefined
           `;
-          return;
+        return;
 
-          function* generateCaseClauses() {
-            if (item.objectProperties != null) {
-              for (const name in item.objectProperties) {
-                const elementKey = item.objectProperties[name];
+        function* generateCaseClauses() {
+          assert(item != null);
+          assert(item.type === "object");
 
-                yield itt`
+          if (item.objectProperties != null) {
+            for (const name in item.objectProperties) {
+              const elementKey = item.objectProperties[name];
+
+              yield itt`
                   case ${JSON.stringify(name)}:
                     return [
                       name,
                       ${generateParserReference(elementKey, `value`)},
                     ]
                 `;
-              }
             }
+          }
 
-            yield itt`
+          yield itt`
               default:
                 ${generateDefaultClauseContent()}
             `;
+        }
+
+        function* generateDefaultClauseContent() {
+          assert(item != null);
+          assert(item.type === "object");
+
+          const elementKeys = new Array<number>();
+          if (item.mapProperties != null) {
+            elementKeys.push(item.mapProperties);
+          }
+          if (item.patternProperties != null) {
+            for (const elementKey of Object.values(
+              item.patternProperties as Record<string, number>,
+            )) {
+              elementKeys.push(elementKey);
+            }
           }
 
-          function* generateDefaultClauseContent() {
-            const elementKeys = new Array<number>();
-            if (item.mapProperties != null) {
-              elementKeys.push(item.mapProperties);
-            }
-            if (item.patternProperties != null) {
-              for (const elementKey of Object.values(
-                item.patternProperties as Record<string, number>,
-              )) {
-                elementKeys.push(elementKey);
-              }
-            }
-
-            if (elementKeys.length > 0) {
-              yield itt`
+          if (elementKeys.length > 0) {
+            yield itt`
                 return [
                   name,
                   (${joinIterable(
@@ -353,17 +347,33 @@ export function* generateParsersTsCode(specification: models.Specification) {
                   )}),
                   ]
               `;
-              return;
-            }
+            return;
+          }
 
-            yield itt`
+          yield itt`
               return [name, value];
             `;
-          }
         }
       }
-    }
 
-    yield valueExpression;
+      case "reference": {
+        yield generateParserReference(item.reference, valueExpression);
+        return;
+      }
+
+      case "union": {
+        yield itt`
+            ${joinIterable(
+              [...item.members].map(
+                (element) => itt`
+                  ${generateParserReference(element, valueExpression)}
+                `,
+              ),
+              " ??\n",
+            )}
+          `;
+        return;
+      }
+    }
   }
 }

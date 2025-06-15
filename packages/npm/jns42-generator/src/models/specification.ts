@@ -1,9 +1,13 @@
 import * as core from "@jns42/core";
+import assert from "node:assert";
+import { toTypeModel, TypeModel } from "./type.js";
+import { toValidatorModel, ValidatorModel } from "./validator.js";
 
 export interface Specification {
-  typesArena: core.SchemaArenaContainer;
-  validatorsArena: core.SchemaArenaContainer;
+  locationToKeyMap: Map<string, number>;
   names: core.NamesContainer;
+  typeModels: Map<number, TypeModel>;
+  validatorModels: Map<number, ValidatorModel>;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -18,40 +22,26 @@ export function loadSpecification(
   const { transformMaximumIterations, defaultTypeName } = configuration;
 
   // load the arena
-
   const typesArena = core.SchemaArenaContainer.fromDocumentContext(documentContext);
   const validatorsArena = typesArena.clone();
 
-  // generate root keys
-
-  const explicitLocations = new Set(documentContext.getExplicitLocations());
-  const explicitTypeKeys = [];
+  // generate locationLookup
+  const locationToKeyMap = new Map<string, number>();
   for (let key = 0; key < typesArena.count(); key++) {
     const item = typesArena.getItem(key);
-    if (item.location == null) {
-      continue;
-    }
-    if (!explicitLocations.has(item.location)) {
-      continue;
-    }
+    assert(item.location != null);
 
-    explicitTypeKeys.push(key);
+    locationToKeyMap.set(item.location, key);
   }
 
-  // transform the validatorsArena
-  {
-    const transformers = [] as Transformer[];
-    let transformIterations = 0;
-    while (validatorsArena.transform(transformers) > 0) {
-      transformIterations++;
-      if (transformIterations < transformMaximumIterations) {
-        continue;
-      }
-      throw new Error("maximum number of iterations reached");
-    }
-  }
+  // generate root keys
+  const explicitTypeKeys = documentContext.getExplicitLocations().map((location) => {
+    const key = locationToKeyMap.get(location);
+    assert(key != null);
+    return key;
+  });
 
-  // transform the typesArena
+  // transform the typesArena (note that we are not transforming the validatorsArena!)
   {
     const transformers = [
       core.SchemaTransform.Explode,
@@ -68,8 +58,8 @@ export function loadSpecification(
       core.SchemaTransform.InheritAnyOf,
       core.SchemaTransform.InheritOneOf,
       core.SchemaTransform.InheritReference,
-      core.SchemaTransform.ResolveAllOf,
       core.SchemaTransform.ResolveAnyOf,
+      core.SchemaTransform.ResolveAllOf,
       core.SchemaTransform.ResolveNot,
       core.SchemaTransform.ResolveIfThenElse,
       core.SchemaTransform.ResolveSingleAllOf,
@@ -89,7 +79,6 @@ export function loadSpecification(
   }
 
   // generate names
-
   {
     const transformers = [core.SchemaTransform.Name];
     let transformIterations = 0;
@@ -123,9 +112,22 @@ export function loadSpecification(
 
   const names = namesBuilder.build();
 
+  const typeModels = new Map<number, TypeModel>();
+  for (let key = 0; key < typesArena.count(); key++) {
+    const model = toTypeModel(typesArena, key);
+    typeModels.set(key, model);
+  }
+
+  const validatorModels = new Map<number, ValidatorModel>();
+  for (let key = 0; key < validatorsArena.count(); key++) {
+    const model = toValidatorModel(validatorsArena, key);
+    validatorModels.set(key, model);
+  }
+
   return {
-    typesArena,
-    validatorsArena,
+    locationToKeyMap,
     names,
+    typeModels,
+    validatorModels,
   };
 }
