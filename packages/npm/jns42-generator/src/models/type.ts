@@ -112,30 +112,30 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   const item = arena.getItem(key);
 
   if (item.types != null) {
-    assert(item.types.length <= 1);
+    assert(item.types.length <= 1, "unexpected multiple type");
   }
 
   if (item.ifSchema != null) {
-    assert(item.ifSchema == null);
+    assert(item.ifSchema == null, "unexpected if");
   }
   if (item.thenSchema != null) {
-    assert(item.thenSchema == null);
+    assert(item.thenSchema == null, "unexpected then");
   }
   if (item.elseSchema != null) {
-    assert(item.elseSchema == null);
+    assert(item.elseSchema == null, "unexpected else");
   }
   if (item.not != null) {
-    assert(item.not == null);
+    assert(item.not == null, "unexpected not");
   }
 
   if (item.allOf != null) {
-    assert(item.allOf.length === 0);
+    assert(item.allOf.length === 0, "unexpected allOf");
   }
   if (item.anyOf != null) {
-    assert(item.anyOf.length === 0);
+    assert(item.anyOf.length === 0, "unexpected anyOf");
   }
   if (item.oneOf != null) {
-    assert(item.oneOf.length > 1);
+    assert(item.oneOf.length > 1, "unexpected single oneOf");
   }
 
   const { location, title, description, examples, deprecated } = item;
@@ -170,8 +170,8 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   const mockable = isMockable(arena, key);
 
   if (type != null) {
-    assert(reference == null);
-    assert(oneOf == null);
+    assert(reference == null, "unexpected reference");
+    assert(oneOf == null, "unexpected oneOf");
 
     switch (type) {
       case core.SchemaType.Never:
@@ -323,8 +323,8 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   }
 
   if (reference != null) {
-    assert(type == null);
-    assert(oneOf == null);
+    assert(type == null, "unexpected type");
+    assert(oneOf == null, "unexpected oneOf");
 
     return {
       location,
@@ -340,8 +340,8 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   }
 
   if (oneOf != null) {
-    assert(type == null);
-    assert(reference == null);
+    assert(type == null, "unexpected type");
+    assert(reference == null, "unexpected reference");
 
     return {
       location,
@@ -356,7 +356,7 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
     } as MetadataTypeModel & UnionTypeModel;
   }
 
-  assert.fail();
+  assert.fail("could not produce type model");
 }
 
 function isMockable(arena: core.SchemaArenaContainer, key: number) {
