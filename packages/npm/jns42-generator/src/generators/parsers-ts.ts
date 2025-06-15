@@ -69,12 +69,12 @@ export function* generateParsersTsCode(specification: models.Specification) {
     const item = typeModels.get(itemKey);
     assert(item != null);
 
-    if (item.reference != null) {
+    if ("reference" in item) {
       yield generateParserReference(item.reference, valueExpression);
       return;
     }
 
-    if (item.oneOf != null && item.oneOf.length > 0) {
+    if ("oneOf" in item) {
       yield itt`
         ${joinIterable(
           [...item.oneOf].map(
@@ -88,13 +88,13 @@ export function* generateParsersTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.type != null) {
+    if ("type" in item) {
       switch (item.type) {
-        case core.SchemaType.Any:
+        case "any":
           yield valueExpression;
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield `
             ((value: unknown) => {
               if(value == null) {
@@ -130,7 +130,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield `
             ((value: unknown) => {
               if(value == null) {
@@ -173,7 +173,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Integer:
+        case "integer":
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -199,7 +199,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Number:
+        case "number":
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -225,7 +225,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.String:
+        case "string":
           yield `
             ((value: unknown) => {
               if(Array.isArray(value)) {
@@ -251,7 +251,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           `;
           return;
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
             Array.isArray(${valueExpression}) ?
               ${valueExpression}.map((value, index) => {
@@ -265,6 +265,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateCaseClauses() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type === "array");
 
             if (item.tupleItems != null) {
               for (let elementIndex = 0; elementIndex < item.tupleItems.length; elementIndex++) {
@@ -285,6 +287,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateDefaultClauseContent() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type === "array");
 
             if (item.arrayItems != null) {
               yield itt`
@@ -299,7 +303,7 @@ export function* generateParsersTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
             (typeof ${valueExpression} === "object" && ${valueExpression} !== null && !Array.isArray(${valueExpression})) ?
               Object.fromEntries(
@@ -315,6 +319,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateCaseClauses() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type === "object");
 
             if (item.objectProperties != null) {
               for (const name in item.objectProperties) {
@@ -338,6 +344,8 @@ export function* generateParsersTsCode(specification: models.Specification) {
 
           function* generateDefaultClauseContent() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type === "object");
 
             const elementKeys = new Array<number>();
             if (item.mapProperties != null) {

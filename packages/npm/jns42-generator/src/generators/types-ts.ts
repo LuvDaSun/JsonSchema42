@@ -59,12 +59,12 @@ export function* generateTypesTsCode(specification: models.Specification) {
     const item = typeModels.get(itemKey);
     assert(item != null);
 
-    if (item.reference != null) {
+    if ("reference" in item) {
       yield generateTypeReference(item.reference);
       return;
     }
 
-    if (item.oneOf != null && item.oneOf.length > 0) {
+    if ("oneOf" in item) {
       yield itt`
       ${joinIterable(
         [...item.oneOf].map(
@@ -78,58 +78,42 @@ export function* generateTypesTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.allOf != null && item.allOf.length > 0) {
-      yield itt`
-      ${joinIterable(
-        [...item.allOf].map(
-          (element) => itt`
-            ${generateTypeReference(element)}
-          `,
-        ),
-        " &\n",
-      )}
-    `;
+    if ("options" in item && item.options !== null) {
+      yield joinIterable(
+        (item.options as any[]).map((option) => JSON.stringify(option)),
+        " |\n",
+      );
       return;
     }
 
-    if (item.options !== null) {
-      if (item.options != null && item.options.length > 0) {
-        yield joinIterable(
-          (item.options as any[]).map((option) => JSON.stringify(option)),
-          " |\n",
-        );
-        return;
-      }
-    }
-
-    if (item.type != null) {
+    if ("type" in item) {
       switch (item.type) {
-        case core.SchemaType.Never:
+        case "never":
           yield "never";
           return;
 
-        case core.SchemaType.Any:
+        case "any":
           yield "unknown";
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield "null";
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield "boolean";
           return;
 
-        case core.SchemaType.Integer:
-        case core.SchemaType.Number:
+        case "integer":
+        case "number":
           yield "number";
           return;
 
-        case core.SchemaType.String:
+        case "string":
           yield "string";
           return;
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
           [
             ${generateArrayContent()}
@@ -140,6 +124,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
           function* generateArrayContent() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type === "array");
 
             if (item.tupleItems != null) {
               for (const elementKey of item.tupleItems) {
@@ -164,7 +150,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
           {
             ${generateInterfaceContent()}
@@ -175,6 +161,8 @@ export function* generateTypesTsCode(specification: models.Specification) {
 
           function* generateInterfaceContent() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type === "object");
 
             let hasUndefinedProperty = false;
             let hasUnknownProperty = false;

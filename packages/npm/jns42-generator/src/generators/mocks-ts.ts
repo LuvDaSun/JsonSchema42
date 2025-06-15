@@ -70,7 +70,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function mock${name.toPascalCase()}(options: MockGeneratorOptions = {}): types.${name.toPascalCase()} {
+      export function mock${name.toPascalCase()}(
+        options: MockGeneratorOptions = {},
+      ): types.${name.toPascalCase()} {
         const configuration = {
           ...defaultMockGeneratorOptions,
           ...options,
@@ -120,12 +122,12 @@ export function* generateMocksTsCode(specification: models.Specification) {
     assert(item != null);
     assert(item.mockable);
 
-    if (item.reference != null) {
+    if ("reference" in item) {
       yield generateMockReference(item.reference);
       return;
     }
 
-    if (item.oneOf != null && item.oneOf.length > 0) {
+    if ("oneOf" in item) {
       const oneOfMockableEntries = [...item.oneOf]
         .map((itemKey) => {
           const item = typeModels.get(itemKey);
@@ -156,7 +158,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.options != null && item.options.length > 0) {
+    if ("options" in item && item.options != null) {
       yield itt`
           (
             [
@@ -172,25 +174,25 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.type != null) {
+    if ("type" in item) {
       switch (item.type) {
-        case core.SchemaType.Never:
+        case "never":
           yield "neverValue";
           return;
 
-        case core.SchemaType.Any:
+        case "any":
           yield "anyValue";
           return;
 
-        case core.SchemaType.Null:
+        case "null":
           yield JSON.stringify(null);
           return;
 
-        case core.SchemaType.Boolean:
+        case "boolean":
           yield `Boolean(nextSeed() % 2)`;
           return;
 
-        case core.SchemaType.Integer: {
+        case "integer": {
           let multipleOf = item.multipleOf ?? 1;
 
           let minimumValue = Number.NEGATIVE_INFINITY;
@@ -233,7 +235,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.Number: {
+        case "number": {
           let minimumValue = Number.NEGATIVE_INFINITY;
           let isMinimumExclusive: boolean | undefined;
           if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
@@ -279,7 +281,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.String: {
+        case "string": {
           const minimumStringLengthExpression =
             item.minimumLength == null
               ? "configuration.defaultMinimumStringLength"
@@ -303,7 +305,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           return;
         }
 
-        case core.SchemaType.Array: {
+        case "array": {
           yield itt`
             [
               ${generateInterfaceContent()}
@@ -314,6 +316,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
           function* generateInterfaceContent() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type == "array");
 
             const minimumItemsExpression =
               item.minimumItems == null
@@ -353,7 +357,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
           }
         }
 
-        case core.SchemaType.Object: {
+        case "object": {
           yield itt`
             {
               ${generateInterfaceContent()}
@@ -364,6 +368,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
           function* generateInterfaceContent() {
             assert(item != null);
+            assert("type" in item);
+            assert(item.type == "object");
 
             let propertiesCount = 0;
 
