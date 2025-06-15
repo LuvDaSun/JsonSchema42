@@ -1,6 +1,10 @@
 import * as core from "@jns42/core";
 import assert from "node:assert";
 
+export interface UnknownTypeModel {
+  readonly type: "unknown";
+}
+
 export interface NeverTypeModel {
   readonly type: "never";
 }
@@ -95,6 +99,7 @@ export interface MetadataTypeModel {
 
 export type TypeModel = MetadataTypeModel &
   (
+    | UnknownTypeModel
     | NeverTypeModel
     | AnyTypeModel
     | NullTypeModel
@@ -356,7 +361,16 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
     } as MetadataTypeModel & UnionTypeModel;
   }
 
-  assert.fail("could not produce type model");
+  return {
+    location,
+    title,
+    description,
+    examples,
+    deprecated,
+    mockable,
+
+    type: "unknown",
+  };
 }
 
 function isMockable(arena: core.SchemaArenaContainer, key: number) {
