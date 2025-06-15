@@ -3,8 +3,6 @@ import * as models from "../models.js";
 import { NestedText } from "./iterable-text-template.js";
 
 export function* generateJsDocComments(item: models.TypeModel): Iterable<NestedText> {
-  const { location: nodeId } = item;
-
   yield `/**\n`;
   if (item.title != null) {
     yield ` * @summary ${formatComment(item.title)}\n`;
@@ -14,9 +12,9 @@ export function* generateJsDocComments(item: models.TypeModel): Iterable<NestedT
     yield ` * @description ${formatComment(item.description)}\n`;
   }
 
-  if (nodeId != null) {
+  if (item.location != null) {
     // TODO make this stable (relative paths)
-    // yield ` * @see {@link ${nodeId}}\n`;
+    // yield ` * @see {@link ${item.location}}\n`;
   }
 
   if (item.deprecated ?? false) {

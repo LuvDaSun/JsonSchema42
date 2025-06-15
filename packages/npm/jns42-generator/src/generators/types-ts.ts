@@ -59,7 +59,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
     const item = typeModels.get(itemKey);
     assert(item != null);
 
-    if ("options" in item && item.options !== null) {
+    if ("options" in item && item.options != null) {
       yield joinIterable(
         (item.options as any[]).map((option) => JSON.stringify(option)),
         " |\n",
