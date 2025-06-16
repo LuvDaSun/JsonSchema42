@@ -563,23 +563,23 @@ impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
 
       required: value.required.map(|value| value.into_iter().collect()),
 
-      minimum_inclusive: value.minimum_inclusive.and_then(|value| value.as_f64()),
-      minimum_exclusive: value.minimum_exclusive.and_then(|value| value.as_f64()),
-      maximum_inclusive: value.maximum_inclusive.and_then(|value| value.as_f64()),
-      maximum_exclusive: value.maximum_exclusive.and_then(|value| value.as_f64()),
-      multiple_of: value.multiple_of.and_then(|value| value.as_f64()),
+      minimum_inclusive: value.minimum_inclusive,
+      minimum_exclusive: value.minimum_exclusive,
+      maximum_inclusive: value.maximum_inclusive,
+      maximum_exclusive: value.maximum_exclusive,
+      multiple_of: value.multiple_of,
 
-      minimum_length: value.minimum_length.map(|value| value as u32),
-      maximum_length: value.maximum_length.map(|value| value as u32),
+      minimum_length: value.minimum_length,
+      maximum_length: value.maximum_length,
       value_pattern: value.value_pattern,
       value_format: value.value_format,
 
-      minimum_items: value.minimum_items.map(|value| value as u32),
-      maximum_items: value.maximum_items.map(|value| value as u32),
+      minimum_items: value.minimum_items,
+      maximum_items: value.maximum_items,
       unique_items: value.unique_items,
 
-      minimum_properties: value.minimum_properties.map(|value| value as u32),
-      maximum_properties: value.maximum_properties.map(|value| value as u32),
+      minimum_properties: value.minimum_properties,
+      maximum_properties: value.maximum_properties,
     }
   }
 }
