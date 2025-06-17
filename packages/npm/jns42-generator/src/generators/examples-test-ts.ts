@@ -5,7 +5,7 @@ import { itt, mapIterable, readPackageInfo } from "../utilities.js";
 export function* generateExamplesTestTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, typesArena } = specification;
 
@@ -26,8 +26,8 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     yield mapIterable(
       item.examples ?? [],
       (example) => itt`
-        await test(${JSON.stringify(name.toPascalCase())}, () => {
-          const example = ${JSON.stringify(example)};
+        test(${JSON.stringify(name.toPascalCase())}, () => {
+          const example = ${example.serialize()};
           const valid = validators.is${name.toPascalCase()}(example);
           assert.equal(valid, true);
         });

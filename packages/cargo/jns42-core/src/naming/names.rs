@@ -1,6 +1,8 @@
 use super::Sentence;
 use std::collections::BTreeMap;
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 pub struct Names<K>(BTreeMap<K, Sentence>);
 
@@ -26,25 +28,33 @@ impl<K> IntoIterator for Names<K> {
   }
 }
 
-#[wasm_bindgen]
-pub struct NamesContainer(Names<usize>);
+#[cfg(target_arch = "wasm32")]
+pub struct NamesHost(Names<u32>);
 
-#[wasm_bindgen]
-impl NamesContainer {
-  #[wasm_bindgen(js_name = getName)]
-  pub fn get_name(&self, key: usize) -> Option<Sentence> {
-    self.0.get_name(&key).cloned()
-  }
-}
-
-impl From<Names<usize>> for NamesContainer {
-  fn from(value: Names<usize>) -> Self {
+#[cfg(target_arch = "wasm32")]
+impl From<Names<u32>> for NamesHost {
+  fn from(value: Names<u32>) -> Self {
     Self(value)
   }
 }
 
-impl From<NamesContainer> for Names<usize> {
-  fn from(value: NamesContainer) -> Self {
-    value.0
+#[cfg(target_arch = "wasm32")]
+impl From<NamesHost> for exports::jns42::core::naming::Names {
+  fn from(value: NamesHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<Names<u32>> for exports::jns42::core::naming::Names {
+  fn from(value: Names<u32>) -> Self {
+    NamesHost::from(value).into()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::naming::GuestNames for NamesHost {
+  fn get_name(&self, key: u32) -> Option<exports::jns42::core::naming::Sentence> {
+    self.0.get_name(&key).cloned().map(Into::into)
   }
 }

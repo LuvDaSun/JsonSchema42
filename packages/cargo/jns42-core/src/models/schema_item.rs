@@ -1,12 +1,13 @@
 use super::SchemaType;
 use crate::utilities::NodeLocation;
 use crate::utilities::{merge_either, merge_option};
-use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeSet;
 use std::fmt::Debug;
 use std::iter;
 use std::{collections::BTreeMap, iter::empty};
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 pub type DocumentSchemaItem = SchemaItem<NodeLocation>;
 pub type ArenaSchemaItem = SchemaItem<usize>;
@@ -442,227 +443,143 @@ where
   }
 }
 
-#[wasm_bindgen]
-pub struct ArenaSchemaItemContainer(ArenaSchemaItem);
-
-#[wasm_bindgen]
-impl ArenaSchemaItemContainer {
-  #[wasm_bindgen(getter = name)]
-  pub fn name_get(&self) -> Option<Vec<String>> {
-    Some(self.0.name.as_ref()?.clone())
-  }
-  #[wasm_bindgen(getter = exact)]
-  pub fn exact_get(&self) -> Option<bool> {
-    self.0.exact
-  }
-
-  #[wasm_bindgen(getter = location)]
-  pub fn location_get(&self) -> Option<String> {
-    Some(self.0.location.as_ref()?.to_string())
-  }
-
-  // metadata
-  #[wasm_bindgen(getter = title)]
-  pub fn title_get(&self) -> Option<String> {
-    Some(self.0.title.as_ref()?.clone())
-  }
-  #[wasm_bindgen(getter = description)]
-  pub fn description_get(&self) -> Option<String> {
-    Some(self.0.description.as_ref()?.clone())
-  }
-  #[wasm_bindgen(getter = examples)]
-  pub fn examples_get(&self) -> Option<Vec<JsValue>> {
-    Some(
-      self
-        .0
-        .examples
-        .as_ref()?
-        .iter()
-        .filter_map(|value| JsValue::from_serde(value).ok())
-        .collect(),
-    )
-  }
-  #[wasm_bindgen(getter = deprecated)]
-  pub fn deprecated_get(&self) -> Option<bool> {
-    self.0.deprecated
-  }
-
-  // types
-  #[wasm_bindgen(getter = types)]
-  pub fn types_get(&self) -> Option<Vec<SchemaType>> {
-    Some(self.0.types.as_ref()?.clone())
-  }
-
-  // applicators
-  #[wasm_bindgen(getter = reference)]
-  pub fn reference_get(&self) -> Option<usize> {
-    self.0.reference
-  }
-
-  #[wasm_bindgen(getter = ifSchema)]
-  pub fn if_get(&self) -> Option<usize> {
-    self.0.r#if
-  }
-  #[wasm_bindgen(getter = thenSchema)]
-  pub fn then_get(&self) -> Option<usize> {
-    self.0.then
-  }
-  #[wasm_bindgen(getter = elseSchema)]
-  pub fn else_get(&self) -> Option<usize> {
-    self.0.r#else
-  }
-
-  #[wasm_bindgen(getter = not)]
-  pub fn not_get(&self) -> Option<usize> {
-    self.0.not
-  }
-
-  #[wasm_bindgen(getter = propertyNames)]
-  pub fn property_names_get(&self) -> Option<usize> {
-    self.0.property_names
-  }
-  #[wasm_bindgen(getter = mapProperties)]
-  pub fn map_properties_get(&self) -> Option<usize> {
-    self.0.map_properties
-  }
-  #[wasm_bindgen(getter = arrayItems)]
-  pub fn array_items_get(&self) -> Option<usize> {
-    self.0.array_items
-  }
-  #[wasm_bindgen(getter = contains)]
-  pub fn contains_get(&self) -> Option<usize> {
-    self.0.contains
-  }
-
-  #[wasm_bindgen(getter = allOf)]
-  pub fn all_of_get(&self) -> Option<Vec<usize>> {
-    Some(self.0.all_of.as_ref()?.iter().copied().collect())
-  }
-  #[wasm_bindgen(getter = anyOf)]
-  pub fn any_of_get(&self) -> Option<Vec<usize>> {
-    Some(self.0.any_of.as_ref()?.iter().copied().collect())
-  }
-  #[wasm_bindgen(getter = oneOf)]
-  pub fn one_of_get(&self) -> Option<Vec<usize>> {
-    Some(self.0.one_of.as_ref()?.iter().copied().collect())
-  }
-  #[wasm_bindgen(getter = tupleItems)]
-  pub fn tuple_items_get(&self) -> Option<Vec<usize>> {
-    Some(self.0.tuple_items.as_ref()?.clone())
-  }
-
-  #[wasm_bindgen(getter = objectProperties)]
-  pub fn object_properties_get(&self) -> JsValue {
-    let Some(value) = self.0.object_properties.as_ref() else {
-      return JsValue::undefined();
-    };
-
-    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
-  }
-  #[wasm_bindgen(getter = patternProperties)]
-  pub fn pattern_properties_get(&self) -> JsValue {
-    let Some(value) = self.0.pattern_properties.as_ref() else {
-      return JsValue::undefined();
-    };
-
-    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
-  }
-  #[wasm_bindgen(getter = dependentSchemas)]
-  pub fn dependent_schemas_get(&self) -> JsValue {
-    let Some(value) = self.0.dependent_schemas.as_ref() else {
-      return JsValue::undefined();
-    };
-
-    JsValue::from_serde(value).unwrap_or(JsValue::undefined())
-  }
-
-  // assertions
-  #[wasm_bindgen(getter = options)]
-  pub fn options_get(&self) -> Option<Vec<JsValue>> {
-    Some(
-      self
-        .0
-        .options
-        .as_ref()?
-        .iter()
-        .filter_map(|value| JsValue::from_serde(value).ok())
-        .collect(),
-    )
-  }
-  #[wasm_bindgen(getter = required)]
-  pub fn required_get(&self) -> Option<Vec<String>> {
-    Some(self.0.required.as_ref()?.iter().cloned().collect())
-  }
-
-  #[wasm_bindgen(getter = minimumInclusive)]
-  pub fn minimum_inclusive_get(&self) -> Option<f64> {
-    self.0.minimum_inclusive
-  }
-  #[wasm_bindgen(getter = minimumExclusive)]
-  pub fn minimum_exclusive_get(&self) -> Option<f64> {
-    self.0.minimum_exclusive
-  }
-  #[wasm_bindgen(getter = maximumInclusive)]
-  pub fn maximum_inclusive_get(&self) -> Option<f64> {
-    self.0.maximum_inclusive
-  }
-  #[wasm_bindgen(getter = maximumExclusive)]
-  pub fn maximum_exclusive_get(&self) -> Option<f64> {
-    self.0.maximum_exclusive
-  }
-  #[wasm_bindgen(getter = multipleOf)]
-  pub fn multiple_of_get(&self) -> Option<f64> {
-    self.0.multiple_of
-  }
-
-  #[wasm_bindgen(getter = minimumLength)]
-  pub fn minimum_length_get(&self) -> Option<u32> {
-    self.0.minimum_length
-  }
-  #[wasm_bindgen(getter = maximumLength)]
-  pub fn maximum_length_get(&self) -> Option<u32> {
-    self.0.maximum_length
-  }
-  #[wasm_bindgen(getter = valuePattern)]
-  pub fn value_pattern_get(&self) -> Option<String> {
-    Some(self.0.value_pattern.as_ref()?.clone())
-  }
-  #[wasm_bindgen(getter = valueFormat)]
-  pub fn value_format_get(&self) -> Option<String> {
-    Some(self.0.value_format.as_ref()?.clone())
-  }
-
-  #[wasm_bindgen(getter = minimumItems)]
-  pub fn minimum_items_get(&self) -> Option<u32> {
-    self.0.minimum_items
-  }
-  #[wasm_bindgen(getter = maximumItems)]
-  pub fn maximum_items_get(&self) -> Option<u32> {
-    self.0.maximum_items
-  }
-  #[wasm_bindgen(getter = uniqueItems)]
-  pub fn unique_items_get(&self) -> Option<bool> {
-    self.0.unique_items
-  }
-
-  #[wasm_bindgen(getter = minimumProperties)]
-  pub fn minimum_properties_get(&self) -> Option<u32> {
-    self.0.minimum_properties
-  }
-  #[wasm_bindgen(getter = maximumProperties)]
-  pub fn maximum_properties_get(&self) -> Option<u32> {
-    self.0.maximum_properties
-  }
-}
-
-impl From<ArenaSchemaItem> for ArenaSchemaItemContainer {
+#[cfg(target_arch = "wasm32")]
+impl From<ArenaSchemaItem> for exports::jns42::core::models::ArenaSchemaItem {
   fn from(value: ArenaSchemaItem) -> Self {
-    Self(value)
-  }
-}
+    Self {
+      name: value.name,
+      exact: value.exact,
 
-impl From<ArenaSchemaItemContainer> for ArenaSchemaItem {
-  fn from(value: ArenaSchemaItemContainer) -> Self {
-    value.0
+      location: value.location.map(Into::into),
+
+      // metadata
+      title: value.title,
+      description: value.description,
+      examples: value.examples.map(|value| {
+        value
+          .into_iter()
+          .map(crate::utilities::JsonValueHost::from)
+          .map(Into::into)
+          .collect()
+      }),
+      deprecated: value.deprecated,
+
+      // types
+      types: value
+        .types
+        .map(|value| value.into_iter().map(Into::into).collect()),
+
+      // applicators
+      reference: value
+        .reference
+        .map(|value| value as exports::jns42::core::models::Key),
+
+      if_: value
+        .r#if
+        .map(|value| value as exports::jns42::core::models::Key),
+      then: value
+        .then
+        .map(|value| value as exports::jns42::core::models::Key),
+      else_: value
+        .r#else
+        .map(|value| value as exports::jns42::core::models::Key),
+
+      not: value
+        .not
+        .map(|value| value as exports::jns42::core::models::Key),
+
+      property_names: value
+        .property_names
+        .map(|value| value as exports::jns42::core::models::Key),
+      map_properties: value
+        .map_properties
+        .map(|value| value as exports::jns42::core::models::Key),
+      array_items: value
+        .array_items
+        .map(|value| value as exports::jns42::core::models::Key),
+      contains: value
+        .contains
+        .map(|value| value as exports::jns42::core::models::Key),
+
+      all_of: value.all_of.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+      any_of: value.any_of.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+      one_of: value.one_of.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+      tuple_items: value.tuple_items.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+
+      object_properties: value.object_properties.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as exports::jns42::core::models::Key))
+          .collect()
+      }),
+      pattern_properties: value.pattern_properties.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as exports::jns42::core::models::Key))
+          .collect()
+      }),
+      dependent_schemas: value.dependent_schemas.map(|value| {
+        value
+          .into_iter()
+          .map(|(key, value)| (key, value as exports::jns42::core::models::Key))
+          .collect()
+      }),
+
+      definitions: value.definitions.map(|value| {
+        value
+          .into_iter()
+          .map(|value| value as exports::jns42::core::models::Key)
+          .collect()
+      }),
+
+      // assertions
+      options: value.options.map(|value| {
+        value
+          .into_iter()
+          .map(crate::utilities::JsonValueHost::from)
+          .map(Into::into)
+          .collect()
+      }),
+
+      required: value.required.map(|value| value.into_iter().collect()),
+
+      minimum_inclusive: value.minimum_inclusive,
+      minimum_exclusive: value.minimum_exclusive,
+      maximum_inclusive: value.maximum_inclusive,
+      maximum_exclusive: value.maximum_exclusive,
+      multiple_of: value.multiple_of,
+
+      minimum_length: value.minimum_length,
+      maximum_length: value.maximum_length,
+      value_pattern: value.value_pattern,
+      value_format: value.value_format,
+
+      minimum_items: value.minimum_items,
+      maximum_items: value.maximum_items,
+      unique_items: value.unique_items,
+
+      minimum_properties: value.minimum_properties,
+      maximum_properties: value.maximum_properties,
+    }
   }
 }

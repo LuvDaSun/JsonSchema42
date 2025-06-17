@@ -69,16 +69,18 @@ interface MainConfiguration {
   transformMaximumIterations: number;
 }
 
-async function main(configuration: MainConfiguration) {
+function main(configuration: MainConfiguration) {
   const { instanceSchemaLocation, defaultMetaSchema } = configuration;
   const packageDirectoryPath = path.resolve(configuration.packageDirectory);
   const { packageName, packageVersion, transformMaximumIterations, defaultTypeName } =
     configuration;
 
-  const context = new core.DocumentContextContainer();
-  context.registerWellKnownFactories();
+  const contextBuilder = new core.documents.DocumentContextBuilder();
+  contextBuilder.registerWellKnownFactories();
 
-  const entryLocation = await context.loadFromLocation(
+  const context = contextBuilder.build();
+
+  const entryLocation = context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
     undefined,

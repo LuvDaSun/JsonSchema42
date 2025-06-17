@@ -1,0 +1,220 @@
+package jns42:core;
+
+
+interface imports {
+  enum fetch-text-error {
+    io-error,
+    http-error,
+  }
+
+  fetch-text: func(location: string) -> result<string, fetch-text-error>;
+}
+
+interface utilities {
+  banner: func(prefix: string, version: string) -> string;
+
+  enum json-type {
+    null,
+    boolean,
+    number,
+    str,
+    array,
+    object,
+  }
+
+  resource json-value {
+    get-type: func() -> json-type;
+    
+    as-boolean: func() -> option<bool>;
+    as-number: func() -> option<f64>;
+    as-string: func() -> option<string>;
+    as-array: func() -> option<list<json-value>>;
+    as-object: func() -> option<list<tuple<string, json-value>>>;
+
+    serialize: func() -> string;
+    deserialize: static func(value: string) -> json-value;
+  }
+}
+
+interface naming {
+  resource names {
+    get-name: func(key: u32) -> option<sentence>;
+  }
+
+  resource names-builder {
+    constructor();
+    
+    set-default-name: func(value: string);
+    add: func(key: u32, values: list<string>);
+    build: func() -> names;
+  }
+
+  resource sentence {
+    constructor(input: string);
+
+    to-pascal-case: func() -> string;
+    to-camel-case: func() -> string;
+    to-snake-case: func() -> string;
+    to-screaming-snake-case: func() -> string;
+  }
+}
+
+interface models {
+  use utilities.{json-value};
+
+  type key = u32;
+  type key-set = list<key>;
+  type key-map = list<tuple<string, key>>;
+
+  enum schema-type {
+    any,
+    never,
+    null,
+    boolean,
+    integer,
+    number,
+    str,
+    array,
+    object,
+  }
+
+  enum schema-transform {
+    explode,
+    flatten-all-of,
+    flatten-any-of,
+    flatten-one-of,
+    flip-all-of-any-of,
+    flip-all-of-one-of,
+    flip-any-of-all-of,
+    flip-any-of-one-of,
+    flip-one-of-all-of,
+    flip-one-of-any-of,
+    inherit-all-of,
+    inherit-any-of,
+    inherit-one-of,
+    inherit-reference,
+    resolve-all-of,
+    resolve-any-of,
+    resolve-if-then-else,
+    resolve-not,
+    resolve-single-all-of,
+    resolve-single-any-of,
+    resolve-single-one-of,
+    single-type,
+    unalias,
+    name,
+  }
+
+  record arena-schema-item {
+    name: option<list<string>>,
+    exact: option<bool>,
+    types: option<list<schema-type>>,
+    location: option<string>,
+    title: option<string>,
+    description: option<string>,
+    examples: option<list<json-value>>,
+    deprecated: option<bool>,
+    options: option<list<json-value>>,
+    minimum-inclusive: option<f64>,
+    minimum-exclusive: option<f64>,
+    maximum-inclusive: option<f64>,
+    maximum-exclusive: option<f64>,
+    multiple-of: option<f64>,
+    minimum-length: option<u32>,
+    maximum-length: option<u32>,
+    value-pattern: option<string>,
+    value-format: option<string>,
+    maximum-items: option<u32>,
+    minimum-items: option<u32>,
+    unique-items: option<bool>,
+    minimum-properties: option<u32>,
+    maximum-properties: option<u32>,
+    required: option<list<string>>,
+    reference: option<key>,
+    contains: option<key>,
+    property-names: option<key>,
+    map-properties: option<key>,
+    array-items: option<key>,
+    if: option<key>,
+    then: option<key>,
+    else: option<key>,
+    not: option<key>,
+    tuple-items: option<key-set>,
+    all-of: option<key-set>,
+    any-of: option<key-set>,
+    one-of: option<key-set>,
+    definitions: option<key-set>,
+    dependent-schemas: option<key-map>,
+    object-properties: option<key-map>,
+    pattern-properties: option<key-map>,
+  }
+
+  resource schema-arena {
+    constructor();
+
+    count: func() -> u32;
+    get-item: func(key: key) -> arena-schema-item;
+    get-all-related: func(key: key) -> list<key>;
+
+    clone: func() -> schema-arena;
+    transform: func(transforms: list<schema-transform>) -> u32;
+  }
+}
+
+interface documents {
+  use models.{schema-arena};
+  use utilities.{json-value};
+
+  variant error {
+    unknown,
+    conflict,
+    document-node-not-found(string),
+    version-node-not-found(string),
+    factory-not-found(string),
+    retrieval-location-not-found(string),
+    identity-location-not-found(string),
+    document-not-found(string),
+    reference-not-found(string),
+    invalid-location,
+    fetch-error,
+    serialization-error,
+  }
+
+  resource document-context-builder {
+    constructor();
+
+    register-well-known-factories: func() -> result<_, error>;
+    build: func() -> document-context;
+  }
+
+  resource document-context {
+    load-from-location: func(
+      retrieval-location: string,
+      given-location: string,
+      antecedent-location: option<string>,
+      default-meta-schema-id: string,
+    ) -> result<string, error>;
+
+    load-from-node: func(
+      retrieval-location: string,
+      given-location: string,
+      antecedent-location: option<string>,
+      node: json-value,
+      default-meta-schema-id: string,
+    ) -> result<_, error>;
+
+    get-explicit-locations: func() -> list<string>;
+
+    make-schema-arena: func() -> schema-arena;
+  }
+}
+
+world core {
+  export utilities;
+  export naming;
+  export models;
+  export documents;
+
+  import imports;
+}
+
