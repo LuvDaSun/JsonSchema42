@@ -251,6 +251,8 @@ pub fn run_command(options: CommandOptions) -> Result<(), Box<dyn Error>> {
   // assert
   for case_info in &case_infos {
     for specification_info in &case_info.specifications {
+      println!("{}", specification_info.name);
+
       for valid_value in &case_info.valid_values {
         let mut child = match r#type {
           PackageType::Cargo => std::process::Command::new("cargo")
