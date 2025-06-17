@@ -648,10 +648,8 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     default_meta_schema_id: String,
   ) -> Result<String, exports::jns42::core::documents::Error> {
     let retrieval_location: NodeLocation = retrieval_location.parse()?;
-    let given_location = given_location.try_into()?;
-    let antecedent_location = antecedent_location
-      .map(|value| value.try_into())
-      .transpose()?;
+    let given_location = given_location.parse()?;
+    let antecedent_location = antecedent_location.map(|value| value.parse()).transpose()?;
 
     self.0.load_from_location(
       retrieval_location.clone(),
@@ -672,10 +670,8 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
     let retrieval_location = retrieval_location.parse()?;
-    let given_location = given_location.try_into()?;
-    let antecedent_location = antecedent_location
-      .map(|value| value.try_into())
-      .transpose()?;
+    let given_location = given_location.parse()?;
+    let antecedent_location = antecedent_location.map(|value| value.parse()).transpose()?;
 
     let node: crate::utilities::JsonValueHost = node.into_inner();
     let node = node.into();
