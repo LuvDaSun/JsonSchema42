@@ -7,7 +7,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typesArena } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import assert from "node:assert";
@@ -15,9 +15,7 @@ export function* generateExamplesTestTsCode(specification: models.Specification)
     import * as validators from "./validators.js";
   `;
 
-  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    const item = typesArena.getItem(itemKey);
-
+  for (const [itemKey, item] of typeModels) {
     const name = names.getName(itemKey);
     if (name == null) {
       continue;

@@ -253,7 +253,7 @@ where
       pattern_properties: merge_object_keys!(pattern_properties),
       dependent_schemas: merge_object_keys!(dependent_schemas),
 
-      options: union_merge!(options), // TODO
+      options: union_merge!(options), // TODO should be intersection?
       required: union_merge!(required),
 
       minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),

@@ -1,9 +1,10 @@
 import * as core from "@jns42/core";
+import assert from "node:assert";
 import * as models from "../models.js";
 import {
   NestedText,
   generateJsDocComments,
-  isMockable,
+  getMapItemProperty,
   itt,
   joinIterable,
   readPackageInfo,
@@ -14,7 +15,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typesArena } = specification;
+  const { names, typeModels } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -55,10 +56,8 @@ export function* generateMocksTsCode(specification: models.Specification) {
     }
   `;
 
-  for (let itemKey = 0; itemKey < typesArena.count(); itemKey++) {
-    const item = typesArena.getItem(itemKey);
-
-    if (!isMockable(typesArena, itemKey)) {
+  for (const [itemKey, item] of typeModels) {
+    if (!item.mockable) {
       continue;
     }
 
@@ -71,7 +70,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
     yield itt`
       ${generateJsDocComments(item)}
-      export function mock${name.toPascalCase()}(options: MockGeneratorOptions = {}): types.${name.toPascalCase()} {
+      export function mock${name.toPascalCase()}(
+        options: MockGeneratorOptions = {},
+      ): types.${name.toPascalCase()} {
         const configuration = {
           ...defaultMockGeneratorOptions,
           ...options,
@@ -104,9 +105,9 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   function* generateMockReference(itemKey: number): Iterable<NestedText> {
-    if (!isMockable(typesArena, itemKey)) {
-      throw new TypeError("cannot mock non-mockable type");
-    }
+    const item = typeModels.get(itemKey);
+    assert(item != null);
+    assert(item.mockable);
 
     const name = names.getName(itemKey);
     if (name == null) {
@@ -117,41 +118,11 @@ export function* generateMocksTsCode(specification: models.Specification) {
   }
 
   function* generateMockDefinition(itemKey: number): Iterable<NestedText> {
-    const item = typesArena.getItem(itemKey);
+    const item = typeModels.get(itemKey);
+    assert(item != null);
+    assert(item.mockable);
 
-    if (item.reference != null) {
-      yield generateMockReference(item.reference);
-      return;
-    }
-
-    if (item.oneOf != null && item.oneOf.length > 0) {
-      const oneOfMockableEntries = [...item.oneOf]
-        .filter((key) => isMockable(typesArena, key))
-        .map((key) => [key, typesArena.getItem(key)] as const);
-
-      yield itt`
-        (() => {
-          switch (
-            (
-              nextSeed() % ${JSON.stringify(oneOfMockableEntries.length)}
-            ) as ${joinIterable(
-              oneOfMockableEntries.map((entry, index) => JSON.stringify(index)),
-              " | ",
-            )}
-          ) {
-            ${oneOfMockableEntries.map(
-              (entry, index) => itt`
-                case ${JSON.stringify(index)}:
-                  return (${generateMockReference(entry[0])});
-              `,
-            )}              
-          }
-        })()
-      `;
-      return;
-    }
-
-    if (item.options != null && item.options.length > 0) {
+    if ("options" in item && item.options != null) {
       yield itt`
           (
             [
@@ -167,103 +138,106 @@ export function* generateMocksTsCode(specification: models.Specification) {
       return;
     }
 
-    if (item.types != null && item.types.length == 1) {
-      switch (item.types[0] as core.SchemaType) {
-        case core.SchemaType.Never:
-          yield "neverValue";
-          return;
+    switch (item.type) {
+      case "unknown":
+        yield "unknownValue";
+        return;
 
-        case core.SchemaType.Any:
-          yield "anyValue";
-          return;
+      case "never":
+        yield "neverValue";
+        return;
 
-        case core.SchemaType.Null:
-          yield JSON.stringify(null);
-          return;
+      case "any":
+        yield "anyValue";
+        return;
 
-        case core.SchemaType.Boolean:
-          yield `Boolean(nextSeed() % 2)`;
-          return;
+      case "null":
+        yield JSON.stringify(null);
+        return;
 
-        case core.SchemaType.Integer: {
-          let multipleOf = item.multipleOf ?? 1;
+      case "boolean":
+        yield `Boolean(nextSeed() % 2)`;
+        return;
 
-          let minimumValue = Number.NEGATIVE_INFINITY;
-          let isMinimumExclusive: boolean | undefined;
-          if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
-            minimumValue = item.minimumInclusive;
-            isMinimumExclusive = false;
-          }
-          if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
-            minimumValue = item.minimumExclusive;
-            isMinimumExclusive = true;
-          }
-          const minimumValueInclusiveExpression =
-            isMinimumExclusive == null
-              ? `Math.ceil(configuration.defaultMinimumValue / ${JSON.stringify(multipleOf)})`
-              : isMinimumExclusive
-                ? `(Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)}) + 1)`
-                : `Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)})`;
+      case "integer": {
+        let multipleOf = item.multipleOf ?? 1;
 
-          let maximumValue = Number.POSITIVE_INFINITY;
-          let isMaximumExclusive: boolean | undefined;
-          if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
-            maximumValue = item.maximumInclusive;
-            isMaximumExclusive = false;
-          }
-          if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
-            maximumValue = item.maximumExclusive;
-            isMaximumExclusive = true;
-          }
-          const maximumValueInclusiveExpression =
-            isMaximumExclusive == null
-              ? `Math.floor(configuration.defaultMaximumValue / ${JSON.stringify(multipleOf)})`
-              : isMaximumExclusive
-                ? `(Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)}) - 1)`
-                : `Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)})`;
+        let minimumValue = Number.NEGATIVE_INFINITY;
+        let isMinimumExclusive: boolean | undefined;
+        if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
+          minimumValue = item.minimumInclusive;
+          isMinimumExclusive = false;
+        }
+        if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
+          minimumValue = item.minimumExclusive;
+          isMinimumExclusive = true;
+        }
+        const minimumValueInclusiveExpression =
+          isMinimumExclusive == null
+            ? `Math.ceil(configuration.defaultMinimumValue / ${JSON.stringify(multipleOf)})`
+            : isMinimumExclusive
+              ? `(Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)}) + 1)`
+              : `Math.ceil(${JSON.stringify(minimumValue)} / ${JSON.stringify(multipleOf)})`;
 
-          yield `
+        let maximumValue = Number.POSITIVE_INFINITY;
+        let isMaximumExclusive: boolean | undefined;
+        if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
+          maximumValue = item.maximumInclusive;
+          isMaximumExclusive = false;
+        }
+        if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
+          maximumValue = item.maximumExclusive;
+          isMaximumExclusive = true;
+        }
+        const maximumValueInclusiveExpression =
+          isMaximumExclusive == null
+            ? `Math.floor(configuration.defaultMaximumValue / ${JSON.stringify(multipleOf)})`
+            : isMaximumExclusive
+              ? `(Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)}) - 1)`
+              : `Math.floor(${JSON.stringify(maximumValue)} / ${JSON.stringify(multipleOf)})`;
+
+        yield `
             (${minimumValueInclusiveExpression} + nextSeed() % (${maximumValueInclusiveExpression} - ${minimumValueInclusiveExpression} + 1)) * ${multipleOf}
           `;
-          return;
+        return;
+      }
+
+      case "number": {
+        let minimumValue = Number.NEGATIVE_INFINITY;
+        let isMinimumExclusive: boolean | undefined;
+        if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
+          minimumValue = item.minimumInclusive;
+          isMinimumExclusive = false;
         }
+        if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
+          minimumValue = item.minimumExclusive;
+          isMinimumExclusive = true;
+        }
+        const minimumValueInclusiveExpression =
+          isMinimumExclusive == null
+            ? `configuration.defaultMinimumValue * configuration.numberPrecision`
+            : isMinimumExclusive
+              ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
+              : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
 
-        case core.SchemaType.Number: {
-          let minimumValue = Number.NEGATIVE_INFINITY;
-          let isMinimumExclusive: boolean | undefined;
-          if (item.minimumInclusive != null && item.minimumInclusive >= minimumValue) {
-            minimumValue = item.minimumInclusive;
-            isMinimumExclusive = false;
-          }
-          if (item.minimumExclusive != null && item.minimumExclusive >= minimumValue) {
-            minimumValue = item.minimumExclusive;
-            isMinimumExclusive = true;
-          }
-          const minimumValueInclusiveExpression =
-            isMinimumExclusive == null
-              ? `configuration.defaultMinimumValue * configuration.numberPrecision`
-              : isMinimumExclusive
-                ? `(${JSON.stringify(minimumValue)} * configuration.numberPrecision + 1)`
-                : `(${JSON.stringify(minimumValue)} * configuration.numberPrecision)`;
+        let maximumValue = Number.POSITIVE_INFINITY;
+        let isMaximumExclusive: boolean | undefined;
+        if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
+          maximumValue = item.maximumInclusive;
+          isMaximumExclusive = false;
+        }
+        if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
+          maximumValue = item.maximumExclusive;
+          isMaximumExclusive = true;
+        }
+        const maximumValueInclusiveExpression =
+          isMaximumExclusive == null
+            ? `(configuration.defaultMaximumValue * configuration.numberPrecision)`
+            : isMaximumExclusive
+              ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
+              : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
 
-          let maximumValue = Number.POSITIVE_INFINITY;
-          let isMaximumExclusive: boolean | undefined;
-          if (item.maximumInclusive != null && item.maximumInclusive <= maximumValue) {
-            maximumValue = item.maximumInclusive;
-            isMaximumExclusive = false;
-          }
-          if (item.maximumExclusive != null && item.maximumExclusive <= maximumValue) {
-            maximumValue = item.maximumExclusive;
-            isMaximumExclusive = true;
-          }
-          const maximumValueInclusiveExpression =
-            isMaximumExclusive == null
-              ? `(configuration.defaultMaximumValue * configuration.numberPrecision)`
-              : isMaximumExclusive
-                ? `(${JSON.stringify(maximumValue)} * configuration.numberPrecision - 1)`
-                : `(${JSON.stringify(maximumValue)} * configuration.numberPrecision)`;
-
-          yield `
+        yield `
             (
               ${minimumValueInclusiveExpression} + 
               nextSeed() % (
@@ -271,20 +245,20 @@ export function* generateMocksTsCode(specification: models.Specification) {
               ) / configuration.numberPrecision
             )
           `;
-          return;
-        }
+        return;
+      }
 
-        case core.SchemaType.String: {
-          const minimumStringLengthExpression =
-            item.minimumLength == null
-              ? "configuration.defaultMinimumStringLength"
-              : JSON.stringify(item.minimumLength);
-          const maximumStringLengthExpression =
-            item.maximumLength == null
-              ? "configuration.defaultMaximumStringLength"
-              : JSON.stringify(item.maximumLength);
+      case "string": {
+        const minimumStringLengthExpression =
+          item.minimumLength == null
+            ? "configuration.defaultMinimumStringLength"
+            : JSON.stringify(item.minimumLength);
+        const maximumStringLengthExpression =
+          item.maximumLength == null
+            ? "configuration.defaultMaximumStringLength"
+            : JSON.stringify(item.maximumLength);
 
-          yield `
+        yield `
             new Array(
               ${minimumStringLengthExpression} +
               nextSeed() % (
@@ -295,39 +269,45 @@ export function* generateMocksTsCode(specification: models.Specification) {
               map(() => configuration.stringCharacters[nextSeed() % configuration.stringCharacters.length]).
               join("")
           `;
-          return;
-        }
+        return;
+      }
 
-        case core.SchemaType.Array: {
-          yield itt`
+      case "array": {
+        yield itt`
             [
               ${generateInterfaceContent()}
             ]
           `;
 
-          return;
+        return;
 
-          function* generateInterfaceContent() {
-            const minimumItemsExpression =
-              item.minimumItems == null
-                ? "configuration.defaultMinimumItems"
-                : JSON.stringify(item.minimumItems);
-            const maximumItemsExpression =
-              item.maximumItems == null
-                ? "configuration.defaultMaximumItems"
-                : JSON.stringify(item.maximumItems);
-            const tupleItemsLength = item.tupleItems?.length ?? 0;
+        function* generateInterfaceContent() {
+          assert(item != null);
+          assert(item.type == "array");
 
-            if (item.tupleItems != null) {
-              for (const elementKey of item.tupleItems) {
-                yield itt`
+          const minimumItemsExpression =
+            item.minimumItems == null
+              ? "configuration.defaultMinimumItems"
+              : JSON.stringify(item.minimumItems);
+          const maximumItemsExpression =
+            item.maximumItems == null
+              ? "configuration.defaultMaximumItems"
+              : JSON.stringify(item.maximumItems);
+          const tupleItemsLength = item.tupleItems?.length ?? 0;
+
+          if (item.tupleItems != null) {
+            for (const elementKey of item.tupleItems) {
+              yield itt`
                   ${generateMockReference(elementKey)},
                 `;
-              }
             }
+          }
 
-            if (item.arrayItems != null && isMockable(typesArena, item.arrayItems)) {
-              yield itt`
+          if (
+            item.arrayItems != null &&
+            (getMapItemProperty(typeModels, "mockable", item.arrayItems) ?? false)
+          ) {
+            yield itt`
               ...new Array(
                 Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
                 nextSeed() % (
@@ -339,69 +319,77 @@ export function* generateMocksTsCode(specification: models.Specification) {
                 .fill(undefined)
                 .map(() => ${generateMockReference(item.arrayItems)})
             `;
-            }
           }
         }
+      }
 
-        case core.SchemaType.Object: {
-          yield itt`
+      case "object": {
+        yield itt`
             {
               ${generateInterfaceContent()}
             }
           `;
 
-          return;
+        return;
 
-          function* generateInterfaceContent() {
-            let propertiesCount = 0;
+        function* generateInterfaceContent() {
+          assert(item != null);
+          assert(item.type == "object");
 
-            if (item.objectProperties != null || item.required != null) {
-              const required = new Set(item.required);
-              const objectProperties = item.objectProperties ?? {};
-              const propertyNames = new Set([
-                ...Object.keys(objectProperties),
-                ...required,
-              ] as string[]);
-              propertiesCount = propertyNames.size;
+          let propertiesCount = 0;
 
-              for (const name of propertyNames) {
-                if ((objectProperties as Record<string, number>)[name] == null) {
-                  yield itt`
+          if (item.objectProperties != null || item.required != null) {
+            const required = new Set(item.required);
+            const objectProperties = item.objectProperties ?? {};
+            const propertyNames = new Set([
+              ...Object.keys(objectProperties),
+              ...required,
+            ] as string[]);
+            propertiesCount = propertyNames.size;
+
+            for (const name of propertyNames) {
+              if ((objectProperties as Record<string, number>)[name] == null) {
+                yield itt`
                     [${JSON.stringify(name)}]: anyValue,
                   `;
-                } else {
-                  if (required.has(name)) {
-                    yield itt`
+              } else {
+                if (required.has(name)) {
+                  yield itt`
                       [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
                     `;
-                  } else {
-                    if (!isMockable(typesArena, objectProperties[name])) {
-                      continue;
-                    }
+                } else {
+                  if (
+                    !(getMapItemProperty(typeModels, "mockable", objectProperties[name]) ?? false)
+                  ) {
+                    continue;
+                  }
 
-                    yield itt`
+                  yield itt`
                       [${JSON.stringify(name)}]:
                         depthCounter < configuration.maximumDepth ?
                         ${generateMockReference(objectProperties[name])} :
                         undefined,
                     `;
-                  }
                 }
               }
             }
+          }
 
-            {
-              const minimumPropertiesExpression =
-                item.minimumProperties == null
-                  ? "configuration.defaultMinimumProperties"
-                  : JSON.stringify(item.minimumProperties);
-              const maximumPropertiesExpression =
-                item.maximumProperties == null
-                  ? "configuration.defaultMaximumProperties"
-                  : JSON.stringify(item.maximumProperties);
+          {
+            const minimumPropertiesExpression =
+              item.minimumProperties == null
+                ? "configuration.defaultMinimumProperties"
+                : JSON.stringify(item.minimumProperties);
+            const maximumPropertiesExpression =
+              item.maximumProperties == null
+                ? "configuration.defaultMaximumProperties"
+                : JSON.stringify(item.maximumProperties);
 
-              if (item.mapProperties != null && isMockable(typesArena, item.mapProperties)) {
-                yield itt`
+            if (
+              item.mapProperties != null &&
+              (getMapItemProperty(typeModels, "mockable", item.mapProperties) ?? false)
+            ) {
+              yield itt`
                   ...Object.fromEntries(
                     new Array(
                       Math.max(0, ${minimumPropertiesExpression} - ${JSON.stringify(propertiesCount)}) + 
@@ -433,14 +421,46 @@ export function* generateMocksTsCode(specification: models.Specification) {
                     )
                   )
                 `;
-                return;
-              }
+              return;
             }
           }
         }
       }
-    }
 
-    yield itt`unknownValue`;
+      case "union": {
+        const unionMockableEntries = [...item.members]
+          .map((itemKey) => {
+            const item = typeModels.get(itemKey);
+            assert(item != null);
+            return [itemKey, item] as const;
+          })
+          .filter(([itemKey, item]) => item.mockable);
+
+        yield itt`
+          (() => {
+            switch (
+              (
+                nextSeed() % ${JSON.stringify(unionMockableEntries.length)}
+              ) as ${joinIterable(
+                unionMockableEntries.map((entry, index) => JSON.stringify(index)),
+                " | ",
+              )}
+            ) {
+              ${unionMockableEntries.map(
+                (entry, index) => itt`
+                  case ${JSON.stringify(index)}:
+                    return (${generateMockReference(entry[0])});
+                `,
+              )}              
+            }
+          })()
+        `;
+        return;
+      }
+
+      case "reference":
+        yield generateMockReference(item.reference);
+        return;
+    }
   }
 }
