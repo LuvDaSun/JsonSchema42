@@ -77,7 +77,7 @@ export function* generateTypesTsCode(specification: models.Specification) {
         return;
 
       case "any":
-        yield "unknown";
+        yield "any";
         return;
 
       case "null":
