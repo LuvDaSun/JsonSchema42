@@ -193,7 +193,7 @@ interface documents {
       given-location: string,
       antecedent-location: option<string>,
       default-meta-schema-id: string,
-    ) -> result<_, error>;
+    ) -> result<string, error>;
 
     load-from-node: func(
       retrieval-location: string,
