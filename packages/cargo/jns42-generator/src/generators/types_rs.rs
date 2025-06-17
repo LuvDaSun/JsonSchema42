@@ -84,9 +84,6 @@ fn generate_type_token_stream(
         Some(&SchemaType::Boolean) => {}
         Some(&SchemaType::Integer) => {
           if let Some(validation_value) = &item.maximum_exclusive {
-            let validation_value = validation_value
-              .as_i64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value >= #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -94,9 +91,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.maximum_inclusive {
-            let validation_value = validation_value
-              .as_i64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value > #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -104,9 +98,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.minimum_exclusive {
-            let validation_value = validation_value
-              .as_i64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value <= #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -114,9 +105,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.minimum_inclusive {
-            let validation_value = validation_value
-              .as_i64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value < #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -124,9 +112,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.multiple_of {
-            let validation_value = validation_value
-              .as_i64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value % #validation_value != 0 {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -136,9 +121,6 @@ fn generate_type_token_stream(
         }
         Some(&SchemaType::Number) => {
           if let Some(validation_value) = &item.maximum_exclusive {
-            let validation_value = validation_value
-              .as_f64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value >= #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -146,9 +128,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.maximum_inclusive {
-            let validation_value = validation_value
-              .as_f64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value > #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -156,9 +135,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.minimum_exclusive {
-            let validation_value = validation_value
-              .as_f64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value <= #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -166,9 +142,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.minimum_inclusive {
-            let validation_value = validation_value
-              .as_f64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value < #validation_value {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
@@ -176,9 +149,6 @@ fn generate_type_token_stream(
             });
           }
           if let Some(validation_value) = &item.multiple_of {
-            let validation_value = validation_value
-              .as_f64()
-              .ok_or(crate::errors::Error::ExpectedSome)?;
             tokens_validation.append_all(quote! {
               if value % #validation_value != 0 {
                 core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
