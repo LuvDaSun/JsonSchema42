@@ -647,7 +647,7 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     antecedent_location: Option<String>,
     default_meta_schema_id: String,
   ) -> Result<String, exports::jns42::core::documents::Error> {
-    let retrieval_location: NodeLocation = retrieval_location.try_into()?;
+    let retrieval_location: NodeLocation = retrieval_location.parse()?;
     let given_location = given_location.try_into()?;
     let antecedent_location = antecedent_location
       .map(|value| value.try_into())
