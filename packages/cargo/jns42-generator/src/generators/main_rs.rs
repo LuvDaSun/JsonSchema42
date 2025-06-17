@@ -36,6 +36,8 @@ pub fn generate_file_token_stream(
           let mut buffer = String::new();
           std::io::stdin().read_to_string(&mut buffer)?;
 
+          // TODO implement parse
+          // TODO implement quiet
           let _entity: #identifier = serde_json::from_str(&buffer)?;
         },
       }
@@ -59,6 +61,8 @@ pub fn generate_file_token_stream(
     pub struct AssertCommandOptions {
       #[arg(long)]
       pub parse: bool,
+      #[arg(long)]
+      pub quiet: bool,
     }
 
   });
