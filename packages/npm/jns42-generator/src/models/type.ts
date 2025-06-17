@@ -95,6 +95,7 @@ export interface MetadataTypeModel {
   readonly deprecated: boolean | undefined;
 
   readonly mockable: boolean;
+  readonly exact: boolean;
 }
 
 export type TypeModel = MetadataTypeModel &
@@ -155,6 +156,8 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
   const { objectProperties, patternProperties, dependentSchemas } = item;
   const { options, required } = item;
 
+  const exact = item.exact ?? false;
+
   const {
     minimumInclusive,
     minimumExclusive,
@@ -186,7 +189,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "never",
         } as MetadataTypeModel & NeverTypeModel;
@@ -198,7 +203,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "any",
         } as MetadataTypeModel & AnyTypeModel;
@@ -210,7 +217,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "null",
         } as MetadataTypeModel & NullTypeModel;
@@ -222,7 +231,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "boolean",
           options: options?.filter((option) => typeof option === "boolean"),
@@ -235,7 +246,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "integer",
           options: options?.filter((option) => typeof option === "number"),
@@ -254,7 +267,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "number",
           options: options?.filter((option) => typeof option === "number"),
@@ -273,7 +288,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "string",
           options: options?.filter((option) => typeof option === "string"),
@@ -291,7 +308,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "array",
 
@@ -311,7 +330,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
           description,
           examples,
           deprecated,
+
           mockable,
+          exact,
 
           type: "object",
 
@@ -337,7 +358,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
       description,
       examples,
       deprecated,
+
       mockable,
+      exact,
 
       type: "reference",
       reference,
@@ -354,7 +377,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
       description,
       examples,
       deprecated,
+
       mockable,
+      exact,
 
       type: "union",
       members: oneOf,
@@ -367,7 +392,9 @@ export function toTypeModel(arena: core.SchemaArenaContainer, key: number): Type
     description,
     examples,
     deprecated,
+
     mockable,
+    exact,
 
     type: "unknown",
   };
