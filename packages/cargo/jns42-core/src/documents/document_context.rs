@@ -646,21 +646,21 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     given_location: String,
     antecedent_location: Option<String>,
     default_meta_schema_id: String,
-  ) -> Result<(), exports::jns42::core::documents::Error> {
-    let retrieval_location = retrieval_location.try_into()?;
+  ) -> Result<String, exports::jns42::core::documents::Error> {
+    let retrieval_location: NodeLocation = retrieval_location.try_into()?;
     let given_location = given_location.try_into()?;
     let antecedent_location = antecedent_location
       .map(|value| value.try_into())
       .transpose()?;
 
     self.0.load_from_location(
-      retrieval_location,
+      retrieval_location.clone(),
       given_location,
       antecedent_location,
       &default_meta_schema_id,
     )?;
 
-    Ok(())
+    Ok(retrieval_location.to_string())
   }
 
   fn load_from_node(
