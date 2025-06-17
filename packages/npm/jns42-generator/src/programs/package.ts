@@ -80,7 +80,7 @@ function main(configuration: MainConfiguration) {
 
   const context = contextBuilder.build();
 
-  context.loadFromLocation(
+  const entryLocation = context.loadFromLocation(
     instanceSchemaLocation,
     instanceSchemaLocation,
     undefined,
@@ -96,6 +96,6 @@ function main(configuration: MainConfiguration) {
     packageDirectoryPath,
     packageName,
     packageVersion,
-    entryLocation: instanceSchemaLocation,
+    entryLocation,
   });
 }
