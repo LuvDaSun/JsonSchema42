@@ -671,7 +671,7 @@ impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHo
     node: exports::jns42::core::utilities::JsonValue,
     default_meta_schema_id: String,
   ) -> Result<(), exports::jns42::core::documents::Error> {
-    let retrieval_location = retrieval_location.try_into()?;
+    let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.try_into()?;
     let antecedent_location = antecedent_location
       .map(|value| value.try_into())
