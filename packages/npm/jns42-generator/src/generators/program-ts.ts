@@ -55,6 +55,11 @@ export function* generateProgramTsCode(
         option("parse", {
           description: "parse the data before asserting",
           type: "boolean",
+        }).
+        option("quiet", {
+          description: "Don't display error",
+          type: "boolean",
+          default: false,
         }),
       async argv => {
         const stdinData = await consumers.text(process.stdin);
@@ -63,7 +68,11 @@ export function* generateProgramTsCode(
           data = parsers.${parseFunction}(data);
         }
         if(!validators.${validatorFunction}(data)) {
-          throw lib.validation.getValidationError();
+          const error = lib.validation.getValidationError();
+          if(!argv.quiet) {
+            console.error(error.message);
+          }
+          process.exit(1);
         }
       },
     );
