@@ -13,7 +13,7 @@ import {
 export function* generateValidatorsTsCode(specification: models.Specification) {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   const { names, validatorsArena } = specification;
 
@@ -78,9 +78,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       yield itt`
         if(
           ${joinIterable(
-            (item.options as any[]).map(
-              (option) => itt`${valueExpression} !== ${JSON.stringify(option)}`,
-            ),
+            item.options.map((option) => itt`${valueExpression} !== ${option.serialize()}`),
             " &&\n",
           )}
         ) {
@@ -101,29 +99,29 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     `;
       function* generateSubAssertions() {
-        for (const type of item.types ?? ([] as core.SchemaType[])) {
+        for (const type of item.types ?? ([] as core.models.SchemaType[])) {
           switch (type) {
-            case core.SchemaType.Any: {
+            case "any": {
               yield JSON.stringify(true);
               break;
             }
 
-            case core.SchemaType.Never: {
+            case "never": {
               yield JSON.stringify(false);
               return;
             }
 
-            case core.SchemaType.Null: {
+            case "null": {
               yield itt`${valueExpression} === null`;
               break;
             }
 
-            case core.SchemaType.Boolean: {
+            case "boolean": {
               yield itt`typeof ${valueExpression} === "boolean"`;
               break;
             }
 
-            case core.SchemaType.Integer: {
+            case "integer": {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression}) &&
@@ -132,7 +130,7 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case core.SchemaType.Number: {
+            case "number": {
               yield itt`
                 typeof ${valueExpression} === "number" &&
                 !isNaN(${valueExpression})
@@ -140,17 +138,17 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
               break;
             }
 
-            case core.SchemaType.String: {
+            case "str": {
               yield itt`typeof ${valueExpression} === "string"`;
               break;
             }
 
-            case core.SchemaType.Array: {
+            case "array": {
               yield itt`Array.isArray(${valueExpression})`;
               break;
             }
 
-            case core.SchemaType.Object: {
+            case "object": {
               yield itt`
                 ${valueExpression} !== null &&
                 typeof ${valueExpression} === "object" &&
@@ -525,15 +523,12 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
       function* generateCaseClauses() {
         if (item.objectProperties != null) {
-          for (const propertyName in item.objectProperties) {
+          for (const [propertyName, propertyKey] of item.objectProperties) {
             yield itt`
               case ${JSON.stringify(propertyName)}:
                 if(!lib.validation.withValidationPath(
                   propertyName,
-                  () => ${generateValidatorReference(
-                    item.objectProperties[propertyName],
-                    `propertyValue`,
-                  )},
+                  () => ${generateValidatorReference(propertyKey, `propertyValue`)},
                 )) {
                   return false
                 }
@@ -551,15 +546,12 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
 
       function* generateDefaultCaseStatements() {
         if (item.patternProperties != null) {
-          for (const propertyPattern in item.patternProperties) {
+          for (const [propertyPattern, propertyKey] of item.patternProperties) {
             yield itt`
               if(new RegExp(${JSON.stringify(propertyPattern)}).test(propertyName)) {
                 if(!lib.validation.withValidationPath(
                   propertyName,
-                  () => ${generateValidatorReference(
-                    item.patternProperties[propertyPattern],
-                    `propertyValue`,
-                  )},
+                  () => ${generateValidatorReference(propertyKey, `propertyValue`)},
                 )) {
                   return false
                 }
@@ -683,9 +675,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
     }
 
-    if (item.ifSchema != null) {
+    if (item.if != null) {
       yield itt`
-        if(${generateValidatorReference(item.ifSchema, valueExpression)}) {
+        if(${generateValidatorReference(item.if, valueExpression)}) {
           ${generateInnerThenStatements()}
         }
         else {
@@ -694,9 +686,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       `;
 
       function* generateInnerThenStatements() {
-        if (item.thenSchema != null) {
+        if (item.then != null) {
           yield itt`
-            if(!${generateValidatorReference(item.thenSchema, valueExpression)}) {
+            if(!${generateValidatorReference(item.then, valueExpression)}) {
               lib.validation.recordValidationFailure("then");
               return false;
             }
@@ -705,9 +697,9 @@ export function* generateValidatorsTsCode(specification: models.Specification) {
       }
 
       function* generateInnerElseStatements() {
-        if (item.elseSchema != null) {
+        if (item.else != null) {
           yield itt`
-            if(!${generateValidatorReference(item.elseSchema, valueExpression)}) {
+            if(!${generateValidatorReference(item.else, valueExpression)}) {
               lib.validation.recordValidationFailure("else");
               return false;
             }

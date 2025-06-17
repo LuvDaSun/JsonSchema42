@@ -1,17 +1,18 @@
 use super::find_version_node;
 use super::schema_document::SchemaDocument;
 use crate::documents;
-use crate::error::Error;
+use crate::documents::Error;
 use crate::models::DocumentSchemaItem;
 use crate::utilities::NodeCache;
 use crate::utilities::NodeLocation;
-use gloo::utils::format::JsValueSerdeExt;
 use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::iter;
 use std::rc;
-use wasm_bindgen::prelude::*;
+
+#[cfg(target_arch = "wasm32")]
+use crate::exports;
 
 pub struct DocumentConfiguration {
   pub retrieval_location: NodeLocation,
@@ -98,7 +99,7 @@ impl DocumentContext {
   }
 
   pub fn register_factory(
-    self: &mut rc::Rc<Self>,
+    &mut self,
     schema: &str,
     factory: Box<DocumentFactory>,
   ) -> Result<(), Error> {
@@ -106,15 +107,12 @@ impl DocumentContext {
     don't check if the factory is already registered here so we can
     override factories
     */
-    rc::Rc::get_mut(self)
-      .ok_or(Error::Unknown)?
-      .factories
-      .insert(schema.to_owned(), factory);
+    self.factories.insert(schema.to_owned(), factory);
 
     Ok(())
   }
 
-  pub fn register_well_known_factories(self: &mut rc::Rc<Self>) -> Result<(), Error> {
+  pub fn register_well_known_factories(&mut self) -> Result<(), Error> {
     self.register_factory(
       documents::draft_2020_12::META_SCHEMA_ID,
       Box::new(|context, configuration| {
@@ -225,12 +223,15 @@ impl DocumentContext {
     Ok(())
   }
 
+  pub fn build(self) -> rc::Rc<Self> {
+    rc::Rc::new(self)
+  }
+
   /**
   Load nodes from a location. The retrieval location is the physical location of the node,
   it should be a root location
   */
-  #[allow(clippy::await_holding_refcell_ref)]
-  pub async fn load_from_location(
+  pub fn load_from_location(
     self: &rc::Rc<Self>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
@@ -276,8 +277,7 @@ impl DocumentContext {
       self
         .cache
         .borrow_mut()
-        .load_from_location(&retrieval_location)
-        .await?;
+        .load_from_location(&retrieval_location)?;
 
       // Get the node from the cache
       let document_node = self
@@ -384,7 +384,7 @@ impl DocumentContext {
     Ok(())
   }
 
-  pub async fn load_from_node(
+  pub fn load_from_node(
     self: &rc::Rc<Self>,
     retrieval_location: NodeLocation,
     given_location: NodeLocation,
@@ -397,14 +397,12 @@ impl DocumentContext {
       .borrow_mut()
       .load_from_node(&retrieval_location, node)?;
 
-    self
-      .load_from_location(
-        retrieval_location,
-        given_location,
-        antecedent_location,
-        default_meta_schema_id,
-      )
-      .await
+    self.load_from_location(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      default_meta_schema_id,
+    )
   }
 
   pub fn get_explicit_locations(&self) -> BTreeSet<NodeLocation> {
@@ -490,100 +488,218 @@ impl DocumentContext {
   }
 }
 
-#[wasm_bindgen]
-#[derive(Default, Clone)]
-pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
+// // #[wasm_bindgen]
+// #[derive(Default, Clone)]
+// pub struct DocumentContextContainer(rc::Rc<DocumentContext>);
 
-#[wasm_bindgen]
-impl DocumentContextContainer {
-  #[wasm_bindgen(constructor)]
-  pub fn new() -> Self {
-    Self::default()
+// // #[wasm_bindgen]
+// impl DocumentContextContainer {
+//   // #[wasm_bindgen(constructor)]
+//   pub fn new() -> Self {
+//     Self::default()
+//   }
+
+//   // #[wasm_bindgen(js_name = "registerWellKnownFactories")]
+//   pub fn register_well_known_factories(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+//     Ok(self.0.register_well_known_factories()?)
+//   }
+
+//   // #[wasm_bindgen(js_name = "loadFromLocation")]
+//   pub fn load_from_location(
+//     &self,
+//     retrieval_location: String,
+//     given_location: String,
+//     antecedent_location: Option<String>,
+//     default_meta_schema_id: &str,
+//   ) -> Result<(), Box<dyn std::error::Error>> {
+//     let retrieval_location = retrieval_location.parse()?;
+//     let given_location = given_location.parse()?;
+//     let antecedent_location = antecedent_location
+//       .map(|location| location.parse())
+//       .transpose()?;
+
+//     Ok(self.0.load_from_location(
+//       retrieval_location,
+//       given_location,
+//       antecedent_location,
+//       default_meta_schema_id,
+//     )?)
+//   }
+
+//   // #[wasm_bindgen(js_name = "loadFromNode")]
+//   pub fn load_from_node(
+//     &self,
+//     retrieval_location: String,
+//     given_location: String,
+//     antecedent_location: Option<String>,
+//     node: serde_json::Value,
+//     default_meta_schema_id: &str,
+//   ) -> Result<(), Box<dyn std::error::Error>> {
+//     let retrieval_location = retrieval_location.parse()?;
+//     let given_location = given_location.parse()?;
+//     let antecedent_location = antecedent_location
+//       .map(|location| location.parse())
+//       .transpose()?;
+
+//     Ok(self.0.load_from_node(
+//       retrieval_location,
+//       given_location,
+//       antecedent_location,
+//       node,
+//       default_meta_schema_id,
+//     )?)
+//   }
+
+//   // #[wasm_bindgen(js_name = "getExplicitLocations")]
+//   pub fn get_explicit_locations(&self) -> Vec<String> {
+//     self
+//       .0
+//       .get_explicit_locations()
+//       .into_iter()
+//       .map(|location| location.to_string())
+//       .collect()
+//   }
+// }
+
+// impl From<rc::Rc<DocumentContext>> for DocumentContextContainer {
+//   fn from(value: rc::Rc<DocumentContext>) -> Self {
+//     Self(value)
+//   }
+// }
+
+// impl From<DocumentContextContainer> for rc::Rc<DocumentContext> {
+//   fn from(value: DocumentContextContainer) -> Self {
+//     value.0
+//   }
+// }
+
+#[cfg(target_arch = "wasm32")]
+pub struct DocumentContextBuilderHost(std::cell::RefCell<Option<DocumentContext>>);
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::documents::GuestDocumentContextBuilder for DocumentContextBuilderHost {
+  fn new() -> Self {
+    Self(std::cell::RefCell::new(Some(DocumentContext::new())))
   }
 
-  #[wasm_bindgen(js_name = "registerWellKnownFactories")]
-  pub fn register_well_known_factories(&mut self) -> Result<(), js_sys::Error> {
-    Ok(self.0.register_well_known_factories()?)
+  fn register_well_known_factories(&self) -> Result<(), exports::jns42::core::documents::Error> {
+    self
+      .0
+      .borrow_mut()
+      .as_mut()
+      .unwrap()
+      .register_well_known_factories()?;
+
+    Ok(())
   }
 
-  #[wasm_bindgen(js_name = "loadFromLocation")]
-  pub async fn load_from_location(
+  fn build(&self) -> exports::jns42::core::documents::DocumentContext {
+    let document_context = self.0.borrow_mut().take().unwrap();
+    let document_context: DocumentContextHost = document_context.into();
+    exports::jns42::core::documents::DocumentContext::new(document_context)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+pub struct DocumentContextHost(rc::Rc<DocumentContext>);
+
+#[cfg(target_arch = "wasm32")]
+impl From<DocumentContext> for DocumentContextHost {
+  fn from(value: DocumentContext) -> Self {
+    Self(value.into())
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<DocumentContextHost> for exports::jns42::core::documents::DocumentContext {
+  fn from(value: DocumentContextHost) -> Self {
+    Self::new(value)
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<DocumentContext> for exports::jns42::core::documents::DocumentContext {
+  fn from(value: DocumentContext) -> Self {
+    DocumentContextHost::from(value).into()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<exports::jns42::core::documents::DocumentContext> for DocumentContextHost {
+  fn from(value: exports::jns42::core::documents::DocumentContext) -> Self {
+    value.into_inner()
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<exports::jns42::core::documents::DocumentContext> for rc::Rc<DocumentContext> {
+  fn from(value: exports::jns42::core::documents::DocumentContext) -> Self {
+    DocumentContextHost::from(value).0
+  }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl exports::jns42::core::documents::GuestDocumentContext for DocumentContextHost {
+  fn load_from_location(
     &self,
     retrieval_location: String,
     given_location: String,
     antecedent_location: Option<String>,
-    default_meta_schema_id: &str,
-  ) -> Result<String, js_sys::Error> {
+    default_meta_schema_id: String,
+  ) -> Result<String, exports::jns42::core::documents::Error> {
     let retrieval_location: NodeLocation = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
-    let antecedent_location = antecedent_location
-      .map(|location| location.parse())
-      .transpose()?;
+    let antecedent_location = antecedent_location.map(|value| value.parse()).transpose()?;
 
-    self
-      .0
-      .load_from_location(
-        retrieval_location.clone(),
-        given_location,
-        antecedent_location,
-        default_meta_schema_id,
-      )
-      .await?;
+    self.0.load_from_location(
+      retrieval_location.clone(),
+      given_location,
+      antecedent_location,
+      &default_meta_schema_id,
+    )?;
 
     Ok(retrieval_location.to_string())
   }
 
-  #[wasm_bindgen(js_name = "loadFromNode")]
-  pub async fn load_from_node(
+  fn load_from_node(
     &self,
     retrieval_location: String,
     given_location: String,
     antecedent_location: Option<String>,
-    node: &JsValue,
-    default_meta_schema_id: &str,
-  ) -> Result<(), js_sys::Error> {
+    node: exports::jns42::core::utilities::JsonValue,
+    default_meta_schema_id: String,
+  ) -> Result<(), exports::jns42::core::documents::Error> {
     let retrieval_location = retrieval_location.parse()?;
     let given_location = given_location.parse()?;
-    let antecedent_location = antecedent_location
-      .map(|location| location.parse())
-      .transpose()?;
+    let antecedent_location = antecedent_location.map(|value| value.parse()).transpose()?;
 
-    let node = JsValue::into_serde(node).unwrap();
+    let node: crate::utilities::JsonValueHost = node.into_inner();
+    let node = node.into();
 
-    Ok(
-      self
-        .0
-        .load_from_node(
-          retrieval_location,
-          given_location,
-          antecedent_location,
-          node,
-          default_meta_schema_id,
-        )
-        .await?,
-    )
+    self.0.load_from_node(
+      retrieval_location,
+      given_location,
+      antecedent_location,
+      node,
+      &default_meta_schema_id,
+    )?;
+
+    Ok(())
   }
 
-  #[wasm_bindgen(js_name = "getExplicitLocations")]
-  pub fn get_explicit_locations(&self) -> Vec<String> {
+  fn get_explicit_locations(&self) -> Vec<String> {
     self
       .0
       .get_explicit_locations()
-      .into_iter()
-      .map(|location| location.to_string())
+      .iter()
+      .map(Into::into)
       .collect()
   }
-}
 
-impl From<rc::Rc<DocumentContext>> for DocumentContextContainer {
-  fn from(value: rc::Rc<DocumentContext>) -> Self {
-    Self(value)
-  }
-}
-
-impl From<DocumentContextContainer> for rc::Rc<DocumentContext> {
-  fn from(value: DocumentContextContainer) -> Self {
-    value.0
+  fn make_schema_arena(&self) -> exports::jns42::core::models::SchemaArena {
+    let document_context = self.0.clone();
+    let schema_arena = crate::models::SchemaArena::from_document_context(&document_context);
+    schema_arena.into()
   }
 }
 
@@ -593,10 +709,12 @@ mod tests {
   use super::*;
   use crate::models::SchemaType;
 
-  #[tokio::test]
-  async fn test_load_string_from_location() {
-    let mut document_context = rc::Rc::new(DocumentContext::default());
+  #[test]
+  fn test_load_string_from_location() {
+    let mut document_context = DocumentContext::default();
     document_context.register_well_known_factories().unwrap();
+
+    let document_context = document_context.build();
 
     let location: NodeLocation = "../../../fixtures/specifications/string.json"
       .parse()
@@ -609,7 +727,6 @@ mod tests {
         None,
         documents::draft_2020_12::META_SCHEMA_ID,
       )
-      .await
       .unwrap();
 
     let mut nodes = document_context.get_schema_nodes();

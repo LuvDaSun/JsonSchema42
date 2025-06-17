@@ -5,7 +5,7 @@ import { itt } from "../utilities/iterable-text-template.js";
 export function* generateBuildJsCode() {
   const packageInfo = readPackageInfo();
 
-  yield core.banner("//", `v${packageInfo.version}`);
+  yield core.utilities.banner("//", `v${packageInfo.version}`);
 
   yield itt`
     import cp from "node:child_process";

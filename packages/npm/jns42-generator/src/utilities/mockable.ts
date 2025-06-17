@@ -1,6 +1,6 @@
 import * as core from "@jns42/core";
 
-export function isMockable(arena: core.SchemaArenaContainer, key: number) {
+export function isMockable(arena: core.models.SchemaArena, key: number) {
   const item = arena.getItem(key);
 
   // the counter keeps track of of this item is unknown or not. If the counter is 0
@@ -29,11 +29,7 @@ export function isMockable(arena: core.SchemaArenaContainer, key: number) {
 
   if (item.types != null) {
     // we cannot mock never and any types
-    if (
-      item.types.every(
-        (type: core.SchemaType) => type === core.SchemaType.Never || type === core.SchemaType.Any,
-      )
-    ) {
+    if (item.types.every((type: core.models.SchemaType) => type === "never" || type === "any")) {
       return false;
     }
     mockableCounter++;
@@ -46,13 +42,13 @@ export function isMockable(arena: core.SchemaArenaContainer, key: number) {
     mockableCounter++;
   }
 
-  if (item.ifSchema != null) {
+  if (item.if != null) {
     return false;
   }
-  if (item.thenSchema != null) {
+  if (item.then != null) {
     return false;
   }
-  if (item.elseSchema != null) {
+  if (item.else != null) {
     return false;
   }
   if (item.not != null) {
@@ -102,7 +98,7 @@ export function isMockable(arena: core.SchemaArenaContainer, key: number) {
   if (item.objectProperties != null && Object.keys(item.objectProperties).length > 0) {
     const required = new Set(item.required);
     if (
-      !Object.entries(item.objectProperties as Record<string, number>)
+      !item.objectProperties
         .filter(([name, key]) => required.has(name))
         .every(([name, key]) => isMockable(arena, key))
     ) {
