@@ -148,13 +148,9 @@ export function loadSpecification(
 
     switch (item.type) {
       case "unknown":
-        return true;
-
       case "never":
-        return false;
-
       case "any":
-        return true;
+        return false;
 
       case "null":
         return true;
