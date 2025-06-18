@@ -8,6 +8,7 @@ export interface Specification {
   names: core.NamesContainer;
   typeModels: Map<number, TypeModel>;
   validatorModels: Map<number, ValidatorModel>;
+  isMockable: (key: number) => boolean;
 }
 
 export interface LoadSpecificationConfiguration {
@@ -129,5 +130,124 @@ export function loadSpecification(
     names,
     typeModels,
     validatorModels,
+    isMockable,
   };
+
+  function isMockable(key: number) {
+    const item = typeModels.get(key);
+    assert(item != null);
+
+    // the counter keeps track of of this item is unknown or not. If the counter is 0
+    // then the item has no meaningful mockable elements (often only validation).
+    let mockableCounter = 0;
+
+    // we can only mock exact items
+    if (!(item.exact ?? false)) {
+      return false;
+    }
+
+    switch (item.type) {
+      case "unknown":
+        return true;
+
+      case "never":
+        return false;
+
+      case "any":
+        return true;
+
+      case "null":
+        return true;
+
+      case "boolean":
+        return true;
+
+      case "integer":
+        return true;
+
+      case "number":
+        return true;
+
+      case "string":
+        // one day we might support some formats
+        if (item.valueFormat != null) {
+          return false;
+        }
+
+        // anything with a regex cannot be mocked
+        if (item.valuePattern != null) {
+          return false;
+        }
+
+        return true;
+
+      case "array": {
+        // we might support this one day
+        if (item.uniqueItems != null) {
+          return false;
+        }
+
+        if (item.arrayItems != null) {
+          if (!isMockable(item.arrayItems)) {
+            return false;
+          }
+        }
+
+        if (item.contains != null) {
+          return false;
+        }
+
+        return true;
+      }
+
+      case "object":
+        if (item.mapProperties != null) {
+          // we should not increase the mockableCounter for these kinds of
+          // fields as they are not making the item more mockable
+          if (!isMockable(item.mapProperties)) {
+            return false;
+          }
+        }
+
+        if (item.propertyNames != null) {
+          if (!isMockable(item.propertyNames)) {
+            return false;
+          }
+        }
+
+        // anything with a regex cannot be mocked
+        if (item.patternProperties != null && Object.keys(item.patternProperties).length > 0) {
+          return false;
+        }
+
+        if (item.objectProperties != null && Object.keys(item.objectProperties).length > 0) {
+          const required = new Set(item.required);
+          if (
+            !Object.entries(item.objectProperties as Record<string, number>)
+              .filter(([name, key]) => required.has(name))
+              .every(([name, key]) => isMockable(key))
+          ) {
+            return false;
+          }
+        }
+
+        // if (item.dependentSchemas != null && Object.keys(item.dependentSchemas).length > 0) {
+        //   return false;
+        // }
+
+        return true;
+
+      case "union":
+        if (!item.members.some((key) => isMockable(key))) {
+          return false;
+        }
+        return true;
+
+      case "reference":
+        if (!isMockable(item.reference)) {
+          return false;
+        }
+        return true;
+    }
+  }
 }

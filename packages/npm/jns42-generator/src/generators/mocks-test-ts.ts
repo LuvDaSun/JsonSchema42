@@ -7,7 +7,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typeModels } = specification;
+  const { names, typeModels, isMockable } = specification;
 
   yield itt`
     import assert from "node:assert";
@@ -17,7 +17,7 @@ export function* generateMocksTestTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of typeModels) {
-    if (!item.mockable) {
+    if (!isMockable(itemKey)) {
       continue;
     }
 
