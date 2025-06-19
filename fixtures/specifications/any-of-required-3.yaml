@@ -1,0 +1,6 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+anyOf:
+  - type: object
+    required: [a]
+  - type: object
+    required: [b]
