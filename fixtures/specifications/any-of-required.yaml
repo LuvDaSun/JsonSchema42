@@ -3,4 +3,3 @@ type: object
 anyOf:
   - required: [a]
   - required: [b]
-  - required: [c]
