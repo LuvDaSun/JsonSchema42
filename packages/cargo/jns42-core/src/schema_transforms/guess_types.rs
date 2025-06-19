@@ -15,27 +15,14 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   if let Some(options) = &item.options {
     for option in options {
-      match option {
-        serde_json::Value::Null => {
-          types.insert(SchemaType::Null);
-        }
-        serde_json::Value::Bool(_) => {
-          types.insert(SchemaType::Boolean);
-        }
-        serde_json::Value::Number(_) => {
-          types.insert(SchemaType::Number);
-          types.insert(SchemaType::Integer);
-        }
-        serde_json::Value::String(_) => {
-          types.insert(SchemaType::String);
-        }
-        serde_json::Value::Array(_) => {
-          types.insert(SchemaType::Array);
-        }
-        serde_json::Value::Object(_) => {
-          types.insert(SchemaType::Object);
-        }
-      };
+      types.insert(match option {
+        serde_json::Value::Null => SchemaType::Null,
+        serde_json::Value::Bool(_) => SchemaType::Boolean,
+        serde_json::Value::Number(_) => SchemaType::Number,
+        serde_json::Value::String(_) => SchemaType::String,
+        serde_json::Value::Array(_) => SchemaType::Array,
+        serde_json::Value::Object(_) => SchemaType::Object,
+      });
     }
   }
 
