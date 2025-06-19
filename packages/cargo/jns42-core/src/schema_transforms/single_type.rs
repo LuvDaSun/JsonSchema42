@@ -1,5 +1,5 @@
-use crate::models::{ArenaSchemaItem, SchemaArena};
-use std::iter;
+use crate::models::{ArenaSchemaItem, SchemaArena, SchemaType};
+use std::{collections::BTreeSet, iter};
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -36,6 +36,12 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     return;
   }
 
+  let mut types: BTreeSet<_> = types.iter().cloned().collect();
+  if types.contains(&SchemaType::Number) {
+    // Number overlaps integer
+    types.remove(&SchemaType::Integer);
+  }
+
   match types.len() {
     0 => {
       // if types is empty then we should just set it to None
@@ -55,7 +61,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
         types: None,
         one_of: Some(
           types
-            .clone()
             .into_iter()
             .map(|r#type| {
               arena.add_item(ArenaSchemaItem {
