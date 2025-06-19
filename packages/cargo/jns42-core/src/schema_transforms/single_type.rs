@@ -111,13 +111,13 @@ mod tests {
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some(vec!["base".to_owned(), "string".to_owned()]),
-        types: Some(vec![SchemaType::String]),
+        name: Some(vec!["base".to_owned(), "number".to_owned()]),
+        types: Some(vec![SchemaType::Number]),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some(vec!["base".to_owned(), "number".to_owned()]),
-        types: Some(vec![SchemaType::Number]),
+        name: Some(vec!["base".to_owned(), "string".to_owned()]),
+        types: Some(vec![SchemaType::String]),
         ..Default::default()
       },
     ];
