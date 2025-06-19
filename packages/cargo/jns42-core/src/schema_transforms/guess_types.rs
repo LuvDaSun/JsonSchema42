@@ -54,6 +54,10 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
 
   // TODO maybe guess some more?
 
+  if types.is_empty() {
+    return;
+  }
+
   let mut item_new = item.clone();
 
   item_new.types = Some(types.into_iter().collect());
