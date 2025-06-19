@@ -114,7 +114,7 @@ export function loadSpecification(
   const names = namesBuilder.build();
 
   const typeModels = new Map<number, TypeModel>();
-  for (let key = 0; key < typesArena.count(); key++) {
+  for (const key of primaryTypeKeys) {
     const model = toTypeModel(typesArena, key);
     typeModels.set(key, model);
   }

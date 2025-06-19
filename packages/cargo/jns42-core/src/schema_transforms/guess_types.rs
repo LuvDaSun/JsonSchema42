@@ -39,18 +39,18 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     }
   }
 
-  if item.array_items.is_some() || item.tuple_items.is_some() {
-    types.insert(SchemaType::Array);
-  }
+  // if item.array_items.is_some() || item.tuple_items.is_some() {
+  //   types.insert(SchemaType::Array);
+  // }
 
-  if item.pattern_properties.is_some()
-    || item.property_names.is_some()
-    || item.object_properties.is_some()
-    || item.map_properties.is_some()
-    || item.required.is_some()
-  {
-    types.insert(SchemaType::Object);
-  }
+  // if item.pattern_properties.is_some()
+  //   || item.property_names.is_some()
+  //   || item.object_properties.is_some()
+  //   || item.map_properties.is_some()
+  //   || item.required.is_some()
+  // {
+  //   types.insert(SchemaType::Object);
+  // }
 
   // TODO maybe guess some more?
 
