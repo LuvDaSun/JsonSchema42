@@ -7,34 +7,54 @@ use std::collections::BTreeSet;
 pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
-  if item
-    .types
-    .as_ref()
-    .map(|value| value.len())
-    .unwrap_or_default()
-    > 0
-  {
+  if item.types.is_some() {
     return;
   }
 
-  let Some(options) = &item.options else { return };
-  if options.is_empty() {
-    return;
+  let mut types = BTreeSet::new();
+
+  if let Some(options) = &item.options {
+    for option in options {
+      match option {
+        serde_json::Value::Null => {
+          types.insert(SchemaType::Null);
+        }
+        serde_json::Value::Bool(_) => {
+          types.insert(SchemaType::Boolean);
+        }
+        serde_json::Value::Number(_) => {
+          types.insert(SchemaType::Number);
+          types.insert(SchemaType::Integer);
+        }
+        serde_json::Value::String(_) => {
+          types.insert(SchemaType::String);
+        }
+        serde_json::Value::Array(_) => {
+          types.insert(SchemaType::Array);
+        }
+        serde_json::Value::Object(_) => {
+          types.insert(SchemaType::Object);
+        }
+      };
+    }
   }
+
+  if item.array_items.is_some() || item.tuple_items.is_some() {
+    types.insert(SchemaType::Array);
+  }
+
+  if item.pattern_properties.is_some()
+    || item.property_names.is_some()
+    || item.object_properties.is_some()
+    || item.map_properties.is_some()
+    || item.required.is_some()
+  {
+    types.insert(SchemaType::Object);
+  }
+
+  // TODO maybe guess some more?
 
   let mut item_new = item.clone();
-
-  let types: BTreeSet<_> = options
-    .iter()
-    .map(|option| match option {
-      serde_json::Value::Null => SchemaType::Null,
-      serde_json::Value::Bool(_) => SchemaType::Boolean,
-      serde_json::Value::Number(_) => SchemaType::Number,
-      serde_json::Value::String(_) => SchemaType::String,
-      serde_json::Value::Array(_) => SchemaType::Array,
-      serde_json::Value::Object(_) => SchemaType::Object,
-    })
-    .collect();
 
   item_new.types = Some(types.into_iter().collect());
 
