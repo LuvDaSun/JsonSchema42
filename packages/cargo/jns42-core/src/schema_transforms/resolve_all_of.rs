@@ -579,32 +579,28 @@ mod tests {
   }
 
   #[test]
-  fn test_types_required() {
+  fn test_types_mixed() {
     let mut arena = SchemaArena::from_iter([
       ArenaSchemaItem {
-        required: Some(["a"].map(Into::into).into()),
+        all_of: Some([1, 2].into()),
         ..Default::default()
       }, // 0
       ArenaSchemaItem {
-        required: Some(["b"].map(Into::into).into()),
+        types: Some([SchemaType::Object].into()),
         ..Default::default()
       }, // 1
       ArenaSchemaItem {
-        any_of: Some([4, 5].into()),
+        any_of: Some([3, 4].into()),
         ..Default::default()
       }, // 2
       ArenaSchemaItem {
-        types: Some([SchemaType::Object].into()),
+        required: Some(["a"].map(Into::into).into()),
         ..Default::default()
       }, // 3
       ArenaSchemaItem {
-        all_of: Some([0, 3].into()),
+        required: Some(["b"].map(Into::into).into()),
         ..Default::default()
       }, // 4
-      ArenaSchemaItem {
-        all_of: Some([1, 3].into()),
-        ..Default::default()
-      }, // 5
     ]);
 
     while arena.apply_transform(transform) > 0 {
@@ -614,31 +610,27 @@ mod tests {
     let actual: Vec<_> = arena.iter().cloned().collect();
     let expected: Vec<_> = [
       ArenaSchemaItem {
-        required: Some(["a"].map(Into::into).into()),
+        any_of: Some([3, 4].into()),
         ..Default::default()
       }, // 0
       ArenaSchemaItem {
-        required: Some(["b"].map(Into::into).into()),
+        types: Some([SchemaType::Object].into()),
         ..Default::default()
       }, // 1
       ArenaSchemaItem {
-        any_of: Some([4, 5].into()),
+        any_of: Some([3, 4].into()),
         ..Default::default()
       }, // 2
       ArenaSchemaItem {
         types: Some([SchemaType::Object].into()),
+        required: Some(["a"].map(Into::into).into()),
         ..Default::default()
       }, // 3
       ArenaSchemaItem {
         types: Some([SchemaType::Object].into()),
-        required: Some(["a"].map(Into::into).into()),
-        ..Default::default()
-      }, // 4
-      ArenaSchemaItem {
-        types: Some([SchemaType::Object].into()),
         required: Some(["b"].map(Into::into).into()),
         ..Default::default()
-      }, // 5
+      }, // 4
     ]
     .into();
 

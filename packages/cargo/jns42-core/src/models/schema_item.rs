@@ -197,6 +197,21 @@ where
       }};
     }
 
+    macro_rules! intersection_merge {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            // TODO lots of cloning going on here! is this really necessary?
+            let base: BTreeSet<_> = base.into_iter().cloned().collect();
+            let other: BTreeSet<_> = other.into_iter().cloned().collect();
+            base.intersection(&other).into_iter().cloned().collect()
+          },
+        )
+      }};
+    }
+
     let exact_merge = if (self.multiple_of.is_none() || other.multiple_of.is_none())
       && (self.value_pattern.is_none() || other.value_pattern.is_none())
       && (self.value_format.is_none() || other.value_format.is_none())
@@ -254,7 +269,7 @@ where
       dependent_schemas: merge_object_keys!(dependent_schemas),
 
       options: union_merge!(options), // TODO should be intersection?
-      required: union_merge!(required),
+      required: intersection_merge!(required),
 
       minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),
       minimum_exclusive: merge_option!(minimum_exclusive, |base, other| base.min(*other)),

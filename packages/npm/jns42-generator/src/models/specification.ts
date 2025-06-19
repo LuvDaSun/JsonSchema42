@@ -55,6 +55,7 @@ export function loadSpecification(
       core.SchemaTransform.FlattenOneOf,
       core.SchemaTransform.FlipAllOfOneOf,
       core.SchemaTransform.FlipAnyOfOneOf,
+      core.SchemaTransform.FlipAllOfAnyOf,
       core.SchemaTransform.InheritAllOf,
       core.SchemaTransform.InheritAnyOf,
       core.SchemaTransform.InheritOneOf,
