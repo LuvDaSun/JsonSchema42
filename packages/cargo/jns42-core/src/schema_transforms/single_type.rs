@@ -26,7 +26,7 @@ use std::{collections::BTreeSet, iter};
 pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
-  // ew got nothing to do if there are no types
+  // we got nothing to do if there are no types
   let Some(types) = &item.types else {
     return;
   };

@@ -39,6 +39,8 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
     }
   }
 
+  // TODO maybe guess some more?
+
   // if item.array_items.is_some() || item.tuple_items.is_some() {
   //   types.insert(SchemaType::Array);
   // }
@@ -51,8 +53,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   // {
   //   types.insert(SchemaType::Object);
   // }
-
-  // TODO maybe guess some more?
 
   if types.is_empty() {
     return;
