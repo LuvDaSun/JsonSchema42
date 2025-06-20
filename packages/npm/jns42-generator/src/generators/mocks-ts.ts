@@ -4,7 +4,6 @@ import * as models from "../models.js";
 import {
   NestedText,
   generateJsDocComments,
-  getMapItemProperty,
   itt,
   joinIterable,
   readPackageInfo,
@@ -15,7 +14,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
 
   yield core.banner("//", `v${packageInfo.version}`);
 
-  const { names, typeModels } = specification;
+  const { names, typeModels, isMockable } = specification;
 
   yield itt`
     import * as types from "./types.js";
@@ -57,7 +56,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   `;
 
   for (const [itemKey, item] of typeModels) {
-    if (!item.mockable) {
+    if (!isMockable(itemKey)) {
       continue;
     }
 
@@ -107,7 +106,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   function* generateMockReference(itemKey: number): Iterable<NestedText> {
     const item = typeModels.get(itemKey);
     assert(item != null);
-    assert(item.mockable);
+    assert(isMockable(itemKey));
 
     const name = names.getName(itemKey);
     if (name == null) {
@@ -120,7 +119,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
   function* generateMockDefinition(itemKey: number): Iterable<NestedText> {
     const item = typeModels.get(itemKey);
     assert(item != null);
-    assert(item.mockable);
+    assert(isMockable(itemKey));
 
     if ("options" in item && item.options != null) {
       yield itt`
@@ -303,10 +302,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
             }
           }
 
-          if (
-            item.arrayItems != null &&
-            (getMapItemProperty(typeModels, "mockable", item.arrayItems) ?? false)
-          ) {
+          if (item.arrayItems != null && isMockable(item.arrayItems)) {
             yield itt`
               ...new Array(
                 Math.max(0, ${minimumItemsExpression} - ${JSON.stringify(tupleItemsLength)}) +
@@ -358,9 +354,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                       [${JSON.stringify(name)}]: ${generateMockReference(objectProperties[name])},
                     `;
                 } else {
-                  if (
-                    !(getMapItemProperty(typeModels, "mockable", objectProperties[name]) ?? false)
-                  ) {
+                  if (!isMockable(objectProperties[name])) {
                     continue;
                   }
 
@@ -385,10 +379,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
                 ? "configuration.defaultMaximumProperties"
                 : JSON.stringify(item.maximumProperties);
 
-            if (
-              item.mapProperties != null &&
-              (getMapItemProperty(typeModels, "mockable", item.mapProperties) ?? false)
-            ) {
+            if (item.mapProperties != null && isMockable(item.mapProperties)) {
               yield itt`
                   ...Object.fromEntries(
                     new Array(
@@ -434,7 +425,7 @@ export function* generateMocksTsCode(specification: models.Specification) {
             assert(item != null);
             return [itemKey, item] as const;
           })
-          .filter(([itemKey, item]) => item.mockable);
+          .filter(([itemKey, item]) => isMockable(itemKey));
 
         yield itt`
           (() => {
