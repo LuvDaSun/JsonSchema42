@@ -3,6 +3,7 @@ use crate::utilities::NodeLocation;
 use crate::utilities::{merge_either, merge_option};
 use gloo::utils::format::JsValueSerdeExt;
 use std::collections::BTreeSet;
+use std::collections::HashSet;
 use std::fmt::Debug;
 use std::iter;
 use std::{collections::BTreeMap, iter::empty};
@@ -197,6 +198,21 @@ where
       }};
     }
 
+    macro_rules! intersection_merge {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            // TODO lots of cloning going on here! is this really necessary?
+            let base: HashSet<_> = base.into_iter().cloned().collect();
+            let other: HashSet<_> = other.into_iter().cloned().collect();
+            base.intersection(&other).into_iter().cloned().collect()
+          },
+        )
+      }};
+    }
+
     let exact_merge = if (self.multiple_of.is_none() || other.multiple_of.is_none())
       && (self.value_pattern.is_none() || other.value_pattern.is_none())
       && (self.value_format.is_none() || other.value_format.is_none())
@@ -254,6 +270,211 @@ where
       dependent_schemas: merge_object_keys!(dependent_schemas),
 
       options: union_merge!(options), // TODO should be intersection?
+      required: intersection_merge!(required),
+
+      minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),
+      minimum_exclusive: merge_option!(minimum_exclusive, |base, other| base.min(*other)),
+      maximum_inclusive: merge_option!(maximum_inclusive, |base, other| base.max(*other)),
+      maximum_exclusive: merge_option!(maximum_exclusive, |base, other| base.max(*other)),
+      multiple_of: merge_either!(multiple_of), // TODO
+
+      minimum_length: merge_option!(minimum_length, |base, other| *base.min(other)),
+      maximum_length: merge_option!(maximum_length, |base, other| *base.max(other)),
+      value_pattern: merge_either!(value_pattern),
+      value_format: merge_either!(value_format),
+
+      minimum_items: merge_option!(minimum_items, |base, other| *base.min(other)),
+      maximum_items: merge_option!(maximum_items, |base, other| *base.max(other)),
+      unique_items: merge_option!(unique_items, |base, other| base | other),
+
+      minimum_properties: merge_option!(minimum_properties, |base, other| *base.min(other)),
+      maximum_properties: merge_option!(maximum_properties, |base, other| *base.max(other)),
+    }
+  }
+
+  pub fn union<'f>(&'f self, other: &'f Self, merge_key: &impl Fn(&'f K, &'f K) -> K) -> Self {
+    assert!(
+      self
+        .types
+        .as_ref()
+        .map(|value| value.len())
+        .unwrap_or_default()
+        <= 1
+    );
+    assert!(
+      other
+        .types
+        .as_ref()
+        .map(|value| value.len())
+        .unwrap_or_default()
+        <= 1
+    );
+
+    assert_eq!(self.reference, None);
+    assert_eq!(other.reference, None);
+
+    assert_eq!(self.r#if, None);
+    assert_eq!(other.r#if, None);
+
+    assert_eq!(self.then, None);
+    assert_eq!(other.then, None);
+
+    assert_eq!(self.r#else, None);
+    assert_eq!(other.r#else, None);
+
+    assert_eq!(self.all_of, None);
+    assert_eq!(other.all_of, None);
+
+    assert_eq!(self.any_of, None);
+    assert_eq!(other.any_of, None);
+
+    assert_eq!(self.one_of, None);
+    assert_eq!(other.one_of, None);
+
+    macro_rules! merge_either {
+      ($member: ident) => {
+        merge_either(self.$member.as_ref(), other.$member.as_ref())
+      };
+    }
+
+    macro_rules! merge_option {
+      ($member: ident, $merger: expr) => {
+        merge_option(self.$member.as_ref(), other.$member.as_ref(), $merger)
+      };
+    }
+
+    macro_rules! merge_single_key {
+      ($member: ident) => {
+        merge_option(self.$member.as_ref(), other.$member.as_ref(), merge_key)
+      };
+    }
+
+    macro_rules! generate_merge_array_keys {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            let length = base.len().max(other.len());
+            (0..length)
+              .map(|index| merge_option(base.get(index), other.get(index), merge_key))
+              .map(|key| key.unwrap())
+              .collect()
+          },
+        )
+      }};
+    }
+
+    macro_rules! merge_object_keys {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            let properties: BTreeSet<_> = empty().chain(base.keys()).chain(other.keys()).collect();
+            properties
+              .into_iter()
+              .map(|property| {
+                (
+                  property,
+                  merge_option(base.get(property), other.get(property), merge_key),
+                )
+              })
+              .map(|(property, key)| (property.clone(), key.unwrap()))
+              .collect()
+          },
+        )
+      }};
+    }
+
+    macro_rules! union_merge {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            empty()
+              .chain(base.iter())
+              .chain(other.iter())
+              .cloned()
+              .collect()
+          },
+        )
+      }};
+    }
+
+    macro_rules! intersection_merge {
+      ($member: ident) => {{
+        merge_option(
+          self.$member.as_ref(),
+          other.$member.as_ref(),
+          |base, other| {
+            // TODO lots of cloning going on here! is this really necessary?
+            let base: HashSet<_> = base.into_iter().cloned().collect();
+            let other: HashSet<_> = other.into_iter().cloned().collect();
+            base.intersection(&other).into_iter().cloned().collect()
+          },
+        )
+      }};
+    }
+
+    let exact_merge = if (self.multiple_of.is_none() || other.multiple_of.is_none())
+      && (self.value_pattern.is_none() || other.value_pattern.is_none())
+      && (self.value_format.is_none() || other.value_format.is_none())
+    {
+      None
+    } else {
+      Some(true)
+    };
+
+    let exact = merge_option!(exact, &|base, other| base & other);
+    let exact = merge_option(exact.as_ref(), exact_merge.as_ref(), |base, other| {
+      base & other
+    });
+
+    Self {
+      name: self.name.clone(),
+      exact,
+      location: self.location.clone(),
+
+      title: self.title.clone(),
+      description: self.description.clone(),
+      examples: self.examples.clone(),
+      deprecated: merge_option!(deprecated, &|base, other| base | other),
+
+      types: merge_option!(types, |base, other| vec![
+        base.first().unwrap().intersection(other.first().unwrap())
+      ]),
+
+      reference: None,
+
+      all_of: None,
+      any_of: None,
+      one_of: None,
+      definitions: merge_option!(definitions, |base, other| iter::empty()
+        .chain(base)
+        .chain(other)
+        .cloned()
+        .collect()),
+
+      r#if: None,
+      then: None,
+      r#else: None,
+
+      not: merge_single_key!(not),
+
+      property_names: merge_single_key!(property_names),
+      map_properties: merge_single_key!(map_properties),
+      array_items: merge_single_key!(array_items),
+      contains: merge_single_key!(contains),
+
+      tuple_items: generate_merge_array_keys!(tuple_items),
+
+      object_properties: merge_object_keys!(object_properties),
+      pattern_properties: merge_object_keys!(pattern_properties),
+      dependent_schemas: merge_object_keys!(dependent_schemas),
+
+      options: intersection_merge!(options),
       required: union_merge!(required),
 
       minimum_inclusive: merge_option!(minimum_inclusive, |base, other| base.min(*other)),

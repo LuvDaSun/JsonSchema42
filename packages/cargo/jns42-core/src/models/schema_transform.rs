@@ -27,6 +27,7 @@ pub enum SchemaTransform {
   ResolveSingleAnyOf,
   ResolveSingleOneOf,
   SingleType,
+  GuessTypes,
   Unalias,
 
   Name,
@@ -65,6 +66,7 @@ impl From<SchemaTransform> for BoxedSchemaTransform {
       SchemaTransform::ResolveSingleOneOf => schema_transforms::resolve_single::one_of::transform,
 
       SchemaTransform::SingleType => schema_transforms::single_type::transform,
+      SchemaTransform::GuessTypes => schema_transforms::guess_types::transform,
 
       SchemaTransform::Unalias => schema_transforms::unalias::transform,
 

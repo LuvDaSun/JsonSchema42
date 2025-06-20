@@ -1,6 +1,7 @@
 pub mod explode;
 pub mod flatten;
 pub mod flip;
+pub mod guess_types;
 pub mod inherit;
 pub mod name;
 pub mod resolve_all_of;

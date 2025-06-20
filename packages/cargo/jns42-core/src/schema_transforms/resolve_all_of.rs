@@ -124,7 +124,7 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
       return;
     }
 
-    item_new = item_new.intersection(sub_item, &merge_key);
+    item_new = item_new.union(sub_item, &merge_key);
   }
 
   arena.borrow_mut().replace_item(key, item_new);

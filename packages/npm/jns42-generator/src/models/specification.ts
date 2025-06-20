@@ -45,6 +45,7 @@ export function loadSpecification(
   // transform the typesArena (note that we are not transforming the validatorsArena!)
   {
     const transformers = [
+      core.SchemaTransform.GuessTypes,
       core.SchemaTransform.Explode,
       core.SchemaTransform.SingleType,
       core.SchemaTransform.ResolveSingleAllOf,
@@ -55,6 +56,7 @@ export function loadSpecification(
       core.SchemaTransform.FlattenOneOf,
       core.SchemaTransform.FlipAllOfOneOf,
       core.SchemaTransform.FlipAnyOfOneOf,
+      core.SchemaTransform.FlipAllOfAnyOf,
       core.SchemaTransform.InheritAllOf,
       core.SchemaTransform.InheritAnyOf,
       core.SchemaTransform.InheritOneOf,

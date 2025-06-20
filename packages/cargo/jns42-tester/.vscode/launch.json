@@ -44,7 +44,7 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "test specifications npm",
+      "name": "test specifications async cargo",
       "cargo": {
         "args": [
           "build",
@@ -57,11 +57,11 @@
       "args": [
         "specifications",
         "--type",
-        "npm",
+        "cargo",
         "--specifications-directory",
-        "../../../fixtures/specifications",
+        "../../../fixtures/specifications-async",
         "--output-directory",
-        ".generated/specifications/npm"
+        ".generated/specifications-async/cargo"
       ],
       "cwd": "${workspaceFolder}"
     },
@@ -86,6 +86,54 @@
         "../../../fixtures/cases",
         "--output-directory",
         ".generated/cases/cargo"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test specifications npm",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "specifications",
+        "--type",
+        "npm",
+        "--specifications-directory",
+        "../../../fixtures/specifications",
+        "--output-directory",
+        ".generated/specifications/npm"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test specifications async npm",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin",
+          "${workspaceFolderBasename}",
+          "--package",
+          "${workspaceFolderBasename}"
+        ]
+      },
+      "args": [
+        "specifications",
+        "--type",
+        "npm",
+        "--specifications-directory",
+        "../../../fixtures/specifications-async",
+        "--output-directory",
+        ".generated/specifications-async/npm"
       ],
       "cwd": "${workspaceFolder}"
     },
