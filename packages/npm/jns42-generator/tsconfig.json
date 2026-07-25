@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node20",
+  "extends": "@tsconfig/node24",
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./transpiled",
@@ -7,7 +7,7 @@
     "sourceMap": true,
     "declaration": true,
     "composite": true,
-    "lib": ["es2023", "DOM"]
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "references": [

@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "typescript file",
+      "program": "${file}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/packages/node/*/transpiled/**/*.js"],
+      "preLaunchTask": "tsc-watch",
+      "outputCapture": "std"
+    }
+  ]
+}

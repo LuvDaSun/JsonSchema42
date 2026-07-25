@@ -1,0 +1,55 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "tsc",
+      "label": "tsc",
+      "group": "build",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "type": "npm",
+      "script": "tsc-watch",
+      "isBackground": true,
+      "label": "tsc-watch",
+      "group": "build",
+      "problemMatcher": ["$tsc-watch"]
+    },
+    {
+      "type": "npm",
+      "script": "rollup-watch",
+      "isBackground": true,
+      "label": "rollup-watch",
+      "group": "build",
+      "problemMatcher": [
+        {
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*",
+            "endsPattern": "waiting\\s+for\\s+"
+          },
+          "pattern": [
+            {
+              "regexp": "^$",
+              "file": 0,
+              "line": 0,
+              "column": 0,
+              "code": 0,
+              "message": 0
+            }
+          ]
+        }
+      ],
+      "dependsOn": ["tsc-watch"]
+    },
+    {
+      "dependsOn": ["tsc-watch", "rollup-watch"],
+      "label": "build-watch",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

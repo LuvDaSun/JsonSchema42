@@ -4,12 +4,13 @@ tasks:
   install:
     desc: Install everything
     cmds:
-      - task: install:npm
+      - task: install:node
 
   build:
     run: once
     cmds:
       - task: build:tsc
+      - task: build:rollup
 
   check:
     desc: Check everything
@@ -23,34 +24,38 @@ tasks:
     cmds:
       - task: fix:formatting
 
-  install:npm:
+  install:node:
     run: once
     desc: Install Node.js dependencies
-    sources:
-      - package-lock.json
-    generates:
-      - node_modules/**/*
     cmds:
       - npm clean-install
 
   build:tsc:
     run: once
     deps:
-      - install:npm
+      - install:node
     cmds:
       - npm run tsc
+
+  build:rollup:
+    run: once
+    deps:
+      - build:tsc
+      - install:node
+    cmds:
+      - npm run rollup
 
   check:formatting:
     desc: Check formatting
     deps:
-      - install:npm
+      - install:node
     cmds:
       - npm run formatting
 
   check:spelling:
     desc: Check spelling
     deps:
-      - install:npm
+      - install:node
     cmds:
       - npm run spelling
 
@@ -62,6 +67,6 @@ tasks:
   fix:formatting:
     desc: Fix formatting
     deps:
-      - install:npm
+      - install:node
     cmds:
       - npm run fix-formatting
