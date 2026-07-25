@@ -21,7 +21,7 @@
         "package",
         "${file}",
         "--package-directory",
-        ".generated/file/${fileBasenameNoExtension}",
+        ".generated/file/npm/${fileBasenameNoExtension}",
         "--package-name",
         "${fileBasenameNoExtension}",
         "--package-version",
@@ -35,6 +35,98 @@
       "outFiles": ["${workspaceFolder}/packages/npm/*/transpiled/**/*.js"],
       "preLaunchTask": "tsc-watch",
       "outputCapture": "std"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "package file",
+      "cargo": {
+        "args": ["build", "--bin", "jns42-generator", "--package", "jns42-generator"]
+      },
+      "args": [
+        "package",
+        "${file}",
+        "--package-directory",
+        ".generated/file/cargo/${fileBasenameNoExtension}",
+        "--package-name",
+        "${fileBasenameNoExtension}",
+        "--package-version",
+        "0.0.0"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test specifications cargo",
+      "cargo": {
+        "args": ["build", "--bin", "jns42-tester", "--package", "jns42-tester"]
+      },
+      "args": [
+        "specifications",
+        "--type",
+        "cargo",
+        "--specifications-directory",
+        "fixtures/specifications",
+        "--output-directory",
+        ".generated/specifications/cargo"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test specifications npm",
+      "cargo": {
+        "args": ["build", "--bin", "jns42-tester", "--package", "jns42-tester"]
+      },
+      "args": [
+        "specifications",
+        "--type",
+        "npm",
+        "--specifications-directory",
+        "fixtures/specifications",
+        "--output-directory",
+        ".generated/specifications/npm"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test cases cargo",
+      "cargo": {
+        "args": ["build", "--bin", "jns42-tester", "--package", "jns42-tester"]
+      },
+      "args": [
+        "cases",
+        "--type",
+        "cargo",
+        "--cases-directory",
+        "fixtures/cases",
+        "--output-directory",
+        ".generated/cases/cargo"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "test cases npm",
+      "cargo": {
+        "args": ["build", "--bin", "jns42-tester", "--package", "jns42-tester"]
+      },
+      "args": [
+        "cases",
+        "--type",
+        "npm",
+        "--cases-directory",
+        "fixtures/cases",
+        "--output-directory",
+        ".generated/cases/npm"
+      ],
+      "cwd": "${workspaceFolder}"
     }
   ]
 }
