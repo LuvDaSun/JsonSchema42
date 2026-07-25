@@ -5,11 +5,15 @@
     "packages/npm/*"
   ],
   "scripts": {
+    "tsc": "tsc --build",
+    "tsc-watch": "npm run tsc -- --watch",
     "spelling": "cspell",
-    "formatting": "prettier --check *"
+    "formatting": "prettier --check --ignore-unknown *",
+    "fix-formatting": "prettier --write --ignore-unknown *"
   },
   "devDependencies": {
-    "cspell": "^8.19.4",
-    "prettier": "^3.5.3"
+    "cspell": "^9.8.0",
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2"
   }
 }

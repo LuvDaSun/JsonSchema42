@@ -1,0 +1,67 @@
+version: "3"
+
+tasks:
+  install:
+    desc: Install everything
+    cmds:
+      - task: install:npm
+
+  build:
+    run: once
+    cmds:
+      - task: build:tsc
+
+  check:
+    desc: Check everything
+    cmds:
+      - task: check:formatting
+      - task: check:spelling
+      - task: check:audit
+
+  fix:
+    desc: Fix everything
+    cmds:
+      - task: fix:formatting
+
+  install:npm:
+    run: once
+    desc: Install Node.js dependencies
+    sources:
+      - package-lock.json
+    generates:
+      - node_modules/**/*
+    cmds:
+      - npm clean-install
+
+  build:tsc:
+    run: once
+    deps:
+      - install:npm
+    cmds:
+      - npm run tsc
+
+  check:formatting:
+    desc: Check formatting
+    deps:
+      - install:npm
+    cmds:
+      - npm run formatting
+
+  check:spelling:
+    desc: Check spelling
+    deps:
+      - install:npm
+    cmds:
+      - npm run spelling
+
+  check:audit:
+    desc: Audit
+    cmds:
+      - npm audit
+
+  fix:formatting:
+    desc: Fix formatting
+    deps:
+      - install:npm
+    cmds:
+      - npm run fix-formatting
