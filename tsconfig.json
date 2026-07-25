@@ -1,9 +1,6 @@
 {
   "references": [
     {
-      "path": "packages/npm/jns42-core"
-    },
-    {
       "path": "packages/npm/jns42-generator"
     },
     {
