@@ -5,12 +5,14 @@ tasks:
     desc: Install everything
     cmds:
       - task: install:node
+      - task: install:cargo-targets
 
   build:
     run: once
     cmds:
       - task: build:tsc
       - task: build:rollup
+      - task: build:cargo
 
   check:
     desc: Check everything
@@ -18,11 +20,13 @@ tasks:
       - task: check:formatting
       - task: check:spelling
       - task: check:audit
+      - task: check:cargo
 
   fix:
     desc: Fix everything
     cmds:
       - task: fix:formatting
+      - task: fix:cargo
 
   install:node:
     run: once
@@ -30,10 +34,16 @@ tasks:
     cmds:
       - npm clean-install
 
+  install:cargo-targets:
+    run: once
+    cmds:
+      - rustup target add wasm32-unknown-unknown
+
   build:tsc:
     run: once
     deps:
       - install:node
+      - build:cargo
     cmds:
       - npm run tsc
 
@@ -44,6 +54,15 @@ tasks:
       - install:node
     cmds:
       - npm run rollup
+
+  build:cargo:
+    run: once
+    deps:
+      - install:cargo-targets
+    cmds:
+      - cargo build --release
+      - cargo build --package jns42-core --target wasm32-unknown-unknown --release
+      - wasm-bindgen --target nodejs --out-dir packages/npm/jns42-core/dist target/wasm32-unknown-unknown/release/jns42_core.wasm
 
   check:formatting:
     desc: Check formatting
@@ -64,9 +83,17 @@ tasks:
     cmds:
       - npm audit
 
+  check:cargo:
+    cmds:
+      - cargo check
+
   fix:formatting:
     desc: Fix formatting
     deps:
       - install:node
     cmds:
       - npm run fix-formatting
+
+  fix:cargo:
+    cmds:
+      - cargo fix --allow-dirty
