@@ -5,7 +5,7 @@ tasks:
     desc: Install everything
     cmds:
       - task: install:node
-      - task: install:cargo-targets
+      - task: install:rust
 
   build:
     run: once
@@ -19,8 +19,9 @@ tasks:
     cmds:
       - task: check:formatting
       - task: check:spelling
-      - task: check:audit
+      - task: check:npm-audit
       - task: check:cargo
+      - task: check:clippy
 
   fix:
     desc: Fix everything
@@ -34,10 +35,11 @@ tasks:
     cmds:
       - npm clean-install
 
-  install:cargo-targets:
+  install:rust:
     run: once
     cmds:
       - rustup target add wasm32-unknown-unknown
+      - rustup component add clippy
 
   build:tsc:
     run: once
@@ -58,7 +60,7 @@ tasks:
   build:cargo:
     run: once
     deps:
-      - install:cargo-targets
+      - install:rust
     cmds:
       - cargo build --release
       - cargo build --package jns42-core --target wasm32-unknown-unknown --release
@@ -78,14 +80,19 @@ tasks:
     cmds:
       - npm run spelling
 
-  check:audit:
-    desc: Audit
+  check:npm-audit:
     cmds:
       - npm audit
 
   check:cargo:
     cmds:
       - cargo check
+
+  check:clippy:
+    deps:
+      - install:rust
+    cmds:
+      - cargo clippy --all-targets
 
   fix:formatting:
     desc: Fix formatting
