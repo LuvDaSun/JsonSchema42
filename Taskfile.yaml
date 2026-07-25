@@ -64,7 +64,7 @@ tasks:
       - build:tsc
       - install:node
     cmds:
-      - npm run rollup
+      - npx rollup --config rollup.config.mjs
 
   build:cargo:
     run: once
