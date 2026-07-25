@@ -48,7 +48,7 @@ tasks:
     cmds:
       - rustup target add wasm32-unknown-unknown
       - rustup component add clippy rustfmt
-      - cargo install wasm-bindgen-cli
+      - cargo install wasm-bindgen-cli@0.2.100
 
   build:tsc:
     run: once
