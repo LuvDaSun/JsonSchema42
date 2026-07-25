@@ -15,11 +15,6 @@
   "files": [
     "./dist/**"
   ],
-  "scripts": {
-    "prepack": "npm run build",
-    "build": "just build-npm-jns42-core",
-    "generate": "wasm-bindgen --target nodejs --out-dir dist $npm_config_local_prefix/target/wasm32-unknown-unknown/release/jns42_core.wasm"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/LuvDaSun/JsonSchema42.git"
@@ -42,6 +37,6 @@
   "devDependencies": {},
   "dependencies": {},
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }
