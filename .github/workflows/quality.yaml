@@ -10,7 +10,8 @@ jobs:
         with:
           path: |
             ~/.cargo/
-            target/
+            ~/.npm/
+            ~/.cache/
           key: ${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
       - uses: go-task/setup-task@v1
         with:
@@ -29,7 +30,8 @@ jobs:
         with:
           path: |
             ~/.cargo/
-            target/
+            ~/.npm/
+            ~/.cache/
           key: ${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
       - uses: go-task/setup-task@v1
         with:
