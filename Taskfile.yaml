@@ -24,6 +24,12 @@ tasks:
       - task: check:cargo
       - task: check:clippy
 
+  test:
+    cmds:
+      - task: test:node
+      - task: test:cargo
+      - task: test:specifications
+
   fix:
     desc: Fix everything
     cmds:
@@ -99,6 +105,32 @@ tasks:
       - install:rust
     cmds:
       - cargo fmt --check
+
+  test:node:
+    deps:
+      - install:node
+      - build:tsc
+    cmds:
+      - node --test packages/npm/*/transpiles/**/*.test.js
+
+  test:cargo:
+    deps:
+      - install:rust
+    cmds:
+      - cargo test --workspace --all-targets
+
+  test:specifications:
+    deps:
+      - install:rust
+    cmds:
+      - >
+        cargo run 
+        --package jns42-tester
+        --
+        specifications
+        --type cargo
+        --specifications-directory fixtures/specifications
+        --output-directory .generated
 
   fix:prettier:
     deps:
