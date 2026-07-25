@@ -2,7 +2,7 @@ on:
   pull_request:
 
 jobs:
-  check:
+  install-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: "24"
       - run: rustup default 1.97.0
-      - run: task check
+      - run: task install check
 
   build-test:
     runs-on: ubuntu-latest
