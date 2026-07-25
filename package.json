@@ -4,13 +4,6 @@
   "workspaces": [
     "packages/npm/*"
   ],
-  "scripts": {
-    "tsc": "tsc --build",
-    "tsc-watch": "npm run tsc -- --watch",
-    "spelling": "cspell",
-    "formatting": "prettier --check --ignore-unknown *",
-    "fix-formatting": "prettier --write --ignore-unknown *"
-  },
   "devDependencies": {
     "@cspell/dict-en_us": "^4.4.36",
     "@rollup/plugin-replace": "^6.0.3",

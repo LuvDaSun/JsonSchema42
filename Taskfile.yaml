@@ -17,8 +17,9 @@ tasks:
   check:
     desc: Check everything
     cmds:
-      - task: check:formatting
-      - task: check:spelling
+      - task: check:prettier
+      - task: check:rustfmt
+      - task: check:cspell
       - task: check:npm-audit
       - task: check:cargo
       - task: check:clippy
@@ -26,7 +27,8 @@ tasks:
   fix:
     desc: Fix everything
     cmds:
-      - task: fix:formatting
+      - task: fix:prettier
+      - task: fix:rustfmt
       - task: fix:cargo
 
   install:node:
@@ -39,7 +41,7 @@ tasks:
     run: once
     cmds:
       - rustup target add wasm32-unknown-unknown
-      - rustup component add clippy
+      - rustup component add clippy rustfmt
 
   build:tsc:
     run: once
@@ -47,7 +49,7 @@ tasks:
       - install:node
       - build:cargo
     cmds:
-      - npm run tsc
+      - npx tsc --build
 
   build:rollup:
     run: once
@@ -66,19 +68,17 @@ tasks:
       - cargo build --package jns42-core --target wasm32-unknown-unknown --release
       - wasm-bindgen --target nodejs --out-dir packages/npm/jns42-core/dist target/wasm32-unknown-unknown/release/jns42_core.wasm
 
-  check:formatting:
-    desc: Check formatting
+  check:prettier:
     deps:
       - install:node
     cmds:
-      - npm run formatting
+      - npx prettier --check --ignore-unknown *
 
-  check:spelling:
-    desc: Check spelling
+  check:cspell:
     deps:
       - install:node
     cmds:
-      - npm run spelling
+      - npx cspell
 
   check:npm-audit:
     cmds:
@@ -94,12 +94,23 @@ tasks:
     cmds:
       - cargo clippy --all-targets
 
-  fix:formatting:
-    desc: Fix formatting
+  check:rustfmt:
+    deps:
+      - install:rust
+    cmds:
+      - cargo fmt --check
+
+  fix:prettier:
     deps:
       - install:node
     cmds:
-      - npm run fix-formatting
+      - npx prettier --write --ignore-unknown *
+
+  fix:rustfmt:
+    deps:
+      - install:rust
+    cmds:
+      - cargo fmt --check
 
   fix:cargo:
     cmds:
