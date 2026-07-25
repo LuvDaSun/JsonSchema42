@@ -2,23 +2,16 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "tsc",
-      "label": "tsc",
-      "group": "build",
-      "problemMatcher": ["$tsc"]
-    },
-    {
-      "type": "npm",
-      "script": "tsc-watch",
-      "isBackground": true,
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "option": "watch",
+      "problemMatcher": ["$tsc-watch"],
       "label": "tsc-watch",
-      "group": "build",
-      "problemMatcher": ["$tsc-watch"]
+      "group": "build"
     },
     {
-      "type": "npm",
-      "script": "rollup-watch",
+      "type": "shell",
+      "command": "./node_modules/.bin/rollup --config rollup.config.mjs --waitForBundleInput --no-watch.clearScreen --watch",
       "isBackground": true,
       "label": "rollup-watch",
       "group": "build",
@@ -49,7 +42,8 @@
       "group": {
         "kind": "build",
         "isDefault": true
-      }
+      },
+      "problemMatcher": []
     }
   ]
 }
