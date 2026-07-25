@@ -8,7 +8,31 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
-      "outFiles": ["${workspaceFolder}/packages/node/*/transpiled/**/*.js"],
+      "outFiles": ["${workspaceFolder}/packages/npm/*/transpiled/**/*.js"],
+      "preLaunchTask": "tsc-watch",
+      "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "package file",
+      "program": "${workspaceFolder}/packages/npm/jns42-generator/src/program.ts",
+      "args": [
+        "package",
+        "${file}",
+        "--package-directory",
+        ".generated/file/${fileBasenameNoExtension}",
+        "--package-name",
+        "${fileBasenameNoExtension}",
+        "--package-version",
+        "0.0.0"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/packages/npm/*/transpiled/**/*.js"],
       "preLaunchTask": "tsc-watch",
       "outputCapture": "std"
     }
