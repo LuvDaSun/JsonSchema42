@@ -123,7 +123,9 @@ tasks:
 
   test:specifications:
     deps:
-      - install:rust
+      - build:tsc
+      - build:rollup
+      - build:cargo
     cmds:
       - for: ["npm", "cargo"]
         cmd: >
@@ -137,7 +139,9 @@ tasks:
 
   test:cases:
     deps:
-      - install:rust
+      - build:tsc
+      - build:rollup
+      - build:cargo
     cmds:
       - for: ["npm"]
         cmd: >
