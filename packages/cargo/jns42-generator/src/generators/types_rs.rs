@@ -2,6 +2,7 @@ use crate::models::Specification;
 use jns42_core::models::{ArenaSchemaItem, SchemaType};
 use proc_macro2::TokenStream;
 use quote::{TokenStreamExt, quote};
+use regex::Regex;
 use std::error::Error;
 
 pub fn generate_file_token_stream(
@@ -22,6 +23,10 @@ fn generate_type_token_stream(
   item: &ArenaSchemaItem,
 ) -> Result<TokenStream, Box<dyn Error>> {
   let mut tokens = quote! {};
+
+  let types = item.types.clone().unwrap_or_default();
+  assert!(types.len() <= 1);
+  let r#type = types.first();
 
   let documentation: Vec<_> = [
     item.title.clone(),
@@ -65,57 +70,165 @@ fn generate_type_token_stream(
       )
     });
 
-    if boxed {
-      tokens.append_all(quote! {
-        #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
-        #[serde(try_from = #interior_name)]
-        pub struct #identifier(pub(super) Box<#interior_identifier>);
-      });
+    {
+      let mut tokens_validation = quote! {};
 
-      tokens.append_all(quote! {
-        impl #identifier {
-            fn new(value: #interior_identifier) -> core::result::Result<Self, crate::errors::ValidationError> {
-                let instance = Self(Box::new(value));
-                if instance.validate() {
-                  core::result::Result::Ok(instance)
-                } else {
-                  core::result::Result::Err(crate::errors::ValidationError::new(#name))
-                }
-            }
+      match r#type {
+        Some(&SchemaType::Never) => {
+          tokens_validation.append_all(quote! {
+            core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+          });
         }
-      });
-    } else {
-      tokens.append_all(quote! {
-        #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
-        #[serde(try_from = #interior_name)]
-        pub struct #identifier(pub(super) #interior_identifier);
-      });
+        Some(&SchemaType::Any) => {}
+        Some(&SchemaType::Null) => {}
+        Some(&SchemaType::Boolean) => {}
+        Some(&SchemaType::Integer) => {
+          if let Some(validation_value) = &item.maximum_exclusive {
+            tokens_validation.append_all(quote! {
+              if value >= #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.maximum_inclusive {
+            tokens_validation.append_all(quote! {
+              if value > #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.minimum_exclusive {
+            tokens_validation.append_all(quote! {
+              if value <= #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.minimum_inclusive {
+            tokens_validation.append_all(quote! {
+              if value < #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.multiple_of {
+            tokens_validation.append_all(quote! {
+              if value % #validation_value != 0 {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+        }
+        Some(&SchemaType::Number) => {
+          if let Some(validation_value) = &item.maximum_exclusive {
+            tokens_validation.append_all(quote! {
+              if value >= #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.maximum_inclusive {
+            tokens_validation.append_all(quote! {
+              if value > #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.minimum_exclusive {
+            tokens_validation.append_all(quote! {
+              if value <= #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.minimum_inclusive {
+            tokens_validation.append_all(quote! {
+              if value < #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.multiple_of {
+            tokens_validation.append_all(quote! {
+              if value % #validation_value != 0 {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+        }
+        Some(&SchemaType::String) => {
+          if let Some(validation_value) = &item.minimum_length {
+            let validation_value: usize = (*validation_value).try_into().unwrap();
+            tokens_validation.append_all(quote! {
+              if value.len() < #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.maximum_length {
+            let validation_value: usize = (*validation_value).try_into().unwrap();
+            tokens_validation.append_all(quote! {
+              if value.len() > #validation_value {
+                core::result::Result::Err(jns42_lib::errors::ValidationError::new(#name))?;
+              }
+            });
+          }
+          if let Some(validation_value) = &item.value_pattern {
+            tokens_validation.append_all(quote! {
+              todo!();
+            });
+          }
+          if let Some(validation_value) = &item.value_format {
+            tokens_validation.append_all(quote! {
+              todo!();
+            });
+          }
+        }
+        Some(&SchemaType::Array) => {}
+        Some(&SchemaType::Object) => {}
+        None => {}
+      };
 
-      tokens.append_all(quote! {
-        impl #identifier {
-            fn new(value: #interior_identifier) -> core::result::Result<Self, crate::errors::ValidationError> {
-                let instance = Self(value);
-                if instance.validate() {
-                  core::result::Result::Ok(instance)
-                } else {
-                  core::result::Result::Err(crate::errors::ValidationError::new(#name))
-                }
+      if boxed {
+        tokens.append_all(quote! {
+          #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
+          #[serde(try_from = #interior_name)]
+          pub struct #identifier(pub(super) Box<#interior_identifier>);
+        });
+
+        tokens.append_all(quote! {
+          impl #identifier {
+            fn new(value: #interior_identifier) -> core::result::Result<Self, jns42_lib::errors::ValidationError> {
+              #tokens_validation
+
+              let instance = Self(Box::new(value));
+              core::result::Result::Ok(instance)
             }
-        }
-      });
+          }
+        });
+      } else {
+        tokens.append_all(quote! {
+          #[derive(core::fmt::Debug, serde::Serialize, serde::Deserialize, core::clone::Clone)]
+          #[serde(try_from = #interior_name)]
+          pub struct #identifier(pub(super) #interior_identifier);
+        });
+
+        tokens.append_all(quote! {
+          impl #identifier {
+            fn new(value: #interior_identifier) -> core::result::Result<Self, jns42_lib::errors::ValidationError> {
+              #tokens_validation
+
+              let instance = Self(value);
+              core::result::Result::Ok(instance)
+            }
+          }
+        });
+      }
     }
 
     tokens.append_all(quote! {
-      impl #identifier {
-          fn validate(&self) -> bool {
-            true
-          }
-      }
-    });
-
-    tokens.append_all(quote! {
       impl core::convert::TryFrom<#interior_identifier> for #identifier {
-        type Error = crate::errors::ValidationError;
+        type Error = jns42_lib::errors::ValidationError;
         fn try_from(value: #interior_identifier) -> core::result::Result<Self, Self::Error> {
             Self::new(value)
         }

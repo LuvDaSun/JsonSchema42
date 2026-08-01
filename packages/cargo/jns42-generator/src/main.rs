@@ -1,3 +1,4 @@
+mod errors;
 mod generators;
 mod models;
 mod programs;
