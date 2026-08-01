@@ -29,6 +29,7 @@ tasks:
       - task: test:node
       - task: test:cargo
       - task: test:specifications
+      - task: test:cases
 
   fix:
     desc: Fix everything
@@ -112,7 +113,7 @@ tasks:
       - install:node
       - build:tsc
     cmds:
-      - node --test packages/npm/*/transpiles/**/*.test.js
+      - node --test packages/npm/*/transpiled/**/*.test.js
 
   test:cargo:
     deps:
@@ -124,14 +125,29 @@ tasks:
     deps:
       - install:rust
     cmds:
-      - >
-        cargo run 
-        --package jns42-tester
-        --
-        specifications
-        --type cargo
-        --specifications-directory fixtures/specifications
-        --output-directory .generated
+      - for: ["cargo", "npm"]
+        cmd: >
+          cargo run 
+          --package jns42-tester
+          --
+          specifications
+          --type {{.ITEM}}
+          --specifications-directory fixtures/specifications
+          --output-directory .generated
+
+  test:cases:
+    deps:
+      - install:rust
+    cmds:
+      - for: ["cargo", "npm"]
+        cmd: >
+          cargo run 
+          --package jns42-tester
+          --
+          cases
+          --type {{.ITEM}}
+          --specifications-directory fixtures/cases
+          --output-directory .generated
 
   fix:prettier:
     deps:
