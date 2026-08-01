@@ -125,7 +125,7 @@ tasks:
     deps:
       - install:rust
     cmds:
-      - for: ["cargo", "npm"]
+      - for: ["npm", "cargo"]
         cmd: >
           cargo run 
           --package jns42-tester
@@ -139,14 +139,14 @@ tasks:
     deps:
       - install:rust
     cmds:
-      - for: ["cargo", "npm"]
+      - for: ["npm"]
         cmd: >
           cargo run 
           --package jns42-tester
           --
           cases
           --type {{.ITEM}}
-          --specifications-directory fixtures/cases
+          --cases-directory fixtures/cases
           --output-directory .generated
 
   fix:prettier:
