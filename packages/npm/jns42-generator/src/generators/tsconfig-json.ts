@@ -9,6 +9,7 @@ export function generateTsconfigJsonData() {
       declaration: true,
       composite: true,
       lib: ["es2023"],
+      types: ["node"],
     },
     include: ["src/**/*"],
   };
