@@ -27,6 +27,7 @@ pub enum SchemaTransform {
   ResolveSingleAnyOf,
   ResolveSingleOneOf,
   SingleType,
+  GuessTypes,
   Unalias,
 
   Name,
@@ -109,6 +110,10 @@ impl From<exports::jns42::core::models::SchemaTransform> for BoxedSchemaTransfor
 
       exports::jns42::core::models::SchemaTransform::SingleType => {
         schema_transforms::single_type::transform
+      }
+
+      exports::jns42::core::models::SchemaTransform::GuessTypes => {
+        schema_transforms::guess_types::transform
       }
 
       exports::jns42::core::models::SchemaTransform::Unalias => {

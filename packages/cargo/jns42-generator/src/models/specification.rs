@@ -68,6 +68,7 @@ impl Specification {
       }
 
       fn transformer(arena: &mut Arena<ArenaSchemaItem>, key: usize) {
+        schema_transforms::guess_types::transform(arena, key);
         schema_transforms::single_type::transform(arena, key);
         schema_transforms::explode::transform(arena, key);
 

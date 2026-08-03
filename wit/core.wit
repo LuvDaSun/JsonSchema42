@@ -100,6 +100,7 @@ interface models {
     resolve-single-any-of,
     resolve-single-one-of,
     single-type,
+    guess-types,
     unalias,
     name,
   }

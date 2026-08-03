@@ -1,5 +1,5 @@
-use crate::models::{ArenaSchemaItem, SchemaArena};
-use std::iter;
+use crate::models::{ArenaSchemaItem, SchemaArena, SchemaType};
+use std::{collections::BTreeSet, iter};
 
 /**
  * This transformer makes the types array into a single type. This is achieved by creating a
@@ -26,7 +26,7 @@ use std::iter;
 pub fn transform(arena: &mut SchemaArena, key: usize) {
   let item = arena.get_item(key);
 
-  // ew got nothing to do if there are no types
+  // we got nothing to do if there are no types
   let Some(types) = &item.types else {
     return;
   };
@@ -34,6 +34,12 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
   // we would overwrite this, so let's not!
   if item.one_of.is_some() {
     return;
+  }
+
+  let mut types: BTreeSet<_> = types.iter().cloned().collect();
+  if types.contains(&SchemaType::Number) {
+    // Number overlaps integer
+    types.remove(&SchemaType::Integer);
   }
 
   match types.len() {
@@ -55,7 +61,6 @@ pub fn transform(arena: &mut SchemaArena, key: usize) {
         types: None,
         one_of: Some(
           types
-            .clone()
             .into_iter()
             .map(|r#type| {
               arena.add_item(ArenaSchemaItem {
@@ -106,13 +111,13 @@ mod tests {
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some(vec!["base".to_owned(), "string".to_owned()]),
-        types: Some(vec![SchemaType::String]),
+        name: Some(vec!["base".to_owned(), "number".to_owned()]),
+        types: Some(vec![SchemaType::Number]),
         ..Default::default()
       },
       ArenaSchemaItem {
-        name: Some(vec!["base".to_owned(), "number".to_owned()]),
-        types: Some(vec![SchemaType::Number]),
+        name: Some(vec!["base".to_owned(), "string".to_owned()]),
+        types: Some(vec![SchemaType::String]),
         ..Default::default()
       },
     ];

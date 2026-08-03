@@ -59,6 +59,7 @@ export function loadSpecification(
   // transform the typesArena (note that we are not transforming the validatorsArena!)
   {
     const transformers: core.models.SchemaTransform[] = [
+      "guess-types",
       "explode",
       "single-type",
       "resolve-single-all-of",

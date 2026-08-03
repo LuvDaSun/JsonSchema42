@@ -125,29 +125,29 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
+        use crate::models::SchemaType;
 
         #[test]
         fn test_transform() {
-          let mut arena = SchemaArena::new();
-
-          arena.add_item(Default::default()); // 0
-          arena.add_item(Default::default()); // 1
-          arena.add_item(Default::default()); // 2
-          arena.add_item(Default::default()); // 3
-          arena.add_item(Default::default()); // 4
-
-          arena.add_item(ArenaSchemaItem {
-            $other_member: Some([1, 2].into()),
-            ..Default::default()
-          }); // 5
-          arena.add_item(ArenaSchemaItem {
-            $other_member: Some([3, 4].into()),
-            ..Default::default()
-          }); // 6
-          arena.add_item(ArenaSchemaItem {
-            $base_member: Some([0, 5, 6].into()),
-            ..Default::default()
-          }); // 7
+          let mut arena = SchemaArena::from_iter([
+            Default::default(), // 0
+            Default::default(), // 1
+            Default::default(), // 2
+            Default::default(), // 3
+            Default::default(), // 4
+            ArenaSchemaItem {
+              $other_member: Some([1, 2].into()),
+              ..Default::default()
+            }, // 5
+            ArenaSchemaItem {
+              $other_member: Some([3, 4].into()),
+              ..Default::default()
+            }, // 6
+            ArenaSchemaItem {
+              $base_member: Some([0, 5, 6].into()),
+              ..Default::default()
+            }, // 7
+          ]);
 
           while arena.apply_transform(transform) > 0 {
             //
@@ -188,6 +188,70 @@ macro_rules! generate_mod {
               $base_member: Some([0, 2, 4].into()),
               ..Default::default()
             }, // 11
+          ];
+
+          assert_eq!(actual, expected)
+        }
+
+        #[test]
+        fn test_transform_2() {
+          let mut arena = SchemaArena::from_iter([
+            ArenaSchemaItem {
+              $base_member: Some([1, 2].into()),
+              ..Default::default()
+            }, // 0
+            ArenaSchemaItem {
+              types: Some([SchemaType::Object].into()),
+              ..Default::default()
+            }, // 1
+            ArenaSchemaItem {
+              $other_member: Some([3, 4].into()),
+              ..Default::default()
+            }, // 2
+            ArenaSchemaItem {
+              required: Some(["a"].map(Into::into).into()),
+              ..Default::default()
+            }, // 3
+            ArenaSchemaItem {
+              required: Some(["b"].map(Into::into).into()),
+              ..Default::default()
+            }, // 4
+          ]);
+
+          while arena.apply_transform(transform) > 0 {
+            //
+          }
+
+          let actual: Vec<_> = arena.iter().cloned().collect();
+          let expected = vec![
+            ArenaSchemaItem {
+              $other_member: Some([5, 6].into()),
+              ..Default::default()
+            }, // 0
+            ArenaSchemaItem {
+              types: Some([SchemaType::Object].into()),
+              ..Default::default()
+            }, // 1
+            ArenaSchemaItem {
+              $other_member: Some([3, 4].into()),
+              ..Default::default()
+            }, // 2
+            ArenaSchemaItem {
+              required: Some(["a"].map(Into::into).into()),
+              ..Default::default()
+            }, // 3
+            ArenaSchemaItem {
+              required: Some(["b"].map(Into::into).into()),
+              ..Default::default()
+            }, // 4
+            ArenaSchemaItem {
+              $base_member: Some([1, 3].into()),
+              ..Default::default()
+            }, // 5
+            ArenaSchemaItem {
+              $base_member: Some([1, 4].into()),
+              ..Default::default()
+            }, // 6
           ];
 
           assert_eq!(actual, expected)

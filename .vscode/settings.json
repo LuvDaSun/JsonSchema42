@@ -8,7 +8,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "rust-analyzer.check.command": "clippy",
-  // "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
+  "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
   },

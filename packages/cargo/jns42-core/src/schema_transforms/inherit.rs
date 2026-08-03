@@ -156,26 +156,25 @@ macro_rules! generate_mod {
       #[cfg(test)]
       mod tests {
         use super::*;
+        use crate::models::SchemaType;
 
         #[test]
         fn test_transform() {
-          let mut arena = SchemaArena::new();
-
-          arena.add_item(ArenaSchemaItem {
-            required: Some(["a"].map(|value| value.into()).into()),
-            ..Default::default()
-          });
-
-          arena.add_item(ArenaSchemaItem {
-            required: Some(["b"].map(|value| value.into()).into()),
-            ..Default::default()
-          });
-
-          arena.add_item(ArenaSchemaItem {
-            $member: Some([0, 1].into()),
-            required: Some(["c"].map(|value| value.into()).into()),
-            ..Default::default()
-          });
+          let mut arena = SchemaArena::from_iter([
+            ArenaSchemaItem {
+              required: Some(["a"].map(|value| value.into()).into()),
+              ..Default::default()
+            }, // 0
+            ArenaSchemaItem {
+              required: Some(["b"].map(|value| value.into()).into()),
+              ..Default::default()
+            }, // 1
+            ArenaSchemaItem {
+              $member: Some([0, 1].into()),
+              required: Some(["c"].map(|value| value.into()).into()),
+              ..Default::default()
+            }, // 2
+          ]);
 
           while arena.apply_transform(transform) > 0 {
             //
@@ -186,27 +185,80 @@ macro_rules! generate_mod {
             ArenaSchemaItem {
               required: Some(["a"].map(|value| value.into()).into()),
               ..Default::default()
-            },
+            }, // 0
             ArenaSchemaItem {
               required: Some(["b"].map(|value| value.into()).into()),
               ..Default::default()
-            },
+            }, // 1
             ArenaSchemaItem {
               $member: Some([4, 5].into()),
               ..Default::default()
-            },
+            }, // 2
             ArenaSchemaItem {
               required: Some(["c"].map(|value| value.into()).into()),
               ..Default::default()
-            },
+            }, // 3
             ArenaSchemaItem {
               all_of: Some([0, 3].into()),
               ..Default::default()
-            },
+            }, // 4
             ArenaSchemaItem {
               all_of: Some([1, 3].into()),
               ..Default::default()
-            },
+            }, // 5
+          ];
+
+          assert_eq!(actual, expected)
+        }
+
+        #[test]
+        fn test_transform_type() {
+          let mut arena = SchemaArena::from_iter([
+            ArenaSchemaItem {
+              required: Some(["a"].map(Into::into).into()),
+              ..Default::default()
+            }, // 0
+            ArenaSchemaItem {
+              required: Some(["b"].map(Into::into).into()),
+              ..Default::default()
+            }, // 1
+            ArenaSchemaItem {
+              types: Some([SchemaType::Object].into()),
+              $member: Some([0, 1].into()),
+              ..Default::default()
+            }, // 2
+          ]);
+
+          while arena.apply_transform(transform) > 0 {
+            //
+          }
+
+          let actual: Vec<_> = arena.iter().cloned().collect();
+          let expected = vec![
+            ArenaSchemaItem {
+              required: Some(["a"].map(Into::into).into()),
+              ..Default::default()
+            }, // 0
+            ArenaSchemaItem {
+              required: Some(["b"].map(Into::into).into()),
+              ..Default::default()
+            }, // 1
+            ArenaSchemaItem {
+              $member: Some([4, 5].into()),
+              ..Default::default()
+            }, // 2
+            ArenaSchemaItem {
+              types: Some([SchemaType::Object].into()),
+              ..Default::default()
+            }, // 3
+            ArenaSchemaItem {
+              all_of: Some([0, 3].into()),
+              ..Default::default()
+            }, // 4
+            ArenaSchemaItem {
+              all_of: Some([1, 3].into()),
+              ..Default::default()
+            }, // 5
           ];
 
           assert_eq!(actual, expected)
