@@ -15,7 +15,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "package file",
+      "name": "package file npm",
       "program": "${workspaceFolder}/packages/npm/jns42-generator/src/program.ts",
       "args": [
         "package",
@@ -39,7 +39,7 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "package file",
+      "name": "package file cargo",
       "cargo": {
         "args": ["build", "--bin", "jns42-generator", "--package", "jns42-generator"]
       },
