@@ -231,6 +231,7 @@ impl DocumentContext {
   Load nodes from a location. The retrieval location is the physical location of the node,
   it should be a root location
   */
+  #[allow(clippy::await_holding_refcell_ref)]
   pub async fn load_from_location(
     self: &rc::Rc<Self>,
     retrieval_location: NodeLocation,
@@ -274,11 +275,11 @@ impl DocumentContext {
       }
 
       // Ensure the node is in the cache
-      self
-        .cache
-        .borrow_mut()
-        .load_from_location(&retrieval_location)
-        .await?;
+      {
+        // this causes a await_holding_refcell_ref warning
+        let mut cache = self.cache.borrow_mut();
+        cache.load_from_location(&retrieval_location).await?;
+      }
 
       // Get the node from the cache
       let document_node = self
